@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-09-25T07:57:18.436154+00:00",
+  "created_at": "2026-09-25T08:43:45.565170+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -63,18 +63,18 @@
     },
     {
       "path": "PUBLICATION_STATUS.md",
-      "sha256": "98a3ac12578eb46ea6c44ab4e2655251be2be5399941aca48ebef96b0f26278d",
-      "bytes": 893
+      "sha256": "341021627a6385779d2cc317beb84bfde274e8eef19ffc8cba8e72e416bf8a20",
+      "bytes": 877
     },
     {
       "path": "README.ko.md",
-      "sha256": "ef70f828d83e174777ea883064226c8f78ba7c6faa08f975a2f47c6086b312ad",
-      "bytes": 8405
+      "sha256": "63e9e93063e1c91a9b8d898adc6c6941d3d972b1bc14c89197454c0490ec6f47",
+      "bytes": 8391
     },
     {
       "path": "README.md",
-      "sha256": "3361b308225c548e92407105a20481f681ebe67867bd562d15cafcd2a678f2a0",
-      "bytes": 7383
+      "sha256": "df18ea0ef634c1adbe4456101069994ee319a6d7002883901da9ae87006ebac0",
+      "bytes": 7369
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -848,8 +848,8 @@
     },
     {
       "path": "docs/PACKAGING.md",
-      "sha256": "2dfda7363cafcb6f214aad44f03f43e07f50e02cbcaeffc15df1eb0c2e4450e5",
-      "bytes": 1824
+      "sha256": "a7b95d22478f3aa5805b10483d795c954fcf40d9791de3ba3cd04185db587024",
+      "bytes": 1817
     },
     {
       "path": "docs/PUBLICATION_REVIEW.md",
@@ -6693,6 +6693,6 @@
     }
   ],
   "source_archive_sha256": "523b6b783080f57fc229cdf0449683ffc26aad999376b410f6fb1c78a383b75c",
-  "public_repository": "https://github.com/hyperdrivebeep/thoth-public",
+  "public_repository": "https://github.com/hyperdrivebeep/thoth",
   "snapshot_type": "MIT source-only public preview"
 }

@@ -71,8 +71,8 @@ routes are shown explicitly. Reading a saved result or comparison does not start
 Clone the repository and install the locked dependencies:
 
 ```powershell
-git clone https://github.com/hyperdrivebeep/thoth-public.git
-cd thoth-public
+git clone https://github.com/hyperdrivebeep/thoth.git
+cd thoth
 uv sync --frozen --extra dev --dev
 pnpm install --frozen-lockfile
 ```

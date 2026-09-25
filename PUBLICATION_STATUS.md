@@ -1,6 +1,6 @@
 # MIT public source preview
 
-Repository: [hyperdrivebeep/thoth-public](https://github.com/hyperdrivebeep/thoth-public)  
+Repository: [hyperdrivebeep/thoth](https://github.com/hyperdrivebeep/thoth)
 First source release: 2026-09-25. License: MIT, copyright 2026 THOTH.
 
 This repository publishes a reviewed source-only snapshot with fresh Git history. The original

@@ -22,5 +22,5 @@ machine paths and private run artifacts are not included. Historical architectur
 must be read with the current [verification limits](VERIFICATION.md).
 
 The bounded clean-install/content review is complete and MIT is applied to the reviewed source
-snapshot. The source preview is published in the separate `thoth-public` repository with fresh
+snapshot. The source preview is published in the separate `thoth` repository with fresh
 Git history. The private development repository and hosted service are not part of this release.
