@@ -68,13 +68,20 @@ routes are shown explicitly. Reading a saved result or comparison does not start
 
 **Windows · source checkout · Python 3.12 or 3.13 · [uv](https://docs.astral.sh/uv/) · Node.js · pnpm**
 
-Clone the repository and install the locked dependencies:
+Clone the repository:
 
 ```powershell
 git clone https://github.com/hyperdrivebeep/thoth.git
 cd thoth
+```
+
+Or choose **Code → Download ZIP** on GitHub, extract it, and open PowerShell in the extracted
+`thoth-main` folder. If PowerShell is in the folder containing that extraction, run `cd thoth-main`.
+Then install the locked dependencies from the repository folder:
+
+```powershell
 uv sync --frozen --extra dev --dev
-pnpm install --frozen-lockfile
+pnpm.cmd install --frozen-lockfile
 ```
 
 Start the API in one terminal:
@@ -83,10 +90,10 @@ Start the API in one terminal:
 .\.venv\Scripts\thoth.exe serve --workspace .\.thoth-local --port 8765
 ```
 
-Start the Web interface in a second terminal, from the same repository:
+Start the Web interface in a second terminal, after entering the same `thoth` or `thoth-main` folder:
 
 ```powershell
-pnpm --dir apps/web run dev
+pnpm.cmd --dir apps/web run dev
 ```
 
 Open **<http://127.0.0.1:5173/>**. In setup/settings, select a supported login route or enter your

@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-09-25T16:41:20.596132+00:00",
+  "created_at": "2026-09-25T16:46:27.970028+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -63,18 +63,18 @@
     },
     {
       "path": "PUBLICATION_STATUS.md",
-      "sha256": "00279f3d74b459f27cdf93a3225eda724fd02c10fa48cc83cf2e8b402697b889",
-      "bytes": 1158
+      "sha256": "ca92ea69094140df867aca8a96be7e3d24b70a2ab73d0629b7977a4ba1d4a6b5",
+      "bytes": 1366
     },
     {
       "path": "README.ko.md",
-      "sha256": "f3ac48a1c21da9be22bdcf391ce67929ed9c47879cd3096fd1890b9a178d7825",
-      "bytes": 8722
+      "sha256": "08f376165f836369b03884b11295b90c33edf83c22f643a10742187d93e34df6",
+      "bytes": 9058
     },
     {
       "path": "README.md",
-      "sha256": "053c1ee17b75980e02dbc9273e6c874f42ac1f353d7bdb10eacfe5f8caf73c3e",
-      "bytes": 7639
+      "sha256": "df562e253482bdabae37b02934785ee3b60723236fb1f293a083aa3ae6c204e7",
+      "bytes": 7923
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -838,8 +838,8 @@
     },
     {
       "path": "docs/INSTALL.md",
-      "sha256": "f5bebdaf6a4712b68295df20642ff9e91f152e8fa5883184c0e23c78b1efff4f",
-      "bytes": 3766
+      "sha256": "3ac71bcf02900926cb4abc2118bc87a8c69ac38f73f579110906dd5f7d836e8c",
+      "bytes": 3958
     },
     {
       "path": "docs/KNOWN_TEST_FAILURES.json",
@@ -858,8 +858,8 @@
     },
     {
       "path": "docs/VERIFICATION.md",
-      "sha256": "12bede504257f5355cfcf25db8682089f212f370175eb6d380618220b7ca28d4",
-      "bytes": 5803
+      "sha256": "3fe5effd1fc48826e0bc49d36f18e05b55ac62429ccc71d86e794da973160773",
+      "bytes": 6360
     },
     {
       "path": "docs/architecture/agent-execution-rules.md",
