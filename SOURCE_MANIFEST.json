@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-09-25T07:35:03.413477+00:00",
+  "created_at": "2026-09-25T07:41:09.374499+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -63,13 +63,13 @@
     },
     {
       "path": "PUBLICATION_STATUS.md",
-      "sha256": "f8b9ecbe9aa4065530f50be0f83ac660e823e89c04d63625c322e2b970514912",
-      "bytes": 897
+      "sha256": "98a3ac12578eb46ea6c44ab4e2655251be2be5399941aca48ebef96b0f26278d",
+      "bytes": 893
     },
     {
       "path": "README.md",
-      "sha256": "f3408b72465766b873020ca3a841bf197b3b3025e58109b572bbb3dd6e3d140a",
-      "bytes": 4397
+      "sha256": "b41010d96a46ec484b0059021ba26caeef6a96ebcbab7b01af30d8b55b14f72c",
+      "bytes": 4393
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -6663,6 +6663,6 @@
     }
   ],
   "source_archive_sha256": "523b6b783080f57fc229cdf0449683ffc26aad999376b410f6fb1c78a383b75c",
-  "public_repository": "https://github.com/luvyoun0224-beep/thoth-public",
+  "public_repository": "https://github.com/hyperdrivebeep/thoth-public",
   "snapshot_type": "MIT source-only public preview"
 }

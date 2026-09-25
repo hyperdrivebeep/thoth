@@ -80,5 +80,5 @@ The original code, documentation and THOTH-authored synthetic fixtures in this s
 are licensed under the **MIT License**. See [LICENSE](LICENSE), copyright 2026 THOTH.
 Third-party dependencies retain their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-The reviewed MIT source preview is available at [luvyoun0224-beep/thoth-public](https://github.com/luvyoun0224-beep/thoth-public).
+The reviewed MIT source preview is available at [hyperdrivebeep/thoth-public](https://github.com/hyperdrivebeep/thoth-public).
 This source release does not update the separately managed hosted service.
