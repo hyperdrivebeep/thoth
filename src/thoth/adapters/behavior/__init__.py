@@ -1,0 +1,1 @@
+"""Registered local behavior capabilities."""

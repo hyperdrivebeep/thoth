@@ -1,0 +1,29 @@
+policy_version: policy:holdout-membrane-v1
+resource_scope_policy:
+  default:
+    owner_kind: PROJECT
+    visibility: PROJECT_SHARED
+model_policy_ref: model-policy:codex-oauth-holdout-v1
+external_write: false
+allow_scripted_model: false
+sealed_evidence_supported: true
+minimum_action_tier_by_family:
+  EVIDENCE_REQUEST: R0
+  READ_ONLY_ANALYSIS: R0
+  SANDBOX_REPLAY: R2
+  CONFIGURATION_CHANGE: R3
+  CONTROLLED_RERUN: R3
+  OFFICIAL_CRITERION_CHANGE: R4
+approver_role_by_family:
+  EVIDENCE_REQUEST: project-owner
+  READ_ONLY_ANALYSIS: project-owner
+  SANDBOX_REPLAY: analysis-owner
+  CONFIGURATION_CHANGE: laboratory-owner
+  CONTROLLED_RERUN: test-owner
+  OFFICIAL_CRITERION_CHANGE: criterion-owner
+unknown_action_family_tier: R3
+sufficiency_signals:
+  comparison_context_confirmed: false
+  counterevidence_checked: true
+  instrumentation_verified: false
+  expert_semantics_confirmed: true

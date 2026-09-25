@@ -1,0 +1,7 @@
+connectors:
+  - connector_id: local-file-upload
+    kind: LOCAL
+    root: ../../.thoth/inbox
+  - connector_id: read-only-git-snapshot
+    kind: GIT
+    root: ../..

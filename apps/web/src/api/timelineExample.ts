@@ -1,0 +1,223 @@
+import type { ResearchStatus } from "./research";
+
+export const TIMELINE_EXAMPLE_SOURCES = [
+  "C:/papers/psyche-irb-2022.pdf",
+  "C:/papers/gao-23-106021.pdf",
+];
+
+export const TIMELINE_EXAMPLE_ASKED_AT = "2026-09-20T03:00:00+09:00";
+
+export const timelineExampleStatus: ResearchStatus = {
+  thread_id: "thread:psyche-demo",
+  project_id: "project:psyche",
+  cycle_id: "cycle:c",
+  problem: "Psyche 표 3 발사 준비 조건",
+  lifecycle: "ACTIVE",
+  execution_state: "RUNNING",
+  current_object_ids: [],
+  working_head_digest: "0".repeat(64),
+  operation_state: "RUNNING",
+  attempt: {
+    operation_id: "operation:o",
+    phase: "HYPOTHESIS_REVIEW",
+    status: "RUNNING",
+    draft_progress: {
+      evidence_focus: {
+        locators: [
+          { page: 6, exact_text: "70.6" },
+          { page: 14, exact_text: "GNC software verification complete" },
+        ],
+      },
+      portfolio: {
+        hypotheses: [
+          { hypothesis_id: "h1", statement: "일정만 늘리면 해결된다" },
+          { hypothesis_id: "h2", statement: "GNC 소프트웨어만 닫으면 된다" },
+          { hypothesis_id: "h3", statement: "시험환경·V&V·운용 준비를 함께 복구해야 한다" },
+          { hypothesis_id: "h4", statement: "인력과 감독 공백이 발사 준비를 막고 있다" },
+        ],
+      },
+      hypothesis_review: { decisions: [{ hypothesis_id: "h1" }, { hypothesis_id: "h2" }] },
+    },
+  },
+  completed_stages: [
+    { role: "RESEARCH_PLANNER", state: "COMPLETED", elapsed_ms: 91700, context_bytes: 12000, dispatch_ids: ["d1"] },
+    { role: "EVIDENCE_RERANKER", state: "COMPLETED", elapsed_ms: 59100, context_bytes: 8400, dispatch_ids: ["d2"] },
+    { role: "SEMANTIC_REVIEWER", state: "COMPLETED", elapsed_ms: 68000, context_bytes: 15600, dispatch_ids: ["d3"] },
+    { role: "HYPOTHESIS_GENERATOR", state: "COMPLETED", elapsed_ms: 131000, context_bytes: 22100, dispatch_ids: ["d4"] },
+  ],
+  activity_events: [
+    { seq: 1, kind: "note", key: "RESEARCH_PLANNER" },
+    {
+      seq: 2,
+      kind: "action",
+      action_type: "stage_completed",
+      payload: { elapsed_ms: 91700, context_bytes: 12000, dispatch_count: 1 },
+    },
+    { seq: 3, kind: "note", key: "EVIDENCE_RERANKER" },
+    {
+      seq: 4,
+      kind: "action",
+      action_type: "stage_completed",
+      payload: { elapsed_ms: 59100, context_bytes: 8400, dispatch_count: 1 },
+    },
+    { seq: 5, kind: "note", key: "SEMANTIC_REVIEWER" },
+    {
+      seq: 6,
+      kind: "action",
+      action_type: "source_read",
+      payload: { page: 6, exact_text: "70.6" },
+    },
+    {
+      seq: 7,
+      kind: "action",
+      action_type: "source_read",
+      payload: { page: 14, exact_text: "GNC software verification complete" },
+    },
+    {
+      seq: 8,
+      kind: "action",
+      action_type: "stage_completed",
+      payload: { elapsed_ms: 68000, context_bytes: 15600, dispatch_count: 1 },
+    },
+    { seq: 9, kind: "note", key: "HYPOTHESIS_GENERATOR" },
+    {
+      seq: 10,
+      kind: "action",
+      action_type: "stage_completed",
+      payload: { elapsed_ms: 131000, context_bytes: 22100, dispatch_count: 1 },
+    },
+    { seq: 11, kind: "note", key: "HYPOTHESIS_REVIEWER", live: true },
+    {
+      seq: 12,
+      kind: "action",
+      action_type: "hypothesis_review",
+      live: true,
+      payload: { hypothesis_count: 4, review_count: 2 },
+    },
+    {
+      seq: 13,
+      kind: "action",
+      action_type: "model_call",
+      live: true,
+      payload: { elapsed_ms: 47000, first_byte_ms: null, received_bytes: 0, state: "RESERVED" },
+    },
+  ],
+  user_activity_events: [
+    {
+      schema_version: "thoth.user_activity_event.v1",
+      event_id: "activity:stage-plan",
+      seq: 1,
+      time: "2026-09-20T03:01:31+09:00",
+      severity: "success",
+      visibility: "default",
+      announce: "none",
+      phase: "RESEARCH_PLANNER",
+      activity_kind: "judgement",
+      action: "stage_complete",
+      label_ko: "질문의 확인 조건을 정리했습니다",
+      why_ko: "원문 확인 범위와 추측 금지 조건을 이후 단계에 그대로 적용하기 위해서입니다.",
+      state: "succeeded",
+      research_relation: "none",
+      result: { summary_ko: "질문 조건 4개와 인용 제한을 정리했습니다.", duration_ms: 91700, counts: { constraints: 4 } },
+      redaction: { applied: false, classes: [], source_content_included: false },
+    },
+    {
+      schema_version: "thoth.user_activity_event.v1",
+      event_id: "activity:source-page-6",
+      seq: 2,
+      time: "2026-09-20T03:04:22+09:00",
+      severity: "success",
+      visibility: "default",
+      announce: "none",
+      phase: "SEMANTIC_REVIEWER",
+      activity_kind: "source",
+      action: "read",
+      label_ko: "Psyche 감사 보고서 원문을 확인했습니다",
+      why_ko: "표 3 수치가 질문의 발사 준비 조건을 직접 뒷받침하는지 확인하기 위해서입니다.",
+      state: "succeeded",
+      research_relation: "read",
+      target: {
+        kind: "span",
+        title: "Psyche IRB 감사 보고서",
+        display_ref: "연결 자료 1",
+        host_alias: "local-source",
+        locator: { page: 6, section: "Table 3" },
+        source_version_id: "source-v3",
+        hash_short: "71e8c8f2",
+        currentness: "current",
+        access_state: "allowed",
+      },
+      tool: {
+        display_name: "연결 자료 읽기",
+        family: "LOCAL",
+        operation: "READ_SOURCE",
+        sanitized_args: { page: 6, scope: "project" },
+        raw_command_available: false,
+        command_detail: "unavailable",
+      },
+      result: { summary_ko: "지정한 쪽의 구조와 표 위치를 확인했습니다.", duration_ms: 840, counts: { spans: 1 } },
+      redaction: { applied: true, classes: ["absolute_path", "source_content"], public_note_ko: "로컬 경로와 원문은 화면에서 제외했습니다.", source_content_included: false },
+    },
+    {
+      schema_version: "thoth.user_activity_event.v1",
+      event_id: "activity:evidence-review",
+      seq: 3,
+      time: "2026-09-20T03:06:10+09:00",
+      severity: "success",
+      visibility: "default",
+      announce: "none",
+      phase: "EVIDENCE_RERANKER",
+      activity_kind: "judgement",
+      action: "select_candidate",
+      label_ko: "답변에 쓸 근거 후보를 골랐습니다",
+      why_ko: "질문의 네 조건과 직접 연결되는 원문만 다음 판단에 넘기기 위해서입니다.",
+      state: "succeeded",
+      research_relation: "selected_candidate",
+      result: { summary_ko: "후보 38개 중 관련성이 높은 4개를 골랐습니다.", duration_ms: 59100, counts: { reviewed: 38, selected: 4 } },
+      redaction: { applied: false, classes: [], source_content_included: false },
+    },
+    {
+      schema_version: "thoth.user_activity_event.v1",
+      event_id: "activity:model-review",
+      seq: 4,
+      time: null,
+      severity: "info",
+      visibility: "default",
+      announce: "none",
+      phase: "HYPOTHESIS_REVIEW",
+      activity_kind: "model",
+      action: "call_model",
+      label_ko: "설명 후보를 원문과 대조하고 있습니다",
+      why_ko: "서로 다른 설명 4개 중 원문과 맞지 않는 설명을 걸러내기 위해서입니다.",
+      state: "running",
+      research_relation: "none",
+      target: { kind: "model", title: "판단 검토 모델", display_ref: "모델 호출 5", currentness: null, access_state: "allowed" },
+      tool: { display_name: "판단 검토", family: "MODEL", operation: "CALL_MODEL", sanitized_args: { evidence_candidates: 4, hypotheses: 4 }, raw_command_available: false, command_detail: "unavailable" },
+      result: { summary_ko: "가설 4개 중 2개를 검토했습니다.", duration_ms: 47000, counts: { reviewed: 2, total: 4 } },
+      redaction: { applied: true, classes: ["prompt", "provider_payload"], public_note_ko: "프롬프트와 제공자 응답 원문은 표시하지 않았습니다.", source_content_included: false },
+    },
+  ],
+  request: {
+    operation_id: "operation:o",
+    authored_text:
+      "Psyche 표 3 발사 준비 조건 4개가 원문에서 각각 확인되는지, 확인되면 원문 위치와 함께 답하고, 확인 안 되면 왜 부족한지 적어라. 표 숫자만 인용하고 추측 금지.",
+    model_settings: { model: "grok-4.6", reasoning_effort: "high" },
+  },
+  usage: {
+    input_tokens: 8000,
+    output_tokens: 4400,
+    total_tokens: 12400,
+    state: "PARTIAL",
+    unreported_calls: 1,
+    cumulative_token_limit_enforced: false,
+  },
+  model_dispatches: [{ state: "RESERVED", transport_observation: { elapsed_ms: 47000, received_bytes: 0 } }],
+};
+
+export function isTimelineExampleRequested(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  const params = new URLSearchParams(window.location.search);
+  return params.get("example") === "psyche";
+}

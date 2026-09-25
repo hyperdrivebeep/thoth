@@ -1,0 +1,668 @@
+{
+  "$defs": {
+    "JsonValue": {},
+    "UserActivityLocator": {
+      "additionalProperties": false,
+      "properties": {
+        "cell": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cell"
+        },
+        "line_end": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Line End"
+        },
+        "line_start": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Line Start"
+        },
+        "page": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page"
+        },
+        "section": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Section"
+        }
+      },
+      "title": "UserActivityLocator",
+      "type": "object"
+    },
+    "UserActivityRedaction": {
+      "additionalProperties": false,
+      "properties": {
+        "applied": {
+          "default": false,
+          "title": "Applied",
+          "type": "boolean"
+        },
+        "classes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Classes",
+          "type": "array"
+        },
+        "public_note_ko": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Public Note Ko"
+        },
+        "source_content_included": {
+          "const": false,
+          "default": false,
+          "title": "Source Content Included",
+          "type": "boolean"
+        }
+      },
+      "title": "UserActivityRedaction",
+      "type": "object"
+    },
+    "UserActivityRefs": {
+      "additionalProperties": false,
+      "properties": {
+        "operation_alias": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operation Alias"
+        },
+        "receipt_ref": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Receipt Ref"
+        },
+        "revision_ref": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Revision Ref"
+        },
+        "source_ref": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Ref"
+        }
+      },
+      "title": "UserActivityRefs",
+      "type": "object"
+    },
+    "UserActivityResult": {
+      "additionalProperties": false,
+      "properties": {
+        "counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Counts",
+          "type": "object"
+        },
+        "duration_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duration Ms"
+        },
+        "exit_code": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exit Code"
+        },
+        "http_status": {
+          "anyOf": [
+            {
+              "maximum": 599,
+              "minimum": 100,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Http Status"
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "pattern": "^[A-Z][A-Z0-9_]{0,159}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason Code"
+        },
+        "summary_ko": {
+          "anyOf": [
+            {
+              "maxLength": 240,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Summary Ko"
+        }
+      },
+      "title": "UserActivityResult",
+      "type": "object"
+    },
+    "UserActivityTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "access_state": {
+          "default": "unknown",
+          "enum": [
+            "allowed",
+            "blocked",
+            "out_of_scope",
+            "unknown"
+          ],
+          "title": "Access State",
+          "type": "string"
+        },
+        "currentness": {
+          "anyOf": [
+            {
+              "enum": [
+                "current",
+                "stale",
+                "unknown_time",
+                "access_unverified"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currentness"
+        },
+        "display_ref": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display Ref"
+        },
+        "hash_short": {
+          "anyOf": [
+            {
+              "maxLength": 16,
+              "minLength": 8,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hash Short"
+        },
+        "host_alias": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Host Alias"
+        },
+        "kind": {
+          "enum": [
+            "file",
+            "uri",
+            "artifact",
+            "span",
+            "table_cell",
+            "line_range",
+            "database_view",
+            "sandbox",
+            "model"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "locator": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UserActivityLocator"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "safe_uri": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Safe Uri"
+        },
+        "source_version_id": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Version Id"
+        },
+        "title": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "title"
+      ],
+      "title": "UserActivityTarget",
+      "type": "object"
+    },
+    "UserActivityTool": {
+      "additionalProperties": false,
+      "properties": {
+        "command_detail": {
+          "const": "unavailable",
+          "default": "unavailable",
+          "title": "Command Detail",
+          "type": "string"
+        },
+        "display_name": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Display Name",
+          "type": "string"
+        },
+        "family": {
+          "enum": [
+            "LOCAL",
+            "GIT",
+            "MCP",
+            "POSTGRES",
+            "S3",
+            "SANDBOX",
+            "MODEL"
+          ],
+          "title": "Family",
+          "type": "string"
+        },
+        "operation": {
+          "maxLength": 40,
+          "minLength": 1,
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Operation",
+          "type": "string"
+        },
+        "raw_command_available": {
+          "const": false,
+          "default": false,
+          "title": "Raw Command Available",
+          "type": "boolean"
+        },
+        "sanitized_args": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Sanitized Args",
+          "type": "object"
+        }
+      },
+      "required": [
+        "display_name",
+        "family",
+        "operation"
+      ],
+      "title": "UserActivityTool",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "enum": [
+        "search",
+        "open",
+        "fetch",
+        "parse",
+        "read",
+        "screen",
+        "select_candidate",
+        "adopt_support",
+        "adopt_counter",
+        "run",
+        "call_model",
+        "retry",
+        "cancel",
+        "hold",
+        "stage_complete"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "activity_kind": {
+      "enum": [
+        "tool",
+        "source",
+        "model",
+        "sandbox",
+        "connector",
+        "judgement",
+        "control"
+      ],
+      "title": "Activity Kind",
+      "type": "string"
+    },
+    "announce": {
+      "default": "none",
+      "enum": [
+        "none",
+        "polite",
+        "assertive"
+      ],
+      "title": "Announce",
+      "type": "string"
+    },
+    "event_id": {
+      "maxLength": 80,
+      "minLength": 1,
+      "title": "Event Id",
+      "type": "string"
+    },
+    "label_ko": {
+      "maxLength": 240,
+      "minLength": 1,
+      "title": "Label Ko",
+      "type": "string"
+    },
+    "phase": {
+      "anyOf": [
+        {
+          "maxLength": 80,
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Phase"
+    },
+    "redaction": {
+      "$ref": "#/$defs/UserActivityRedaction"
+    },
+    "refs": {
+      "$ref": "#/$defs/UserActivityRefs"
+    },
+    "research_relation": {
+      "default": "none",
+      "enum": [
+        "none",
+        "discovered",
+        "opened",
+        "fetched",
+        "parsed",
+        "read",
+        "screened",
+        "selected_candidate",
+        "supports",
+        "contradicts",
+        "inconclusive",
+        "held",
+        "excluded",
+        "stale",
+        "access_blocked"
+      ],
+      "title": "Research Relation",
+      "type": "string"
+    },
+    "result": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UserActivityResult"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "schema_version": {
+      "const": "thoth.user_activity_event.v1",
+      "default": "thoth.user_activity_event.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "seq": {
+      "minimum": 1,
+      "title": "Seq",
+      "type": "integer"
+    },
+    "severity": {
+      "enum": [
+        "info",
+        "success",
+        "warning",
+        "error",
+        "blocked",
+        "input_required"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "planned",
+        "running",
+        "succeeded",
+        "failed",
+        "blocked",
+        "cancel_requested",
+        "cancelled",
+        "timed_out",
+        "unknown_external_effect"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "target": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UserActivityTarget"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "time": {
+      "anyOf": [
+        {
+          "maxLength": 64,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Time"
+    },
+    "tool": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UserActivityTool"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "visibility": {
+      "default": "default",
+      "enum": [
+        "default",
+        "expanded"
+      ],
+      "title": "Visibility",
+      "type": "string"
+    },
+    "why_ko": {
+      "anyOf": [
+        {
+          "maxLength": 320,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Why Ko"
+    }
+  },
+  "required": [
+    "event_id",
+    "seq",
+    "severity",
+    "activity_kind",
+    "action",
+    "label_ko",
+    "state"
+  ],
+  "title": "UserActivityEvent",
+  "type": "object"
+}

@@ -1,0 +1,10 @@
+kind: EVALUATOR_CONTRACT
+version: 1.0.0
+independence: frozen-fixture-separate-evaluator
+dimensions:
+  - quality
+  - safety
+  - cost
+  - latency
+hidden_holdout_access: evaluator-only
+promotion_authority: deterministic-local-gate

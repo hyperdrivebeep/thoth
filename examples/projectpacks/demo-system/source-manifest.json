@@ -1,0 +1,24 @@
+[
+  {
+    "source_id": "source:plan",
+    "path": "plan.md",
+    "media_type": "text/markdown",
+    "authority": "OFFICIAL",
+    "cutoff_state": "ELIGIBLE",
+    "security_class": "INTERNAL",
+    "version_label": "plan-v1",
+    "byte_sha256": "3588798af06821587b1e8ff0d20a972eb8fc5c2f147b4e7f569172884faf6dac",
+    "rights": "Synthetic fixture authored for THOTH verification"
+  },
+  {
+    "source_id": "source:interim-report",
+    "path": "interim-report.md",
+    "media_type": "text/markdown",
+    "authority": "OFFICIAL",
+    "cutoff_state": "ELIGIBLE",
+    "security_class": "INTERNAL",
+    "version_label": "report-v1",
+    "byte_sha256": "a3892147650e029a987c7ab9e8433cf6f18be4531998547a161400db63ef79a2",
+    "rights": "Synthetic fixture authored for THOTH verification"
+  }
+]

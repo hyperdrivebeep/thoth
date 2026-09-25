@@ -1,0 +1,56 @@
+{
+  "$defs": {
+    "ResultIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "request_revision_digest": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Request Revision Digest",
+          "type": "string"
+        },
+        "result_revision_digest": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Result Revision Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_revision_digest",
+        "result_revision_digest"
+      ],
+      "title": "ResultIdentity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "after": {
+      "$ref": "#/$defs/ResultIdentity"
+    },
+    "before": {
+      "$ref": "#/$defs/ResultIdentity"
+    },
+    "contract_version": {
+      "const": 2,
+      "default": 2,
+      "title": "Contract Version",
+      "type": "integer"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "thread_id": {
+      "title": "Thread Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "thread_id",
+    "before",
+    "after"
+  ],
+  "title": "DecisionDeltaInput",
+  "type": "object"
+}

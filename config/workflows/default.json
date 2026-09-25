@@ -1,0 +1,8 @@
+{
+  "kind": "WORKFLOW_DEFINITION",
+  "version": "1.0.0",
+  "loop": ["observe", "hypothesize", "acquire", "appraise", "act", "revise"],
+  "max_semantic_retries_per_revision": 0,
+  "require_typed_hold": true,
+  "external_effects": false
+}

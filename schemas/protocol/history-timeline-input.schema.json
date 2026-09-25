@@ -1,0 +1,113 @@
+{
+  "$defs": {
+    "HistoryScope": {
+      "additionalProperties": false,
+      "properties": {
+        "entity_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entity Ref"
+        },
+        "project_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Project Id",
+          "type": "string"
+        },
+        "request_revision_digest": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Fa-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Request Revision Digest"
+        },
+        "thread_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Thread Id"
+        }
+      },
+      "required": [
+        "project_id"
+      ],
+      "title": "HistoryScope",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": 2,
+      "default": 2,
+      "title": "Contract Version",
+      "type": "integer"
+    },
+    "cursor": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cursor"
+    },
+    "kinds": {
+      "default": [],
+      "items": {
+        "enum": [
+          "REQUEST",
+          "RESULT",
+          "REVISION",
+          "RESTORE",
+          "MEMORY"
+        ],
+        "type": "string"
+      },
+      "title": "Kinds",
+      "type": "array"
+    },
+    "limit": {
+      "default": 25,
+      "maximum": 50,
+      "minimum": 1,
+      "title": "Limit",
+      "type": "integer"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "scope": {
+      "$ref": "#/$defs/HistoryScope"
+    }
+  },
+  "required": [
+    "project_id",
+    "scope"
+  ],
+  "title": "HistoryTimelineInput",
+  "type": "object"
+}

@@ -1,0 +1,12 @@
+pack_id: pack:c1-complete
+project_id: project:c1-complete
+name: Complete evaluation contract fixture
+cutoff_at: 2026-08-30T12:00:00Z
+overlay: general-rnd
+policy_binding_ref: policy:c1-v1
+scenario:
+  case_id: case:c1-complete
+  thread_id: thread:c1-complete
+  cycle_id: cycle:1
+  object_id: object:c1-complete
+  problem: Does the sealed report meet the latency criterion under comparable conditions?

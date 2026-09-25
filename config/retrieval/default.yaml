@@ -1,0 +1,8 @@
+kind: RETRIEVAL_POLICY
+version: 1.0.0
+strategy: hybrid-keyword-vector-graph
+max_candidates: 24
+max_selected: 8
+require_project_scope: true
+require_cutoff_eligibility: true
+canonical_projection: false

@@ -1,0 +1,17 @@
+profile_ref: NATIONAL_RND_PERFORMANCE
+version: 1
+name: National R&D Performance
+domain_hint: national-rnd-performance
+applicability_terms: [national, ministry, program, indicator, government, performance, rnd]
+required_fields: [construct, verification_spec, context_spec, acceptance_rule]
+conditional_fields: [uncertainty, responsible_role]
+required_evidence: [official_program_notice, indicator_definition, reporting_period]
+allowed_computation_types: [FORMULA, TEST_PROCEDURE, INSPECTION_CHECKLIST, DEMONSTRATION_PROTOCOL, HUMAN_RUBRIC]
+measurement_validity: {minimum: official-indicator-definition, invalid_result: HOLD}
+uncertainty_policy: {required: reporting-limitations, missing: HOLD}
+decision_rules: [use_official_indicator_version, separate_output_from_outcome]
+authority_policy: {controlling_source: PROGRAM_AUTHORITY, reference_candidate: NOT_AUTHORIZED}
+change_authority: {profile: PROGRAM_OWNER, criterion: PERFORMANCE_AUTHORITY}
+entry_criteria: [official_program_scope_confirmed]
+exit_criteria: [indicator_evidence_complete, attribution_limits_recorded]
+enabled: true

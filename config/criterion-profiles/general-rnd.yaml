@@ -1,0 +1,17 @@
+profile_ref: GENERAL_RND
+version: 1
+name: General R&D Decision
+domain_hint: general-rnd
+applicability_terms: [research, evidence, prototype, experiment]
+required_fields: [construct, context_spec]
+conditional_fields: [uncertainty, responsible_role]
+required_evidence: [problem_context, observed_evidence]
+allowed_computation_types: [FORMULA, STATISTICAL_MODEL, TEST_PROCEDURE, HUMAN_RUBRIC]
+measurement_validity: {minimum: source-grounded, invalid_result: NOT_ASSESSED}
+uncertainty_policy: {required: explicit, missing: HOLD}
+decision_rules: [compare_supported_alternatives, preserve_unknown]
+authority_policy: {controlling_source: OFFICIAL_OR_APPROVED, reference_candidate: NOT_AUTHORIZED}
+change_authority: {profile: PROFILE_OWNER, criterion: PROJECT_OWNER}
+entry_criteria: [project_scope_known]
+exit_criteria: [evidence_refs_recorded, uncertainty_recorded]
+enabled: true

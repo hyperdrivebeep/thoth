@@ -1,0 +1,17 @@
+profile_ref: SYSTEMS_ENGINEERING_VERIFICATION
+version: 1
+name: Systems Engineering Verification
+domain_hint: systems-engineering
+applicability_terms: [system, requirements, verification, inspection, acceptance, procedure]
+required_fields: [construct, verification_spec, context_spec, acceptance_rule]
+conditional_fields: [uncertainty, responsible_role]
+required_evidence: [approved_requirement, verification_method, acceptance_threshold]
+allowed_computation_types: [TEST_PROCEDURE, INSPECTION_CHECKLIST, DEMONSTRATION_PROTOCOL, FORMULA]
+measurement_validity: {minimum: requirement-method-trace, invalid_result: HOLD}
+uncertainty_policy: {required: bounded, missing: HOLD}
+decision_rules: [require_requirement_trace, require_pass_fail_rule]
+authority_policy: {controlling_source: CONFIGURATION_AUTHORITY, reference_candidate: NOT_AUTHORIZED}
+change_authority: {profile: SYSTEMS_AUTHORITY, criterion: VERIFICATION_OWNER}
+entry_criteria: [approved_requirement_exists]
+exit_criteria: [verification_method_bound, acceptance_rule_authorized]
+enabled: true

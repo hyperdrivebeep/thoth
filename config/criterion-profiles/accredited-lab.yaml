@@ -1,0 +1,17 @@
+profile_ref: ACCREDITED_LAB_CONFORMITY
+version: 1
+name: Accredited Laboratory Conformity
+domain_hint: accredited-laboratory
+applicability_terms: [accredited, laboratory, calibration, "17025", metrology, traceability]
+required_fields: [construct, verification_spec, context_spec, acceptance_rule, uncertainty]
+conditional_fields: [responsible_role]
+required_evidence: [accreditation_scope, calibrated_method, traceable_measurement]
+allowed_computation_types: [FORMULA, TEST_PROCEDURE, INSPECTION_CHECKLIST]
+measurement_validity: {minimum: metrological-traceability, invalid_result: INVALID}
+uncertainty_policy: {required: measurement-uncertainty, missing: HOLD}
+decision_rules: [scope_must_cover_method, uncertainty_must_fit_limit]
+authority_policy: {controlling_source: ACCREDITED_LAB_AUTHORITY, reference_candidate: NOT_AUTHORIZED}
+change_authority: {profile: QUALITY_MANAGER, criterion: TECHNICAL_MANAGER}
+entry_criteria: [accreditation_scope_confirmed]
+exit_criteria: [traceability_confirmed, uncertainty_accepted]
+enabled: true

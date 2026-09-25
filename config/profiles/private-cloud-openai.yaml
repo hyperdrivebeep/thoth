@@ -1,0 +1,22 @@
+profile_id: profile:private-cloud-openai-v1
+deployment: PRIVATE_CLOUD
+bind_host: 0.0.0.0
+model_route: OPENAI_RESPONSES
+egress_policy: ALLOWLIST
+allowed_egress_hosts:
+  - api.openai.com
+connector_allowlist:
+  - private-object-store-readonly
+  - internal-git-readonly
+  - local-file-upload
+data_residency: Canonical ledger remains in the private cloud; selected model context follows the approved provider contract.
+model_data_may_leave_boundary: true
+external_writes_enabled: false
+physical_actions_enabled: false
+adapter_available: true
+sandbox_route: GVISOR
+sandbox_adapter_available: false
+sandbox_network_policy: DENY_ALL
+notes:
+  - Requires organization-approved account, retention terms, secrets management and network policy.
+  - gVisor or managed sandbox activation requires a separate deployment approval.

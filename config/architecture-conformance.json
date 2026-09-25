@@ -1,0 +1,177 @@
+{
+  "schema_version": "1.0.0",
+  "rule_bundle": "thoth-architecture-rules@1.0.0",
+  "rule_documents": [
+    "AGENTS.md",
+    "docs/architecture/backend-runtime-boundaries.md",
+    "docs/architecture/agent-execution-rules.md",
+    "docs/architecture/canonical-owner-matrix.md",
+    "docs/architecture/extension-point-catalog.md",
+    "docs/architecture/error-contract.md",
+    "docs/architecture/nfr-evidence-matrix.md"
+  ],
+  "maturity_levels": {
+    "D0": "DESIGNED",
+    "D1": "SCHEMA_DEFINED",
+    "D2": "HANDLER_MATERIALIZED",
+    "D3": "ISOLATED_TESTED",
+    "D4": "INTEGRATED_IN_LOOP",
+    "D5": "LIVE_E2E_VERIFIED",
+    "D6": "FIELD_VALIDATED"
+  },
+  "layers": {
+    "domain": {
+      "roots": ["src/thoth/domain"],
+      "forbidden_import_prefixes": ["thoth.adapters", "thoth.application", "thoth.protocol", "fastapi", "sqlalchemy", "openai", "typer", "uvicorn"]
+    },
+    "ports": {
+      "roots": ["src/thoth/ports"],
+      "forbidden_import_prefixes": ["thoth.adapters", "thoth.application", "fastapi", "sqlalchemy", "openai", "typer", "uvicorn"]
+    },
+    "application": {
+      "roots": ["src/thoth/application"],
+      "forbidden_import_prefixes": ["thoth.adapters", "fastapi", "sqlalchemy", "openai", "typer", "uvicorn"]
+    }
+  },
+  "canonical_owners": [
+    {
+      "aggregate": "PROJECT_GOVERNANCE",
+      "canonical_owner": "project_governance_revision",
+      "projections": ["projects", "project_policies", "project_roles", "project_references", "resource_scope_heads"],
+      "unit_of_work_target": "ProjectGovernanceUnitOfWork",
+      "current_atomicity": "PARTIAL",
+      "atomicity_debt": {"debt_id": "UOW-PROJECT-GOVERNANCE-001", "status": "OPEN", "acceptance_ids": ["A13"], "closure_evidence_required": "normal-entry governance fault injection with canonical revision, projections, audit and receipt committed or rolled back together"}
+    },
+    {
+      "aggregate": "SOURCE_ARTIFACT_SPAN",
+      "canonical_owner": "artifact_source_ledger",
+      "projections": ["structural_nodes", "structural_fts", "evidence_spans", "evidence_sources"],
+      "unit_of_work_target": "AcquisitionUnitOfWork",
+      "current_atomicity": "PARTIAL",
+      "atomicity_debt": {"debt_id": "UOW-SOURCE-ARTIFACT-001", "status": "OPEN", "acceptance_ids": ["A01"], "closure_evidence_required": "ingestion fault injection across artifact, source spans, indexes, audit and receipt"}
+    },
+    {
+      "aggregate": "EVIDENCE_OBSERVATION_CLAIM",
+      "canonical_owner": "evidence_revision_ledger",
+      "projections": ["evidence_observations", "evidence_links", "evidence_conflicts"],
+      "unit_of_work_target": "EvidenceUnitOfWork",
+      "current_atomicity": "PARTIAL",
+      "atomicity_debt": {"debt_id": "UOW-EVIDENCE-001", "status": "OPEN", "acceptance_ids": ["A02", "A03"], "closure_evidence_required": "acquisition and counter-search fault injection across observation, lead, claim, head, audit and receipt"}
+    },
+    {
+      "aggregate": "CRITERION",
+      "canonical_owner": "criterion_revision_ledger",
+      "projections": ["criterion_contracts", "criterion_profiles", "criterion_references", "criterion_conflicts"],
+      "unit_of_work_target": "CriterionUnitOfWork",
+      "current_atomicity": "PARTIAL",
+      "atomicity_debt": {"debt_id": "UOW-CRITERION-001", "status": "OPEN", "acceptance_ids": ["A09"], "closure_evidence_required": "criterion compile and correction fault injection across revision, profile projection, conflict, audit and receipt"}
+    },
+    {
+      "aggregate": "DECISION_OBJECT",
+      "canonical_owner": "semantic_revision_ledger",
+      "canonical_scope": "OBJECT",
+      "projections": ["decision_objects", "object_profiles", "object_relations"],
+      "unit_of_work_target": "DecisionObjectUnitOfWork",
+      "current_atomicity": "PARTIAL",
+      "atomicity_debt": {"debt_id": "UOW-DECISION-OBJECT-001", "status": "OPEN", "acceptance_ids": ["A01"], "closure_evidence_required": "decision-object materialization fault injection across semantic revision, projections, head, audit and receipt"}
+    },
+    {
+      "aggregate": "HYPOTHESIS",
+      "canonical_owner": "semantic_revision_ledger",
+      "canonical_scope": "HYPOTHESIS",
+      "projections": ["hypotheses", "hypothesis_portfolios", "predictions", "appraisals", "research_test_assessments"],
+      "unit_of_work_target": "HypothesisUnitOfWork",
+      "current_atomicity": "PARTIAL",
+      "atomicity_debt": {"debt_id": "UOW-HYPOTHESIS-001", "status": "OPEN", "acceptance_ids": ["A03"], "closure_evidence_required": "hypothesis portfolio and appraisal fault injection across semantic revision, projections, head, audit and receipt"}
+    },
+    {
+      "aggregate": "ACTION_PLAN_AUTHORIZATION",
+      "canonical_owner": "semantic_revision_ledger",
+      "canonical_scope": "ACTION",
+      "projections": ["actions", "action_portfolios", "action_plans", "authorizations"],
+      "unit_of_work_target": "ActionUnitOfWork",
+      "current_atomicity": "PARTIAL",
+      "atomicity_debt": {"debt_id": "UOW-ACTION-001", "status": "OPEN", "acceptance_ids": ["A04"], "closure_evidence_required": "action portfolio, plan and authorization fault injection across semantic revision, projections, head, audit and receipt"}
+    },
+    {
+      "aggregate": "EXECUTION_OUTCOME",
+      "canonical_owner": "execution_outcome_revision_ledger",
+      "projections": ["plan_executions", "step_attempts", "effects", "outcomes", "outcome_series"],
+      "unit_of_work_target": "ExecutionOutcomeUnitOfWork",
+      "current_atomicity": "PARTIAL",
+      "atomicity_debt": {"debt_id": "UOW-EXECUTION-OUTCOME-001", "status": "OPEN", "acceptance_ids": ["A04", "A05"], "closure_evidence_required": "execution and outcome fault injection across attempts, effects, observations, revisions, audit and receipt"}
+    },
+    {
+      "aggregate": "MEMORY",
+      "canonical_owner": "memory_revision_ledger",
+      "projections": ["memory_records", "context_packs", "memory_projection_tasks"],
+      "unit_of_work_target": "MemoryUnitOfWork",
+      "current_atomicity": "ATOMIC"
+    },
+    {
+      "aggregate": "IMPROVEMENT",
+      "canonical_owner": "improvement_revision_ledger",
+      "projections": ["improvement_evaluations", "exposures", "promotions"],
+      "unit_of_work_target": "ImprovementUnitOfWork",
+      "current_atomicity": "MATERIALIZED_ONLY",
+      "atomicity_debt": {"debt_id": "UOW-IMPROVEMENT-001", "status": "OPEN", "acceptance_ids": ["A08"], "closure_evidence_required": "candidate evaluation, exposure, promotion and rollback fault injection with immutable baseline preservation"}
+    },
+    {
+      "aggregate": "BASELINE",
+      "canonical_owner": "baseline_sets",
+      "projections": ["project_head_sets", "baseline_candidates", "baseline_decisions"],
+      "unit_of_work_target": "BaselineUnitOfWork",
+      "current_atomicity": "ATOMIC"
+    },
+    {
+      "aggregate": "BEHAVIOR_ARTIFACT",
+      "canonical_owner": "behavior_artifacts",
+      "projections": ["behavior_registry", "improvement_evaluations", "exposures"],
+      "unit_of_work_target": "ImprovementUnitOfWork",
+      "current_atomicity": "ATOMIC"
+    },
+    {
+      "aggregate": "CLOSURE_EXPORT",
+      "canonical_owner": "closure_export_revision_ledger",
+      "projections": ["closure_packages", "export_manifests"],
+      "unit_of_work_target": "ClosureExportUnitOfWork",
+      "current_atomicity": "PARTIAL",
+      "atomicity_debt": {"debt_id": "UOW-CLOSURE-EXPORT-001", "status": "OPEN", "acceptance_ids": ["A10"], "closure_evidence_required": "closure and export fault injection across snapshot, package, manifest, release state, audit and receipt"}
+    }
+  ],
+  "extension_points": [
+    {"name": "MODEL", "port": "thoth.ports.model.ModelPort", "factory_target": "thoth.adapters.models.registry.RegisteredModelResolver", "factory_port": "thoth.ports.model.ModelResolverPort", "composition_target": "thoth.apps.model_composition.create_models", "registration_method": "register", "status": "IMPLEMENTED", "consumer_targets": ["thoth.apps.runtime.create_runtime"]},
+    {"name": "PARSER", "port": "thoth.ports.parser.ParserPort", "factory_target": "thoth.adapters.parsers.registry.ParserRegistry", "factory_port": "thoth.ports.parser.ParserRegistryPort", "composition_target": "thoth.adapters.parsers.registry.default_parser_registry", "status": "IMPLEMENTED", "consumer_targets": ["thoth.apps.source_composition.create_ingestion_service", "thoth.apps.projectpack_source_composition.create_pack_ingestion"]},
+    {"name": "CONNECTOR", "port": "thoth.ports.connectors.ConnectorPort", "factory_target": "thoth.adapters.connectors.registry.ConnectorRegistry", "factory_port": "thoth.ports.connectors.ConnectorRegistryPort", "composition_target": "thoth.apps.runtime.create_runtime", "registration_method": "register", "status": "IMPLEMENTED"},
+    {"name": "SANDBOX", "port": "thoth.ports.sandbox.SandboxPort", "factory_target": "thoth.adapters.sandbox.registry.SandboxFactoryRegistry", "factory_port": "thoth.ports.sandbox.SandboxFactoryRegistryPort", "composition_target": "thoth.adapters.sandbox.registry.default_sandbox_factory_registry", "registration_method": "register", "status": "IMPLEMENTED", "consumer_targets": ["thoth.cli._sandbox_adapter"]},
+    {"name": "STORE", "port": "thoth.ports.store_bundle.StoreBundlePort", "factory_target": "thoth.adapters.storage.registry.StoreFactoryRegistry", "factory_port": "thoth.ports.store_bundle.StoreFactoryRegistryPort", "composition_target": "thoth.adapters.storage.registry.default_store_factory_registry", "registration_method": "register", "status": "IMPLEMENTED", "consumer_targets": ["thoth.apps.storage_composition.open_stores"]},
+    {"name": "CRITERION_PROFILE", "port": "thoth.ports.criterion_profile.CriterionProfileRouterPort", "factory_target": "thoth.application.services.criterion_profile_router.SourceGroundedCriterionProfileRouter", "factory_port": "thoth.ports.criterion_profile.CriterionProfileRouterPort", "composition_target": "thoth.apps.thread_analysis_composition.create_thread_analysis", "status": "IMPLEMENTED"},
+    {"name": "PROJECT_PACK", "port": "thoth.ports.projectpack.ProjectPackLoaderPort", "factory_target": "thoth.apps.projectpack_execution.ProjectPackExecutionFactory", "factory_port": "thoth.ports.projectpack.ProjectPackExecutionFactoryPort", "composition_target": "thoth.apps.runtime.create_runtime", "status": "IMPLEMENTED"},
+    {"name": "SCHEMA_MIGRATION", "port": "thoth.ports.migration.SchemaMigrationPort", "factory_target": "thoth.adapters.storage.alembic_migrations.AlembicSchemaMigrator", "factory_port": "thoth.ports.migration.SchemaMigrationPort", "composition_target": "thoth.adapters.storage.alembic_migrations.migrate_sqlite_database", "status": "IMPLEMENTED", "consumer_targets": ["thoth.adapters.storage.bundle.SqliteStoreFactory"]},
+    {"name": "EVALUATOR", "port": "thoth.ports.evaluator.EvaluatorRegistryPort", "factory_target": "thoth.adapters.evaluators.registry.EvaluatorRegistry", "factory_port": "thoth.ports.evaluator.EvaluatorRegistryPort", "composition_target": "thoth.adapters.evaluators.registry.default_evaluator_registry", "registration_method": "register", "status": "IMPLEMENTED", "consumer_targets": ["thoth.apps.runtime.create_runtime"]},
+    {"name": "EVALUATION_EXECUTOR", "port": "thoth.ports.evaluation_runner.EvaluationExecutionPort", "factory_target": "thoth.adapters.evaluators.execution_registry.EvaluationExecutorRegistry", "factory_port": "thoth.ports.evaluation_runner.EvaluationExecutorRegistryPort", "composition_target": "thoth.adapters.evaluators.execution_registry.default_execution_registry", "registration_method": "register", "status": "IMPLEMENTED", "consumer_targets": ["thoth.apps.improvement_composition.create_improvement_components"]},
+    {"name": "BEHAVIOR_COMPONENT", "port": "thoth.ports.behavior_resolver.BehaviorComponentHandlerPort", "factory_target": "thoth.adapters.behavior.registry.BehaviorComponentRegistry", "factory_port": "thoth.ports.behavior_resolver.BehaviorComponentRegistryPort", "composition_target": "thoth.adapters.behavior.registry.default_behavior_components", "registration_method": "register", "status": "IMPLEMENTED", "consumer_targets": ["thoth.apps.behavior_composition.create_behavior_runtime"]},
+    {"name": "RESEARCH_TEST_EVALUATOR", "port": "thoth.ports.test_validity.ResearchTestEvaluatorPort", "factory_target": "thoth.adapters.evaluators.research_test.RegisteredResearchTestEvaluator", "factory_port": "thoth.ports.test_validity.ResearchTestEvaluatorPort", "composition_target": "thoth.adapters.evaluators.research_test.default_research_test_evaluator", "registration_method": "register", "status": "IMPLEMENTED", "consumer_targets": ["thoth.apps.test_runtime.create_test_components"]}
+  ],
+  "acceptance_contracts": [
+    {"id": "A01", "current_level": "D5", "target_level": "D5", "title": "Existing-evidence reasoning loop"},
+    {"id": "A02", "current_level": "D5", "target_level": "D5", "title": "Missing evidence to autonomous acquisition"},
+    {"id": "A03", "current_level": "D4", "target_level": "D4", "title": "Critical counter-search"},
+    {"id": "A04", "current_level": "D4", "target_level": "D4", "title": "R2 action closed loop"},
+    {"id": "A05", "current_level": "D4", "target_level": "D4", "title": "Failed execution and bounded recovery"},
+    {"id": "A06", "current_level": "D4", "target_level": "D4", "title": "Project Memory promotion and recall"},
+    {"id": "A07", "current_level": "D4", "target_level": "D4", "title": "Branch, semantic merge and restore"},
+    {"id": "A08", "current_level": "D4", "target_level": "D4", "title": "Recursive improvement canary and rollback"},
+    {"id": "A09", "current_level": "D4", "target_level": "D4", "title": "Dynamic Criterion/Profile selection"},
+    {"id": "A10", "current_level": "D4", "target_level": "D4", "title": "Unified audit closure"},
+    {"id": "A11", "current_level": "D4", "target_level": "D4", "title": "Fail-closed policy integrity"},
+    {"id": "A12", "current_level": "D1", "target_level": "D6", "title": "Field usefulness and workflow reduction"},
+    {"id": "A13", "current_level": "D4", "target_level": "D4", "title": "Authenticated multiplayer attribution"}
+  ],
+  "known_exceptions": [],
+  "watch_limits": {
+    "python_module_lines": 900,
+    "warning_only": false,
+    "enforced_by": "scripts/check_module_budget.py"
+  }
+}

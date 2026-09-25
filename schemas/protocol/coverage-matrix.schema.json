@@ -1,0 +1,200 @@
+{
+  "$defs": {
+    "CoverageMatrixRow": {
+      "additionalProperties": false,
+      "properties": {
+        "applicability": {
+          "title": "Applicability",
+          "type": "string"
+        },
+        "blocker": {
+          "title": "Blocker",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "question": {
+          "title": "Question",
+          "type": "string"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "relation": {
+          "title": "Relation",
+          "type": "string"
+        },
+        "requirement_id": {
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "review_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Review Refs",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "SATISFIED",
+            "UNRESOLVED",
+            "NOT_APPLICABLE",
+            "NOT_ASSESSED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "validation": {
+          "title": "Validation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "target",
+        "question",
+        "status",
+        "applicability",
+        "relation",
+        "validation",
+        "blocker"
+      ],
+      "title": "CoverageMatrixRow",
+      "type": "object"
+    },
+    "CoverageMatrixSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "hold_targets": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Hold Targets",
+          "type": "array"
+        },
+        "not_applicable": {
+          "default": 0,
+          "title": "Not Applicable",
+          "type": "integer"
+        },
+        "not_assessed": {
+          "default": 0,
+          "title": "Not Assessed",
+          "type": "integer"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "satisfied": {
+          "default": 0,
+          "title": "Satisfied",
+          "type": "integer"
+        },
+        "unresolved": {
+          "default": 0,
+          "title": "Unresolved",
+          "type": "integer"
+        }
+      },
+      "title": "CoverageMatrixSummary",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "availability": {
+      "default": "AVAILABLE",
+      "enum": [
+        "AVAILABLE",
+        "PARTIAL",
+        "UNAVAILABLE"
+      ],
+      "title": "Availability",
+      "type": "string"
+    },
+    "coverage_revision_digest": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Coverage Revision Digest"
+    },
+    "reason_codes": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "request_revision_digest": {
+      "pattern": "^[A-Fa-f0-9]{64}$",
+      "title": "Request Revision Digest",
+      "type": "string"
+    },
+    "requirement_set_revision_digest": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Requirement Set Revision Digest"
+    },
+    "rows": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/CoverageMatrixRow"
+      },
+      "title": "Rows",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "summary": {
+      "$ref": "#/$defs/CoverageMatrixSummary"
+    }
+  },
+  "required": [
+    "request_revision_digest"
+  ],
+  "title": "CoverageMatrix",
+  "type": "object"
+}

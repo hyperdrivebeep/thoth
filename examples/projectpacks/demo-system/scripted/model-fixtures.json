@@ -1,0 +1,158 @@
+{
+  "hypothesis_portfolio": {
+    "portfolio_id": "portfolio:comparison-gap",
+    "object_id": "$OBJECT_ID",
+    "hypotheses": [
+      {
+        "hypothesis_id": "hypothesis:input-version",
+        "object_id": "$OBJECT_ID",
+        "statement": "The plan and report refer to different input or dataset versions.",
+        "observed_problem": "The reported result is not yet comparable with the plan.",
+        "primary_locus": "INPUT_MATERIAL_DATA",
+        "contributing_loci": [],
+        "causal_depth": "INTERMEDIATE",
+        "scope_conditions": {"comparison": "plan versus interim report"},
+        "support_evidence_refs": ["$EVIDENCE_4"],
+        "counterevidence_refs": [],
+        "missing_evidence": ["exact dataset version for the reported run"],
+        "counterevidence_queries": ["Find a run manifest proving identical dataset versions."],
+        "assumptions": ["The report describes the run under review."],
+        "uncertainty": "The exact dataset version is absent.",
+        "predicted_observations": ["The run manifest identifies a version different from the plan."],
+        "discriminating_tests": [
+          {
+            "test_id": "test:compare-input-manifests",
+            "procedure_candidate": "Compare plan and run manifest identifiers without changing either source.",
+            "expected_if_true": "At least one material version differs.",
+            "expected_if_alternative": "All material versions match.",
+            "risk_tier": "R0",
+            "reversibility": "FULL"
+          }
+        ],
+        "status": "TESTABLE"
+      },
+      {
+        "hypothesis_id": "hypothesis:method-configuration",
+        "object_id": "$OBJECT_ID",
+        "statement": "The evaluator or system configuration differs from the declared baseline.",
+        "observed_problem": "The reported result is not yet comparable with the plan.",
+        "primary_locus": "METHOD_DESIGN_IMPLEMENTATION",
+        "contributing_loci": ["COMPONENT_INTERFACE_SYSTEM"],
+        "causal_depth": "INTERMEDIATE",
+        "scope_conditions": {"comparison": "declared baseline versus reported configuration"},
+        "support_evidence_refs": ["$EVIDENCE_3"],
+        "counterevidence_refs": [],
+        "missing_evidence": [],
+        "counterevidence_queries": ["Find a sealed configuration record matching the baseline."],
+        "assumptions": ["Configuration labels map to material settings."],
+        "uncertainty": "The changed settings are not enumerated.",
+        "predicted_observations": ["A configuration diff identifies at least one material setting."],
+        "discriminating_tests": [
+          {
+            "test_id": "test:configuration-diff",
+            "procedure_candidate": "Diff sealed configuration manifests and replay only in a sandbox.",
+            "expected_if_true": "A material configuration difference appears and affects the replay.",
+            "expected_if_alternative": "No material difference appears or the replay is unchanged.",
+            "risk_tier": "R2",
+            "reversibility": "FULL"
+          }
+        ],
+        "status": "TESTABLE"
+      },
+      {
+        "hypothesis_id": "hypothesis:unknown",
+        "object_id": "$OBJECT_ID",
+        "statement": "An unobserved factor outside the currently indexed documents explains the mismatch.",
+        "observed_problem": "The reported result is not yet comparable with the plan.",
+        "primary_locus": "OTHER_WITH_DESCRIPTION",
+        "contributing_loci": [],
+        "causal_depth": "UNDETERMINED",
+        "scope_conditions": {"boundary": "indexed sources only"},
+        "support_evidence_refs": [],
+        "counterevidence_refs": [],
+        "missing_evidence": ["run manifest, environment record, and evaluator receipt"],
+        "counterevidence_queries": ["Search authorized stores for the missing run identity and environment record."],
+        "assumptions": ["The current source set is incomplete."],
+        "uncertainty": "The causal locus is unknown because critical records are missing.",
+        "predicted_observations": ["Additional authorized evidence introduces a new causal locus or closes this branch."],
+        "discriminating_tests": [
+          {
+            "test_id": "test:evidence-acquisition",
+            "procedure_candidate": "Search only authorized project sources for missing run records.",
+            "expected_if_true": "A new material factor is found.",
+            "expected_if_alternative": "No new factor is found within the bounded search.",
+            "risk_tier": "R0",
+            "reversibility": "FULL"
+          }
+        ],
+        "status": "TESTABLE"
+      }
+    ],
+    "status": "TESTABLE",
+    "generated_from_head_set": "$HEAD_DIGEST"
+  },
+  "action_plan_draft": {
+    "plan_id": "plan:comparison-gap",
+    "object_id": "$OBJECT_ID",
+    "alternatives": [
+      {
+        "action_id": "action:manifest-compare",
+        "object_id": "$OBJECT_ID",
+        "hypothesis_ids": ["hypothesis:input-version"],
+        "action_family": "READ_ONLY_COMPARISON",
+        "specification": "Compare the declared and observed version identifiers.",
+        "expected_information_value": "Determines whether input identity blocks comparison.",
+        "estimated_seconds": 60,
+        "reversibility": "FULL",
+        "effect_facts": {},
+        "effect_completeness_confirmed": true,
+        "source_refs": ["$EVIDENCE_4"],
+        "missing_evidence": ["run manifest"]
+      },
+      {
+        "action_id": "action:sandbox-replay",
+        "object_id": "$OBJECT_ID",
+        "hypothesis_ids": ["hypothesis:method-configuration"],
+        "action_family": "SANDBOX_REPLAY",
+        "specification": "Replay the evaluator with sealed candidate configurations in isolation.",
+        "expected_information_value": "Tests whether configuration differences change the result.",
+        "estimated_seconds": 300,
+        "reversibility": "FULL",
+        "effect_facts": {"runs_untrusted_code": true},
+        "effect_completeness_confirmed": true,
+        "source_refs": ["$EVIDENCE_3"],
+        "missing_evidence": []
+      },
+      {
+        "action_id": "action:controlled-rerun",
+        "object_id": "$OBJECT_ID",
+        "hypothesis_ids": ["hypothesis:input-version", "hypothesis:method-configuration"],
+        "action_family": "CONTROLLED_PHYSICAL_RERUN",
+        "specification": "Prepare a controlled rerun under the approved baseline; do not execute automatically.",
+        "expected_information_value": "Produces comparable evidence if approved and executed by the test owner.",
+        "estimated_seconds": 3600,
+        "reversibility": "PARTIAL",
+        "effect_facts": {"external_write": true, "physical_action": true},
+        "effect_completeness_confirmed": true,
+        "source_refs": ["$EVIDENCE_1", "$EVIDENCE_3"],
+        "missing_evidence": ["approved test slot and baseline manifest"]
+      }
+    ],
+    "decision_analysis": {
+      "decision": "Select the next information-gaining action without changing official criteria.",
+      "criteria": [
+        {
+          "criterion_id": "decision-criterion:information-gain",
+          "name": "information gain before irreversible cost",
+          "mandatory": true,
+          "rationale": "Prefer bounded read-only checks before protected physical work."
+        }
+      ],
+      "evaluations": [],
+      "uncertainty": "The exact run manifest is missing.",
+      "sensitivity": "If a matching sealed manifest is found, the controlled rerun may be unnecessary."
+    },
+    "proposed_frontier": ["action:manifest-compare", "action:sandbox-replay"],
+    "plan_revision_digest": "$HEAD_DIGEST"
+  }
+}

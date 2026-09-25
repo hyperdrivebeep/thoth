@@ -1,0 +1,327 @@
+[
+  {
+    "span_id": "span:synthetic-greenhouse-001",
+    "artifact_id": "artifact:synthetic-greenhouse-log-01",
+    "source_version_id": "source-version:synthetic-greenhouse-01",
+    "exact_text": "Synthetic greenhouse observation 001: station 1 logged a fictional sensor reading during controlled test cycle 1.",
+    "text_sha256": "fee8f23bd73d945cd6ad870d7728fce0ca4fe2ff56ef5d9e73271c894350d367",
+    "locator": {
+      "page": 1,
+      "line": 1,
+      "section": "Synthetic cycle 1",
+      "structural_node_id": "synthetic-node-001"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-002",
+    "artifact_id": "artifact:synthetic-greenhouse-log-01",
+    "source_version_id": "source-version:synthetic-greenhouse-01",
+    "exact_text": "Synthetic greenhouse observation 002: station 2 logged a fictional sensor reading during controlled test cycle 1.",
+    "text_sha256": "da84fddca8fcf71c92b4317bc349d7713df69130c29e9a004b80d219524795d4",
+    "locator": {
+      "page": 1,
+      "line": 2,
+      "section": "Synthetic cycle 1",
+      "structural_node_id": "synthetic-node-002"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-003",
+    "artifact_id": "artifact:synthetic-greenhouse-log-01",
+    "source_version_id": "source-version:synthetic-greenhouse-01",
+    "exact_text": "Synthetic greenhouse observation 003: station 3 logged a fictional sensor reading during controlled test cycle 1.",
+    "text_sha256": "79e90f0fd915246ffb38db1d2ea9b18f351904433d834fb8a2da7ccb1cb22eb8",
+    "locator": {
+      "page": 1,
+      "line": 3,
+      "section": "Synthetic cycle 1",
+      "structural_node_id": "synthetic-node-003"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-004",
+    "artifact_id": "artifact:synthetic-greenhouse-log-01",
+    "source_version_id": "source-version:synthetic-greenhouse-01",
+    "exact_text": "Synthetic greenhouse observation 004: station 4 logged a fictional sensor reading during controlled test cycle 1.",
+    "text_sha256": "19b0d6956d311bd343b8ee96042bfe359e957271c6e30d1a732d5526f46e7fe2",
+    "locator": {
+      "page": 1,
+      "line": 4,
+      "section": "Synthetic cycle 1",
+      "structural_node_id": "synthetic-node-004"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-005",
+    "artifact_id": "artifact:synthetic-greenhouse-log-01",
+    "source_version_id": "source-version:synthetic-greenhouse-01",
+    "exact_text": "Synthetic greenhouse observation 005: station 5 logged a fictional sensor reading during controlled test cycle 1.",
+    "text_sha256": "3e5a80f7b1a0689b475b635c7f237bbda5d2ccfa38120964b90a4c7a73d63e50",
+    "locator": {
+      "page": 1,
+      "line": 5,
+      "section": "Synthetic cycle 1",
+      "structural_node_id": "synthetic-node-005"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-006",
+    "artifact_id": "artifact:synthetic-greenhouse-log-02",
+    "source_version_id": "source-version:synthetic-greenhouse-02",
+    "exact_text": "Synthetic greenhouse observation 006: station 1 logged a fictional sensor reading during controlled test cycle 2.",
+    "text_sha256": "5eadb09f3aa075193a45284cc706c87d36a81f8e1f94c36df3e648b8f5766dff",
+    "locator": {
+      "page": 2,
+      "line": 6,
+      "section": "Synthetic cycle 2",
+      "structural_node_id": "synthetic-node-006"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-007",
+    "artifact_id": "artifact:synthetic-greenhouse-log-02",
+    "source_version_id": "source-version:synthetic-greenhouse-02",
+    "exact_text": "Synthetic greenhouse observation 007: station 2 logged a fictional sensor reading during controlled test cycle 2.",
+    "text_sha256": "a16ed49c7238e94af76935f27975c3c6963471f3851b99e6cc74a7fd24a099e2",
+    "locator": {
+      "page": 2,
+      "line": 7,
+      "section": "Synthetic cycle 2",
+      "structural_node_id": "synthetic-node-007"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-008",
+    "artifact_id": "artifact:synthetic-greenhouse-log-02",
+    "source_version_id": "source-version:synthetic-greenhouse-02",
+    "exact_text": "Synthetic greenhouse observation 008: station 3 logged a fictional sensor reading during controlled test cycle 2.",
+    "text_sha256": "57c53b035fa82f9965386284e38b7cb3a1d535c2f759dc22fb236bca13917ee6",
+    "locator": {
+      "page": 2,
+      "line": 8,
+      "section": "Synthetic cycle 2",
+      "structural_node_id": "synthetic-node-008"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-009",
+    "artifact_id": "artifact:synthetic-greenhouse-log-02",
+    "source_version_id": "source-version:synthetic-greenhouse-02",
+    "exact_text": "Synthetic greenhouse observation 009: station 4 logged a fictional sensor reading during controlled test cycle 2.",
+    "text_sha256": "413b5a83bd2db7e3d25126af357ddcccd79cbeb09b336e0c6774823373bc9f36",
+    "locator": {
+      "page": 2,
+      "line": 9,
+      "section": "Synthetic cycle 2",
+      "structural_node_id": "synthetic-node-009"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-010",
+    "artifact_id": "artifact:synthetic-greenhouse-log-02",
+    "source_version_id": "source-version:synthetic-greenhouse-02",
+    "exact_text": "Synthetic greenhouse observation 010: station 5 logged a fictional sensor reading during controlled test cycle 2.",
+    "text_sha256": "e89ebeb2e569533ef47b9beca1b4c6f9550eecedd4a6e8ac1c23d85afc95712b",
+    "locator": {
+      "page": 2,
+      "line": 10,
+      "section": "Synthetic cycle 2",
+      "structural_node_id": "synthetic-node-010"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-011",
+    "artifact_id": "artifact:synthetic-greenhouse-log-03",
+    "source_version_id": "source-version:synthetic-greenhouse-03",
+    "exact_text": "Synthetic greenhouse observation 011: station 1 logged a fictional sensor reading during controlled test cycle 3.",
+    "text_sha256": "8967279013642e9eee401e59c37fb3381b3e9868d81ee95278300972b6a6f4d3",
+    "locator": {
+      "page": 3,
+      "line": 11,
+      "section": "Synthetic cycle 3",
+      "structural_node_id": "synthetic-node-011"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-012",
+    "artifact_id": "artifact:synthetic-greenhouse-log-03",
+    "source_version_id": "source-version:synthetic-greenhouse-03",
+    "exact_text": "Synthetic greenhouse observation 012: station 2 logged a fictional sensor reading during controlled test cycle 3.",
+    "text_sha256": "5ab156324d7d1853e487f70808335f96a03187570bab28183b7554f05881242f",
+    "locator": {
+      "page": 3,
+      "line": 12,
+      "section": "Synthetic cycle 3",
+      "structural_node_id": "synthetic-node-012"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-013",
+    "artifact_id": "artifact:synthetic-greenhouse-log-03",
+    "source_version_id": "source-version:synthetic-greenhouse-03",
+    "exact_text": "Synthetic greenhouse observation 013: station 3 logged a fictional sensor reading during controlled test cycle 3.",
+    "text_sha256": "19d1356762aa63d7e94419e40d0406e911a9bbf7339340d222122a809dcb94bb",
+    "locator": {
+      "page": 3,
+      "line": 13,
+      "section": "Synthetic cycle 3",
+      "structural_node_id": "synthetic-node-013"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-014",
+    "artifact_id": "artifact:synthetic-greenhouse-log-03",
+    "source_version_id": "source-version:synthetic-greenhouse-03",
+    "exact_text": "Synthetic greenhouse observation 014: station 4 logged a fictional sensor reading during controlled test cycle 3.",
+    "text_sha256": "c8475604003acbe16c6cf52f18c61d234cb857374f594439fbababd3403208bf",
+    "locator": {
+      "page": 3,
+      "line": 14,
+      "section": "Synthetic cycle 3",
+      "structural_node_id": "synthetic-node-014"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-015",
+    "artifact_id": "artifact:synthetic-greenhouse-log-03",
+    "source_version_id": "source-version:synthetic-greenhouse-03",
+    "exact_text": "Synthetic greenhouse observation 015: station 5 logged a fictional sensor reading during controlled test cycle 3.",
+    "text_sha256": "4f378489c3004a4f3e12404f2efdc4a6f4614bed2f8c4025b8239b4656cc95f7",
+    "locator": {
+      "page": 3,
+      "line": 15,
+      "section": "Synthetic cycle 3",
+      "structural_node_id": "synthetic-node-015"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-016",
+    "artifact_id": "artifact:synthetic-greenhouse-log-04",
+    "source_version_id": "source-version:synthetic-greenhouse-04",
+    "exact_text": "Synthetic greenhouse observation 016: station 1 logged a fictional sensor reading during controlled test cycle 4.",
+    "text_sha256": "5459d9d6590c07f85ffd99225525909585701611c96c7ff8b007f974f2c48007",
+    "locator": {
+      "page": 4,
+      "line": 16,
+      "section": "Synthetic cycle 4",
+      "structural_node_id": "synthetic-node-016"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-017",
+    "artifact_id": "artifact:synthetic-greenhouse-log-04",
+    "source_version_id": "source-version:synthetic-greenhouse-04",
+    "exact_text": "Synthetic greenhouse observation 017: station 2 logged a fictional sensor reading during controlled test cycle 4.",
+    "text_sha256": "a0c71d60b40e9aac905298f44bf35436dab06721f5994169dc3cf5d381077c21",
+    "locator": {
+      "page": 4,
+      "line": 17,
+      "section": "Synthetic cycle 4",
+      "structural_node_id": "synthetic-node-017"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-018",
+    "artifact_id": "artifact:synthetic-greenhouse-log-04",
+    "source_version_id": "source-version:synthetic-greenhouse-04",
+    "exact_text": "Synthetic greenhouse observation 018: station 3 logged a fictional sensor reading during controlled test cycle 4.",
+    "text_sha256": "a1de76eb8218023b94ce27641d2584c0500a020e8be98ebc62978d0cd28f9fff",
+    "locator": {
+      "page": 4,
+      "line": 18,
+      "section": "Synthetic cycle 4",
+      "structural_node_id": "synthetic-node-018"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-019",
+    "artifact_id": "artifact:synthetic-greenhouse-log-04",
+    "source_version_id": "source-version:synthetic-greenhouse-04",
+    "exact_text": "Synthetic greenhouse observation 019: station 4 logged a fictional sensor reading during controlled test cycle 4.",
+    "text_sha256": "c4e09e2ad0d491059ec67acf4e76aaec04ca08abecf55023e42f02d847686e71",
+    "locator": {
+      "page": 4,
+      "line": 19,
+      "section": "Synthetic cycle 4",
+      "structural_node_id": "synthetic-node-019"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-020",
+    "artifact_id": "artifact:synthetic-greenhouse-log-04",
+    "source_version_id": "source-version:synthetic-greenhouse-04",
+    "exact_text": "Synthetic greenhouse observation 020: station 5 logged a fictional sensor reading during controlled test cycle 4.",
+    "text_sha256": "6181734ffcc597060c0d75042b1fa447c3025d6e036a209d775f6384c57bd14c",
+    "locator": {
+      "page": 4,
+      "line": 20,
+      "section": "Synthetic cycle 4",
+      "structural_node_id": "synthetic-node-020"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-021",
+    "artifact_id": "artifact:synthetic-greenhouse-log-05",
+    "source_version_id": "source-version:synthetic-greenhouse-05",
+    "exact_text": "Synthetic greenhouse observation 021: station 1 logged a fictional sensor reading during controlled test cycle 5.",
+    "text_sha256": "5bf5f64e52a508c4267d3e750dff4f4ef4218cc920ba82903430563403331312",
+    "locator": {
+      "page": 5,
+      "line": 21,
+      "section": "Synthetic cycle 5",
+      "structural_node_id": "synthetic-node-021"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-022",
+    "artifact_id": "artifact:synthetic-greenhouse-log-05",
+    "source_version_id": "source-version:synthetic-greenhouse-05",
+    "exact_text": "Synthetic greenhouse observation 022: station 2 logged a fictional sensor reading during controlled test cycle 5.",
+    "text_sha256": "5590b71789bcef04d2dd247fc4dad3502883ef404a554c1b031b3c8453633d56",
+    "locator": {
+      "page": 5,
+      "line": 22,
+      "section": "Synthetic cycle 5",
+      "structural_node_id": "synthetic-node-022"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-023",
+    "artifact_id": "artifact:synthetic-greenhouse-log-05",
+    "source_version_id": "source-version:synthetic-greenhouse-05",
+    "exact_text": "Synthetic greenhouse observation 023: station 3 logged a fictional sensor reading during controlled test cycle 5.",
+    "text_sha256": "6093fb464146b2dadbf9b48a0fb8718c444cc9907e7a3c27020b15d2f00ef5c4",
+    "locator": {
+      "page": 5,
+      "line": 23,
+      "section": "Synthetic cycle 5",
+      "structural_node_id": "synthetic-node-023"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-024",
+    "artifact_id": "artifact:synthetic-greenhouse-log-05",
+    "source_version_id": "source-version:synthetic-greenhouse-05",
+    "exact_text": "Synthetic greenhouse observation 024: station 4 logged a fictional sensor reading during controlled test cycle 5.",
+    "text_sha256": "86eb932ef7a04ace0b272964f0d97aa37698b220a21ec1b1879e77fe1115c809",
+    "locator": {
+      "page": 5,
+      "line": 24,
+      "section": "Synthetic cycle 5",
+      "structural_node_id": "synthetic-node-024"
+    }
+  },
+  {
+    "span_id": "span:synthetic-greenhouse-025",
+    "artifact_id": "artifact:synthetic-greenhouse-log-05",
+    "source_version_id": "source-version:synthetic-greenhouse-05",
+    "exact_text": "Synthetic greenhouse observation 025: station 5 logged a fictional sensor reading during controlled test cycle 5.",
+    "text_sha256": "9e396f5929360df7aa191a73af3258fabc3acb3efc8fd43d9d680cff47311769",
+    "locator": {
+      "page": 5,
+      "line": 25,
+      "section": "Synthetic cycle 5",
+      "structural_node_id": "synthetic-node-025"
+    }
+  }
+]

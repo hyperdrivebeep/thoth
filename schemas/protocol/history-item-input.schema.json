@@ -1,0 +1,117 @@
+{
+  "$defs": {
+    "HistoryRecordRef": {
+      "additionalProperties": false,
+      "properties": {
+        "immutable_id": {
+          "title": "Immutable Id",
+          "type": "string"
+        },
+        "owner_kind": {
+          "enum": [
+            "SEMANTIC_REVISION",
+            "FULL_MEMORY"
+          ],
+          "title": "Owner Kind",
+          "type": "string"
+        },
+        "project_id": {
+          "title": "Project Id",
+          "type": "string"
+        },
+        "revision_digest": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Revision Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner_kind",
+        "project_id",
+        "immutable_id",
+        "revision_digest"
+      ],
+      "title": "HistoryRecordRef",
+      "type": "object"
+    },
+    "HistoryScope": {
+      "additionalProperties": false,
+      "properties": {
+        "entity_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entity Ref"
+        },
+        "project_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "title": "Project Id",
+          "type": "string"
+        },
+        "request_revision_digest": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Fa-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Request Revision Digest"
+        },
+        "thread_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Thread Id"
+        }
+      },
+      "required": [
+        "project_id"
+      ],
+      "title": "HistoryScope",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": 2,
+      "default": 2,
+      "title": "Contract Version",
+      "type": "integer"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "record_ref": {
+      "$ref": "#/$defs/HistoryRecordRef"
+    },
+    "scope": {
+      "$ref": "#/$defs/HistoryScope"
+    }
+  },
+  "required": [
+    "project_id",
+    "scope",
+    "record_ref"
+  ],
+  "title": "HistoryItemInput",
+  "type": "object"
+}

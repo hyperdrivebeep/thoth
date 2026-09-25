@@ -1,0 +1,177 @@
+{
+  "$defs": {
+    "HistoryCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "association": {
+          "default": "EXACT",
+          "enum": [
+            "EXACT",
+            "PARTIAL",
+            "UNRESOLVED"
+          ],
+          "title": "Association",
+          "type": "string"
+        },
+        "reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "scan": {
+          "default": "COMPLETE_PAGE",
+          "enum": [
+            "COMPLETE_PAGE",
+            "CONTINUATION",
+            "LIMITED"
+          ],
+          "title": "Scan",
+          "type": "string"
+        },
+        "visibility": {
+          "const": "AUTHORIZED_SUBSET",
+          "default": "AUTHORIZED_SUBSET",
+          "title": "Visibility",
+          "type": "string"
+        }
+      },
+      "title": "HistoryCoverage",
+      "type": "object"
+    },
+    "SemanticChangeGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "changes": {
+          "items": {
+            "$ref": "#/$defs/SemanticDiffEntry"
+          },
+          "title": "Changes",
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "CONTENT",
+            "EVIDENCE",
+            "CONDITION",
+            "STATUS",
+            "IMPACT",
+            "OTHER"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "trace_paths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Trace Paths",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "trace_paths",
+        "changes",
+        "summary"
+      ],
+      "title": "SemanticChangeGroup",
+      "type": "object"
+    },
+    "SemanticDiffEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "after": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "After"
+        },
+        "after_present": {
+          "title": "After Present",
+          "type": "boolean"
+        },
+        "before": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Before"
+        },
+        "before_present": {
+          "title": "Before Present",
+          "type": "boolean"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "before_present",
+        "after_present"
+      ],
+      "title": "SemanticDiffEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": 2,
+      "default": 2,
+      "title": "Contract Version",
+      "type": "integer"
+    },
+    "coverage": {
+      "$ref": "#/$defs/HistoryCoverage"
+    },
+    "diff": {
+      "items": {
+        "$ref": "#/$defs/SemanticDiffEntry"
+      },
+      "title": "Diff",
+      "type": "array"
+    },
+    "from_revision_digest": {
+      "pattern": "^[A-Fa-f0-9]{64}$",
+      "title": "From Revision Digest",
+      "type": "string"
+    },
+    "summary_groups": {
+      "items": {
+        "$ref": "#/$defs/SemanticChangeGroup"
+      },
+      "title": "Summary Groups",
+      "type": "array"
+    },
+    "to_revision_digest": {
+      "pattern": "^[A-Fa-f0-9]{64}$",
+      "title": "To Revision Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "from_revision_digest",
+    "to_revision_digest",
+    "diff",
+    "summary_groups",
+    "coverage"
+  ],
+  "title": "HistoryDiff",
+  "type": "object"
+}

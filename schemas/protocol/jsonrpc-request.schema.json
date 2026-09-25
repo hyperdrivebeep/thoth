@@ -1,0 +1,122 @@
+{
+  "$defs": {
+    "JsonValue": {},
+    "RpcMeta": {
+      "additionalProperties": false,
+      "properties": {
+        "dataScope": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Datascope",
+          "type": "object"
+        },
+        "expectedHeadDigest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expectedheaddigest"
+        },
+        "fieldSessionId": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fieldsessionid"
+        },
+        "idempotencyKey": {
+          "maxLength": 260,
+          "minLength": 1,
+          "title": "Idempotencykey",
+          "type": "string"
+        },
+        "progressToken": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Progresstoken"
+        }
+      },
+      "required": [
+        "idempotencyKey"
+      ],
+      "title": "RpcMeta",
+      "type": "object"
+    },
+    "RpcParams": {
+      "additionalProperties": false,
+      "properties": {
+        "_meta": {
+          "$ref": "#/$defs/RpcMeta"
+        },
+        "input": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Input",
+          "type": "object"
+        }
+      },
+      "required": [
+        "_meta",
+        "input"
+      ],
+      "title": "RpcParams",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer"
+        }
+      ],
+      "title": "Id"
+    },
+    "jsonrpc": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Jsonrpc",
+      "type": "string"
+    },
+    "method": {
+      "maxLength": 160,
+      "minLength": 1,
+      "title": "Method",
+      "type": "string"
+    },
+    "params": {
+      "$ref": "#/$defs/RpcParams"
+    }
+  },
+  "required": [
+    "id",
+    "method",
+    "params"
+  ],
+  "title": "JsonRpcRequest",
+  "type": "object"
+}

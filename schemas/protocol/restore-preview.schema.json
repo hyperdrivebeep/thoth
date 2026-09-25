@@ -1,0 +1,320 @@
+{
+  "$defs": {
+    "EntityType": {
+      "enum": [
+        "PROJECT",
+        "THREAD",
+        "DECISION_OBJECT",
+        "ARTIFACT",
+        "EVIDENCE",
+        "CRITERION",
+        "HYPOTHESIS",
+        "ACTION",
+        "EXECUTION",
+        "OUTCOME",
+        "MEMORY",
+        "CLOSURE",
+        "EXPORT"
+      ],
+      "title": "EntityType",
+      "type": "string"
+    },
+    "HistoryCapability": {
+      "additionalProperties": false,
+      "properties": {
+        "apply_ready": {
+          "default": false,
+          "title": "Apply Ready",
+          "type": "boolean"
+        },
+        "preview_supported": {
+          "default": false,
+          "title": "Preview Supported",
+          "type": "boolean"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "restore": {
+          "default": "READ_ONLY",
+          "enum": [
+            "RESTORE_SUPPORTED",
+            "READ_ONLY",
+            "UNSUPPORTED"
+          ],
+          "title": "Restore",
+          "type": "string"
+        }
+      },
+      "title": "HistoryCapability",
+      "type": "object"
+    },
+    "ImpactPropagationPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "invalidated_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Invalidated Refs",
+          "type": "array"
+        },
+        "recalculate_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Recalculate Refs",
+          "type": "array"
+        },
+        "stale_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Stale Refs",
+          "type": "array"
+        }
+      },
+      "title": "ImpactPropagationPlan",
+      "type": "object"
+    },
+    "RestoreSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "entity_id": {
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "entity_type": {
+          "$ref": "#/$defs/EntityType"
+        },
+        "expected_current_head": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Expected Current Head",
+          "type": "string"
+        },
+        "project_id": {
+          "title": "Project Id",
+          "type": "string"
+        },
+        "target_revision_digest": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Target Revision Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_id",
+        "entity_type",
+        "entity_id",
+        "target_revision_digest",
+        "expected_current_head"
+      ],
+      "title": "RestoreSelection",
+      "type": "object"
+    },
+    "SemanticChangeGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "changes": {
+          "items": {
+            "$ref": "#/$defs/SemanticDiffEntry"
+          },
+          "title": "Changes",
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "CONTENT",
+            "EVIDENCE",
+            "CONDITION",
+            "STATUS",
+            "IMPACT",
+            "OTHER"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "trace_paths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Trace Paths",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "trace_paths",
+        "changes",
+        "summary"
+      ],
+      "title": "SemanticChangeGroup",
+      "type": "object"
+    },
+    "SemanticDiffEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "after": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "After"
+        },
+        "after_present": {
+          "title": "After Present",
+          "type": "boolean"
+        },
+        "before": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Before"
+        },
+        "before_present": {
+          "title": "Before Present",
+          "type": "boolean"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "before_present",
+        "after_present"
+      ],
+      "title": "SemanticDiffEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actor_scope_digest": {
+      "pattern": "^[A-Fa-f0-9]{64}$",
+      "title": "Actor Scope Digest",
+      "type": "string"
+    },
+    "availability": {
+      "enum": [
+        "AVAILABLE",
+        "BLOCKED",
+        "NO_CHANGE"
+      ],
+      "title": "Availability",
+      "type": "string"
+    },
+    "basis_digest": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Basis Digest"
+    },
+    "capability": {
+      "$ref": "#/$defs/HistoryCapability"
+    },
+    "contract_version": {
+      "const": 2,
+      "default": 2,
+      "title": "Contract Version",
+      "type": "integer"
+    },
+    "diff": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SemanticDiffEntry"
+      },
+      "title": "Diff",
+      "type": "array"
+    },
+    "external_effects": {
+      "const": "PRESERVED",
+      "default": "PRESERVED",
+      "title": "External Effects",
+      "type": "string"
+    },
+    "impact": {
+      "$ref": "#/$defs/ImpactPropagationPlan"
+    },
+    "profile_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Profile Id"
+    },
+    "reanalysis": {
+      "const": "NOT_REQUESTED",
+      "default": "NOT_REQUESTED",
+      "title": "Reanalysis",
+      "type": "string"
+    },
+    "reason_codes": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "selection": {
+      "$ref": "#/$defs/RestoreSelection"
+    },
+    "source_drift": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Drift",
+      "type": "array"
+    },
+    "summary_groups": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SemanticChangeGroup"
+      },
+      "title": "Summary Groups",
+      "type": "array"
+    }
+  },
+  "required": [
+    "selection",
+    "availability",
+    "capability",
+    "actor_scope_digest"
+  ],
+  "title": "RestorePreview",
+  "type": "object"
+}

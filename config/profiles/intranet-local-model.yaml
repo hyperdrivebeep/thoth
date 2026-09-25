@@ -1,0 +1,21 @@
+profile_id: profile:intranet-local-model-v1
+deployment: INTRANET
+bind_host: 0.0.0.0
+model_route: OPENAI_COMPATIBLE_LOCAL
+egress_policy: DENY_ALL
+allowed_egress_hosts: []
+connector_allowlist:
+  - bounded-network-share
+  - local-file-upload
+  - internal-git-readonly
+data_residency: All canonical data and model context remain inside the accredited intranet boundary.
+model_data_may_leave_boundary: false
+external_writes_enabled: false
+physical_actions_enabled: false
+adapter_available: false
+sandbox_route: GVISOR
+sandbox_adapter_available: false
+sandbox_network_policy: DENY_ALL
+notes:
+  - Configuration contract only; local compatible model adapter and institutional accreditation are external gates.
+  - gVisor requires an accredited Linux staging deployment and contract bake-off.

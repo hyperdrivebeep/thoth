@@ -1,0 +1,269 @@
+{
+  "$defs": {
+    "BasisCurrentness": {
+      "additionalProperties": false,
+      "properties": {
+        "execution_eligible": {
+          "default": false,
+          "title": "Execution Eligible",
+          "type": "boolean"
+        },
+        "reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "state": {
+          "enum": [
+            "CURRENT",
+            "REVIEW_REQUIRED",
+            "INVALIDATED",
+            "UNKNOWN_BASIS",
+            "UNAVAILABLE"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "title": "BasisCurrentness",
+      "type": "object"
+    },
+    "DecisionDeltaGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "changes": {
+          "items": {
+            "$ref": "#/$defs/SemanticDiffEntry"
+          },
+          "title": "Changes",
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "CONTENT",
+            "EVIDENCE",
+            "CONDITION",
+            "STATUS",
+            "ACTION",
+            "OTHER"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "trace_paths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Trace Paths",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "trace_paths",
+        "changes"
+      ],
+      "title": "DecisionDeltaGroup",
+      "type": "object"
+    },
+    "ResultIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "request_revision_digest": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Request Revision Digest",
+          "type": "string"
+        },
+        "result_revision_digest": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Result Revision Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_revision_digest",
+        "result_revision_digest"
+      ],
+      "title": "ResultIdentity",
+      "type": "object"
+    },
+    "RevisionRef": {
+      "additionalProperties": false,
+      "properties": {
+        "entity_id": {
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "entity_type": {
+          "title": "Entity Type",
+          "type": "string"
+        },
+        "project_id": {
+          "title": "Project Id",
+          "type": "string"
+        },
+        "revision_digest": {
+          "title": "Revision Digest",
+          "type": "string"
+        },
+        "revision_id": {
+          "title": "Revision Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": "2.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_id",
+        "entity_type",
+        "entity_id",
+        "revision_id",
+        "revision_digest"
+      ],
+      "title": "RevisionRef",
+      "type": "object"
+    },
+    "SemanticDiffEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "after": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "After"
+        },
+        "after_present": {
+          "title": "After Present",
+          "type": "boolean"
+        },
+        "before": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Before"
+        },
+        "before_present": {
+          "title": "Before Present",
+          "type": "boolean"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "before_present",
+        "after_present"
+      ],
+      "title": "SemanticDiffEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "after": {
+      "$ref": "#/$defs/ResultIdentity"
+    },
+    "basis_currentness": {
+      "additionalProperties": {
+        "$ref": "#/$defs/BasisCurrentness"
+      },
+      "title": "Basis Currentness",
+      "type": "object"
+    },
+    "before": {
+      "$ref": "#/$defs/ResultIdentity"
+    },
+    "contract_version": {
+      "const": 2,
+      "default": 2,
+      "title": "Contract Version",
+      "type": "integer"
+    },
+    "groups": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/DecisionDeltaGroup"
+      },
+      "title": "Groups",
+      "type": "array"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "reason_codes": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "reason_refs": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/RevisionRef"
+      },
+      "title": "Reason Refs",
+      "type": "array"
+    },
+    "reason_state": {
+      "enum": [
+        "RECORDED",
+        "UNKNOWN_REASON"
+      ],
+      "title": "Reason State",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "CHANGED",
+        "NO_CHANGE",
+        "PARTIAL",
+        "UNAVAILABLE"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "thread_id": {
+      "title": "Thread Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "thread_id",
+    "before",
+    "after",
+    "state",
+    "reason_state",
+    "basis_currentness"
+  ],
+  "title": "DecisionDelta",
+  "type": "object"
+}

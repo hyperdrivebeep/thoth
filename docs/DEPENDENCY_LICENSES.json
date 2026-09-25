@@ -1,0 +1,367 @@
+{
+  "method": "constraints from manifests; resolved versions from uv.lock and pnpm-lock.yaml; license values from current installed package metadata when available",
+  "not_bundled": [
+    ".venv",
+    "node_modules"
+  ],
+  "python": [
+    {
+      "name": "hatchling",
+      "group": "build-system",
+      "constraint": ">=1.27,<2",
+      "locked_version": null,
+      "license_metadata": "MIT",
+      "note": "Observed clean build WHEEL generator; build-system range is not pinned in uv.lock.",
+      "observed_build_version": "1.32.4",
+      "license_source": "https://pypi.org/pypi/hatchling/1.32.4/json"
+    },
+    {
+      "name": "alembic",
+      "group": "base",
+      "constraint": ">=1.14,<2",
+      "locked_version": "1.19.1",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "defusedxml",
+      "group": "base",
+      "constraint": ">=0.7,<1",
+      "locked_version": "0.7.1",
+      "license_metadata": "PSFL"
+    },
+    {
+      "name": "fastapi",
+      "group": "base",
+      "constraint": ">=0.115,<1",
+      "locked_version": "0.141.1",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "httpx",
+      "group": "base",
+      "constraint": ">=0.28,<1",
+      "locked_version": "0.28.1",
+      "license_metadata": "BSD-3-Clause"
+    },
+    {
+      "name": "lxml",
+      "group": "base",
+      "constraint": ">=5.3,<7",
+      "locked_version": "6.1.2",
+      "license_metadata": "BSD-3-Clause"
+    },
+    {
+      "name": "openai",
+      "group": "base",
+      "constraint": ">=1.60,<3",
+      "locked_version": "2.54.0",
+      "license_metadata": "Apache-2.0"
+    },
+    {
+      "name": "openpyxl",
+      "group": "base",
+      "constraint": ">=3.1,<4",
+      "locked_version": "3.1.5",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "orjson",
+      "group": "base",
+      "constraint": ">=3.10,<4",
+      "locked_version": "3.12.0",
+      "license_metadata": "MPL-2.0 AND (Apache-2.0 OR MIT)"
+    },
+    {
+      "name": "pydantic",
+      "group": "base",
+      "constraint": ">=2.10,<3",
+      "locked_version": "2.13.5",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "pypdf",
+      "group": "base",
+      "constraint": ">=5.1,<7",
+      "locked_version": "6.16.2",
+      "license_metadata": "BSD-3-Clause"
+    },
+    {
+      "name": "python-docx",
+      "group": "base",
+      "constraint": ">=1.1,<2",
+      "locked_version": "1.2.0",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "python-multipart",
+      "group": "base",
+      "constraint": ">=0.0.20,<1",
+      "locked_version": "0.0.32",
+      "license_metadata": "Apache-2.0"
+    },
+    {
+      "name": "pyyaml",
+      "group": "base",
+      "constraint": ">=6.0,<7",
+      "locked_version": "6.0.3",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "rich",
+      "group": "base",
+      "constraint": ">=13.9,<15",
+      "locked_version": "14.3.4",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "sqlalchemy",
+      "group": "base",
+      "constraint": ">=2.0,<3",
+      "locked_version": "2.0.52",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "typer",
+      "group": "base",
+      "constraint": ">=0.15,<1",
+      "locked_version": "0.26.8",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "uvicorn[standard]",
+      "group": "base",
+      "constraint": ">=0.34,<1",
+      "locked_version": "0.52.4",
+      "license_metadata": "BSD-3-Clause",
+      "note": "standard extra dependencies are transitive and not audited here"
+    },
+    {
+      "name": "docling",
+      "group": "structured-pdf",
+      "constraint": "==2.127.0",
+      "locked_version": "2.127.0",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "basedpyright",
+      "group": "dev-extra",
+      "constraint": ">=1.26,<2",
+      "locked_version": "1.39.10",
+      "license_metadata": "MIT classifier"
+    },
+    {
+      "name": "pytest",
+      "group": "dev-extra",
+      "constraint": ">=8.3,<10",
+      "locked_version": "9.1.1",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "pytest-asyncio",
+      "group": "dev-extra",
+      "constraint": ">=0.25,<2",
+      "locked_version": "1.4.0",
+      "license_metadata": "Apache-2.0"
+    },
+    {
+      "name": "pytest-cov",
+      "group": "dev-extra",
+      "constraint": ">=6,<8",
+      "locked_version": "7.1.0",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "ruff",
+      "group": "dev-extra",
+      "constraint": ">=0.9,<1",
+      "locked_version": "0.16.5",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "boto3",
+      "group": "connectors",
+      "constraint": ">=1.40,<2",
+      "locked_version": "1.43.83",
+      "license_metadata": "Apache-2.0"
+    },
+    {
+      "name": "mcp",
+      "group": "connectors",
+      "constraint": ">=1.28,<3",
+      "locked_version": "2.1.1",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "psycopg[binary]",
+      "group": "connectors",
+      "constraint": ">=3.2,<4",
+      "locked_version": "3.3.4",
+      "license_metadata": "LGPL-3.0-only",
+      "note": "binary extra package metadata not separately audited"
+    },
+    {
+      "name": "e2b",
+      "group": "managed",
+      "constraint": ">=1.10,<3",
+      "locked_version": "2.46.0",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "playwright",
+      "group": "browser",
+      "constraint": ">=1.55,<2",
+      "locked_version": "1.62.0",
+      "license_metadata": "Apache-2.0"
+    },
+    {
+      "name": "reportlab",
+      "group": "dependency-group-dev",
+      "constraint": ">=4.2,<5",
+      "locked_version": "4.5.1",
+      "license_metadata": "BSD license; metadata points to package license.txt"
+    }
+  ],
+  "web": [
+    {
+      "name": "@blueprintjs/core",
+      "group": "dependencies",
+      "specifier": "6.18.0",
+      "locked_version": "6.18.0",
+      "license_metadata": "Apache-2.0"
+    },
+    {
+      "name": "@blueprintjs/icons",
+      "group": "dependencies",
+      "specifier": "6.13.0",
+      "locked_version": "6.13.0",
+      "license_metadata": "Apache-2.0"
+    },
+    {
+      "name": "@tanstack/react-query",
+      "group": "dependencies",
+      "specifier": "^5.66.0",
+      "locked_version": "5.102.8",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "react",
+      "group": "dependencies",
+      "specifier": "^19.0.0",
+      "locked_version": "19.2.8",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "react-dom",
+      "group": "dependencies",
+      "specifier": "^19.0.0",
+      "locked_version": "19.2.8",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "zod",
+      "group": "dependencies",
+      "specifier": "^3.24.0",
+      "locked_version": "3.25.76",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "@eslint/js",
+      "group": "devDependencies",
+      "specifier": "^9.19.0",
+      "locked_version": "9.39.5",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "@types/react",
+      "group": "devDependencies",
+      "specifier": "^19.0.8",
+      "locked_version": "19.2.18",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "@types/react-dom",
+      "group": "devDependencies",
+      "specifier": "^19.0.3",
+      "locked_version": "19.2.5",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "@vitejs/plugin-react",
+      "group": "devDependencies",
+      "specifier": "^4.3.4",
+      "locked_version": "4.7.0",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "eslint",
+      "group": "devDependencies",
+      "specifier": "^9.19.0",
+      "locked_version": "9.39.5",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "eslint-plugin-react-hooks",
+      "group": "devDependencies",
+      "specifier": "^5.0.0",
+      "locked_version": "5.2.0",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "eslint-plugin-react-refresh",
+      "group": "devDependencies",
+      "specifier": "^0.4.18",
+      "locked_version": "0.4.26",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "globals",
+      "group": "devDependencies",
+      "specifier": "^15.14.0",
+      "locked_version": "15.15.0",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "jsdom",
+      "group": "devDependencies",
+      "specifier": "26.1.0",
+      "locked_version": "26.1.0",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "typescript",
+      "group": "devDependencies",
+      "specifier": "~5.7.3",
+      "locked_version": "5.7.3",
+      "license_metadata": "Apache-2.0"
+    },
+    {
+      "name": "typescript-eslint",
+      "group": "devDependencies",
+      "specifier": "^8.22.0",
+      "locked_version": "8.68.0",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "vite",
+      "group": "devDependencies",
+      "specifier": "^6.1.0",
+      "locked_version": "6.4.3",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "vitest",
+      "group": "devDependencies",
+      "specifier": "^3.0.5",
+      "locked_version": "3.2.7",
+      "license_metadata": "MIT"
+    },
+    {
+      "name": "@types/node",
+      "group": "devDependencies",
+      "constraint": "22.20.4",
+      "locked_version": "22.20.4",
+      "license_metadata": "MIT",
+      "note": "Added to public preview to make isolated tsc build reproducible; installed package metadata inspected."
+    }
+  ]
+}

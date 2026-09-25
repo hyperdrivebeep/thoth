@@ -1,0 +1,12 @@
+{
+  "helpers": {
+    "scripts/check_module_budget.py": {
+      "allowed_argv": [[]],
+      "files": {
+        "scripts/check_module_budget.py": "7a90010afcaaad5cff0adabe8941fa06f5075badb01b0e374fe5d8d163355aac"
+      }
+    }
+  },
+  "parser_sha256": "68b0e0f3dbb61c581ad546fc3fdeef4c2c2e1c4ad295fefcf3952571ca133783",
+  "schema_version": "1.0.0"
+}

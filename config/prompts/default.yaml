@@ -1,0 +1,10 @@
+kind: PROMPT_BUNDLE
+version: 1.0.0
+system_contract: evidence-first-rnd
+required_sections:
+  - decision_objects
+  - evidence_refs
+  - uncertainty
+forbidden_outputs:
+  - hidden_chain_of_thought
+  - unsupported_truth_certification

@@ -1,0 +1,5092 @@
+{
+  "schema_version": "1.0.0",
+  "authority": "PROJECT_WIKI/30_ARCHITECTURE/rpc-method-catalog.md",
+  "canonical_method_count": 332,
+  "compatibility_alias_count": 6,
+  "runtime_method_count": 338,
+  "notification_count": 221,
+  "methods": [
+    {
+      "name": "action/audit/read",
+      "namespace": "action",
+      "surface": "QUERY",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/authorization/decide",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/authorization/prepare",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/authorization/read",
+      "namespace": "action",
+      "surface": "QUERY",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/compensation/create",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/create",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/generate",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/impact/read",
+      "namespace": "action",
+      "surface": "QUERY",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/impact/recalculate",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/list",
+      "namespace": "action",
+      "surface": "QUERY",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/merge/propose",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/plan/compose",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/plan/graph",
+      "namespace": "action",
+      "surface": "QUERY",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/plan/read",
+      "namespace": "action",
+      "surface": "QUERY",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/plan/revalidate",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/plan/revise",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/policy/classify",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/policy/read",
+      "namespace": "action",
+      "surface": "QUERY",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/portfolio/compose",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/portfolio/evaluate",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/portfolio/list",
+      "namespace": "action",
+      "surface": "QUERY",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/portfolio/read",
+      "namespace": "action",
+      "surface": "QUERY",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/preflight/read",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": false,
+      "alias_target": "action/authorization/prepare",
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/read",
+      "namespace": "action",
+      "surface": "QUERY",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/recommend",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/revise",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/select",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/step/add",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/step/read",
+      "namespace": "action",
+      "surface": "QUERY",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/step/revise",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/audit/read",
+      "namespace": "closure",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/decide",
+      "namespace": "closure",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/finalize",
+      "namespace": "closure",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": false,
+      "alias_target": "closure/decide",
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/followup/create",
+      "namespace": "closure",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/list",
+      "namespace": "closure",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/openItem/list",
+      "namespace": "closure",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/package/read",
+      "namespace": "closure",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/prepare",
+      "namespace": "closure",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/purge/prepare",
+      "namespace": "closure",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/read",
+      "namespace": "closure",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/readiness/assess",
+      "namespace": "closure",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/readiness/read",
+      "namespace": "closure",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/reopen",
+      "namespace": "closure",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/reopen/read",
+      "namespace": "closure",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/retention/plan",
+      "namespace": "closure",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "closure/retention/read",
+      "namespace": "closure",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "closure:versioned-policy",
+      "normal_entrypoint": "closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/audit/read",
+      "namespace": "criteria",
+      "surface": "QUERY",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/change/propose",
+      "namespace": "criteria",
+      "surface": "COMMAND",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/compile",
+      "namespace": "criteria",
+      "surface": "COMMAND",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/conflict/list",
+      "namespace": "criteria",
+      "surface": "QUERY",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/conflict/read",
+      "namespace": "criteria",
+      "surface": "QUERY",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/field/correct",
+      "namespace": "criteria",
+      "surface": "COMMAND",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/list",
+      "namespace": "criteria",
+      "surface": "QUERY",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/profile/apply",
+      "namespace": "criteria",
+      "surface": "COMMAND",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/profile/list",
+      "namespace": "criteria",
+      "surface": "QUERY",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/profile/read",
+      "namespace": "criteria",
+      "surface": "QUERY",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/read",
+      "namespace": "criteria",
+      "surface": "QUERY",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/recalculate",
+      "namespace": "criteria",
+      "surface": "COMMAND",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/reference/generate",
+      "namespace": "criteria",
+      "surface": "COMMAND",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/reference/list",
+      "namespace": "criteria",
+      "surface": "QUERY",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/reference/read",
+      "namespace": "criteria",
+      "surface": "QUERY",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "criteria/revalidate",
+      "namespace": "criteria",
+      "surface": "COMMAND",
+      "canonical_owner": "CRITERION",
+      "policy": "criteria:versioned-policy",
+      "normal_entrypoint": "thread/input|criteria/compile",
+      "behavioral_evidence": [
+        "A09"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/audit/read",
+      "namespace": "evidence",
+      "surface": "QUERY",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/challenge",
+      "namespace": "evidence",
+      "surface": "COMMAND",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/conflict/list",
+      "namespace": "evidence",
+      "surface": "QUERY",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/conflict/read",
+      "namespace": "evidence",
+      "surface": "QUERY",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/link/correct",
+      "namespace": "evidence",
+      "surface": "COMMAND",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/link/propose",
+      "namespace": "evidence",
+      "surface": "COMMAND",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/list",
+      "namespace": "evidence",
+      "surface": "QUERY",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/packet/read",
+      "namespace": "evidence",
+      "surface": "QUERY",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/read",
+      "namespace": "evidence",
+      "surface": "QUERY",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/revalidate",
+      "namespace": "evidence",
+      "surface": "COMMAND",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/source/add",
+      "namespace": "evidence",
+      "surface": "COMMAND",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/source/metadata/correct",
+      "namespace": "evidence",
+      "surface": "COMMAND",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/source/refresh",
+      "namespace": "evidence",
+      "surface": "COMMAND",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "evidence/span/correct",
+      "namespace": "evidence",
+      "surface": "COMMAND",
+      "canonical_owner": "EVIDENCE_OBSERVATION_CLAIM",
+      "policy": "evidence:versioned-policy",
+      "normal_entrypoint": "project/source/connect|thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/attempt/list",
+      "namespace": "execution",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/attempt/read",
+      "namespace": "execution",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/audit/read",
+      "namespace": "execution",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/cancel",
+      "namespace": "execution",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/compensation/propose",
+      "namespace": "execution",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/effect/read",
+      "namespace": "execution",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/frontier/read",
+      "namespace": "execution",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/invalidate",
+      "namespace": "execution",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/list",
+      "namespace": "execution",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/observation/link",
+      "namespace": "execution",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/pause",
+      "namespace": "execution",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/preflight/read",
+      "namespace": "execution",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/read",
+      "namespace": "execution",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/reconcile",
+      "namespace": "execution",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/reconciliation/read",
+      "namespace": "execution",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/resume",
+      "namespace": "execution",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/retry",
+      "namespace": "execution",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "execution/start",
+      "namespace": "execution",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "execution:versioned-policy",
+      "normal_entrypoint": "thread/input|execution/start",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/artifact/list",
+      "namespace": "export",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/audit/read",
+      "namespace": "export",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/correction/create",
+      "namespace": "export",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/correction/read",
+      "namespace": "export",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/generate",
+      "namespace": "export",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/list",
+      "namespace": "export",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/manifest/read",
+      "namespace": "export",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/plan/create",
+      "namespace": "export",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/plan/read",
+      "namespace": "export",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/prepare",
+      "namespace": "export",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": false,
+      "alias_target": "export/plan/create",
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/read",
+      "namespace": "export",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/release/prepare",
+      "namespace": "export",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/release/read",
+      "namespace": "export",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/snapshot/create",
+      "namespace": "export",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/snapshot/read",
+      "namespace": "export",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/verification/read",
+      "namespace": "export",
+      "surface": "QUERY",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "export/verify",
+      "namespace": "export",
+      "surface": "COMMAND",
+      "canonical_owner": "CLOSURE_EXPORT",
+      "policy": "export:versioned-policy",
+      "normal_entrypoint": "export/plan/create",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "field/event/record",
+      "namespace": "field",
+      "surface": "COMMAND",
+      "canonical_owner": "FIELD_MEASUREMENT_LEDGER",
+      "policy": "field:versioned-policy",
+      "normal_entrypoint": "field/protocol/seal|normal RPC fieldSessionId",
+      "behavioral_evidence": [
+        "A12"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "field/export/build",
+      "namespace": "field",
+      "surface": "COMMAND",
+      "canonical_owner": "FIELD_MEASUREMENT_LEDGER",
+      "policy": "field:versioned-policy",
+      "normal_entrypoint": "field/protocol/seal|normal RPC fieldSessionId",
+      "behavioral_evidence": [
+        "A12"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "field/protocol/seal",
+      "namespace": "field",
+      "surface": "COMMAND",
+      "canonical_owner": "FIELD_MEASUREMENT_LEDGER",
+      "policy": "field:versioned-policy",
+      "normal_entrypoint": "field/protocol/seal|normal RPC fieldSessionId",
+      "behavioral_evidence": [
+        "A12"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "field/score/record",
+      "namespace": "field",
+      "surface": "COMMAND",
+      "canonical_owner": "FIELD_MEASUREMENT_LEDGER",
+      "policy": "field:versioned-policy",
+      "normal_entrypoint": "field/protocol/seal|normal RPC fieldSessionId",
+      "behavioral_evidence": [
+        "A12"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "field/session/end",
+      "namespace": "field",
+      "surface": "COMMAND",
+      "canonical_owner": "FIELD_MEASUREMENT_LEDGER",
+      "policy": "field:versioned-policy",
+      "normal_entrypoint": "field/protocol/seal|normal RPC fieldSessionId",
+      "behavioral_evidence": [
+        "A12"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "field/session/start",
+      "namespace": "field",
+      "surface": "COMMAND",
+      "canonical_owner": "FIELD_MEASUREMENT_LEDGER",
+      "policy": "field:versioned-policy",
+      "normal_entrypoint": "field/protocol/seal|normal RPC fieldSessionId",
+      "behavioral_evidence": [
+        "A12"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/appraisal/read",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/appraise",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/assumption/add",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/assumption/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/audit/read",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/causal/update",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/counterevidence/request",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/create",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/generate",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/graph/read",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/intent/update",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/merge/propose",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/portfolio/compose",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/portfolio/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/portfolio/read",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/portfolio/revalidate",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/prediction/bind",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/prediction/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/prediction/read",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/quality/read",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/read",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/relation/add",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/relation/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/relation/remove",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/revise",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/split/propose",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/test/bind",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/audit/read",
+      "namespace": "improvement",
+      "surface": "QUERY",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/canary/read",
+      "namespace": "improvement",
+      "surface": "QUERY",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/evaluation/assess",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/evaluation/plan",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/evaluation/read",
+      "namespace": "improvement",
+      "surface": "QUERY",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/evaluation/result/read",
+      "namespace": "improvement",
+      "surface": "QUERY",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/evaluation/run",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/exposure/complete",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/exposure/decide",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/exposure/prepare",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/exposure/read",
+      "namespace": "improvement",
+      "surface": "QUERY",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/exposure/rollback",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/exposure/runtime/read",
+      "namespace": "improvement",
+      "surface": "QUERY",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/exposure/start",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/list",
+      "namespace": "improvement",
+      "surface": "QUERY",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/promotion/decide",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/promotion/prepare",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/promotion/read",
+      "namespace": "improvement",
+      "surface": "QUERY",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/propose",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/read",
+      "namespace": "improvement",
+      "surface": "QUERY",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/retire/propose",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/revise",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/rollback/prepare",
+      "namespace": "improvement",
+      "surface": "COMMAND",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "improvement/shadow/read",
+      "namespace": "improvement",
+      "surface": "QUERY",
+      "canonical_owner": "IMPROVEMENT",
+      "policy": "improvement:versioned-policy",
+      "normal_entrypoint": "thread/input|improvement/propose|improvement/evaluation/plan|improvement/evaluation/run",
+      "behavioral_evidence": [
+        "A08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "investigation/audit/read",
+      "namespace": "investigation",
+      "surface": "QUERY",
+      "canonical_owner": "INVESTIGATION_LEDGER",
+      "policy": "investigation:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A02"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "investigation/list",
+      "namespace": "investigation",
+      "surface": "QUERY",
+      "canonical_owner": "INVESTIGATION_LEDGER",
+      "policy": "investigation:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A02"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "investigation/pause",
+      "namespace": "investigation",
+      "surface": "COMMAND",
+      "canonical_owner": "INVESTIGATION_LEDGER",
+      "policy": "investigation:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A02"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "investigation/read",
+      "namespace": "investigation",
+      "surface": "QUERY",
+      "canonical_owner": "INVESTIGATION_LEDGER",
+      "policy": "investigation:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A02"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "investigation/resume",
+      "namespace": "investigation",
+      "surface": "COMMAND",
+      "canonical_owner": "INVESTIGATION_LEDGER",
+      "policy": "investigation:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A02"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "investigation/start",
+      "namespace": "investigation",
+      "surface": "COMMAND",
+      "canonical_owner": "INVESTIGATION_LEDGER",
+      "policy": "investigation:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A02"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "investigation/stop",
+      "namespace": "investigation",
+      "surface": "COMMAND",
+      "canonical_owner": "INVESTIGATION_LEDGER",
+      "policy": "investigation:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A02"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "investigation/update",
+      "namespace": "investigation",
+      "surface": "COMMAND",
+      "canonical_owner": "INVESTIGATION_LEDGER",
+      "policy": "investigation:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A02"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/candidate/classify",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/candidate/create",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/candidate/list",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/candidate/read",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/changeSet/propose",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/conflict/list",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/context/build",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/context/read",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/gate/read",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/list",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/policy/list",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/policy/read",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/projection/rebuild",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/projection/status",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/read",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/recall/audit",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/retention/evaluate",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/retire/propose",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/revalidate",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/validate",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "model/credential/list",
+      "namespace": "model",
+      "surface": "QUERY",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "research-model-settings:versioned",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "U08",
+        "U07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "model/credential/register",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "research-model-settings:versioned",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "U08",
+        "U07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "model/settings/read",
+      "namespace": "model",
+      "surface": "QUERY",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "research-model-settings:versioned",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "U08",
+        "U07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "model/settings/update",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "research-model-settings:versioned",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "U08",
+        "U07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/attention/acknowledge",
+      "namespace": "object",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/attention/list",
+      "namespace": "object",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/audit/read",
+      "namespace": "object",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/candidate/list",
+      "namespace": "object",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/candidate/read",
+      "namespace": "object",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/facet/update",
+      "namespace": "object",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/followup/create",
+      "namespace": "object",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/frame/revise",
+      "namespace": "object",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/impact/read",
+      "namespace": "object",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/list",
+      "namespace": "object",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/materialize",
+      "namespace": "object",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/merge/propose",
+      "namespace": "object",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/profile/apply",
+      "namespace": "object",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/profile/list",
+      "namespace": "object",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/profile/read",
+      "namespace": "object",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/read",
+      "namespace": "object",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/relation/add",
+      "namespace": "object",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/relation/list",
+      "namespace": "object",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/relation/remove",
+      "namespace": "object",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/revalidate",
+      "namespace": "object",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/split/propose",
+      "namespace": "object",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "object/work/replan",
+      "namespace": "object",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "object:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "operation/cancel",
+      "namespace": "operation",
+      "surface": "QUERY_OR_CONTROL",
+      "canonical_owner": "OPERATION_JOURNAL",
+      "policy": "operation:versioned-policy",
+      "normal_entrypoint": "normal JSON-RPC dispatch",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "operation/checkpoint/read",
+      "namespace": "operation",
+      "surface": "QUERY_OR_CONTROL",
+      "canonical_owner": "OPERATION_JOURNAL",
+      "policy": "operation:versioned-policy",
+      "normal_entrypoint": "normal JSON-RPC dispatch",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "operation/pause",
+      "namespace": "operation",
+      "surface": "QUERY_OR_CONTROL",
+      "canonical_owner": "OPERATION_JOURNAL",
+      "policy": "operation:versioned-policy",
+      "normal_entrypoint": "normal JSON-RPC dispatch",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "operation/read",
+      "namespace": "operation",
+      "surface": "QUERY_OR_CONTROL",
+      "canonical_owner": "OPERATION_JOURNAL",
+      "policy": "operation:versioned-policy",
+      "normal_entrypoint": "normal JSON-RPC dispatch",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "operation/result/read",
+      "namespace": "operation",
+      "surface": "QUERY_OR_CONTROL",
+      "canonical_owner": "OPERATION_JOURNAL",
+      "policy": "operation:versioned-policy",
+      "normal_entrypoint": "normal JSON-RPC dispatch",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "operation/resume",
+      "namespace": "operation",
+      "surface": "QUERY_OR_CONTROL",
+      "canonical_owner": "OPERATION_JOURNAL",
+      "policy": "operation:versioned-policy",
+      "normal_entrypoint": "normal JSON-RPC dispatch",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/assess",
+      "namespace": "outcome",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/attribution/assess",
+      "namespace": "outcome",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/attribution/read",
+      "namespace": "outcome",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/audit/read",
+      "namespace": "outcome",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/changeSet/propose",
+      "namespace": "outcome",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/changeSet/read",
+      "namespace": "outcome",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/followup/generate",
+      "namespace": "outcome",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/impact/propose",
+      "namespace": "outcome",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/impact/read",
+      "namespace": "outcome",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/list",
+      "namespace": "outcome",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/observation/link",
+      "namespace": "outcome",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/profile/list",
+      "namespace": "outcome",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/profile/read",
+      "namespace": "outcome",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/read",
+      "namespace": "outcome",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/reassess",
+      "namespace": "outcome",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/series/create",
+      "namespace": "outcome",
+      "surface": "COMMAND",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/series/list",
+      "namespace": "outcome",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "outcome/series/read",
+      "namespace": "outcome",
+      "surface": "QUERY",
+      "canonical_owner": "EXECUTION_OUTCOME",
+      "policy": "outcome:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/activate",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/archive",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/create",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/cutoff/impact",
+      "namespace": "project",
+      "surface": "QUERY",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/cutoff/update",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/delete",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": false,
+      "alias_target": "project/archive",
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/list",
+      "namespace": "project",
+      "surface": "QUERY",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/metadata/update",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/overlay/update",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/policy/read",
+      "namespace": "project",
+      "surface": "QUERY",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/policy/update",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/read",
+      "namespace": "project",
+      "surface": "QUERY",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/reference/import",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/reference/list",
+      "namespace": "project",
+      "surface": "QUERY",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/review/list",
+      "namespace": "project",
+      "surface": "QUERY",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/role/assign",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/role/list",
+      "namespace": "project",
+      "surface": "QUERY",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/role/revoke",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/source/connect",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/source/disconnect",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/source/list",
+      "namespace": "project",
+      "surface": "QUERY",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/source/scope/assign",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A13"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/source/scope/grant",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A13"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/source/scope/read",
+      "namespace": "project",
+      "surface": "QUERY",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A13"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/source/scope/revoke",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A13"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/source/scope/update",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A13"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/source/time/confirm",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/source/time/correct",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "projectpack/list",
+      "namespace": "projectpack",
+      "surface": "QUERY",
+      "canonical_owner": "PROJECTPACK_MANIFEST",
+      "policy": "projectpack:versioned-policy",
+      "normal_entrypoint": "projectpack/run",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "projectpack/run",
+      "namespace": "projectpack",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECTPACK_MANIFEST",
+      "policy": "projectpack:versioned-policy",
+      "normal_entrypoint": "projectpack/run",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "receipt/audit/read",
+      "namespace": "receipt",
+      "surface": "QUERY",
+      "canonical_owner": "RECEIPT_DAG",
+      "policy": "receipt:versioned-policy",
+      "normal_entrypoint": "thread/input|closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "receipt/bundle/create",
+      "namespace": "receipt",
+      "surface": "COMMAND",
+      "canonical_owner": "RECEIPT_DAG",
+      "policy": "receipt:versioned-policy",
+      "normal_entrypoint": "thread/input|closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "receipt/bundle/read",
+      "namespace": "receipt",
+      "surface": "QUERY",
+      "canonical_owner": "RECEIPT_DAG",
+      "policy": "receipt:versioned-policy",
+      "normal_entrypoint": "thread/input|closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "receipt/bundle/verify",
+      "namespace": "receipt",
+      "surface": "COMMAND",
+      "canonical_owner": "RECEIPT_DAG",
+      "policy": "receipt:versioned-policy",
+      "normal_entrypoint": "thread/input|closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "receipt/correction/create",
+      "namespace": "receipt",
+      "surface": "COMMAND",
+      "canonical_owner": "RECEIPT_DAG",
+      "policy": "receipt:versioned-policy",
+      "normal_entrypoint": "thread/input|closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "receipt/lineage/read",
+      "namespace": "receipt",
+      "surface": "QUERY",
+      "canonical_owner": "RECEIPT_DAG",
+      "policy": "receipt:versioned-policy",
+      "normal_entrypoint": "thread/input|closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "receipt/list",
+      "namespace": "receipt",
+      "surface": "QUERY",
+      "canonical_owner": "RECEIPT_DAG",
+      "policy": "receipt:versioned-policy",
+      "normal_entrypoint": "thread/input|closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "receipt/read",
+      "namespace": "receipt",
+      "surface": "QUERY",
+      "canonical_owner": "RECEIPT_DAG",
+      "policy": "receipt:versioned-policy",
+      "normal_entrypoint": "thread/input|closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "receipt/seal",
+      "namespace": "receipt",
+      "surface": "COMMAND",
+      "canonical_owner": "RECEIPT_DAG",
+      "policy": "receipt:versioned-policy",
+      "normal_entrypoint": "thread/input|closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "receipt/stream/read",
+      "namespace": "receipt",
+      "surface": "QUERY",
+      "canonical_owner": "RECEIPT_DAG",
+      "policy": "receipt:versioned-policy",
+      "normal_entrypoint": "thread/input|closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "receipt/verification/read",
+      "namespace": "receipt",
+      "surface": "QUERY",
+      "canonical_owner": "RECEIPT_DAG",
+      "policy": "receipt:versioned-policy",
+      "normal_entrypoint": "thread/input|closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "receipt/verify",
+      "namespace": "receipt",
+      "surface": "COMMAND",
+      "canonical_owner": "RECEIPT_DAG",
+      "policy": "receipt:versioned-policy",
+      "normal_entrypoint": "thread/input|closure/prepare",
+      "behavioral_evidence": [
+        "A10"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/audit/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/baseline/decide",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/baseline/list",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/baseline/prepare",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/baseline/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/branch/create",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/changeSet/commit",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/changeSet/create",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/changeSet/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/changeSet/validate",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/compare",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": false,
+      "alias_target": "revision/diff/read",
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/conflict/list",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/conflict/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/content/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/diff/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/graph/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/head/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/history/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": false,
+      "alias_target": "revision/list",
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/impact/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/list",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/merge/propose",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/merge/resolve",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/propose",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/recompute/request",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/restore",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/restore/apply",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/restore/preview",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/restore/propose",
+      "namespace": "revision",
+      "surface": "COMMAND",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/timeline/item/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "revision/timeline/read",
+      "namespace": "revision",
+      "surface": "QUERY",
+      "canonical_owner": "SEMANTIC_REVISION_LEDGER",
+      "policy": "revision:versioned-policy",
+      "normal_entrypoint": "thread/input|revision/changeSet/commit",
+      "behavioral_evidence": [
+        "A07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/activity/list",
+      "namespace": "thread",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/checkpoint/list",
+      "namespace": "thread",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/checkpoint/read",
+      "namespace": "thread",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/fork",
+      "namespace": "thread",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/input",
+      "namespace": "thread",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/list",
+      "namespace": "thread",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/metadata/update",
+      "namespace": "thread",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/pause",
+      "namespace": "thread",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/read",
+      "namespace": "thread",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/result/compare/read",
+      "namespace": "thread",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/result/read",
+      "namespace": "thread",
+      "surface": "QUERY",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/resume",
+      "namespace": "thread",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/start",
+      "namespace": "thread",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/steer",
+      "namespace": "thread",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "thread/stop",
+      "namespace": "thread",
+      "surface": "COMMAND",
+      "canonical_owner": "DECISION_OBJECT",
+      "policy": "thread:versioned-policy",
+      "normal_entrypoint": "thread/start|thread/input",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "workspace/ready",
+      "namespace": "workspace",
+      "surface": "QUERY",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "research-model-settings:versioned",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "U08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "workspace/setup/read",
+      "namespace": "workspace",
+      "surface": "QUERY",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "research-model-settings:versioned",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "U08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "workspace/setup/update",
+      "namespace": "workspace",
+      "surface": "COMMAND",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "research-model-settings:versioned",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "U08"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    }
+  ],
+  "notifications": [
+    "action/authorizationConsumed",
+    "action/authorizationDecided",
+    "action/authorizationExpired",
+    "action/authorizationPrepared",
+    "action/authorizationStale",
+    "action/compensationCreated",
+    "action/created",
+    "action/evaluated",
+    "action/frontierChanged",
+    "action/generated",
+    "action/impactChanged",
+    "action/invalidated",
+    "action/planComposed",
+    "action/planUpdated",
+    "action/policyChanged",
+    "action/portfolioUpdated",
+    "action/recommended",
+    "action/retired",
+    "action/selected",
+    "action/updated",
+    "closure/blocked",
+    "closure/decided",
+    "closure/followupCreated",
+    "closure/prepared",
+    "closure/purgePrepared",
+    "closure/readinessChanged",
+    "closure/reopened",
+    "closure/retentionChanged",
+    "criteria/changeProposed",
+    "criteria/compiled",
+    "criteria/conflictUpdated",
+    "criteria/invalidated",
+    "criteria/profileApplied",
+    "criteria/readinessUpdated",
+    "criteria/recalculated",
+    "criteria/referenceUpdated",
+    "criteria/updated",
+    "evidence/conflictUpdated",
+    "evidence/invalidated",
+    "evidence/revalidated",
+    "evidence/sourceUpdated",
+    "evidence/updated",
+    "execution/attemptFailed",
+    "execution/attemptPartial",
+    "execution/attemptStarted",
+    "execution/attemptSucceeded",
+    "execution/attemptTimedOut",
+    "execution/cancelConfirmed",
+    "execution/cancelFailed",
+    "execution/cancelRequested",
+    "execution/compensationRequired",
+    "execution/created",
+    "execution/effectChanged",
+    "execution/frontierChanged",
+    "execution/invalidated",
+    "execution/paused",
+    "execution/planCompleted",
+    "execution/planPartial",
+    "execution/reconciliationCompleted",
+    "execution/reconciliationRequired",
+    "execution/resumed",
+    "execution/started",
+    "execution/stepDispatched",
+    "execution/unknownCompletion",
+    "export/corrected",
+    "export/generated",
+    "export/generating",
+    "export/planned",
+    "export/releaseEligible",
+    "export/releasePrepared",
+    "export/released",
+    "export/snapshotSealed",
+    "export/superseded",
+    "export/verificationFailed",
+    "export/verified",
+    "hypothesis/appraisalUpdated",
+    "hypothesis/assumptionChanged",
+    "hypothesis/counterevidenceRequested",
+    "hypothesis/created",
+    "hypothesis/generated",
+    "hypothesis/intentChanged",
+    "hypothesis/invalidated",
+    "hypothesis/mergeProposed",
+    "hypothesis/portfolioUpdated",
+    "hypothesis/predictionBound",
+    "hypothesis/qualityUpdated",
+    "hypothesis/relationChanged",
+    "hypothesis/retired",
+    "hypothesis/splitProposed",
+    "hypothesis/stageChanged",
+    "hypothesis/testBound",
+    "hypothesis/updated",
+    "improvement/canaryPrepared",
+    "improvement/canaryStarted",
+    "improvement/canaryStopped",
+    "improvement/evaluated",
+    "improvement/evaluationPlanned",
+    "improvement/exposurePrepared",
+    "improvement/guardrailFailed",
+    "improvement/promoted",
+    "improvement/promotionDecided",
+    "improvement/promotionPrepared",
+    "improvement/proposed",
+    "improvement/retired",
+    "improvement/rollbackPrepared",
+    "improvement/rolledBack",
+    "improvement/shadowCompleted",
+    "improvement/shadowStarted",
+    "improvement/updated",
+    "investigation/checkpointCreated",
+    "investigation/completed",
+    "investigation/progress",
+    "investigation/started",
+    "investigation/statusChanged",
+    "investigation/sufficiencyUpdated",
+    "investigation/waitingForInput",
+    "memory/candidateCreated",
+    "memory/classified",
+    "memory/committed",
+    "memory/conflictDetected",
+    "memory/contextBuilt",
+    "memory/expired",
+    "memory/held",
+    "memory/projectionRebuilt",
+    "memory/quarantined",
+    "memory/recallEligibilityChanged",
+    "memory/rejected",
+    "memory/retired",
+    "memory/revised",
+    "memory/superseded",
+    "memory/validated",
+    "memory/validationStarted",
+    "object/attentionCleared",
+    "object/attentionRaised",
+    "object/blockerChanged",
+    "object/candidateCreated",
+    "object/closed",
+    "object/completed",
+    "object/dispositionChanged",
+    "object/invalidated",
+    "object/materialized",
+    "object/mergeProposed",
+    "object/profileChanged",
+    "object/relationChanged",
+    "object/resolutionChanged",
+    "object/splitProposed",
+    "object/superseded",
+    "object/updated",
+    "object/verificationChanged",
+    "object/workModeChanged",
+    "outcome/assessed",
+    "outcome/attributionUpdated",
+    "outcome/changeSetProposed",
+    "outcome/followupGenerated",
+    "outcome/impactProposed",
+    "outcome/invalidated",
+    "outcome/observationLinked",
+    "outcome/readyToAssess",
+    "outcome/reassessed",
+    "outcome/reassessmentRequired",
+    "outcome/seriesCreated",
+    "outcome/superseded",
+    "project/activated",
+    "project/archived",
+    "project/created",
+    "project/cutoff/updated",
+    "project/metadata/updated",
+    "project/overlay/updated",
+    "project/policy/updated",
+    "project/reference/imported",
+    "project/role/assigned",
+    "project/role/revoked",
+    "project/source/connected",
+    "project/source/disconnected",
+    "project/source/revoked",
+    "project/statusChanged",
+    "receipt/bundleCreated",
+    "receipt/corrected",
+    "receipt/sealFailed",
+    "receipt/sealed",
+    "receipt/sealing",
+    "receipt/verificationFailed",
+    "receipt/verified",
+    "revision/baselineCreated",
+    "revision/baselinePrepared",
+    "revision/baselineSuperseded",
+    "revision/branchCreated",
+    "revision/changeSetAborted",
+    "revision/changeSetCommitted",
+    "revision/changeSetCreated",
+    "revision/conflictOpened",
+    "revision/conflictResolved",
+    "revision/headChanged",
+    "revision/held",
+    "revision/invalidated",
+    "revision/mergeProposed",
+    "revision/projectionRecomputed",
+    "revision/projectionStale",
+    "revision/proposed",
+    "revision/recomputeRequested",
+    "revision/rejected",
+    "revision/restoreProposed",
+    "revision/restored",
+    "revision/validated",
+    "thread/checkpointCreated",
+    "thread/cycleStarted",
+    "thread/cycleTerminated",
+    "thread/forked",
+    "thread/inputAccepted",
+    "thread/inputQueued",
+    "thread/metadataUpdated",
+    "thread/pauseRequested",
+    "thread/paused",
+    "thread/resumed",
+    "thread/started",
+    "thread/statusChanged",
+    "thread/steered",
+    "thread/stopRequested",
+    "thread/stopped",
+    "thread/waitingForInput",
+    "thread/waitingForProtectedAction"
+  ],
+  "catalog_digest": "5c4362b89f00189aeb763c5c7a60ceaef1fed17c42a50828210298661f6606de"
+}

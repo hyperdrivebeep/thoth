@@ -1,0 +1,62 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": 2,
+      "default": 2,
+      "title": "Contract Version",
+      "type": "integer"
+    },
+    "include_selected_evidence": {
+      "default": false,
+      "title": "Include Selected Evidence",
+      "type": "boolean"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "request_revision_digest": {
+      "pattern": "^[A-Fa-f0-9]{64}$",
+      "title": "Request Revision Digest",
+      "type": "string"
+    },
+    "result_revision_digest": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Result Revision Digest"
+    },
+    "selected_evidence_limit": {
+      "default": 50,
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Selected Evidence Limit",
+      "type": "integer"
+    },
+    "selected_evidence_offset": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Selected Evidence Offset",
+      "type": "integer"
+    },
+    "thread_id": {
+      "title": "Thread Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "thread_id",
+    "request_revision_digest"
+  ],
+  "title": "HistoricalResultInput",
+  "type": "object"
+}

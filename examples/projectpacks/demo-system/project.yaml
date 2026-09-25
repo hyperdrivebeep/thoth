@@ -1,0 +1,12 @@
+pack_id: pack:demo-system
+project_id: project:demo-system
+name: Generic integrated R&D system
+cutoff_at: 2026-08-30T07:20:00Z
+overlay: general-rnd
+policy_binding_ref: policy:demo-v1
+scenario:
+  case_id: case:demo-system
+  thread_id: thread:integration-gap
+  cycle_id: cycle:1
+  object_id: object:comparison-gap
+  problem: Why can the reported result not yet be compared with the planned acceptance condition?

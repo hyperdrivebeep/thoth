@@ -1,0 +1,193 @@
+{
+  "$defs": {
+    "EntityType": {
+      "enum": [
+        "PROJECT",
+        "THREAD",
+        "DECISION_OBJECT",
+        "ARTIFACT",
+        "EVIDENCE",
+        "CRITERION",
+        "HYPOTHESIS",
+        "ACTION",
+        "EXECUTION",
+        "OUTCOME",
+        "MEMORY",
+        "CLOSURE",
+        "EXPORT"
+      ],
+      "title": "EntityType",
+      "type": "string"
+    },
+    "ImpactPropagationPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "invalidated_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Invalidated Refs",
+          "type": "array"
+        },
+        "recalculate_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Recalculate Refs",
+          "type": "array"
+        },
+        "stale_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Stale Refs",
+          "type": "array"
+        }
+      },
+      "title": "ImpactPropagationPlan",
+      "type": "object"
+    },
+    "RestoreSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "entity_id": {
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "entity_type": {
+          "$ref": "#/$defs/EntityType"
+        },
+        "expected_current_head": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Expected Current Head",
+          "type": "string"
+        },
+        "project_id": {
+          "title": "Project Id",
+          "type": "string"
+        },
+        "target_revision_digest": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Target Revision Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_id",
+        "entity_type",
+        "entity_id",
+        "target_revision_digest",
+        "expected_current_head"
+      ],
+      "title": "RestoreSelection",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": 2,
+      "default": 2,
+      "title": "Contract Version",
+      "type": "integer"
+    },
+    "external_effects": {
+      "const": "PRESERVED",
+      "default": "PRESERVED",
+      "title": "External Effects",
+      "type": "string"
+    },
+    "impact": {
+      "$ref": "#/$defs/ImpactPropagationPlan"
+    },
+    "new_revision_digest": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "New Revision Digest"
+    },
+    "new_revision_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "New Revision Id"
+    },
+    "reanalysis": {
+      "const": "NOT_REQUESTED",
+      "default": "NOT_REQUESTED",
+      "title": "Reanalysis",
+      "type": "string"
+    },
+    "receipt_digest": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Receipt Digest"
+    },
+    "receipt_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Receipt Id"
+    },
+    "restore_audit_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Restore Audit Id"
+    },
+    "selection": {
+      "$ref": "#/$defs/RestoreSelection"
+    },
+    "status": {
+      "enum": [
+        "APPLIED",
+        "NO_CHANGE"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "selection",
+    "impact"
+  ],
+  "title": "RestoreApplyResult",
+  "type": "object"
+}

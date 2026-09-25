@@ -1,0 +1,35 @@
+[
+  {
+    "source_id": "source:holdout-approved-plan",
+    "path": "approved-plan.md",
+    "media_type": "text/markdown",
+    "authority": "OFFICIAL",
+    "cutoff_state": "ELIGIBLE",
+    "security_class": "INTERNAL",
+    "version_label": "plan-v1",
+    "byte_sha256": "16b787109bf703c2135221ff8741cb45202cd72955f26301d05d3075cf06f28d",
+    "rights": "Synthetic fixture authored for THOTH portability verification"
+  },
+  {
+    "source_id": "source:holdout-interim-report",
+    "path": "interim-report.md",
+    "media_type": "text/markdown",
+    "authority": "OFFICIAL",
+    "cutoff_state": "ELIGIBLE",
+    "security_class": "INTERNAL",
+    "version_label": "interim-v1",
+    "byte_sha256": "8488abd10b5ba674ee8b3a822ecf7338494909df97641c62a55c62654cf826fa",
+    "rights": "Synthetic fixture authored for THOTH portability verification"
+  },
+  {
+    "source_id": "source:holdout-lab-log",
+    "path": "lab-log.json",
+    "media_type": "application/json",
+    "authority": "OFFICIAL",
+    "cutoff_state": "ELIGIBLE",
+    "security_class": "INTERNAL",
+    "version_label": "lab-log-v1",
+    "byte_sha256": "513a919bf47d7ae67e25a6fbed46f2bf1e50f2a548ee7c1a00ba18fc589398b0",
+    "rights": "Synthetic fixture authored for THOTH portability verification"
+  }
+]

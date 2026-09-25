@@ -1,0 +1,17 @@
+profile_ref: CLINICAL_STATISTICAL_ANALYSIS
+version: 1
+name: Clinical Statistical Analysis
+domain_hint: clinical-statistical
+applicability_terms: [clinical, trial, endpoint, confidence, prespecified, statistical, protocol]
+required_fields: [construct, context_spec, acceptance_rule, prespecification]
+conditional_fields: [uncertainty, responsible_role]
+required_evidence: [approved_protocol, analysis_population, endpoint_definition]
+allowed_computation_types: [STATISTICAL_MODEL]
+measurement_validity: {minimum: estimand-and-population, invalid_result: NOT_INTERPRETABLE}
+uncertainty_policy: {required: confidence-interval, missing: HOLD}
+decision_rules: [prespecification_before_unblinding, multiplicity_control]
+authority_policy: {controlling_source: CLINICAL_STATISTICAL_AUTHORITY, reference_candidate: NOT_AUTHORIZED}
+change_authority: {profile: PROTOCOL_OWNER, criterion: INDEPENDENT_STATISTICIAN}
+entry_criteria: [protocol_version_frozen]
+exit_criteria: [endpoint_appraised, uncertainty_reported]
+enabled: true

@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0.0",
+  "module_line_limit": 900,
+  "function_line_limit": 200,
+  "scan_roots": [
+    "src/thoth"
+  ],
+  "watched_modules": {
+    "src/thoth/adapters/storage/schema.py": {
+      "baseline_lines": 1182,
+      "top_level_symbols": [],
+      "policy": "schema registry only; new table families prefer owned schema modules"
+    },
+    "src/thoth/application/commands/actions_full.py": {
+      "baseline_lines": 1002,
+      "top_level_symbols": [
+        "ProjectInput",
+        "ActionListInput",
+        "ActionReadInput",
+        "PortfolioListInput",
+        "PortfolioReadInput",
+        "PlanReadInput",
+        "StepReadInput",
+        "ImpactReadInput",
+        "AuthorizationReadInput",
+        "AuditReadInput",
+        "CreateInput",
+        "ActionRevisionBound",
+        "ReviseInput",
+        "PortfolioComposeInput",
+        "PortfolioEvaluateInput",
+        "RecommendInput",
+        "SelectInput",
+        "PlanComposeInput",
+        "PlanRevisionBound",
+        "PlanReviseInput",
+        "PlanRevalidateInput",
+        "StepAddInput",
+        "StepReviseInput",
+        "ImpactRecalculateInput",
+        "PolicyClassifyInput",
+        "AuthorizationPrepareInput",
+        "AuthorizationDecideInput",
+        "CompensationCreateInput",
+        "MergeProposeInput",
+        "ActionHandlers"
+      ],
+      "policy": "existing Action RPC surface only; new responsibility goes to a new command/service module"
+    },
+    "src/thoth/application/commands/hypotheses_full.py": {
+      "baseline_lines": 981,
+      "top_level_symbols": [
+        "ProjectInput",
+        "HypothesisListInput",
+        "HypothesisReadInput",
+        "PortfolioListInput",
+        "PortfolioReadInput",
+        "RelationListInput",
+        "PredictionListInput",
+        "PredictionReadInput",
+        "AssumptionListInput",
+        "GenerateInput",
+        "CreateInput",
+        "RevisionBoundInput",
+        "ReviseInput",
+        "IntentUpdateInput",
+        "CausalUpdateInput",
+        "RelationAddInput",
+        "RelationRemoveInput",
+        "AssumptionAddInput",
+        "PredictionBindInput",
+        "CounterevidenceRequestInput",
+        "PortfolioComposeInput",
+        "PortfolioRevalidateInput",
+        "TestBindInput",
+        "AppraiseInput",
+        "SplitProposeInput",
+        "MergeProposeInput",
+        "HypothesisHandlers"
+      ],
+      "policy": "existing Hypothesis RPC surface only; new responsibility goes to a new command/service module"
+    },
+    "src/thoth/application/commands/revisions_full.py": {
+      "baseline_lines": 1323,
+      "top_level_symbols": [
+        "_authenticated_revision_provenance",
+        "ProjectInput",
+        "RevisionListInput",
+        "RevisionReadInput",
+        "ContentReadInput",
+        "DiffReadInput",
+        "GraphReadInput",
+        "HeadReadInput",
+        "RecordReadInput",
+        "ConflictListInput",
+        "RestorePreviewInput",
+        "BaselineListInput",
+        "BaselineReadInput",
+        "AuditReadInput",
+        "ProposeInput",
+        "ChangeSetCreateInput",
+        "ChangeSetValidateInput",
+        "ChangeSetCommitInput",
+        "BranchCreateInput",
+        "MergeProposeInput",
+        "MergeResolveInput",
+        "RestoreProposeInput",
+        "RecomputeRequestInput",
+        "BaselinePrepareInput",
+        "BaselineDecideInput",
+        "RevisionFullHandlers"
+      ],
+      "policy": "existing Revision RPC surface only; new responsibility goes to a new command/service module"
+    },
+    "src/thoth/application/services/action_service.py": {
+      "baseline_lines": 996,
+      "top_level_symbols": [
+        "classify_effect_vector",
+        "ActionService"
+      ],
+      "policy": "Action domain orchestration only; extract new policy/evaluator/compiler responsibility"
+    },
+    "src/thoth/application/services/execution_service.py": {
+      "baseline_lines": 834,
+      "top_level_symbols": [
+        "ExecutionService"
+      ],
+      "policy": "Execution state orchestration only; extract new adapter/recovery responsibility"
+    },
+    "src/thoth/apps/runtime.py": {
+      "baseline_lines": 773,
+      "top_level_symbols": [
+        "create_runtime"
+      ],
+      "policy": "composition only; new feature composition belongs in an owned module factory"
+    }
+  },
+  "watched_long_functions": {
+    "src/thoth/application/services/acquisition_coordinator.py::execute_if_required": 209,
+    "src/thoth/application/services/critical_counter_search_coordinator.py::_execute_multi_wave": 380,
+    "src/thoth/application/workflows/thread_cycle.py::execute": 208,
+    "src/thoth/apps/runtime.py::create_runtime": 656,
+    "src/thoth/protocol/notifications.py::notifications_for": 255
+  }
+}

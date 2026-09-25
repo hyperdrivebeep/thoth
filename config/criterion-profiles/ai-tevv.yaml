@@ -1,0 +1,17 @@
+profile_ref: AI_TEVV
+version: 1
+name: AI Test Evaluation Verification and Validation
+domain_hint: ai-tevv
+applicability_terms: [ai, tevv, robustness, red, team, dataset, drift, model]
+required_fields: [construct, context_spec, acceptance_rule, evaluator_binding]
+conditional_fields: [uncertainty, responsible_role]
+required_evidence: [dataset_lineage, model_digest, evaluator_contract, threat_scope]
+allowed_computation_types: [FORMULA, STATISTICAL_MODEL, TEST_PROCEDURE, HUMAN_RUBRIC]
+measurement_validity: {minimum: exact-model-dataset-evaluator-digest, invalid_result: HOLD}
+uncertainty_policy: {required: distributional-and-evaluator, missing: HOLD}
+decision_rules: [separate_capability_from_safety, require_independent_evaluator]
+authority_policy: {controlling_source: AI_TEVV_AUTHORITY, reference_candidate: NOT_AUTHORIZED}
+change_authority: {profile: SAFETY_OWNER, criterion: EVALUATION_OWNER}
+entry_criteria: [model_and_dataset_digests_frozen]
+exit_criteria: [safety_gate_passed, critical_regressions_absent]
+enabled: true

@@ -1,0 +1,37 @@
+[
+  {
+    "draft": {
+      "criterion_id": "criterion:mean-user-plane-latency",
+      "project_id": "$PROJECT_ID",
+      "name": "Mean user plane latency",
+      "measured_construct": "arithmetic mean of round-trip latency samples",
+      "computation": {
+        "expression": "mean(round_trip_latency_samples_ms)",
+        "unit": "ms"
+      },
+      "context": {
+        "configuration": "baseline A",
+        "dataset_version": "v3"
+      },
+      "acceptance_rule": {
+        "operator": "<",
+        "target": "1"
+      },
+      "origin": "DOCUMENT_EXTRACTED",
+      "field_evidence": {
+        "name": ["$EVIDENCE_1"],
+        "measured_construct": ["$EVIDENCE_1"],
+        "computation": ["$EVIDENCE_1"],
+        "acceptance_rule": ["$EVIDENCE_1"],
+        "context": ["$EVIDENCE_1", "$EVIDENCE_3"]
+      },
+      "missing_fields": [],
+      "uncertainty": "sealed fixture with independently confirmed semantics"
+    },
+    "signals": {
+      "source_scope_confirmed": true,
+      "expert_semantics_confirmed": true,
+      "computation_verified": true
+    }
+  }
+]

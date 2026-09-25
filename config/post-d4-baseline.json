@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0.0",
+  "record_type": "POST_D4_BASELINE",
+  "frozen_at": "2026-09-01T09:40:00Z",
+  "cleanup_receipt": "d0401d7ce8b42bc63adac91703b37b9d6b57cb959bf5586eee2b9ebd8437f3a1",
+  "architecture": {
+    "rule_bundle_digest": "dd932b6672df2c619931d992a94aa100a53dfd2bc9d42936a33898a7a89573b3",
+    "exception_count": 0,
+    "acceptance_blocker_count": 0
+  },
+  "migration": {
+    "head": "9d12a7c5e3b8",
+    "migration_count": 22,
+    "runtime_create_all_exception_count": 0
+  },
+  "protocol": {
+    "runtime_public_method_count": 309,
+    "canonical_callable_count": 295,
+    "implemented_notification_count": 219
+  },
+  "acceptance_receipts": {
+    "A01": "d0401d7ce8b42bc63adac91703b37b9d6b57cb959bf5586eee2b9ebd8437f3a1",
+    "A02": "e16ab35c0686b1f310c5c04dd55ac7972be047c9b0812d7efba8bb6f59c94bb3",
+    "A03": "542afd8b4f81226bda980f5341cb89c322f35bae46949fe34de317d8d698f54d",
+    "A04": "115e4fd3c694c28d852c8d27e716f456f165585db4cb8e4f7a7060084741bb5b",
+    "A05": "6027188a22887b88039a93284e39b0c9b71df7b10e54971ca1a0022e3aaebf12",
+    "A06": "d6c3818c673cf78324b7b90a981e58fafeb0f28b7d27db80adf6eb3915064297",
+    "A07": "a7d82bf88bb6e571a0697a3b54fba4fa14a278edf0312662d4f2205a5e8ac152",
+    "A08": "bab78e78104d3a1e7a765e754ffcd996681221e929aa2fb184aa9ee0b664f89c",
+    "A09": "bc3709060d66ca4e5862a8032af2a1e7b9184f88a91fff28ba9d908edd2616c7",
+    "A10": "f317b65bb20a752f102fe8b766ec5277a57b2bc6394e74efb48cf57b47966972",
+    "A11": "68478e90e38e006972ec2d4424ea2744be9f8b950f069bd7165eb9c234000de2",
+    "A12": "80b2e02133c83499d95e972a236e6135407247a3c2f51e604173fd95e21ba2fa",
+    "A13": "5257afaec401a9109235deee6a14c3a89b6bef867e79a69ee0b9acd6306efbd6"
+  },
+  "projectpack_digests": {
+    "6g-sandbox-hero": "5d2812618958eb734e1dcb571e406ba957fd9b6e1e6a0a963ae74dce73e7bedf",
+    "public-demo-membrane": "821e761a0ce414322054b5d48f896c85b08e5dd75fc7c314dda9545f6e1829d4",
+    "sunrise-secondary": "d93660ef867071fa2245d412b9e7297e81be73f921bbbe09f42a433d6311cd79",
+    "l3pilot-regression": "029fd5b87af01f84ac7a2538f6dae179a27a4efdd23de5c67e033c06db810356",
+    "opendreamkit-hidden-holdout": "a37514f47a8a34ee8db3aa91e785c6fd415500cf9fd89dae1ed65a79bc22cb8e"
+  },
+  "external_gates": {
+    "participant_sessions": "NOT_RUN",
+    "independent_expert_scores": "NOT_RUN",
+    "time_saving": "NOT_RUN",
+    "wtp": "NOT_RUN",
+    "institutional_identity": "NOT_RUN",
+    "production_deployment": "NOT_RUN",
+    "r3_reality_change": "NOT_RUN",
+    "r4_official_decision": "NOT_RUN"
+  },
+  "semantic_redefinition": false,
+  "baseline_receipt_digest": "bbb597f4d1e9ace15ab8a1b61249b1a13d4a44ad4affb9de37d1c3d7c06aa5a6"
+}

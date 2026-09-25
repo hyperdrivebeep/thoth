@@ -1,0 +1,18 @@
+{
+  "scope": {
+    "projectId": "project:synthetic-greenhouse",
+    "threadId": "thread:synthetic-sensor-review",
+    "requestDigest": "29705cf0f044b95bbc1b129a36187382f18a80064d485594348f4e32bdf02952"
+  },
+  "operationId": "operation:synthetic-greenhouse-001",
+  "result": {
+    "answer": "이 답변은 공개 예시를 위한 합성 연구 결과입니다. 가상 온실의 센서 차이는 설치 위치와 교정 시점이 달랐을 가능성을 보여주지만, 같은 조건의 재측정 기록이 없어 원인을 확정하지 않습니다.",
+    "answer_status": "PARTIAL_HOLD",
+    "contract_version": 2,
+    "request_epoch": 1,
+    "thread_id": "thread:synthetic-sensor-review",
+    "retrieval": {
+      "selected_count": 149
+    }
+  }
+}

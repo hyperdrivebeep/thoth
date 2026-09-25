@@ -1,0 +1,80 @@
+{
+  "$defs": {
+    "EntityType": {
+      "enum": [
+        "PROJECT",
+        "THREAD",
+        "DECISION_OBJECT",
+        "ARTIFACT",
+        "EVIDENCE",
+        "CRITERION",
+        "HYPOTHESIS",
+        "ACTION",
+        "EXECUTION",
+        "OUTCOME",
+        "MEMORY",
+        "CLOSURE",
+        "EXPORT"
+      ],
+      "title": "EntityType",
+      "type": "string"
+    },
+    "RestoreSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "entity_id": {
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "entity_type": {
+          "$ref": "#/$defs/EntityType"
+        },
+        "expected_current_head": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Expected Current Head",
+          "type": "string"
+        },
+        "project_id": {
+          "title": "Project Id",
+          "type": "string"
+        },
+        "target_revision_digest": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Target Revision Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_id",
+        "entity_type",
+        "entity_id",
+        "target_revision_digest",
+        "expected_current_head"
+      ],
+      "title": "RestoreSelection",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": 2,
+      "default": 2,
+      "title": "Contract Version",
+      "type": "integer"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "selection": {
+      "$ref": "#/$defs/RestoreSelection"
+    }
+  },
+  "required": [
+    "project_id",
+    "selection"
+  ],
+  "title": "RestorePreviewInput",
+  "type": "object"
+}

@@ -1,0 +1,12 @@
+pack_id: pack:holdout-membrane
+project_id: project:holdout-membrane
+name: Membrane durability hidden holdout
+cutoff_at: 2026-08-20T23:59:59Z
+overlay: materials-durability-rnd
+policy_binding_ref: policy:holdout-membrane-v1
+scenario:
+  case_id: case:membrane-durability-comparability
+  thread_id: thread:retained-flux-discrepancy
+  cycle_id: cycle:holdout-1
+  object_id: object:membrane-durability-result
+  problem: Does the reported retained-flux result satisfy the approved durability criterion under comparable cycle count, temperature, batch, evaluator, and calibration conditions? If not, identify competing explanations and the safest discriminating next action.

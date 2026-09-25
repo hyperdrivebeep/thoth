@@ -1,0 +1,23 @@
+policy_version: policy:c1-v1
+resource_scope_policy:
+  default:
+    owner_kind: PROJECT
+    visibility: PROJECT_SHARED
+model_policy_ref: model-policy:scripted-c1
+external_write: false
+allow_scripted_model: true
+sealed_evidence_supported: true
+minimum_action_tier_by_family:
+  READ_ONLY_COMPARISON: R0
+  SANDBOX_REPLAY: R2
+  CONTROLLED_PHYSICAL_RERUN: R3
+approver_role_by_family:
+  READ_ONLY_COMPARISON: project-owner
+  SANDBOX_REPLAY: sandbox-owner
+  CONTROLLED_PHYSICAL_RERUN: test-owner
+unknown_action_family_tier: R3
+sufficiency_signals:
+  comparison_context_confirmed: true
+  counterevidence_checked: true
+  instrumentation_verified: true
+  expert_semantics_confirmed: true

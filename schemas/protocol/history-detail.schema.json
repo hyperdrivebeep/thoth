@@ -1,0 +1,402 @@
+{
+  "$defs": {
+    "BasisCurrentness": {
+      "additionalProperties": false,
+      "properties": {
+        "execution_eligible": {
+          "default": false,
+          "title": "Execution Eligible",
+          "type": "boolean"
+        },
+        "reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "state": {
+          "enum": [
+            "CURRENT",
+            "REVIEW_REQUIRED",
+            "INVALIDATED",
+            "UNKNOWN_BASIS",
+            "UNAVAILABLE"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "title": "BasisCurrentness",
+      "type": "object"
+    },
+    "HistoryCapability": {
+      "additionalProperties": false,
+      "properties": {
+        "apply_ready": {
+          "default": false,
+          "title": "Apply Ready",
+          "type": "boolean"
+        },
+        "preview_supported": {
+          "default": false,
+          "title": "Preview Supported",
+          "type": "boolean"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "restore": {
+          "default": "READ_ONLY",
+          "enum": [
+            "RESTORE_SUPPORTED",
+            "READ_ONLY",
+            "UNSUPPORTED"
+          ],
+          "title": "Restore",
+          "type": "string"
+        }
+      },
+      "title": "HistoryCapability",
+      "type": "object"
+    },
+    "HistoryCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "association": {
+          "default": "EXACT",
+          "enum": [
+            "EXACT",
+            "PARTIAL",
+            "UNRESOLVED"
+          ],
+          "title": "Association",
+          "type": "string"
+        },
+        "reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "scan": {
+          "default": "COMPLETE_PAGE",
+          "enum": [
+            "COMPLETE_PAGE",
+            "CONTINUATION",
+            "LIMITED"
+          ],
+          "title": "Scan",
+          "type": "string"
+        },
+        "visibility": {
+          "const": "AUTHORIZED_SUBSET",
+          "default": "AUTHORIZED_SUBSET",
+          "title": "Visibility",
+          "type": "string"
+        }
+      },
+      "title": "HistoryCoverage",
+      "type": "object"
+    },
+    "HistoryItem": {
+      "additionalProperties": false,
+      "properties": {
+        "association": {
+          "enum": [
+            "PRODUCED_IN",
+            "USED_BY",
+            "RELATED_OBJECT",
+            "UNATTRIBUTED"
+          ],
+          "title": "Association",
+          "type": "string"
+        },
+        "availability": {
+          "default": "AVAILABLE",
+          "enum": [
+            "AVAILABLE",
+            "PARTIAL",
+            "UNAVAILABLE"
+          ],
+          "title": "Availability",
+          "type": "string"
+        },
+        "capability": {
+          "$ref": "#/$defs/HistoryCapability"
+        },
+        "completion": {
+          "anyOf": [
+            {
+              "enum": [
+                "CHECKPOINT",
+                "TERMINAL"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completion"
+        },
+        "currentness": {
+          "$ref": "#/$defs/BasisCurrentness"
+        },
+        "entity_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entity Id"
+        },
+        "entity_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entity Type"
+        },
+        "head_membership": {
+          "enum": [
+            "CURRENT",
+            "ANCESTOR",
+            "BRANCH",
+            "UNKNOWN"
+          ],
+          "title": "Head Membership",
+          "type": "string"
+        },
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "REQUEST",
+            "RESULT",
+            "REVISION",
+            "RESTORE",
+            "MEMORY"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operation Id"
+        },
+        "origin_request_revision_digest": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Fa-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Origin Request Revision Digest"
+        },
+        "phase": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Phase"
+        },
+        "record_ref": {
+          "$ref": "#/$defs/HistoryRecordRef"
+        },
+        "schema_family": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Schema Family"
+        },
+        "scope_links": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/HistoryScopeLink"
+          },
+          "title": "Scope Links",
+          "type": "array"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "kind",
+        "occurred_at",
+        "record_ref",
+        "association",
+        "head_membership",
+        "title",
+        "currentness"
+      ],
+      "title": "HistoryItem",
+      "type": "object"
+    },
+    "HistoryRecordRef": {
+      "additionalProperties": false,
+      "properties": {
+        "immutable_id": {
+          "title": "Immutable Id",
+          "type": "string"
+        },
+        "owner_kind": {
+          "enum": [
+            "SEMANTIC_REVISION",
+            "FULL_MEMORY"
+          ],
+          "title": "Owner Kind",
+          "type": "string"
+        },
+        "project_id": {
+          "title": "Project Id",
+          "type": "string"
+        },
+        "revision_digest": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Revision Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner_kind",
+        "project_id",
+        "immutable_id",
+        "revision_digest"
+      ],
+      "title": "HistoryRecordRef",
+      "type": "object"
+    },
+    "HistoryScopeLink": {
+      "additionalProperties": false,
+      "properties": {
+        "association": {
+          "enum": [
+            "PRODUCED_IN",
+            "USED_BY",
+            "RELATED_OBJECT"
+          ],
+          "title": "Association",
+          "type": "string"
+        },
+        "request_revision_digest": {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "title": "Request Revision Digest",
+          "type": "string"
+        },
+        "thread_id": {
+          "title": "Thread Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "thread_id",
+        "request_revision_digest",
+        "association"
+      ],
+      "title": "HistoryScopeLink",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "content": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Content"
+    },
+    "contract_version": {
+      "const": 2,
+      "default": 2,
+      "title": "Contract Version",
+      "type": "integer"
+    },
+    "coverage": {
+      "$ref": "#/$defs/HistoryCoverage"
+    },
+    "current_head_digest": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Fa-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Current Head Digest"
+    },
+    "item": {
+      "$ref": "#/$defs/HistoryItem"
+    }
+  },
+  "required": [
+    "item",
+    "content",
+    "coverage"
+  ],
+  "title": "HistoryDetail",
+  "type": "object"
+}
