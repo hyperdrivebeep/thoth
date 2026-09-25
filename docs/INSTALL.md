@@ -2,10 +2,12 @@
 
 This preview targets a Windows source checkout with Python 3.12 or 3.13. Keep the root uv lock,
 pnpm lock/workspace, migration tree and protocol schemas together.
+Git clone creates a `thoth` folder. GitHub's **Code → Download ZIP** extracts to `thoth-main`;
+open PowerShell in whichever repository folder you obtained before running these commands.
 
 ```powershell
 uv sync --frozen --extra dev --dev
-pnpm install --frozen-lockfile
+pnpm.cmd install --frozen-lockfile
 .\.venv\Scripts\thoth.exe doctor --workspace .\.thoth-local
 ```
 
@@ -23,7 +25,7 @@ unavailable until it is deliberately configured.
 Run the API and Vite in two terminals as shown in the README. For a production Web build:
 
 ```powershell
-pnpm --dir apps/web run build
+pnpm.cmd --dir apps/web run build
 ```
 
 `apps/web/dist` is generated output. Desktop/backend-served UI modes require that build; the API

@@ -58,6 +58,13 @@ those four collection-error files encountered further failures and was interrupt
 not a completed regression result. The candidate's focused checks do not establish remote Codex
 entitlement, model output quality, or a complete public-tree regression pass.
 
+After that repair reached GitHub `main`, a fresh **Download ZIP** archive extracted to `thoth-main`.
+All 1,337 files named by `SOURCE_MANIFEST.json` matched their byte length and SHA-256. Frozen uv
+sync, frozen pnpm install, Web build and doctor passed from the extracted source. This used an
+existing WSL Python/uv installation and an existing Windows pnpm store; it does not prove
+first-time tool installation on a new PC. The archive check exposed the README's clone-only
+`cd thoth` step for ZIP users, corrected in the subsequent documentation update.
+
 The private clean Windows check completed on 2026-09-25:
 
 | Check | Result |

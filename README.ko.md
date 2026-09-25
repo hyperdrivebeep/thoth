@@ -63,13 +63,20 @@
 
 **Windows · 소스 체크아웃 · Python 3.12 또는 3.13 · [uv](https://docs.astral.sh/uv/) · Node.js · pnpm**
 
-저장소를 내려받고 잠금 파일에 맞춰 의존성을 설치합니다.
+Git으로 저장소를 내려받는다면 다음 명령을 실행합니다.
 
 ```powershell
 git clone https://github.com/hyperdrivebeep/thoth.git
 cd thoth
+```
+
+GitHub의 **Code → Download ZIP**으로 받았다면 압축을 풀고 `thoth-main` 폴더에서 PowerShell을
+엽니다. 압축을 푼 상위 폴더에 있다면 `cd thoth-main`을 실행하세요. 저장소 폴더에서 잠금 파일에
+맞춰 의존성을 설치합니다.
+
+```powershell
 uv sync --frozen --extra dev --dev
-pnpm install --frozen-lockfile
+pnpm.cmd install --frozen-lockfile
 ```
 
 첫 번째 터미널에서 API를 시작합니다.
@@ -78,10 +85,10 @@ pnpm install --frozen-lockfile
 .\.venv\Scripts\thoth.exe serve --workspace .\.thoth-local --port 8765
 ```
 
-두 번째 터미널에서 같은 저장소를 열고 웹 화면을 시작합니다.
+두 번째 터미널에서도 같은 `thoth` 또는 `thoth-main` 폴더로 이동한 뒤 웹 화면을 시작합니다.
 
 ```powershell
-pnpm --dir apps/web run dev
+pnpm.cmd --dir apps/web run dev
 ```
 
 **<http://127.0.0.1:5173/>**을 엽니다. 처음 설정 또는 설정 화면에서 지원되는 로그인 경로를 선택하거나 본인의 API 키를 입력한 뒤 모델을 고릅니다. 실제 호출에는 해당 서비스의 사용량이 소모될 수 있습니다.

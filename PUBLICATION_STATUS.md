@@ -18,3 +18,6 @@ GitHub source publication does not deploy or update the hosted service.
 The 2026-09-26 Codex first-run repair has focused local and Chrome verification recorded
 in [docs/VERIFICATION.md](docs/VERIFICATION.md). Repository-wide pytest/type checks remain RED on
 the public package's absent `apps.api` test imports; no full current-source pass is claimed.
+The merged source was downloaded again as GitHub's `main.zip`; manifest hashes, frozen dependency
+sync, Web build and doctor passed. ZIP extraction creates `thoth-main`, which the quick-start now
+identifies.
