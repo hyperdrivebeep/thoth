@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-09-25T08:43:45.565170+00:00",
+  "created_at": "2026-09-25T16:41:20.596132+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -58,23 +58,23 @@
     },
     {
       "path": "PROJECT_WIKI/NOW.md",
-      "sha256": "cac7ed4cfda502428882b4a6758619b484b57d21e47c1d4a8c9789f4e08c6b0f",
-      "bytes": 498
+      "sha256": "68d8d578057b61cd45f99220d5d040f5367661fd8e2d9ec141c5b07a99653b29",
+      "bytes": 885
     },
     {
       "path": "PUBLICATION_STATUS.md",
-      "sha256": "341021627a6385779d2cc317beb84bfde274e8eef19ffc8cba8e72e416bf8a20",
-      "bytes": 877
+      "sha256": "00279f3d74b459f27cdf93a3225eda724fd02c10fa48cc83cf2e8b402697b889",
+      "bytes": 1158
     },
     {
       "path": "README.ko.md",
-      "sha256": "63e9e93063e1c91a9b8d898adc6c6941d3d972b1bc14c89197454c0490ec6f47",
-      "bytes": 8391
+      "sha256": "f3ac48a1c21da9be22bdcf391ce67929ed9c47879cd3096fd1890b9a178d7825",
+      "bytes": 8722
     },
     {
       "path": "README.md",
-      "sha256": "df18ea0ef634c1adbe4456101069994ee319a6d7002883901da9ae87006ebac0",
-      "bytes": 7369
+      "sha256": "053c1ee17b75980e02dbc9273e6c874f42ac1f353d7bdb10eacfe5f8caf73c3e",
+      "bytes": 7639
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -403,13 +403,13 @@
     },
     {
       "path": "apps/web/src/components/FirstRunSetup.test.tsx",
-      "sha256": "43f09643aafdfb049f6e73fea58255b5355f17f72f59b0e58bab83a5ecae6947",
-      "bytes": 17390
+      "sha256": "8d759f411c8d402ab66e7fd25a7fce9a2441528e2d87b6a0a7a370ea353a72b9",
+      "bytes": 18311
     },
     {
       "path": "apps/web/src/components/FirstRunSetup.tsx",
-      "sha256": "23a9d0de9c1a61befda903467478fa1b7fd46ea9446de2ad2ce22adf93be0ef5",
-      "bytes": 10150
+      "sha256": "a4b9414cdbc58fdf0f9300378bab88e9421532a103efe8f18132cff04897b136",
+      "bytes": 10446
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspace.tsx",
@@ -418,8 +418,8 @@
     },
     {
       "path": "apps/web/src/components/ModelCredentialPanel.tsx",
-      "sha256": "0526034d461f35ed92ccb7572f9d24e9506f03152117a68b36e9258f64457b69",
-      "bytes": 4368
+      "sha256": "69606cfa78e31b8657ed4beada712a7bc84a3f3b65e7d88ee0e3545728ad52b3",
+      "bytes": 4443
     },
     {
       "path": "apps/web/src/components/ModelSettings.test.tsx",
@@ -623,8 +623,8 @@
     },
     {
       "path": "apps/web/src/components/modelCredentialPresentation.ts",
-      "sha256": "216ac0661ce084f994cf12f26542e3f406cfc0a87fc5a5d0de5974a15093974b",
-      "bytes": 3779
+      "sha256": "537b70914a254c3163a11e7f055a4fdba8535198169374a90b2743ecb632fb0b",
+      "bytes": 4253
     },
     {
       "path": "apps/web/src/components/useConversationReadProtection.ts",
@@ -838,8 +838,8 @@
     },
     {
       "path": "docs/INSTALL.md",
-      "sha256": "b5df5ca2f43a5032466d63d886cabdd12b0fbce27d8bc2e58a6ab9325c59bc43",
-      "bytes": 3083
+      "sha256": "f5bebdaf6a4712b68295df20642ff9e91f152e8fa5883184c0e23c78b1efff4f",
+      "bytes": 3766
     },
     {
       "path": "docs/KNOWN_TEST_FAILURES.json",
@@ -848,8 +848,8 @@
     },
     {
       "path": "docs/PACKAGING.md",
-      "sha256": "a7b95d22478f3aa5805b10483d795c954fcf40d9791de3ba3cd04185db587024",
-      "bytes": 1817
+      "sha256": "41311a39464f37900351947105fafefc984d38ac014f1fab1102d4be323b7cbd",
+      "bytes": 2074
     },
     {
       "path": "docs/PUBLICATION_REVIEW.md",
@@ -858,8 +858,8 @@
     },
     {
       "path": "docs/VERIFICATION.md",
-      "sha256": "3ae50b7c553f7d39d4f20d93c36de925b45c50c7931ce9e56fb3cace54008b0d",
-      "bytes": 4130
+      "sha256": "12bede504257f5355cfcf25db8682089f212f370175eb6d380618220b7ca28d4",
+      "bytes": 5803
     },
     {
       "path": "docs/architecture/agent-execution-rules.md",
@@ -1973,8 +1973,8 @@
     },
     {
       "path": "src/thoth/adapters/models/catalog.py",
-      "sha256": "9db1628e4bef5857b09ffe725367a4a04f81a39977fec0e2942cf39a0206bf7c",
-      "bytes": 5038
+      "sha256": "099f8857fb6115f2aaec9f9514d54d7e4b11b5765184dc700ecf1a10e730a246",
+      "bytes": 5181
     },
     {
       "path": "src/thoth/adapters/models/codex_account_usage.py",
@@ -2003,8 +2003,8 @@
     },
     {
       "path": "src/thoth/adapters/models/local_credentials.py",
-      "sha256": "b398717d65f36d86aa8c7b35d8fad9429fb47a6c0da1797d56d377d0d45be5ba",
-      "bytes": 11735
+      "sha256": "e8397e672f78a9eefba62bd524d10fa2c7d4366a8fc5d65f7576733f6c639da5",
+      "bytes": 11799
     },
     {
       "path": "src/thoth/adapters/models/omo_native.py",
@@ -6323,8 +6323,8 @@
     },
     {
       "path": "tests/unit/models/test_account_connections.py",
-      "sha256": "0db0e80be98533bd126435770cf60e6eb4229e59d22d77c4db1545e18dea3a45",
-      "bytes": 4238
+      "sha256": "e6d2441bd57468ebaa4e81918a7852d390bc0fbc13119969c144f6b1e47a144c",
+      "bytes": 6116
     },
     {
       "path": "tests/unit/models/test_anthropic_messages.py",
@@ -6533,8 +6533,8 @@
     },
     {
       "path": "tests/unit/test_codex_chatgpt_catalog.py",
-      "sha256": "f3bb8e534a99f6e6c91d3976400a0812bf91fd214b7c48f557c92ba6c3356a59",
-      "bytes": 1556
+      "sha256": "aef53802d456682577999285928abff478ab267e83200d18515f31ce84c58b14",
+      "bytes": 2427
     },
     {
       "path": "tests/unit/test_connector_cleanup_accounting.py",

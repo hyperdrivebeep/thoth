@@ -35,14 +35,21 @@ screen. No existing workspace is needed for that check.
 
 ## First run and credentials
 
-Use THOTH's setup/settings flow. The supported OpenAI account route starts the official Codex
-device-auth flow and observes local CLI login status separately. CLI availability and account
-entitlement are external prerequisites. Providers without an implemented account-login route
-use their supported API-key route.
+Use THOTH's setup/settings flow. On Windows, the supported OpenAI account route opens the official
+Codex device-auth flow in a separate console and observes local CLI login status separately. When
+the backend runs in WSL or another headless POSIX environment, use a visible terminal in that same
+environment to run `codex login --device-auth`. The Web button returns terminal guidance immediately;
+it does not complete login or wait for the browser step. After finishing CLI login, refresh the
+connection state in THOTH. CLI availability and account entitlement are external prerequisites.
+Providers without an implemented account-login route use their supported API-key route.
 
 Keys and model preferences belong to the selected workspace. The default route does not import
 OMO credentials automatically. The optional official Codex catalog may read that CLI's local
-configuration/cache when present. A configured route is not proof of remote credential validity.
+configuration/cache when present. If CLI login is confirmed but no supported model appears, check
+that the backend can read the CLI's `models_cache.json`. To point THOTH at a trusted non-secret
+model-list file, set `THOTH_CODEX_MODELS_CACHE` to its absolute path before starting the backend.
+This setting does not move or configure Codex authentication tokens. A configured route is not
+proof of remote credential validity.
 
 No account configuration is distributed here. Keep `.thoth-local` and credentials out of Git.
 Use a new workspace for first-run smoke tests; opening an existing workspace may run migrations.

@@ -81,7 +81,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
               {credentialCompanies.map((company) => {
                 const row = accounts.find((item) => item.provider === company.provider);
                 const connected = credentialLocallyConfigured(row);
-                const canStartLogin = loginSupported(row);
+                const canStartLogin = loginSupported(row) && !row?.oauth;
                 const canGuideKey = row?.login_supported === false && row.login_kind === "unsupported";
                 const availabilityNote = credentialAvailabilityNote(row);
                 const keyOpen = keyProvider === company.provider;
@@ -92,10 +92,11 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                       <Tag minimal intent={connected ? "success" : "none"}>{credentialAccountLabel(row)}</Tag>
                       <p>{credentialConnectionHint(row)}</p>
                       {availabilityNote && <small>{availabilityNote}</small>}
+                      {row?.oauth && !value?.model_connected && <small>로그인은 확인됐지만 이 환경에서 사용할 모델 목록이 없습니다. 재로그인 대신 모델 경로를 확인하세요.</small>}
                     </div>
                     <div className="first-run-provider-actions">
                       <Button disabled={!canStartLogin && !canGuideKey} loading={connect.isPending} onClick={() => connect.mutate({ provider: company.provider })}>
-                        {canStartLogin ? "Codex 로그인 시작" : canGuideKey ? "키 발급 안내" : "연결 방법 확인 중"}
+                        {row?.oauth && loginSupported(row) ? "로그인 확인됨" : canStartLogin ? "Codex 로그인 시작" : canGuideKey ? "키 발급 안내" : "연결 방법 확인 중"}
                       </Button>
                       <Button minimal onClick={() => { setKeyProvider(keyOpen ? null : company.provider); setApiKey(""); }}>
                         {keyOpen ? "키 입력 닫기" : "API 키"}

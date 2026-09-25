@@ -55,6 +55,10 @@ class StaticModelCatalog:
 class CodexModelCatalog:
     def __init__(self, root: Path | None = None) -> None:
         self.root = root or Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
+        cache_override = os.environ.get("THOTH_CODEX_MODELS_CACHE")
+        self.cache_path = (
+            Path(cache_override).expanduser() if cache_override else self.root / "models_cache.json"
+        )
 
     def defaults(self) -> ModelSelection:
         try:
@@ -70,7 +74,7 @@ class CodexModelCatalog:
 
     def options(self) -> tuple[ModelOption, ...]:
         try:
-            raw = json.loads((self.root / "models_cache.json").read_text(encoding="utf-8-sig"))
+            raw = json.loads(self.cache_path.read_text(encoding="utf-8-sig"))
             result: list[ModelOption] = []
             for entry in raw["models"]:
                 # Aggregated local catalogs also contain routes for other providers.
@@ -107,10 +111,7 @@ class CompositeModelCatalog:
             return self._defaults
         for catalog in self._catalogs:
             defaults = catalog.defaults()
-            advertised = {
-                (option.provider, option.model)
-                for option in catalog.options()
-            }
+            advertised = {(option.provider, option.model) for option in catalog.options()}
             if (
                 defaults.provider is not None
                 and defaults.model is not None

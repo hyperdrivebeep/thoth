@@ -14,3 +14,7 @@ separate. No full current-source regression, live-provider quality, hosted readi
 collaborator field-effect claim is made. See [verification](docs/VERIFICATION.md).
 
 GitHub source publication does not deploy or update the hosted service.
+
+The 2026-09-26 Codex first-run repair has focused local and Chrome verification recorded
+in [docs/VERIFICATION.md](docs/VERIFICATION.md). Repository-wide pytest/type checks remain RED on
+the public package's absent `apps.api` test imports; no full current-source pass is claimed.

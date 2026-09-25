@@ -118,22 +118,33 @@ it("treats an unsupported xAI login response as key guidance, without claiming l
   expect(([...container.querySelectorAll("button")].find(button => button.textContent === "다음") as HTMLButtonElement).disabled).toBe(true);
 });
 
-it("labels OAuth as started and waits for authoritative workspace readiness", async () => {
+it("does not restart an existing OAuth login to repair a missing model route", async () => {
   fixture.ready = { ready: false, deployment_mode: "LOCAL", model_connected: false, setup: { internet_consent: "UNDECIDED" } };
-  fixture.registerResult = { started: true, provider: "codex-oauth", kind: "oauth" };
   fixture.accounts = [{ provider: "openai", label: "ChatGPT", connected: true, has_key: false, oauth: true,
     login_supported: true, login_kind: "codex_device_auth", remote_auth_verified: null, available_model_providers: ["codex-oauth"] }];
   await mount();
   expect(container.textContent).toContain("로그인 상태 확인됨");
   expect(container.textContent).toContain("실제 공급자 호출은 아직 확인되지 않았습니다");
-  const login = [...container.querySelectorAll("button")].find(button => button.textContent === "Codex 로그인 시작")!;
-  await act(async () => login.click()); await flush();
-  expect(container.textContent).toContain("계정 로그인 절차를 시작했습니다");
+  expect(container.textContent).toContain("재로그인 대신 모델 경로를 확인하세요");
+  const login = [...container.querySelectorAll("button")].find(button => button.textContent === "로그인 확인됨") as HTMLButtonElement;
+  expect(login.disabled).toBe(true);
+  expect(fixture.calls.some(call => call.method === "model/credential/register")).toBe(false);
   expect(([...container.querySelectorAll("button")].find(button => button.textContent === "다음") as HTMLButtonElement).disabled).toBe(true);
   fixture.ready = { ...fixture.ready, model_connected: true };
   const refresh = [...container.querySelectorAll("button")].find(button => button.textContent === "연결 상태 다시 확인")!;
   await act(async () => refresh.click()); await flush();
   expect(([...container.querySelectorAll("button")].find(button => button.textContent === "다음") as HTMLButtonElement).disabled).toBe(false);
+});
+
+it("shows a terminal-only device login response without claiming login started", async () => {
+  fixture.ready = { ready: false, deployment_mode: "LOCAL", model_connected: false, setup: { internet_consent: "UNDECIDED" } };
+  fixture.registerResult = { started: false, provider: "codex-oauth", kind: "manual_device_auth", reason_code: "CODEX_DEVICE_AUTH_TERMINAL_REQUIRED" };
+  await mount();
+  const login = [...container.querySelectorAll("button")].find(button => button.textContent === "Codex 로그인 시작")!;
+  await act(async () => login.click()); await flush();
+  expect(container.textContent).toContain("codex login --device-auth");
+  expect(container.textContent).toContain("THOTH는 로그인을 시작하거나 완료하지 않았습니다");
+  expect(([...container.querySelectorAll("button")].find(button => button.textContent === "다음") as HTMLButtonElement).disabled).toBe(true);
 });
 
 it("does not infer login or readiness from an OMO-only legacy account row", async () => {

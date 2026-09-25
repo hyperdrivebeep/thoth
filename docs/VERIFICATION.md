@@ -36,6 +36,28 @@ complete atomicity for all owners or execution paths.
 
 ## Candidate checks
 
+### 2026-09-26 Codex first-run repair candidate
+
+The public source candidate was installed with frozen uv and pnpm locks in an isolated WSL copy.
+The copy's changed runtime and Web files were SHA-256 checked against the Windows worktree.
+Python 3.12.3, Node 24.19.0 and pnpm 11.21.0 were used. No provider model call was made.
+
+| Check | Result |
+| --- | --- |
+| Codex credential/catalog unit tests and related first-run/model-settings integration files | PASS |
+| Architecture check, Ruff, changed-file BasedPyright, doctor | PASS |
+| Web ESLint, TypeScript, 189 tests, production build | PASS; one existing Web test skipped |
+| Chrome first-run with CLI login but no visible model catalog | PASS: login action disabled and missing-route guidance shown |
+| Chrome first-run with an explicit non-secret model-cache path | PASS: eight Codex model options found; Next advanced to step 2 without a model call |
+| POSIX HTTP device-login request and immediate health check | PASS: manual-terminal guidance in 256 ms; `/healthz` 200 |
+| Repository-wide pytest | FAIL at collection: four existing test files import `apps.api`, which is absent from this source-only package |
+| Repository-wide BasedPyright with all optional extras | FAIL: 17 errors confined to the same four `apps.api`-dependent test files |
+
+The full-suite failure is not represented as a pass. A separate diagnostic pytest run that ignored
+those four collection-error files encountered further failures and was interrupted at 17%; it is
+not a completed regression result. The candidate's focused checks do not establish remote Codex
+entitlement, model output quality, or a complete public-tree regression pass.
+
 The private clean Windows check completed on 2026-09-25:
 
 | Check | Result |
