@@ -24,3 +24,7 @@ must be read with the current [verification limits](VERIFICATION.md).
 The bounded clean-install/content review is complete and MIT is applied to the reviewed source
 snapshot. The source preview is published in the separate `thoth` repository with fresh
 Git history. The private development repository and hosted service are not part of this release.
+
+`SOURCE_MANIFEST.json` tracks hashes of the current reviewed public files. Its
+`source_archive_sha256` is the digest of the original assembled 2026-09-25 archive, retained as
+historical publication evidence; it is not a digest of later GitHub source ZIPs.

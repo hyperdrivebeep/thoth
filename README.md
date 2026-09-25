@@ -92,6 +92,10 @@ pnpm --dir apps/web run dev
 Open **<http://127.0.0.1:5173/>**. In setup/settings, select a supported login route or enter your
 own provider key, then choose a model before starting research. Provider use may consume its quota.
 
+If the backend runs in WSL, complete Codex device login in that WSL terminal with
+`codex login --device-auth`. If login is confirmed but no model appears, check the model catalog
+path in the [installation and credentials guide](docs/INSTALL.md) before repeating login.
+
 The API binds to loopback; Vite proxies API calls to port 8765. Keep the migration tree with the
 source checkout: a standalone wheel is not supported by this preview.
 

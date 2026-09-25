@@ -42,9 +42,7 @@ def _read_json(path: Path, *, encoding: str = "utf-8") -> dict[str, object]:
     if not isinstance(raw, dict):
         return {}
     return {
-        key: value
-        for key, value in cast(dict[object, object], raw).items()
-        if isinstance(key, str)
+        key: value for key, value in cast(dict[object, object], raw).items() if isinstance(key, str)
     }
 
 
@@ -212,27 +210,32 @@ def account_connections(
 
 
 def start_codex_login() -> dict[str, object]:
-    from thoth.adapters.models.codex_oauth import CodexOAuthUnavailable, run_codex_device_login
+    from thoth.adapters.models.codex_oauth import (
+        CodexOAuthUnavailable,
+        resolve_codex_executable,
+    )
 
-    creationflags = 0
-    if sys.platform == "win32":
-        creationflags = getattr(subprocess, "CREATE_NEW_CONSOLE", 0)
     try:
+        resolved = resolve_codex_executable()
+        if not resolved.is_file():
+            raise LocalCredentialHold("CODEX_CLI_NOT_FOUND")
+        creationflags = (
+            getattr(subprocess, "CREATE_NEW_CONSOLE", 0) if sys.platform == "win32" else 0
+        )
         if creationflags:
-            from thoth.adapters.models.codex_oauth import resolve_codex_executable
-
-            resolved = resolve_codex_executable()
-            if not resolved.is_file():
-                raise LocalCredentialHold("CODEX_CLI_NOT_FOUND")
             subprocess.Popen(
                 [str(resolved), "login", "--device-auth"],
                 creationflags=creationflags,
             )
             return {"started": True, "provider": "codex-oauth", "kind": "oauth"}
-        code = run_codex_device_login()
-        if code != 0:
-            raise LocalCredentialHold("CODEX_LOGIN_FAILED")
-        return {"started": True, "provider": "codex-oauth", "kind": "oauth"}
+        # Headless/device login waits for a person to finish a browser step.
+        # Never hold the HTTP event loop (or hide the one-time code in server logs).
+        return {
+            "started": False,
+            "provider": "codex-oauth",
+            "kind": "manual_device_auth",
+            "reason_code": "CODEX_DEVICE_AUTH_TERMINAL_REQUIRED",
+        }
     except CodexOAuthUnavailable as exc:
         raise LocalCredentialHold(str(exc)) from exc
 
@@ -277,9 +280,7 @@ def register_thoth_local_providers(
             lambda model, bound=provider: thoth_local_model(bound, model, root),
         )
     resolver.register_dynamic(
-        lambda provider: any(
-            item["provider"] == provider for item in available_credentials(root)
-        ),
+        lambda provider: any(item["provider"] == provider for item in available_credentials(root)),
         lambda provider, model: thoth_local_model(provider, model, root),
     )
 

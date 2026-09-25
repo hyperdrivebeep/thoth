@@ -78,7 +78,7 @@ function CompanyRow({
   onKey: (apiKey: string) => void;
 }) {
   const [key, setKey] = useState("");
-  const canStartLogin = loginSupported(row);
+  const canStartLogin = loginSupported(row) && !row?.oauth;
   const canGuideKey = row?.login_supported === false && row.login_kind === "unsupported";
   return (
     <div className="company-account">
@@ -88,7 +88,7 @@ function CompanyRow({
       {credentialAvailabilityNote(row) && <small>{credentialAvailabilityNote(row)}</small>}
       <div className="company-account-actions">
         <Button small disabled={!canStartLogin && !canGuideKey} loading={pending} onClick={onLogin}>
-          {canStartLogin ? "Codex 로그인 시작" : canGuideKey ? "키 발급 안내" : "연결 방법 확인 중"}
+          {row?.oauth && loginSupported(row) ? "로그인 확인됨" : canStartLogin ? "Codex 로그인 시작" : canGuideKey ? "키 발급 안내" : "연결 방법 확인 중"}
         </Button>
         <InputGroup
           type="password"

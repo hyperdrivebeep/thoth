@@ -99,3 +99,46 @@ def test_missing_codex_cli_reports_key_entry_fallback(
     monkeypatch.setattr(local_credentials, "start_codex_login", unavailable)
     with pytest.raises(ModelCredentialError, match="CODEX_CLI_NOT_FOUND"):
         LocalModelCredentials(tmp_path).start_login("openai")
+
+
+def test_posix_codex_device_login_never_waits_inside_the_http_request(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cli = tmp_path / "codex"
+    cli.write_text("synthetic executable", encoding="utf-8")
+    monkeypatch.setattr(local_credentials.sys, "platform", "linux")
+    monkeypatch.setattr(codex_oauth, "resolve_codex_executable", lambda: cli)
+
+    def forbidden_process(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("device login must not launch or block a server request")
+
+    monkeypatch.setattr(local_credentials.subprocess, "run", forbidden_process)
+    monkeypatch.setattr(local_credentials.subprocess, "Popen", forbidden_process)
+    assert LocalModelCredentials(tmp_path).start_login("openai") == {
+        "started": False,
+        "provider": "codex-oauth",
+        "kind": "manual_device_auth",
+        "reason_code": "CODEX_DEVICE_AUTH_TERMINAL_REQUIRED",
+    }
+
+
+def test_windows_codex_login_still_starts_a_separate_console(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cli = tmp_path / "codex.exe"
+    cli.write_text("synthetic executable", encoding="utf-8")
+    monkeypatch.setattr(local_credentials.sys, "platform", "win32")
+    monkeypatch.setattr(local_credentials.subprocess, "CREATE_NEW_CONSOLE", 16, raising=False)
+    monkeypatch.setattr(codex_oauth, "resolve_codex_executable", lambda: cli)
+    launched: list[tuple[list[str], int]] = []
+
+    def record_process(arguments: list[str], *, creationflags: int) -> None:
+        launched.append((arguments, creationflags))
+
+    monkeypatch.setattr(local_credentials.subprocess, "Popen", record_process)
+    assert LocalModelCredentials(tmp_path).start_login("openai") == {
+        "started": True,
+        "provider": "codex-oauth",
+        "kind": "oauth",
+    }
+    assert launched == [([str(cli), "login", "--device-auth"], 16)]
