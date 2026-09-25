@@ -27,5 +27,6 @@ Clean candidate installation, doctor, 36 focused Web tests, corrected Web build 
 first-run Chrome/API smoke passed. See [VERIFICATION.md](VERIFICATION.md). The owner subsequently
 selected MIT; only license notices and package license metadata changed. Runtime code, tests,
 dependency selections and lockfiles were unchanged. GitHub source publication was subsequently
-authorized on 2026-09-25. Publication updates only these status documents and the source manifest;
+authorized on 2026-09-25. Publication updates the status documents, source manifest and one
+PowerShell line-ending attribute. GitHub source archives preserve the reviewed PowerShell LF bytes;
 the reviewed runtime, test and dependency files remain unchanged. Private Git history is excluded.
