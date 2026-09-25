@@ -3,7 +3,10 @@
 The preview contains selected code, migrations, schemas, build/test configuration, developer rules,
 public documentation and three self-described synthetic example packs. It contains no Git history,
 local workspaces, credentials, user databases, deployment configuration, verification dumps,
-screenshots/reference images, dependency installations or generated Web bundle.
+private screenshots or external reference images, dependency installations or generated Web bundle.
+
+The selected THOTH brand mark, wordmark, original AI-generated Thoth illustration and README banner
+are included in `docs/brand`. These presentation assets do not contain user research or runtime data.
 
 Original QA04 Web fixtures were replaced in this public copy with synthetic data while preserving
 the schema, 149 selected refs, 50/50/49 paging and 25 available citations. The private source files

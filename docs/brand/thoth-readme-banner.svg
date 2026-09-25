@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-labelledby="title description">
+  <title id="title">THOTH — Evidence. Judgment. Revision.</title>
+  <desc id="description">THOTH research workbench, with the original connected T symbol in research blue on ink navy.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#182029"/>
+      <stop offset="1" stop-color="#14263C"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" x2="1">
+      <stop stop-color="#4C90F0" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#4C90F0" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#8ABBFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="320" rx="16" fill="url(#background)"/>
+  <path d="M790 0V320M894 0V320M998 0V320M1102 0V320M1206 0V320" stroke="#8ABBFF" stroke-opacity="0.045"/>
+  <circle cx="1110" cy="158" r="184" fill="none" stroke="#4C90F0" stroke-opacity="0.10"/>
+  <circle cx="1110" cy="158" r="127" fill="none" stroke="#4C90F0" stroke-opacity="0.10"/>
+  <path d="M54 286H1226" stroke="url(#line)"/>
+  <g transform="translate(74 102) scale(1.62)">
+    <rect width="72" height="72" rx="15" fill="#26384C"/>
+    <path d="M18 23H54M36 23V51" fill="none" stroke="#8ABBFF" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="18" cy="23" r="5.5" fill="#4C90F0"/>
+    <circle cx="54" cy="23" r="5.5" fill="#4C90F0"/>
+    <circle cx="36" cy="51" r="6" fill="#72CA9B" stroke="#26384C" stroke-width="1.5"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="234" y="86" fill="#8ABBFF" font-size="15" font-weight="700" letter-spacing="3.2">A LOCAL RESEARCH WORKBENCH</text>
+    <text x="228" y="177" fill="#F1F4F7" font-size="86" font-weight="700" letter-spacing="10">THOTH</text>
+    <text x="234" y="221" fill="#A6B4C4" font-size="25" letter-spacing="0.6">Evidence. Judgment. Revision.</text>
+    <g font-size="14" letter-spacing="1.6" fill="#A6B4C4">
+      <path d="M957 96V224" stroke="#8ABBFF" stroke-opacity="0.40" stroke-width="2"/>
+      <circle cx="957" cy="100" r="5" fill="#4C90F0"/>
+      <circle cx="957" cy="160" r="5" fill="#4C90F0"/>
+      <circle cx="957" cy="220" r="5" fill="#72CA9B"/>
+      <text x="982" y="105">ASK</text>
+      <text x="982" y="165">INSPECT</text>
+      <text x="982" y="225">REVISIT</text>
+    </g>
+  </g>
+</svg>

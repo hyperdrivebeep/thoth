@@ -21,3 +21,13 @@ External-derived 6g-sandbox-hero, sunrise-secondary, l3pilot-regression and open
 packs are omitted pending source/license clarification. public-demo-membrane is also omitted from
 this initial preview until its separate attribution wording is confirmed. No upstream PDF or
 repository copy is distributed.
+
+## THOTH brand assets
+
+The THOTH mark and wordmark are original vector assets created for this project. The README banner
+reuses that mark and the existing product palette. `docs/brand/thoth-ibis-hero.png` is an original
+AI-generated illustration created for THOTH, not a reproduction of a museum artifact. The brand
+assets are included under this repository's MIT license. Their source files are preserved.
+
+The README's badges are rendered by Shields.io. No third-party logo, screenshot, testimonial or
+performance claim from another project is bundled into this presentation.

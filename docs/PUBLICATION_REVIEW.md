@@ -30,3 +30,9 @@ dependency selections and lockfiles were unchanged. GitHub source publication wa
 authorized on 2026-09-25. Publication updates the status documents, source manifest and one
 PowerShell line-ending attribute. GitHub source archives preserve the reviewed PowerShell LF bytes;
 the reviewed runtime, test and dependency files remain unchanged. Private Git history is excluded.
+
+The README presentation was subsequently updated with the project's existing vector mark, wordmark,
+original AI-generated Thoth illustration, a matching vector banner and a Korean README. The original
+three image assets are copied byte-for-byte from the branding work. The files are documented in
+`docs/brand`; the publication manifest includes them. This is a documentation/asset update and does
+not change runtime code, tests, dependencies or the stated verification limits.

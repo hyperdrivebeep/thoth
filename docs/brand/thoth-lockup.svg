@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" role="img" aria-labelledby="title desc">
+  <title id="title">THOTH</title>
+  <desc id="desc">THOTH wordmark with a connected evidence-point symbol.</desc>
+  <rect width="480" height="120" rx="16" fill="#182029"/>
+  <g transform="translate(24 24)">
+    <rect width="72" height="72" rx="15" fill="#26384C"/>
+    <path d="M18 23H54M36 23V51" fill="none" stroke="#8ABBFF" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="18" cy="23" r="5.5" fill="#4C90F0"/>
+    <circle cx="54" cy="23" r="5.5" fill="#4C90F0"/>
+    <circle cx="36" cy="51" r="6" fill="#72CA9B" stroke="#26384C" stroke-width="1.5"/>
+  </g>
+  <text x="116" y="70" fill="#F1F4F7" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="700" letter-spacing="5">THOTH</text>
+  <text x="118" y="94" fill="#A6B4C4" font-family="Arial, Helvetica, sans-serif" font-size="13" letter-spacing="0.4">Evidence. Judgment. Revision.</text>
+</svg>

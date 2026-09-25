@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-09-25T07:41:09.374499+00:00",
+  "created_at": "2026-09-25T07:57:18.436154+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -67,14 +67,19 @@
       "bytes": 893
     },
     {
+      "path": "README.ko.md",
+      "sha256": "ef70f828d83e174777ea883064226c8f78ba7c6faa08f975a2f47c6086b312ad",
+      "bytes": 8405
+    },
+    {
       "path": "README.md",
-      "sha256": "b41010d96a46ec484b0059021ba26caeef6a96ebcbab7b01af30d8b55b14f72c",
-      "bytes": 4393
+      "sha256": "3361b308225c548e92407105a20481f681ebe67867bd562d15cafcd2a678f2a0",
+      "bytes": 7383
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
-      "sha256": "94a9bbfb14ff0875b321c4f831be2e7af3813d06b1dce3a6149e7c18d55ae027",
-      "bytes": 1599
+      "sha256": "a41d5557aa7fc0f89b6a8aa075075d38a4efcce08f459496c0334da395d59c70",
+      "bytes": 2178
     },
     {
       "path": "alembic.ini",
@@ -843,13 +848,13 @@
     },
     {
       "path": "docs/PACKAGING.md",
-      "sha256": "f5eb5ce31b3d9218a792ad30e0f71b6bc40dca4da8690771633532b6953179bf",
-      "bytes": 1601
+      "sha256": "2dfda7363cafcb6f214aad44f03f43e07f50e02cbcaeffc15df1eb0c2e4450e5",
+      "bytes": 1824
     },
     {
       "path": "docs/PUBLICATION_REVIEW.md",
-      "sha256": "b34b67dcad2514f3dd0cc6fb878ea84a8472c8c3195a191c9ba9d61cc66338d3",
-      "bytes": 2307
+      "sha256": "ceb267ab1bd4bdd1b6ece5e558765072c28b961de582a0558d11a13983d04d35",
+      "bytes": 2785
     },
     {
       "path": "docs/VERIFICATION.md",
@@ -950,6 +955,31 @@
       "path": "docs/architecture/verification-profiles.md",
       "sha256": "4a7a1f858d780e86d9dae5ef0512aef7ea73e2db39b7fec91d8939238815a176",
       "bytes": 5545
+    },
+    {
+      "path": "docs/brand/README.md",
+      "sha256": "9093cadf6eac65cfae9ca82dbce087b140eaff7a9c44ddd489f7980fff3cac19",
+      "bytes": 3066
+    },
+    {
+      "path": "docs/brand/thoth-ibis-hero.png",
+      "sha256": "4fb4b0ed8b19f5c7191d8ac4a664ffeee66a77e3f6595bd2938454428ff6e68d",
+      "bytes": 1830480
+    },
+    {
+      "path": "docs/brand/thoth-lockup.svg",
+      "sha256": "491943eab74e20af9e1f4962461bfabf6ee094a840d616cca7adf5da9f88f20e",
+      "bytes": 979
+    },
+    {
+      "path": "docs/brand/thoth-mark.svg",
+      "sha256": "15251217e6c50071e84948d27a04320f6e01f8a6bc487f3e59b80702406a18e2",
+      "bytes": 570
+    },
+    {
+      "path": "docs/brand/thoth-readme-banner.svg",
+      "sha256": "f997f3b91b0e785608fb7d801f1bbc3b397313e7677ae06ff1b3f018df1fe892",
+      "bytes": 2446
     },
     {
       "path": "examples/projectpacks/c1-complete/criteria.json",
