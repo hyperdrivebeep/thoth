@@ -1,0 +1,12 @@
+pack_id: pack:opendreamkit-hidden-holdout
+project_id: project:opendreamkit-hidden-holdout
+name: OpenDreamKit license-and-oracle negative holdout
+cutoff_at: 2018-12-12T23:59:59Z
+overlay: eu-rnd-mathematical-software
+policy_binding_ref: policy:opendreamkit-hidden-v1
+scenario:
+  case_id: case:opendreamkit-change-lineage
+  thread_id: thread:opendreamkit-review
+  cycle_id: cycle:opendreamkit-1
+  object_id: object:opendreamkit-change-gap
+  problem: Survey evidence changed initial assumptions and reprioritized tasks, but repository-wide reuse rights and an independent deterministic outcome oracle are unresolved. What can be concluded safely without copying domain-specific automotive logic?

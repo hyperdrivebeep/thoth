@@ -9,9 +9,28 @@ from thoth.adapters.models.catalog import (
     CompositeModelCatalog,
     StaticModelCatalog,
 )
+from thoth.adapters.models.claude_catalog import ClaudeOAuthCatalog
+from thoth.adapters.models.claude_code import ClaudeCodeCatalog
+from thoth.adapters.models.claude_oauth import (
+    release_workspace_broker as release_claude_workspace_broker,
+)
+from thoth.adapters.models.claude_oauth import (
+    retain_workspace_broker as retain_claude_workspace_broker,
+)
 from thoth.adapters.models.codex_account_usage import CodexAccountUsageAdapter
+from thoth.adapters.models.codex_broker import (
+    release_workspace_broker,
+    retain_workspace_broker,
+)
 from thoth.adapters.models.local_credentials import LocalModelCredentials, ThothLocalCatalog
 from thoth.adapters.models.xai_account_usage import XaiAccountUsageAdapter
+from thoth.adapters.models.xai_broker import (
+    release_workspace_broker as release_xai_workspace_broker,
+)
+from thoth.adapters.models.xai_broker import (
+    retain_workspace_broker as retain_xai_workspace_broker,
+)
+from thoth.adapters.models.xai_catalog import ThothXaiOAuthCatalog
 from thoth.adapters.storage.research_queue import ControlResearchQueueStore
 from thoth.adapters.storage.workspace_setup import FilesystemWorkspaceSetup
 from thoth.adapters.task_profiles import default_task_profiles
@@ -29,6 +48,7 @@ from thoth.application.services.research_analysis import ResearchAnalysis
 from thoth.application.services.research_leases import ResearchLeases
 from thoth.application.services.scoped_artifacts import ScopedArtifactLedger
 from thoth.apps.test_runtime import TestComponents
+from thoth.apps.workspace_paths import workspace_id
 from thoth.domain.deployment_mode import DeploymentMode, parse_deployment_mode
 from thoth.ports.criterion_contract import CriterionContractStorePort
 from thoth.ports.evidence_graph import EvidenceGraphStorePort
@@ -45,18 +65,29 @@ class ResearchEntryComposition:
     entry: ResearchThreadHandlers
     worker: LocalWorkerIdentity
     stores: StoreBundlePort
+    broker_workspace: Path | None = None
 
     def close_storage(self) -> None:
-        self.worker.close()
-        self.stores.close()
+        try:
+            self.worker.close()
+        finally:
+            try:
+                self.stores.close()
+            finally:
+                if self.broker_workspace is not None:
+                    try:
+                        release_claude_workspace_broker(self.broker_workspace)
+                    finally:
+                        try:
+                            release_xai_workspace_broker(self.broker_workspace)
+                        finally:
+                            release_workspace_broker(self.broker_workspace)
 
 
 def _configured_model_available(
     catalog: ModelCatalogPort, credentials: LocalModelCredentials
 ) -> bool:
-    key_models = {
-        (item["provider"], item["model"]) for item in credentials.list_credentials()
-    }
+    key_models = {(item["provider"], item["model"]) for item in credentials.list_credentials()}
     oauth_providers: set[str] = set()
     for account in credentials.account_connections():
         if account.get("oauth") is not True:
@@ -68,8 +99,7 @@ def _configured_model_available(
             item for item in cast(list[object], providers) if isinstance(item, str)
         )
     return any(
-        (option.provider, option.model) in key_models
-        or option.provider in oauth_providers
+        (option.provider, option.model) in key_models or option.provider in oauth_providers
         for option in catalog.options()
     )
 
@@ -106,7 +136,11 @@ def create_research_entry(
         catalog
         or (
             CompositeModelCatalog(
-                ThothLocalCatalog(workspace), CodexModelCatalog()
+                ThothLocalCatalog(workspace),
+                CodexModelCatalog(workspace) if workspace is not None else StaticModelCatalog(),
+                ClaudeCodeCatalog(workspace) if workspace is not None else StaticModelCatalog(),
+                ClaudeOAuthCatalog(workspace) if workspace is not None else StaticModelCatalog(),
+                ThothXaiOAuthCatalog(workspace) if workspace is not None else StaticModelCatalog(),
             )
             if use_codex_defaults
             else StaticModelCatalog()
@@ -125,6 +159,9 @@ def create_research_entry(
     registry.register("model/settings/update", settings_handlers.update)
     registry.register("model/credential/list", settings_handlers.list_credentials)
     registry.register("model/credential/register", settings_handlers.register_credential)
+    registry.register("model/credential/login/status", settings_handlers.login_status)
+    registry.register("model/credential/login/cancel", settings_handlers.cancel_login)
+    registry.register("model/credential/login/complete", settings_handlers.complete_login)
     mode = deployment_mode or parse_deployment_mode()
     ready_projection = None
     if mode is DeploymentMode.HOSTED_REVIEW:
@@ -136,6 +173,9 @@ def create_research_entry(
         deployment_mode=mode,
         model_connected=lambda: _configured_model_available(settings.catalog, local_credentials),
         ready_projection=ready_projection,
+        workspace_id=workspace_id(workspace)
+        if mode is DeploymentMode.LOCAL and workspace
+        else None,
     )
     registry.register("workspace/setup/read", workspace_setup.read)
     registry.register("workspace/setup/update", workspace_setup.update)
@@ -170,6 +210,7 @@ def create_research_entry(
         "codex-oauth": CodexAccountUsageAdapter(),
         "default": CodexAccountUsageAdapter(),
         "xai": XaiAccountUsageAdapter(),
+        "xai-oauth": XaiAccountUsageAdapter(),
     }
     entry.queue.reconcile_terminal_operations(entry)
     registry.decorate("thread/start", lambda _: entry.start)
@@ -195,4 +236,17 @@ def create_research_entry(
             max_projects=limits.max_projects,
             max_concurrent_research=limits.max_concurrent_research,
         )
-    return ResearchEntryComposition(entry, worker, stores)
+    broker_workspace = workspace if mode is DeploymentMode.LOCAL else None
+    if broker_workspace is not None:
+        retain_workspace_broker(broker_workspace)
+        try:
+            retain_xai_workspace_broker(broker_workspace)
+            try:
+                retain_claude_workspace_broker(broker_workspace)
+            except BaseException:
+                release_xai_workspace_broker(broker_workspace)
+                raise
+        except BaseException:
+            release_workspace_broker(broker_workspace)
+            raise
+    return ResearchEntryComposition(entry, worker, stores, broker_workspace)

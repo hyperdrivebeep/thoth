@@ -36,7 +36,8 @@ see what remains unresolved, and compare two saved results before deciding what 
 
 > [!NOTE]
 > **Experimental source preview for personal/local use.** The interface is Korean-first.
-> Focused feature and installation checks passed; 25 source-tree regression cases remain unresolved.
+> Focused feature checks passed; the latest repository-wide verification is not passing. See the verification limits below.
+> **2026-09-29 update:** isolated model authentication and restart recovery are included. Real-provider analysis and a current-source FULL pass remain unverified; Claude subscription login is disabled without client configuration.
 > See [status and limits](#status) before relying on a result.
 
 ## What you can do
@@ -77,17 +78,19 @@ cd thoth
 
 Or choose **Code → Download ZIP** on GitHub, extract it, and open PowerShell in the extracted
 `thoth-main` folder. If PowerShell is in the folder containing that extraction, run `cd thoth-main`.
-Then install the locked dependencies from the repository folder:
+First [prepare the Windows Python environment](docs/INSTALL.md#prepare-python-on-windows),
+then install the locked dependencies from the repository folder:
 
 ```powershell
-uv sync --frozen --extra dev --dev
+uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev
 pnpm.cmd install --frozen-lockfile
 ```
 
 Start the API in one terminal:
 
 ```powershell
-.\.venv\Scripts\thoth.exe serve --workspace .\.thoth-local --port 8765
+.\.venv\Scripts\python.exe -m thoth.cli workspace
+.\.venv\Scripts\python.exe -m thoth.cli serve --port 8765
 ```
 
 Start the Web interface in a second terminal, after entering the same `thoth` or `thoth-main` folder:
@@ -99,9 +102,16 @@ pnpm.cmd --dir apps/web run dev
 Open **<http://127.0.0.1:5173/>**. In setup/settings, select a supported login route or enter your
 own provider key, then choose a model before starting research. Provider use may consume its quota.
 
-If the backend runs in WSL, complete Codex device login in that WSL terminal with
-`codex login --device-auth`. If login is confirmed but no model appears, check the model catalog
-path in the [installation and credentials guide](docs/INSTALL.md) before repeating login.
+New Windows installations keep research data in `%LOCALAPPDATA%\THOTH`, independently of the
+downloaded source folder. If you used an earlier version, open its existing data directory with
+`serve --workspace "C:\path\to\your\old\.thoth-local" --port 8765`.
+THOTH reports the selected directory at startup and does not move old data automatically.
+
+Codex sign-in uses a separate THOTH profile and requires a compatible official standalone CLI.
+Use THOTH's connection flow; an existing Desktop login is not imported. This source version adds
+experimental xAI device-code sign-in with a THOTH-owned profile. Its controlled Chrome/RPC flow
+passed with fake providers; real-account acceptance is pending. Claude and xAI API keys remain separate routes. See
+[connection requirements and restart behavior](docs/INSTALL.md).
 
 The API binds to loopback; Vite proxies API calls to port 8765. Keep the migration tree with the
 source checkout: a standalone wheel is not supported by this preview.
@@ -113,8 +123,9 @@ The isolated Windows check used Python 3.13.15, Node 24.19.0, pnpm 12.6.0 and uv
 The basic PDF path uses pypdf. Structured PDF parsing, browser acquisition, additional connectors
 and managed sandboxes have optional dependencies and prerequisites.
 
-The default connection does not import OMO credentials. The optional official Codex catalog may
-read the CLI's local configuration/cache when present. No account configuration is distributed here.
+The default connection does not import OMO or Codex Desktop credentials. The experimental Codex
+bridge uses its own profile for login, token refresh and model discovery. No account configuration
+is distributed here; successful login alone does not establish a successful model response.
 
 See [installation and credentials](docs/INSTALL.md).
 
@@ -130,8 +141,10 @@ This is an **experimental reference implementation**, with evidence scoped to th
 | Fresh frozen installation, doctor and Web build | Passed on the recorded Windows environment. |
 | Synthetic evidence interface | 36 focused Web tests passed. |
 | First-run Chrome/API smoke | Passed with no credentials or model calls. An unconfigured model was expected. |
+| 2026-09-28 authentication/restart r2 | Partial independent Chrome/RPC acceptance with synthetic providers; five saved results reopened in another process without model calls. Diagnostic failure and unrun scenarios are documented. |
+| Connection/restart Web acceptance after signed Python recovery | 247 Web tests and 8 doctor checks passed; actual Chrome/RPC with fake providers covered setup, saved results, drafts and workspace separation. Real OAuth and physical PC reboot remain unverified. |
 
-**25 source-tree regression cases remain unresolved.** These are separate from the focused feature
+**The latest repository-wide verification is not passing.** These results are separate from the focused feature
 checks. No complete current-source regression pass is claimed. Some legacy assets are also omitted
 because their redistribution rights were not established.
 

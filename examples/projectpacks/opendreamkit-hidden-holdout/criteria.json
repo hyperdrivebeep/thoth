@@ -1,0 +1,18 @@
+[
+  {
+    "draft": {
+      "criterion_id": "criterion:opendreamkit-change-readiness",
+      "project_id": "$PROJECT_ID",
+      "name": "Change-readiness evidence completeness",
+      "measured_construct": "traceable survey, issue, review, and deliverable lineage",
+      "computation": null,
+      "context": {"domain": "mathematical software infrastructure"},
+      "acceptance_rule": null,
+      "origin": "DOCUMENT_EXTRACTED",
+      "field_evidence": {"name": ["$EVIDENCE_0"]},
+      "missing_fields": ["independent outcome oracle", "repository-wide reuse rights"],
+      "uncertainty": "The correct safe result is rights hold and abstention, not an invented project outcome."
+    },
+    "signals": {"source_scope_confirmed": true, "expert_semantics_confirmed": false, "computation_verified": false}
+  }
+]

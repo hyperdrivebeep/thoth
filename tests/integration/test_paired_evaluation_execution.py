@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from tests.integration.paired_evaluation_helpers import pair_harness
+from tests.integration.source_time_fixture import confirm_synthetic_source_time
 from tests.integration.storage_coverage_helpers import request, value
 from tests.integration.test_a02_autonomous_acquisition import StaticModelResolver
 from tests.integration.test_a04_r2_closed_loop import A04R2Model
@@ -175,7 +176,7 @@ async def test_normal_thread_invokes_its_explicit_runnable_plan_without_activati
         inbox = workspace / "inbox"
         inbox.mkdir(exist_ok=True)
         (inbox / "basis.md").write_text("# Basis\n\nRun a bounded comparison.\n", encoding="utf-8")
-        value(
+        connected = value(
             await h.runtime.bus.dispatch(
                 request(
                     "project/source/connect",
@@ -191,6 +192,11 @@ async def test_normal_thread_invokes_its_explicit_runnable_plan_without_activati
                 )
             )
         )
+        current_source = await confirm_synthetic_source_time(
+            h.runtime, h.project, connected, key="normal-source"
+        )
+        assert current_source["cutoff_eligibility"] == "ELIGIBLE"
+        assert h.plan["record_id"]
         output = {}
         for index in range(2):
             output = value(
@@ -205,7 +211,12 @@ async def test_normal_thread_invokes_its_explicit_runnable_plan_without_activati
                     )
                 )
             )
+            assert len(sandbox.seen_specs) == index + 1
+        observation = output["improvement_observation"]
+        assert observation["failure_observation_ref"] is not None
+        assert observation["trigger_state"] == "EVALUATED"
         improvement = output["recursive_improvement"]
+        assert improvement is not None
         assert improvement["state"] == "EVALUATED", improvement
         assert improvement["evaluation_provenance"] == "MEASURED_PAIR"
         assert improvement["paired_evaluation_id"]
@@ -229,3 +240,94 @@ async def test_normal_thread_invokes_its_explicit_runnable_plan_without_activati
             )
             is None
         )
+
+
+async def test_unknown_source_time_does_not_fabricate_a_pair_trigger(tmp_path: Path) -> None:
+    sandbox = RecoverySandboxAdapter(
+        (
+            (SandboxExecutionState.FAILED, "SEMANTIC first synthetic failure"),
+            (SandboxExecutionState.FAILED, "SEMANTIC second synthetic failure"),
+        )
+    )
+    workspace = tmp_path / "unknown-pair"
+    async with pair_harness(
+        workspace,
+        {"op": "input", "key": "x"},
+        {"op": "literal", "value": 1},
+        [
+            {
+                "public": {"case_id": "one", "payload": {"x": 2}},
+                "expected_output": {"answer": 1},
+                "axis": "quality",
+            }
+        ],
+        thread_id="thread:unknown-pair",
+        runtime_options={
+            "model_resolver": StaticModelResolver(A04R2Model()),
+            "sandbox_adapter": sandbox,
+        },
+    ) as h:
+        project = value(
+            await h.runtime.bus.dispatch(
+                request("project/read", "unknown-project", {"project_id": h.project})
+            )
+        )
+        policy = recovery_policy(0)
+        policy["connector_allowlist"] = ["local-file-upload"]
+        value(
+            await h.runtime.bus.dispatch(
+                request(
+                    "project/policy/update",
+                    "unknown-policy",
+                    {
+                        "project_id": h.project,
+                        "expected_revision": project["revision"],
+                        "payload": policy,
+                    },
+                )
+            )
+        )
+        inbox = workspace / "inbox"
+        inbox.mkdir(exist_ok=True)
+        (inbox / "basis.md").write_text("# Undated synthetic basis\n", encoding="utf-8")
+        connected = value(
+            await h.runtime.bus.dispatch(
+                request(
+                    "project/source/connect",
+                    "unknown-source",
+                    {
+                        "project_id": h.project,
+                        "relative_path": "basis.md",
+                        "media_type": "text/markdown",
+                        "authority": "OFFICIAL",
+                        "cutoff_state": "ELIGIBLE",
+                        "security_class": "INTERNAL",
+                    },
+                )
+            )
+        )
+        listed = value(
+            await h.runtime.bus.dispatch(
+                request("project/source/list", "unknown-time", {"project_id": h.project})
+            )
+        )
+        assessment = next(
+            item
+            for item in listed["source_times"]
+            if item["artifact_id"] == connected["artifact"]["artifact_id"]
+        )
+        assert assessment["cutoff_state"] == "UNKNOWN_TIME"
+        assert h.plan["record_id"]
+        result = value(
+            await h.runtime.bus.dispatch(
+                request(
+                    "thread/input",
+                    "unknown-input",
+                    {"project_id": h.project, "thread_id": "thread:unknown-pair"},
+                )
+            )
+        )
+        assert result["r2_closed_loop"]["terminal_state"] == "HOLD"
+        assert result["improvement_observation"]["reason_code"] == "NO_QUALIFYING_FAILURE_EVENT"
+        assert result["recursive_improvement"] is None
+        assert sandbox.seen_specs == []

@@ -3,15 +3,121 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
 import time
 from pathlib import Path
+from typing import Literal
 
-from scripts.required_architecture_checks import run_checks
+from scripts.required_architecture_checks import CHECKS, validate_check_results
+
+_HOOK_FILES = (
+    ".codex/hooks/pre_tool_policy.py",
+    ".codex/hooks/stop_acceptance_gate.py",
+    ".codex/hooks/session_start.py",
+)
+_PUBLIC_MARKER = "MIT source-only public preview"
+_PUBLIC_HOOK_CONFIG_SHA256 = "9c5f0dca5fcf7a5aca8f6b489415bceee39f4e400bc8d750e23137e4341f229a"
+
+
+def hook_smoke_applicability(
+    root: Path, candidates: dict[str, bytes]
+) -> Literal["REQUIRED", "NOT_APPLICABLE"]:
+    """Only the unchanged, reviewed source-only baseline can omit inactive Hook smoke."""
+    manifest_path = root / "SOURCE_MANIFEST.json"
+    if not manifest_path.is_file():
+        return "REQUIRED"
+    try:
+        manifest = json.loads(manifest_path.read_bytes())
+    except (OSError, ValueError) as exc:
+        raise ValueError("source manifest is invalid for Hook smoke") from exc
+    if not isinstance(manifest, dict):
+        raise ValueError("source manifest is invalid for Hook smoke")
+    if manifest.get("snapshot_type") != _PUBLIC_MARKER:
+        return "REQUIRED"
+    if (
+        manifest.get("schema_version") != "thoth-source-preview-manifest-v1"
+        or manifest.get("license") != "MIT"
+        or manifest.get("git_history_included") is not False
+    ):
+        raise ValueError("source-only Hook smoke marker is malformed")
+    files = manifest.get("files")
+    if not isinstance(files, list) or any(
+        not isinstance(item, dict) or not isinstance(item.get("path"), str) for item in files
+    ):
+        raise ValueError("source-only file inventory is malformed")
+    names = [item["path"] for item in files]
+    if len(names) != len(set(names)):
+        raise ValueError("source-only file inventory has duplicate paths")
+    config_rows = [item for item in files if item["path"] == ".codex/hooks.json"]
+    if len(config_rows) != 1:
+        raise ValueError("source-only Hook config is missing from baseline inventory")
+    config = root / ".codex/hooks.json"
+    raw = config.read_bytes() if config.is_file() else b""
+    digest = hashlib.sha256(raw).hexdigest()
+    if (
+        digest != _PUBLIC_HOOK_CONFIG_SHA256
+        or config_rows[0].get("sha256") != digest
+        or config_rows[0].get("bytes") != len(raw)
+    ):
+        raise ValueError("source-only Hook config bytes differ from reviewed baseline")
+    try:
+        payload = json.loads(raw)
+    except ValueError as exc:
+        raise ValueError("source-only Hook config is malformed") from exc
+    if not isinstance(payload, dict) or payload.get("hooks") != {}:
+        raise ValueError("source-only Hook config is not inactive")
+    if any(name in names or (root / name).exists() for name in _HOOK_FILES):
+        raise ValueError("source-only Hook source is present or partially listed")
+    hook_directory = root / ".codex/hooks"
+    if hook_directory.is_dir() and any(hook_directory.iterdir()):
+        raise ValueError("source-only Hook directory contains unreviewed content")
+    if any(
+        name in {"SOURCE_MANIFEST.json", ".codex/hooks.json"} or name.startswith(".codex/hooks/")
+        for name in candidates
+    ):
+        raise ValueError("candidate cannot change its source-only Hook smoke baseline")
+    trusted_checks = {f"scripts/{name}" for name in CHECKS} | {
+        "scripts/required_architecture_checks.py"
+    }
+    if trusted_checks.intersection(candidates):
+        raise ValueError("candidate cannot replace a trusted architecture validator")
+    return "NOT_APPLICABLE"
+
+
+def _snapshot_environment(snapshot: Path) -> dict[str, str]:
+    return {
+        **os.environ,
+        "PYTHONPATH": os.pathsep.join((str(snapshot / "src"), str(snapshot))),
+    }
+
+
+def _run_trusted_snapshot_checks(snapshot: Path, deadline: float) -> list[dict[str, object]]:
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+        raise TimeoutError("architecture candidate check budget exhausted")
+    completed = subprocess.run(
+        [sys.executable, str(snapshot / "scripts/required_architecture_checks.py")],
+        cwd=snapshot,
+        env=_snapshot_environment(snapshot),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        check=False,
+        timeout=remaining,
+    )
+    if completed.returncode:
+        raise RuntimeError(
+            "trusted architecture candidate checks failed: " + completed.stdout + completed.stderr
+        )
+    results = [json.loads(line) for line in completed.stdout.splitlines()]
+    validate_check_results(results)
+    return results
 
 
 def apply_candidate_patch(original: bytes, body: str) -> bytes:
@@ -123,6 +229,7 @@ def validate_candidate(root: Path, candidates: dict[str, bytes]) -> list[dict[st
 
     deadline = time.monotonic() + 45.0
     before = repository_digest(root)
+    hook_smoke = hook_smoke_applicability(root, candidates)
     _preserve_ratchets(root, candidates)
     # Copy only reviewable source, not .git, credentials, runtimes or the active gate.
     with tempfile.TemporaryDirectory(prefix="thoth-rule-candidate-") as temporary:
@@ -154,11 +261,12 @@ def validate_candidate(root: Path, candidates: dict[str, bytes]) -> list[dict[st
                     candidate_guard_bytes[relative] = target.read_bytes()
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(root / relative, target)
-        results = run_checks(snapshot, deadline=deadline)
+        results = _run_trusted_snapshot_checks(snapshot, deadline)
         # Import smoke may exercise candidate guard code, but cannot issue architecture PASS.
         for relative, data in candidate_guard_bytes.items():
             (snapshot / relative).write_bytes(data)
-        for hook in ("pre_tool_policy.py", "stop_acceptance_gate.py", "session_start.py"):
+        hook_names = tuple(Path(relative).name for relative in _HOOK_FILES)
+        for hook in hook_names if hook_smoke == "REQUIRED" else ():
             remaining = deadline - time.monotonic()
             if remaining <= 0:
                 raise TimeoutError("rule candidate hook-smoke budget exhausted")
@@ -169,6 +277,7 @@ def validate_candidate(root: Path, candidates: dict[str, bytes]) -> list[dict[st
                     "tool_input": {"command": "Get-Content -LiteralPath AGENTS.md"},
                 }),
                 encoding="utf-8", capture_output=True, check=False, timeout=remaining,
+                env=_snapshot_environment(snapshot),
             )
             if result.returncode:
                 raise ValueError(f"candidate hook import/smoke failed: {hook}: {result.stderr}")

@@ -1,0 +1,5 @@
+[
+  {"source_id":"source:6g-evaluation","path":"evaluation-baseline.md","media_type":"text/markdown","authority":"OFFICIAL","cutoff_state":"ELIGIBLE","security_class":"INTERNAL","version_label":"reference-v1","byte_sha256":"f02ec267d9233de951972f5346a299a487239b08c3be7ed790645302f5194fc1","rights":"THOTH-authored factual paraphrase; source deliverables remain reference-only"},
+  {"source_id":"source:6g-interim","path":"interim-integration.md","media_type":"text/markdown","authority":"OFFICIAL","cutoff_state":"ELIGIBLE","security_class":"INTERNAL","version_label":"reference-v1","byte_sha256":"ad8ffe6881d709c565614b173587f9cf9f8afa991007fd0361a84c9ef1147a77","rights":"THOTH-authored factual paraphrase; source deliverables remain reference-only"},
+  {"source_id":"source:6g-outcome","path":"later-outcome.md","media_type":"text/markdown","authority":"OFFICIAL","cutoff_state":"AFTER_CUTOFF","security_class":"INTERNAL","version_label":"outcome-reference-v1","byte_sha256":"0c9a5cf5ba985d69bbafdb8d6488a2fdf34be68ed5220d5046b656a5ae04d3ff","rights":"THOTH-authored factual paraphrase; outcome-only"}
+]

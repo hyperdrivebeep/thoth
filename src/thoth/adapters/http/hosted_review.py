@@ -9,7 +9,14 @@ from fastapi import Request
 from thoth.domain.deployment_mode import DeploymentMode, parse_deployment_mode
 
 LOOPBACK_HOSTS = frozenset({"127.0.0.1", "::1", "localhost", "testclient"})
-CREDENTIAL_METHODS = frozenset({"model/credential/list", "model/credential/register"})
+CREDENTIAL_METHODS = frozenset(
+    {
+        "model/credential/list",
+        "model/credential/register",
+        "model/credential/login/status",
+        "model/credential/login/cancel",
+    }
+)
 DISPATCH_GATE_TRUTHY = frozenset({"1", "true", "yes", "on"})
 
 

@@ -6,12 +6,10 @@ from typing import cast
 from pydantic import JsonValue
 
 from thoth.adapters.models import ScriptedModel
-from thoth.adapters.projectpacks.loader import source_path
 from thoth.adapters.runtime import SystemClock, UuidIdGenerator
 from thoth.application.reducers import SufficiencySignals
 from thoth.application.services import (
     DecisionObjectService,
-    IngestArtifactCommand,
     RevisionCommitService,
     compile_criterion,
     select_evidence_context,
@@ -20,7 +18,11 @@ from thoth.application.workflows.projectpack_run import ProjectPackRunResult
 from thoth.application.workflows.thread_cycle import (
     ThreadCycleCommand,
 )
-from thoth.apps.projectpack_source_composition import create_pack_ingestion, create_pack_project
+from thoth.apps.projectpack_source_composition import (
+    create_pack_ingestion,
+    create_pack_project,
+    ingest_pack_sources,
+)
 from thoth.apps.research_runtime import create_projectpack_research_cycle
 from thoth.apps.storage_composition import open_stores
 from thoth.domain.action import ActionCompilationPolicy
@@ -31,7 +33,7 @@ from thoth.domain.criterion import (
     CriterionCompilationSignals,
     CriterionDraft,
 )
-from thoth.domain.enums import ActorKind, SupportState, VerificationState
+from thoth.domain.enums import ActorKind, CutoffState, SupportState, VerificationState
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.project import WorkThread
 from thoth.domain.projectpack import LoadedProjectPack
@@ -72,24 +74,16 @@ async def run_project_pack(
             working_head_digest=head_set_digest({}),
         )
         stores.threads.create(thread)
-        ingested = tuple(
-            [
-                await ingestion.ingest_async(
-                    IngestArtifactCommand(
-                        project_id=project.project_id,
-                        source_uri=f"projectpack://{pack.project.pack_id}/{source.path}",
-                        media_type=source.media_type,
-                        raw=source_path(pack, source).read_bytes(),
-                        authority=source.authority,
-                        cutoff_state=source.cutoff_state,
-                        security_class=source.security_class,
-                        operation_id=ids.new("operation"),
-                        version_label=source.version_label,
-                        source_path=source_path(pack, source),
-                    )
-                )
-                for source in pack.sources
-            ]
+        ingested, project = await ingest_pack_sources(
+            pack,
+            ledger=ledger,
+            stores=stores,
+            project=project,
+            projects=projects,
+            clock=clock,
+            ids=ids,
+            artifacts=artifact_ledger,
+            ingestion=ingestion,
         )
         evidence = tuple(span for result in ingested for span in result.evidence_candidates)
         if pack.policy.sealed_evidence_supported:
@@ -127,7 +121,9 @@ async def run_project_pack(
             purpose_statement=pack.scenario.problem,
             problem_frame=pack.scenario.problem,
             focus_refs=(f"PROJECTPACK:{pack.project.pack_id}",),
-            trigger_evidence_refs=tuple(span.span_id for span in evidence),
+            trigger_evidence_refs=tuple(
+                span.span_id for span in evidence if span.cutoff_state == CutoffState.ELIGIBLE
+            ),
             profile_refs=("GENERAL_RND_DECISION",),
             actor_ref="agent:projectpack-runner",
             object_id=pack.scenario.object_id,

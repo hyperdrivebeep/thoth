@@ -1,12 +1,15 @@
 """Read non-secret local Codex metadata; advertise only direct-wire effort levels."""
 
-import json
-import os
-import tomllib
+from __future__ import annotations
+
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from thoth.domain.model_settings import ModelOption, ModelSelection
 from thoth.ports.model_catalog import ModelCatalogPort
+
+if TYPE_CHECKING:
+    from thoth.adapters.models.codex_broker import CodexAuthBroker
 
 # The direct Responses transport does not implement product orchestration levels.
 WIRE_EFFORTS = frozenset({"none", "low", "medium", "high", "xhigh"})
@@ -53,58 +56,31 @@ class StaticModelCatalog:
 
 
 class CodexModelCatalog:
-    def __init__(self, root: Path | None = None) -> None:
-        self.root = root or Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
-        cache_override = os.environ.get("THOTH_CODEX_MODELS_CACHE")
-        self.cache_path = (
-            Path(cache_override).expanduser() if cache_override else self.root / "models_cache.json"
-        )
+    def __init__(self, workspace: Path, *, broker: CodexAuthBroker | None = None) -> None:
+        from thoth.adapters.models.codex_broker import broker_for_workspace
+
+        self._broker = broker or broker_for_workspace(workspace)
 
     def defaults(self) -> ModelSelection:
-        try:
-            config = tomllib.loads((self.root / "config.toml").read_text(encoding="utf-8-sig"))
-            model = chatgpt_codex_model_id(config.get("model"))
-            return ModelSelection(
-                provider="codex-oauth",
-                model=model,
-                reasoning_effort=config.get("model_reasoning_effort"),
-            )
-        except (OSError, ValueError):
-            return ModelSelection(provider="codex-oauth")
+        return self._broker.cached_state().default
 
     def options(self) -> tuple[ModelOption, ...]:
-        try:
-            raw = json.loads(self.cache_path.read_text(encoding="utf-8-sig"))
-            result: list[ModelOption] = []
-            for entry in raw["models"]:
-                # Aggregated local catalogs also contain routes for other providers.
-                # A namespaced router alias is not a direct Codex Responses model ID.
-                slug = chatgpt_codex_model_id(entry.get("slug"))
-                if slug is None or entry.get("visibility", "list") != "list":
-                    continue
-                efforts = tuple(
-                    item["effort"]
-                    for item in entry["supported_reasoning_levels"]
-                    if item["effort"] in WIRE_EFFORTS
-                )
-                result.append(
-                    ModelOption(
-                        provider="codex-oauth",
-                        model=slug,
-                        reasoning_efforts=efforts,
-                        default_effort=entry.get("default_reasoning_level"),
-                        capability_source="codex-local-catalog/direct-responses-v1",
-                    )
-                )
-            return tuple(result)
-        except (OSError, ValueError, KeyError, TypeError):
-            return ()
+        return self._broker.cached_state().options
+
+    def refresh(self) -> None:
+        self._broker.state(force=True)
 
 
 class CompositeModelCatalog:
     def __init__(self, *catalogs: ModelCatalogPort, defaults: ModelSelection | None = None) -> None:
         self._catalogs = catalogs
         self._defaults = defaults
+
+    def refresh(self) -> None:
+        for catalog in self._catalogs:
+            refresh = getattr(catalog, "refresh", None)
+            if callable(refresh):
+                refresh()
 
     def defaults(self) -> ModelSelection:
         if self._defaults is not None:
@@ -119,6 +95,8 @@ class CompositeModelCatalog:
             ):
                 return defaults
         for catalog in self._catalogs:
+            if getattr(catalog, "fallback_default_allowed", True) is False:
+                continue
             options = catalog.options()
             if options:
                 option = options[0]

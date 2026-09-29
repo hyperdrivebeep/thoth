@@ -5,9 +5,11 @@ from typing import cast
 
 import pytest
 from pydantic import JsonValue
+from tests.integration.source_time_fixture import confirm_synthetic_source_time
 from tests.integration.test_four_projectpack_portability import GenericProjectPackModel
 
 from thoth.adapters.projectpacks import load_project_pack
+from thoth.adapters.storage.evidence_graph import SqliteEvidenceGraphStore
 from thoth.apps.projectpack_execution import run_project_pack
 from thoth.apps.runtime import create_runtime
 from thoth.domain.canonical import head_set_digest
@@ -49,6 +51,27 @@ async def test_6g_reference_pack_reaches_full_backend_learning_cycle(tmp_path: P
     project_id = pack.project.project_id
     object_id = pack.scenario.object_id
     try:
+        listed_sources = value(
+            await runtime.bus.dispatch(
+                request("project/source/list", "6g-pack-sources", {"project_id": project_id})
+            )
+        )
+        bindings = cast(list[dict[str, JsonValue]], listed_sources["bindings"])
+        artifacts = cast(list[dict[str, JsonValue]], listed_sources["artifacts"])
+        assert len(initial.project.source_binding_ids) == len(bindings) == len(pack.sources)
+        assert {str(item["artifact_id"]) for item in bindings} == set(initial.artifact_ids)
+        assert all(item["state"] == "ACTIVE" and item["capability"] == "READ" for item in bindings)
+        graph = SqliteEvidenceGraphStore(runtime.ledger.engine)
+        for artifact in artifacts:
+            if artifact["artifact_id"] not in initial.artifact_ids:
+                continue
+            source = graph.read_source_by_artifact(str(artifact["artifact_id"]))
+            assert source is not None
+            assert source.project_id == project_id
+            assert source.connector_ref == f"projectpack://{pack.project.pack_id}"
+            assert source.uri == artifact["source_uri"]
+            assert source.sha256 == artifact["byte_sha256"]
+            assert source.version == artifact["version_label"]
         evidence_result = value(
             await runtime.bus.dispatch(
                 request("evidence/list", "6g-evidence", {"project_id": project_id})
@@ -242,6 +265,9 @@ async def test_6g_reference_pack_reaches_full_backend_learning_cycle(tmp_path: P
             )
         )
         new_artifact = cast(dict[str, JsonValue], connected_result["artifact"])
+        await confirm_synthetic_source_time(
+            runtime, project_id, connected_result, key="6g-new-evidence"
+        )
         all_spans = cast(
             list[dict[str, JsonValue]],
             value(
@@ -334,6 +360,10 @@ async def test_6g_reference_pack_reaches_full_backend_learning_cycle(tmp_path: P
             )
         )
         object_value = cast(dict[str, JsonValue], object_result["object"])
+        assert set(cast(list[str], object_value["trigger_evidence_refs"])) <= set(eligible_refs)
+        assert not set(cast(list[str], object_value["trigger_evidence_refs"])) & set(
+            after_cutoff_refs
+        )
         old_head = str(object_value["revision_digest"])
         changed_content = {
             **object_value,

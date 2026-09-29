@@ -24,7 +24,9 @@ async def test_normal_memory_is_hidden_until_all_sources_are_shared(
     async with scope_harness(
         tmp_path, policy, model_resolver=StaticModelResolver(DynamicA02Model()), owner_admin=False
     ) as h:
-        source = value(await h.connect("alpha", "memory-source", None))["artifact"]["artifact_id"]
+        source = value(
+            await h.connect("alpha", "memory-source", None, confirm_synthetic_time=True)
+        )["artifact"]["artifact_id"]
         value(
             await h.call(
                 "alpha",

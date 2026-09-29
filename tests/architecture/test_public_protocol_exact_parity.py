@@ -5,6 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from thoth.protocol.bus import READ_QUERY_METHODS
 from thoth.protocol.notifications import IMPLEMENTED_NOTIFICATIONS
 from thoth.protocol.registry import PUBLIC_METHODS
 
@@ -16,9 +17,12 @@ def test_public_method_manifest_exactly_matches_runtime_and_notifications() -> N
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     methods = manifest["methods"]
     by_name = {item["name"]: item for item in methods}
-    assert len(methods) == len(by_name) == 338
+    assert len(methods) == len(by_name) == 340
     assert set(by_name) == set(PUBLIC_METHODS)
-    assert sum(item["canonical"] for item in methods) == 332
+    assert sum(item["canonical"] for item in methods) == 334
+    assert manifest["runtime_method_count"] == 340
+    assert manifest["canonical_method_count"] == 334
+    assert manifest["compatibility_alias_count"] == 6
     assert {
         f"project/source/scope/{name}" for name in ("read", "grant", "revoke", "assign", "update")
     } <= set(by_name)
@@ -44,16 +48,41 @@ def test_public_method_manifest_exactly_matches_runtime_and_notifications() -> N
     assert set(manifest["notifications"]) == set(IMPLEMENTED_NOTIFICATIONS)
     assert len(manifest["notifications"]) == 221
     assert all(item["namespace"] == item["name"].split("/", 1)[0] for item in methods)
-    for namespace in ("model", "workspace"):
-        entries = [item for item in methods if item["namespace"] == namespace]
-        assert len(entries) == (4 if namespace == "model" else 3)
-        for item in entries:
-            assert item["canonical_owner"] == "THREAD_REQUEST_SETTINGS"
+    model = {name: item for name, item in by_name.items() if item["namespace"] == "model"}
+    assert len(model) == 6
+    assert {name: model[name]["surface"] for name in model} == {
+        "model/credential/list": "QUERY",
+        "model/credential/login/status": "QUERY",
+        "model/credential/login/cancel": "COMMAND",
+        "model/credential/register": "COMMAND",
+        "model/settings/read": "QUERY",
+        "model/settings/update": "COMMAND",
+    }
+    assert "model/credential/login/status" in READ_QUERY_METHODS
+    assert "model/credential/login/cancel" not in READ_QUERY_METHODS
+    for name, item in model.items():
+        assert item["canonical_owner"] == "THREAD_REQUEST_SETTINGS"
+        if name.startswith("model/credential/"):
+            assert item["policy"] == "system:workspace; LOCAL only; HOSTED_REVIEW denied"
+            assert "FirstRunSetup" in item["normal_entrypoint"]
+            assert "ModelCredentialPanel" in item["normal_entrypoint"]
+            assert "tests/unit/test_hosted_review_credential_rpc.py" in item["behavioral_evidence"]
+            if "/login/" in name:
+                assert "XaiDeviceLogin" in item["normal_entrypoint"]
+                assert (
+                    "tests/integration/test_xai_workspace_route.py" in item["behavioral_evidence"]
+                )
+        else:
             assert item["normal_entrypoint"] == "thread/input"
             assert item["policy"] == "research-model-settings:versioned"
-            assert item["behavioral_evidence"] == (
-                ["U08", "U07"] if namespace == "model" else ["U08"]
-            )
+            assert item["behavioral_evidence"] == ["U08", "U07"]
+    workspace = [item for item in methods if item["namespace"] == "workspace"]
+    assert len(workspace) == 3
+    for item in workspace:
+        assert item["canonical_owner"] == "THREAD_REQUEST_SETTINGS"
+        assert item["normal_entrypoint"] == "thread/input"
+        assert item["policy"] == "research-model-settings:versioned"
+        assert item["behavioral_evidence"] == ["U08"]
 
 
 def test_public_protocol_checker_reports_zero_drift() -> None:

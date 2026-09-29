@@ -1,0 +1,18 @@
+[
+  {
+    "draft": {
+      "criterion_id": "criterion:l3pilot-common-indicators",
+      "project_id": "$PROJECT_ID",
+      "name": "Cross-site indicator comparability",
+      "measured_construct": "common indicators calculated from harmonized logging inputs",
+      "computation": null,
+      "context": {"pilot_sites": "multiple"},
+      "acceptance_rule": null,
+      "origin": "DOCUMENT_EXTRACTED",
+      "field_evidence": {"name": ["$EVIDENCE_0"], "measured_construct": ["$EVIDENCE_0"]},
+      "missing_fields": ["computation", "acceptance_rule"],
+      "uncertainty": "Public beneficiary rights and an independent action oracle remain unresolved."
+    },
+    "signals": {"source_scope_confirmed": true, "expert_semantics_confirmed": false, "computation_verified": false}
+  }
+]

@@ -13,6 +13,7 @@ from tests.integration.test_research_request_v2 import ControlledResearchModel, 
 from thoth.adapters.connectors import ConnectorRegistry
 from thoth.application.services.research_boundary import RequestBoundary
 from thoth.apps.runtime import AppRuntime, create_runtime
+from thoth.domain.connectors import ConnectorArtifactRef, ConnectorErrorCode, ConnectorFailure
 from thoth.domain.enums import ModelRole
 from thoth.domain.model import ModelRequest, ModelResult
 from thoth.ports.model import ModelExecutionHold
@@ -131,6 +132,55 @@ async def test_permitted_public_discovery_is_followed_by_reader_and_parser(tmp_p
         assert sources["evidence"]
         # Acquisition has not magically certified the source's date or scientific truth.
         assert any(s["cutoff_state"] == "UNKNOWN_TIME" for s in sources["evidence"])
+    finally:
+        runtime.close()
+
+
+@pytest.mark.parametrize(
+    ("code", "expected"),
+    [
+        (ConnectorErrorCode.EGRESS_DENIED, "BLOCKED_ACCESS"),
+        (ConnectorErrorCode.SOURCE_NOT_FOUND, "ACQUISITION_FAILED"),
+    ],
+)
+async def test_attempted_discovery_keeps_its_blocked_or_failed_display(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    code: ConnectorErrorCode,
+    expected: str,
+) -> None:
+    connector = A02Connector()
+    connector.capability = connector.capability.model_copy(
+        update={"source_kind": "REST", "egress_class": "ALLOWLISTED_EXTERNAL"}
+    )
+
+    async def fail_discover(*_args: object, **_kwargs: object) -> tuple[ConnectorArtifactRef, ...]:
+        raise ConnectorFailure(code, "synthetic bounded discovery refusal")
+
+    monkeypatch.setattr(connector, "discover", fail_discover)
+    runtime = await setup(
+        tmp_path,
+        ControlledResearchModel(discover=True),
+        source=False,
+        connector_registry=ConnectorRegistry((connector,)),
+    )
+    try:
+        policy = policy_payload(allow_connector=True)
+        policy["connector_allowed_egress_classes"] = ["NONE", "ALLOWLISTED_EXTERNAL"]
+        policy["max_query_egress_security_class"] = "INTERNAL"
+        value(
+            await runtime.bus.dispatch(
+                request(
+                    "project/policy/update",
+                    "policy",
+                    {"project_id": "p", "expected_revision": 0, "payload": policy},
+                )
+            )
+        )
+        _, status = await finished(runtime, "공개 자료에서 최신 데이터 조건을 확인해줘")
+        result = status["current_result"]["result"]
+        assert result["discovery"]["state"] == expected
+        assert result["coverage"]["web_decision"] == expected
     finally:
         runtime.close()
 

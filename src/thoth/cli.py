@@ -10,9 +10,9 @@ import shutil
 import sqlite3
 import subprocess
 import sys
-from collections.abc import Mapping
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Annotated, cast
+from typing import Annotated, Literal
 
 import orjson
 import typer
@@ -23,11 +23,11 @@ from thoth import __version__
 from thoth.adapters.connectors import load_connector_registry
 from thoth.adapters.environment import load_environment_profile
 from thoth.adapters.models import (
-    CodexCliExecutor,
-    CodexOAuthModel,
     codex_oauth_status,
-    run_codex_device_login,
 )
+from thoth.adapters.models.claude_code import ClaudeCodeUnavailable, run_claude_code_login
+from thoth.adapters.models.codex_broker import close_workspace_broker
+from thoth.adapters.models.local_credentials import start_codex_login
 from thoth.adapters.projectpacks import load_project_pack
 from thoth.adapters.runtime import SystemClock
 from thoth.adapters.sandbox import default_sandbox_factory_registry
@@ -35,14 +35,31 @@ from thoth.adapters.storage import SqliteConversationSessionStore
 from thoth.application.services.conversation_router import ConversationRouter
 from thoth.application.services.tui_session_service import TuiSessionService
 from thoth.apps.conversation_dispatch import BusConversationDispatcher
+from thoth.apps.model_composition import create_codex_model
 from thoth.apps.projectpack_execution import run_project_pack
 from thoth.apps.runtime import create_runtime
+from thoth.apps.tui_presentation import present_research_progress, render_tui_turn
+from thoth.apps.workspace_paths import (
+    default_workspace,
+    legacy_workspace_candidates,
+    selected_workspace,
+    workspace_id,
+)
+from thoth.domain.base import DomainModel
+from thoth.domain.enums import ModelRole
+from thoth.domain.model import ContextPack, ModelRequest
+from thoth.ports.model import ModelExecutionHold
 from thoth.ports.sandbox import SandboxPort
-from thoth.protocol.bus import CommandBus
 from thoth.protocol.stdio import handle_json_line
 
 app = typer.Typer(no_args_is_help=False, add_completion=False)
 console = Console()
+DEFAULT_WORKSPACE = default_workspace()
+
+
+class ModelProbeOutput(DomainModel):
+    status: Literal["OK"]
+    message: str
 
 
 def workspace_session_id(workspace: Path) -> str:
@@ -54,7 +71,7 @@ def workspace_session_id(workspace: Path) -> str:
 @app.callback(invoke_without_command=True)
 def main(
     context: typer.Context,
-    workspace: Annotated[Path, typer.Option("--workspace")] = Path(".thoth"),
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
     sandbox_profile: Annotated[
         str,
         typer.Option(
@@ -70,6 +87,7 @@ def main(
     """Open the CLI shell when no subcommand is supplied."""
     if context.invoked_subcommand is not None:
         return
+    announce_workspace(workspace, command="thoth")
     _interactive_shell(
         workspace,
         sandbox_profile=sandbox_profile,
@@ -88,6 +106,19 @@ def _interactive_shell(
             workspace, sandbox_profile=sandbox_profile, connector_config=connector_config
         )
     )
+
+
+def announce_workspace(workspace: Path, *, command: str) -> None:
+    root = workspace.resolve()
+    typer.echo(f"THOTH workspace: {root} ({workspace_id(root)})", err=True)
+    for legacy in legacy_workspace_candidates(Path.cwd()):
+        if legacy != root:
+            typer.echo(
+                f"Existing local workspace found: {legacy}. "
+                f'To resume it explicitly: {command} --workspace "{legacy}". '
+                "No data was moved.",
+                err=True,
+            )
 
 
 async def _interactive_session(
@@ -114,7 +145,7 @@ async def _interactive_session(
         "THOTH CLI shell — natural-language mode. "
         "Use /help, or /rpc <JSON> as a developer escape hatch."
     )
-    presenter = asyncio.create_task(_present_research_progress(tui, runtime.bus))
+    presenter = asyncio.create_task(present_research_progress(tui, runtime.bus, console))
     try:
         while True:
             try:
@@ -145,161 +176,13 @@ async def _interactive_session(
                 sys.stdout.buffer.write(response + b"\n")
                 sys.stdout.buffer.flush()
                 continue
-            _render_tui_turn(await tui.execute(line))
+            render_tui_turn(await tui.execute(line), console)
     finally:
         presenter.cancel()
         await asyncio.gather(presenter, return_exceptions=True)
         runtime.bus.close_tasks()
         await runtime.bus.drain()
         runtime.close()
-
-
-async def _present_research_progress(tui: TuiSessionService, bus: CommandBus) -> None:
-    from thoth.protocol.jsonrpc import JsonRpcRequest
-
-    previous = None
-    cursor = 0
-    while True:
-        await asyncio.sleep(1)
-        session = tui.current()
-        if session.active_project_id is None or session.active_thread_id is None:
-            continue
-        cursor += 1
-        response = await bus.query(
-            JsonRpcRequest.model_validate(
-                {
-                    "id": f"tui-progress:{cursor}",
-                    "method": "thread/read",
-                    "params": {
-                        "_meta": {
-                            "idempotencyKey": f"tui-progress:{session.session_id}:"
-                            f"{id(tui)}:{cursor}"
-                        },
-                        "input": {
-                            "project_id": session.active_project_id,
-                            "thread_id": session.active_thread_id,
-                        },
-                    },
-                }
-            )
-        )
-        if response.result is None:
-            continue
-        value = response.result.get("value")
-        if not isinstance(value, dict):
-            continue
-        from thoth.application.services.research_progress_view import progress_view
-
-        status = progress_view(value)
-        if status != previous:
-            previous = status
-            console.print_json(json.dumps(status))
-            console.print(str(status["usage_summary"]), markup=False)
-            reason = status.get("terminal_reason")
-            rejection = status.get("http_rejection")
-            if isinstance(reason, str) and reason:
-                detail = "미확인"
-                if isinstance(rejection, dict):
-                    rejection_kind = cast(dict[str, object], rejection).get("rejection_kind")
-                    if rejection_kind:
-                        detail = str(rejection_kind)
-                console.print(
-                    f"연구 상태: 보류 — {reason} / 원인 상세: {detail}",
-                    markup=False,
-                )
-
-
-def _render_tui_turn(turn: object) -> None:
-    from thoth.domain.conversation import TuiTurnResult
-
-    value = TuiTurnResult.model_validate(turn)
-    payload: dict[str, object] = {
-        "intent": value.candidate.intent.value,
-        "status": value.status.value,
-        "project_id": value.session.active_project_id,
-        "thread_id": value.session.active_thread_id,
-        "message": value.candidate.display_message,
-    }
-    if value.error_message is not None:
-        payload["hold"] = {
-            "code": value.error_code,
-            "message": value.error_message,
-        }
-    if value.response:
-        payload["result"] = _tui_result_summary(value.response)
-    console.print_json(json.dumps(payload))
-
-
-def _tui_result_summary(value: Mapping[str, object]) -> dict[str, object]:
-    summary: dict[str, object] = {}
-    for key in (
-        "project_id",
-        "thread_id",
-        "lifecycle",
-        "execution_state",
-        "current_object_ids",
-        "working_head_digest",
-        "status",
-        "contract_version",
-        "operation_id",
-        "request_epoch",
-        "request_ref",
-        "input_id",
-        "input_state",
-        "phase",
-        "freshness",
-        "current_result",
-        "previous_result",
-        "attempt",
-        "budget",
-        "settings_digest",
-        "selection",
-        "effective_settings",
-        "model_options",
-        "model_settings",
-        "answer_outcome",
-        "resume_information",
-        "completed_stages",
-        "usage",
-        "failure",
-        "execution_summary",
-        "model_dispatches",
-    ):
-        if key in value:
-            summary[key] = value[key]
-    for key in (
-        "criterion_profile_decision",
-        "autonomous_acquisition",
-        "critical_counter_search",
-        "r2_closed_loop",
-        "recursive_improvement",
-    ):
-        child = value.get(key)
-        if isinstance(child, dict):
-            child_values = cast(dict[str, object], child)
-            summary[key] = {
-                name: child_values[name]
-                for name in ("state", "terminal_state", "hold_reason", "receipt_digest")
-                if name in child_values
-            }
-    portfolio = value.get("portfolio")
-    if isinstance(portfolio, dict):
-        portfolio_values = cast(dict[str, object], portfolio)
-        hypotheses = portfolio_values.get("hypotheses")
-        summary["hypothesis_count"] = (
-            len(cast(list[object], hypotheses)) if isinstance(hypotheses, list) else 0
-        )
-    action_plan = value.get("action_plan")
-    if isinstance(action_plan, dict):
-        action_values = cast(dict[str, object], action_plan)
-        alternatives = action_values.get("alternatives")
-        summary["action_count"] = (
-            len(cast(list[object], alternatives)) if isinstance(alternatives, list) else 0
-        )
-    for key in ("assessment", "commit", "export", "exports", "activities"):
-        if key in value:
-            summary[key] = value[key]
-    return summary or {"acknowledged": True}
 
 
 def _module_available(name: str) -> bool:
@@ -328,9 +211,45 @@ def version(json_output: Annotated[bool, typer.Option("--json")] = False) -> Non
     console.print(f"THOTH {payload['version']} (protocol {payload['protocol_version']})")
 
 
+@app.command("workspace")
+def workspace_info(
+    workspace: Annotated[Path | None, typer.Option("--workspace")] = None,
+) -> None:
+    """Show the selected data root and legacy paths without opening or moving them."""
+    root = selected_workspace(workspace)
+    legacy = legacy_workspace_candidates(Path.cwd())
+    console.print_json(
+        json.dumps(
+            {
+                "workspace": str(root),
+                "workspace_id": workspace_id(root),
+                "selection": "EXPLICIT" if workspace is not None else "STABLE_DEFAULT",
+                "legacy_candidates": [str(path) for path in legacy if path != root],
+                "resume_hint": (
+                    "Pass --workspace <existing-path> to serve or desktop; no data is moved."
+                ),
+            }
+        )
+    )
+
+
+@app.command("claude-code-login")
+def claude_code_login(
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
+    console_login: Annotated[bool, typer.Option("--console")] = False,
+) -> None:
+    """Open the official Claude Code sign-in for THOTH's isolated profile."""
+    try:
+        code = run_claude_code_login(workspace, console=console_login)
+    except ClaudeCodeUnavailable as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    raise typer.Exit(code=code)
+
+
 @app.command()
 def doctor(
-    workspace: Annotated[Path, typer.Option("--workspace")] = Path(".thoth"),
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
     json_output: Annotated[bool, typer.Option("--json")] = False,
 ) -> None:
     """Check local runtime capabilities without external calls."""
@@ -439,63 +358,120 @@ def profile_check(
 
 
 @app.command("auth-status")
-def auth_status(json_output: Annotated[bool, typer.Option("--json")] = False) -> None:
-    """Report Codex OAuth connectivity without reading or printing tokens."""
-    payload = codex_oauth_status()
+def auth_status(
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
+    json_output: Annotated[bool, typer.Option("--json")] = False,
+) -> None:
+    """Report isolated Codex connectivity without exposing credentials."""
+    try:
+        payload = codex_oauth_status(workspace)
+    except ModelExecutionHold as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    finally:
+        close_workspace_broker(workspace)
     if json_output:
-        console.print_json(json.dumps(payload))
+        safe = {
+            key: payload.get(key)
+            for key in (
+                "provider",
+                "connected",
+                "connection_state",
+                "profile_mode",
+                "reason_code",
+                "execution_eligible",
+                "execution_verified",
+            )
+            if key in payload
+        }
+        console.print_json(json.dumps(safe))
     else:
-        state = "CONNECTED" if payload["connected"] else "LOGIN REQUIRED"
-        console.print(f"Codex OAuth: {state}")
+        state = str(payload.get("connection_state") or "UNKNOWN")
+        console.print(f"Codex account: {state}")
     if not payload["connected"]:
         raise typer.Exit(code=1)
 
 
 @app.command("auth-connect")
-def auth_connect() -> None:
-    """Delegate ChatGPT device OAuth to the official Codex CLI."""
-    status = codex_oauth_status()
-    if status["connected"]:
-        console.print("Codex OAuth is already connected.")
-        return
-    exit_code = run_codex_device_login()
-    if exit_code != 0:
-        raise typer.Exit(code=exit_code)
+def auth_connect(
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
+) -> None:
+    """Keep the official login listener owned until completion or bounded timeout."""
+    try:
+        status = codex_oauth_status(workspace)
+        if status["connected"]:
+            console.print("Codex account is already connected in this THOTH workspace.")
+            return
+        result = start_codex_login(workspace, wait_for_completion=True)
+    except ModelExecutionHold as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    finally:
+        close_workspace_broker(workspace)
+    safe = {
+        key: result.get(key)
+        for key in (
+            "started",
+            "connected",
+            "connection_state",
+            "reason_code",
+            "execution_eligible",
+            "execution_verified",
+            "guidance",
+        )
+        if key in result
+    }
+    console.print_json(json.dumps(safe))
+    if result.get("connected") is not True:
+        raise typer.Exit(code=1)
 
 
 @app.command("model-probe")
 def model_probe(
     model: Annotated[str | None, typer.Option("--model")] = None,
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
 ) -> None:
-    """Run one synthetic structured-output canary through Codex OAuth."""
-    schema: dict[str, object] = {
-        "type": "object",
-        "properties": {
-            "status": {"type": "string", "enum": ["OK"]},
-            "message": {"type": "string"},
-        },
-        "required": ["status", "message"],
-        "additionalProperties": False,
-    }
+    """Use the normal workspace-bound model-only transport for one synthetic canary."""
     prompt = (
         "Return one JSON object matching the supplied schema. "
         "Set status to OK and message to THOTH OAuth model connection verified. "
-        "Do not use tools or inspect files."
+        "This is a synthetic connectivity check with no attached sources."
     )
-    raw = asyncio.run(CodexCliExecutor(model=model).execute(prompt, schema))
-    payload_value = cast(object, json.loads(raw))
-    if not isinstance(payload_value, dict):
+    request = ModelRequest(
+        role=ModelRole.USER_EXPLAINER,
+        project_id="system:workspace",
+        cutoff_at=datetime.now(UTC),
+        context_pack=ContextPack(
+            case_id="case:model-probe",
+            project_id="system:workspace",
+            object_id="object:model-probe",
+            problem=prompt,
+            evidence=(),
+            criteria=(),
+            sufficiency=None,
+            input_head_set_digest="0" * 64,
+        ),
+        output_model=ModelProbeOutput,
+        prompt_version="model-probe.v1",
+        model_policy_ref="model-probe:workspace-bound-v1",
+        max_output_tokens=256,
+    )
+    try:
+        result = asyncio.run(create_codex_model(workspace, model).structured(request))
+    except ModelExecutionHold as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    finally:
+        close_workspace_broker(workspace)
+    if result.scripted or result.output.status != "OK":
         raise typer.Exit(code=1)
-    payload = cast(dict[str, object], payload_value)
-    if payload.get("status") != "OK":
-        raise typer.Exit(code=1)
-    console.print_json(json.dumps(payload))
+    console.print_json(result.output.model_dump_json())
 
 
 @app.command("source-stage")
 def source_stage(
     source: Annotated[Path, typer.Option("--source", exists=True, dir_okay=False)],
-    workspace: Annotated[Path, typer.Option("--workspace")] = Path(".thoth"),
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
 ) -> None:
     """Copy one user-selected source into the bounded workspace inbox."""
     raw = source.read_bytes()
@@ -521,7 +497,7 @@ def source_stage(
 @app.command("git-snapshot")
 def git_snapshot(
     repository: Annotated[Path, typer.Option("--repository", exists=True, file_okay=False)],
-    workspace: Annotated[Path, typer.Option("--workspace")] = Path(".thoth"),
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
 ) -> None:
     """Create a read-only Git identity/status manifest in the workspace inbox."""
     resolved = repository.resolve()
@@ -590,7 +566,7 @@ def git_snapshot(
 @app.command("run")
 def run_request(
     request: Annotated[Path, typer.Option("--request", exists=True, dir_okay=False)],
-    workspace: Annotated[Path, typer.Option("--workspace")] = Path(".thoth"),
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
     sandbox_profile: Annotated[str, typer.Option("--sandbox-profile")] = "disabled",
     connector_config: Annotated[
         Path | None,
@@ -646,7 +622,7 @@ def run_request(
 
 @app.command("rpc")
 def rpc_stdio(
-    workspace: Annotated[Path, typer.Option("--workspace")] = Path(".thoth"),
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
     sandbox_profile: Annotated[str, typer.Option("--sandbox-profile")] = "disabled",
     connector_config: Annotated[
         Path | None,
@@ -679,7 +655,7 @@ def rpc_stdio(
 def events(
     project_id: Annotated[str, typer.Option("--project-id")],
     operation_id: Annotated[str, typer.Option("--operation-id")],
-    workspace: Annotated[Path, typer.Option("--workspace")] = Path(".thoth"),
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
 ) -> None:
     """Read one operation's hash-chained events and latest checkpoint."""
     request = {
@@ -702,7 +678,7 @@ def events(
 @app.command("run-pack")
 def run_pack(
     pack: Annotated[Path, typer.Option("--pack", exists=True, file_okay=False)],
-    workspace: Annotated[Path, typer.Option("--workspace")] = Path(".thoth-pack"),
+    workspace: Annotated[Path | None, typer.Option("--workspace")] = None,
     scripted: Annotated[bool, typer.Option("--scripted")] = False,
     provider: Annotated[str | None, typer.Option("--provider")] = None,
     model_name: Annotated[str | None, typer.Option("--model")] = None,
@@ -713,13 +689,27 @@ def run_pack(
         raise typer.BadParameter("--scripted cannot be combined with another provider")
     if selected_provider not in {"scripted", "codex-oauth"}:
         raise typer.BadParameter("provider must be scripted or codex-oauth")
+    if selected_provider == "codex-oauth" and workspace is None:
+        raise typer.BadParameter(
+            "Codex run-pack requires explicit --workspace matching auth-connect and model-probe"
+        )
+    pack_workspace = Path(".thoth-pack") if workspace is None else workspace.resolve()
     loaded = load_project_pack(pack, include_scripted=selected_provider == "scripted")
-    selected_model = (
-        None
-        if selected_provider == "scripted"
-        else CodexOAuthModel(CodexCliExecutor(model=model_name))
-    )
-    result = asyncio.run(run_project_pack(loaded, workspace=workspace, model=selected_model))
+    try:
+        selected_model = (
+            None
+            if selected_provider == "scripted"
+            else create_codex_model(pack_workspace, model_name)
+        )
+        result = asyncio.run(
+            run_project_pack(loaded, workspace=pack_workspace, model=selected_model)
+        )
+    except ModelExecutionHold as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    finally:
+        if selected_provider == "codex-oauth":
+            close_workspace_broker(pack_workspace)
     sys.stdout.buffer.write(
         orjson.dumps(result.model_dump(mode="json"), option=orjson.OPT_SORT_KEYS) + b"\n"
     )
@@ -727,7 +717,7 @@ def run_pack(
 
 @app.command()
 def serve(
-    workspace: Annotated[Path, typer.Option("--workspace")] = Path(".thoth"),
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
     host: Annotated[str, typer.Option("--host")] = "127.0.0.1",
     port: Annotated[int, typer.Option("--port", min=1, max=65535)] = 8765,
 ) -> None:
@@ -736,6 +726,7 @@ def serve(
 
     if host not in {"127.0.0.1", "localhost", "::1"}:
         raise typer.BadParameter("V0 local server only permits loopback hosts")
+    announce_workspace(workspace, command="thoth serve")
     os.environ["THOTH_WORKSPACE"] = str(workspace.resolve())
     from thoth.adapters.http import app as local_app
 
@@ -780,7 +771,7 @@ def desktop_window_command(
 
 @app.command()
 def desktop(
-    workspace: Annotated[Path, typer.Option("--workspace")] = Path(".thoth"),
+    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
     host: Annotated[str, typer.Option("--host")] = "127.0.0.1",
     port: Annotated[int, typer.Option("--port", min=1, max=65535)] = 8765,
 ) -> None:
@@ -797,11 +788,10 @@ def desktop(
 
     if host not in {"127.0.0.1", "localhost", "::1"}:
         raise typer.BadParameter("V0 local server only permits loopback hosts")
+    announce_workspace(workspace, command="thoth desktop")
     os.environ["THOTH_WORKSPACE"] = str(workspace.resolve())
     if web_ui_dist() is None:
-        console.print(
-            "apps/web/dist 없음. `npm --prefix apps/web run build` 후 다시 실행."
-        )
+        console.print("apps/web/dist 없음. `npm --prefix apps/web run build` 후 다시 실행.")
     from thoth.adapters.http import app as local_app
 
     url = f"http://{host}:{port}/"
@@ -824,9 +814,7 @@ def desktop(
         url,
         system=platform.system(),
         program_files=Path(os.environ.get("PROGRAMFILES", r"C:\Program Files")),
-        program_files_x86=Path(
-            os.environ.get("PROGRAMFILES(X86)", r"C:\Program Files (x86)")
-        ),
+        program_files_x86=Path(os.environ.get("PROGRAMFILES(X86)", r"C:\Program Files (x86)")),
     )
     if command is not None:
         subprocess.Popen(command)

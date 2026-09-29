@@ -17,6 +17,7 @@ from thoth.adapters.auth import SecureSessionTokenIssuer, StaticCredentialVerifi
 from thoth.adapters.http.app import create_app
 from thoth.adapters.runtime import SystemClock, UuidIdGenerator
 from thoth.adapters.storage import SqliteAuthSessionStore, SqliteGovernanceStore
+from thoth.adapters.storage.evidence_graph import SqliteEvidenceGraphStore
 from thoth.application.services import LocalAuthenticationService
 from thoth.apps.runtime import AppRuntime, create_runtime
 from thoth.domain.resource_scope import ResourceScopePolicy
@@ -66,7 +67,12 @@ class ScopeHarness:
         )
 
     async def connect(
-        self, actor: str, key: str, scope: dict[str, object] | None
+        self,
+        actor: str,
+        key: str,
+        scope: dict[str, object] | None,
+        *,
+        confirm_synthetic_time: bool = False,
     ) -> httpx.Response:
         relative = f"{project_upload_prefix(self.project)}/{key}.md"
         path = self.workspace / "inbox" / relative
@@ -81,7 +87,48 @@ class ScopeHarness:
         }
         if scope is not None:
             payload["resource_scope"] = scope
-        return await self.call(actor, "project/source/connect", key, payload)
+        response = await self.call(actor, "project/source/connect", key, payload)
+        if not confirm_synthetic_time:
+            return response
+        connected = value(response)
+        artifact_id = str(connected["artifact"]["artifact_id"])
+        version_id = str(connected["source_version_id"])
+        listed = value(await self.call(actor, "project/source/list", key + ":basis", {}))
+        assessment = next(
+            item
+            for item in listed["source_times"]
+            if item["artifact_id"] == artifact_id and item["source_version_id"] == version_id
+        )
+        assert assessment["cutoff_state"] == "UNKNOWN_TIME"
+        cutoff = listed["cutoff_basis"]
+        confirmed = value(
+            await self.call(
+                actor,
+                "project/source/time/confirm",
+                key + ":confirm",
+                {
+                    "artifact_id": artifact_id,
+                    "source_version_id": version_id,
+                    "byte_sha256": assessment["byte_sha256"],
+                    "expected_project_revision": cutoff["project_revision"],
+                    "expected_cutoff_at": cutoff["cutoff_at"],
+                    "expected_assessment_revision": assessment["revision"],
+                    "expected_metadata_digest": assessment["metadata_digest"],
+                    "assertion": "ON_OR_BEFORE_CUTOFF",
+                },
+            )
+        )
+        assert confirmed["source_time"]["cutoff_state"] == "ELIGIBLE"
+        current = SqliteEvidenceGraphStore(self.runtime.ledger.engine).read_source_by_artifact(
+            artifact_id
+        )
+        assert current is not None and current.cutoff_eligibility.value == "ELIGIBLE"
+        assert current.source_id != connected["source"]["source_id"]
+        evidence = value(await self.call(actor, "evidence/list", key + ":readback", {}))
+        spans = [item for item in evidence["spans"] if item["artifact_id"] == artifact_id]
+        assert spans and all(item["cutoff_state"] == "ELIGIBLE" for item in spans)
+        assert all(item["authority_state"] == "INFORMAL" for item in spans)
+        return response
 
 
 @asynccontextmanager

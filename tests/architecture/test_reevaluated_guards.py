@@ -12,6 +12,7 @@ from scripts import architecture_gate_contract as gate
 from scripts import checkpoint_commit_contract as checkpoint
 from scripts.check_ocp_extensions import core_closed_errors, extension_manifest_errors
 from scripts.check_truth_drift import truth_drift_errors
+from tests.architecture.synthetic_preflight_fixture import synthetic_preflight
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -95,8 +96,10 @@ def test_mixed_staged_and_unstaged_is_rejected(monkeypatch: pytest.MonkeyPatch) 
     assert not checkpoint._fully_staged(ROOT)  # pyright: ignore[reportPrivateUsage]
 
 
-def test_preflight_cannot_omit_checks_even_with_recomputed_identity() -> None:
-    value = copy.deepcopy(json.loads((ROOT / ".thoth/architecture/preflight.json").read_text()))
+def test_preflight_cannot_omit_checks_even_with_recomputed_identity(tmp_path: Path) -> None:
+    (tmp_path / "source.py").write_text("value = 1\n", encoding="utf-8")
+    (tmp_path / "fixture-rule.md").write_text("immutable fixture rule\n", encoding="utf-8")
+    value = copy.deepcopy(synthetic_preflight(tmp_path, scopes=("source.py", "fixture-rule.md")))
     value["status"] = "READY_FOR_EDIT"
     value["baseline_checks"] = []
     value["preflight_receipt_id"] = gate.calculate_preflight_receipt_id(value)

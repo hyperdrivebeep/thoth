@@ -1,30 +1,23 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
-from typing import cast
 
 import pytest
+from tests.integration.synthetic_field_baseline import synthetic_sealed_baseline
 
 from thoth.application.services.field_execution_tools import (
     generate_counterbalanced_assignments,
     validate_sealed_baseline,
 )
-from thoth.domain.canonical import canonical_payload, domain_digest
-from thoth.domain.field_measurement import SealedFieldBaseline
 
 
-def test_six_by_six_assignment_is_balanced_and_collision_free() -> None:
-    root = Path(__file__).resolve().parents[2]
-    payload = json.loads(
-        (root / "field-validation" / "sealed-baseline.json").read_text(encoding="utf-8")
-    )
-    actual = {case_id: digest for case_id, digest in payload["case_digests"].items()}
-    baseline = validate_sealed_baseline(payload, actual_case_digests=actual)
+def test_six_by_six_assignment_is_balanced_and_collision_free(tmp_path: Path) -> None:
+    baseline = synthetic_sealed_baseline(tmp_path)
+    assert baseline.external_results == "NOT_RUN"
     reviewers = tuple(f"reviewer:{ordinal:02d}" for ordinal in range(1, 7))
     manifest = generate_counterbalanced_assignments(
         baseline=baseline,
@@ -45,22 +38,15 @@ def test_six_by_six_assignment_is_balanced_and_collision_free() -> None:
         assert counts == {"A": 2, "B": 2, "C": 2}
 
 
-def test_assignment_rejects_duplicate_identity_and_stale_baseline_digest() -> None:
-    payload = {
-        "baseline_id": "baseline:test",
-        "version": "1",
-        "case_digests": {f"case:{index}": str(index) * 64 for index in range(1, 7)},
-        "sequence_matrix": ["ABC", "BCA", "CAB", "ACB", "CBA", "BAC"],
-        "baseline_toolchain": ["manual", "gpt", "thoth"],
-        "hard_zero_metrics": ["unauthorized_r3"],
-        "timebox_seconds": 1800,
-        "sealed_at": "2026-09-02T00:00:00Z",
-        "baseline_digest": "0" * 64,
-    }
+def test_assignment_rejects_duplicate_identity_and_stale_baseline_digest(tmp_path: Path) -> None:
+    baseline = synthetic_sealed_baseline(tmp_path)
+    payload = baseline.model_dump(mode="json")
+    payload["baseline_digest"] = "0" * 64
     with pytest.raises(ValueError, match="digest"):
-        validate_sealed_baseline(
-            payload,
-            actual_case_digests=cast(dict[str, str], payload["case_digests"]),
+        validate_sealed_baseline(payload, actual_case_digests=baseline.case_digests)
+    with pytest.raises(ValueError, match="unique"):
+        generate_counterbalanced_assignments(
+            baseline=baseline, reviewer_pseudonyms=("reviewer:01",) * 6
         )
 
 
@@ -69,35 +55,8 @@ def test_assignment_generator_cli_validates_sealed_case_fixture(
     tmp_path: Path, tamper: bool
 ) -> None:
     root = Path(__file__).resolve().parents[2]
-    # The historical field baseline must not be resealed when product pack policy changes.
-    # Exercise the CLI with six independently sealed temporary cases instead.
-    payload = json.loads((root / "field-validation" / "sealed-baseline.json").read_text())
-    paths, digests = {}, {}
-    for index in range(6):
-        case = tmp_path / f"case-{index}"
-        case.mkdir()
-        content = f"bounded assignment fixture {index}".encode()
-        (case / "case.txt").write_bytes(content)
-        paths[f"case:{index}"] = case.as_posix()
-        digests[f"case:{index}"] = hashlib.sha256(b"case.txt" + content).hexdigest()
-    model = SealedFieldBaseline.model_validate(
-        {
-            **payload,
-            "baseline_id": "baseline:cli-fixture",
-            "case_paths": paths,
-            "case_digests": digests,
-            "baseline_digest": "0" * 64,
-        }
-    )
-    sealed = model.model_copy(
-        update={
-            "baseline_digest": domain_digest(
-                "FIELD_SEALED_BASELINE",
-                "1.0.0",
-                canonical_payload(model.model_dump(mode="python", exclude={"baseline_digest"})),
-            )
-        }
-    )
+    sealed = synthetic_sealed_baseline(tmp_path)
+    assert len(sealed.case_paths) == 6 and sealed.external_results == "NOT_RUN"
     baseline_path = tmp_path / "baseline.json"
     baseline_path.write_text(sealed.model_dump_json(), encoding="utf-8")
     if tamper:

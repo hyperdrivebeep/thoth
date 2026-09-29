@@ -2,6 +2,7 @@ import type { PackRunResult, WorkThread } from "../types";
 import { z } from "zod";
 import type { Currentness } from "./historyModels";
 import type { CoverageMatrix, NextUserAction, UserProgressSummary } from "./researchFollowup";
+import { readLocalContext, writeLocalContext, type BrowserScope } from "./localWorkspacePersistence";
 
 export type ThreadAnalysis = PackRunResult["cycle"] & { selected_evidence_refs: string[] };
 export type ResearchFailure = {
@@ -134,7 +135,20 @@ export type ResearchStatus = WorkThread & {
   budget?: { calls: number; max_calls: number | null; reserved_tokens: number; max_reserved_tokens: number | null; actual_tokens?: number | null; actual_cost?: string | null; max_seconds: number | null; started_at: string } | null;
   cleanup?: unknown; post_execution_learning_current?: unknown[]; inputs?: unknown[];
 };
-export type ResearchAdmission = { thread_id: string; operation_id: string; request_epoch: number };
+export type ResearchAdmission = { contract_version: number; project_id?: string; thread_id: string; operation_id?: string;
+  status?: string; request_epoch?: number | null; terminal_reason?: string | null };
+export type WorkspaceReady = {
+  ready: boolean;
+  model_connected?: boolean;
+  deployment_mode?: string;
+  disclosure?: string;
+  hosted_model?: { provider: string; model: string };
+  setup?: { internet_consent: string };
+  setup_complete?: boolean;
+  workspace_readable?: boolean;
+  execution_ready?: boolean;
+  workspace_id?: string;
+};
 
 const stringList=z.array(z.string());
 const dimension=z.object({status:z.string(),reason:z.string()});
@@ -162,13 +176,16 @@ export function isThreadAnalysis(value: Record<string, unknown>): value is Threa
 }
 
 const contextKey = "thoth:web-context:v1";
-export function readWorkspaceContext(): { projectId: string; threadId: string } {
+export function readWorkspaceContext(scope?: BrowserScope): { projectId: string; threadId: string } {
+  if (scope?.mode === "LOCAL") return readLocalContext(scope.workspaceId);
   try {
     const value = JSON.parse(sessionStorage.getItem(contextKey) ?? "null");
     if (value?.version === 1 && typeof value.projectId === "string" && typeof value.threadId === "string") return value;
   } catch { /* Storage can be disabled; canonical data is always fetched from the server. */ }
   return { projectId: "", threadId: "" };
 }
-export function saveWorkspaceContext(projectId: string, threadId: string) {
-  try { sessionStorage.setItem(contextKey, JSON.stringify({ version: 1, projectId, threadId })); } catch { /* Noncanonical convenience only. */ }
+export function saveWorkspaceContext(projectId: string, threadId: string, scope?: BrowserScope) {
+  if (scope?.mode === "LOCAL") return writeLocalContext(scope.workspaceId, { projectId, threadId });
+  try { sessionStorage.setItem(contextKey, JSON.stringify({ version: 1, projectId, threadId })); return true; }
+  catch { return false; }
 }

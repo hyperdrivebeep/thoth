@@ -1,11 +1,17 @@
 from pathlib import Path
 
+from tests.architecture.public_source_profile import public_source_profile
 
-def test_hosted_review_deploy_scaffold_keeps_secrets_out_of_the_image() -> None:
-    root = Path(__file__).resolve().parents[2]
-    dockerignore = (root / "deploy" / "hosted-review" / ".dockerignore").read_text(
-        encoding="utf-8"
-    )
+
+def assert_hosted_review_package_contract(root: Path) -> None:
+    profile = public_source_profile(root)
+    if profile is not None:
+        packaging = profile.read_text("docs/PACKAGING.md")
+        assert "deployment configuration" in packaging
+        assert "HOSTED_IMAGE_NOT_VERIFIED" in packaging
+        assert not (root / "deploy/hosted-review").exists()
+        return
+    dockerignore = (root / "deploy" / "hosted-review" / ".dockerignore").read_text(encoding="utf-8")
     for name in (
         ".thoth",
         ".codex",
@@ -88,3 +94,7 @@ def test_hosted_review_deploy_scaffold_keeps_secrets_out_of_the_image() -> None:
     assert "r2_buckets" in wrangler
     assert "ENGINE_ORIGIN" in worker_text
     assert "HOSTED_REVIEW_DISPATCH_GATE" in engine
+
+
+def test_hosted_review_package_or_internal_scaffold_contract() -> None:
+    assert_hosted_review_package_contract(Path(__file__).resolve().parents[2])

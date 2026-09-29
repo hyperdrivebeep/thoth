@@ -2,18 +2,20 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from tests.architecture.public_source_profile import current_open_owner_debt, public_source_profile
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 WORKSPACE = REPO_ROOT if (REPO_ROOT / "PROJECT_WIKI").is_dir() else REPO_ROOT.parent
 
 
-def test_post_d4_wiki_pages_have_no_stale_implementation_claims() -> None:
+def assert_profile_status_has_no_stale_claims(workspace: Path) -> None:
+    profile = public_source_profile(workspace)
     pages = (
-        WORKSPACE / "PROJECT_WIKI/80_OPEN_QUESTIONS/INDEX.md",
-        WORKSPACE / "PROJECT_WIKI/50_SEED_ROADMAP/seed-map.md",
-        WORKSPACE / "PROJECT_WIKI/50_SEED_ROADMAP/seed-1-memory-kernel.md",
-        WORKSPACE / "PROJECT_WIKI/40_HACKATHON_DEMO/demo-scope.md",
+        workspace / "PROJECT_WIKI/80_OPEN_QUESTIONS/INDEX.md",
+        workspace / "PROJECT_WIKI/50_SEED_ROADMAP/seed-map.md",
+        workspace / "PROJECT_WIKI/50_SEED_ROADMAP/seed-1-memory-kernel.md",
+        workspace / "PROJECT_WIKI/40_HACKATHON_DEMO/demo-scope.md",
     )
-    text = "\n".join(path.read_text(encoding="utf-8") for path in pages)
     stale = (
         "A11 connector allowlist·Project Policy·sandbox policy digest fail-closed enforcement",
         "full FACT/FAILURE/LESSON/PRACTICE/DECISION/PERSON/REFERENCE lifecycle, "
@@ -21,7 +23,23 @@ def test_post_d4_wiki_pages_have_no_stale_implementation_claims() -> None:
         "OpenDreamKit / PENDING MATERIALIZATION",
         "runtime recursive-improvement application",
     )
+    if profile is None:
+        text = "\n".join(path.read_text(encoding="utf-8") for path in pages)
+        assert "ratcheted exception 0" in (workspace / "PROJECT_WIKI/NOW.md").read_text(
+            encoding="utf-8"
+        )
+    else:
+        now = profile.read_text("PROJECT_WIKI/NOW.md")
+        verification = profile.read_text("docs/VERIFICATION.md")
+        text = now + "\n" + verification
+        debt = current_open_owner_debt(profile)
+        assert f"ATOMICITY DEBT: {debt} OPEN" in now
+        if debt > 0:
+            assert "ratcheted exception 0" not in now
+        if "no current-source full pass is claimed" in " ".join(verification.casefold().split()):
+            assert "No complete current-source FULL pass" in now
     assert all(value not in text for value in stale)
-    assert "ratcheted exception 0" in (
-        WORKSPACE / "PROJECT_WIKI/NOW.md"
-    ).read_text(encoding="utf-8")
+
+
+def test_status_projection_has_no_stale_implementation_claims() -> None:
+    assert_profile_status_has_no_stale_claims(WORKSPACE)

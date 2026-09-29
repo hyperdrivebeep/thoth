@@ -6,11 +6,12 @@ from pydantic import JsonValue
 
 from thoth.domain.operation import OperationRecord
 from thoth.ports.operation import OperationReentryAuthorizer
-from thoth.protocol.deferred import AcceptedRunning, PendingExecution
+from thoth.protocol.deferred import AcceptedRunning, EphemeralCommandResult, PendingExecution
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 
 CommandHandler = Callable[
-    [dict[str, JsonValue]], Awaitable[dict[str, JsonValue] | AcceptedRunning | PendingExecution]
+    [dict[str, JsonValue]],
+    Awaitable[dict[str, JsonValue] | AcceptedRunning | PendingExecution | EphemeralCommandResult],
 ]
 
 PUBLIC_METHODS: tuple[str, ...] = (
@@ -24,6 +25,9 @@ PUBLIC_METHODS: tuple[str, ...] = (
     "model/settings/update",
     "model/credential/list",
     "model/credential/register",
+    "model/credential/login/status",
+    "model/credential/login/cancel",
+    "model/credential/login/complete",
     "workspace/setup/read",
     "workspace/setup/update",
     "workspace/ready",

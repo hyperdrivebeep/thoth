@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TypeVar, cast
+import asyncio
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, TypeVar, cast
 
+import httpx
 from pydantic import BaseModel, ValidationError
 
 from thoth.adapters.models.codex_oauth import (
@@ -13,6 +16,7 @@ from thoth.adapters.models.codex_oauth import (
     strict_output_schema,
 )
 from thoth.adapters.models.reference_schema import constrain_span_references
+from thoth.adapters.models.xai_oauth import XaiSession
 from thoth.domain.canonical import canonical_payload, domain_digest, model_digest
 from thoth.domain.model import ModelRequest, ModelResult
 from thoth.domain.model_dispatch import ModelControlCapability, PreparedModelDispatch
@@ -21,8 +25,16 @@ from thoth.domain.research_execution import (
     research_work,
     reserve_model_dispatch,
 )
-from thoth.ports.model import ModelPort, ModelTransportCancelled, ModelTransportHold
+from thoth.ports.model import (
+    ModelExecutionHold,
+    ModelPort,
+    ModelTransportCancelled,
+    ModelTransportHold,
+)
 from thoth.ports.model_transport import BoundedModelExecutorPort
+
+if TYPE_CHECKING:
+    from thoth.adapters.models.xai_broker import XaiAuthBroker
 
 TModel = TypeVar("TModel", bound=BaseModel)
 
@@ -33,11 +45,13 @@ class XaiOAuthModel(ModelPort):
         executor: BoundedModelExecutorPort,
         *,
         max_repair_attempts: int = 2,
+        provider: str = "xai",
     ) -> None:
         if max_repair_attempts < 0 or max_repair_attempts > 2:
             raise ValueError("max_repair_attempts must be between zero and two")
         self._executor = executor
         self._max_repair_attempts = max_repair_attempts
+        self._provider = provider
 
     @property
     def control_capability(self) -> ModelControlCapability:
@@ -107,7 +121,7 @@ class XaiOAuthModel(ModelPort):
                 "2.0.0",
                 canonical_payload(
                     {
-                        "provider": "xai",
+                        "provider": self._provider,
                         "prompt": final_prompt,
                         "schema": schema,
                         "prompt_version": request.prompt_version,
@@ -124,9 +138,7 @@ class XaiOAuthModel(ModelPort):
             ),
         )
 
-    async def _dispatch_once(
-        self, prepared: PreparedModelDispatch, dispatches: list[str]
-    ) -> str:
+    async def _dispatch_once(self, prepared: PreparedModelDispatch, dispatches: list[str]) -> str:
         work = research_work.get()
         check_research_boundary()
         dispatch_id = reserve_model_dispatch(
@@ -175,3 +187,46 @@ def _xai_validation_summary(error: ValidationError) -> str:
         location = ".".join(str(part) for part in detail.get("loc", ())) or "root"
         items.append(f"{location}:{detail.get('type')}:{detail.get('msg')}")
     return " | ".join(items)[:1500]
+
+
+@dataclass(frozen=True)
+class _SessionReader:
+    session: XaiSession
+
+    def read(self) -> XaiSession:
+        return self.session
+
+
+class XaiWorkspaceModel(ModelPort):
+    """Resolve one credential snapshot before the first physical model send."""
+
+    def __init__(
+        self,
+        broker: XaiAuthBroker,
+        *,
+        transport: httpx.AsyncBaseTransport | None = None,
+    ) -> None:
+        self.broker, self.transport = broker, transport
+
+    @property
+    def control_capability(self) -> ModelControlCapability:
+        from thoth.adapters.models.xai_responses import XAI_CONTROL
+
+        return XAI_CONTROL
+
+    async def structured(self, request: ModelRequest[TModel]) -> ModelResult[TModel]:
+        from thoth.adapters.models.xai_responses import XaiResponsesExecutor
+
+        settings = request.model_settings
+        if settings is None or settings.provider != "xai-oauth" or not settings.model:
+            raise ModelExecutionHold("XAI_MODEL_SETTINGS_MISMATCH")
+        credential = await asyncio.to_thread(self.broker.execution_credential)
+        executor = XaiResponsesExecutor(
+            _SessionReader(
+                XaiSession(credential.access_token, settings.model, settings.reasoning_effort)
+            ),
+            expected_provider="xai-oauth",
+            transport=self.transport,
+            dispatch_guard=lambda: self.broker.dispatch_gate_async(credential),
+        )
+        return await XaiOAuthModel(executor, provider="xai-oauth").structured(request)

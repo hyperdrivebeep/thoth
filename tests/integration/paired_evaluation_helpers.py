@@ -1,6 +1,6 @@
 from collections.abc import AsyncGenerator, Mapping, Sequence
 from contextlib import asynccontextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +32,17 @@ class PairHarness:
     binding: EvaluationBinding
     plan: dict[str, Any]
     proposal: dict[str, Any]
+    _closed_runtimes: list[AppRuntime] = field(default_factory=list, repr=False)
+
+    def runtime_closed(self, runtime: AppRuntime) -> bool:
+        return any(closed is runtime for closed in self._closed_runtimes)
+
+    def close_runtime(self, runtime: AppRuntime | None = None) -> None:
+        target = self.runtime if runtime is None else runtime
+        if self.runtime_closed(target):
+            raise RuntimeError("PAIR_RUNTIME_ALREADY_CLOSED")
+        self._closed_runtimes.append(target)
+        target.close()
 
     async def run(self, key: str = "execute-pair") -> dict[str, Any]:
         return value(
@@ -120,6 +131,7 @@ async def pair_harness(
     options: RuntimeOptions = {**(runtime_options or {})}
     options["evaluation_catalog"] = FrozenEvaluationCatalog((binding,))
     runtime = create_runtime(workspace, **options)
+    harness: PairHarness | None = None
     try:
         value(
             await runtime.bus.dispatch(
@@ -211,10 +223,13 @@ async def pair_harness(
         try:
             yield harness
         finally:
-            if harness.runtime is not runtime:
-                harness.runtime.close()
+            if harness.runtime is not runtime and not harness.runtime_closed(harness.runtime):
+                harness.close_runtime(harness.runtime)
     finally:
-        runtime.close()
+        if harness is None:
+            runtime.close()
+        elif not harness.runtime_closed(runtime):
+            harness.close_runtime(runtime)
 
 
 async def create_pair_thread(runtime: AppRuntime, project: str, thread_id: str | None) -> None:

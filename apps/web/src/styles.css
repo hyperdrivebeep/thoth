@@ -428,6 +428,11 @@ button { color: inherit; }
 
 .company-account { margin: 12px 0; }
 .company-account-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; max-width: 560px; }
+.xai-device-login, .oauth-login-flow { display: grid; gap: 8px; max-width: 560px; margin-top: 8px; }
+.xai-device-login > .bp6-button, .oauth-login-flow > .bp6-button { justify-self: start; }
+.xai-device-login .bp6-callout, .oauth-login-flow .bp6-callout { overflow-wrap: anywhere; }
+.xai-device-login .bp6-callout p, .oauth-login-flow .bp6-callout p { margin: 0 0 8px; }
+.xai-device-login .bp6-callout > div, .oauth-login-flow .bp6-callout > div { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 
 .research-progress-now { margin: 0 0 6px; color: var(--accent-bright); font-size: 14px; }
 .research-progress-detail, .research-progress-missing { margin: 0 0 10px; color: var(--muted); font-size: 12px; line-height: 1.6; }

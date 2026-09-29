@@ -42,9 +42,7 @@ HOSTED_REVIEW_RESEARCH_METHODS = frozenset({"thread/start", "thread/input", "thr
 HOSTED_REVIEW_DEFAULT_MODEL = "gpt-5.5"
 HOSTED_REVIEW_MODEL_ALLOWLIST = frozenset({HOSTED_REVIEW_DEFAULT_MODEL})
 HOSTED_REVIEW_OPENAI_BASE_URL = COMPANIES["openai"]["base_url"]
-HOSTED_REVIEW_DISCLOSURE = (
-    "질문과 분석에 쓰인 자료는 운영자 OpenAI API로 전달됩니다."
-)
+HOSTED_REVIEW_DISCLOSURE = "질문과 분석에 쓰인 자료는 운영자 OpenAI API로 전달됩니다."
 
 
 @dataclass(frozen=True)
@@ -195,9 +193,7 @@ def lock_hosted_model_route(
 
 def hosted_active_project_count(projects: ProjectStorePort) -> int:
     return sum(
-        1
-        for project in projects.list()
-        if project.lifecycle != ProjectLifecycle.ARCHIVED_READ_ONLY
+        1 for project in projects.list() if project.lifecycle != ProjectLifecycle.ARCHIVED_READ_ONLY
     )
 
 
@@ -212,6 +208,9 @@ def install_hosted_review_rpc_guards(
 ) -> None:
     registry.decorate("model/credential/list", lambda _: deny_hosted_credentials)
     registry.decorate("model/credential/register", lambda _: deny_hosted_credentials)
+    registry.decorate("model/credential/login/status", lambda _: deny_hosted_credentials)
+    registry.decorate("model/credential/login/cancel", lambda _: deny_hosted_credentials)
+    registry.decorate("model/credential/login/complete", lambda _: deny_hosted_credentials)
     registry.decorate("model/settings/update", lock_hosted_model_route)
     if projects is not None:
 

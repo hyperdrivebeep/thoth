@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import asyncio
 import json
-from contextlib import suppress
+from collections.abc import Callable
+from contextlib import AbstractAsyncContextManager, suppress
 from dataclasses import replace
 from decimal import Decimal
+from typing import Protocol
 
 import httpx
 from openai import DEFAULT_TIMEOUT
@@ -14,7 +16,7 @@ from openai import DEFAULT_TIMEOUT
 from thoth.adapters.models.http_rejection import read_rejection_metadata
 from thoth.adapters.models.receive_stats import ReceiveStats
 from thoth.adapters.models.sse_stream import parse_responses_sse
-from thoth.adapters.models.xai_oauth import OmoXaiSessionReader, XaiSession
+from thoth.adapters.models.xai_oauth import XaiSession
 from thoth.domain.model_dispatch import (
     ModelControlCapability,
     ModelTransportReply,
@@ -35,19 +37,27 @@ XAI_CONTROL = ModelControlCapability(
 _XAI_ENDPOINT = "https://api.x.ai/v1/responses"
 
 
+class XaiSessionReader(Protocol):
+    def read(self) -> XaiSession: ...
+
+
 class XaiResponsesExecutor:
     control_capability = XAI_CONTROL
 
     def __init__(
         self,
-        session: OmoXaiSessionReader,
+        session: XaiSessionReader,
         *,
+        expected_provider: str = "xai",
         transport: httpx.AsyncBaseTransport | None = None,
         timeout_policy: TransportTimeouts | None = None,
+        dispatch_guard: Callable[[], AbstractAsyncContextManager[None]] | None = None,
     ) -> None:
         self.session = session
+        self.expected_provider = expected_provider
         self.transport = transport
         self.timeout_policy = timeout_policy
+        self.dispatch_guard = dispatch_guard
         self._model_label = "xai/current-settings"
 
     @property
@@ -65,14 +75,14 @@ class XaiResponsesExecutor:
     ) -> PreparedModelDispatch:
         settings = self.session.read()
         if model_settings is not None:
-            if model_settings.provider != "xai" or model_settings.model is None:
+            if model_settings.provider != self.expected_provider or model_settings.model is None:
                 raise ModelExecutionHold("XAI_MODEL_SETTINGS_MISMATCH")
             settings = XaiSession(
                 settings.access_token,
                 model_settings.model,
                 model_settings.reasoning_effort,
             )
-        self._model_label = f"xai/{settings.model}"
+        self._model_label = f"{self.expected_provider}/{settings.model}"
         body: dict[str, object] = {
             "model": settings.model,
             "store": False,
@@ -197,7 +207,7 @@ class XaiResponsesExecutor:
             elif ".receive_response_body." in event:
                 stats.last_transport_phase = "READ_BODY"
 
-        async with client.stream(
+        outgoing = client.build_request(
             "POST",
             _XAI_ENDPOINT,
             headers={
@@ -206,7 +216,13 @@ class XaiResponsesExecutor:
             },
             content=request.payload,
             extensions={"trace": trace},
-        ) as response:
+        )
+        if self.dispatch_guard is None:
+            response = await client.send(outgoing, stream=True)
+        else:
+            async with self.dispatch_guard():
+                response = await client.send(outgoing, stream=True)
+        try:
             stats.http_status = response.status_code
             stats.capture_response(response)
             stats.first_response_ms = stats.elapsed_ms()
@@ -221,3 +237,5 @@ class XaiResponsesExecutor:
                     stats.http_rejection = None
                 raise ModelExecutionHold(f"XAI_{reason}_{response.status_code}")
             return await parse_responses_sse(response, request, stats, reason_prefix="XAI")
+        finally:
+            await response.aclose()

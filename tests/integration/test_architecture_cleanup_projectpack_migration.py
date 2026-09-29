@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+from tests.integration.migration_head_helpers import current_single_head
 from tests.integration.test_four_projectpack_portability import GenericProjectPackModel
 
 from thoth.adapters.models import RegisteredModelResolver
@@ -14,8 +15,6 @@ from thoth.apps.runtime import create_runtime
 from thoth.domain.migration import MigrationFailure, MigrationFailureCode
 from thoth.ports.model import ModelPort
 from thoth.protocol.jsonrpc import JsonRpcRequest
-
-EXPECTED_HEAD = "2af5d3e76c81"
 
 
 def _rpc(method: str, key: str, value: dict[str, object]) -> JsonRpcRequest:
@@ -98,7 +97,7 @@ def test_runtime_bootstrap_is_idempotent_and_stamps_single_head(tmp_path: Path) 
     first.close()
     second = create_runtime(workspace)
     second.close()
-    assert _alembic_versions(workspace / "db" / "thoth.sqlite3") == (EXPECTED_HEAD,)
+    assert _alembic_versions(workspace / "db" / "thoth.sqlite3") == (current_single_head(),)
 
 
 def test_runtime_upgrades_existing_workspace_from_prior_revision(tmp_path: Path) -> None:
@@ -114,7 +113,7 @@ def test_runtime_upgrades_existing_workspace_from_prior_revision(tmp_path: Path)
     assert _alembic_versions(database) == ("8c13f6b2a4d9",)
     runtime = create_runtime(workspace)
     runtime.close()
-    assert _alembic_versions(database) == (EXPECTED_HEAD,)
+    assert _alembic_versions(database) == (current_single_head(),)
     with sqlite3.connect(database) as connection:
         node_columns = {row[1] for row in connection.execute("PRAGMA table_info(structural_nodes)")}
         version_columns = {
@@ -172,7 +171,7 @@ def test_legacy_create_all_workspace_is_safely_adopted_and_preserved(tmp_path: P
     finally:
         runtime.close()
     assert name == "Legacy"
-    assert _alembic_versions(database) == (EXPECTED_HEAD,)
+    assert _alembic_versions(database) == (current_single_head(),)
 
 
 def test_missing_migration_repository_fails_with_typed_error(tmp_path: Path) -> None:

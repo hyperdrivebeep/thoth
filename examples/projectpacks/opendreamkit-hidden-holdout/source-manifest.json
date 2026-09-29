@@ -1,0 +1,4 @@
+[
+  {"source_id":"source:odk-change","path":"survey-change-lineage.md","media_type":"text/markdown","authority":"OFFICIAL","cutoff_state":"ELIGIBLE","security_class":"INTERNAL","version_label":"reference-v1","byte_sha256":"014d4985dba43bdbd249e1c41384bdac657e9ce55dd85cc44cb066a4b71a674d","rights":"THOTH-authored factual paraphrase; upstream repository license unresolved"},
+  {"source_id":"source:odk-rights-gap","path":"rights-and-oracle-gap.md","media_type":"text/markdown","authority":"OFFICIAL","cutoff_state":"ELIGIBLE","security_class":"INTERNAL","version_label":"reference-v1","byte_sha256":"6ad400a0be544fc0c7db7ee30a4467825980c62196ec4572bd8edc7cd56d5392","rights":"THOTH-authored negative-gate statement; upstream reuse prohibited until resolved"}
+]

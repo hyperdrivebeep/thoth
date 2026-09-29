@@ -1,9 +1,40 @@
 export type CredentialRegisterResult = {
   started?: boolean;
+  provider?: string;
+  account_provider?: string;
+  auth_method?: string;
+  route?: string;
+  login_state?: string;
+  auth_state?: string;
+  catalog_state?: string;
+  capabilities?: CredentialLoginCapabilities;
+  authorization_url?: string;
+  manual_response_required?: boolean;
   kind?: string;
+  login_id?: string;
+  state?: string;
+  user_code?: string;
+  verification_uri?: string;
+  expires_at?: number;
   browser_url?: string;
   reason_code?: string;
+  guidance?: string | null;
+  profile_mode?: string;
   credential?: { provider?: string; model?: string };
+};
+
+export type CredentialLoginCapabilities = { start?: boolean; status?: boolean; cancel?: boolean; manual_complete?: boolean };
+export type CredentialAuthMethod = {
+  auth_method: string;
+  route: string;
+  connected?: boolean;
+  execution_eligible?: boolean;
+  connection_state?: string;
+  reason_code?: string | null;
+  login_state?: string;
+  auth_state?: string;
+  catalog_state?: string;
+  capabilities?: CredentialLoginCapabilities;
 };
 
 export type CredentialAccount = {
@@ -16,6 +47,13 @@ export type CredentialAccount = {
   login_kind?: string;
   remote_auth_verified?: boolean | null;
   available_model_providers?: string[];
+  connection_state?: string;
+  profile_mode?: string;
+  reason_code?: string | null;
+  guidance?: string | null;
+  execution_eligible?: boolean | null;
+  execution_verified?: boolean | null;
+  auth_methods?: CredentialAuthMethod[];
 };
 
 export const credentialCompanies = [
@@ -25,17 +63,53 @@ export const credentialCompanies = [
 ] as const;
 
 export function loginSupported(account?: CredentialAccount): boolean {
-  return account?.login_supported === true && account.login_kind === "codex_device_auth";
+  return account?.login_supported === true && ["codex_isolated_browser", "codex_device_auth", "xai_device_code"].includes(account.login_kind ?? "");
+}
+
+export function xaiDeviceLoginSupported(account?: CredentialAccount): boolean {
+  return account?.provider === "xai" && account.login_supported === true &&
+    (account.login_kind === "xai_device_code" || Boolean(credentialAuthMethod(account, "xai_device_code")));
+}
+
+export function credentialAuthMethod(account: CredentialAccount | undefined, authMethod: string): CredentialAuthMethod | null {
+  if (!Array.isArray(account?.auth_methods)) return null;
+  const value = account.auth_methods.find(item => item && item.auth_method === authMethod);
+  return value && typeof value.route === "string" && value.route.length > 0 ? value : null;
+}
+
+export function canStartCredentialMethod(account: CredentialAccount | undefined, authMethod: string): boolean {
+  const method = credentialAuthMethod(account, authMethod);
+  return Boolean(method && account?.login_supported === true && method.capabilities?.start === true);
+}
+
+export function loginUnavailable(account?: CredentialAccount): boolean {
+  return ["CODEX_STANDALONE_NOT_INSTALLED", "CODEX_STANDALONE_PIN_UNAVAILABLE", "UPDATE_REVIEW_REQUIRED"].includes(account?.connection_state ?? "");
 }
 
 export function credentialLocallyConfigured(account?: CredentialAccount): boolean {
   if (!account?.connected) return false;
+  if (["UNAVAILABLE", "LOGIN_REQUIRED", "LOGIN_PENDING", "CATALOG_UNAVAILABLE", "ERROR"].includes(account.connection_state ?? "") || loginUnavailable(account)) return false;
+  if (account.execution_eligible === false || account.connection_state === "EXECUTION_UNVERIFIED" && account.execution_eligible !== true) return false;
   const routes = account.available_model_providers ?? [];
+  const oauthRoute = Array.isArray(account.auth_methods) && account.auth_methods.some(method => method && method.auth_method !== "api_key" && method.connected === true
+    && method.execution_eligible === true && routes.includes(method.route));
   return (account.has_key && routes.includes(account.provider)) ||
-    (account.oauth && loginSupported(account) && routes.includes("codex-oauth"));
+    (account.oauth && (oauthRoute || !account.auth_methods && loginSupported(account)
+      && routes.includes(account.provider === "xai" ? "xai-oauth" : "codex-oauth")));
 }
 
 export function credentialAccountLabel(account?: CredentialAccount): string {
+  if (account?.connection_state === "UNAVAILABLE") return "연결 경로 없음";
+  if (account?.connection_state === "CODEX_STANDALONE_NOT_INSTALLED") return "Codex 실행 파일 없음";
+  if (account?.connection_state === "CODEX_STANDALONE_PIN_UNAVAILABLE") return "지원 버전 없음";
+  if (account?.connection_state === "UPDATE_REVIEW_REQUIRED") return "업데이트 검토 필요";
+  if (account?.connection_state === "LOGIN_REQUIRED") return "로그인 필요";
+  if (account?.connection_state === "LOGIN_PENDING") return "로그인 진행 중";
+  if (account?.connection_state === "CATALOG_UNAVAILABLE") return "모델 목록 없음";
+  if (account?.connection_state === "EXECUTION_UNVERIFIED") return account.execution_eligible === true ? "실행 시도 가능 · 성공 미검증" : "실행 미검증";
+  if (account?.connection_state === "ERROR") return "연결 확인 실패";
+  if (account?.connection_state === "API_KEY_AVAILABLE") return "키 등록됨 · 연결 준비";
+  if (account?.connection_state === "READY") return account.has_key ? "키 등록됨 · 연결 준비" : "로그인 상태 확인됨 · 연결 준비";
   if (!account?.connected) return "아직 없음";
   if (!credentialLocallyConfigured(account) && !account.has_key) return "연결 경로 확인 필요";
   if (account.oauth && account.has_key) return "로그인 상태 확인 · 키 등록됨";
@@ -45,25 +119,54 @@ export function credentialAccountLabel(account?: CredentialAccount): string {
 }
 
 export function credentialAvailabilityNote(account?: CredentialAccount): string | null {
-  if (!account?.connected) return null;
-  if (!credentialLocallyConfigured(account) && !account.has_key) return "THOTH에서 사용할 수 있는 연결 경로를 확인하지 못했습니다.";
+  if (!account) return null;
+  const notes: string[] = [];
+  if (account.profile_mode === "THOTH_ISOLATED") notes.push(loginSupported(account)
+    ? "THOTH 전용 별도 프로필을 사용하며 기존 Codex Desktop 인증 파일을 가져오지 않습니다."
+    : "THOTH 전용 별도 프로필을 사용합니다.");
+  if (account.profile_mode === "THOTH_XAI_OAUTH") notes.push("xAI 로그인은 이 THOTH 작업 공간의 별도 인증을 사용합니다. API 키 연결은 유지됩니다.");
+  if (loginSupported(account) && !xaiDeviceLoginSupported(account)) notes.push("Codex 모델 연결은 실험적이며 실행 성공은 별도 확인이 필요합니다.");
+  if (xaiDeviceLoginSupported(account)) notes.push("xAI 로그인 확인과 실제 모델 실행 성공은 별도입니다.");
+  if (credentialAuthMethod(account, "claude_pkce")) notes.push("Claude OAuth는 사용자가 명시적으로 선택하는 별도 경로입니다. 실제 제3자 사용 허용과 모델 실행 성공은 아직 확인되지 않았습니다.");
+  if (account.connection_state === "LOGIN_REQUIRED") notes.push("로그인을 완료한 뒤 연결 상태를 다시 확인하세요.");
+  if (account.connection_state === "LOGIN_PENDING") notes.push("로그인 절차를 마친 뒤 연결 상태를 다시 확인하세요. 시작 응답은 연결 완료가 아닙니다.");
+  if (loginUnavailable(account)) notes.push("실행 파일의 설치·지원 버전을 확인하세요. THOTH가 자동 설치하거나 기존 Desktop 인증을 변경하지 않습니다.");
+  if (account.connection_state === "CATALOG_UNAVAILABLE") notes.push("로그인과 별개로 사용할 모델 목록을 확인하지 못했습니다.");
+  if (account.connection_state === "EXECUTION_UNVERIFIED") notes.push(account.execution_eligible === true
+    ? "로컬 실행 시도 조건은 확인됐지만 실제 공급자 성공은 아직 검증되지 않았습니다."
+    : "새 모델 실행 시도 조건이 아직 확인되지 않았습니다.");
+  if (account.connection_state === "UNAVAILABLE" && account.reason_code) notes.push(`연결 경로를 사용할 수 없습니다 (${account.reason_code}).`);
+  if (account.guidance) notes.push(account.guidance);
+  if (!account.connected) return notes.join(" ") || null;
+  if (!credentialLocallyConfigured(account) && !account.has_key) notes.push("THOTH에서 사용할 수 있는 연결 경로를 확인하지 못했습니다.");
   const routes = account.available_model_providers;
-  if (routes?.length === 0) return "현재 선택 가능한 모델 경로가 없습니다.";
-  return account.remote_auth_verified === true ? null : "실제 공급자 호출은 아직 확인되지 않았습니다.";
+  if (routes?.length === 0) notes.push("현재 선택 가능한 모델 경로가 없습니다.");
+  if (account.execution_verified === false) notes.push("실제 모델 실행 성공은 아직 확인되지 않았습니다.");
+  if (account.remote_auth_verified !== true) notes.push("실제 공급자 호출은 아직 확인되지 않았습니다.");
+  return notes.join(" ") || null;
 }
 
 export function credentialConnectionHint(account?: CredentialAccount): string {
+  if (credentialAuthMethod(account, "claude_pkce")) return "Claude Code 안내와 THOTH 전용 Claude OAuth는 별도입니다. OAuth 로그인은 직접 선택해야 시작됩니다.";
+  if (xaiDeviceLoginSupported(account) && account?.oauth) return account.available_model_providers?.includes("xai-oauth")
+    ? "xAI 로그인이 확인됐습니다. 모델 목록에서 xai-oauth 경로를 직접 선택할 수 있습니다. 실제 실행 성공은 별도 확인이 필요합니다."
+    : "xAI 로그인은 확인됐지만 사용할 모델 경로가 아직 없습니다. 재로그인보다 모델 목록을 확인하세요.";
+  if (xaiDeviceLoginSupported(account)) return "THOTH 작업 공간의 xAI 기기 코드 로그인을 시작하거나 API 키를 별도로 등록할 수 있습니다.";
   if (account?.oauth && loginSupported(account)) return "Codex 로그인은 확인됐습니다. 모델 목록이 없으면 재로그인 대신 모델 경로를 확인하세요.";
-  if (loginSupported(account)) return "Codex 기기 로그인을 시작하거나 API 키를 등록합니다. 시작 응답만으로 로그인 완료는 아닙니다.";
+  if (loginSupported(account)) return "THOTH 전용 Codex 로그인을 시작하거나 API 키를 등록합니다. 시작 응답만으로 로그인 완료는 아닙니다.";
   if (account?.login_supported === false && account.login_kind === "unsupported") return "계정 로그인 연결은 지원되지 않습니다. API 키를 발급받아 등록하세요.";
   return "서버의 로그인 지원 정보를 확인한 뒤 연결 방법을 안내합니다. API 키 등록은 별도로 할 수 있습니다.";
 }
 
 export function credentialResultMessage(result?: CredentialRegisterResult): string {
   if (result?.credential) return "API 키를 THOTH 로컬 저장소에 등록했습니다. 실제 모델 사용 가능 여부는 사용 시 확인됩니다.";
-  if (result?.kind === "manual_device_auth") return "이 환경의 기기 로그인은 서버 터미널에서 codex login --device-auth를 직접 실행해야 합니다. 완료한 뒤 연결 상태를 다시 확인하세요. THOTH는 로그인을 시작하거나 완료하지 않았습니다.";
+  if (result?.kind === "manual_device_auth") {
+    const guidance = result.guidance && !/\bcodex\s+login\b/i.test(result.guidance)
+      ? result.guidance : "현재 서버와 같은 workspace의 THOTH 전용 연결 방법을 확인하세요.";
+    return `${guidance} 완료한 뒤 연결 상태를 다시 확인하세요. THOTH는 로그인을 시작하거나 완료하지 않았습니다.`;
+  }
   if (result?.kind === "unsupported" || result?.kind === "console") return "계정 로그인 연결은 지원되지 않습니다. 키 발급 사이트에서 API 키를 만든 뒤 THOTH에 등록하세요. 사이트 방문만으로 연결되지는 않습니다.";
-  if (result?.kind === "oauth" && result.started) return "계정 로그인 절차를 시작했습니다. 완료한 뒤 연결 상태를 다시 확인하세요.";
+  if (result?.kind === "oauth" && result.started) return `${result.profile_mode === "THOTH_ISOLATED" ? "THOTH 전용 Codex" : "계정"} 로그인 절차를 시작했습니다. 완료한 뒤 연결 상태를 다시 확인하세요. ${result.guidance ?? ""}`.trim();
   return "연결 완료를 확인하지 못했습니다. 연결 상태를 다시 확인하세요.";
 }
 

@@ -9,7 +9,11 @@ from typing import Any
 import httpx
 import pytest
 from sqlalchemy import func, select
-from tests.integration.storage_coverage_helpers import prepare_project, request, value
+from tests.integration.storage_coverage_helpers import (
+    prepare_project,
+    value,
+)
+from tests.integration.storage_coverage_helpers import request as rpc_request
 
 from thoth.adapters.auth import SecureSessionTokenIssuer, StaticCredentialVerifier
 from thoth.adapters.http.app import create_app
@@ -37,6 +41,17 @@ def auth_service(runtime: AppRuntime) -> LocalAuthenticationService:
 
 
 @dataclass
+class RuntimeCloseOwner:
+    runtime: AppRuntime
+    closed: bool = False
+
+    def close(self) -> None:
+        if not self.closed:
+            self.closed = True
+            self.runtime.close()
+
+
+@dataclass
 class ScopeHarness:
     runtime: AppRuntime
     client: httpx.AsyncClient
@@ -47,6 +62,7 @@ class ScopeHarness:
     broad_target: str
     legacy_target: str
     private_target: str = ""
+    runtime_owner: RuntimeCloseOwner | None = None
 
     async def rpc(
         self,
@@ -79,8 +95,10 @@ class ScopeHarness:
 
 
 @pytest.fixture
-async def harness(tmp_path: Path) -> AsyncIterator[ScopeHarness]:
+async def harness(tmp_path: Path, request: pytest.FixtureRequest) -> AsyncIterator[ScopeHarness]:
     runtime, project = await prepare_project(tmp_path / "scope")
+    runtime_owner = RuntimeCloseOwner(runtime)
+    request.addfinalizer(runtime_owner.close)
     tokens: dict[str, str] = {}
     scopes = {
         "alpha": "WORKSTREAM:alpha",
@@ -92,7 +110,7 @@ async def harness(tmp_path: Path) -> AsyncIterator[ScopeHarness]:
     for revision, (actor, scope) in enumerate(scopes.items()):
         assigned = value(
             await runtime.bus.dispatch(
-                request(
+                rpc_request(
                     "project/role/assign",
                     actor,
                     {
@@ -108,7 +126,7 @@ async def harness(tmp_path: Path) -> AsyncIterator[ScopeHarness]:
         )
         roles[actor] = str(assigned["role"]["role_assignment_id"])
     legacy = await runtime.bus.dispatch(
-        request("project/read", "local-read", {"project_id": project})
+        rpc_request("project/read", "local-read", {"project_id": project})
     )
     assert legacy.result is not None
     transport = httpx.ASGITransport(app=create_app(runtime.bus, auth=auth_service(runtime)))
@@ -137,6 +155,7 @@ async def harness(tmp_path: Path) -> AsyncIterator[ScopeHarness]:
                 "",
                 "",
                 str(legacy.result["operation_id"]),
+                runtime_owner=runtime_owner,
             )
             for actor, key in (("alpha", "scoped-thread"), ("admin", "broad-thread")):
                 created = await result.rpc(
@@ -171,7 +190,7 @@ async def harness(tmp_path: Path) -> AsyncIterator[ScopeHarness]:
                     result.broad_target = operation_id
             yield result
     finally:
-        runtime.close()
+        runtime_owner.close()
 
 
 @pytest.mark.parametrize(
@@ -324,7 +343,8 @@ async def test_operation_scope_and_result_persist_after_reopen(
     harness: ScopeHarness,
     tmp_path: Path,
 ) -> None:
-    harness.runtime.close()
+    assert harness.runtime_owner is not None
+    harness.runtime_owner.close()
     reopened = create_runtime(tmp_path / "scope")
     transport = httpx.ASGITransport(app=create_app(reopened.bus, auth=auth_service(reopened)))
     try:

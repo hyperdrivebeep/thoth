@@ -19,9 +19,9 @@ async def test_execution_views_follow_current_plan_source_access(tmp_path: Path)
         }
     )
     async with scope_harness(tmp_path, policy) as h:
-        resource = value(await h.connect("alpha", "execution-source", None))["artifact"][
-            "artifact_id"
-        ]
+        resource = value(
+            await h.connect("alpha", "execution-source", None, confirm_synthetic_time=True)
+        )["artifact"]["artifact_id"]
         spans = value(await h.call("alpha", "evidence/list", "spans", {}))["spans"]
         refs = [span["span_id"] for span in spans]
         thread = value(

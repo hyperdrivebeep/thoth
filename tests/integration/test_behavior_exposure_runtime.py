@@ -176,7 +176,7 @@ async def test_final_baseline_requires_separate_approval_and_preserves_research_
             if item["component"] == "PROMPT_BUNDLE"
         )
         assert snapshot["origin"] == "BASELINE" and snapshot["exposure_ref"] is None
-        h.pair.runtime.close()
+        h.pair.close_runtime()
         h.pair.runtime = create_runtime(
             tmp_path,
             model_resolver=StaticModelResolver(h.model),

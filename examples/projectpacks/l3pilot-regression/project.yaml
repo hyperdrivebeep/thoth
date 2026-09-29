@@ -1,0 +1,12 @@
+pack_id: pack:l3pilot-regression
+project_id: project:l3pilot-regression
+name: L3Pilot lifecycle regression reference packet
+cutoff_at: 2020-07-01T23:59:59Z
+overlay: eu-rnd-automated-driving
+policy_binding_ref: policy:l3pilot-reference-v1
+scenario:
+  case_id: case:l3pilot-log-harmonization
+  thread_id: thread:l3pilot-evaluation
+  cycle_id: cycle:l3pilot-1
+  object_id: object:l3pilot-evaluation-gap
+  problem: Pilot sites use heterogeneous logs and changing operational constraints. Which explanations distinguish a data-harmonization problem from a vehicle, route, clearance, or evaluation-method problem, and what bounded action should follow?

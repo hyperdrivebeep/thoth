@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import cast
 
@@ -50,6 +51,7 @@ def _public_web_execution(
 def test_setup_starts_undecided(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("THOTH_WORKSPACE", str(tmp_path))
     assert read_setup(tmp_path).internet_consent == "UNDECIDED"
+    assert read_setup(tmp_path).storage_status == "MISSING"
 
 
 def test_allowed_gets_grant(tmp_path: Path) -> None:
@@ -59,6 +61,60 @@ def test_allowed_gets_grant(tmp_path: Path) -> None:
     )
     assert state.internet_consent == "ALLOWED"
     assert state.internet_grant_id is not None
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "{broken",
+        "[]",
+        "{}",
+        '{"schema_version":1,"revision":2,"internet_consent":"ALLOWED"}',
+        '{"schema_version":1,"revision":2,"internet_consent":"DENIED","internet_grant_id":"grant:stale"}',
+        '{"schema_version":99,"revision":2,"internet_consent":"DENIED"}',
+    ],
+)
+def test_existing_damaged_setup_is_not_silent_first_run(tmp_path: Path, raw: str) -> None:
+    source = tmp_path / "workspace-setup.json"
+    source.write_text(raw, encoding="utf-8")
+    assert read_setup(tmp_path).storage_status == "CORRUPT"
+    with pytest.raises(RuntimeError):
+        write_setup(WorkspaceSetupState(internet_consent="ALLOWED"), tmp_path)
+    assert source.read_text(encoding="utf-8") == raw
+
+
+def test_unreadable_existing_setup_is_not_silent_first_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "workspace-setup.json"
+    source.write_text("sentinel", encoding="utf-8")
+    original = Path.read_text
+
+    def unreadable(path: Path, encoding: str | None = None, errors: str | None = None) -> str:
+        if path == source:
+            raise PermissionError("synthetic denied")
+        return original(path, encoding=encoding, errors=errors)
+
+    monkeypatch.setattr(Path, "read_text", unreadable)
+    assert read_setup(tmp_path).storage_status == "UNREADABLE"
+    assert source.read_bytes() == b"sentinel"
+
+
+def test_setup_fsync_failure_preserves_existing_bytes_and_cleans_temp(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    old = write_setup(WorkspaceSetupState(internet_consent="DENIED"), tmp_path)
+    source = tmp_path / "workspace-setup.json"
+    before = source.read_bytes()
+
+    def fail_fsync(_fd: int) -> None:
+        raise OSError("synthetic fsync failure")
+
+    monkeypatch.setattr(os, "fsync", fail_fsync)
+    with pytest.raises(OSError):
+        write_setup(old.model_copy(update={"internet_consent": "ALLOWED"}), tmp_path)
+    assert source.read_bytes() == before
+    assert list(tmp_path.glob(".workspace-setup.json.*.tmp")) == []
 
 
 def test_web_on_without_hosts_rejected() -> None:

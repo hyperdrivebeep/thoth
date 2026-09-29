@@ -212,6 +212,11 @@ async def test_abandoned_running_same_key_does_not_reenter_model(
             isinstance(key, str) and isinstance(task, asyncio.Task)
             for key, task in cast(dict[object, object], tasks).items()
         )
+        live_replay = await runtime.bus.dispatch(request("thread/start", "start", payload))
+        assert live_replay.error is None
+        assert live_replay.result is not None
+        assert live_replay.result["operation_id"] == operation_id
+        assert len(model.calls) == calls_before
         tasks.clear()
         replayed = await runtime.bus.dispatch(request("thread/start", "start", payload))
         assert replayed.error is not None

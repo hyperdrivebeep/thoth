@@ -4,9 +4,7 @@ from __future__ import annotations
 
 import json
 import os
-import shutil
 import subprocess
-import sys
 from contextlib import suppress
 from pathlib import Path
 from typing import cast
@@ -14,6 +12,7 @@ from typing import cast
 from openai import AsyncOpenAI
 
 from thoth.adapters.models.anthropic_messages import AnthropicMessagesModel
+from thoth.adapters.models.auth_registry import AuthRegistry, AuthRoute, default_auth_registry
 from thoth.adapters.models.companies import COMPANIES, company
 from thoth.adapters.models.openai_responses import OpenAIResponsesModel
 from thoth.adapters.models.registry import RegisteredModelResolver
@@ -182,73 +181,175 @@ def thoth_local_model(provider: str, model: str | None, root: Path | None = None
 
 
 def account_connections(
-    codex_status: dict[str, object], root: Path | None = None
+    codex_status: dict[str, object],
+    root: Path | None = None,
+    xai_status: dict[str, object] | None = None,
+    claude_status: dict[str, object] | None = None,
 ) -> list[dict[str, object]]:
     listed = {item["provider"] for item in available_credentials(root)}
     rows: list[dict[str, object]] = []
     for key, spec in COMPANIES.items():
         oauth = key == "openai" and codex_status.get("connected") is True
+        codex_eligible = key == "openai" and codex_status.get("execution_eligible") is True
+        xai_oauth = key == "xai" and (xai_status or {}).get("connected") is True
+        xai_eligible = key == "xai" and (xai_status or {}).get("execution_eligible") is True
+        claude_oauth = key == "anthropic" and (claude_status or {}).get("connected") is True
+        claude_eligible = (
+            key == "anthropic" and (claude_status or {}).get("execution_eligible") is True
+        )
+        oauth_status = (
+            codex_status
+            if key == "openai"
+            else (xai_status or {})
+            if key == "xai"
+            else (claude_status or {})
+        )
+        raw_capabilities = (claude_status or {}).get("capabilities")
+        claude_capabilities: dict[str, object] = (
+            cast(dict[str, object], raw_capabilities) if isinstance(raw_capabilities, dict) else {}
+        )
         has_key = spec["provider"] in listed
         model_providers = [spec["provider"]] if has_key else []
-        if oauth:
+        if codex_eligible:
             model_providers.append("codex-oauth")
+        if xai_eligible:
+            model_providers.append("xai-oauth")
+        if claude_eligible:
+            model_providers.append("claude-oauth")
+        reason = (
+            str(codex_status.get("reason_code") or "LOGIN_REQUIRED")
+            if key == "openai" and not has_key
+            else str((claude_status or {}).get("reason_code") or "MODEL_ACCOUNT_LOGIN_UNSUPPORTED")
+            if key == "anthropic" and not has_key
+            else "API_KEY_AVAILABLE"
+            if has_key
+            else "MODEL_ACCOUNT_LOGIN_UNSUPPORTED"
+        )
+        guidance = (
+            "Use the saved THOTH workspace API key"
+            if has_key
+            else "Install the pinned Codex standalone package in the THOTH tools prefix"
+            if reason in {"CODEX_STANDALONE_NOT_INSTALLED", "CODEX_STANDALONE_PIN_UNAVAILABLE"}
+            else "Connect the THOTH-only Codex profile"
+            if reason in {"LOGIN_REQUIRED", "LOGIN_PENDING"}
+            else "Check the isolated Codex model catalog"
+            if reason == "CATALOG_UNAVAILABLE"
+            else "The Codex route is eligible; live execution has not been verified"
+            if reason == "EXECUTION_UNVERIFIED"
+            else "Use a THOTH workspace API key for this provider"
+        )
         rows.append(
             {
                 "provider": spec["provider"],
                 "label": spec["label"],
                 "kind": "account",
-                "connected": oauth or has_key,
+                "connected": oauth or xai_oauth or claude_oauth or has_key,
                 "has_key": has_key,
-                "oauth": oauth,
+                "oauth": oauth or xai_oauth or claude_oauth,
                 "remote_auth_verified": None,
-                "login_supported": key == "openai",
-                "login_kind": "codex_device_auth" if key == "openai" else "unsupported",
+                "login_supported": key in {"openai", "xai"}
+                or (key == "anthropic" and claude_capabilities.get("start") is True),
+                "login_kind": "codex_isolated_browser"
+                if key == "openai"
+                else "xai_device_code"
+                if key == "xai"
+                else "claude_pkce"
+                if claude_capabilities.get("start") is True
+                else "unsupported",
                 "available_model_providers": model_providers,
+                "connection_state": (
+                    codex_status.get("connection_state", "LOGIN_REQUIRED")
+                    if key == "openai" and not has_key
+                    else (xai_status or {}).get("connection_state", "LOGIN_REQUIRED")
+                    if key == "xai" and not has_key
+                    else (claude_status or {}).get("auth_state", "DISCONNECTED")
+                    if key == "anthropic" and not has_key
+                    else "API_KEY_AVAILABLE"
+                    if has_key
+                    else "UNAVAILABLE"
+                ),
+                "profile_mode": (
+                    "THOTH_LOCAL_KEY"
+                    if has_key
+                    else "THOTH_ISOLATED"
+                    if key == "openai"
+                    else "THOTH_XAI_OAUTH"
+                    if key == "xai"
+                    else "THOTH_CLAUDE_OAUTH"
+                    if key == "anthropic" and claude_oauth
+                    else "THOTH_LOCAL_KEY"
+                ),
+                "reason_code": reason,
+                "guidance": guidance,
+                "execution_eligible": has_key or codex_eligible or xai_eligible or claude_eligible,
+                "execution_verified": False,
+                "auth_methods": [
+                    {
+                        "auth_method": "api_key",
+                        "route": spec["provider"],
+                        "connected": has_key,
+                        "execution_eligible": has_key,
+                        "connection_state": "API_KEY_AVAILABLE" if has_key else "LOGIN_REQUIRED",
+                        "reason_code": "API_KEY_AVAILABLE"
+                        if has_key
+                        else "MODEL_CREDENTIAL_UNAVAILABLE",
+                        "capabilities": {
+                            "start": False,
+                            "status": True,
+                            "cancel": False,
+                            "manual_complete": False,
+                        },
+                    },
+                    {
+                        "auth_method": "codex_isolated_browser"
+                        if key == "openai"
+                        else "xai_device_code"
+                        if key == "xai"
+                        else "claude_pkce",
+                        "route": "codex-oauth"
+                        if key == "openai"
+                        else "xai-oauth"
+                        if key == "xai"
+                        else "claude-oauth",
+                        "connected": oauth or xai_oauth or claude_oauth,
+                        "execution_eligible": codex_eligible or xai_eligible or claude_eligible,
+                        "connection_state": oauth_status.get(
+                            "connection_state", oauth_status.get("auth_state", "LOGIN_REQUIRED")
+                        ),
+                        "reason_code": oauth_status.get("reason_code"),
+                        "capabilities": {
+                            "start": key != "anthropic" or claude_capabilities.get("start") is True,
+                            "status": True,
+                            "cancel": True,
+                            "manual_complete": key == "anthropic",
+                        },
+                    },
+                ],
             }
         )
+        if key == "xai" and not has_key:
+            rows[-1]["reason_code"] = (xai_status or {}).get("reason_code", "XAI_LOGIN_REQUIRED")
+            rows[-1]["guidance"] = (
+                "Use the THOTH workspace xAI device login; remote execution is unverified"
+            )
     return rows
 
 
-def start_codex_login() -> dict[str, object]:
-    from thoth.adapters.models.codex_oauth import (
-        CodexOAuthUnavailable,
-        resolve_codex_executable,
-    )
+def start_codex_login(
+    workspace: Path,
+    *,
+    wait_for_completion: bool = False,
+    timeout_seconds: float = 180,
+) -> dict[str, object]:
+    from thoth.adapters.models.codex_broker import broker_for_workspace
+    from thoth.adapters.models.codex_profile import CodexProfileHold
 
     try:
-        resolved = resolve_codex_executable()
-        if not resolved.is_file():
-            raise LocalCredentialHold("CODEX_CLI_NOT_FOUND")
-        creationflags = (
-            getattr(subprocess, "CREATE_NEW_CONSOLE", 0) if sys.platform == "win32" else 0
+        return broker_for_workspace(workspace).start_login(
+            wait_for_completion=wait_for_completion, timeout_seconds=timeout_seconds
         )
-        if creationflags:
-            subprocess.Popen(
-                [str(resolved), "login", "--device-auth"],
-                creationflags=creationflags,
-            )
-            return {"started": True, "provider": "codex-oauth", "kind": "oauth"}
-        # Headless/device login waits for a person to finish a browser step.
-        # Never hold the HTTP event loop (or hide the one-time code in server logs).
-        return {
-            "started": False,
-            "provider": "codex-oauth",
-            "kind": "manual_device_auth",
-            "reason_code": "CODEX_DEVICE_AUTH_TERMINAL_REQUIRED",
-        }
-    except CodexOAuthUnavailable as exc:
+    except CodexProfileHold as exc:
         raise LocalCredentialHold(str(exc)) from exc
-
-
-def start_claude_login() -> dict[str, object]:
-    executable = shutil.which("claude") or shutil.which("claude.exe")
-    if executable:
-        creationflags = (
-            getattr(subprocess, "CREATE_NEW_CONSOLE", 0) if sys.platform == "win32" else 0
-        )
-        subprocess.Popen([executable, "login"], creationflags=creationflags)
-        return {"started": True, "provider": "anthropic", "kind": "oauth"}
-    return start_console_login("anthropic")
 
 
 def start_console_login(provider: str, *, open_browser: bool = False) -> dict[str, object]:
@@ -286,18 +387,72 @@ def register_thoth_local_providers(
 
 
 class LocalModelCredentials(ModelCredentialPort):
-    def __init__(self, root: Path | None = None) -> None:
+    def __init__(
+        self, root: Path | None = None, *, auth_registry: AuthRegistry | None = None
+    ) -> None:
         self.root = root
+        self.auth_registry = auth_registry or default_auth_registry()
+
+    @staticmethod
+    def _method(provider: str, auth_method: str | None) -> str:
+        if auth_method:
+            return auth_method
+        return {"openai": "codex_isolated_browser", "xai": "xai_device_code"}.get(provider, "")
+
+    def _route(self, provider: str, auth_method: str | None) -> AuthRoute:
+        if self.root is None:
+            raise ModelCredentialError("MODEL_AUTH_WORKSPACE_REQUIRED")
+        return self.auth_registry.resolve(provider, self._method(provider, auth_method))
+
+    @staticmethod
+    def _auth_error(exc: ModelExecutionHold) -> ModelCredentialError:
+        reason = str(exc)
+        return ModelCredentialError(
+            reason
+            if reason.isascii() and reason.replace("_", "").isalnum() and reason.upper() == reason
+            else "MODEL_AUTH_FAILURE"
+        )
+
+    @staticmethod
+    def _decorate(route: AuthRoute, result: dict[str, object]) -> dict[str, object]:
+        capabilities = result.get("capabilities")
+        if not isinstance(capabilities, dict):
+            capabilities = {
+                "start": True,
+                "status": True,
+                "cancel": True,
+                "manual_complete": route.manual_complete,
+            }
+        return {
+            **result,
+            "account_provider": route.account_provider,
+            "auth_method": route.auth_method,
+            "route": route.model_route,
+            "capabilities": capabilities,
+        }
 
     def account_connections(self) -> list[dict[str, object]]:
-        from thoth.adapters.models.codex_oauth import codex_oauth_status
+        from thoth.adapters.models.codex_broker import broker_for_workspace as codex_broker
 
         status: dict[str, object]
         try:
-            status = codex_oauth_status()
+            status = (
+                codex_broker(self.root).local_status().public()
+                if self.root is not None
+                else {"connected": False, "reason_code": "CODEX_WORKSPACE_REQUIRED"}
+            )
         except (OSError, subprocess.TimeoutExpired):
-            status = {"connected": False}
-        return account_connections(status, self.root)
+            status = {"connected": False, "reason_code": "CODEX_STATUS_UNAVAILABLE"}
+        xai_status: dict[str, object] = {}
+        claude_status: dict[str, object] = {}
+        if self.root is not None:
+            from thoth.adapters.models.xai_broker import broker_for_workspace
+
+            xai_status = broker_for_workspace(self.root).status()
+            from thoth.adapters.models.claude_oauth import broker_for_workspace as claude_broker
+
+            claude_status = claude_broker(self.root).status()
+        return account_connections(status, self.root, xai_status, claude_status)
 
     def list_credentials(self) -> tuple[dict[str, str], ...]:
         return available_credentials(self.root)
@@ -321,14 +476,54 @@ class LocalModelCredentials(ModelCredentialPort):
         except LocalCredentialHold as exc:
             raise ModelCredentialError(str(exc)) from exc
 
-    def start_login(self, provider: str) -> dict[str, object]:
+    def start_login(self, provider: str, auth_method: str | None = None) -> dict[str, object]:
         spec = company(provider)
         if spec is None:
             raise ModelCredentialError("MODEL_ACCOUNT_LOGIN_UNSUPPORTED")
-        login = spec["login"]
+        if provider == "anthropic" and auth_method is None:
+            from thoth.adapters.models.claude_code import claude_code_login_guidance
+
+            if self.root is None:
+                raise ModelCredentialError("CLAUDE_CODE_WORKSPACE_REQUIRED")
+            return claude_code_login_guidance(self.root)
+        route = self._route(provider, auth_method)
         try:
-            if login == "codex":
-                return start_codex_login()
-            return start_console_login(provider, open_browser=False)
-        except LocalCredentialHold as exc:
-            raise ModelCredentialError(str(exc)) from exc
+            return self._decorate(route, route.factory(self.root).start_login())  # type: ignore[arg-type]
+        except ModelExecutionHold as exc:
+            raise self._auth_error(exc) from exc
+
+    def login_status(
+        self, provider: str, login_id: str | None = None, auth_method: str | None = None
+    ) -> dict[str, object]:
+        route = self._route(provider, auth_method)
+        try:
+            return self._decorate(route, route.factory(self.root).login_status(login_id))  # type: ignore[arg-type]
+        except ModelExecutionHold as exc:
+            raise self._auth_error(exc) from exc
+
+    def cancel_login(
+        self, provider: str, login_id: str, auth_method: str | None = None
+    ) -> dict[str, object]:
+        route = self._route(provider, auth_method)
+        try:
+            return self._decorate(route, route.factory(self.root).cancel_login(login_id))  # type: ignore[arg-type]
+        except ModelExecutionHold as exc:
+            raise self._auth_error(exc) from exc
+
+    def submit_login_response(
+        self, provider: str, login_id: str, response: str, auth_method: str
+    ) -> dict[str, object]:
+        route = self._route(provider, auth_method)
+        if not route.manual_complete:
+            raise ModelCredentialError("MODEL_LOGIN_COMPLETE_UNSUPPORTED")
+        handler = route.factory(self.root)  # type: ignore[arg-type]
+        submit = getattr(handler, "submit_login_response", None)
+        if not callable(submit):
+            raise ModelCredentialError("MODEL_LOGIN_COMPLETE_UNSUPPORTED")
+        try:
+            result: object = submit(login_id, response)
+            if not isinstance(result, dict):
+                raise ModelCredentialError("MODEL_AUTH_RESPONSE_INVALID")
+            return self._decorate(route, cast(dict[str, object], result))
+        except ModelExecutionHold as exc:
+            raise self._auth_error(exc) from None

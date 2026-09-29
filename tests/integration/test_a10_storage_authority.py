@@ -37,7 +37,13 @@ async def rpc(
 
 
 async def source(
-    runtime: AppRuntime, project: str, workspace: Path, name: str, security: str = "PUBLIC"
+    runtime: AppRuntime,
+    project: str,
+    workspace: Path,
+    name: str,
+    security: str = "PUBLIC",
+    *,
+    confirm_source_time: bool = False,
 ):
     inbox = workspace / "inbox"
     inbox.mkdir(parents=True, exist_ok=True)
@@ -53,6 +59,46 @@ async def source(
         cutoff_state="ELIGIBLE",
         security_class=security,
     )
+    if confirm_source_time:
+        # This is an explicit author assertion for this synthetic test source only.
+        # Source connect intentionally leaves an undated document UNKNOWN_TIME.
+        artifact_id = connected["artifact"]["artifact_id"]
+        source_version_id = connected["source_version_id"]
+        listed = value(
+            await runtime.bus.query(
+                request("project/source/list", "source-time-basis-" + name, {"project_id": project})
+            )
+        )
+        assessment = next(
+            item
+            for item in listed["source_times"]
+            if item["artifact_id"] == artifact_id and item["source_version_id"] == source_version_id
+        )
+        assert assessment["cutoff_state"] == "UNKNOWN_TIME"
+        cutoff = listed["cutoff_basis"]
+        confirmed = await rpc(
+            runtime,
+            "project/source/time/confirm",
+            "source-time-confirm-" + name,
+            project,
+            artifact_id=artifact_id,
+            source_version_id=source_version_id,
+            byte_sha256=assessment["byte_sha256"],
+            expected_project_revision=cutoff["project_revision"],
+            expected_cutoff_at=cutoff["cutoff_at"],
+            expected_assessment_revision=assessment["revision"],
+            expected_metadata_digest=assessment["metadata_digest"],
+            assertion="ON_OR_BEFORE_CUTOFF",
+        )
+        assert confirmed["source_time"]["cutoff_state"] == "ELIGIBLE"
+        # The time mutation supersedes the graph source revision. Downstream rights
+        # tests must use the current source ID, not the pre-confirmation row.
+        current_source = SqliteEvidenceGraphStore(runtime.ledger.engine).read_source_by_artifact(
+            str(artifact_id)
+        )
+        assert current_source is not None
+        assert current_source.cutoff_eligibility.value == "ELIGIBLE"
+        return current_source.model_dump(mode="json")
     return connected["source"]
 
 
@@ -143,7 +189,7 @@ async def test_public_receipt_claims_stay_partial_and_evidence_survives_restart(
 async def test_export_scope_is_frozen_and_later_artifact_is_not_added(tmp_path: Path) -> None:
     runtime, project = await prepare_project(tmp_path)
     try:
-        first = await source(runtime, project, tmp_path, "first.md")
+        first = await source(runtime, project, tmp_path, "first.md", confirm_source_time=True)
         planned = await plan(runtime, project, [first["artifact_id"]])
         snapshot = await seal_snapshot(runtime, project, planned)
         await source(runtime, project, tmp_path, "unrelated.md")
@@ -158,6 +204,31 @@ async def test_export_scope_is_frozen_and_later_artifact_is_not_added(tmp_path: 
         )["export"]
         data = json.loads((Path(generated["payload"]["root"]) / "canonical.json").read_text())
         assert [item["artifact_id"] for item in data["resources"]] == [first["artifact_id"]]
+    finally:
+        runtime.close()
+
+
+async def test_undated_unconfirmed_source_stays_out_of_export(tmp_path: Path) -> None:
+    runtime, project = await prepare_project(tmp_path)
+    try:
+        unconfirmed = await source(runtime, project, tmp_path, "unconfirmed.md")
+        planned = await plan(runtime, project, [unconfirmed["artifact_id"]])
+        snapshot = await seal_snapshot(runtime, project, planned)
+        generated = (
+            await rpc(
+                runtime,
+                "export/generate",
+                "generate-unconfirmed",
+                project,
+                export_snapshot_id=snapshot["record_id"],
+            )
+        )["export"]
+        data = json.loads((Path(generated["payload"]["root"]) / "canonical.json").read_text())
+        assert data["resources"] == []
+        assert data["excluded_resource_count"] == 1
+        assert generated["payload"]["excluded_resources"][0]["reason_codes"] == [
+            "CUTOFF_INELIGIBLE"
+        ]
     finally:
         runtime.close()
 
@@ -220,7 +291,7 @@ async def test_local_public_ceiling_excludes_internal_resources(tmp_path: Path) 
 async def test_release_cannot_widen_local_boundary_or_recipient(tmp_path: Path) -> None:
     runtime, project = await prepare_project(tmp_path)
     try:
-        first = await source(runtime, project, tmp_path, "first.md")
+        first = await source(runtime, project, tmp_path, "first.md", confirm_source_time=True)
         snapshot = await seal_snapshot(
             runtime, project, await plan(runtime, project, [first["artifact_id"]])
         )
@@ -639,7 +710,7 @@ async def test_file_staging_allows_peer_writer_and_rechecks_only_bound_resources
     original = FilesystemExportBundle.stage
     changed = False
     try:
-        selected = await source(runtime, project, tmp_path, "stage.md")
+        selected = await source(runtime, project, tmp_path, "stage.md", confirm_source_time=True)
         snapshot = await seal_snapshot(
             runtime,
             project,

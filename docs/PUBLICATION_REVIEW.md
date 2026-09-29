@@ -1,5 +1,16 @@
 # Publication content review
 
+## 2026-09-29 source update
+
+The latest source includes authentication/restart changes and accumulated public-package repairs.
+Runtime, test and dependency files match the recorded r2 snapshot; publication updates its status
+documentation and manifest. Local account profiles, research databases, private QA receipts and
+recording artifacts remain outside this repository. Current functional limits are in
+[VERIFICATION.md](VERIFICATION.md). The review below describes the original package and does not
+turn its earlier checks into verification of the latest source.
+
+## Original 2026-09-25 package and presentation review
+
 This source-only preview was assembled from an explicit file selection. Git history, account
 state, research databases, private diagnostics, deployment files and rights-unconfirmed legacy
 assets are outside the package. Original working files were preserved.

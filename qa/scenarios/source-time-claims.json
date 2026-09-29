@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0.0",
+  "claims": [
+    {
+      "pack_name": "public-demo-membrane",
+      "relative_path": "approved-plan.md",
+      "byte_sha256": "16b787109bf703c2135221ff8741cb45202cd72955f26301d05d3075cf06f28d",
+      "assertion": "ON_OR_BEFORE_CUTOFF",
+      "basis": "THOTH-authored synthetic fixture relative-cutoff assertion; not an external publication-time claim"
+    },
+    {
+      "pack_name": "public-demo-membrane",
+      "relative_path": "interim-report.md",
+      "byte_sha256": "8488abd10b5ba674ee8b3a822ecf7338494909df97641c62a55c62654cf826fa",
+      "assertion": "ON_OR_BEFORE_CUTOFF",
+      "basis": "THOTH-authored synthetic fixture relative-cutoff assertion; not an external publication-time claim"
+    },
+    {
+      "pack_name": "public-demo-membrane",
+      "relative_path": "lab-log.json",
+      "byte_sha256": "513a919bf47d7ae67e25a6fbed46f2bf1e50f2a548ee7c1a00ba18fc589398b0",
+      "assertion": "ON_OR_BEFORE_CUTOFF",
+      "basis": "THOTH-authored synthetic fixture relative-cutoff assertion; not an external publication-time claim"
+    },
+    {
+      "pack_name": "6g-sandbox-hero",
+      "relative_path": "evaluation-baseline.md",
+      "byte_sha256": "f02ec267d9233de951972f5346a299a487239b08c3be7ed790645302f5194fc1",
+      "assertion": "ON_OR_BEFORE_CUTOFF",
+      "basis": "THOTH-authored synthetic fixture relative-cutoff assertion; not an external publication-time claim"
+    },
+    {
+      "pack_name": "6g-sandbox-hero",
+      "relative_path": "interim-integration.md",
+      "byte_sha256": "ad8ffe6881d709c565614b173587f9cf9f8afa991007fd0361a84c9ef1147a77",
+      "assertion": "ON_OR_BEFORE_CUTOFF",
+      "basis": "THOTH-authored synthetic fixture relative-cutoff assertion; not an external publication-time claim"
+    },
+    {
+      "pack_name": "6g-sandbox-hero",
+      "relative_path": "later-outcome.md",
+      "byte_sha256": "0c9a5cf5ba985d69bbafdb8d6488a2fdf34be68ed5220d5046b656a5ae04d3ff",
+      "assertion": "AFTER_CUTOFF",
+      "basis": "THOTH-authored outcome-only fixture declaration; excluded from runtime evidence"
+    },
+    {
+      "pack_name": "sunrise-secondary",
+      "relative_path": "allocation-spec.md",
+      "byte_sha256": "78bb19ce966786341c0511a8d46e2529904f9d7cbf9967e407fcc6f86e46536e",
+      "assertion": "ON_OR_BEFORE_CUTOFF",
+      "basis": "THOTH-authored synthetic fixture relative-cutoff assertion; not an external publication-time claim"
+    },
+    {
+      "pack_name": "sunrise-secondary",
+      "relative_path": "hybrid-real-gap.md",
+      "byte_sha256": "87cd3d0205f11287df93b435d3b71418f252476ab87336d71ec2733852ef4e94",
+      "assertion": "ON_OR_BEFORE_CUTOFF",
+      "basis": "THOTH-authored synthetic fixture relative-cutoff assertion; not an external publication-time claim"
+    },
+    {
+      "pack_name": "l3pilot-regression",
+      "relative_path": "research-to-logging.md",
+      "byte_sha256": "8bf564338744627cddf29d8677fe5a3e326cd7f3bb6bd4cd3e56e1d57670dbc7",
+      "assertion": "ON_OR_BEFORE_CUTOFF",
+      "basis": "THOTH-authored synthetic fixture relative-cutoff assertion; not an external publication-time claim"
+    },
+    {
+      "pack_name": "l3pilot-regression",
+      "relative_path": "interim-challenges.md",
+      "byte_sha256": "f32278d1842a4e1d35e305b5873c376e57555bbbe4b355ce75de68473589523a",
+      "assertion": "ON_OR_BEFORE_CUTOFF",
+      "basis": "THOTH-authored synthetic fixture relative-cutoff assertion; not an external publication-time claim"
+    },
+    {
+      "pack_name": "l3pilot-regression",
+      "relative_path": "final-evaluation.md",
+      "byte_sha256": "2d5427045359b4520850cb5df6f1968d540f935bb83c526f2d7fb1d2cff44b61",
+      "assertion": "AFTER_CUTOFF",
+      "basis": "THOTH-authored outcome-only fixture declaration; excluded from runtime evidence"
+    },
+    {
+      "pack_name": "opendreamkit-hidden-holdout",
+      "relative_path": "survey-change-lineage.md",
+      "byte_sha256": "014d4985dba43bdbd249e1c41384bdac657e9ce55dd85cc44cb066a4b71a674d",
+      "assertion": "ON_OR_BEFORE_CUTOFF",
+      "basis": "THOTH-authored synthetic fixture relative-cutoff assertion; not an external publication-time claim"
+    },
+    {
+      "pack_name": "opendreamkit-hidden-holdout",
+      "relative_path": "rights-and-oracle-gap.md",
+      "byte_sha256": "6ad400a0be544fc0c7db7ee30a4467825980c62196ec4572bd8edc7cd56d5392",
+      "assertion": "ON_OR_BEFORE_CUTOFF",
+      "basis": "THOTH-authored synthetic fixture relative-cutoff assertion; not an external publication-time claim"
+    }
+  ]
+}

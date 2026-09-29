@@ -8,9 +8,20 @@ from pydantic import JsonValue
 
 from thoth.adapters.storage import SqliteDependencyGraph
 from thoth.apps.runtime import AppRuntime, create_runtime
-from thoth.domain.canonical import canonical_payload, domain_digest, head_set_digest
+from thoth.domain.canonical import head_set_digest
 from thoth.domain.relation import DependencyRelation
 from thoth.protocol.jsonrpc import JsonRpcRequest, JsonRpcResponse
+
+pytestmark = pytest.mark.usefixtures("xai_http_guard")
+
+
+@pytest.fixture(autouse=True)
+def isolated_model_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    home = tmp_path / "isolated-home"
+    home.mkdir()
+    for name in ("HOME", "USERPROFILE", "LOCALAPPDATA", "APPDATA", "CODEX_HOME"):
+        monkeypatch.setenv(name, str(home / name.lower()))
+    monkeypatch.setenv("THOTH_CODEX_PACKAGE_ROOT", str(home / "missing-codex-package"))
 
 
 def request(method: str, key: str, value: dict[str, object]) -> JsonRpcRequest:
@@ -122,7 +133,8 @@ async def commit(
 async def test_public_revision_flow_preserves_siblings_and_auto_merges_independent_paths(
     tmp_path: Path,
 ) -> None:
-    runtime = create_runtime(tmp_path / "workspace")
+    workspace = tmp_path / "workspace"
+    runtime = create_runtime(workspace)
     project_id = "project:a07:independent"
     try:
         value(
@@ -238,7 +250,21 @@ async def test_public_revision_flow_preserves_siblings_and_auto_merges_independe
         assert merged_snapshot.content["purpose_statement"] == "left actor clarified purpose"
         assert merged_snapshot.content["problem_frame"] == "right actor clarified problem frame"
 
-        dependent_ref = "HYPOTHESIS:a07:dependent"
+        dependent_thread = value(
+            await runtime.bus.dispatch(
+                request(
+                    "thread/start",
+                    "a07-dependent-thread",
+                    {
+                        "project_id": project_id,
+                        "thread_id": "thread:a07:dependent",
+                        "problem": "A separate decision depends on the restored object",
+                    },
+                )
+            )
+        )
+        dependent_object_id = str(cast(list[JsonValue], dependent_thread["current_object_ids"])[0])
+        dependent_ref = f"DECISION_OBJECT:{dependent_object_id}"
         relation_draft: dict[str, object] = {
             "relation_id": "relation:a07:restore",
             "project_id": project_id,
@@ -248,19 +274,7 @@ async def test_public_revision_flow_preserves_siblings_and_auto_merges_independe
             "payload": {"reason": "restore recalculation acceptance"},
         }
         SqliteDependencyGraph(runtime.ledger.engine).add(
-            DependencyRelation(
-                relation_id="relation:a07:restore",
-                project_id=project_id,
-                source_ref=aggregate_key,
-                relation_type="DERIVES",
-                target_ref=dependent_ref,
-                payload={"reason": "restore recalculation acceptance"},
-                revision_digest=domain_digest(
-                    "DEPENDENCY_RELATION",
-                    "1.0.0",
-                    canonical_payload(relation_draft),
-                ),
-            )
+            DependencyRelation.model_validate({**relation_draft, "revision_digest": merged_digest})
         )
         restored = value(
             await runtime.bus.dispatch(
@@ -282,6 +296,18 @@ async def test_public_revision_flow_preserves_siblings_and_auto_merges_independe
         )
         restore = cast(dict[str, JsonValue], restored["restore"])
         assert restore["restored_revision_id"] != revision.revision_id
+        restored_digest = str(restored["new_revision_digest"])
+        restored_revision = runtime.ledger.read_revision_by_digest(project_id, restored_digest)
+        assert restored_revision is not None
+        assert restored_revision.parent_revision_digests == (merged_digest,)
+        assert restored_revision.revision_id == restore["restored_revision_id"]
+        restored_snapshot = runtime.ledger.read_snapshot(restored_revision.snapshot_id)
+        assert restored_snapshot is not None
+        assert restored_snapshot.snapshot_id != snapshot.snapshot_id
+        assert restored_snapshot.content == snapshot.content
+        assert restored_snapshot.content_digest == snapshot.content_digest
+        assert runtime.ledger.read_snapshot(snapshot.snapshot_id) == snapshot
+        assert runtime.ledger.read_heads(project_id)[aggregate_key] == restored_digest
         assert dependent_ref in cast(list[str], restore["recalculate_refs"])
         assert runtime.ledger.read_dependency_states(project_id)[dependent_ref] == (
             "RECALCULATION_REQUIRED"
@@ -306,12 +332,21 @@ async def test_public_revision_flow_preserves_siblings_and_auto_merges_independe
             )
         )
         assert stale_restore.error is not None
-        assert "stale" in stale_restore.error.message
+        assert stale_restore.error.data["reason_code"] == "RESTORE_HEAD_CHANGED"
         assert len(runtime.ledger.read_revisions(project_id, "DECISION_OBJECT", object_id)) == (
             revision_count
         )
     finally:
         runtime.close()
+    reopened = create_runtime(workspace)
+    try:
+        assert reopened.ledger.read_heads(project_id)[aggregate_key] == restored_digest
+        assert reopened.ledger.read_dependency_states(project_id)[dependent_ref] == (
+            "RECALCULATION_REQUIRED"
+        )
+        assert reopened.ledger.read_snapshot(snapshot.snapshot_id) == snapshot
+    finally:
+        reopened.close()
 
 
 async def prepare_conflicting_siblings(

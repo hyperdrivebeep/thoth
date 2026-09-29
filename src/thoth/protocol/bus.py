@@ -37,7 +37,12 @@ from thoth.ports.operation import (
 )
 from thoth.ports.resource_scope import ResourceAccessPort
 from thoth.ports.runtime import ClockPort, IdGeneratorPort
-from thoth.protocol.deferred import AcceptedRunning, PendingExecution, current_operation
+from thoth.protocol.deferred import (
+    AcceptedRunning,
+    EphemeralCommandResult,
+    PendingExecution,
+    current_operation,
+)
 from thoth.protocol.jsonrpc import (
     JsonRpcError,
     JsonRpcRequest,
@@ -65,6 +70,7 @@ READ_QUERY_METHODS = frozenset(
         "thread/activity/list",
         "model/settings/read",
         "model/credential/list",
+        "model/credential/login/status",
         "workspace/setup/read",
         "workspace/ready",
         "project/read",
@@ -153,7 +159,7 @@ class CommandBus:
                 if isinstance(owner, PreClaimAuthorization):
                     owner.authorize_before_claim(request.method, request.params.input)
                 value = await handler(request.params.input)
-            if isinstance(value, (AcceptedRunning, PendingExecution)):
+            if isinstance(value, (AcceptedRunning, PendingExecution, EphemeralCommandResult)):
                 raise ValueError("READ_QUERY_RETURNED_EXECUTION")
             return JsonRpcResponse(
                 id=request.id, result={"operation_id": "", "state": "SUCCEEDED", "value": value}
@@ -236,6 +242,12 @@ class CommandBus:
                 if operation.state == OperationState.RUNNING:
                     self._registry.authorize_reentry(operation)
                     live_task = operation.operation_id in self._research_tasks
+                    if (
+                        self._seal_abandoned_running
+                        and request.method in RUNNING_RESEARCH_METHODS
+                        and not live_task
+                    ):
+                        return self._fail_abandoned_running(request, operation)
                     queued_value = (
                         None
                         if self._queued_admission is None
@@ -254,12 +266,6 @@ class CommandBus:
                                 "value": queued_value,
                             },
                         )
-                    if (
-                        self._seal_abandoned_running
-                        and request.method in RUNNING_RESEARCH_METHODS
-                        and not live_task
-                    ):
-                        return self._fail_abandoned_running(request, operation)
                 # A claim without durable T1 is not admission. The same payload may
                 # re-enter admission, but never dispatch a second admitted attempt.
                 owner = getattr(handler, "__self__", None)
@@ -359,22 +365,25 @@ class CommandBus:
                 )
             if isinstance(value, AcceptedRunning):
                 return self._continue_accepted(request, operation, value)
+            durable_value = (
+                value.durable_value if isinstance(value, EphemeralCommandResult) else value
+            )
             if self._resource_access is not None:
                 self._resource_access.require_operation(
                     operation.model_copy(
                         update={
-                            "result": value,
+                            "result": durable_value,
                             "resource_uses": current_resource_uses(),
                         }
                     )
                 )
-            if request.method == "operation/cancel" and value.get("cancelled") is True:
+            if request.method == "operation/cancel" and durable_value.get("cancelled") is True:
                 target = request.params.input.get("operation_id")
                 if isinstance(target, str) and self._operation_task_canceller is not None:
                     self._operation_task_canceller(target)
                 if isinstance(target, str) and target in self._research_tasks:
                     self._research_tasks[target].cancel()
-            cancel_target = value.get("cancel_operation_id")
+            cancel_target = durable_value.get("cancel_operation_id")
             if isinstance(cancel_target, str) and cancel_target in self._research_tasks:
                 self._research_tasks[cancel_target].cancel()
         except OperationReentryDenied as exc:
@@ -473,16 +482,16 @@ class CommandBus:
             return JsonRpcResponse(id=request.id, error=error)
         completed = self._operations.complete(
             operation.operation_id,
-            value,
+            durable_value,
             completed_at=self._clock.now(),
         )
-        result_digest = domain_digest("OPERATION_RESULT", "1.0.0", canonical_payload(value))
+        result_digest = domain_digest("OPERATION_RESULT", "1.0.0", canonical_payload(durable_value))
         if self._journal is not None:
             self._journal.checkpoint(
                 operation_id=operation.operation_id,
                 payload={"state": completed.state.value, "result_digest": result_digest},
             )
-        for notification in notifications_for(request.method, value):
+        for notification in notifications_for(request.method, durable_value):
             self._append_event(
                 operation,
                 notification,
@@ -494,7 +503,10 @@ class CommandBus:
             {"result_digest": result_digest},
         )
         self._measure(request, operation.project_id, "SUCCEEDED")
-        return JsonRpcResponse(id=request.id, result=self._result_payload(completed))
+        response = self._result_payload(completed)
+        if isinstance(value, EphemeralCommandResult):
+            response["value"] = value.response_value
+        return JsonRpcResponse(id=request.id, result=response)
 
     def _measure(self, request: JsonRpcRequest, project_id: str, outcome: str) -> None:
         session_id = request.params.meta.field_session_id
@@ -517,6 +529,9 @@ class CommandBus:
             "workspace/ready",
             "model/credential/list",
             "model/credential/register",
+            "model/credential/login/status",
+            "model/credential/login/cancel",
+            "model/credential/login/complete",
         }:
             return "system:workspace"
         value = request.params.input.get("project_id")

@@ -221,6 +221,7 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 .first-run-provider p, .first-run-choice-copy>span { width: 100%; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
 .first-run-provider.connected { border-color: #3d7a5c; background: #1b2a24; }
 .first-run-provider-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.first-run-provider > .xai-device-login, .first-run-provider > .oauth-login-flow { grid-column: 1 / -1; }
 .first-run-key { grid-column: 1 / -1; display: flex; gap: 8px; }
 .first-run-choice { cursor: pointer; justify-content:flex-start; }.first-run-choice .bp6-button-text{width:100%}.first-run-choice-copy{display:grid;gap:8px;width:100%}
 .first-run-choice.selected { border-color: #4c90f0; background: #1d2c40; }

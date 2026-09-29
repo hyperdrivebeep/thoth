@@ -6,6 +6,7 @@ from typing import cast
 import pytest
 from pydantic import JsonValue
 from tests.integration.scoped_runtime import create_runtime
+from tests.integration.source_time_fixture import confirm_synthetic_source_time
 from tests.integration.test_a04_storage_authority import approve_required_roles
 
 from thoth.domain.auth import AuthenticatedActorContext, authenticated_actor_scope
@@ -76,7 +77,7 @@ async def test_action_decision_plan_policy_and_content_bound_authorization(
         )
         role = cast(dict[str, JsonValue], role_result["role"])
         role_id = str(role["role_assignment_id"])
-        value(
+        connected = value(
             await runtime.bus.dispatch(
                 request(
                     "project/source/connect",
@@ -93,6 +94,7 @@ async def test_action_decision_plan_policy_and_content_bound_authorization(
                 )
             )
         )
+        await confirm_synthetic_source_time(runtime, project_id, connected, key="action-source")
         evidence = value(
             await runtime.bus.dispatch(
                 request("evidence/list", "action-evidence", {"project_id": project_id})

@@ -8,7 +8,7 @@ from tests.integration.storage_coverage_helpers import request, value
 from tests.integration.test_research_request_v2 import ControlledResearchModel, setup
 
 from thoth.application.services.request_records import RequestRecords
-from thoth.domain.research_request import CurrentResultManifest
+from thoth.domain.research_request import CurrentResultManifestV21
 from thoth.protocol.bus import DispatchTicket
 
 
@@ -44,9 +44,13 @@ async def test_requirement_checkpoint_failure_rolls_back_its_records_and_heads(
     runtime = await setup(tmp_path, ControlledResearchModel(), source=False)
     original = RequestRecords.save
 
+    injected = 0
+
     def fail(self: RequestRecords, *args: Any, **kwargs: Any):
+        nonlocal injected
         record = args[3]
-        if isinstance(record, CurrentResultManifest) and record.phase == "REQUIREMENTS":
+        if isinstance(record, CurrentResultManifestV21) and record.phase == "REQUIREMENTS":
+            injected += 1
             raise RuntimeError("INJECTED_CHECKPOINT_FAILURE")
         return original(self, *args, **kwargs)
 
@@ -62,6 +66,7 @@ async def test_requirement_checkpoint_failure_rolls_back_its_records_and_heads(
             )
         )
         await runtime.bus.drain()
+        assert injected == 1
         operation = runtime.bus.read_operation(str(accepted["operation_id"]))
         assert operation is not None and operation.state.value == "FAILED"
         heads = runtime.ledger.read_heads("p")

@@ -1,0 +1,18 @@
+[
+  {
+    "draft": {
+      "criterion_id": "criterion:6g-cross-site-kpi",
+      "project_id": "$PROJECT_ID",
+      "name": "Cross-site KPI comparability",
+      "measured_construct": "same KPI evaluated under traceable method, configuration, traffic, and platform conditions",
+      "computation": null,
+      "context": {"site": "multiple", "method_version": "unresolved"},
+      "acceptance_rule": null,
+      "origin": "DOCUMENT_EXTRACTED",
+      "field_evidence": {"name": ["$EVIDENCE_0"], "measured_construct": ["$EVIDENCE_0"]},
+      "missing_fields": ["computation", "acceptance_rule", "method_version"],
+      "uncertainty": "The reference packet preserves the public-method gap and does not invent an official threshold."
+    },
+    "signals": {"source_scope_confirmed": true, "expert_semantics_confirmed": false, "computation_verified": false}
+  }
+]

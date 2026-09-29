@@ -28,7 +28,7 @@ async def test_unknown_finalization_after_reopen_uses_baseline_without_replaying
             patch.setattr(BehaviorThreadEntry, "_persist", fail_final)
             failed = await h.call("thread/input", "unknown-finalization", {"thread_id": h.thread})
             assert failed.error is not None
-        h.pair.runtime.close()
+        h.pair.close_runtime()
         h.pair.runtime = create_runtime(
             tmp_path,
             model_resolver=StaticModelResolver(h.model),

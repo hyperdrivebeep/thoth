@@ -1,0 +1,18 @@
+[
+  {
+    "draft": {
+      "criterion_id": "criterion:sunrise-hybrid-validation",
+      "project_id": "$PROJECT_ID",
+      "name": "Hybrid-real validation comparability",
+      "measured_construct": "performance under traceable hybrid and real conditions",
+      "computation": null,
+      "context": {},
+      "acceptance_rule": null,
+      "origin": "DOCUMENT_EXTRACTED",
+      "field_evidence": {"name": ["$EVIDENCE_0"]},
+      "missing_fields": ["computation", "context", "acceptance_rule"],
+      "uncertainty": "The secondary packet should end in evidence acquisition or expert input."
+    },
+    "signals": {"source_scope_confirmed": true, "expert_semantics_confirmed": false, "computation_verified": false}
+  }
+]

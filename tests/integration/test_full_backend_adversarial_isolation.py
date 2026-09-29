@@ -6,6 +6,7 @@ from typing import cast
 import pytest
 from pydantic import JsonValue
 from tests.integration.scoped_runtime import create_runtime
+from tests.integration.source_time_fixture import confirm_synthetic_source_time
 
 from thoth.application.services.evidence_context import select_evidence_context
 from thoth.domain.artifact import SourceLocator
@@ -61,7 +62,7 @@ async def test_cross_project_domain_records_fail_closed(tmp_path: Path) -> None:
             )
         project_a = "project:isolation:a"
         project_b = "project:isolation:b"
-        value(
+        connected = value(
             await runtime.bus.dispatch(
                 request(
                     "project/source/connect",
@@ -77,6 +78,7 @@ async def test_cross_project_domain_records_fail_closed(tmp_path: Path) -> None:
                 )
             )
         )
+        await confirm_synthetic_source_time(runtime, project_a, connected, key="isolation-source-a")
         thread = value(
             await runtime.bus.dispatch(
                 request(

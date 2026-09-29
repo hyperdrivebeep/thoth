@@ -26,6 +26,7 @@ from scripts.verification_bundle_contract import (
 from scripts.verification_identity import capture_source_manifest, repository_digest, source_matches
 from scripts.verification_status import verification_status
 from tests.architecture.progress_helpers import simulated_reports
+from tests.architecture.synthetic_preflight_fixture import synthetic_preflight
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -59,25 +60,16 @@ def fixture_bundle(root: Path, *, owned: bool = False) -> dict[str, Any]:
         check=True,
         capture_output=True,
     )
-    preflight = gate.preflight_archive_payload(
-        json.loads((ROOT / ".thoth/architecture/preflight.json").read_text(encoding="utf-8"))
-    )
-    preflight.pop("owner_context", None)  # This fixture exercises legacy portable identity.
-    preflight.update(
-        {
-            "acceptance_id": "A11",
-            "declared_scope": ["source.py", "PROJECT_WIKI", ".codex/verification"],
-            "plan_id": "FIXTURE_ONLY",
-            "node_id": "FIXTURE_NODE",
-        }
-    )
+    owner_context = None
     if owned:
         from tests.architecture.test_stop_session_ownership import owner_record
 
-        preflight["owner_context"] = owner_record()
-        preflight.pop("plan_id")
-        preflight.pop("node_id")
-    preflight["preflight_receipt_id"] = gate.calculate_preflight_receipt_id(preflight)
+        owner_context = owner_record()
+    preflight = synthetic_preflight(
+        root,
+        scopes=("source.py", "PROJECT_WIKI", ".codex/verification"),
+        owner_context=owner_context,
+    )
     timestamp = datetime.now(UTC).isoformat()
     data = wiki_path.read_bytes()
     wiki: dict[str, Any] = {

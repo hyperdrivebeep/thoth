@@ -1,0 +1,12 @@
+pack_id: pack:sunrise-secondary
+project_id: project:sunrise-secondary
+name: SUNRISE hybrid-real validation secondary packet
+cutoff_at: 2023-06-30T23:59:59Z
+overlay: eu-rnd-network-validation
+policy_binding_ref: policy:sunrise-reference-v1
+scenario:
+  case_id: case:sunrise-validation
+  thread_id: thread:sunrise-hybrid-real
+  cycle_id: cycle:sunrise-1
+  object_id: object:sunrise-validation-gap
+  problem: Dynamic resource allocation is specified, but the hybrid-real validation evidence does not yet establish comparable conditions or an authorized acceptance rule. What evidence should be acquired before any performance claim?

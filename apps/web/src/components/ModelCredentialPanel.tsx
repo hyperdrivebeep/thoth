@@ -3,10 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { rpc } from "../api/rpcClient";
-import { credentialAccountLabel, credentialAvailabilityNote, credentialCompanies, credentialGuideUrl, credentialResultMessage, loginSupported,
-  type CredentialAccount, type CredentialRegisterResult } from "./modelCredentialPresentation";
+import { canStartCredentialMethod, credentialAccountLabel, credentialAuthMethod, credentialAvailabilityNote, credentialCompanies, credentialGuideUrl, credentialResultMessage, loginSupported, loginUnavailable,
+  xaiDeviceLoginSupported, type CredentialAccount, type CredentialRegisterResult } from "./modelCredentialPresentation";
+import { XaiDeviceLogin } from "./XaiDeviceLogin";
+import { OAuthLoginFlow } from "./OAuthLoginFlow";
 
-export function ModelCredentialPanel({ projectId }: { projectId: string }) {
+export function ModelCredentialPanel({ projectId, workspaceId }: { projectId: string; workspaceId?: string }) {
   const client = useQueryClient();
   const listed = useQuery({
     queryKey: ["model-credentials", projectId],
@@ -40,11 +42,16 @@ export function ModelCredentialPanel({ projectId }: { projectId: string }) {
       <p className="muted">지원되는 계정 로그인 절차를 시작하거나 API 키를 등록합니다. 키 발급 콘솔 방문만으로 THOTH 연결은 완료되지 않습니다.</p>
       {credentialCompanies.map((company) => {
         const row = accounts.find((item) => item.provider === company.provider);
+        const knownRow = listed.data?.value.accounts.find((item) => item.provider === company.provider);
         return (
           <CompanyRow
             key={company.provider}
             company={company}
             row={row}
+            knownRow={knownRow}
+            xaiLogin={xaiDeviceLoginSupported(knownRow)}
+            projectId={projectId}
+            workspaceId={workspaceId}
             pending={connect.isPending}
             onLogin={() => connect.mutate({ provider: company.provider })}
             onKey={(api_key) => connect.mutate({ provider: company.provider, api_key })}
@@ -67,29 +74,43 @@ export function ModelCredentialPanel({ projectId }: { projectId: string }) {
 function CompanyRow({
   company,
   row,
+  knownRow,
+  xaiLogin,
+  projectId,
+  workspaceId,
   pending,
   onLogin,
   onKey,
 }: {
   company: { provider: string; label: string };
   row?: CredentialAccount;
+  knownRow?: CredentialAccount;
+  xaiLogin: boolean;
+  projectId: string;
+  workspaceId?: string;
   pending: boolean;
   onLogin: () => void;
   onKey: (apiKey: string) => void;
 }) {
   const [key, setKey] = useState("");
-  const canStartLogin = loginSupported(row) && !row?.oauth;
+  const canStartLogin = loginSupported(row) && !row?.oauth && row?.connection_state !== "LOGIN_PENDING" && !loginUnavailable(row);
   const canGuideKey = row?.login_supported === false && row.login_kind === "unsupported";
+  const canGuideClaude = company.provider === "anthropic" && Boolean(row);
+  const codexMethod = company.provider === "openai" ? credentialAuthMethod(knownRow, "codex_isolated_browser") : null;
+  const xaiMethod = company.provider === "xai" ? credentialAuthMethod(knownRow, "xai_device_code") : null;
+  const claudeMethod = company.provider === "anthropic" ? credentialAuthMethod(knownRow, "claude_pkce") : null;
+  const keyMethod = credentialAuthMethod(knownRow, "api_key");
   return (
     <div className="company-account">
       <p>
         {company.label} · {credentialAccountLabel(row)}
       </p>
       {credentialAvailabilityNote(row) && <small>{credentialAvailabilityNote(row)}</small>}
+      {keyMethod && <small>API 키: {keyMethod.connected ? "등록됨" : "미등록"} · OAuth와 별도 경로</small>}
       <div className="company-account-actions">
-        <Button small disabled={!canStartLogin && !canGuideKey} loading={pending} onClick={onLogin}>
-          {row?.oauth && loginSupported(row) ? "로그인 확인됨" : canStartLogin ? "Codex 로그인 시작" : canGuideKey ? "키 발급 안내" : "연결 방법 확인 중"}
-        </Button>
+        {!xaiLogin && !codexMethod && <Button small disabled={!canStartLogin && !canGuideKey && !canGuideClaude} loading={pending} onClick={onLogin}>
+          {canGuideClaude ? "Claude Code 연결 안내" : loginUnavailable(row) ? "설치·버전 확인 필요" : row?.connection_state === "LOGIN_PENDING" ? "로그인 완료 대기" : row?.oauth && loginSupported(row) ? "로그인 확인됨" : canStartLogin ? "Codex 로그인 시작" : canGuideKey ? "키 발급 안내" : "연결 방법 확인 중"}
+        </Button>}
         <InputGroup
           type="password"
           placeholder="API 키"
@@ -110,6 +131,15 @@ function CompanyRow({
           키 등록
         </Button>
       </div>
+      {xaiLogin && <XaiDeviceLogin key={`${workspaceId ?? "unknown"}:${projectId}`} projectId={projectId}
+        workspaceId={workspaceId} account={row} method={xaiMethod ?? undefined}
+        methodStartAllowed={row?.auth_methods ? canStartCredentialMethod(row, "xai_device_code") : undefined} />}
+      {codexMethod && <OAuthLoginFlow key={`${workspaceId ?? "unknown"}:${projectId}:openai`}
+        projectId={projectId} workspaceId={workspaceId} provider="openai"
+        authMethod="codex_isolated_browser" method={codexMethod} account={row} />}
+      {claudeMethod && <OAuthLoginFlow key={`${workspaceId ?? "unknown"}:${projectId}:anthropic`}
+        projectId={projectId} workspaceId={workspaceId} provider="anthropic"
+        authMethod="claude_pkce" method={claudeMethod} account={row} />}
     </div>
   );
 }

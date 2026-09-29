@@ -26,9 +26,9 @@ async def test_reference_model_revocation_blocks_commit_and_cached_inquiry_read(
     async with scope_harness(
         tmp_path, policy, model_resolver=StaticModelResolver(DynamicA02Model())
     ) as h:
-        source = value(await h.connect("alpha", "reference-source", None))["artifact"][
-            "artifact_id"
-        ]
+        source = value(
+            await h.connect("alpha", "reference-source", None, confirm_synthetic_time=True)
+        )["artifact"]["artifact_id"]
         scope = value(
             await h.call(
                 "alpha",

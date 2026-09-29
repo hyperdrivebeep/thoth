@@ -20,6 +20,8 @@ from thoth.domain.research_execution import ResearchWork, research_work
 from thoth.domain.research_request import RevisionRef
 from thoth.ports.model import ModelTransportHold
 
+pytestmark = pytest.mark.usefixtures("xai_http_guard")
+
 
 def _isolate_local_xai_secret(monkeypatch: pytest.MonkeyPatch) -> None:
     from thoth.adapters.models import local_credentials

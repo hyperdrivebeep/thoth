@@ -391,8 +391,7 @@ class ResearchAnalysis:
                     proposal,
                     self.evidence(project.project_id),
                 )
-            if coverage.web_decision == "REQUIRED":
-                coverage = coverage.model_copy(update={"web_decision": str(discovery["state"])})
+            coverage = coverage.model_copy(update={"web_decision": str(discovery["state"])})
         work.context.update(
             {"coverage": coverage.model_dump(mode="json"), "discovery": discovery, "answer": answer}
         )

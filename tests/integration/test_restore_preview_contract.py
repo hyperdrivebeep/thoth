@@ -146,10 +146,18 @@ async def test_preview_profiles_are_typed_read_only_and_apply_is_closed(tmp_path
     try:
         # Exercise a closed server gate independently of the released composition default.
         restore_handler(runtime).planner.apply_ready = False
-        assert len(candidates) == 6, candidates.keys()
+        assert set(candidates) == {
+            "evidence-assessment.v1",
+            "hypothesis.v1",
+            "hypothesis-portfolio.v1",
+            "action.v1",
+            "action-portfolio.v1",
+            "action-plan.v1",
+            "decision-object-record.v1",
+        }
         before = snapshot(runtime.ledger.engine)
         calls = len(model.calls)
-        preview: dict[str, object] | None = None
+        decision_preview: dict[str, object] | None = None
         for profile_id, (revision, _snap) in candidates.items():
             preview = rpc_record(
                 await runtime.bus.query(
@@ -174,11 +182,14 @@ async def test_preview_profiles_are_typed_read_only_and_apply_is_closed(tmp_path
             assert preview["profile_id"] == profile_id
             assert record(preview["capability"])["apply_ready"] is False
             assert record(preview["capability"])["preview_supported"] is True
+            assert record(preview["capability"])["reason_codes"] == ["RESTORE_NOT_READY"]
+            if profile_id == "decision-object-record.v1":
+                decision_preview = preview
         assert_phase_delta(before, snapshot(runtime.ledger.engine))
         assert len(model.calls) == calls
-        assert preview is not None
-        selection = record(preview["selection"])
-        basis_digest = preview["basis_digest"]
+        assert decision_preview is not None
+        selection = record(decision_preview["selection"])
+        basis_digest = decision_preview["basis_digest"]
         assert isinstance(basis_digest, str)
         denied_command = request(
             "revision/restore/apply",

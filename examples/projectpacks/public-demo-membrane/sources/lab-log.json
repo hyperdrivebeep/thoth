@@ -1,0 +1,13 @@
+{
+  "run_id": "MEM-77",
+  "membrane_batch": "M-204",
+  "cycle_count": 350,
+  "temperature_deg_c": 40,
+  "evaluator_version": "v2.0",
+  "reported_retained_flux_percent": 91.0,
+  "instrument_id": "FLOW-09",
+  "calibration_due": "2026-07-31",
+  "run_started": "2026-08-04T09:00:00Z",
+  "raw_series_attached": false,
+  "operator_note": "The flow sensor required a zero adjustment before the final reading."
+}

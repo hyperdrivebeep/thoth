@@ -1,0 +1,12 @@
+pack_id: pack:public-demo-membrane
+project_id: project:public-demo-membrane
+name: Rights-cleared membrane durability public demo
+cutoff_at: 2026-08-20T23:59:59Z
+overlay: materials-durability-rnd
+policy_binding_ref: policy:public-demo-membrane-v1
+scenario:
+  case_id: case:public-demo-membrane
+  thread_id: thread:public-demo-discrepancy
+  cycle_id: cycle:public-demo-1
+  object_id: object:public-demo-result
+  problem: Does the reported retained-flux result satisfy the approved durability criterion under comparable cycle count, temperature, batch, evaluator, and calibration conditions? If not, identify competing explanations and the safest discriminating next action.

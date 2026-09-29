@@ -1,0 +1,14 @@
+{
+  "ready": false,
+  "setup": {
+    "schema_version": 1,
+    "revision": 1,
+    "internet_consent": "UNDECIDED",
+    "internet_grant_id": null
+  },
+  "model_connected": false,
+  "setup_complete": false,
+  "workspace_readable": true,
+  "execution_ready": false,
+  "workspace_id": "workspace:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}

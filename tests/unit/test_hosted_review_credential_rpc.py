@@ -40,6 +40,20 @@ async def test_credential_rpc_is_denied_before_secrets_file(
         )
         assert registered.error is not None
         assert registered.error.data["reason_code"] == "HOSTED_REVIEW_CREDENTIAL_RPC_DENIED"
+        for method in (
+            "model/credential/login/status",
+            "model/credential/login/cancel",
+            "model/credential/login/complete",
+        ):
+            denied_login = await runtime.bus.dispatch(
+                request(
+                    method,
+                    f"hosted-{method}",
+                    {"project_id": "system:workspace", "provider": "xai", "login_id": "synthetic"},
+                )
+            )
+            assert denied_login.error is not None
+            assert denied_login.error.data["reason_code"] == "HOSTED_REVIEW_CREDENTIAL_RPC_DENIED"
         secrets = tmp_path / "model-registry" / "secrets.json"
         assert not secrets.exists()
         locked = await runtime.bus.dispatch(

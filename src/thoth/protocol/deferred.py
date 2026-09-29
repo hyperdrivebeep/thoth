@@ -19,6 +19,14 @@ class PendingExecution:
 
 
 @dataclass(frozen=True)
+class EphemeralCommandResult:
+    """One response projection with a separate secret-free durable replay value."""
+
+    response_value: dict[str, JsonValue]
+    durable_value: dict[str, JsonValue]
+
+
+@dataclass(frozen=True)
 class AcceptedRunning:
     value: dict[str, JsonValue]
     continue_execution: Callable[[], Awaitable[dict[str, JsonValue] | PendingExecution]]

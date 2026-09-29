@@ -1,0 +1,5 @@
+[
+  {"source_id":"source:l3-research-logging","path":"research-to-logging.md","media_type":"text/markdown","authority":"OFFICIAL","cutoff_state":"ELIGIBLE","security_class":"INTERNAL","version_label":"reference-v1","byte_sha256":"8bf564338744627cddf29d8677fe5a3e326cd7f3bb6bd4cd3e56e1d57670dbc7","rights":"THOTH-authored factual paraphrase; beneficiary PDF rights unresolved"},
+  {"source_id":"source:l3-interim","path":"interim-challenges.md","media_type":"text/markdown","authority":"OFFICIAL","cutoff_state":"ELIGIBLE","security_class":"INTERNAL","version_label":"reference-v1","byte_sha256":"f32278d1842a4e1d35e305b5873c376e57555bbbe4b355ce75de68473589523a","rights":"THOTH-authored factual paraphrase; beneficiary PDF rights unresolved"},
+  {"source_id":"source:l3-final","path":"final-evaluation.md","media_type":"text/markdown","authority":"OFFICIAL","cutoff_state":"AFTER_CUTOFF","security_class":"INTERNAL","version_label":"outcome-reference-v1","byte_sha256":"2d5427045359b4520850cb5df6f1968d540f935bb83c526f2d7fb1d2cff44b61","rights":"THOTH-authored factual paraphrase; outcome-only"}
+]

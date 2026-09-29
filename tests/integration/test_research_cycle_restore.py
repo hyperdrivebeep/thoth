@@ -356,8 +356,12 @@ async def test_restore_keeps_raw_snapshot_and_excludes_old_test_from_active_cont
             )
         )
         lifecycle = result["r2_closed_loop"]["test_lifecycle"]
+        sandbox_runs_before_restore = len(sandbox.seen_specs)
+        assert sandbox_runs_before_restore == 1
         prediction = lifecycle["predictions"][0]
         hypothesis_id = prediction["hypothesis_id"]
+        old_assessment_ids = {str(item["assessment_id"]) for item in lifecycle["assessments"]}
+        assert len(old_assessment_ids) == 2
         before_prediction = runtime.ledger.read_revision_by_digest(
             project, prediction["hypothesis_revision_digest"]
         )
@@ -366,7 +370,7 @@ async def test_restore_keeps_raw_snapshot_and_excludes_old_test_from_active_cont
         assert snapshot is not None
         saved = snapshot.model_dump(mode="json")
         current_head = runtime.ledger.read_heads(project)[f"HYPOTHESIS:{hypothesis_id}"]
-        value(
+        applied = value(
             await runtime.bus.dispatch(
                 request(
                     "revision/restore",
@@ -384,6 +388,11 @@ async def test_restore_keeps_raw_snapshot_and_excludes_old_test_from_active_cont
                 )
             )
         )
+        restore = cast(dict[str, Any], applied["restore"])
+        recalculate_refs = set(cast(list[str], restore["recalculate_refs"]))
+        assert {f"HYPOTHESIS:{identifier}" for identifier in old_assessment_ids} <= (
+            recalculate_refs
+        )
         restored = value(
             await runtime.bus.dispatch(
                 request(
@@ -396,6 +405,7 @@ async def test_restore_keeps_raw_snapshot_and_excludes_old_test_from_active_cont
         assert restored["empirical_appraisal"] == "UNASSESSED" and restored["prediction_refs"] == []
         original = runtime.ledger.read_snapshot(before_prediction.snapshot_id)
         assert original is not None and original.model_dump(mode="json") == saved
+        assert len(sandbox.seen_specs) == sandbox_runs_before_restore
         binding = SqliteHypothesisStore(runtime.ledger.engine, runtime.ledger).list_test_bindings(
             project, prediction["prediction_id"]
         )[0]
@@ -430,13 +440,16 @@ async def test_restore_keeps_raw_snapshot_and_excludes_old_test_from_active_cont
                 )
             )
         )
-        eligible = {
-            item["assessment_id"]
-            for item in lifecycle["assessments"]
-            if item["hypothesis_id"] != hypothesis_id
+        expected_after_restore: set[str] = set()
+        actual = set(sandbox.model_assessment_refs[-1])
+        assert actual == expected_after_restore, {
+            "actual_assessment_refs": sorted(actual),
+            "old_assessment_refs": sorted(old_assessment_ids),
+            "restored_hypothesis_id": hypothesis_id,
         }
-        assert set(sandbox.model_assessment_refs[-1]) == eligible
-        assert len(sandbox.seen_specs) == 1
+        assert old_assessment_ids.isdisjoint(actual)
+        # The explicit new thread input may run a new test; restore itself did not.
+        assert len(sandbox.seen_specs) == sandbox_runs_before_restore + 1
     finally:
         reopened.close()
 

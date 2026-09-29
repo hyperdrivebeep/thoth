@@ -1,5 +1,6 @@
 """Registered full-schema restore rules and deterministic semantic diff groups."""
 
+from collections.abc import Collection
 from dataclasses import dataclass
 from typing import cast
 
@@ -23,19 +24,28 @@ class TypedRestoreProfile:
     object_field: str = "object_id"
     reference_fields: tuple[tuple[str, str], ...] = ()
     display_name: str = "연구 항목"
+    supported_schema_versions: frozenset[str] = frozenset({"1.0.0", "1.1.0"})
+    digest_kinds: tuple[str, ...] = ("SNAPSHOT", "ENTITY_SNAPSHOT")
+    require_embedded_schema: bool = False
+    evidence_fields: tuple[str, ...] = ("evidence_refs", "counterevidence_refs")
+    review_reference_fields: tuple[str, ...] = ()
 
     def decode(self, revision: SemanticRevision, snapshot: EntitySnapshot) -> DomainModel | None:
-        if revision.entity_type != self.entity_type or snapshot.schema_version not in {
-            "1.0.0",
-            "1.1.0",
-        }:
+        if (
+            revision.entity_type != self.entity_type
+            or snapshot.schema_version not in self.supported_schema_versions
+            or (
+                self.require_embedded_schema
+                and snapshot.content.get("schema_version") != snapshot.schema_version
+            )
+        ):
             return None
         try:
             record = self.codec.model_validate(snapshot.content)
         except ValidationError:
             return None
         values = record.model_dump(mode="python")
-        if values.get("schema_version") not in {"1.0.0", "1.1.0"}:
+        if values.get("schema_version") not in self.supported_schema_versions:
             return None
         if (
             values.get(self.identifier_field) != revision.entity_id
@@ -44,7 +54,7 @@ class TypedRestoreProfile:
             raise RestoreError("RESTORE_TARGET_MISMATCH")
         if snapshot.content_digest not in {
             domain_digest(kind, "1.0.0", canonical_payload(snapshot.content))
-            for kind in ("SNAPSHOT", "ENTITY_SNAPSHOT")
+            for kind in self.digest_kinds
         }:
             raise RestoreError("RESTORE_CONTENT_DIGEST_MISMATCH")
         return record
@@ -54,6 +64,15 @@ class TypedRestoreProfile:
 
     def references(self, record: DomainModel) -> tuple[str, ...]:
         values = record.model_dump(mode="python")
+        if any(
+            (value := values.get(field)) is not None
+            and (
+                not isinstance(value, (tuple, list, dict))
+                or len(cast(Collection[object], value)) > 0
+            )
+            for field in self.review_reference_fields
+        ):
+            raise RestoreError("RESTORE_MEMBERS_REQUIRE_REVIEW")
         return tuple(
             f"{kind}:{identifier}"
             for field, kind in self.reference_fields
@@ -65,9 +84,7 @@ class TypedRestoreProfile:
             refs: set[str] = set()
             if isinstance(value, dict):
                 for key, nested in cast(dict[str, object], value).items():
-                    if key in {"evidence_refs", "counterevidence_refs"} and isinstance(
-                        nested, (tuple, list)
-                    ):
+                    if key in self.evidence_fields and isinstance(nested, (tuple, list)):
                         refs.update(
                             str(ref) for ref in cast(list[object] | tuple[object, ...], nested)
                         )

@@ -1,0 +1,4 @@
+[
+  {"source_id":"source:sunrise-allocation","path":"allocation-spec.md","media_type":"text/markdown","authority":"OFFICIAL","cutoff_state":"ELIGIBLE","security_class":"INTERNAL","version_label":"reference-v1","byte_sha256":"78bb19ce966786341c0511a8d46e2529904f9d7cbf9967e407fcc6f86e46536e","rights":"THOTH-authored factual paraphrase; beneficiary PDF not redistributed"},
+  {"source_id":"source:sunrise-validation-gap","path":"hybrid-real-gap.md","media_type":"text/markdown","authority":"OFFICIAL","cutoff_state":"ELIGIBLE","security_class":"INTERNAL","version_label":"reference-v1","byte_sha256":"87cd3d0205f11287df93b435d3b71418f252476ab87336d71ec2733852ef4e94","rights":"THOTH-authored factual paraphrase; beneficiary PDF not redistributed"}
+]

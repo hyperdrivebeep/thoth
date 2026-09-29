@@ -1,0 +1,12 @@
+pack_id: pack:6g-sandbox-hero
+project_id: project:6g-sandbox-hero
+name: 6G-SANDBOX integration-readiness reference packet
+cutoff_at: 2024-02-29T23:59:59Z
+overlay: eu-rnd-systems-integration
+policy_binding_ref: policy:6g-sandbox-reference-v1
+scenario:
+  case_id: case:6g-sandbox-integration
+  thread_id: thread:6g-sandbox-readiness
+  cycle_id: cycle:6g-sandbox-1
+  object_id: object:6g-sandbox-readiness
+  problem: The integrated experimentation platform reports promising component results, but cross-site KPI comparison remains blocked by incomplete method, configuration, and evidence alignment. Which competing explanations should be tested, and what is the safest next action?

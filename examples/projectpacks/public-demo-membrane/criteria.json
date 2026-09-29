@@ -1,0 +1,39 @@
+[
+  {
+    "draft": {
+      "criterion_id": "criterion:retained-flux-durability",
+      "project_id": "$PROJECT_ID",
+      "name": "Retained water flux after durability cycling",
+      "measured_construct": "final water flux divided by the pre-cycle baseline flux, expressed as a percentage",
+      "computation": {
+        "expression": "100 * final_flux_lmh / baseline_flux_lmh",
+        "unit": "%"
+      },
+      "context": {
+        "cycle_count": "500",
+        "temperature": "60 degC",
+        "membrane_batch": "M-204",
+        "evaluator_version": "v2.1"
+      },
+      "acceptance_rule": {
+        "operator": ">=",
+        "target": "85"
+      },
+      "origin": "DOCUMENT_EXTRACTED",
+      "field_evidence": {
+        "name": ["$EVIDENCE_0"],
+        "measured_construct": ["$EVIDENCE_0"],
+        "computation": ["$EVIDENCE_0"],
+        "acceptance_rule": ["$EVIDENCE_0"],
+        "context": ["$EVIDENCE_0"]
+      },
+      "missing_fields": [],
+      "uncertainty": "The criterion is complete, but the reported run may not be comparable to it."
+    },
+    "signals": {
+      "source_scope_confirmed": true,
+      "expert_semantics_confirmed": true,
+      "computation_verified": true
+    }
+  }
+]

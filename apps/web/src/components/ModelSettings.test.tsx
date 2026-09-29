@@ -7,13 +7,16 @@ import { LiveProjectWorkspace } from "./LiveProjectWorkspace";
 
 const fixture = vi.hoisted(() => ({ calls: [] as {method: string; input: Record<string, unknown>; key:string}[],
   effort: "low", pending: null as null | (() => void), delay: false, failOnce:false, unavailable:false,
-  reason:"MODEL_CAPABILITY_UNKNOWN", saved:{provider:"retired",model:"old-model",reasoning_effort:"high"}, inheritThread:false, projectSettingsDenied:false, threadDenied:false }));
+  reason:"MODEL_CAPABILITY_UNKNOWN", saved:{provider:"retired",model:"old-model",reasoning_effort:"high"}, inheritThread:false, projectSettingsDenied:false, threadDenied:false, includeXaiModel:false }));
 vi.mock("../api/rpcClient", async (importOriginal) => ({ ...(await importOriginal<typeof import("../api/rpcClient")>()), cancelRpcOperation: vi.fn(),
   rpc: async (method: string, input: Record<string, unknown>, key:string) => {
     fixture.calls.push({method, input,key});
     let value: unknown = {};
+    let responseState = "SUCCEEDED";
     if (method === "project/list") value = {projects: ["p", "q"].map(project_id =>
       ({project_id, name: project_id, overlay: "test", lifecycle: "ACTIVE"}))};
+    if (method === "workspace/ready") value = { ready: true, deployment_mode: "LOCAL", model_connected: true,
+      setup_complete: true, workspace_readable: true, execution_ready: true, workspace_id: "a".repeat(64), setup: { internet_consent: "DENIED" } };
     if (method === "model/settings/update") { fixture.effort = (input.selection as {reasoning_effort: string}).reasoning_effort; fixture.unavailable = false; }
     if (method === "model/settings/read" && !input.thread_id && fixture.inheritThread && fixture.projectSettingsDenied) throw new Error("PROJECT_SETTINGS_SCOPE_REQUIRED");
     if (method === "model/settings/read" && input.thread_id && fixture.threadDenied) throw new Error("AUTHORIZATION_DENIED");
@@ -21,7 +24,8 @@ vi.mock("../api/rpcClient", async (importOriginal) => ({ ...(await importOrigina
       selection: fixture.unavailable ? input.thread_id && fixture.inheritThread ? {provider: null, model: null, reasoning_effort: null} : fixture.saved : {provider: null, model: null, reasoning_effort: null},
       effective_settings: fixture.unavailable ? null : {provider: "test", model: "test", reasoning_effort: fixture.effort},
       availability: fixture.unavailable ? "UNAVAILABLE" : "AVAILABLE", reason_code: fixture.unavailable ? fixture.reason : null,
-      model_options: [{provider: "test", model: "test", reasoning_efforts: ["low", "high"], default_effort: "low"}]};
+      model_options: [{provider: "test", model: "test", reasoning_efforts: ["low", "high"], default_effort: "low"},
+        ...(fixture.includeXaiModel ? [{provider: "xai-oauth", model: "grok-4.6", reasoning_efforts: ["low", "medium", "high", "xhigh"], default_effort: null}] : [])]};
     if (method === "project/source/list") value = {artifacts: []};
     if (method === "evidence/list") value = {evidence: []};
     if (method === "thread/list") value = {threads:["t","other"].map(thread_id=>({project_id:input.project_id,thread_id,problem:thread_id,execution_state:"IDLE",lifecycle:"OPEN"}))};
@@ -33,10 +37,12 @@ vi.mock("../api/rpcClient", async (importOriginal) => ({ ...(await importOrigina
     if (method === "thread/start" || method === "thread/input") {
       if (fixture.failOnce) {fixture.failOnce=false;throw new Error("transport response lost");}
       if (fixture.delay) await new Promise<void>(resolve => {fixture.pending = resolve;});
-      value = {thread_id: "t", operation_id: "op", request_epoch: 1};
+      value = {contract_version: 2, project_id: input.project_id, thread_id: input.thread_id ?? "t",
+        operation_id: "op", status: "ACCEPTED_RUNNING", request_epoch: 1};
+      responseState = "RUNNING";
     }
     if (method === "thread/read") value = {project_id: input.project_id, thread_id: input.thread_id, operation_state: "RUNNING", current_result: null};
-    return {value, state: "SUCCEEDED", operation_id: "op"};
+    return {value, state: responseState, operation_id: "op"};
   },
 }));
 
@@ -56,17 +62,17 @@ async function submit() {
   await act(async () => {container.querySelector("form.prompt-composer")!.dispatchEvent(new Event("submit", {bubbles: true, cancelable: true}));});
   await flush();
 }
-async function mount(unavailable = false, options: { reason?: string; saved?: { provider: string; model: string; reasoning_effort: string }; inheritThread?: boolean } = {}) {
+async function mount(unavailable = false, options: { reason?: string; saved?: { provider: string; model: string; reasoning_effort: string }; inheritThread?: boolean; includeXaiModel?: boolean } = {}) {
   Object.assign(globalThis, {IS_REACT_ACT_ENVIRONMENT: true});
   fixture.calls = []; fixture.effort = "low"; fixture.delay = false; fixture.pending = null;fixture.failOnce=false;fixture.unavailable=unavailable;
-  fixture.reason=options.reason??"MODEL_CAPABILITY_UNKNOWN";fixture.saved=options.saved??{provider:"retired",model:"old-model",reasoning_effort:"high"};fixture.inheritThread=options.inheritThread??false;fixture.projectSettingsDenied=false;fixture.threadDenied=false;
-  sessionStorage.clear();
+  fixture.reason=options.reason??"MODEL_CAPABILITY_UNKNOWN";fixture.saved=options.saved??{provider:"retired",model:"old-model",reasoning_effort:"high"};fixture.inheritThread=options.inheritThread??false;fixture.projectSettingsDenied=false;fixture.threadDenied=false;fixture.includeXaiModel=options.includeXaiModel??false;
+  sessionStorage.clear(); localStorage.clear();
   container = document.createElement("div"); document.body.append(container);
   root = createRoot(container); client = new QueryClient({defaultOptions: {queries: {retry: false}}});
   await act(async () => {root.render(<QueryClientProvider client={client}><LiveProjectWorkspace /></QueryClientProvider>);});
-  await flush();
+  for (let i = 0; i < 8 && !container.querySelector("button.project-button"); i++) await flush();
   await act(async () => {container.querySelector<HTMLButtonElement>("button.project-button")!.click();});
-  await flush();
+  for (let i = 0; i < 10 && (!container.querySelector('[aria-label="연구 추론강도"]') || (!unavailable && effort().value !== "low")); i++) await flush();
   if (!unavailable) expect(effort().value).toBe("low");
 }
 afterEach(async () => { if (root) await act(async () => root.unmount()); client?.clear(); container?.remove(); });
@@ -78,6 +84,18 @@ it("one-shot high returns to low visibly and in the next same-thread request", a
   expect(effort().value).toBe("low");
   await submit();
   expect(fixture.calls.filter(c => c.method === "thread/input").at(-1)?.input.reasoning_effort).toBeUndefined();
+});
+
+it("offers the explicit xai-oauth model without replacing an existing selection", async () => {
+  await mount(false, { includeXaiModel: true });
+  const model = container.querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
+  expect([...model.options].map(option => option.value)).toContain("xai-oauth/grok-4.6");
+  expect(model.value).toBe("test/test");
+  expect(effort().value).toBe("low");
+  expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
+  await act(async () => { model.value = "xai-oauth/grok-4.6"; model.dispatchEvent(new Event("change", { bubbles: true })); });
+  expect(model.value).toBe("xai-oauth/grok-4.6");
+  expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
 });
 
 it("keeps an unavailable saved model and effort visible until a user selects a new option", async () => {
@@ -248,7 +266,7 @@ it("a late admission cannot replace a different selected thread",async()=>{
 
 it("ordinary navigation only automatically calls the actual nonmutating query surface",async()=>{
   await mount();
-  expect(fixture.calls.every(call=>["project/list","thread/list","project/source/list","evidence/list","model/settings/read","workspace/ready"].includes(call.method))).toBe(true);
+  expect(fixture.calls.filter(call=>!["project/list","thread/list","project/source/list","evidence/list","model/settings/read","workspace/ready"].includes(call.method)).map(call=>call.method)).toEqual([]);
   await act(async()=>{container.querySelector<HTMLElement>('[role="tab"][data-tab-id="records"]')?.click();});
   expect(fixture.calls.some(call=>call.method==="receipt/verify")).toBe(false);
 });

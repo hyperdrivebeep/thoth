@@ -31,6 +31,8 @@ from thoth.domain.research_execution import ResearchWork, research_work
 from thoth.domain.research_request import RevisionRef
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
 
+pytestmark = pytest.mark.usefixtures("xai_http_guard")
+
 
 def _record(value: object) -> dict[str, object]:
     assert isinstance(value, dict)
@@ -183,9 +185,7 @@ async def test_existing_shape_repair_keeps_the_same_candidate_enum() -> None:
     assert len(executor.payloads) == 2
     for wire in executor.payloads:
         field = _ranking_field(wire)
-        assert _record(field["items"])["enum"] == [
-            s.span_id for s in request.context_pack.evidence
-        ]
+        assert _record(field["items"])["enum"] == [s.span_id for s in request.context_pack.evidence]
     assert "REPAIR_TASK" in _prompt_text(executor.payloads[1])
 
 

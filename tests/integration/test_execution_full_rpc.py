@@ -6,6 +6,7 @@ from typing import cast
 import pytest
 from pydantic import JsonValue
 from tests.integration.scoped_runtime import create_runtime
+from tests.integration.source_time_fixture import confirm_synthetic_source_time
 from tests.integration.test_a04_storage_authority import approve_required_roles
 
 from thoth.domain.canonical import head_set_digest
@@ -74,7 +75,7 @@ async def test_execution_cancel_reconcile_retry_authorize_compensate_and_invalid
             )
         )
         role_id = str(cast(dict[str, JsonValue], role_result["role"])["role_assignment_id"])
-        value(
+        connected = value(
             await runtime.bus.dispatch(
                 request(
                     "project/source/connect",
@@ -91,6 +92,7 @@ async def test_execution_cancel_reconcile_retry_authorize_compensate_and_invalid
                 )
             )
         )
+        await confirm_synthetic_source_time(runtime, project_id, connected, key="execution-source")
         evidence = value(
             await runtime.bus.dispatch(
                 request("evidence/list", "execution-evidence", {"project_id": project_id})

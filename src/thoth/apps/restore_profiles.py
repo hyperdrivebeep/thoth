@@ -1,7 +1,8 @@
-"""Initial six full families. Adding a profile does not change planner dispatch."""
+"""Typed restore families. Adding a profile does not change planner dispatch."""
 
 from thoth.application.services.restore_profiles import RestoreProfileRegistry, TypedRestoreProfile
 from thoth.domain.action_full import ActionPlanRecord, ActionPortfolioRecord, ActionRecord
+from thoth.domain.decision_object_full import DecisionObjectRecord
 from thoth.domain.enums import EntityType
 from thoth.domain.evidence import InformationSufficiencyAssessment
 from thoth.domain.hypothesis_full import HypothesisPortfolioRecord, HypothesisRecord
@@ -10,6 +11,27 @@ from thoth.domain.hypothesis_full import HypothesisPortfolioRecord, HypothesisRe
 def restore_profiles() -> RestoreProfileRegistry:
     return RestoreProfileRegistry(
         (
+            TypedRestoreProfile(
+                "decision-object-record.v1",
+                DecisionObjectRecord,
+                EntityType.DECISION_OBJECT,
+                "object_id",
+                display_name="결정 객체",
+                supported_schema_versions=frozenset({"1.0.0"}),
+                digest_kinds=("ENTITY_SNAPSHOT",),
+                require_embedded_schema=True,
+                evidence_fields=(
+                    "evidence_refs",
+                    "counterevidence_refs",
+                    "trigger_evidence_refs",
+                ),
+                review_reference_fields=(
+                    "parent_object_id",
+                    "requirement_refs",
+                    "cutoff_ref",
+                    "relation_refs",
+                ),
+            ),
             TypedRestoreProfile(
                 "evidence-assessment.v1",
                 InformationSufficiencyAssessment,

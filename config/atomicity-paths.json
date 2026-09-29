@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "purpose": "DEVELOPMENT_VERIFICATION_LEDGER_NOT_RUNTIME_POLICY",
   "baseline_head": "f0262732a0e79235f3839c3393f459b90bd53783",
-  "catalog_sha256": "c754f679e2256e920a0f9a7709926f610fb18570460a5921b835d13bb347f6ca",
+  "catalog_sha256": "1c4a5611fb2fe965d1ffd5e18a351b692b82b9819d6b15611b82ffebf0d50151",
   "public_entries": [
     {
       "name": "action/audit/read",
@@ -5235,11 +5235,12 @@
       "namespace": "model",
       "surface": "QUERY",
       "canonical_owner": "THREAD_REQUEST_SETTINGS",
-      "policy": "research-model-settings:versioned",
-      "normal_entrypoint": "thread/input",
+      "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied",
+      "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via local /rpc",
       "behavioral_evidence": [
         "U08",
-        "U07"
+        "U07",
+        "tests/unit/test_hosted_review_credential_rpc.py"
       ],
       "canonical": true,
       "alias_target": null,
@@ -5247,8 +5248,8 @@
       "method": "model/credential/list",
       "actual_callable": "thoth.application.commands.model_settings.ModelSettingsHandlers.list_credentials",
       "source": "src/thoth/application/commands/model_settings.py",
-      "line": 139,
-      "callable_sha256": "9ef155eb33c179ba6ddffa9cd469639689032783c70ebd11be185c9d0249c533",
+      "line": 163,
+      "callable_sha256": "f5b56a7f755fa80436fb885e3a256161273484ec407445e6517479012bc68249",
       "entry_kind": "public",
       "path_id": "rpc:model/credential/list",
       "owner_scope": "THREAD_REQUEST_SETTINGS",
@@ -5258,15 +5259,73 @@
       "mutation_observed_in_code": false
     },
     {
+      "name": "model/credential/login/cancel",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied",
+      "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via XaiDeviceLogin local /rpc",
+      "behavioral_evidence": [
+        "tests/integration/test_xai_workspace_route.py",
+        "tests/unit/test_hosted_review_credential_rpc.py",
+        "apps/web/src/components/FirstRunSetup.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "model/credential/login/cancel",
+      "actual_callable": "thoth.application.commands.model_settings.ModelSettingsHandlers.cancel_login",
+      "source": "src/thoth/application/commands/model_settings.py",
+      "line": 224,
+      "callable_sha256": "3d207dcaac5b33e7e3e740ccbba353e476556ba11ab7421028998492e61e3fd0",
+      "entry_kind": "public",
+      "path_id": "rpc:model/credential/login/cancel",
+      "owner_scope": "THREAD_REQUEST_SETTINGS",
+      "phase_ids": [
+        "rpc:model/credential/login/cancel"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "model/credential/login/status",
+      "namespace": "model",
+      "surface": "QUERY",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied",
+      "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via XaiDeviceLogin local /rpc",
+      "behavioral_evidence": [
+        "tests/integration/test_xai_workspace_route.py",
+        "tests/unit/test_hosted_review_credential_rpc.py",
+        "apps/web/src/components/FirstRunSetup.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "model/credential/login/status",
+      "actual_callable": "thoth.application.commands.model_settings.ModelSettingsHandlers.login_status",
+      "source": "src/thoth/application/commands/model_settings.py",
+      "line": 210,
+      "callable_sha256": "d0d0b6d9de5375fcbead58ed2615b1169af3d4db82643fb3832fc6e674020380",
+      "entry_kind": "public",
+      "path_id": "rpc:model/credential/login/status",
+      "owner_scope": "THREAD_REQUEST_SETTINGS",
+      "phase_ids": [
+        "rpc:model/credential/login/status"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
       "name": "model/credential/register",
       "namespace": "model",
       "surface": "COMMAND",
       "canonical_owner": "THREAD_REQUEST_SETTINGS",
-      "policy": "research-model-settings:versioned",
-      "normal_entrypoint": "thread/input",
+      "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied",
+      "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via local /rpc",
       "behavioral_evidence": [
         "U08",
-        "U07"
+        "U07",
+        "tests/unit/test_hosted_review_credential_rpc.py",
+        "tests/integration/test_xai_workspace_route.py"
       ],
       "canonical": true,
       "alias_target": null,
@@ -5274,8 +5333,8 @@
       "method": "model/credential/register",
       "actual_callable": "thoth.application.commands.model_settings.ModelSettingsHandlers.register_credential",
       "source": "src/thoth/application/commands/model_settings.py",
-      "line": 149,
-      "callable_sha256": "e96f782f2f8acbc30cd65edf19877553c30705a3858a2c61f7ff0b8fa2f35453",
+      "line": 183,
+      "callable_sha256": "7d609e46c68bbe5e314b151afb2d0dd5b701c227da105189a55be18d69ce6ba6",
       "entry_kind": "public",
       "path_id": "rpc:model/credential/register",
       "owner_scope": "THREAD_REQUEST_SETTINGS",
@@ -37322,6 +37381,192 @@
       ]
     },
     {
+      "path_id": "rpc:model/credential/login/cancel",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "THREAD_REQUEST_SETTINGS",
+      "entry_kind": "public",
+      "method_or_trigger": "model/credential/login/cancel",
+      "actual_callable": "thoth.application.commands.model_settings.ModelSettingsHandlers.cancel_login",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/hosted_review_composition.py",
+          "line": 212,
+          "binding": "lambda _: deny_hosted_credentials"
+        },
+        {
+          "source": "src/thoth/apps/research_entry_composition.py",
+          "line": 152,
+          "binding": "settings_handlers.cancel_login"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.models.local_credentials.LocalModelCredentials.cancel_login",
+        "thoth.adapters.models.xai_broker.XaiAuthBroker.cancel_login",
+        "thoth.adapters.models.xai_profile.XaiProfile.set_generation"
+      ],
+      "phase_id": [
+        "VALIDATE_LOGIN_ID",
+        "CANCEL_LOGIN_WORKER",
+        "FENCE_PROFILE_GENERATION",
+        "RECORD_COMMAND_RESULT"
+      ],
+      "composite_not_one_transaction": true,
+      "canonical_records_and_projections": [
+        "workspace-local xAI profile generation",
+        "in-memory login worker state",
+        "CommandBus operation result"
+      ],
+      "head_selector": "Selected THOTH workspace and exact login_id; no project research head move.",
+      "audit_receipt_refs": [],
+      "expected_basis": "LOCAL system:workspace COMMAND requires provider xai and a login_id. The bounded handler signals the matching in-memory worker, marks it cancelled, and fences the workspace profile generation when it still matches; CommandBus records command outcome separately. HOSTED_REVIEW rejects the RPC before this handler.",
+      "uow_participants": [
+        "thoth.adapters.models.xai_broker.XaiAuthBroker.cancel_login",
+        "thoth.adapters.models.xai_profile.XaiProfile.set_generation"
+      ],
+      "irreversible_effect_boundary": "Worker cancellation and profile-generation write are not one transaction with CommandBus operation completion; no model request is sent by cancel.",
+      "allowed_phase_deltas": [
+        "Missing/mismatched login_id refuses before cancelling another worker; a late worker callback cannot overwrite the fenced generation."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/XaiDeviceLogin.tsx",
+        "model/credential/login/status",
+        "model/credential/list"
+      ],
+      "existing_tests": [
+        "tests/integration/test_xai_workspace_route.py",
+        "tests/unit/test_hosted_review_credential_rpc.py"
+      ],
+      "fault_points": "Missing, mismatched, terminal, or stale login_id and profile-write failure are distinct; no rollback of an already signalled worker is claimed.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/model_settings.py",
+        "src/thoth/adapters/models/local_credentials.py",
+        "src/thoth/adapters/models/xai_broker.py",
+        "src/thoth/adapters/models/xai_profile.py",
+        "src/thoth/apps/hosted_review_composition.py",
+        "src/thoth/apps/research_entry_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Source-level phase map; the worker/profile/operation effects are not one atomic transaction.",
+      "verification": {
+        "classification": "MUTATION",
+        "required_callables": [
+          "thoth.application.commands.model_settings.ModelSettingsHandlers.cancel_login",
+          "thoth.adapters.models.local_credentials.LocalModelCredentials.cancel_login",
+          "thoth.adapters.models.xai_broker.XaiAuthBroker.cancel_login",
+          "thoth.adapters.models.xai_profile.XaiProfile.set_generation"
+        ],
+        "cases": [],
+        "status": "CURRENT_SOURCE_EXECUTION_EVIDENCE_PENDING"
+      },
+      "blockers": [
+        "Current-source FULL, live OAuth, and ten-owner atomicity closure are not established."
+      ]
+    },
+    {
+      "path_id": "rpc:model/credential/login/status",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "THREAD_REQUEST_SETTINGS",
+      "entry_kind": "public",
+      "method_or_trigger": "model/credential/login/status",
+      "actual_callable": "thoth.application.commands.model_settings.ModelSettingsHandlers.login_status",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/hosted_review_composition.py",
+          "line": 211,
+          "binding": "lambda _: deny_hosted_credentials"
+        },
+        {
+          "source": "src/thoth/apps/research_entry_composition.py",
+          "line": 151,
+          "binding": "settings_handlers.login_status"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.models.local_credentials.LocalModelCredentials.login_status",
+        "thoth.adapters.models.xai_broker.XaiAuthBroker.login_status",
+        "thoth.adapters.models.xai_profile.XaiProfile.read"
+      ],
+      "phase_id": [
+        "READ_BROKER_STATUS",
+        "READ_PROFILE_GENERATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "workspace-local xAI profile generation (read)",
+        "in-memory login status (read)"
+      ],
+      "head_selector": "Selected THOTH workspace broker and optional login_id; no project research head move.",
+      "audit_receipt_refs": [],
+      "expected_basis": "LOCAL system:workspace QUERY reads the bounded xAI broker login state and, if needed, the workspace-local profile generation; it does not poll the remote OAuth endpoint or dispatch a model. The Web setup/settings XaiDeviceLogin consumer supplies provider xai and login_id. HOSTED_REVIEW rejects the RPC before this handler.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "No external request, credential mutation, model send, or CommandBus operation publication in this query.",
+      "allowed_phase_deltas": [
+        "No worker cancellation, profile generation write, or canonical SQL mutation from status read."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/XaiDeviceLogin.tsx",
+        "apps/web/src/components/FirstRunSetup.tsx",
+        "apps/web/src/components/ModelCredentialPanel.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_xai_workspace_route.py",
+        "tests/unit/test_hosted_review_credential_rpc.py"
+      ],
+      "fault_points": "Unknown provider/workspace, expired or mismatched login_id, and local profile read failure remain distinct from remote OAuth polling.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/model_settings.py",
+        "src/thoth/adapters/models/local_credentials.py",
+        "src/thoth/adapters/models/xai_broker.py",
+        "src/thoth/adapters/models/xai_profile.py",
+        "src/thoth/apps/hosted_review_composition.py",
+        "src/thoth/apps/research_entry_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Source-level local read path only; no whole-RPC atomicity or ten-owner closure is claimed.",
+      "verification": {
+        "classification": "READ_ONLY",
+        "review": {
+          "reason": "Current source maps QUERY through the local broker/profile read; focused synthetic tests are separate from live authentication and FULL.",
+          "source_files": [
+            {
+              "path": "src/thoth/application/commands/model_settings.py",
+              "sha256": "5e3a897aa465609b975f38ed0ae32fba24def517a35802b096c2035ae0d8cfaf"
+            },
+            {
+              "path": "src/thoth/adapters/models/local_credentials.py",
+              "sha256": "c034eca9b66f11152c4260182f499b0014be2cf1ecbd66a76d5baf5049752125"
+            },
+            {
+              "path": "src/thoth/adapters/models/xai_broker.py",
+              "sha256": "ec130f52ed88503750a502a83d7545b627dec151fa60676870f3b83084e4433a"
+            },
+            {
+              "path": "src/thoth/adapters/models/xai_profile.py",
+              "sha256": "22d75a39d7dd67f97dfc9f70c2226cc0a7ee0138ffae23301b42f9ba316c5ac4"
+            },
+            {
+              "path": "src/thoth/apps/hosted_review_composition.py",
+              "sha256": "8df28d04528e0ee7ee291baf9a72f9d67f461b684398c282c55bc739801388bd"
+            },
+            {
+              "path": "src/thoth/apps/research_entry_composition.py",
+              "sha256": "6d6707890c0ec0ea2dc584d79be405522f5ed8a22dfb4625905a79b2089c2ea1"
+            }
+          ],
+          "call_graph": "model/credential/login/status"
+        }
+      },
+      "blockers": [
+        "Current-source FULL, live OAuth, and ten-owner atomicity closure are not established."
+      ]
+    },
+    {
       "path_id": "rpc:model/credential/register",
       "owner": "SHARED_OR_OTHER_OWNER",
       "catalog_owner": "THREAD_REQUEST_SETTINGS",
@@ -37331,19 +37576,19 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/hosted_review_composition.py",
-          "line": 214,
+          "line": 210,
           "binding": "lambda _: deny_hosted_credentials"
         },
         {
           "source": "src/thoth/apps/research_entry_composition.py",
-          "line": 127,
+          "line": 150,
           "binding": "settings_handlers.register_credential"
         }
       ],
       "producer_refs": [
         "thoth.adapters.models.local_credentials.LocalModelCredentials.start_login",
-        "thoth.adapters.models.local_credentials._write_json",
-        "thoth.adapters.models.local_credentials.register_api_key"
+        "thoth.adapters.models.local_credentials.LocalModelCredentials.register_api_key",
+        "thoth.adapters.models.xai_broker.XaiAuthBroker.start_login"
       ],
       "phase_id": [
         "VALIDATE_CREDENTIAL_ROUTE",
@@ -37356,34 +37601,40 @@
       ],
       "head_selector": "Selected local workspace model-registry directory; no project research head moves.",
       "audit_receipt_refs": [],
-      "expected_basis": "Explicit THOTH workspace key registration writes index and secret separately; a supported Codex device-auth response records start only. Anthropic/xAI no-key paths return unsupported plus HTTPS key guidance and do not launch backend CLI/browser.",
+      "expected_basis": "LOCAL system:workspace credential RPC: an explicit API key records the selected THOTH workspace credential; an xAI no-key request starts a bounded device-code broker job, while Codex uses its isolated login and Anthropic returns local guidance. Started is not connected or execution-verified. HOSTED_REVIEW denies this RPC before the handler. No research head is moved.",
       "uow_participants": [
         "thoth.adapters.models.local_credentials.LocalModelCredentials.start_login",
         "thoth.adapters.models.local_credentials._write_json",
         "thoth.adapters.models.local_credentials.register_api_key"
       ],
-      "irreversible_effect_boundary": "Two local registry JSON writes or an OAuth login start are not one Ledger transaction; secret file permissions and external login status are separate effects.",
+      "irreversible_effect_boundary": "Local index/secret writes, an external device-code start or isolated login, and CommandBus operation completion are distinct effects, not one Ledger transaction; no automatic retry is certified.",
       "allowed_phase_deltas": [
         "On refusal before I/O the registry remains unchanged; after a partial file write or unknown login response do not claim an atomic rollback."
       ],
       "downstream_reader": [
         "apps/web/src/components/FirstRunSetup.tsx",
+        "apps/web/src/components/ModelCredentialPanel.tsx",
+        "apps/web/src/components/XaiDeviceLogin.tsx",
+        "model/credential/login/status",
         "model/credential/list",
         "model/settings/read",
         "workspace/ready"
       ],
       "existing_tests": [
         "tests/integration/test_local_first_run_model_boundary.py",
+        "tests/integration/test_xai_workspace_route.py",
         "tests/unit/models/test_account_connections.py",
         "tests/unit/models/test_local_credentials.py",
         "tests/unit/test_hosted_review_credential_rpc.py"
       ],
-      "fault_points": "Missing/invalid key, insecure endpoint, file write failure and login failure need separate local receipts; no live account call is certified here.",
+      "fault_points": "Invalid/missing key, local file write failure, device-code start failure, and uncertain external response are separate; no live account or model dispatch is certified here.",
       "disposition": "OWNER_EVIDENCE_PENDING",
       "evidence_refs": [],
       "source_refs": [
         "src/thoth/adapters/models/local_credentials.py",
         "src/thoth/adapters/models/registry.py",
+        "src/thoth/adapters/models/xai_broker.py",
+        "src/thoth/adapters/models/xai_profile.py",
         "src/thoth/application/commands/model_settings.py",
         "src/thoth/apps/hosted_review_composition.py",
         "src/thoth/apps/model_composition.py",
@@ -37395,10 +37646,10 @@
       "verification": {
         "classification": "MUTATION",
         "required_callables": [
-          "thoth.application.commands.model_settings.ModelSettingsHandlers.register_credential",
           "thoth.adapters.models.local_credentials.LocalModelCredentials.start_login",
-          "thoth.adapters.models.local_credentials._write_json",
-          "thoth.adapters.models.local_credentials.register_api_key"
+          "thoth.adapters.models.local_credentials.LocalModelCredentials.register_api_key",
+          "thoth.adapters.models.xai_broker.XaiAuthBroker.start_login",
+          "thoth.application.commands.model_settings.ModelSettingsHandlers.register_credential"
         ],
         "cases": [],
         "status": "CURRENT_SOURCE_EXECUTION_EVIDENCE_PENDING"

@@ -1,6 +1,5 @@
 import asyncio
 import json
-from dataclasses import replace
 
 import httpx
 import pytest
@@ -55,7 +54,9 @@ async def test_frozen_effort_reaches_tool_free_wire_and_byte_limit_closes_transp
     assert "max_output_tokens" not in wire
     assert reply.input_tokens is None and reply.output_tokens is None
     with pytest.raises(ModelExecutionHold, match="VISIBLE_BYTE_LIMIT"):
-        await executor.dispatch(replace(prepared, max_visible_output_bytes=3))
+        await executor.dispatch(
+            executor.with_observation_limits(prepared, max_visible_output_bytes=3)
+        )
 
 
 async def test_no_overall_research_deadline_preserves_user_cancellation():
@@ -128,7 +129,7 @@ async def test_single_oversized_sse_frame_is_rejected_without_a_total_stream_cap
     executor = CodexHttpExecutor(
         Session(), transport=httpx.MockTransport(lambda _: httpx.Response(200, content=content))
     )
-    prepared = replace(
+    prepared = executor.with_observation_limits(
         executor.prepare("fixture", {"type": "object"}, output_tokens=6000, timeout_seconds=None),
         max_frame_bytes=128,
     )

@@ -6,6 +6,7 @@ from typing import cast
 import pytest
 from pydantic import JsonValue
 from tests.integration.scoped_runtime import create_runtime
+from tests.integration.source_time_fixture import confirm_synthetic_source_time
 
 from thoth.protocol.jsonrpc import JsonRpcRequest, JsonRpcResponse
 
@@ -85,7 +86,14 @@ async def test_evidence_source_link_conflict_packet_and_audit(tmp_path: Path) ->
         )
         plan_artifact = cast(dict[str, JsonValue], connected_plan["artifact"])
         report_artifact = cast(dict[str, JsonValue], connected_report["artifact"])
-        plan_source = cast(dict[str, JsonValue], connected_plan["source"])
+        plan_current = await confirm_synthetic_source_time(
+            runtime, project_id, connected_plan, key="ev-connect-plan"
+        )
+        report_current = await confirm_synthetic_source_time(
+            runtime, project_id, connected_report, key="ev-connect-report"
+        )
+        assert plan_current["authority_status"] == report_current["authority_status"] == "OFFICIAL"
+        plan_source = plan_current
 
         source_add = value(
             await runtime.bus.dispatch(

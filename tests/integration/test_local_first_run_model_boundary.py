@@ -13,6 +13,8 @@ from thoth.adapters.models.catalog import StaticModelCatalog
 from thoth.apps.runtime import AppRuntime, create_runtime
 from thoth.domain.model_settings import ModelOption, ModelSelection
 
+pytestmark = pytest.mark.usefixtures("xai_http_guard")
+
 
 def _isolated_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     home = tmp_path / "synthetic-home"
@@ -33,8 +35,8 @@ def _isolated_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     def fake_home(_cls: type[Path]) -> Path:
         return home
 
-    def disconnected() -> dict[str, object]:
-        return {"provider": "codex-oauth", "connected": False}
+    def disconnected(_workspace: Path) -> dict[str, object]:
+        return {"provider": "codex-oauth", "connected": False, "execution_eligible": False}
 
     monkeypatch.setattr(Path, "home", classmethod(fake_home))
     monkeypatch.setattr(codex_oauth, "codex_oauth_status", disconnected)
@@ -263,33 +265,37 @@ async def test_saved_unavailable_model_is_preserved_while_other_workspace_option
 async def test_codex_status_needs_matching_catalog_option_for_ready(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    home = _isolated_home(tmp_path, monkeypatch)
+    _isolated_home(tmp_path, monkeypatch)
 
-    def connected() -> dict[str, object]:
-        return {"provider": "codex-oauth", "connected": True}
+    def connected(_workspace: Path) -> dict[str, object]:
+        return {
+            "provider": "codex-oauth",
+            "connected": True,
+            "execution_eligible": True,
+            "connection_state": "EXECUTION_UNVERIFIED",
+        }
 
     monkeypatch.setattr(codex_oauth, "codex_oauth_status", connected)
-    runtime = create_runtime(tmp_path / "a")
+
+    class MutableCatalog(StaticModelCatalog):
+        def set_options(self, options: tuple[ModelOption, ...]) -> None:
+            self._options = options
+
+    catalog = MutableCatalog()
+    runtime = create_runtime(tmp_path / "a", model_catalog=catalog)
     try:
         no_option = value(await runtime.bus.query(request("workspace/ready", "none", {})))
         assert no_option["model_connected"] is False
-        (home / ".codex" / "config.toml").write_text(
-            'model = "gpt-test"\nmodel_reasoning_effort = "high"\n', encoding="utf-8"
-        )
-        (home / ".codex" / "models_cache.json").write_text(
-            json.dumps(
-                {
-                    "models": [
-                        {
-                            "slug": "gpt-test",
-                            "visibility": "list",
-                            "supported_reasoning_levels": [{"effort": "high"}],
-                            "default_reasoning_level": "high",
-                        }
-                    ]
-                }
-            ),
-            encoding="utf-8",
+        catalog.set_options(
+            (
+                ModelOption(
+                    provider="codex-oauth",
+                    model="gpt-test",
+                    reasoning_efforts=("high",),
+                    default_effort="high",
+                    capability_source="controlled-isolated-catalog",
+                ),
+            )
         )
         with_option = value(await runtime.bus.query(request("workspace/ready", "yes", {})))
         assert with_option["model_connected"] is True

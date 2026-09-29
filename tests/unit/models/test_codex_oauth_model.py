@@ -10,7 +10,7 @@ import pytest
 from thoth.adapters.models import (
     CodexCliExecutor,
     CodexOAuthModel,
-    CodexStructuredOutputHold,
+    CodexOAuthUnavailable,
     constrain_action_families,
     strict_output_schema,
 )
@@ -218,29 +218,18 @@ class SlowProcess:
         return self.returncode or 0
 
 
-@pytest.mark.asyncio
-async def test_codex_executor_kills_timed_out_process() -> None:
+def test_native_tool_codex_executor_is_rejected_before_process_spawn() -> None:
     process = SlowProcess()
+    calls: list[tuple[str, ...]] = []
 
     async def factory(arguments: tuple[str, ...]) -> SlowProcess:
-        assert "--ephemeral" in arguments
+        calls.append(arguments)
         return process
 
-    executor = CodexCliExecutor(
-        executable=Path(__file__),
-        timeout_seconds=0.01,
-        process_factory=factory,
-    )
-
-    with pytest.raises(CodexStructuredOutputHold, match="timed out"):
-        await executor.execute(
-            "synthetic prompt",
-            {
-                "type": "object",
-                "properties": {"status": {"type": "string"}},
-                "required": ["status"],
-                "additionalProperties": False,
-            },
+    with pytest.raises(CodexOAuthUnavailable, match="CODEX_NATIVE_TOOL_BOUNDARY_UNSUPPORTED"):
+        CodexCliExecutor(
+            executable=Path(__file__),
+            timeout_seconds=0.01,
+            process_factory=factory,
         )
-
-    assert process.killed is True
+    assert calls == [] and process.killed is False

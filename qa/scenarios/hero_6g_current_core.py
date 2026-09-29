@@ -7,10 +7,10 @@ import json
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import Literal, assert_never, cast
 
 import orjson
-from pydantic import JsonValue
+from pydantic import BaseModel, ConfigDict, Field, JsonValue
 
 from thoth.adapters.projectpacks import load_project_pack
 from thoth.adapters.projectpacks.loader import source_path
@@ -24,9 +24,11 @@ from thoth.apps.runtime import create_runtime
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.enums import CausalLocus
 from thoth.domain.operation import OperationRecord
+from thoth.domain.projectpack import LoadedProjectPack
 from thoth.ports.memory import MemoryReviewerPort
 from thoth.ports.model import ModelPort, ModelResolverPort
 from thoth.ports.sandbox import SandboxPort
+from thoth.protocol.bus import CommandBus
 from thoth.protocol.jsonrpc import JsonRpcRequest, JsonRpcResponse
 
 HERO_INSTRUCTION = (
@@ -64,6 +66,23 @@ class HeroRunResult:
     observations: dict[str, object]
 
 
+class _FixtureTimeClaim(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    pack_name: str
+    relative_path: str
+    byte_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    assertion: Literal["ON_OR_BEFORE_CUTOFF", "AFTER_CUTOFF"]
+    basis: str = Field(min_length=1)
+
+
+class _FixtureTimeClaims(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    schema_version: Literal["1.0.0"]
+    claims: tuple[_FixtureTimeClaim, ...]
+
+
 class SingleModelResolver(ModelResolverPort):
     def __init__(self, model: ModelPort) -> None:
         self._model = model
@@ -74,14 +93,12 @@ class SingleModelResolver(ModelResolverPort):
 
 
 async def _dispatch(
-    bus: object,
+    bus: CommandBus,
     method: str,
     key: str,
     value: dict[str, object],
 ) -> dict[str, JsonValue]:
-    from thoth.protocol.bus import CommandBus
-
-    response = await cast(CommandBus, bus).dispatch(
+    response = await bus.dispatch(
         JsonRpcRequest.model_validate(
             {
                 "id": key,
@@ -91,6 +108,100 @@ async def _dispatch(
         )
     )
     return _value(response)
+
+
+def _fixture_time_claims(pack_name: str, pack: LoadedProjectPack) -> tuple[_FixtureTimeClaim, ...]:
+    path = Path(__file__).with_name("source-time-claims.json")
+    if not path.is_file():
+        return ()
+    document = _FixtureTimeClaims.model_validate_json(path.read_bytes())
+    sources = {source.path: source for source in pack.sources}
+    claims = tuple(item for item in document.claims if item.pack_name == pack_name)
+    if len({item.relative_path for item in claims}) != len(claims):
+        raise ValueError("duplicate synthetic source-time fixture claim")
+    for claim in claims:
+        source = sources.get(claim.relative_path)
+        if (
+            source is None
+            or source.byte_sha256 != claim.byte_sha256
+            or source.cutoff_state.value != _expected_fixture_cutoff(claim.assertion)
+        ):
+            raise ValueError("synthetic source-time claim does not match the current ProjectPack")
+    return claims
+
+
+def _expected_fixture_cutoff(
+    assertion: Literal["ON_OR_BEFORE_CUTOFF", "AFTER_CUTOFF"],
+) -> str:
+    match assertion:
+        case "ON_OR_BEFORE_CUTOFF":
+            return "ELIGIBLE"
+        case "AFTER_CUTOFF":
+            return "AFTER_CUTOFF"
+    assert_never(assertion)
+
+
+async def _confirm_fixture_source_times(
+    bus: CommandBus,
+    project_id: str,
+    connected: dict[str, tuple[str, str]],
+    claims: tuple[_FixtureTimeClaim, ...],
+) -> tuple[dict[str, JsonValue], ...]:
+    confirmations: list[dict[str, JsonValue]] = []
+    for ordinal, claim in enumerate(claims):
+        artifact_id, source_version_id = connected[claim.relative_path]
+        # Every mutation reads a fresh basis; an earlier confirmation may have advanced it.
+        listed = await _dispatch(
+            bus,
+            "project/source/list",
+            f"hero:{project_id}:source-time-basis:{ordinal}",
+            {"project_id": project_id},
+        )
+        assessments = cast(list[dict[str, JsonValue]], listed["source_times"])
+        current = next(
+            (
+                item
+                for item in assessments
+                if item["artifact_id"] == artifact_id
+                and item["source_version_id"] == source_version_id
+            ),
+            None,
+        )
+        if current is None or current["byte_sha256"] != claim.byte_sha256:
+            raise ValueError("synthetic source-time basis no longer matches connected source")
+        if current["cutoff_state"] != "UNKNOWN_TIME":
+            raise ValueError("synthetic source-time claim requires an unconfirmed source")
+        cutoff = cast(dict[str, JsonValue], listed["cutoff_basis"])
+        confirmed = await _dispatch(
+            bus,
+            "project/source/time/confirm",
+            f"hero:{project_id}:source-time-confirm:{ordinal}",
+            {
+                "project_id": project_id,
+                "artifact_id": artifact_id,
+                "source_version_id": source_version_id,
+                "byte_sha256": claim.byte_sha256,
+                "expected_project_revision": cutoff["project_revision"],
+                "expected_cutoff_at": cutoff["cutoff_at"],
+                "expected_assessment_revision": current["revision"],
+                "expected_metadata_digest": current["metadata_digest"],
+                "assertion": claim.assertion,
+            },
+        )
+        result = cast(dict[str, JsonValue], confirmed["source_time"])
+        if result["cutoff_state"] != _expected_fixture_cutoff(claim.assertion):
+            raise ValueError("synthetic source-time confirmation did not match its claim")
+        confirmations.append(
+            {
+                "relative_path": claim.relative_path,
+                "byte_sha256": claim.byte_sha256,
+                "assertion": claim.assertion,
+                "basis": claim.basis,
+                "source_version_id": source_version_id,
+                "assessment_revision": result["revision"],
+            }
+        )
+    return tuple(confirmations)
 
 
 def _value(response: JsonRpcResponse) -> dict[str, JsonValue]:
@@ -246,6 +357,7 @@ async def run_current_hero(
     sandbox_adapter: SandboxPort | None = None,
     policy_payload: dict[str, object] | None = None,
     memory_reviewer: MemoryReviewerPort | None = None,
+    apply_fixture_source_time_claims: bool = True,
 ) -> HeroRunResult:
     pack_root = Path(__file__).resolve().parents[2] / "examples" / "projectpacks" / pack_name
     pack = load_project_pack(pack_root)
@@ -262,6 +374,9 @@ async def run_current_hero(
         memory_reviewer=memory_reviewer,
     )
     project_id = pack.project.project_id
+    fixture_claims = (
+        _fixture_time_claims(pack_name, pack) if apply_fixture_source_time_claims else ()
+    )
     try:
         await _dispatch(
             runtime.bus,
@@ -285,8 +400,9 @@ async def run_current_hero(
                 "payload": effective_policy,
             },
         )
+        connected_sources: dict[str, tuple[str, str]] = {}
         for ordinal, source in enumerate(pack.sources):
-            await _dispatch(
+            connected = await _dispatch(
                 runtime.bus,
                 "project/source/connect",
                 f"hero:{pack_name}:source:{ordinal}",
@@ -301,6 +417,14 @@ async def run_current_hero(
                     "version_label": source.version_label,
                 },
             )
+            artifact = cast(dict[str, JsonValue], connected["artifact"])
+            connected_sources[source.path] = (
+                str(artifact["artifact_id"]),
+                str(connected["source_version_id"]),
+            )
+        fixture_time_confirmations = await _confirm_fixture_source_times(
+            runtime.bus, project_id, connected_sources, fixture_claims
+        )
         started = await _dispatch(
             runtime.bus,
             "thread/start",
@@ -328,7 +452,11 @@ async def run_current_hero(
             await runtime.bus.drain()
             operation = runtime.bus.read_operation(str(analysis["operation_id"]))
             if operation is None or operation.error is not None or operation.result is None:
-                message = None if operation is None or operation.error is None else operation.error.get("message")
+                message = (
+                    None
+                    if operation is None or operation.error is None
+                    else operation.error.get("message")
+                )
                 raise RuntimeError(str(message or "Hero research did not produce a final result"))
             analysis = operation.result
             if analysis.get("terminal_reason") != "BOUNDED_RESEARCH_COMPLETE":
@@ -453,9 +581,8 @@ async def run_current_hero(
             receipt_audit=receipt_audit,
             project=project,
             policy_payload=effective_policy,
-            operation_trace=SqliteOperationStore(runtime.ledger.engine).list_by_project(
-                project_id
-            ),
+            fixture_time_confirmations=fixture_time_confirmations,
+            operation_trace=SqliteOperationStore(runtime.ledger.engine).list_by_project(project_id),
             tui_operation_trace=SqliteOperationStore(runtime.ledger.engine).list_by_project(
                 project_id,
                 idempotency_prefix=f"tui:tui:hero:{pack_name}:",
@@ -492,11 +619,10 @@ def _result(
     receipt_audit: dict[str, JsonValue],
     project: dict[str, JsonValue],
     policy_payload: dict[str, object],
+    fixture_time_confirmations: tuple[dict[str, JsonValue], ...],
     operation_trace: tuple[OperationRecord, ...],
     tui_operation_trace: tuple[OperationRecord, ...],
 ) -> HeroRunResult:
-    from thoth.domain.projectpack import LoadedProjectPack
-
     loaded = cast(LoadedProjectPack, pack)
     spans = cast(list[dict[str, JsonValue]], evidence["spans"])
     selected_refs = set(cast(list[str], analysis["selected_evidence_refs"]))
@@ -620,9 +746,7 @@ def _result(
             f"Hero requires exactly one observed thread/input, got {len(normal_entries)}"
         )
     manual_semantic = [
-        operation
-        for operation in operation_trace
-        if operation.method in _MANUAL_SEMANTIC_METHODS
+        operation for operation in operation_trace if operation.method in _MANUAL_SEMANTIC_METHODS
     ]
     trace_payload = [
         {
@@ -661,6 +785,7 @@ def _result(
         "trace_contracts": _contract_digests(policy_payload),
         "runtime_source_paths": [source.path for source in loaded.sources],
         "source_digests": [source.byte_sha256 for source in loaded.sources],
+        "fixture_source_time_confirmations": list(fixture_time_confirmations),
         "model_ids": cast(list[str], analysis["model_ids"]),
         "stages": stages,
         "external_write_performed": False,

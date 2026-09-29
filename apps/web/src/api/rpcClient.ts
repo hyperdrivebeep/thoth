@@ -6,7 +6,7 @@ export type RpcResult<T> = {
   value: T;
 };
 export const readQueries = new Set(["thread/read", "thread/list", "thread/activity/list", "model/settings/read",
-  "model/credential/list", "workspace/setup/read", "workspace/ready",
+  "model/credential/list", "model/credential/login/status", "workspace/setup/read", "workspace/ready",
   "project/read", "project/list", "project/source/list", "evidence/list", "operation/read",
   "operation/result/read", "operation/checkpoint/read",
   "revision/timeline/read", "revision/timeline/item/read", "thread/result/read",

@@ -2,10 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import re
-import shutil
-import subprocess
-import tempfile
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Protocol, TypeVar, cast
@@ -69,6 +65,7 @@ ProcessFactory = Callable[[tuple[str, ...]], Awaitable[ProcessPort]]
 
 
 class CodexCliExecutor(CodexExecutorPort):
+    model_label = "codex-oauth/native-tools-unsupported"
     def __init__(
         self,
         *,
@@ -77,70 +74,12 @@ class CodexCliExecutor(CodexExecutorPort):
         timeout_seconds: float = 300,
         process_factory: ProcessFactory | None = None,
     ) -> None:
-        resolved = executable or _resolve_codex_executable()
-        if not resolved.is_file():
-            raise CodexOAuthUnavailable("official Codex CLI executable was not found")
-        self._executable = resolved
-        self._model = model
-        self._timeout_seconds = timeout_seconds
-        self._process_factory = process_factory or _spawn_codex
-        self.model_label = f"codex-oauth/{model or 'account-default'}"
+        del executable, model, timeout_seconds, process_factory
+        raise CodexOAuthUnavailable("CODEX_NATIVE_TOOL_BOUNDARY_UNSUPPORTED")
 
     async def execute(self, prompt: str, schema: dict[str, object]) -> str:
-        with tempfile.TemporaryDirectory(prefix="thoth-codex-oauth-") as directory:
-            root = Path(directory)
-            schema_path = root / "output.schema.json"
-            output_path = root / "last-message.json"
-            schema_path.write_text(
-                json.dumps(schema, ensure_ascii=False, sort_keys=True),
-                encoding="utf-8",
-                newline="\n",
-            )
-            arguments = [
-                str(self._executable),
-                "exec",
-                "--ephemeral",
-                "--ignore-user-config",
-                "--ignore-rules",
-                "--skip-git-repo-check",
-                "--sandbox",
-                "read-only",
-                "--output-schema",
-                str(schema_path),
-                "--output-last-message",
-                str(output_path),
-                "--color",
-                "never",
-                "-C",
-                str(root),
-            ]
-            if self._model:
-                arguments.extend(("--model", self._model))
-            arguments.append("-")
-            process = await self._process_factory(tuple(arguments))
-            try:
-                stdout, stderr = await asyncio.wait_for(
-                    process.communicate(prompt.encode()), timeout=self._timeout_seconds
-                )
-            except TimeoutError as exc:
-                process.kill()
-                await process.wait()
-                raise CodexStructuredOutputHold("Codex OAuth model execution timed out") from exc
-            if process.returncode != 0:
-                raw_diagnostic = (stdout + stderr).decode(errors="replace")
-                lowered = raw_diagnostic.lower()
-                if "not logged in" in lowered or ("login" in lowered and "required" in lowered):
-                    raise CodexOAuthUnavailable(
-                        "Codex OAuth is not connected; run `thoth auth-connect`"
-                    )
-                diagnostic = _safe_failure_diagnostic(raw_diagnostic)
-                raise CodexStructuredOutputHold(
-                    f"Codex OAuth model execution failed with exit code {process.returncode}: "
-                    f"{diagnostic}"
-                )
-            if not output_path.is_file():
-                raise CodexStructuredOutputHold("Codex did not produce a final structured message")
-            return output_path.read_text(encoding="utf-8")
+        del prompt, schema
+        raise CodexOAuthUnavailable("CODEX_NATIVE_TOOL_BOUNDARY_UNSUPPORTED")
 
 
 class CodexOAuthModel(ModelPort):
@@ -199,13 +138,21 @@ class CodexOAuthModel(ModelPort):
             )
             if isinstance(self._executor, BoundedModelExecutorPort):
                 work = research_work.get()
-                prepared = self._executor.prepare(
-                    final_prompt,
-                    schema,
-                    output_tokens=request.max_output_tokens,
-                    timeout_seconds=300 if work is None else work.boundary.call_timeout(),
-                    model_settings=request.model_settings,
-                )
+                call_timeout = 300 if work is None else work.boundary.call_timeout()
+                try:
+                    prepared = await asyncio.wait_for(
+                        asyncio.to_thread(
+                            self._executor.prepare,
+                            final_prompt,
+                            schema,
+                            output_tokens=request.max_output_tokens,
+                            timeout_seconds=call_timeout,
+                            model_settings=request.model_settings,
+                        ),
+                        timeout=20 if call_timeout is None else min(20, call_timeout),
+                    )
+                except TimeoutError as exc:
+                    raise CodexStructuredOutputHold("OAUTH_PREPARE_DEADLINE") from exc
                 raw = await self._dispatch_with_retry(prepared, dispatches)
             else:
                 wire = json.dumps(
@@ -312,65 +259,23 @@ class CodexOAuthModel(ModelPort):
             return reply.text
 
 
-def codex_oauth_status(executable: Path | None = None) -> dict[str, object]:
-    resolved = executable or _resolve_codex_executable()
-    if not resolved.is_file():
-        return {"provider": "codex-oauth", "connected": False, "reason": "CLI_NOT_FOUND"}
-    completed = subprocess.run(
-        [str(resolved), "login", "status"],
-        capture_output=True,
-        text=True,
-        timeout=15,
-        check=False,
-    )
-    output = f"{completed.stdout}\n{completed.stderr}".lower()
-    connected = completed.returncode == 0 and "logged in using chatgpt" in output
-    return {
-        "provider": "codex-oauth",
-        "connected": connected,
-        "reason": "CONNECTED" if connected else "LOGIN_REQUIRED",
-    }
+def codex_oauth_status(workspace: Path) -> dict[str, object]:
+    from thoth.adapters.models.codex_broker import broker_for_workspace
+
+    return broker_for_workspace(workspace).state().public()
 
 
-def run_codex_device_login(executable: Path | None = None) -> int:
-    resolved = executable or _resolve_codex_executable()
-    if not resolved.is_file():
-        raise CodexOAuthUnavailable("official Codex CLI executable was not found")
-    return subprocess.run([str(resolved), "login", "--device-auth"], check=False).returncode
+def run_codex_device_login(_workspace: Path | None = None) -> int:
+    raise CodexOAuthUnavailable("CODEX_USE_ISOLATED_APP_SERVER_LOGIN")
 
 
 def _resolve_codex_executable() -> Path:
-    value = shutil.which("codex.exe") or shutil.which("codex")
-    return Path(value) if value else Path("codex.exe")
+    raise CodexOAuthUnavailable("CODEX_USE_ISOLATED_APP_SERVER_PROFILE")
 
 
 def resolve_codex_executable() -> Path:
-    """Public local credential entrypoint for the existing CLI search order."""
+    """Legacy global lookup is deliberately disabled."""
     return _resolve_codex_executable()
-
-
-async def _spawn_codex(arguments: tuple[str, ...]) -> ProcessPort:
-    return await asyncio.create_subprocess_exec(
-        *arguments,
-        stdin=asyncio.subprocess.PIPE,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE,
-    )
-
-
-def _safe_failure_diagnostic(value: str) -> str:
-    selected = [
-        line.strip()
-        for line in value.splitlines()
-        if any(
-            marker in line.lower()
-            for marker in ("error", "invalid", "schema", "unsupported", "failed")
-        )
-    ]
-    compact = " | ".join(selected[-8:]) or "no safe diagnostic available"
-    compact = re.sub(r"(?i)bearer\s+[a-z0-9._-]+", "Bearer [REDACTED]", compact)
-    compact = re.sub(r"eyJ[a-zA-Z0-9._-]{20,}", "[REDACTED_JWT]", compact)
-    return compact[:1500]
 
 
 def _validation_summary(error: ValidationError) -> str:

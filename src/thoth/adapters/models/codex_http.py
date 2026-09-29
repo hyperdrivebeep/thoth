@@ -6,16 +6,18 @@ The upstream does not support a per-request generated/billed token ceiling.
 
 import asyncio
 import json
-import os
-import tomllib
+import time
+import weakref
 from contextlib import suppress
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from typing import cast
 
 import httpx
 from openai import DEFAULT_TIMEOUT
 
+from thoth.adapters.models.codex_broker import CodexAuthBroker, broker_for_workspace
 from thoth.adapters.models.http_rejection import read_rejection_metadata
 from thoth.adapters.models.receive_stats import ReceiveStats
 from thoth.adapters.models.sse_stream import parse_responses_sse
@@ -41,29 +43,24 @@ OAUTH_LOCAL_CONTROL = ModelControlCapability(
 
 
 class CodexLocalSession:
-    def __init__(self, root: Path | None = None, model: str | None = None) -> None:
-        self.root = root or Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
+    def __init__(
+        self,
+        workspace: Path,
+        model: str | None = None,
+        *,
+        broker: CodexAuthBroker | None = None,
+    ) -> None:
+        self.broker = broker or broker_for_workspace(workspace)
         self.model = model
 
     def read(self) -> OAuthSession:
-        try:
-            auth = json.loads((self.root / "auth.json").read_text(encoding="utf-8-sig"))
-            config = tomllib.loads((self.root / "config.toml").read_text(encoding="utf-8-sig"))
-            tokens = auth["tokens"]
-            model = self.model or config["model"]
-            if not all(
-                isinstance(v, str) and v
-                for v in (tokens["access_token"], tokens["account_id"], model)
-            ):
-                raise ValueError("missing settings")
-            return OAuthSession(
-                tokens["access_token"],
-                tokens["account_id"],
-                model,
-                config.get("model_reasoning_effort"),
-            )
-        except (OSError, ValueError, KeyError, TypeError) as exc:
-            raise ModelExecutionHold("OAUTH_CURRENT_SESSION_UNAVAILABLE") from exc
+        return self.broker.session(self.model)
+
+    def read_bound(self) -> tuple[OAuthSession, str]:
+        return self.broker.session_bound(self.model)
+
+    def validate_selection(self, model: str, effort: str | None) -> None:
+        self.broker.validate_selection(model, effort)
 
 
 class CodexHttpExecutor:
@@ -80,6 +77,42 @@ class CodexHttpExecutor:
         self.transport = transport
         self.timeout_policy = timeout_policy
         self._model_label = "codex-oauth/current-settings"
+        self._prepared_accounts: dict[
+            int, tuple[weakref.ReferenceType[PreparedModelDispatch], str, str | None]
+        ] = {}
+
+    def _bind(
+        self, prepared: PreparedModelDispatch, account_id: str, auth_digest: str | None
+    ) -> None:
+        key = id(prepared)
+        owner = weakref.ref(self)
+
+        def release(_ref: weakref.ReferenceType[PreparedModelDispatch]) -> None:
+            executor = owner()
+            if executor is not None:
+                executor._prepared_accounts.pop(key, None)
+
+        self._prepared_accounts[key] = (weakref.ref(prepared, release), account_id, auth_digest)
+
+    def with_observation_limits(
+        self,
+        prepared: PreparedModelDispatch,
+        *,
+        max_visible_output_bytes: int | None = None,
+        max_frame_bytes: int | None = None,
+    ) -> PreparedModelDispatch:
+        """Keep the same account/payload when a caller adds local receive limits."""
+        bound = self._prepared_accounts.get(id(prepared))
+        if bound is None or bound[0]() is not prepared:
+            raise ModelExecutionHold("OAUTH_PREPARED_BINDING_MISSING")
+        updates: dict[str, object] = {}
+        if max_visible_output_bytes is not None:
+            updates["max_visible_output_bytes"] = max_visible_output_bytes
+        if max_frame_bytes is not None:
+            updates["max_frame_bytes"] = max_frame_bytes
+        copy = replace(prepared, **updates)
+        self._bind(copy, bound[1], bound[2])
+        return copy
 
     @property
     def model_label(self) -> str:
@@ -94,10 +127,24 @@ class CodexHttpExecutor:
         timeout_seconds: float | None,
         model_settings: ResolvedModelSettings | None = None,
     ) -> PreparedModelDispatch:
-        settings = self.session.read()
+        if isinstance(self.session, CodexLocalSession):
+            settings, auth_digest = self.session.read_bound()
+        else:
+            settings, auth_digest = self.session.read(), None
         if model_settings is not None:
-            if model_settings.provider != "codex-oauth" or model_settings.model is None:
+            if (
+                model_settings.provider != "codex-oauth"
+                or model_settings.model is None
+                or (
+                    isinstance(self.session, CodexLocalSession)
+                    and model_settings.model != settings.model
+                )
+            ):
                 raise ModelExecutionHold("OAUTH_MODEL_SETTINGS_MISMATCH")
+            if isinstance(self.session, CodexLocalSession):
+                self.session.validate_selection(
+                    model_settings.model, model_settings.reasoning_effort
+                )
             settings = OAuthSession(
                 settings.access_token,
                 settings.account_id,
@@ -143,7 +190,7 @@ class CodexHttpExecutor:
                 pool_seconds=Decimal(str(DEFAULT_TIMEOUT.pool)),
                 policy_ref="OPENAI_SDK_IO_DEFAULTS",
             ).model_copy(update={} if policy is None else policy.model_dump(exclude_none=True))
-        return PreparedModelDispatch(
+        prepared = PreparedModelDispatch(
             json.dumps(body, ensure_ascii=False, separators=(",", ":")).encode(),
             output_tokens,
             None,
@@ -152,9 +199,64 @@ class CodexHttpExecutor:
             self.control_capability,
             None if policy is None else policy.bounded(timeout_seconds),
         )
+        self._bind(prepared, settings.account_id, auth_digest)
+        return prepared
 
     async def dispatch(self, request: PreparedModelDispatch) -> ModelTransportReply:
-        settings = self.session.read()
+        started = time.monotonic()
+        auth_limit = 15 if request.timeout_seconds is None else min(15, request.timeout_seconds)
+        try:
+            if isinstance(self.session, CodexLocalSession):
+                settings, auth_digest = await asyncio.wait_for(
+                    asyncio.to_thread(self.session.read_bound), timeout=auth_limit
+                )
+            else:
+                settings = await asyncio.wait_for(
+                    asyncio.to_thread(self.session.read), timeout=auth_limit
+                )
+                auth_digest = None
+        except TimeoutError as exc:
+            raise ModelExecutionHold("OAUTH_AUTH_DEADLINE") from exc
+        bound = self._prepared_accounts.get(id(request))
+        if bound is None or bound[0]() is not request or bound[1] != settings.account_id:
+            raise ModelExecutionHold("OAUTH_ACCOUNT_CHANGED_BEFORE_DISPATCH")
+        if bound[2] != auth_digest:
+            raise ModelExecutionHold("OAUTH_AUTH_SNAPSHOT_CHANGED_BEFORE_DISPATCH")
+        try:
+            payload_value: object = json.loads(request.payload)
+            if not isinstance(payload_value, dict):
+                raise TypeError("prepared payload must be an object")
+            payload = cast(dict[str, object], payload_value)
+            model = payload["model"]
+            reasoning = payload.get("reasoning")
+            effort = (
+                cast(dict[str, object], reasoning).get("effort")
+                if isinstance(reasoning, dict)
+                else None
+            )
+        except (ValueError, KeyError, TypeError, AttributeError) as exc:
+            raise ModelExecutionHold("OAUTH_PREPARED_PAYLOAD_INVALID") from exc
+        if isinstance(self.session, CodexLocalSession) and model != settings.model:
+            raise ModelExecutionHold("OAUTH_MODEL_CHANGED_BEFORE_DISPATCH")
+        if isinstance(self.session, CodexLocalSession):
+            try:
+                await asyncio.wait_for(
+                    asyncio.to_thread(
+                        self.session.validate_selection,
+                        settings.model,
+                        effort if isinstance(effort, str) else None,
+                    ),
+                    timeout=auth_limit,
+                )
+            except TimeoutError as exc:
+                raise ModelExecutionHold("OAUTH_AUTH_DEADLINE") from exc
+        remaining = (
+            None
+            if request.timeout_seconds is None
+            else request.timeout_seconds - (time.monotonic() - started)
+        )
+        if remaining is not None and remaining <= 0:
+            raise ModelExecutionHold("OAUTH_TRANSPORT_DEADLINE_REMOTE_STOP_UNKNOWN")
         stats = ReceiveStats()
         timeouts = (request.transport_timeouts or TransportTimeouts()).bounded(
             request.timeout_seconds
@@ -179,7 +281,8 @@ class CodexHttpExecutor:
         reason = ""
         try:
             reply = await asyncio.wait_for(
-                self._receive(client, request, settings, stats), request.timeout_seconds
+                self._receive(client, request, settings, stats, expected_digest=auth_digest),
+                remaining,
             )
         except asyncio.CancelledError as exc:
             stats.local_cancel_requested = True
@@ -225,6 +328,8 @@ class CodexHttpExecutor:
         request: PreparedModelDispatch,
         settings: OAuthSession,
         stats: ReceiveStats,
+        *,
+        expected_digest: str | None,
     ) -> ModelTransportReply:
         async def trace(event: str, info: dict[str, object]) -> None:
             # Only event identity is observed. Trace data may contain credentials/body.
@@ -237,7 +342,7 @@ class CodexHttpExecutor:
             elif ".receive_response_body." in event:
                 stats.last_transport_phase = "READ_BODY"
 
-        async with client.stream(
+        outgoing = client.build_request(
             "POST",
             "https://chatgpt.com/backend-api/codex/responses",
             headers={
@@ -247,7 +352,15 @@ class CodexHttpExecutor:
             },
             content=request.payload,
             extensions={"trace": trace},
-        ) as response:
+        )
+        if isinstance(self.session, CodexLocalSession):
+            async with self.session.broker.dispatch_gate_async(
+                settings, expected_digest=expected_digest
+            ):
+                response = await client.send(outgoing, stream=True)
+        else:
+            response = await client.send(outgoing, stream=True)
+        try:
             stats.http_status = response.status_code
             stats.capture_response(response)
             stats.first_response_ms = stats.elapsed_ms()
@@ -267,3 +380,5 @@ class CodexHttpExecutor:
                     reason = "MODEL_NOT_SUPPORTED"
                 raise ModelExecutionHold(f"OAUTH_{reason}_{response.status_code}")
             return await parse_responses_sse(response, request, stats, reason_prefix="OAUTH")
+        finally:
+            await response.aclose()

@@ -42,7 +42,9 @@ async def test_admitted_sandbox_receipt_nodes_share_with_all_input_sources(tmp_p
                 },
             )
         )
-        resource = value(await h.connect("alpha", "share-source", None))["artifact"]["artifact_id"]
+        resource = value(
+            await h.connect("alpha", "share-source", None, confirm_synthetic_time=True)
+        )["artifact"]["artifact_id"]
         value(
             await h.call(
                 "alpha",
@@ -148,7 +150,9 @@ async def test_executed_result_is_captured_when_source_is_revoked_during_run(
                 },
             )
         )
-        source = value(await h.connect("alpha", "sandbox-source", None))["artifact"]["artifact_id"]
+        source = value(
+            await h.connect("alpha", "sandbox-source", None, confirm_synthetic_time=True)
+        )["artifact"]["artifact_id"]
         scope = value(
             await h.call(
                 "alpha",

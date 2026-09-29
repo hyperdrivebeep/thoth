@@ -60,12 +60,9 @@ def test_malformed_index_lists_only_string_model_ids(tmp_path: Path) -> None:
     assert [item["model"] for item in listed] == ["gpt-4.1"]
 
 
-def test_public_codex_executable_lookup_keeps_existing_resolver(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    expected = tmp_path / "codex.exe"
-    monkeypatch.setattr(codex_oauth, "_resolve_codex_executable", lambda: expected)
-    assert resolve_codex_executable() == expected
+def test_legacy_global_codex_executable_lookup_is_disabled() -> None:
+    with pytest.raises(codex_oauth.CodexOAuthUnavailable, match="ISOLATED_APP_SERVER"):
+        resolve_codex_executable()
 
 
 def test_dynamic_credential_factory_sees_key_added_after_registration(tmp_path: Path) -> None:

@@ -4,6 +4,7 @@ import type { ExecutionError, ResearchFailure, ResultManifest } from "./research
 import { hasResearchContent } from "./presentation";
 import type { Currentness } from "./historyModels";
 import { ConversationRefreshError, isTransientReadFailure } from "./conversationRefresh";
+import { readLocalDraft, writeLocalDraft, type BrowserScope, type DraftWriteResult } from "./localWorkspacePersistence";
 
 const inputSchema = z.object({
   request_epoch: z.number().int(), request_revision_digest: z.string(),
@@ -86,9 +87,12 @@ export function withCurrentCheckpoint(turns: ConversationTurn[], status?: {curre
 }
 
 const draftKey = (project: string, thread: string) => `thoth:draft:v1:${JSON.stringify([project, thread])}`;
-export function readDraft(project: string, thread: string): string {
+export function readDraft(project: string, thread: string, scope?: BrowserScope): string {
+  if (scope?.mode === "LOCAL") return readLocalDraft(scope.workspaceId, project, thread);
   try { return sessionStorage.getItem(draftKey(project, thread)) ?? ""; } catch { return ""; }
 }
-export function writeDraft(project: string, thread: string, text: string) {
-  try { if (text) sessionStorage.setItem(draftKey(project, thread), text); else sessionStorage.removeItem(draftKey(project, thread)); } catch { /* Draft convenience only. */ }
+export function writeDraft(project: string, thread: string, text: string, scope?: BrowserScope): DraftWriteResult {
+  if (scope?.mode === "LOCAL") return writeLocalDraft(scope.workspaceId, project, thread, text);
+  try { if (text) sessionStorage.setItem(draftKey(project, thread), text); else sessionStorage.removeItem(draftKey(project, thread)); return "SAVED"; }
+  catch { return "UNAVAILABLE"; }
 }

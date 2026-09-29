@@ -31,6 +31,14 @@ BASE = {"op": "literal", "value": 0}
 CANDIDATE = {"op": "literal", "value": 1}
 
 
+async def test_pair_harness_rejects_duplicate_runtime_close(tmp_path: Path) -> None:
+    async with pair_harness(tmp_path, BASE, CANDIDATE, CASES) as harness:
+        runtime = harness.runtime
+        harness.close_runtime(runtime)
+        with pytest.raises(RuntimeError, match="PAIR_RUNTIME_ALREADY_CLOSED"):
+            harness.close_runtime(runtime)
+
+
 @pytest.mark.parametrize("change", ["scorer", "deadline"])
 async def test_change_after_baseline_prevents_candidate_execution(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, change: str
@@ -103,7 +111,7 @@ async def test_reopen_resumes_durable_arm_without_repeating_baseline(
         )
         assert stored is not None and stored.baseline is not None and stored.state == "PARTIAL"
         baseline_id = stored.baseline.execution_id
-        h.runtime.close()
+        h.close_runtime()
         reopened = create_runtime(
             tmp_path, evaluation_catalog=FrozenEvaluationCatalog((h.binding,))
         )
@@ -113,7 +121,7 @@ async def test_reopen_resumes_durable_arm_without_repeating_baseline(
             assert completed["state"] == "COMPLETE", completed
             assert completed["pair"]["baseline"]["execution_id"] == baseline_id
         finally:
-            reopened.close()
+            h.close_runtime(reopened)
 
 
 async def test_concurrent_pair_claim_executes_each_arm_once_without_transaction_during_io(
@@ -221,7 +229,7 @@ async def test_new_plan_cannot_reset_case_pack_reuse_budget(
                     data,
                 )
             )
-            h.runtime.close()
+            h.close_runtime()
             h.runtime = create_runtime(
                 tmp_path, evaluation_catalog=FrozenEvaluationCatalog((h.binding,))
             )

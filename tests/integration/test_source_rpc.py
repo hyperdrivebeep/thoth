@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 from tests.integration.scoped_runtime import create_runtime
+from tests.integration.test_a02_autonomous_acquisition import policy_payload
 
 from thoth.adapters.connectors import ConnectorRegistry, S3ReadConnector
 from thoth.domain.connectors import (
@@ -365,6 +366,35 @@ async def test_egress_preflight_blocks_driver_io_by_default(tmp_path: Path) -> N
                 },
             )
         )
+        empty_policy = await runtime.bus.dispatch(
+            _rpc(
+                "project/source/connect",
+                "egress-empty-allowlist",
+                {
+                    "project_id": "project:egress",
+                    "selector": {"bucket": "approved", "key": "project/result.json"},
+                    "media_type": "application/json",
+                },
+            )
+        )
+        assert empty_policy.error is not None
+        assert empty_policy.error.data["connector_error"] == "POLICY_EMPTY_CONNECTOR_ALLOWLIST"
+        policy = policy_payload(allow_connector=True)
+        policy["connector_allowlist"] = [connector.capability.connector_id]
+        policy["connector_allowed_egress_classes"] = ["NONE"]
+        policy["acquisition_routes"] = []
+        updated = await runtime.bus.dispatch(
+            _rpc(
+                "project/policy/update",
+                "egress-policy",
+                {
+                    "project_id": "project:egress",
+                    "expected_revision": 0,
+                    "payload": policy,
+                },
+            )
+        )
+        assert updated.error is None
         response = await runtime.bus.dispatch(
             _rpc(
                 "project/source/connect",

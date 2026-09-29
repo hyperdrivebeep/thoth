@@ -175,4 +175,5 @@ def test_session_runner_cli_replays_preregistered_event_taxonomy(tmp_path: Path)
     summary = json.loads(output.read_text(encoding="utf-8"))
     assert summary["summary"]["active_milliseconds"] == 300_000
     assert summary["summary"]["manual_reentry_count"] == 1
+    assert summary["external_participant_session"] == "LOCAL_REPLAY_ONLY"
     assert summary["d6_claimed"] is False

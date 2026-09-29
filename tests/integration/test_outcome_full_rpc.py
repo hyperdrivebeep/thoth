@@ -6,6 +6,7 @@ from typing import cast
 import pytest
 from pydantic import JsonValue
 from tests.integration.scoped_runtime import create_runtime
+from tests.integration.source_time_fixture import confirm_synthetic_source_time
 
 from thoth.domain.canonical import head_set_digest
 from thoth.protocol.jsonrpc import JsonRpcRequest, JsonRpcResponse
@@ -54,7 +55,7 @@ async def test_outcome_levels_attribution_changeset_followup_and_impact(tmp_path
                 )
             )
         )
-        value(
+        connected = value(
             await runtime.bus.dispatch(
                 request(
                     "project/source/connect",
@@ -70,6 +71,7 @@ async def test_outcome_levels_attribution_changeset_followup_and_impact(tmp_path
                 )
             )
         )
+        await confirm_synthetic_source_time(runtime, project_id, connected, key="outcome-source")
         evidence = value(
             await runtime.bus.dispatch(
                 request("evidence/list", "outcome-evidence", {"project_id": project_id})

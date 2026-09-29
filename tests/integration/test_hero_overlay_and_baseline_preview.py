@@ -21,6 +21,11 @@ async def test_hero_preserves_overlay_cutoff_and_protected_preview_boundaries(
     assert result.manifest["overlay"] == "eu-rnd-systems-integration"
     stages = cast(dict[str, dict[str, object]], result.manifest["stages"])
     assert cast(int, stages["source_cutoff"]["after_cutoff_excluded"]) >= 1
+    confirmations = cast(
+        list[dict[str, object]], result.manifest["fixture_source_time_confirmations"]
+    )
+    later = [item for item in confirmations if item["relative_path"] == "later-outcome.md"]
+    assert len(later) == 1 and later[0]["assertion"] == "AFTER_CUTOFF"
     preview = stages["closure_baseline_r3_preview"]
     assert preview["baseline_decision_performed"] is False
     assert preview["r3_action_performed"] is False

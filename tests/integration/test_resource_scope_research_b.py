@@ -20,9 +20,9 @@ async def test_b_hypothesis_access_tracks_source_grant_and_revocation(tmp_path: 
         }
     )
     async with scope_harness(tmp_path, policy) as h:
-        source = value(await h.connect("alpha", "hypothesis-source", None))["artifact"][
-            "artifact_id"
-        ]
+        source = value(
+            await h.connect("alpha", "hypothesis-source", None, confirm_synthetic_time=True)
+        )["artifact"]["artifact_id"]
         spans = value(await h.call("alpha", "evidence/list", "hypothesis-spans", {}))["spans"]
         thread = value(
             await h.call(

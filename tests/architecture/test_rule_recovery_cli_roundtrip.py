@@ -10,9 +10,17 @@ import sys
 import tempfile
 from pathlib import Path
 
+from scripts.extension_binding_contract import SourceIndex, binding_errors
 from scripts.verification_identity import reviewed_paths
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_current_schema_migration_class_binding_is_valid() -> None:
+    manifest = json.loads((ROOT / "config/architecture-conformance.json").read_bytes())
+    item = next(row for row in manifest["extension_points"] if row["name"] == "SCHEMA_MIGRATION")
+    assert item["consumer_targets"] == ["thoth.adapters.storage.bundle.SqliteStoreFactory"]
+    assert binding_errors(SourceIndex(ROOT), "SCHEMA_MIGRATION", item) == []
 
 
 def test_legacy_corruption_without_transaction_is_not_retroactively_authorized() -> None:
@@ -29,12 +37,21 @@ def _roundtrip(root: Path) -> None:
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
     gate = root / ".thoth/architecture"
-    env = {**os.environ, "THOTH_GATE_DIR": str(gate)}
+    env = {
+        **os.environ,
+        "THOTH_GATE_DIR": str(gate),
+        "PYTHONPATH": os.pathsep.join((str(root / "src"), str(root))),
+    }
 
     def run(script: str, *args: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            [sys.executable, f"scripts/{script}.py", *args], cwd=root, env=env,
-            capture_output=True, encoding="utf-8", check=False, timeout=90,
+            [sys.executable, f"scripts/{script}.py", *args],
+            cwd=root,
+            env=env,
+            capture_output=True,
+            encoding="utf-8",
+            check=False,
+            timeout=90,
         )
 
     prepared = run("prepare_architecture_preflight", "--acceptance", "A11", "--scope", "config")
@@ -45,10 +62,12 @@ def _roundtrip(root: Path) -> None:
     original_archive = archived.read_bytes()
     target = root / "config/architecture-conformance.json"
     original = target.read_bytes()
-    target.write_bytes(original.replace(
-        b'thoth.adapters.storage.bundle.SqliteStoreFactory"',
-        b'thoth.adapters.storage.bundle.SqliteStoreFactory.open"',
-    ))
+    target.write_bytes(
+        original.replace(
+            b'thoth.adapters.storage.bundle.SqliteStoreFactory"',
+            b'thoth.adapters.storage.bundle.MissingFactory"',
+        )
+    )
     assert target.read_bytes() != original
     unrelated = root / "user-work.txt"
     unrelated.write_bytes(b"unrelated working change")

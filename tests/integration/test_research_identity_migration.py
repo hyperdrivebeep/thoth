@@ -7,6 +7,7 @@ from pathlib import Path
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import URL, select
+from tests.integration.migration_head_helpers import current_single_head
 from tests.unit.test_research_projection import make_hypothesis
 
 from thoth.adapters.runtime import SystemClock, UuidIdGenerator
@@ -151,7 +152,7 @@ def test_upgrade_indexes_known_and_unknown_legacy_without_rewriting_snapshots(
         )
     result = AlembicSchemaMigrator(database).upgrade_head()
     assert result.before_heads == ("f7a69b2345cd",)
-    assert result.target_head == "2af5d3e76c81"
+    assert result.target_head == current_single_head()
     index = SqliteResearchIdentityStore(ledger.engine, ledger)
     rebuild_identity_index(ledger, index)
     rebuild_identity_index(ledger, index)

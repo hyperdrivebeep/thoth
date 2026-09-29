@@ -120,6 +120,95 @@ ENTRYPOINT = {
     "field": "field/protocol/seal|normal RPC fieldSessionId",
 }
 
+CREDENTIAL_METHOD_METADATA: dict[str, dict[str, object]] = {
+    "model/credential/list": {
+        "surface": "QUERY",
+        "canonical_owner": "THREAD_REQUEST_SETTINGS",
+        "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied",
+        "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via local /rpc",
+        "behavioral_evidence": (
+            "U08",
+            "U07",
+            "tests/unit/test_hosted_review_credential_rpc.py",
+        ),
+    },
+    "model/credential/login/cancel": {
+        "surface": "COMMAND",
+        "canonical_owner": "THREAD_REQUEST_SETTINGS",
+        "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied",
+        "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via XaiDeviceLogin local /rpc",
+        "behavioral_evidence": (
+            "tests/integration/test_xai_workspace_route.py",
+            "tests/unit/test_hosted_review_credential_rpc.py",
+            "apps/web/src/components/FirstRunSetup.test.tsx",
+        ),
+    },
+    "model/credential/login/complete": {
+        "surface": "COMMAND",
+        "canonical_owner": "THREAD_REQUEST_SETTINGS",
+        "policy": (
+            "system:workspace; LOCAL only; HOSTED_REVIEW denied; "
+            "secret response is ephemeral"
+        ),
+        "normal_entrypoint": "ModelCredentialPanel via local /rpc",
+        "behavioral_evidence": (
+            "tests/integration/test_xai_workspace_route.py",
+            "tests/unit/test_hosted_review_credential_rpc.py",
+        ),
+    },
+    "model/credential/login/status": {
+        "surface": "QUERY",
+        "canonical_owner": "THREAD_REQUEST_SETTINGS",
+        "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied",
+        "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via XaiDeviceLogin local /rpc",
+        "behavioral_evidence": (
+            "tests/integration/test_xai_workspace_route.py",
+            "tests/unit/test_hosted_review_credential_rpc.py",
+            "apps/web/src/components/FirstRunSetup.test.tsx",
+        ),
+    },
+    "model/credential/register": {
+        "surface": "COMMAND",
+        "canonical_owner": "THREAD_REQUEST_SETTINGS",
+        "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied",
+        "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via local /rpc",
+        "behavioral_evidence": (
+            "U08",
+            "U07",
+            "tests/unit/test_hosted_review_credential_rpc.py",
+            "tests/integration/test_xai_workspace_route.py",
+        ),
+    },
+}
+
+
+def _credential_metadata(name: str, surface: str) -> dict[str, object]:
+    metadata = CREDENTIAL_METHOD_METADATA.get(name)
+    required = {
+        "surface",
+        "canonical_owner",
+        "policy",
+        "normal_entrypoint",
+        "behavioral_evidence",
+    }
+    if metadata is None or set(metadata) != required:
+        raise ValueError(f"credential metadata missing or incomplete: {name}")
+    if metadata["surface"] != surface:
+        raise ValueError(f"credential surface mismatch: {name}")
+    if not all(
+        isinstance(metadata[key], str) and metadata[key]
+        for key in ("canonical_owner", "policy", "normal_entrypoint")
+    ):
+        raise ValueError(f"credential metadata missing or incomplete: {name}")
+    evidence = metadata["behavioral_evidence"]
+    if (
+        not isinstance(evidence, tuple)
+        or not evidence
+        or not all(isinstance(item, str) and item for item in evidence)
+    ):
+        raise ValueError(f"credential metadata missing or incomplete: {name}")
+    return metadata
+
 
 def _method_entry(
     *,
@@ -130,16 +219,31 @@ def _method_entry(
     alias_target: str | None,
     evidence: str | None = None,
 ) -> dict[str, object]:
+    credential = (
+        _credential_metadata(name, surface) if name.startswith("model/credential/") else None
+    )
     return {
         "name": name,
         "namespace": namespace,
         "surface": surface,
-        "canonical_owner": OWNER[namespace],
-        "policy": "research-model-settings:versioned"
-        if namespace in {"model", "workspace"}
-        else f"{namespace}:versioned-policy",
-        "normal_entrypoint": ENTRYPOINT[namespace],
-        "behavioral_evidence": tuple((evidence or ACCEPTANCE[namespace]).split(",")),
+        "canonical_owner": credential["canonical_owner"] if credential else OWNER[namespace],
+        "policy": (
+            credential["policy"]
+            if credential
+            else (
+                "research-model-settings:versioned"
+                if namespace in {"model", "workspace"}
+                else f"{namespace}:versioned-policy"
+            )
+        ),
+        "normal_entrypoint": (
+            credential["normal_entrypoint"] if credential else ENTRYPOINT[namespace]
+        ),
+        "behavioral_evidence": (
+            credential["behavioral_evidence"]
+            if credential
+            else tuple((evidence or ACCEPTANCE[namespace]).split(","))
+        ),
         "canonical": canonical,
         "alias_target": alias_target,
         "runtime_status": "IMPLEMENTED",
