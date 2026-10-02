@@ -157,6 +157,33 @@ class MemoryTransitionReceipt(DomainModel):
     recorded_at: AwareDatetime
 
 
+class MemorySelectionRecord(DomainModel):
+    """Which stored memory reached each stage of one recall, and why the rest did not.
+
+    Every list holds memory revision ids. The stages only narrow: eligible, retrieved (matches
+    the question), selected (inside the count limits), context_included (inside the token
+    budget). No score or probability is kept.
+    """
+
+    schema_version: Literal["1.0.0"] = "1.0.0"
+    injection_enabled: bool = True
+    limits: dict[str, int] = Field(default_factory=dict)
+    eligible: tuple[str, ...] = ()
+    retrieved: tuple[str, ...] = ()
+    selected: tuple[str, ...] = ()
+    context_included: tuple[str, ...] = ()
+    excluded: dict[str, tuple[str, ...]] = Field(default_factory=dict)
+    omitted_by_limit: dict[str, int] = Field(default_factory=dict)
+    truncated: tuple[str, ...] = ()
+    estimated_tokens: int = 0
+    # Words that most of the memories allowed at all share (counted, not scored); an automatic
+    # memory meeting the question only on these is left out. Empty when the pool was too small.
+    common_terms: tuple[str, ...] = ()
+    # A question that continues the previous investigation skips the word gate; the markers found.
+    follow_up: bool = False
+    follow_up_markers: tuple[str, ...] = ()
+
+
 class FullMemoryContextPack(DomainModel):
     context_pack_id: str
     project_id: ProjectId
@@ -170,6 +197,7 @@ class FullMemoryContextPack(DomainModel):
     injected_into_thread: bool
     canonical_truth: Literal[False] = False
     created_at: AwareDatetime
+    selection: MemorySelectionRecord | None = None
 
 
 class MemoryProjection(DomainModel):

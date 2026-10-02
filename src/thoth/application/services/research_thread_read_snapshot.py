@@ -17,7 +17,7 @@ from thoth.application.services.research_freshness import (
 )
 from thoth.application.services.resource_scope_read_context import scope_read_transaction
 from thoth.application.services.user_activity_projection import source_activity_contexts
-from thoth.domain.enums import EntityType
+from thoth.domain.enums import AuthorityState, CutoffState, EntityType
 from thoth.domain.evidence import connected_retrieval_spans
 from thoth.domain.model_dispatch import ModelDispatchRecord
 from thoth.domain.operation import OperationRecord
@@ -70,6 +70,7 @@ def read_research_snapshot(
             host.governance,
             host.analysis.artifacts,
             host.operations,
+            host.analysis.memory.store,
         ).evaluate_result(
             project_id,
             manifest.research_basis if isinstance(manifest, CurrentResultManifestV21) else None,
@@ -104,22 +105,35 @@ def read_research_snapshot(
                 manifest,
                 thread_id,
             )
-        visible_evidence = ()
         if manifest is not None and fresh:
-            # Source bindings/cutoff can change without a new user input.
-            visible_evidence = host.analysis.evidence(project_id)
-            present = {
-                s.span_id: f"{s.source_version_id}:{s.text_sha256}"
-                for s in connected_retrieval_spans(visible_evidence)
-            }
-            fresh = set(manifest.source_refs) <= present.keys() and all(
-                present.get(key) == digest for key, digest in manifest.source_basis.items()
-            )
-            selected = tuple(
-                s
-                for s in visible_evidence
-                if s.span_id in manifest.source_refs
-            )
+            # Source bindings/cutoff can change without a new user input. Only the sources this
+            # result used decide that, so they are read by id. When every one of them is an
+            # eligible connected span the full catalog adds nothing (eligible spans are always
+            # retrievable); any other state falls back to the catalog-wide rule below.
+            refs = tuple(dict.fromkeys((*manifest.source_refs, *manifest.source_basis)))
+            used = host.analysis.evidence_by_ids(project_id, refs)
+            by_id = {s.span_id: s for s in used}
+            if all(
+                ref in by_id
+                and by_id[ref].cutoff_state == CutoffState.ELIGIBLE
+                and by_id[ref].authority_state != AuthorityState.NOT_ADMISSIBLE
+                for ref in refs
+            ):
+                fresh = all(
+                    f"{by_id[key].source_version_id}:{by_id[key].text_sha256}" == digest
+                    for key, digest in manifest.source_basis.items()
+                )
+                selected = tuple(by_id[ref] for ref in dict.fromkeys(manifest.source_refs))
+            else:
+                visible_evidence = host.analysis.evidence(project_id)
+                present = {
+                    s.span_id: f"{s.source_version_id}:{s.text_sha256}"
+                    for s in connected_retrieval_spans(visible_evidence)
+                }
+                fresh = set(manifest.source_refs) <= present.keys() and all(
+                    present.get(key) == digest for key, digest in manifest.source_basis.items()
+                )
+                selected = tuple(s for s in visible_evidence if s.span_id in manifest.source_refs)
             if manifest.source_context_digest is not None:
                 fresh = fresh and manifest.source_context_digest == host.analysis.source_digest(
                     selected, version=manifest.source_context_version or "2.0.0"
@@ -155,14 +169,8 @@ def read_research_snapshot(
                         span_id = locator.get("span_id")
                         if isinstance(span_id, str):
                             activity_span_ids.add(span_id)
-        if activity_span_ids and not visible_evidence:
-            visible_evidence = host.analysis.evidence(project_id)
         activity_source_context = source_activity_contexts(
-            (
-                span
-                for span in visible_evidence
-                if span.span_id in activity_span_ids
-            ),
+            host.analysis.evidence_by_ids(project_id, sorted(activity_span_ids)),
             host.analysis.artifacts,
         )
     return ResearchThreadReadSnapshot(

@@ -18,6 +18,11 @@ export const recordRefSchema = z.object({
   owner_kind: z.enum(["SEMANTIC_REVISION", "FULL_MEMORY"]), project_id: z.string(),
   immutable_id: z.string(), revision_digest: digestSchema,
 });
+export const changeSummarySchema = z.object({
+  lines: z.array(z.object({ label: z.string(), before: z.string(), after: z.string() })), more: z.number().int().min(0).default(0),
+  flags: z.array(z.enum(["NUMBER", "NEGATION", "STATUS", "CITATION", "AUTHORITY", "TIME"])).default([]), text_diff_recommended: z.boolean().default(false),
+  other: z.number().int().min(0).default(0), technical: z.array(z.object({ label: z.string(), before: z.string(), after: z.string() })).default([]),
+});
 export const historyItemSchema = z.object({
   item_id: z.string(), kind: z.enum(["REQUEST", "RESULT", "REVISION", "RESTORE", "MEMORY"]),
   occurred_at: z.string().datetime({ offset: true }), record_ref: recordRefSchema,
@@ -30,6 +35,7 @@ export const historyItemSchema = z.object({
   entity_type: z.string().nullable().optional(), entity_id: z.string().nullable().optional(),
   schema_family: z.string().nullable().optional(), currentness: currentnessSchema, capability: capabilitySchema,
   completion: z.enum(["CHECKPOINT", "TERMINAL"]).nullable().optional(), phase: z.string().nullable().optional(),
+  change_summary: changeSummarySchema.nullable().optional(),
 });
 export const historyPageSchema = z.object({
   contract_version: z.literal(2), items: z.array(historyItemSchema), coverage: coverageSchema,

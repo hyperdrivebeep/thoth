@@ -111,15 +111,20 @@ screen. No existing workspace is needed for that check.
 ## First run and credentials
 
 Use THOTH's setup/settings flow and keep the backend and connection commands on the same workspace.
-API keys and model preferences belong to that workspace. Neither OMO nor Codex Desktop credentials
-are imported. A configured connection and a successful provider response are separate states.
+API keys and model preferences belong to that workspace. Existing credentials from other programs
+are not imported. A configured connection and a successful provider response are separate states.
 
 | Connection | Behavior |
 | --- | --- |
 | OpenAI, Anthropic and xAI API keys | Register your own provider key, then select an available model. |
 | ChatGPT / Codex | Experimental, version-pinned bridge using an official standalone Codex CLI and a THOTH-only profile. Login, token refresh and model discovery share that profile. |
-| Official Claude Code profile | Separate profile and official login helper are available. Research execution remains unavailable until its request/retry contract is verified. Use the Anthropic API-key route for research. |
+| Claude (official Claude Code) | Sign in from the Claude card. THOTH runs the official Claude Code executable with a THOTH-only `CLAUDE_CONFIG_DIR` and never reads its credential files. Research runs use that executable's no-tools print mode and record token usage as an observation, not a cost limit. Controlled with a fake executable only; real-account sign-in and answers are unverified. The client-ID Claude OAuth route stays hidden until an app registration exists. |
 | xAI subscription login | Experimental device-code route using a THOTH-owned workspace profile. OAuth models use the explicit `xai-oauth` route; existing `xai` API-key connections stay separate. Controlled Chrome/RPC flow passed with fake providers; real-account acceptance remains pending. |
+
+The Codex CLI and Claude Code are helper programs. When one is missing, its card offers an automatic
+install (Node.js required) into `%LOCALAPPDATA%\THOTH\tools\codex` or `...\claude-code`. It installs one
+pinned version, checks it, and never touches a global install or another program's login. The
+manual commands below do the same thing.
 
 For Codex, use THOTH's connection action. A started login is not a completed login; refresh the
 connection status after finishing in the browser. Missing CLI, unsupported version, missing login,
@@ -138,7 +143,7 @@ For the xAI candidate, start login in THOTH, then use the displayed user code an
 link. Starting a flow does not mean approval completed. Pending, denied, expired and cancelled
 flows have separate states; selecting an OAuth model is explicit and does not replace an existing
 API-key selection. THOTH owns token persistence and refresh in its workspace and does not import
-OMON's authentication or model-cache files. Connection/status reads do not call a model.
+other programs' authentication or model-cache files. Connection/status reads do not call a model.
 
 The device-code configuration follows the pinned open-source Senpi integration. Its use of the
 xAI Responses endpoint is an implementation reference, not a promise of official third-party
@@ -172,6 +177,21 @@ native package target is Windows x64; a working API-key route on another platfor
 that this pinned Codex package works there. The isolated nested installation, lock integrity and
 native version check passed; product authentication and integrated acceptance are separate in
 [the verification record](VERIFICATION.md).
+
+### Optional Claude Code prerequisite on Windows
+
+THOTH looks for Claude Code in its own tools folder first, then `claude` on PATH (an npm shim is
+followed to its native `claude.exe`), then the official installer folder. A global Claude Code that
+other programs use therefore never overrides the copy THOTH installed. To install a THOTH-only copy
+without changing that global one:
+
+```powershell
+$thothClaudePrefix = Join-Path $env:LOCALAPPDATA 'THOTH\tools\claude-code'
+npm.cmd install --prefix $thothClaudePrefix --install-strategy=nested --save-exact @anthropic-ai/claude-code@2.1.284
+```
+
+This does not sign in or call a model. Start the sign-in from the Claude card; it opens the official
+browser flow and, if the executable asks for a pasted code, the card forwards it to that process.
 
 ## Data location and restarting
 

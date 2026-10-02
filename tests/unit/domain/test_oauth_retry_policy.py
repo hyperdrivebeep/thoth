@@ -11,5 +11,5 @@ def test_allows_once_transient_429_for_codex_capability() -> None:
 def test_rejects_once_transient_429_for_xai_capability() -> None:
     assert not allows_once_transient_429(
         provider="xai",
-        capability_source="omo-xai-models-store/openai-responses-v1",
+        capability_source="fixture-xai/openai-responses-v1",
     )

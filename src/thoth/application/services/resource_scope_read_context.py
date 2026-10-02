@@ -40,6 +40,11 @@ def scope_read_transaction() -> Generator[None]:
     if not historical_verification_allowed():
         yield
         return
+    outer = _READ_LOOKUPS.get()
+    if outer is not None and outer.active and outer.task is asyncio.current_task():
+        # A read that is already inside one request-wide memo keeps using it.
+        yield
+        return
     memo = ReadLookupMemo(asyncio.current_task())
     token = _READ_LOOKUPS.set(memo)
     try:
@@ -53,7 +58,11 @@ def scope_read_transaction() -> Generator[None]:
 def scope_read_context(
     owner: object, project: str, actor: AuthenticatedActorContext | None
 ) -> ScopeReadContext:
-    """Reuse immutable lookups, never another admission's permission/depth verdict."""
+    """Share immutable lookups within a request; authorize each traversal independently.
+
+    Successful approvals depend on the root's ancestry depth, so they must not carry
+    over to another root even in the same task, actor and read transaction.
+    """
     from thoth.application.services.historical_access_verification import (
         historical_verification_allowed,
     )
@@ -69,5 +78,8 @@ def scope_read_context(
     key = (id(owner), project, "LOCAL" if actor is None else actor.model_dump_json())
     prior = memo.lookups.setdefault(key, ScopeReadContext(project, actor))
     return ScopeReadContext(
-        project, actor, alias_to_canonical=prior.alias_to_canonical, records=prior.records
+        project,
+        actor,
+        alias_to_canonical=prior.alias_to_canonical,
+        records=prior.records,
     )

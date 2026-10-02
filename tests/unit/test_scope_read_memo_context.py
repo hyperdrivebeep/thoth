@@ -19,9 +19,15 @@ async def test_lookup_memo_is_query_transaction_task_project_and_owner_local():
             first = scope_read_context(owner, "p", None)
             first.alias_to_canonical["alias"] = "canonical"
             first.checked.add("checked")
+            first.ancestors.add("walk-only")
             again = scope_read_context(owner, "p", None)
             assert again.alias_to_canonical is first.alias_to_canonical
-            assert not again.checked and not again.ancestors
+            # Lookups are shared; approvals and ancestry belong to each traversal.
+            assert again.records is first.records
+            assert again.checked is not first.checked and not again.checked
+            assert not again.ancestors
+            assert not scope_read_context(other, "p", None).checked
+            assert not scope_read_context(owner, "foreign", None).checked
             assert not scope_read_context(other, "p", None).alias_to_canonical
             assert not scope_read_context(owner, "foreign", None).alias_to_canonical
             actor = AuthenticatedActorContext(

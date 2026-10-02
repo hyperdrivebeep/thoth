@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import dataclass
 
 from thoth.adapters.memory import (
     DeterministicRoleMemoryReviewer,
@@ -10,17 +11,23 @@ from thoth.adapters.memory import (
     LocalMemoryEmbedding,
     LocalRelationProjectionBuilder,
 )
+from thoth.application.commands.memory_edits import MemoryEditHandlers
 from thoth.application.commands.memory_full import MemoryFullHandlers
+from thoth.application.commands.memory_revisions import MemoryRevisionHandlers
+from thoth.application.commands.memory_settings import MemorySettingsHandlers
 from thoth.application.services.full_project_memory import FullProjectMemoryService
 from thoth.application.services.memory_admission import MemoryAdmissionService
+from thoth.application.services.memory_edit_service import MemoryEditService
+from thoth.application.services.memory_settings import MemorySettingsService
 from thoth.application.services.post_execution_memory import PostExecutionMemory
 from thoth.application.services.request_records import RequestRecords
+from thoth.application.services.research_freshness import ResearchFreshnessService
+from thoth.application.services.revision_service import RevisionCommitService
 from thoth.application.services.scoped_memory import MemoryResourceAccess, ScopedFullMemoryStore
 from thoth.application.services.scoped_memory_controls import (
     MemoryControlWriter,
     ScopedMemoryControls,
 )
-from thoth.ports.control_record import ControlRecordStorePort
 from thoth.ports.governance import GovernanceStorePort
 from thoth.ports.ledger import LedgerPort, ManagedLedgerPort
 from thoth.ports.memory import FullMemoryStorePort, MemoryReviewerPort, MemoryStorePort
@@ -40,22 +47,62 @@ def create_post_execution_memory(
     return PostExecutionMemory(RequestRecords(stores.ledger, stores.controls, clock, ids), memory)
 
 
+@dataclass(frozen=True)
+class MemoryHandlers:
+    controls: MemoryFullHandlers
+    revisions: MemoryRevisionHandlers
+    edits: MemoryEditHandlers
+    settings: MemorySettingsHandlers
+
+
+def create_memory_settings(
+    stores: StoreBundlePort, clock: ClockPort, ids: IdGeneratorPort
+) -> MemorySettingsService:
+    return MemorySettingsService(RequestRecords(stores.ledger, stores.controls, clock, ids))
+
+
 def create_memory_handlers(
-    records: ControlRecordStorePort,
+    stores: StoreBundlePort,
     legacy: MemoryStorePort,
     full: FullMemoryStorePort,
     ledger: LedgerPort,
     clock: ClockPort,
     ids: IdGeneratorPort,
     access: ResourceAccessPort,
-) -> MemoryFullHandlers:
-    visible = ScopedMemoryControls(records, access, ledger)
-    return MemoryFullHandlers(
+    memory: FullProjectMemoryService,
+) -> MemoryHandlers:
+    """Build every memory RPC owner and seed the two built-in memory policies."""
+
+    visible = ScopedMemoryControls(stores.controls, access, ledger)
+    controls = MemoryFullHandlers(
         records=visible,
         controls=MemoryControlWriter(store=visible, clock=clock, ids=ids),
         legacy=legacy,
         full=full,
         ledger=ledger,
+    )
+    controls.seed_policies()
+    freshness = ResearchFreshnessService(ledger)
+    revisions = MemoryRevisionHandlers(
+        full=full,
+        ledger=ledger,
+        owner_state=lambda project_id, owner: freshness.owner_eligibility(project_id, owner).state,
+    )
+    service = MemoryEditService(
+        memory=memory,
+        full=full,
+        ledger=ledger,
+        commits=RevisionCommitService(ledger, clock, ids, policy_version="memory-edit:1.0.0"),
+        clock=clock,
+        ids=ids,
+    )
+    return MemoryHandlers(
+        controls,
+        revisions,
+        MemoryEditHandlers(service=service, rows=revisions),
+        MemorySettingsHandlers(
+            service=create_memory_settings(stores, clock, ids), projects=stores.projects
+        ),
     )
 
 
@@ -91,11 +138,17 @@ def create_memory_components(
             clock=clock,
         ),
         resource_access=access,
+        injection=create_memory_settings(stores, clock, ids),
     )
     return (store if access is None else ScopedFullMemoryStore(store, access)), service
 
 
-def register_memory_handlers(registry: MethodRegistry, handlers: MemoryFullHandlers) -> None:
+def register_memory_handlers(registry: MethodRegistry, owners: MemoryHandlers) -> None:
+    handlers = owners.controls
+    registry.register("memory/revision/list", owners.revisions.revision_list)
+    registry.register("memory/edit/propose", owners.edits.propose)
+    registry.register("memory/settings/read", owners.settings.read)
+    registry.register("memory/settings/update", owners.settings.update)
     registry.register("memory/list", handlers.list)
     registry.register("memory/read", handlers.read)
     registry.register("memory/candidate/list", handlers.candidate_list)

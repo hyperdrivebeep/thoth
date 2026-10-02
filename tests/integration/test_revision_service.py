@@ -212,3 +212,30 @@ def test_transaction_rolls_back_all_rows_on_integrity_failure(tmp_path: Path) ->
     assert ledger.read_revisions("project:1", "DECISION_OBJECT", "object:1") == ()
     assert ledger.read_receipts("project:1") == ()
     ledger.close()
+
+
+def test_a_record_that_must_still_be_absent_branches_when_someone_created_it_first(
+    tmp_path: Path,
+) -> None:
+    ledger, service = _service(tmp_path / "db.sqlite3")
+    first = _staged("a", "first")
+
+    def change(staged: StagedRevision, absent: tuple[str, ...]) -> RevisionChangeSet:
+        return RevisionChangeSet(
+            changeset_id=f"changeset:{staged.revision.revision_id}",
+            project_id="project:1",
+            expected_heads={},
+            expected_absent_heads=absent,
+            staged_revisions=(staged,),
+            impact_plan=ImpactPropagationPlan(),
+            actor=staged.revision.actor,
+            reason="test",
+        )
+
+    key = "DECISION_OBJECT:object:1"
+    assert service.commit(change(first, (key,))).disposition == CommitDisposition.FAST_FORWARD
+    second = _staged("b", "second", parents=(first.revision.revision_digest,))
+    late = service.commit(change(second, (key,)))
+    assert late.disposition == CommitDisposition.BRANCH
+    assert ledger.read_heads("project:1")[key] == first.revision.revision_digest
+    ledger.close()

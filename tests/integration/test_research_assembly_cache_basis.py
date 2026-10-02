@@ -81,6 +81,7 @@ async def test_cache_tracks_its_actual_raw_structure_and_policy_inputs(
         analysis.assemble(current, ranking, candidates, source)
         baseline = len(calls)
         original_structure = analysis.artifacts.read_structure
+        original_metadata = analysis.artifacts.read_structure_metadata_digest
 
         def changed_structure(
             project_id: str, artifact_id: str, source_version_id: str
@@ -99,6 +100,21 @@ async def test_cache_tracks_its_actual_raw_structure_and_policy_inputs(
 
         with monkeypatch.context() as patch:
             patch.setattr(analysis.artifacts, "read_structure", changed_structure)
+
+            # Persisted structure metadata contains nodes_digest. A changed body
+            # must change that identity too; changing only read_structure would
+            # violate the immutable version/metadata contract used by the cache.
+            def changed_metadata(project: str, artifact: str, version: str) -> str | None:
+                prior = original_metadata(project, artifact, version)
+                return (
+                    None
+                    if prior is None
+                    else domain_digest(
+                        "FIXTURE_CHANGED_STRUCTURE", "1.0.0", canonical_payload({"prior": prior})
+                    )
+                )
+
+            patch.setattr(analysis.artifacts, "read_structure_metadata_digest", changed_metadata)
             analysis.assemble(current, ranking, candidates, source)
             assert len(calls) == baseline + 1
         current = work()

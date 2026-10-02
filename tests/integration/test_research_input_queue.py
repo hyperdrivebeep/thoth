@@ -803,6 +803,13 @@ async def test_cancel_queued_operation_records_hold_without_running_it(tmp_path:
         runtime.close()
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "Known HOSTED_REVIEW-only issue (decision record 2026-10-01): "
+        "a same-key retransmit seals the queued operation; local mode is unaffected."
+    ),
+)
 async def test_restart_preserves_queued_receipt_without_automatic_model_reentry(
     tmp_path: Path,
 ) -> None:

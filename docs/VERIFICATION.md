@@ -1,5 +1,41 @@
 # Verification and known limits
 
+## Current merge gate (2026-10-03)
+
+The merge/publication gate is the product check defined in
+[verification policy](architecture/verification-profiles.md). The candidate retains an unresolved Python failure;
+no complete current-source product-check pass is claimed. Historical FULL results below are
+retained as historical evidence, not current merge requirements or a new pass.
+
+## Recorded product-check follow-up (2026-10-03)
+
+The first completed candidate product check had 2,135 Python passes, 40 failures,
+one skip and one expected failure; 139 inactive development diagnostics were excluded.
+That failure result is retained. A correction keeps optional stream observations absent
+instead of converting missing values to decimals. Scope lookup tests now require fresh
+approvals for each traversal, and permission-recall fixtures explicitly ask about previous
+research to satisfy the independent narrow-recall gate. Focused results do not replace a
+complete product-check result. The final-source rerun of those 40 failures passed 39 cases and retained one baseline failure.
+A new complete-suite rerun was stopped when verification was explicitly narrowed to failed cases.
+The complete result and focused result are reported separately.
+
+Web verification passed 409 cases with one skip; lint, types, build and runtime layer checks passed.
+The final first-setup screen shows all three providers disconnected and its Next button disabled;
+local doctor passed eight checks. The Web source hashes are unchanged, so its verified build was
+reused for this screen check. Real-account login and provider response acceptance remain unverified.
+
+A synthetic finalization-fault/reopen case also fails on the unmodified source baseline:
+the same action can execute again when its compiled input files shrink from two to one,
+while the previous execution's result remains unadmitted. The current guard compares exact
+input bundles. This input-change recovery risk is unresolved and requires reconciliation
+before relying on that path for effects. No release-readiness claim is made for it.
+
+ATOMICITY DEBT: 10 OPEN
+
+A bounded slice D4/D5 does not certify full namespace atomicity.
+Claude Code and xAI real-account login and response acceptance remain unverified.
+
+
 ## 2026-09-29 public source update and acceptance boundary
 
 Authentication and restart changes are published as experimental source before live acceptance.
@@ -52,6 +88,10 @@ live OAuth entitlement, actual provider output quality, Codex Desktop coexistenc
 physical Windows reboot is certified. Synthetic transports and process interruption/cold
 copies are not evidence of those external outcomes. No verifier policy, inactive Hook
 selection or assertion threshold was relaxed.
+
+Known limit (decision record 2026-10-01): in the hosted-review mode only, retransmitting the same idempotency key after a restart seals the queued research operation as stale instead of returning the original receipt. Local mode is unaffected; the test is marked as an expected failure and the fix is deferred.
+
+Known limit (decision record 2026-10-03): if a sandboxed research test runs but saving its result fails, and the test's input files shrink before the workspace is reopened, the duplicate-run guard treats it as a new test and runs it a second time. The earlier execution record is kept. The case exists since the first public source; its test is marked as a strict expected failure and the fix (resolve the pending result before any rerun) is deferred.
 
 ## Recorded feature evidence
 

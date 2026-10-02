@@ -24,7 +24,7 @@ name both; otherwise resolve fails with `MODEL_ROUTE_INCOMPLETE`. Replacing the 
 drops inherited effort unless that same layer names one; the new option's default_effort
 is then used. Effort-only updates (`/reasoning`) keep the current route.
 `ONCE_TRANSIENT_429` is attached only on the Codex OAuth path; other providers omit it.
-The xAI Responses wire matches OmO native chat params plus codec json_schema: model, input,
+The xAI Responses wire uses these Responses parameters plus codec json_schema: model, input,
 stream, store, optional reasoning, and text.format.json_schema. Empty tools, tool_choice,
 parallel_tool_calls, and instructions stay omitted. Probe 2026-09-17: that combination is HTTP 200.
 
@@ -54,9 +54,9 @@ final serialized request; tests compare the captured transport body with its res
 
 ## User-approved token policy change — 2026-09-14, locally implemented
 
-Implementation record: [conversation UI and shared usage](../verification/conversation-ui-20260914.md). Shared request reservation no longer enforces the cumulative token cutoff, including old stored 400,000 settings. `thread/read.usage` version 1.0.0 reports Thread-scoped observed tokens to Web and the existing TUI progress presenter. Current transports/catalogs provide no applicable pricing/cost basis, so estimated cost is UNKNOWN without a replacement calculation or extra call. Focused checks passed; real-case QA and FULL are not claimed.
+Shared request reservation no longer enforces the cumulative token cutoff, including old stored 400,000 settings. `thread/read.usage` version 1.0.0 reports Thread-scoped observed tokens to Web and the existing TUI progress presenter. Current transports/catalogs provide no applicable pricing/cost basis, so estimated cost is UNKNOWN without a replacement calculation or extra call. Focused checks passed; real-case QA and FULL are not claimed.
 
-The user requested: “일단 한도는 정하지 말고 사용자에게 사용되는 토큰 보여지는게 나은듯 내가 쓰는 omo native tui 보니까 그르더라”.
+The approved policy displays observed token usage without imposing a cumulative token ceiling.
 
 - Do not enforce THOTH's own cumulative token ceiling by default. The 400,000 conservative-reservation cutoff below is the previous implementation, not the newly approved policy. Do not replace it with another arbitrary token cap or only hide the existing stop condition.
 - Show actual provider-reported token usage compactly in the conversation/composer area. Label the scope (current request or current Thread), and offer input/output detail. It is usage information, not a percentage of completion, context occupancy, or an allowance purchased from the provider.

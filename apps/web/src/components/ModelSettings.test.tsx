@@ -7,7 +7,7 @@ import { LiveProjectWorkspace } from "./LiveProjectWorkspace";
 
 const fixture = vi.hoisted(() => ({ calls: [] as {method: string; input: Record<string, unknown>; key:string}[],
   effort: "low", pending: null as null | (() => void), delay: false, failOnce:false, unavailable:false,
-  reason:"MODEL_CAPABILITY_UNKNOWN", saved:{provider:"retired",model:"old-model",reasoning_effort:"high"}, inheritThread:false, projectSettingsDenied:false, threadDenied:false, includeXaiModel:false }));
+  reason:"MODEL_CAPABILITY_UNKNOWN", saved:{provider:"retired",model:"old-model",reasoning_effort:"high"}, inheritThread:false, projectSettingsDenied:false, threadDenied:false, includeXaiModel:false, catalogStatus: [] as unknown[], optionExtra: {} as Record<string, unknown> }));
 vi.mock("../api/rpcClient", async (importOriginal) => ({ ...(await importOriginal<typeof import("../api/rpcClient")>()), cancelRpcOperation: vi.fn(),
   rpc: async (method: string, input: Record<string, unknown>, key:string) => {
     fixture.calls.push({method, input,key});
@@ -24,7 +24,8 @@ vi.mock("../api/rpcClient", async (importOriginal) => ({ ...(await importOrigina
       selection: fixture.unavailable ? input.thread_id && fixture.inheritThread ? {provider: null, model: null, reasoning_effort: null} : fixture.saved : {provider: null, model: null, reasoning_effort: null},
       effective_settings: fixture.unavailable ? null : {provider: "test", model: "test", reasoning_effort: fixture.effort},
       availability: fixture.unavailable ? "UNAVAILABLE" : "AVAILABLE", reason_code: fixture.unavailable ? fixture.reason : null,
-      model_options: [{provider: "test", model: "test", reasoning_efforts: ["low", "high"], default_effort: "low"},
+      catalog_status: fixture.catalogStatus,
+      model_options: [{provider: "test", model: "test", reasoning_efforts: ["low", "high"], default_effort: "low", ...fixture.optionExtra},
         ...(fixture.includeXaiModel ? [{provider: "xai-oauth", model: "grok-4.6", reasoning_efforts: ["low", "medium", "high", "xhigh"], default_effort: null}] : [])]};
     if (method === "project/source/list") value = {artifacts: []};
     if (method === "evidence/list") value = {evidence: []};
@@ -62,7 +63,7 @@ async function submit() {
   await act(async () => {container.querySelector("form.prompt-composer")!.dispatchEvent(new Event("submit", {bubbles: true, cancelable: true}));});
   await flush();
 }
-async function mount(unavailable = false, options: { reason?: string; saved?: { provider: string; model: string; reasoning_effort: string }; inheritThread?: boolean; includeXaiModel?: boolean } = {}) {
+async function mount(unavailable = false, options: { reason?: string; saved?: { provider: string; model: string; reasoning_effort: string }; inheritThread?: boolean; includeXaiModel?: boolean; newSession?: boolean } = {}) {
   Object.assign(globalThis, {IS_REACT_ACT_ENVIRONMENT: true});
   fixture.calls = []; fixture.effort = "low"; fixture.delay = false; fixture.pending = null;fixture.failOnce=false;fixture.unavailable=unavailable;
   fixture.reason=options.reason??"MODEL_CAPABILITY_UNKNOWN";fixture.saved=options.saved??{provider:"retired",model:"old-model",reasoning_effort:"high"};fixture.inheritThread=options.inheritThread??false;fixture.projectSettingsDenied=false;fixture.threadDenied=false;fixture.includeXaiModel=options.includeXaiModel??false;
@@ -72,10 +73,22 @@ async function mount(unavailable = false, options: { reason?: string; saved?: { 
   await act(async () => {root.render(<QueryClientProvider client={client}><LiveProjectWorkspace /></QueryClientProvider>);});
   for (let i = 0; i < 8 && !container.querySelector("button.project-button"); i++) await flush();
   await act(async () => {container.querySelector<HTMLButtonElement>("button.project-button")!.click();});
-  for (let i = 0; i < 10 && (!container.querySelector('[aria-label="연구 추론강도"]') || (!unavailable && effort().value !== "low")); i++) await flush();
+  // The effort select exists before the settings response, so an unavailable mount waits for the notice
+  // that only renders once that response has been applied.
+  const settingsApplied = () => unavailable
+    ? Boolean(container.textContent?.includes("저장된 모델 선택을 현재 사용할 수 없습니다"))
+    : Boolean(container.querySelector('[aria-label="연구 추론강도"]')) && effort().value === "low";
+  for (let i = 0; i < 40 && !settingsApplied(); i++) await flush();
+  if (options.newSession) await startNewSession();
   if (!unavailable) expect(effort().value).toBe("low");
 }
-afterEach(async () => { if (root) await act(async () => root.unmount()); client?.clear(); container?.remove(); });
+// A8: opening a project lands on its latest work, so tests that need a first-question draft start a new session.
+async function startNewSession() {
+  for (let i = 0; i < 10 && !container.querySelector("button.new-session-button"); i++) await flush();
+  await act(async () => {container.querySelector<HTMLButtonElement>("button.new-session-button")!.click();});
+  await flush();
+}
+afterEach(async () => { if (root) await act(async () => root.unmount()); client?.clear(); container?.remove(); fixture.catalogStatus = []; fixture.optionExtra = {}; });
 
 it("one-shot high returns to low visibly and in the next same-thread request", async () => {
   await mount(); await submit(); // established Thread: same child key thereafter
@@ -226,9 +239,9 @@ it("saved defaults survive reload and apply to successive requests", async () =>
 });
 
 it("a late admission cannot replace a different project draft", async () => {
-  await mount(); fixture.delay = true; await select("high"); await submit();
+  await mount(false, { newSession: true }); fixture.delay = true; await select("high"); await submit();
   await act(async () => {container.querySelectorAll<HTMLButtonElement>("button.project-button")[1].click();});
-  await flush(); await select("low");
+  await flush(); await startNewSession(); await select("low");
   await act(async () => {fixture.pending!(); await tick();});
   expect(effort().value).toBe("low");
   fixture.delay = false; await submit();
@@ -238,7 +251,7 @@ it("a late admission cannot replace a different project draft", async () => {
 });
 
 it("same-draft transport retry reuses the idempotency key and double-submit is blocked",async()=>{
-  await mount();fixture.failOnce=true;await submit();
+  await mount(false, { newSession: true });fixture.failOnce=true;await submit();
   const failed=fixture.calls.filter(c=>c.method==="thread/start").at(-1)!;
   fixture.delay=true;
   await act(async()=>{
@@ -266,7 +279,8 @@ it("a late admission cannot replace a different selected thread",async()=>{
 
 it("ordinary navigation only automatically calls the actual nonmutating query surface",async()=>{
   await mount();
-  expect(fixture.calls.filter(call=>!["project/list","thread/list","project/source/list","evidence/list","model/settings/read","workspace/ready"].includes(call.method)).map(call=>call.method)).toEqual([]);
+  // A8: opening a project also reads its latest work (read-only thread queries).
+  expect(fixture.calls.filter(call=>!["project/list","thread/list","project/source/list","evidence/list","model/settings/read","workspace/ready","thread/read","thread/activity/list"].includes(call.method)).map(call=>call.method)).toEqual([]);
   await act(async()=>{container.querySelector<HTMLElement>('[role="tab"][data-tab-id="records"]')?.click();});
   expect(fixture.calls.some(call=>call.method==="receipt/verify")).toBe(false);
 });
@@ -290,4 +304,38 @@ it("project-create retry preserves project ID and key without a globally shared 
   expect(calls[0].input.project_id).toBe(calls[1].input.project_id);
   expect(calls[0].input).not.toHaveProperty("policy_binding_ref");
   await act(async()=>{fixture.pending!();await tick();});
+});
+
+it("shows when the list was last checked and keeps listing the models", async () => {
+  fixture.catalogStatus = [{ provider: "test", source: "PROVIDER_LIST", status: "ACTIVE", fetched_at: new Date().toISOString(), failure_reason: null, excluded: [] }];
+  await mount();
+  expect(container.textContent).toContain("마지막 확인: 오늘");
+  expect(container.textContent).toContain("최신");
+  expect(container.textContent).not.toContain("갱신 실패");
+});
+
+it("warns in one line when the refresh failed, without emptying the list or changing the selection", async () => {
+  fixture.catalogStatus = [{ provider: "test", source: "PROVIDER_LIST", status: "STALE_LAST_GOOD", fetched_at: new Date().toISOString(), failure_reason: "CATALOG_UNAVAILABLE", excluded: [] }];
+  await mount();
+  expect(container.textContent).toContain("마지막 확인 목록 · 갱신 실패");
+  expect(container.textContent).toContain("모델 목록을 새로 받지 못해 마지막으로 확인한 목록을 보여 줍니다");
+  const model = container.querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
+  expect([...model.options].map(option => option.value)).toContain("test/test");
+  expect(model.value).toBe("test/test");
+  expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
+});
+
+it("marks a refused model and a model not yet checked against the account, and folds away the unsupported ones", async () => {
+  fixture.optionExtra = { entitlement: "UNVERIFIED", execution: "REJECTED", label: "최신 Sonnet(별칭) · Claude Code 2.1.284" };
+  fixture.catalogStatus = [{ provider: "test", source: "PROVIDER_LIST", status: "ACTIVE", fetched_at: new Date().toISOString(), failure_reason: null,
+    excluded: [{ model: "gpt-5.4", reason: "UNSUPPORTED_SLUG" }, { model: "router/x", reason: "NAMESPACED_ID" }] }];
+  await mount();
+  const text = container.textContent ?? "";
+  expect(text).toContain("최신 Sonnet(별칭) · Claude Code 2.1.284");
+  expect(text).toContain("실행 거부됨");
+  expect(text).toContain("THOTH가 아직 지원하지 않는 모델 2개");
+  const folded = container.querySelector("details.model-excluded");
+  expect(folded).not.toBeNull();
+  expect(folded!.hasAttribute("open")).toBe(false);
+  expect(folded!.textContent).toContain("gpt-5.4");
 });

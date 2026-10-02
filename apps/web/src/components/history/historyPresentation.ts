@@ -8,6 +8,9 @@ const states: Record<string, string> = {
 export function currentnessLabel(currentness: Currentness): string {
   return states[currentness.state] ?? "현재 기준 미확인";
 }
+export function currentnessReasonNote(currentness: Currentness): string | null {
+  return currentness.reasons.includes("MEMORY_CORRECTED_AFTER_RESULT") ? "이 결과가 쓴 기억이 이후 정정되었습니다" : null;
+}
 export function currentnessTone(currentness: Currentness): "success" | "warning" | "none" {
   if (currentness.state === "CURRENT") return "success";
   return ["REVIEW_REQUIRED", "RECALCULATION_REQUIRED", "STALE", "INVALIDATED"].includes(currentness.state) ? "warning" : "none";

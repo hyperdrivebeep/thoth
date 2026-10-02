@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from contextlib import nullcontext, suppress
+from contextlib import nullcontext
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Literal
@@ -18,10 +18,13 @@ from thoth.application.services.behavior_context import (
     should_semantic_repair,
 )
 from thoth.application.services.criterion_projection import criterion_projection
+from thoth.application.services.cycle_memory_preparation import prepare_cycle_memory
 from thoth.application.services.full_project_memory import (
     FullMemoryPromotionResult,
     FullProjectMemoryService,
 )
+from thoth.application.services.memory_relation_resolver import MemoryRelationBudget
+from thoth.application.services.research_commit_scope import ReadScope, read_scope
 from thoth.application.services.research_identity_service import (
     HypothesisOwnershipBatch,
     ResearchContext,
@@ -60,7 +63,11 @@ from thoth.domain.evidence_requirements import (
 from thoth.domain.hypothesis import HypothesisPortfolio
 from thoth.domain.hypothesis_review_validation import review_coverage, target_ids
 from thoth.domain.memory import MemoryRecord
-from thoth.domain.memory_preparation import MemoryPreparationBasis, MemoryPreparationHeadChanged
+from thoth.domain.memory_preparation import (
+    MemoryPreparationBasis,
+    MemoryPreparationStale,
+    PreparedMemoryPromotion,
+)
 from thoth.domain.model import ContextPack, ModelRequest, ModelResult
 from thoth.domain.outcome import OutcomeRecord
 from thoth.domain.relation import DependencyRelation
@@ -468,7 +475,7 @@ class ThreadCycleService:
                 cutoff_at=command.cutoff_at,
                 context_pack=context.model_copy(update={"candidate_portfolio": portfolio}),
                 output_model=ActionPlanDraft,
-                prompt_version="action_alternatives.v2",
+                prompt_version="action_alternatives.v3",
                 model_policy_ref=command.model_policy_ref,
                 max_output_tokens=ACTION_PLAN_MAX_OUTPUT_TOKENS,
             )
@@ -513,7 +520,7 @@ class ThreadCycleService:
                         update={"candidate_portfolio": portfolio}
                     ),
                     output_model=ActionPlanDraft,
-                    prompt_version="action_alternatives.semantic_repair.v2",
+                    prompt_version="action_alternatives.semantic_repair.v3",
                     model_policy_ref=command.model_policy_ref,
                     max_output_tokens=ACTION_PLAN_MAX_OUTPUT_TOKENS,
                 )
@@ -548,18 +555,79 @@ class ThreadCycleService:
         memory_basis: MemoryPreparationBasis | None,
         research_batch: ResearchOwnershipBatch,
     ) -> tuple[CommitResult, tuple[MemoryRecord, ...], FullMemoryPromotionResult | None]:
-        full_memory_result: FullMemoryPromotionResult | None = None
         memories = self._prepare_memory(command.project_id, staged)
-        prepared = None
-        if self._full_memory is not None and memory_basis is not None:
-            # Preserve semantic candidates as a branch; admit no stale memory.
-            with suppress(MemoryPreparationHeadChanged):
-                prepared = await self._full_memory.prepare_thread_results(
-                    basis=memory_basis,
+        # With a research attempt on record, compare what it read and wrote, not every head.
+        scope = read_scope(
+            research_work.get(),
+            command.project_id,
+            heads,
+            (f"{item.revision.entity_type.value}:{item.revision.entity_id}" for item in staged),
+        )
+        if scope is not None:
+            expected_heads = {**scope.expected_heads, **expected_heads}
+        attempt = 1
+        relations = MemoryRelationBudget()
+        while True:
+            try:
+                prepared = await prepare_cycle_memory(
+                    self._full_memory,
                     thread_id=command.thread_id,
+                    basis=memory_basis,
+                    scope=scope,
+                    expected_heads=expected_heads,
                     candidates=memories,
-                    staged_revisions=staged,
+                    staged=staged,
+                    attempt=attempt,
+                    relations=relations,
                 )
+                commit, memories, full_memory_result = self._save_cycle(
+                    command=command,
+                    heads=heads,
+                    expected_heads=expected_heads,
+                    scope=scope,
+                    staged=staged,
+                    assessment=assessment,
+                    portfolio=portfolio,
+                    plan=plan,
+                    outcome=outcome,
+                    memory_basis=memory_basis,
+                    research_batch=research_batch,
+                    memories=memories,
+                    prepared=prepared,
+                )
+                break
+            except MemoryPreparationStale:
+                # Memory was added after the review (a user correction, another investigation).
+                # The save was rolled back whole, so one fresh review and save cannot duplicate it.
+                if attempt >= 2:
+                    raise
+                attempt += 1
+        if commit.disposition == CommitDisposition.FAST_FORWARD:
+            from thoth.application.services.research_basis_capture import capture_cycle_produced
+
+            capture_cycle_produced(staged, commit.receipt.receipt_id)
+        return commit, memories, full_memory_result
+
+    def _save_cycle(
+        self,
+        *,
+        command: ThreadCycleCommand,
+        heads: dict[str, str],
+        expected_heads: dict[str, str],
+        scope: ReadScope | None,
+        staged: tuple[StagedRevision, ...],
+        assessment: InformationSufficiencyAssessment,
+        portfolio: HypothesisPortfolio,
+        plan: ActionPlan,
+        outcome: OutcomeRecord | None,
+        memory_basis: MemoryPreparationBasis | None,
+        research_batch: ResearchOwnershipBatch,
+        memories: tuple[MemoryRecord, ...],
+        prepared: PreparedMemoryPromotion | None,
+    ) -> tuple[CommitResult, tuple[MemoryRecord, ...], FullMemoryPromotionResult | None]:
+        """One transaction: the ledger commit, the research records and the prepared memory."""
+
+        full_memory_result: FullMemoryPromotionResult | None = None
         with (
             self._ledger.transaction(),
             self._unit_of_work.transaction() if self._unit_of_work is not None else nullcontext(),
@@ -572,7 +640,8 @@ class ThreadCycleService:
                     changeset_id=self._ids.new("changeset"),
                     project_id=command.project_id,
                     expected_heads=expected_heads,
-                    expected_head_set_digest=head_set_digest(heads),
+                    expected_absent_heads=() if scope is None else scope.expected_absent,
+                    expected_head_set_digest=None if scope is not None else head_set_digest(heads),
                     staged_revisions=staged,
                     impact_plan=ImpactPropagationPlan(),
                     actor=command.actor,
@@ -604,10 +673,6 @@ class ThreadCycleService:
                     )
             else:
                 memories = ()
-        if commit.disposition == CommitDisposition.FAST_FORWARD:
-            from thoth.application.services.research_basis_capture import capture_cycle_produced
-
-            capture_cycle_produced(staged, commit.receipt.receipt_id)
         return commit, memories, full_memory_result
 
     def _record_dependencies(
@@ -815,6 +880,10 @@ class ThreadCycleService:
         return tuple(
             record
             for item in staged
-            if (record := domain_reference_memory(item.revision, self._ids.new("memory")))
+            if (
+                record := domain_reference_memory(
+                    item.revision, self._ids.new("memory"), item.snapshot.content
+                )
+            )
             is not None
         )

@@ -26,6 +26,10 @@ field-validation/private/
 field-validation/results/
 
 # Local research and verification artifacts
+docs/plans/
+docs/research/
+docs/verification/
+PROJECT_WIKI/
 outputs/
 .codex/verification/
 .omo/

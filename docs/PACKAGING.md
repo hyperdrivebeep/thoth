@@ -27,13 +27,12 @@ hashes and do not confirm the dates of user documents. The full verification com
 visible without new skips or weaker assertions. The historical 25 unresolved cases describe a
 selected run on the original development tree, not a claim that every other test passes here.
 
-The public NOW page is a concise status projection. Original internal timelines, task identifiers,
-machine paths and private run artifacts are not included. Historical architecture reference pages
-must be read with the current [verification limits](VERIFICATION.md).
-
-The full internal canonical design, historical Wiki timeline pages and `deploy/hosted-review`
-scaffold are excluded from this source-only package. Its public contract anchors are the NOW
-projection, behavioral acceptance, backend runtime boundaries and verification limits.
+Private development process folders (`docs/plans`, `docs/research`, `docs/verification`) and
+`PROJECT_WIKI` are not distributed. Their local files are preserved. The public RPC source is
+`docs/architecture/rpc-method-catalog.md`; the generated schema remains the runtime parity contract.
+Public contract anchors are the RPC catalog, backend runtime boundaries, canonical owner record,
+packaging boundary and verification limits. The internal canonical design and deployment
+configuration under `deploy/hosted-review` remain excluded.
 `HOSTED_IMAGE_NOT_VERIFIED` means this package's omission check does not validate a hosted image;
 that remains a separate private deployment and security review.
 

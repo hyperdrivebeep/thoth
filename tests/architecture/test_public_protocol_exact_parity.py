@@ -17,11 +17,11 @@ def test_public_method_manifest_exactly_matches_runtime_and_notifications() -> N
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     methods = manifest["methods"]
     by_name = {item["name"]: item for item in methods}
-    assert len(methods) == len(by_name) == 340
+    assert len(methods) == len(by_name) == 351
     assert set(by_name) == set(PUBLIC_METHODS)
-    assert sum(item["canonical"] for item in methods) == 334
-    assert manifest["runtime_method_count"] == 340
-    assert manifest["canonical_method_count"] == 334
+    assert sum(item["canonical"] for item in methods) == 345
+    assert manifest["runtime_method_count"] == 351
+    assert manifest["canonical_method_count"] == 345
     assert manifest["compatibility_alias_count"] == 6
     assert {
         f"project/source/scope/{name}" for name in ("read", "grant", "revoke", "assign", "update")
@@ -49,25 +49,31 @@ def test_public_method_manifest_exactly_matches_runtime_and_notifications() -> N
     assert len(manifest["notifications"]) == 221
     assert all(item["namespace"] == item["name"].split("/", 1)[0] for item in methods)
     model = {name: item for name, item in by_name.items() if item["namespace"] == "model"}
-    assert len(model) == 6
+    assert len(model) == 11
     assert {name: model[name]["surface"] for name in model} == {
         "model/credential/list": "QUERY",
         "model/credential/login/status": "QUERY",
         "model/credential/login/cancel": "COMMAND",
         "model/credential/register": "COMMAND",
+        "model/credential/login/complete": "COMMAND",
+        "model/catalog/refresh": "COMMAND",
+        "model/tooling/install": "COMMAND",
         "model/settings/read": "QUERY",
         "model/settings/update": "COMMAND",
+        "model/callSettings/read": "QUERY",
+        "model/callSettings/update": "COMMAND",
     }
     assert "model/credential/login/status" in READ_QUERY_METHODS
     assert "model/credential/login/cancel" not in READ_QUERY_METHODS
     for name, item in model.items():
         assert item["canonical_owner"] == "THREAD_REQUEST_SETTINGS"
-        if name.startswith("model/credential/"):
-            assert item["policy"] == "system:workspace; LOCAL only; HOSTED_REVIEW denied"
-            assert "FirstRunSetup" in item["normal_entrypoint"]
+        if name.startswith(("model/credential/", "model/catalog/", "model/tooling/")):
+            assert item["policy"].startswith("system:workspace; LOCAL only; HOSTED_REVIEW denied")
             assert "ModelCredentialPanel" in item["normal_entrypoint"]
+            if name != "model/credential/login/complete":
+                assert "FirstRunSetup" in item["normal_entrypoint"]
             assert "tests/unit/test_hosted_review_credential_rpc.py" in item["behavioral_evidence"]
-            if "/login/" in name:
+            if "/login/" in name and name != "model/credential/login/complete":
                 assert "XaiDeviceLogin" in item["normal_entrypoint"]
                 assert (
                     "tests/integration/test_xai_workspace_route.py" in item["behavioral_evidence"]

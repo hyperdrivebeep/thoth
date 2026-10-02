@@ -141,8 +141,10 @@ async def test_historical_memo_hits_still_record_actual_uses_and_deny_4097(
         runtime.close()
 
 
+@pytest.mark.parametrize("warm_depth", [60, 120])
 async def test_shallow_then_deep_root_keeps_depth_guard_and_parent_changes_refresh(
     tmp_path: Path,
+    warm_depth: int,
 ) -> None:
     runtime = await setup(tmp_path, ControlledResearchModel())
     try:
@@ -169,7 +171,7 @@ async def test_shallow_then_deep_root_keeps_depth_guard_and_parent_changes_refre
         async def read(inputs: dict[str, JsonValue]) -> dict[str, JsonValue]:
             root = _text(inputs["root"])
             with host.records.ledger.transaction(), scope_read_transaction():
-                host.access.require_read("p", "depth:60")
+                host.access.require_read("p", f"depth:{warm_depth}")
                 host.access.require_read("p", root)
                 return {"ok": True}
 

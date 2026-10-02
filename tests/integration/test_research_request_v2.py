@@ -361,7 +361,11 @@ async def test_first_tui_input_is_durably_accepted_then_researched(tmp_path: Pat
         assert op.state.value == "SUCCEEDED", op.error
         status = value(
             await runtime.bus.dispatch(
-                request("thread/read", "read-after", {"project_id": "p", "thread_id": thread})
+                request(
+                    "thread/read",
+                    "read-after",
+                    {"project_id": "p", "thread_id": thread, "view": "FULL"},
+                )
             )
         )
         assert status["current_result"]["completion"] == "TERMINAL"
@@ -407,7 +411,9 @@ async def test_unconnected_question_and_reopen_have_no_fabricated_evidence(tmp_p
         status = value(
             await reopened.bus.dispatch(
                 request(
-                    "thread/read", "reopen", {"project_id": "p", "thread_id": accepted["thread_id"]}
+                    "thread/read",
+                    "reopen",
+                    {"project_id": "p", "thread_id": accepted["thread_id"], "view": "FULL"},
                 )
             )
         )

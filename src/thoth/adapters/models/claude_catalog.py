@@ -1,4 +1,4 @@
-"""THOTH-curated Claude Messages option; no OmO model-cache dependency."""
+"""THOTH-curated Claude Messages option; no external model-cache dependency."""
 
 from __future__ import annotations
 

@@ -15,7 +15,7 @@ export type ResultManifest = {
   request_ref?: { revision_digest: string };
   operation_id: string; phase: string; state: string; completion: string; terminal_reason: string | null;
   basis_digest: string; result: Record<string, unknown>; gaps: string[]; next_steps: string[];
-  source_refs: string[]; record_refs: unknown[];
+  source_refs: string[]; /** Not sent by the summary read; the result read has it. */ record_refs?: unknown[];
 };
 export type CompletedStage = {
   role?: string;
@@ -23,6 +23,8 @@ export type CompletedStage = {
   elapsed_ms?: number | null;
   context_bytes?: number | null;
   dispatch_ids?: string[];
+  /** Set when this stage's output came from an interrupted run the user resumed; no model call was made for it. */
+  reused_from_operation_id?: string | null;
 };
 export type ActivityEvent = {
   seq?: number;
@@ -113,9 +115,17 @@ export type UserActivityEvent = {
     revision_ref?: string | null;
   };
 };
+export type ResultUsage = {
+  operation_id: string; calls: number; input_tokens: number | null; output_tokens: number | null; total_tokens: number | null;
+  cached_input_tokens: number | null; unreported_calls: number; state: string; wall_ms: number | null;
+  /** Calls sent again on their own after an earlier call was cut off. */
+  auto_retries?: number;
+};
 export type ResearchStatus = WorkThread & {
   usage?: { input_tokens: number | null; output_tokens: number | null; total_tokens: number | null; state: string; unreported_calls: number; cumulative_token_limit_enforced: boolean; cached_input_tokens?: number | null };
   operation_state?: string; operation_error?: ExecutionError | null; request_epoch?: number;
+  /** Usage per result (operation id), computed by the server when the status is read. */
+  result_usage?: Record<string, ResultUsage>;
   failure?: ResearchFailure | null;
   execution_summary?: {effective_execution_state:string;state_inconsistent:boolean;last_checkpoint_only:boolean;automatic_retry:boolean};
   freshness?: string; current_result?: ResultManifest | null; previous_result?: ResultManifest | null;
@@ -125,6 +135,7 @@ export type ResearchStatus = WorkThread & {
   next_user_action?: NextUserAction | null;
   request?: { operation_id: string; authored_text?: string; effective_question?: string; model_settings?: unknown; policy_digest?: string; cutoff_at?: string };
   completed_stages?: CompletedStage[];
+  stage_reuse?: { reused: number; new: number };
   activity_events?: ActivityEvent[];
   user_activity_events?: UserActivityEvent[];
   model_dispatches?: ModelDispatch[];
@@ -157,7 +168,9 @@ const analysisDisplaySchema=z.object({
     scope_identity:dimension,criterion_authority:dimension,evidence_coverage:dimension,comparability:dimension}),
   portfolio:z.object({portfolio_id:z.string(),hypotheses:z.array(z.object({
     hypothesis_id:z.string(),statement:z.string(),primary_locus:z.string().nullable(),uncertainty:z.string(),
-    support_evidence_refs:stringList,counterevidence_queries:stringList,predicted_observations:stringList,
+    support_evidence_refs:stringList.optional(),evidence_refs:stringList.optional(),counterevidence_refs:stringList.optional(),
+    critical_review:z.object({terminal:z.string()}).passthrough().nullable().optional(),
+    counterevidence_queries:stringList,predicted_observations:stringList,
     discriminating_tests:z.array(z.object({procedure_candidate:z.string(),expected_if_true:z.string(),expected_if_alternative:z.string(),risk_tier:z.string()})),
   }))}),
   action_plan:z.object({plan_id:z.string(),frontier:stringList,alternatives:z.array(z.object({

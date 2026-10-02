@@ -60,8 +60,9 @@ export async function rpc<T>(
   input: Record<string, unknown>,
   idempotencyKey: string,
   signal?: AbortSignal,
+  options: { timeoutMs?: number } = {},
 ): Promise<RpcResult<T>> {
-  const bounded = timeoutSignal(signal, 15000);
+  const bounded = timeoutSignal(signal, options.timeoutMs ?? 15000);
   try {
     const response = await transportRead(() => fetch(readQueries.has(method) ? "/rpc/query" : "/rpc", {
       method: "POST",

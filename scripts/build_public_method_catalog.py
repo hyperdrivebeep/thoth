@@ -11,8 +11,7 @@ from thoth.protocol.notifications import IMPLEMENTED_NOTIFICATIONS
 from thoth.protocol.registry import PUBLIC_METHODS
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKSPACE = ROOT if (ROOT / "PROJECT_WIKI").is_dir() else ROOT.parent
-WIKI = WORKSPACE / "PROJECT_WIKI/30_ARCHITECTURE/rpc-method-catalog.md"
+WIKI = ROOT / "docs/architecture/rpc-method-catalog.md"
 OUTPUT = ROOT / "schemas/protocol/public-method-catalog.json"
 
 EXTENSIONS = {
@@ -143,12 +142,41 @@ CREDENTIAL_METHOD_METADATA: dict[str, dict[str, object]] = {
             "apps/web/src/components/FirstRunSetup.test.tsx",
         ),
     },
-    "model/credential/login/complete": {
+    "model/catalog/refresh": {
         "surface": "COMMAND",
         "canonical_owner": "THREAD_REQUEST_SETTINGS",
         "policy": (
             "system:workspace; LOCAL only; HOSTED_REVIEW denied; "
-            "secret response is ephemeral"
+            "explicit remote model-list refresh, never run by status polling"
+        ),
+        "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via OAuthLoginFlow local /rpc",
+        "behavioral_evidence": (
+            "tests/integration/test_model_catalog_refresh_rpc.py",
+            "tests/unit/test_hosted_review_credential_rpc.py",
+            "apps/web/src/components/FirstRunSetup.test.tsx",
+        ),
+    },
+    "model/tooling/install": {
+        "surface": "COMMAND",
+        "canonical_owner": "THREAD_REQUEST_SETTINGS",
+        "policy": (
+            "system:workspace; LOCAL only; HOSTED_REVIEW denied; "
+            "installs one registered tool into the THOTH tools folder"
+        ),
+        "normal_entrypoint": (
+            "FirstRunSetup|ModelCredentialPanel via CodexToolHelp|ClaudeCodeHelp local /rpc"
+        ),
+        "behavioral_evidence": (
+            "tests/integration/test_model_tooling_rpc.py",
+            "tests/unit/models/test_tool_installers.py",
+            "tests/unit/test_hosted_review_credential_rpc.py",
+        ),
+    },
+    "model/credential/login/complete": {
+        "surface": "COMMAND",
+        "canonical_owner": "THREAD_REQUEST_SETTINGS",
+        "policy": (
+            "system:workspace; LOCAL only; HOSTED_REVIEW denied; secret response is ephemeral"
         ),
         "normal_entrypoint": "ModelCredentialPanel via local /rpc",
         "behavioral_evidence": (
@@ -220,7 +248,9 @@ def _method_entry(
     evidence: str | None = None,
 ) -> dict[str, object]:
     credential = (
-        _credential_metadata(name, surface) if name.startswith("model/credential/") else None
+        _credential_metadata(name, surface)
+        if name.startswith("model/credential/") or name in CREDENTIAL_METHOD_METADATA
+        else None
     )
     return {
         "name": name,
@@ -308,7 +338,7 @@ def build() -> dict[str, object]:
         raise ValueError("manifest builder inputs do not match PUBLIC_METHODS")
     unsigned: dict[str, object] = {
         "schema_version": "1.0.0",
-        "authority": "PROJECT_WIKI/30_ARCHITECTURE/rpc-method-catalog.md",
+        "authority": "docs/architecture/rpc-method-catalog.md",
         "canonical_method_count": sum(bool(item["canonical"]) for item in methods),
         "compatibility_alias_count": sum(not bool(item["canonical"]) for item in methods),
         "runtime_method_count": len(methods),
@@ -327,6 +357,7 @@ def main() -> None:
     OUTPUT.write_text(
         json.dumps(build(), ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
 
 

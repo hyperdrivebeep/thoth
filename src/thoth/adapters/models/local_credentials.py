@@ -180,23 +180,114 @@ def thoth_local_model(provider: str, model: str | None, root: Path | None = None
     return OpenAIResponsesModel(client, model_id=model)
 
 
+def _account_auth_methods(
+    key: str,
+    code: dict[str, object],
+    oauth_status: dict[str, object],
+    *,
+    code_connected: bool,
+    code_eligible: bool,
+    code_tool_problem: bool,
+    code_startable: bool,
+    code_state: object,
+    pkce_start: bool,
+    pkce_connected: bool,
+    pkce_eligible: bool,
+    oauth: bool,
+    xai_oauth: bool,
+    codex_eligible: bool,
+    xai_eligible: bool,
+) -> list[dict[str, object]]:
+    oauth_methods: list[dict[str, object]]
+    if key == "anthropic":
+        oauth_methods = [
+            {
+                "auth_method": "claude_code_login",
+                "route": "claude-code",
+                "connected": code_connected,
+                "execution_eligible": code_eligible,
+                "connection_state": (
+                    code.get("reason_code", "CLAUDE_CODE_STATUS_UNAVAILABLE")
+                    if code_tool_problem or not code
+                    else code_state
+                ),
+                "reason_code": code.get("reason_code", "CLAUDE_CODE_STATUS_UNAVAILABLE"),
+                "capabilities": {
+                    "start": code_startable,
+                    "status": True,
+                    "cancel": True,
+                    "manual_complete": True,
+                },
+            }
+        ]
+        if pkce_start:
+            # The client-ID route stays hidden until an app registration enables it.
+            oauth_methods.append(
+                {
+                    "auth_method": "claude_pkce",
+                    "route": "claude-oauth",
+                    "connected": pkce_connected,
+                    "execution_eligible": pkce_eligible,
+                    "connection_state": oauth_status.get(
+                        "connection_state", oauth_status.get("auth_state", "LOGIN_REQUIRED")
+                    ),
+                    "reason_code": oauth_status.get("reason_code"),
+                    "capabilities": {
+                        "start": True,
+                        "status": True,
+                        "cancel": True,
+                        "manual_complete": True,
+                    },
+                }
+            )
+    else:
+        oauth_methods = [
+            {
+                "auth_method": "codex_isolated_browser" if key == "openai" else "xai_device_code",
+                "route": "codex-oauth" if key == "openai" else "xai-oauth",
+                "connected": oauth or xai_oauth,
+                "execution_eligible": codex_eligible or xai_eligible,
+                "connection_state": oauth_status.get(
+                    "connection_state", oauth_status.get("auth_state", "LOGIN_REQUIRED")
+                ),
+                "reason_code": oauth_status.get("reason_code"),
+                "capabilities": {
+                    "start": True,
+                    "status": True,
+                    "cancel": True,
+                    "manual_complete": False,
+                },
+            }
+        ]
+    return oauth_methods
+
+
 def account_connections(
     codex_status: dict[str, object],
     root: Path | None = None,
     xai_status: dict[str, object] | None = None,
     claude_status: dict[str, object] | None = None,
+    claude_code: dict[str, object] | None = None,
 ) -> list[dict[str, object]]:
     listed = {item["provider"] for item in available_credentials(root)}
+    code = claude_code or {}
+    code_state = code.get("connection_state")
+    code_tool_problem = code_state == "UNAVAILABLE"
+    code_startable = code_state in {"LOGIN_REQUIRED", "EXECUTION_UNVERIFIED", "ERROR"}
+    code_connected = code.get("connected") is True
+    code_eligible = code.get("execution_eligible") is True
     rows: list[dict[str, object]] = []
     for key, spec in COMPANIES.items():
         oauth = key == "openai" and codex_status.get("connected") is True
         codex_eligible = key == "openai" and codex_status.get("execution_eligible") is True
         xai_oauth = key == "xai" and (xai_status or {}).get("connected") is True
         xai_eligible = key == "xai" and (xai_status or {}).get("execution_eligible") is True
-        claude_oauth = key == "anthropic" and (claude_status or {}).get("connected") is True
-        claude_eligible = (
+        pkce_connected = key == "anthropic" and (claude_status or {}).get("connected") is True
+        pkce_eligible = (
             key == "anthropic" and (claude_status or {}).get("execution_eligible") is True
         )
+        claude_oauth = pkce_connected or (key == "anthropic" and code_connected)
+        claude_eligible = pkce_eligible or (key == "anthropic" and code_eligible)
         oauth_status = (
             codex_status
             if key == "openai"
@@ -214,11 +305,17 @@ def account_connections(
             model_providers.append("codex-oauth")
         if xai_eligible:
             model_providers.append("xai-oauth")
-        if claude_eligible:
+        if pkce_eligible:
             model_providers.append("claude-oauth")
+        if key == "anthropic" and code_eligible:
+            model_providers.append("claude-code")
+        pkce_start = claude_capabilities.get("start") is True
+        code_owns_row = key == "anthropic" and bool(code) and not pkce_connected
         reason = (
             str(codex_status.get("reason_code") or "LOGIN_REQUIRED")
             if key == "openai" and not has_key
+            else str(code.get("reason_code") or "CLAUDE_CODE_STATUS_UNAVAILABLE")
+            if code_owns_row and not has_key
             else str((claude_status or {}).get("reason_code") or "MODEL_ACCOUNT_LOGIN_UNSUPPORTED")
             if key == "anthropic" and not has_key
             else "API_KEY_AVAILABLE"
@@ -236,7 +333,28 @@ def account_connections(
             if reason == "CATALOG_UNAVAILABLE"
             else "The Codex route is eligible; live execution has not been verified"
             if reason == "EXECUTION_UNVERIFIED"
+            else "Install the official Claude Code executable, then sign in from THOTH"
+            if code_owns_row and code_tool_problem
+            else "Sign in with the official Claude Code executable in the THOTH profile"
+            if code_owns_row
             else "Use a THOTH workspace API key for this provider"
+        )
+        oauth_methods = _account_auth_methods(
+            key,
+            code,
+            oauth_status,
+            code_connected=code_connected,
+            code_eligible=code_eligible,
+            code_tool_problem=code_tool_problem,
+            code_startable=code_startable,
+            code_state=code_state,
+            pkce_start=pkce_start,
+            pkce_connected=pkce_connected,
+            pkce_eligible=pkce_eligible,
+            oauth=oauth,
+            xai_oauth=xai_oauth,
+            codex_eligible=codex_eligible,
+            xai_eligible=xai_eligible,
         )
         rows.append(
             {
@@ -248,13 +366,15 @@ def account_connections(
                 "oauth": oauth or xai_oauth or claude_oauth,
                 "remote_auth_verified": None,
                 "login_supported": key in {"openai", "xai"}
-                or (key == "anthropic" and claude_capabilities.get("start") is True),
+                or (key == "anthropic" and (pkce_start or code_startable)),
                 "login_kind": "codex_isolated_browser"
                 if key == "openai"
                 else "xai_device_code"
                 if key == "xai"
+                else "claude_code_login"
+                if code_startable
                 else "claude_pkce"
-                if claude_capabilities.get("start") is True
+                if pkce_start
                 else "unsupported",
                 "available_model_providers": model_providers,
                 "connection_state": (
@@ -262,6 +382,12 @@ def account_connections(
                     if key == "openai" and not has_key
                     else (xai_status or {}).get("connection_state", "LOGIN_REQUIRED")
                     if key == "xai" and not has_key
+                    else (
+                        code_state
+                        if not code_tool_problem
+                        else code.get("reason_code", "CLAUDE_CODE_STATUS_UNAVAILABLE")
+                    )
+                    if code_owns_row and not has_key
                     else (claude_status or {}).get("auth_state", "DISCONNECTED")
                     if key == "anthropic" and not has_key
                     else "API_KEY_AVAILABLE"
@@ -276,7 +402,9 @@ def account_connections(
                     else "THOTH_XAI_OAUTH"
                     if key == "xai"
                     else "THOTH_CLAUDE_OAUTH"
-                    if key == "anthropic" and claude_oauth
+                    if pkce_connected
+                    else "THOTH_ISOLATED"
+                    if key == "anthropic" and code_connected
                     else "THOTH_LOCAL_KEY"
                 ),
                 "reason_code": reason,
@@ -300,30 +428,7 @@ def account_connections(
                             "manual_complete": False,
                         },
                     },
-                    {
-                        "auth_method": "codex_isolated_browser"
-                        if key == "openai"
-                        else "xai_device_code"
-                        if key == "xai"
-                        else "claude_pkce",
-                        "route": "codex-oauth"
-                        if key == "openai"
-                        else "xai-oauth"
-                        if key == "xai"
-                        else "claude-oauth",
-                        "connected": oauth or xai_oauth or claude_oauth,
-                        "execution_eligible": codex_eligible or xai_eligible or claude_eligible,
-                        "connection_state": oauth_status.get(
-                            "connection_state", oauth_status.get("auth_state", "LOGIN_REQUIRED")
-                        ),
-                        "reason_code": oauth_status.get("reason_code"),
-                        "capabilities": {
-                            "start": key != "anthropic" or claude_capabilities.get("start") is True,
-                            "status": True,
-                            "cancel": True,
-                            "manual_complete": key == "anthropic",
-                        },
-                    },
+                    *oauth_methods,
                 ],
             }
         )
@@ -445,6 +550,7 @@ class LocalModelCredentials(ModelCredentialPort):
             status = {"connected": False, "reason_code": "CODEX_STATUS_UNAVAILABLE"}
         xai_status: dict[str, object] = {}
         claude_status: dict[str, object] = {}
+        claude_code_status: dict[str, object] | None = None
         if self.root is not None:
             from thoth.adapters.models.xai_broker import broker_for_workspace
 
@@ -452,7 +558,10 @@ class LocalModelCredentials(ModelCredentialPort):
             from thoth.adapters.models.claude_oauth import broker_for_workspace as claude_broker
 
             claude_status = claude_broker(self.root).status()
-        return account_connections(status, self.root, xai_status, claude_status)
+            from thoth.adapters.models import claude_code
+
+            claude_code_status = claude_code.cached_claude_code_status(self.root)
+        return account_connections(status, self.root, xai_status, claude_status, claude_code_status)
 
     def list_credentials(self) -> tuple[dict[str, str], ...]:
         return available_credentials(self.root)

@@ -3,6 +3,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { readProjectReviewList, type ProjectReviewItem } from "../../api/researchFollowup";
 import type { HistorySelection } from "../../api/historyModels";
 import { currentnessLabel, currentnessTone } from "./historyPresentation";
+import { nextActionLabel } from "../statusLabels";
 
 function priorityLabel(priority: ProjectReviewItem["priority"]) {
   if (priority === "HIGH") return "높음";
@@ -27,7 +28,8 @@ export function ProjectReviewList({ projectId, onSelect }: { projectId: string; 
       : <div className="review-items">{items.map(item => <article className="review-item" key={item.item_id}>
         <div><Tag minimal>{priorityLabel(item.priority)}</Tag><Tag minimal intent={currentnessTone(item.currentness)}>{currentnessLabel(item.currentness)}</Tag></div>
         <h3>{item.title}</h3>
-        <p>{item.next_user_action.label}</p>
+        <p>{nextActionLabel(item.next_user_action)}</p>
+        <details className="connection-tech"><summary>기술 정보</summary><small>{item.next_user_action.label}</small></details>
         {item.reason_codes.length > 0 && <small>{item.reason_codes.slice(0, 3).join(" · ")}</small>}
         <Button small icon="document-open" onClick={() => onSelect(selectionOf(item))}>해당 답변 열기</Button>
       </article>)}</div>}

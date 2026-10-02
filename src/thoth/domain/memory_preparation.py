@@ -15,6 +15,7 @@ from thoth.domain.memory import (
     MemoryRecord,
     MemoryTransitionReceipt,
 )
+from thoth.domain.memory_relation import MemoryRelationJudgment
 
 
 class MemoryAuthorityBasis(DomainModel):
@@ -37,6 +38,9 @@ class MemoryPreparationBasis(DomainModel):
     memory_revision_set: tuple[str, ...]
     candidate_set_digest: str
     authority: MemoryAuthorityBasis | None = None
+    # Only these heads (and these keys still absent) must be unchanged; None compares every head.
+    head_scope: tuple[tuple[str, str], ...] | None = None
+    head_absent: tuple[str, ...] = ()
 
 
 class FullMemoryPromotionResult(DomainModel):
@@ -47,6 +51,10 @@ class FullMemoryPromotionResult(DomainModel):
     receipts: tuple[MemoryTransitionReceipt, ...]
     projection_checkpoint: str
     projection_state: Literal["BUILT", "DEFERRED_SCOPE"] = "BUILT"
+    # 2 when the memory review had to be redone once because memory changed before the save.
+    preparation_attempts: int = 1
+    # Relations the rules could not settle, and whether a model was asked or the memory was held.
+    relation_judgments: tuple[MemoryRelationJudgment, ...] = ()
 
 
 class PreparedMemoryPromotion(DomainModel):
@@ -56,6 +64,10 @@ class PreparedMemoryPromotion(DomainModel):
     receipts: tuple[MemoryTransitionReceipt, ...]
     projections: tuple[MemoryProjection, ...]
     result: FullMemoryPromotionResult
+
+
+class MemoryPreparationStale(ValueError):
+    """Memory or candidates changed since the preparation was made; preparing again can fix it."""
 
 
 class MemoryPreparationHeadChanged(ValueError):

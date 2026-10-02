@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKSPACE = ROOT if (ROOT / "PROJECT_WIKI").is_dir() else ROOT.parent
+WORKSPACE = ROOT
 
 
 def contains(path: str, text: str) -> bool:
@@ -12,10 +12,18 @@ def contains(path: str, text: str) -> bool:
 
 
 def main() -> None:
-    coverage = json.loads(
-        (ROOT / "artifacts" / "qa" / "full-product-coverage.json").read_text(
-            encoding="utf-8"
+    if not (ROOT / "PROJECT_WIKI").is_dir():
+        print(
+            json.dumps(
+                {
+                    "verdict": "NOT_APPLICABLE",
+                    "reason": "Local development Wiki is not distributed.",
+                }
+            )
         )
+        return
+    coverage = json.loads(
+        (ROOT / "artifacts" / "qa" / "full-product-coverage.json").read_text(encoding="utf-8")
     )
     checks = {
         "home_current_truth_active": contains(
@@ -42,9 +50,7 @@ def main() -> None:
             "PROJECT_WIKI/70_RESEARCH/INDEX.md", "Executable Hero Materialization"
         ),
         "full_backend_dag": (
-            WORKSPACE
-            / "research-briefs"
-            / "THOTH_FULL_BACKEND_MATERIALIZATION_DAG.md"
+            WORKSPACE / "research-briefs" / "THOTH_FULL_BACKEND_MATERIALIZATION_DAG.md"
         ).is_file(),
         "operator_tui_gap_recorded": contains(
             "PROJECT_WIKI/50_SEED_ROADMAP/implementation-maturity-matrix.md",

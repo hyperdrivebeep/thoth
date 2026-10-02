@@ -8,6 +8,7 @@ from pydantic import JsonValue
 from thoth.application.commands.thread_analysis import ThreadInputRequest
 from thoth.application.commands.threads import ThreadCommandHandlers
 from thoth.application.services.connector_cleanup import cleanup_summary
+from thoth.application.services.model_call_settings import ModelCallSettingsService
 from thoth.application.services.model_settings import ModelSettingsService
 from thoth.application.services.post_execution_memory import PostExecutionMemory
 from thoth.application.services.provider_usage_service import ProviderUsageService
@@ -22,6 +23,12 @@ from thoth.application.services.research_controls import ResearchControls
 from thoth.application.services.research_input_queue import ResearchInputQueue
 from thoth.application.services.research_leases import ResearchLeases
 from thoth.application.services.research_operation_access import ResearchOperationAccess
+from thoth.application.services.research_read_summary import (
+    VIEWS,
+    progress_thread_read,
+    summarize_thread_read,
+)
+from thoth.domain.account_usage import AccountQuotaSnapshot
 from thoth.domain.auth import current_authenticated_actor
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.enums import EntityType, OperationState, ThreadLifecycle
@@ -73,6 +80,7 @@ class ResearchThreadHandlers:
         queue_store: ResearchQueueStorePort,
         assessment_verifier: Callable[[str, str], TestValidityAssessment] | None = None,
         provider_usage: ProviderUsagePort | None = None,
+        call_settings: ModelCallSettingsService | None = None,
     ) -> None:
         self.legacy, self.analyze_legacy, self.records, self.analysis = (
             legacy,
@@ -86,9 +94,12 @@ class ResearchThreadHandlers:
         self.operation_access = ResearchOperationAccess(access)
         self.controls = ResearchControls(self)
         self.model_settings = model_settings
+        self.call_settings = call_settings
         self.queue = ResearchInputQueue(queue_store)
         self.provider_usage = ProviderUsageService(records, provider_usage)
         self.assessment_verifier = assessment_verifier
+        # Called after a terminal result is durable; failures never fail the research.
+        self.on_result_published: Callable[..., object] | None = None
 
     def authorize_reentry(self, operation: OperationRecord) -> None:
         if operation.state != OperationState.RUNNING:
@@ -186,10 +197,39 @@ class ResearchThreadHandlers:
         )
         if existing is not None:
             return self.replay_attempt(existing, operation)
+        if payload.get("resume_from_operation_id") is not None:
+            payload = self.resume_payload(payload)
         queued = self.queue.accept_if_busy(self, operation, payload)
         if queued is not None:
             return queued
         return self.submit(payload)
+
+    def resume_payload(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        """The same question as the interrupted run, asked again as a new operation.
+
+        The user asked to continue the latest, finished run of this thread. Its completed stages
+        may then be reused (research_stage_reuse.py); nothing is reused without this request.
+        """
+        project_id, thread_id = str(value["project_id"]), str(value["thread_id"])
+        source_id = str(value["resume_from_operation_id"])
+        head = self.records.read(project_id, EntityType.THREAD, f"request:{thread_id}")
+        source = self.records.journal_read(project_id, source_id, ResearchAttempt)
+        finished = self.operations.read(source_id)
+        if head is None or source is None or source.request_ref != head[0]:
+            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "RESUME_SOURCE_NOT_CURRENT")
+        if finished is None or finished.project_id != project_id:
+            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "RESUME_SOURCE_NOT_CURRENT")
+        if finished.state == OperationState.RUNNING:
+            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "RESUME_SOURCE_STILL_RUNNING")
+        current = ThreadRequestRevision.model_validate(head[1])
+        if len(current.effective_question) > 20_000:
+            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "RESUME_QUESTION_TOO_LONG")
+        return {
+            **value,
+            "instruction": current.effective_question,
+            "edit_kind": "REPLACE",
+            "expected_request_epoch": current.request_epoch,
+        }
 
     async def steer(self, value: dict[str, JsonValue]) -> dict[str, JsonValue] | AcceptedRunning:
         if value.get("contract_version") != 2:
@@ -351,6 +391,7 @@ class ResearchThreadHandlers:
                     "input_id": input_id,
                     "retry_policy": value.get("retry_policy"),
                     "prior_operation_id": value.get("prior_operation_id"),
+                    "resume_from_operation_id": value.get("resume_from_operation_id"),
                 },
             )
             self.records.journal(project_id, operation.operation_id, attempt)
@@ -615,18 +656,55 @@ class ResearchThreadHandlers:
         }
 
     async def read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        if value.get("view", "SUMMARY") not in VIEWS:
+            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "THREAD_READ_VIEW_UNKNOWN")
         base = await self.legacy.read(
             {
                 k: v
                 for k, v in value.items()
-                if k not in {"contract_version", "cursor", "refresh_account_quota"}
+                if k not in {"contract_version", "cursor", "refresh_account_quota", "view"}
             }
         )
+        # A requested account-quota refresh is a provider call: it runs here, outside the read
+        # transaction and its approval memo, and the read only receives its result.
+        quota = (
+            self.provider_usage.refresh(str(value["project_id"]), str(value["thread_id"]))
+            if value.get("refresh_account_quota") is True
+            else None
+        )
+        return self._read_current(value, base, quota)
+
+    def _read_current(
+        self,
+        value: dict[str, JsonValue],
+        base: dict[str, JsonValue],
+        quota: AccountQuotaSnapshot | None,
+    ) -> dict[str, JsonValue]:
+        # One read transaction and one approval memo for the whole read, so a record it touches
+        # again is not re-approved from its first ancestor each time.
+        from thoth.application.services.resource_scope_read_context import (
+            scope_read_transaction,
+        )
+
+        with self.records.ledger.transaction(), scope_read_transaction():
+            return self._read_current_scoped(value, base, quota)
+
+    def _read_current_scoped(
+        self,
+        value: dict[str, JsonValue],
+        base: dict[str, JsonValue],
+        quota: AccountQuotaSnapshot | None,
+    ) -> dict[str, JsonValue]:
         project_id, thread_id = str(value["project_id"]), str(value["thread_id"])
+        from thoth.application.services.research_model_hold import model_call_hold_failure
         from thoth.application.services.research_thread_read_snapshot import (
             read_research_snapshot,
         )
-        from thoth.application.services.research_usage import summarize_usage
+        from thoth.application.services.research_usage import (
+            operation_wall_ms,
+            summarize_operation_usage,
+            summarize_usage,
+        )
         from thoth.application.services.user_activity_projection import (
             project_user_activity_events,
         )
@@ -645,11 +723,30 @@ class ResearchThreadHandlers:
             thread_id,
             0 if budget is None else budget.calls,
             account_quota=(
-                self.provider_usage.refresh(project_id, thread_id)
-                if value.get("refresh_account_quota") is True
+                quota
+                if quota is not None
                 else self.provider_usage.read_snapshot(project_id, thread_id)
             ).model_dump(mode="json"),
         )
+        # Per-result usage, computed from this read's dispatches: the result's own operation and the
+        # one currently requested. A result without recorded calls simply has no entry.
+        result_usage: dict[str, JsonValue] = {}
+        for usage_op in dict.fromkeys(
+            op_id
+            for op_id in (None if manifest is None else manifest.operation_id, request.operation_id)
+            if op_id
+        ):
+            usage_record = self.operations.read(usage_op)
+            entry = summarize_operation_usage(
+                dispatches,
+                thread_id,
+                usage_op,
+                wall_ms=None
+                if usage_record is None
+                else operation_wall_ms(usage_record.created_at, usage_record.completed_at),
+            )
+            if entry is not None:
+                result_usage[usage_op] = entry
         from thoth.domain.research_failure import ResearchCleanupFailure, ResearchFailureRecord
 
         failure = (
@@ -697,7 +794,9 @@ class ResearchThreadHandlers:
             "request_epoch": request.request_epoch,
             "operation_state": "UNKNOWN" if op is None else op.state.value,
             "operation_error": None if op is None else op.error,
-            "failure": None if failure is None else failure.model_dump(mode="json"),
+            "failure": model_call_hold_failure(manifest if fresh else None, attempt)
+            if failure is None
+            else failure.model_dump(mode="json"),
             "cleanup_failure": None
             if cleanup_failure is None
             else cleanup_failure.model_dump(mode="json"),
@@ -723,6 +822,7 @@ class ResearchThreadHandlers:
             ],
             "budget": None if budget is None else budget.model_dump(mode="json"),
             "usage": usage,
+            "result_usage": result_usage,
             "model_dispatches": [
                 {
                     "dispatch_id": dispatch.dispatch_id,
@@ -749,22 +849,28 @@ class ResearchThreadHandlers:
             project_thread_followup,
         )
 
-        progress_summary, coverage_matrix, next_user_action = project_thread_followup(
-            ledger=self.records.ledger,
-            access=self.access,
-            request_ref=current_ref,
-            request=request,
-            result_ref=result_ref,
-            manifest=manifest,
-            attempt=attempt,
-            operation_state=effective,
-            currentness_state=currentness.model_dump(mode="json"),
-        )
-        payload["user_progress_summary"] = progress_summary.model_dump(mode="json")
-        payload["coverage_matrix"] = coverage_matrix.model_dump(mode="json")
-        payload["next_user_action"] = next_user_action.model_dump(mode="json")
+        if value.get("view") != "PROGRESS":
+            progress_summary, coverage_matrix, next_user_action = project_thread_followup(
+                ledger=self.records.ledger,
+                access=self.access,
+                request_ref=current_ref,
+                request=request,
+                result_ref=result_ref,
+                manifest=manifest,
+                attempt=attempt,
+                operation_state=effective,
+                currentness_state=currentness.model_dump(mode="json"),
+            )
+            payload["user_progress_summary"] = progress_summary.model_dump(mode="json")
+            payload["coverage_matrix"] = coverage_matrix.model_dump(mode="json")
+            payload["next_user_action"] = next_user_action.model_dump(mode="json")
         payload["activity_events"] = project_activity_events(cast(dict[str, JsonValue], payload))
         payload["user_activity_events"] = project_user_activity_events(
             cast(dict[str, object], payload), source_context=activity_source_context
         )
-        return cast(dict[str, JsonValue], payload)
+        shown = cast(dict[str, JsonValue], payload)
+        if value.get("view", "SUMMARY") == "FULL":
+            return {**shown, "view": "FULL"}
+        if value.get("view") == "PROGRESS":
+            return progress_thread_read(shown)
+        return summarize_thread_read(shown)

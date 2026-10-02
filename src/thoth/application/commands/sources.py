@@ -16,6 +16,7 @@ from thoth.application.services.resource_scope_context import (
     resource_intake_scope,
     resource_stage_scope,
 )
+from thoth.application.services.resource_scope_read_context import scope_read_transaction
 from thoth.application.services.resource_scope_service import ResourceScopeService
 from thoth.application.services.source_time_service import SourceTimeService
 from thoth.domain.artifact import ParserSelection
@@ -323,6 +324,12 @@ class SourceCommandHandlers:
         }
 
     async def list_sources(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        # One read transaction and one approval memo for the whole list: every artifact and source
+        # time shares the same ancestors, so each is approved once per request.
+        with self._ledger.transaction(), scope_read_transaction():
+            return self._read_sources(value)
+
+    def _read_sources(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ProjectScopedInput.model_validate(value)
         sources = self._artifacts.list_artifacts(request.project_id)
         visible = {source.artifact_id for source in sources}

@@ -61,6 +61,62 @@ async def _finish_shielded[T](task: asyncio.Task[T]) -> T:
                 return task.result()
 
 
+def _request_payload[TModel: BaseModel](
+    request: ModelRequest[TModel], model: str | None
+) -> tuple[str, dict[str, object], bytes]:
+    prompt = prompt_envelope(request)
+    schema = constrain_span_references(
+        strict_output_schema(request.output_model),
+        tuple(span.span_id for span in request.context_pack.evidence),
+        request.context_pack.research_context,
+    )
+    allowed = request.context_pack.policy_hints.get("minimum_action_tier_by_family")
+    if isinstance(allowed, dict):
+        mapping = cast(dict[object, object], allowed)
+        schema = constrain_action_families(schema, tuple(str(key) for key in mapping))
+    schema = apply_hypothesis_review_contract(
+        schema, request.output_model, request.context_pack.research_context
+    )
+    output_config: dict[str, object] = {
+        "format": {"type": "json_schema", "schema": schema},
+    }
+    body: dict[str, object] = {
+        "model": model,
+        "max_tokens": request.max_output_tokens,
+        "messages": [{"role": "user", "content": prompt}],
+        "output_config": output_config,
+        "stream": False,
+    }
+    payload = json.dumps(body, ensure_ascii=False, separators=(",", ":")).encode()
+    return prompt, schema, payload
+
+
+def _input_digest[TModel: BaseModel](
+    request: ModelRequest[TModel],
+    model: str | None,
+    prompt: str,
+    schema: dict[str, object],
+    reasoning_effort: str | None,
+) -> str:
+    return domain_digest(
+        "MODEL_PROMPT_INPUT",
+        "2.0.0",
+        canonical_payload(
+            {
+                "provider": "claude-oauth",
+                "prompt": prompt,
+                "schema": schema,
+                "model": model,
+                "effort": reasoning_effort,
+                "prompt_version": request.prompt_version,
+                "model_policy_ref": request.model_policy_ref,
+                "max_output_tokens": request.max_output_tokens,
+                "model_settings": request.model_settings,
+            }
+        ),
+    )
+
+
 class ClaudeMessagesModel(ModelPort):
     control_capability = CLAUDE_MESSAGES_CONTROL
 
@@ -90,30 +146,7 @@ class ClaudeMessagesModel(ModelPort):
         if request.max_output_tokens <= 0:
             raise ClaudeMessagesHold("CLAUDE_OUTPUT_LIMIT_INVALID")
         check_research_boundary()
-        prompt = prompt_envelope(request)
-        schema = constrain_span_references(
-            strict_output_schema(request.output_model),
-            tuple(span.span_id for span in request.context_pack.evidence),
-            request.context_pack.research_context,
-        )
-        allowed = request.context_pack.policy_hints.get("minimum_action_tier_by_family")
-        if isinstance(allowed, dict):
-            mapping = cast(dict[object, object], allowed)
-            schema = constrain_action_families(schema, tuple(str(key) for key in mapping))
-        schema = apply_hypothesis_review_contract(
-            schema, request.output_model, request.context_pack.research_context
-        )
-        output_config: dict[str, object] = {
-            "format": {"type": "json_schema", "schema": schema},
-        }
-        body: dict[str, object] = {
-            "model": self.model,
-            "max_tokens": request.max_output_tokens,
-            "messages": [{"role": "user", "content": prompt}],
-            "output_config": output_config,
-            "stream": False,
-        }
-        payload = json.dumps(body, ensure_ascii=False, separators=(",", ":")).encode()
+        prompt, schema, payload = _request_payload(request, self.model)
         work = research_work.get()
         deadline = 60.0 if work is None else work.boundary.call_timeout()
         if deadline is None:
@@ -250,22 +283,8 @@ class ClaudeMessagesModel(ModelPort):
                 prompt_version=request.prompt_version,
                 scripted=False,
                 dispatch_ids=(dispatch_id,),
-                input_digest=domain_digest(
-                    "MODEL_PROMPT_INPUT",
-                    "2.0.0",
-                    canonical_payload(
-                        {
-                            "provider": "claude-oauth",
-                            "prompt": prompt,
-                            "schema": schema,
-                            "model": self.model,
-                            "effort": settings.reasoning_effort,
-                            "prompt_version": request.prompt_version,
-                            "model_policy_ref": request.model_policy_ref,
-                            "max_output_tokens": request.max_output_tokens,
-                            "model_settings": settings,
-                        }
-                    ),
+                input_digest=_input_digest(
+                    request, self.model, prompt, schema, settings.reasoning_effort
                 ),
                 output_digest=model_digest(
                     "MODEL_OUTPUT", cast(BaseModel, parsed), schema_version="1.0.0"

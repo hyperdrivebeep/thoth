@@ -1,6 +1,6 @@
 """Connected evidence -> requirements -> semantic review -> permitted source discovery."""
 
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Iterable
 from time import perf_counter_ns
 from typing import cast
 
@@ -12,10 +12,12 @@ from thoth.application.services.request_records import RequestRecords
 from thoth.application.services.requirement_compiler import compile_requirements
 from thoth.application.services.research_context_assembler import assemble_context
 from thoth.application.services.research_coverage import answer_assessment_state, assess_coverage
+from thoth.application.services.research_findings import adopt_confirmed_findings
 from thoth.application.services.research_gaps import gap_targets, validate_gaps
 from thoth.application.services.research_retrieval import lexical_candidates
 from thoth.application.services.research_retrieval_policy import record_selection, retrieval_policy
 from thoth.application.services.research_role_context import bundle_view, role_context
+from thoth.application.services.research_stage_reuse import reuse_stage_if_exact
 from thoth.application.services.research_stages import persist_stage, read_stage
 from thoth.domain.canonical import canonical_payload, domain_digest, head_set_digest
 from thoth.domain.connectors import ConnectorAccessRequest, ConnectorFailure, ConnectorOperation
@@ -36,6 +38,7 @@ from thoth.domain.project import Project, WorkThread
 from thoth.domain.public_web_access import PROJECT_PUBLIC_WEB_CONNECTOR_ID
 from thoth.domain.research_execution import ResearchFence, ResearchWork, research_work
 from thoth.domain.research_request import ResolvedRequestRevision, RevisionRef
+from thoth.domain.resource_scope import ResourceScopeError
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
 from thoth.ports.criterion_contract import CriterionContractStorePort
 from thoth.ports.evidence_graph import EvidenceGraphStorePort
@@ -63,6 +66,12 @@ class ResearchAnalysis:
         self.memory = memory
         self.evidence_graph = evidence_graph
         self.profiles = profiles
+        # (project, artifact, version, stored structure metadata) -> (observation, nodes digest).
+        # A stored structure does not change, so its digest is computed once per process; the scoped
+        # metadata read that forms the key still checks access on every use.
+        self._structure_summaries: dict[
+            tuple[str, str, str, str], tuple[dict[str, object] | None, str]
+        ] = {}
 
     def assemble(
         self,
@@ -131,6 +140,23 @@ class ResearchAnalysis:
         }
         return tuple(s for s in self.artifacts.list_evidence(project) if s.artifact_id in active)
 
+    def evidence_by_ids(self, project: str, span_ids: Iterable[str]) -> tuple[EvidenceSpan, ...]:
+        """The visible spans among span_ids: the rule of evidence(), without loading every span."""
+        active = {
+            b.artifact_id
+            for b in self.governance.list_source_bindings(project)
+            if b.state == "ACTIVE"
+        }
+        found: list[EvidenceSpan] = []
+        for span_id in dict.fromkeys(span_ids):
+            try:
+                span = self.artifacts.read_evidence(span_id)
+            except ResourceScopeError:
+                continue
+            if span is not None and span.project_id == project and span.artifact_id in active:
+                found.append(span)
+        return tuple(found)
+
     def source_overview(self, project_id: str) -> list[dict[str, object]]:
         active = {
             b.artifact_id
@@ -182,23 +208,34 @@ class ResearchAnalysis:
     def source_structures(self, evidence: tuple[EvidenceSpan, ...]) -> list[dict[str, object]]:
         """Assembly consumes original structures; corrections belong to the selected packet."""
         return [
-            {
-                "artifact_id": a,
-                "source_version_id": v,
-                "observation": None
-                if document is None or document.capability_observation is None
-                else document.capability_observation.model_dump(mode="json"),
-                "nodes_digest": None
-                if document is None
-                else domain_digest(
-                    "SOURCE_STRUCTURE", "1.0.0", canonical_payload({"nodes": document.nodes})
-                ),
-            }
+            {"artifact_id": a, "source_version_id": v, **self._structure_summary(p, a, v)}
             for p, a, v in sorted(
                 {(s.project_id, s.artifact_id, s.source_version_id) for s in evidence}
             )
-            for document in (self.artifacts.read_structure(p, a, v),)
         ]
+
+    def _structure_summary(self, project: str, artifact: str, version: str) -> dict[str, object]:
+        metadata = self.artifacts.read_structure_metadata_digest(project, artifact, version)
+        key = None if metadata is None else (project, artifact, version, metadata)
+        if key is not None and key in self._structure_summaries:
+            observation, digest = self._structure_summaries[key]
+            return {"observation": observation, "nodes_digest": digest}
+        document = self.artifacts.read_structure(project, artifact, version)
+        if document is None:
+            return {"observation": None, "nodes_digest": None}
+        observation = (
+            None
+            if document.capability_observation is None
+            else document.capability_observation.model_dump(mode="json")
+        )
+        digest = domain_digest(
+            "SOURCE_STRUCTURE", "1.0.0", canonical_payload({"nodes": document.nodes})
+        )
+        if key is not None:
+            if len(self._structure_summaries) >= 128:
+                self._structure_summaries.clear()
+            self._structure_summaries[key] = (observation, digest)
+        return {"observation": observation, "nodes_digest": digest}
 
     def source_digest(self, evidence: tuple[EvidenceSpan, ...], *, version: str = "2.1.0") -> str:
         return domain_digest(
@@ -496,6 +533,13 @@ class ResearchAnalysis:
         candidate, _ = await self.ask(
             model, project, review_context, ModelRole.SEMANTIC_REVIEWER, ReviewProposal
         )
+        # Facts are shown to the user as confirmed, so a finding citing a span the reviewer was
+        # not given is discarded here (and counted) instead of being trusted.
+        findings, findings_dropped = adopt_confirmed_findings(
+            candidate.confirmed_findings, {span.span_id for span in work.evidence}
+        )
+        work.context["confirmed_findings"] = findings
+        work.context["confirmed_findings_dropped"] = findings_dropped
         adjudication, run = await self.ask(
             model,
             project,
@@ -734,6 +778,16 @@ class ResearchAnalysis:
             max_output_tokens=6000,
             model_settings=None if work is None else work.model_settings,
         )
+        if work is not None and work.resume_from_operation_id is not None:
+            # Only a user-requested resume reuses a stage, and only on an exactly equal input.
+            work.boundary.check()
+            self.require_current_sources(context.evidence, source_context_digest)
+            reused_ref = reuse_stage_if_exact(self.records, work, prepared)
+            if reused_ref is not None:
+                reused = read_stage(self.records, reused_ref)
+                if reused.request_ref != work.request_ref:
+                    raise ResearchFence("STAGE_REQUEST_BASIS_CHANGED")
+                return codec.model_validate(reused.output), reused.provider_output_digest
         started = perf_counter_ns()
         result = await model.structured(prepared)
         if work is not None:

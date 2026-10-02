@@ -13,6 +13,15 @@ export type HistorySelection =
   | { kind: "result"; scope: HistoryScope & { threadId: string; requestDigest: string }; operationId?: string; resultDigest?: string; record?: RecordReference; occurredAt?: string; title?: string }
   | { kind: "record"; scope: HistoryScope; record: RecordReference };
 export type Currentness = { state: string; reasons: string[] };
+export type ChangeSummary = {
+  lines: { label: string; before: string; after: string }[];
+  more: number;
+  flags: ("NUMBER" | "NEGATION" | "STATUS" | "CITATION" | "AUTHORITY" | "TIME")[];
+  text_diff_recommended: boolean;
+  /** Fields without a reader-facing name: only counted by default, raw form in `technical`. */
+  other?: number;
+  technical?: { label: string; before: string; after: string }[];
+};
 export type HistoryRow = {
   id: string;
   kind: string;
@@ -25,6 +34,7 @@ export type HistoryRow = {
   phase?: string | null;
   currentness: Currentness;
   selection: HistorySelection;
+  changeSummary?: ChangeSummary | null;
 };
 export type HistoryPage = {
   items: HistoryRow[];
@@ -55,6 +65,7 @@ export type HistoryEntry = {
   currentHead: string | null;
   capability: { restore: string; applyReady: boolean; previewSupported: boolean; reasons: string[] };
   restoreSelection: RestoreSelection | null;
+  changeSummary?: ChangeSummary | null;
   technical: unknown;
 };
 export type RevisionChange = {

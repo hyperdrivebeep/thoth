@@ -19,7 +19,7 @@ from thoth.domain.memory import MemoryTransition
 
 
 @pytest.mark.asyncio
-async def test_preparation_is_read_only_and_includes_prior_prepared_commit_in_conflicts(
+async def test_preparation_is_read_only_and_includes_prior_prepared_commit_in_relations(
     tmp_path: Path,
 ) -> None:
     runtime, _connector, project_id = await prepare_thread(tmp_path, allow_connector=True)
@@ -66,10 +66,16 @@ async def test_preparation_is_read_only_and_includes_prior_prepared_commit_in_co
             basis=basis,
             thread_id="thread:a06:prepared",
             candidates=candidates,
+            # Two corrections of one starting version: which one stands is not decidable, so
+            # the second is held against the first one prepared in this same batch.
+            parent_by_memory_id={item.memory_id: "1" * 64 for item in candidates},
         )
         assert memory_counts(runtime.ledger.engine) == before
         assert prepared.revisions[0].transition == MemoryTransition.COMMIT
         assert prepared.revisions[1].transition == MemoryTransition.HOLD
+        assert prepared.revisions[1].support_status == "AMBIGUOUS"
+        (judgment,) = prepared.result.relation_judgments
+        assert judgment.outcome == "HELD_NO_MODEL" and judgment.authority == "PROPOSAL_ONLY"
         result = service.commit_prepared(prepared)
         assert result.committed and result.held
         with pytest.raises(ValueError, match="MEMORY_PREPARATION_STALE"):

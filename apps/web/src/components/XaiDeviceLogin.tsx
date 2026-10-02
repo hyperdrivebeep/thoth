@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { rpc } from "../api/rpcClient";
+import { connectionErrorText, reasonText } from "./connectionCopy";
 import type { CredentialAccount, CredentialAuthMethod, CredentialRegisterResult } from "./modelCredentialPresentation";
 
 type LoginState = "PENDING" | "SLOW_DOWN" | "CONNECTED" | "DENIED" | "EXPIRED" | "CANCELLED" | "FAILED" | "LOGIN_REQUIRED";
@@ -124,8 +125,8 @@ export function XaiDeviceLogin({ projectId, workspaceId, account, method, method
       if (!next) { setError("xAI 로그인 시작 응답을 확인하지 못했습니다. 새 로그인은 자동으로 시작하지 않습니다."); return; }
       setNow(Date.now() / 1000);
       setSession(next);
-    } catch {
-      if (active.current && ticket === generation.current) setError("xAI 로그인 시작 결과를 확인하지 못했습니다. 계정 상태를 확인한 뒤 다시 시도하세요.");
+    } catch (caught) {
+      if (active.current && ticket === generation.current) setError(connectionErrorText(caught, "xAI 로그인 시작 결과를 확인하지 못했습니다. 계정 상태를 확인한 뒤 다시 시도하세요."));
     } finally {
       requests.current.delete(controller);
       if (active.current && ticket === generation.current) { startBusy.current = false; setStarting(false); }
@@ -195,19 +196,18 @@ export function XaiDeviceLogin({ projectId, workspaceId, account, method, method
   };
 
   return <div className="xai-device-login">
-    {method && <small>{method.route} · 연결 {method.connection_state ?? "미조회"} · 모델 경로 {method.execution_eligible ? "시도 가능" : "준비 전"} · 실행 성공 {account?.execution_verified === true ? "확인됨" : "미검증"}</small>}
-    <Button small disabled={!canStart} loading={starting} onClick={() => void start()}>
-      {account?.oauth || shownState === "CONNECTED" ? "xAI 로그인 확인됨" : session ? "xAI 로그인 다시 시작" : "xAI 로그인 시작"}
-    </Button>
-    {method && method.capabilities?.start !== true && <small role="status">xAI 로그인 시작을 사용할 수 없습니다{method.reason_code ? ` (${method.reason_code})` : ""}.</small>}
+    {method && method.capabilities?.start !== true
+      ? <p className="connection-note" role="status">{reasonText(method.reason_code) ?? "이 PC에서는 xAI 로그인을 시작할 수 없습니다. API 키로 연결하세요."}</p>
+      : <Button intent={canStart ? "primary" : "none"} disabled={!canStart} loading={starting} onClick={() => void start()}>
+        {account?.oauth || shownState === "CONNECTED" ? "xAI 로그인됨" : session ? "xAI 로그인 다시 시작" : "xAI로 로그인"}
+      </Button>}
     {!workspaceId && <small role="status">작업 공간을 확인한 뒤 xAI 로그인을 시작할 수 있습니다.</small>}
     {session && <Callout compact>
       <p role="status">{stateMessage(shownState!)}</p>
-      <p>로그인 시도: {shownState} · 저장 인증: {session.authState} · 모델 목록: {session.catalogState}</p>
       {!terminalStates.has(shownState!) && <>
-        <p>사용자 코드: <code>{session.userCode}</code></p>
-        <p aria-live="off">남은 유효 시간: {Math.max(0, Math.ceil(session.expiresAt - now))}초</p>
-        <a href={session.verificationUri} target="_blank" rel="noopener noreferrer">xAI 승인 페이지 열기</a>
+        <p className="device-code-row">사용자 코드: <code className="device-code">{session.userCode}</code></p>
+        <p><a href={session.verificationUri} target="_blank" rel="noopener noreferrer">xAI 승인 페이지 열기</a> — 열린 페이지에 위 코드를 입력하세요.</p>
+        <p className="connection-timer" aria-live="off">남은 유효 시간: {Math.max(0, Math.ceil(session.expiresAt - now))}초</p>
         <div>
           <Button small minimal disabled={checking || cancelling} onClick={() => {
             // A previous status request has settled before this button is enabled again.
@@ -220,5 +220,11 @@ export function XaiDeviceLogin({ projectId, workspaceId, account, method, method
       </>}
     </Callout>}
     {error && <Callout compact intent="warning" role="alert">{error}</Callout>}
+    {(session || method && method.capabilities?.start !== true) && <details className="connection-tech">
+      <summary>기술 정보</summary>
+      {method && <p>{method.route} · 연결 {method.connection_state ?? "미조회"} · 모델 경로 {method.execution_eligible ? "시도 가능" : "준비 전"} · 실행 성공 {account?.execution_verified === true ? "확인됨" : "미검증"}</p>}
+      {method && method.capabilities?.start !== true && <p>로그인 시작 불가{method.reason_code ? ` (${method.reason_code})` : ""}</p>}
+      {session && <p>로그인 시도: {shownState} · 저장 인증: {session.authState} · 모델 목록: {session.catalogState}</p>}
+    </details>}
   </div>;
 }

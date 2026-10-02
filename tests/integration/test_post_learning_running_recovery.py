@@ -10,7 +10,11 @@ from tests.integration.scoped_runtime import create_runtime
 from tests.integration.storage_coverage_helpers import request, value
 
 from thoth.adapters.sandbox import ScriptedSandboxAdapter
+from thoth.application.services import memory_relation_resolver
 from thoth.application.services.full_project_memory import FullProjectMemoryService
+from thoth.application.services.memory_relation import MemorySubject
+from thoth.domain.enums import MemoryKind
+from thoth.domain.memory_relation import MemoryRelation
 from thoth.domain.sandbox import SandboxResult, SandboxRunSpec
 from thoth.protocol.jsonrpc import JsonRpcRequest
 
@@ -30,6 +34,7 @@ class NoSecondExecution(ScriptedSandboxAdapter):
     "route,phase",
     [
         ("resume", "learning"),
+        ("resume_conflict", "learning"),
         ("replay", "learning"),
         ("resume", "outcome"),
         ("paused_replay", "learning"),
@@ -43,6 +48,10 @@ async def test_crash_before_terminal_recovers_only_verified_learning(
     phase: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    # "resume_conflict" is the resume route where the memory review also meets a contradiction
+    # candidate, so the learning ends HELD while the recovery promises stay the same.
+    conflict = route == "resume_conflict"
+    route = "resume" if conflict else route
     worker = Path(__file__).with_name("post_learning_crash_worker.py")
     source_root = Path(__file__).resolve().parents[2]
     process = subprocess.run(
@@ -75,6 +84,15 @@ async def test_crash_before_terminal_recovers_only_verified_learning(
             current = value(await runtime.bus.query(request("thread/read", "paused-read", scope)))
             assert current["execution_state"] in {"PAUSED", "PAUSE_PENDING"}
             assert sandbox.repeated == 0
+        if conflict:
+            classify = memory_relation_resolver.classify_memory_relation
+
+            def contradicts(new: MemorySubject, existing: MemorySubject) -> MemoryRelation:
+                if new.kind == MemoryKind.HYPOTHESIS:
+                    return MemoryRelation.CONTRADICTION_CANDIDATE
+                return classify(new, existing)
+
+            monkeypatch.setattr(memory_relation_resolver, "classify_memory_relation", contradicts)
         if route.startswith("during_"):
             original = FullProjectMemoryService.prepare_thread_results
             control = "thread/pause" if route == "during_pause" else "thread/stop"
@@ -124,11 +142,15 @@ async def test_crash_before_terminal_recovers_only_verified_learning(
             "BASELINE_REFRESH",
         ]
         learning = result["post_execution_learning"]
-        assert learning["state"] == "HELD"
-        assert learning["reason_code"] == "MEMORY_REVIEW_HELD"
+        # Without a real contradiction the reviewed memories are committed; with one they are held.
+        assert learning["state"] == ("HELD" if conflict else "COMMITTED")
+        assert learning["reason_code"] == ("MEMORY_REVIEW_HELD" if conflict else None)
+        assert bool(learning["promotion"]["held"]) is conflict
         outcome = learning["basis"]["execution"]["outcome_revision_ref"]["revision_digest"]
         assert any(m["owner_revision_ref"] == outcome for m in learning["promotion"]["committed"])
-        current = value(await runtime.bus.query(request("thread/read", "read", scope)))
+        current = value(
+            await runtime.bus.query(request("thread/read", "read", {**scope, "view": "FULL"}))
+        )
         assert current["freshness"] == "CURRENT"
         assert current["basis_currentness"]["state"] == "CURRENT"
         assert current["current_result"]["research_basis"]["coverage"] == "COMPLETE"

@@ -1,0 +1,84 @@
+name: Product check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  product-check:
+    # The documented quick start supports Windows; Linux remains unverified.
+    runs-on: windows-latest
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      PYTHONUTF8: "1"
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.thoth-test-browsers
+      THOTH_WORKSPACE: .thoth-ci
+      THOTH_IRIS_RESULT_FIXTURE: .thoth-ci/no-private-result.json
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "11.21.0"
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.5"
+      - name: Install locked dependencies
+        run: |
+          python -m venv --copies --without-pip .venv
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev --extra browser
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pnpm install --frozen-lockfile
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          .\.venv\Scripts\python.exe -m playwright install --only-shell chromium
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Python product tests
+        run: .\.venv\Scripts\python.exe -m pytest
+      - name: Python lint
+        run: .\.venv\Scripts\python.exe -m ruff check src apps tests migrations conftest.py scripts/pytest_environment.py
+      - name: Runtime architecture
+        run: .\.venv\Scripts\python.exe scripts/check_architecture.py
+      - name: Web tests
+        run: pnpm --dir apps/web run test --run
+      - name: Web lint
+        run: pnpm --dir apps/web run lint
+      - name: Web types
+        run: pnpm --dir apps/web run typecheck
+      - name: Web build
+        run: pnpm --dir apps/web run build
+      - name: README quick-start server smoke
+        run: |
+          .\.venv\Scripts\python.exe -m thoth.cli workspace
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $thothApi = Start-Process .\.venv\Scripts\python.exe -ArgumentList @('-m', 'thoth.cli', 'serve', '--workspace', '.thoth-ci', '--port', '18766') -WindowStyle Hidden -PassThru
+          try {
+            $thothReady = $false
+            for ($thothAttempt = 0; $thothAttempt -lt 30; $thothAttempt++) {
+              try {
+                Invoke-RestMethod http://127.0.0.1:18766/healthz -ErrorAction Stop | Out-Null
+                $thothReady = $true
+                break
+              } catch { Start-Sleep -Seconds 1 }
+            }
+            if (-not $thothReady) { throw 'Quick-start API did not become ready.' }
+            $thothPage = Invoke-WebRequest http://127.0.0.1:18766/
+            if ($thothPage.StatusCode -ne 200 -or $thothPage.Content -notmatch 'type="module"') {
+              throw 'Built Web entry did not load.'
+            }
+            # Web tests and local browser acceptance check the rendered first-run UI.
+          } finally {
+            & taskkill /PID $thothApi.Id /T /F | Out-Null
+          }

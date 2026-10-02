@@ -16,12 +16,10 @@ def truth_drift_errors(root: Path) -> list[str]:
         (base / "config/architecture-conformance.json").read_text(encoding="utf-8")
     )
     now = (base / "PROJECT_WIKI/NOW.md").read_text(encoding="utf-8")
-    ocp = (base / "PROJECT_WIKI/30_ARCHITECTURE/current-ocp-gaps.md").read_text(
+    ocp = (base / "PROJECT_WIKI/30_ARCHITECTURE/current-ocp-gaps.md").read_text(encoding="utf-8")
+    matrix = (base / "PROJECT_WIKI/50_SEED_ROADMAP/implementation-maturity-matrix.md").read_text(
         encoding="utf-8"
     )
-    matrix = (
-        base / "PROJECT_WIKI/50_SEED_ROADMAP/implementation-maturity-matrix.md"
-    ).read_text(encoding="utf-8")
     extensions = {str(item["name"]): item for item in manifest["extension_points"]}
     errors: list[str] = []
     stale = (
@@ -58,6 +56,17 @@ def truth_drift_errors(root: Path) -> list[str]:
 
 
 def main() -> int:
+    if not (ROOT / "PROJECT_WIKI").is_dir():
+        print(
+            json.dumps(
+                {
+                    "verdict": "NOT_APPLICABLE",
+                    "errors": [],
+                    "reason": "Local development Wiki is not distributed.",
+                }
+            )
+        )
+        return 0
     errors = truth_drift_errors(ROOT)
     payload = {
         "verdict": "PASS" if not errors else "FAIL",

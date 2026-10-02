@@ -34,6 +34,89 @@
       "title": "BasisCurrentness",
       "type": "object"
     },
+    "ChangeLine": {
+      "additionalProperties": false,
+      "properties": {
+        "after": {
+          "title": "After",
+          "type": "string"
+        },
+        "before": {
+          "title": "Before",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "before",
+        "after"
+      ],
+      "title": "ChangeLine",
+      "type": "object"
+    },
+    "ChangeSummary": {
+      "additionalProperties": false,
+      "description": "Derived view of a revision's diff against its parent; never a second source of truth.",
+      "properties": {
+        "flags": {
+          "default": [],
+          "items": {
+            "enum": [
+              "NUMBER",
+              "NEGATION",
+              "STATUS",
+              "CITATION",
+              "AUTHORITY",
+              "TIME"
+            ],
+            "type": "string"
+          },
+          "title": "Flags",
+          "type": "array"
+        },
+        "lines": {
+          "items": {
+            "$ref": "#/$defs/ChangeLine"
+          },
+          "title": "Lines",
+          "type": "array"
+        },
+        "more": {
+          "default": 0,
+          "minimum": 0,
+          "title": "More",
+          "type": "integer"
+        },
+        "other": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Other",
+          "type": "integer"
+        },
+        "technical": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ChangeLine"
+          },
+          "title": "Technical",
+          "type": "array"
+        },
+        "text_diff_recommended": {
+          "default": false,
+          "title": "Text Diff Recommended",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "lines"
+      ],
+      "title": "ChangeSummary",
+      "type": "object"
+    },
     "HistoryCapability": {
       "additionalProperties": false,
       "properties": {
@@ -135,6 +218,17 @@
         },
         "capability": {
           "$ref": "#/$defs/HistoryCapability"
+        },
+        "change_summary": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChangeSummary"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "completion": {
           "anyOf": [

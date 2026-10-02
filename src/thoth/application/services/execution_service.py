@@ -4,6 +4,7 @@ from typing import cast
 
 from thoth.application.services.action_currentness import find_plan_step, require_plan_current
 from thoth.application.services.action_service import ActionService
+from thoth.application.services.authorization_currentness import approved_authorization
 from thoth.application.services.execution_frontier import execution_frontier
 from thoth.application.services.execution_persistence import (
     append_execution_audit,
@@ -691,15 +692,8 @@ class ExecutionService:
         risk = str(step.get("risk_tier", "R3"))
         authorization: AuthorizationEnvelopeRecord | None = None
         if risk == "R3":
-            authorization = next(
-                (
-                    item
-                    for item in self._actions.list_authorizations(plan.project_id, plan.plan_id)
-                    if item.step_id == step_id
-                    and item.plan_revision_digest == plan.revision_digest
-                    and item.state == "APPROVED"
-                ),
-                None,
+            authorization = approved_authorization(
+                self._actions.list_authorizations(plan.project_id, plan.plan_id), plan, step
             )
             if authorization is None:
                 raise ValueError("R3 dispatch requires an approved exact-digest authorization")

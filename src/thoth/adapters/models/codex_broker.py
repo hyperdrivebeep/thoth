@@ -9,13 +9,14 @@ import threading
 import time
 import webbrowser
 from collections.abc import AsyncGenerator, Callable, Generator
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import asynccontextmanager, contextmanager, suppress
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Protocol, cast
 
-from thoth.adapters.models.catalog import WIRE_EFFORTS, chatgpt_codex_model_id
+from thoth.adapters.models.catalog import WIRE_EFFORTS, classify_codex_model
+from thoth.adapters.models.catalog_store import CatalogSnapshotStore, CatalogStoreError
 from thoth.adapters.models.codex_app_server import CodexAppServerClient
 from thoth.adapters.models.codex_profile import (
     CODEX_BACKEND_ORIGIN,
@@ -25,6 +26,12 @@ from thoth.adapters.models.codex_profile import (
     CodexProfileHold,
     VersionRunner,
     read_codex_executable_version,
+)
+from thoth.domain.model_catalog import (
+    CatalogSnapshot,
+    ExcludedModel,
+    ExecutionMark,
+    authority_digest,
 )
 from thoth.domain.model_dispatch import OAuthSession
 from thoth.domain.model_settings import ModelOption, ModelSelection
@@ -40,6 +47,10 @@ ClientFactory = Callable[[CodexProfile, CodexExecutableIdentity], AppServerPort]
 BrowserOpener = Callable[[str], bool]
 
 
+# One list load per finished login is given this long before the login is shown without a list.
+LOGIN_LIST_DEADLINE_SECONDS = 20.0
+
+
 @dataclass(frozen=True)
 class CodexBrokerState:
     connected: bool
@@ -48,6 +59,7 @@ class CodexBrokerState:
     options: tuple[ModelOption, ...] = ()
     default: ModelSelection = field(default_factory=lambda: ModelSelection(provider="codex-oauth"))
     snapshot: CodexAuthSnapshot | None = None
+    catalog: CatalogSnapshot | None = None
 
     def public(self) -> dict[str, object]:
         return {
@@ -71,6 +83,7 @@ class CodexAuthBroker:
         client_factory: ClientFactory | None = None,
         version_runner: VersionRunner = read_codex_executable_version,
         browser_opener: BrowserOpener = webbrowser.open,
+        login_watch_interval: float = 2.0,
     ) -> None:
         self.profile = CodexProfile.for_workspace(workspace)
         self._client_factory = client_factory or CodexAppServerClient
@@ -79,9 +92,19 @@ class CodexAuthBroker:
         self._client: AppServerPort | None = None
         self._lock = threading.RLock()
         self._cached: CodexBrokerState | None = None
+        self._store = CatalogSnapshotStore(self.profile.workspace)
+        self._catalog: CatalogSnapshot | None = None
         self._cached_at = 0.0
         self._pending_login_id: str | None = None
         self._login_timer: threading.Timer | None = None
+        # Finishing a login is the server's job: it settles the attempt and loads the model list
+        # once, whether or not a screen is still polling. Bookkeeping has its own lock so status
+        # reads stay quick while the list loads.
+        self._login_watch_interval = login_watch_interval
+        self._login_lock = threading.Lock()
+        self._login_runs: dict[str, str] = {}
+        self._login_starts: dict[str, str | None] = {}
+        self._login_stop = threading.Event()
 
     def _client_for(self, identity: CodexExecutableIdentity) -> AppServerPort:
         if self._client is None:
@@ -110,8 +133,11 @@ class CodexAuthBroker:
             raise CodexProfileHold("CODEX_BACKEND_ROUTING_UNSUPPORTED")
 
     @staticmethod
-    def _models(client: AppServerPort) -> tuple[tuple[ModelOption, ...], str | None]:
+    def _models(
+        client: AppServerPort,
+    ) -> tuple[tuple[ModelOption, ...], str | None, tuple[ExcludedModel, ...]]:
         options: list[ModelOption] = []
+        excluded: list[ExcludedModel] = []
         default: str | None = None
         cursor: str | None = None
         for _ in range(10):
@@ -126,8 +152,14 @@ class CodexAuthBroker:
                 if not isinstance(raw, dict):
                     raise CodexProfileHold("CATALOG_UNAVAILABLE")
                 entry = cast(dict[str, object], raw)
-                model = chatgpt_codex_model_id(entry.get("model"))
-                if model is None or entry.get("hidden") is True:
+                model, reason = classify_codex_model(entry.get("model"))
+                if entry.get("hidden") is True or (model is None and reason is None):
+                    continue
+                if model is None:
+                    if reason is not None:
+                        excluded.append(
+                            ExcludedModel(model=str(entry.get("model"))[:160], reason=reason)
+                        )
                     continue
                 levels = entry.get("supportedReasoningEfforts")
                 if not isinstance(levels, list):
@@ -142,6 +174,7 @@ class CodexAuthBroker:
                     and effort in WIRE_EFFORTS
                 )
                 if not efforts:
+                    excluded.append(ExcludedModel(model=model, reason="UNKNOWN_EFFORT_ONLY"))
                     continue
                 suggested = entry.get("defaultReasoningEffort")
                 default_effort = (
@@ -154,19 +187,20 @@ class CodexAuthBroker:
                         reasoning_efforts=efforts,
                         default_effort=default_effort,
                         capability_source="codex-app-server/model-list-pinned-v1",
+                        entitlement="PROVIDER_LISTED",
                     )
                 )
                 if entry.get("isDefault") is True:
                     default = model
             next_cursor = result.get("nextCursor")
             if next_cursor is None:
-                return tuple(options), default
+                return tuple(options), default, tuple(excluded)
             if not isinstance(next_cursor, str) or not next_cursor or next_cursor == cursor:
                 raise CodexProfileHold("CATALOG_UNAVAILABLE")
             cursor = next_cursor
         raise CodexProfileHold("CATALOG_UNAVAILABLE")
 
-    def _refresh(self) -> CodexBrokerState:
+    def _refresh(self, *, refresh_catalog: bool = True) -> CodexBrokerState:
         identity = self.profile.executable(version_runner=self._version_runner)
         if not self.profile.pin_path.is_file():
             return CodexBrokerState(False, False, "LOGIN_REQUIRED")
@@ -222,27 +256,126 @@ class CodexAuthBroker:
                 raise
             if held_digest is not None:
                 self.profile.clear_refresh_hold()
-            options, default_id = self._models(client)
+            catalog = self._catalog_for_refresh(client, snapshot, refresh_catalog)
             if self._pending_login_id is not None:
                 self.profile.clear_login_pending()
                 self._pending_login_id = None
                 if self._login_timer is not None:
                     self._login_timer.cancel()
                     self._login_timer = None
-        if not options:
+        if catalog is None or not catalog.options:
             return CodexBrokerState(True, False, "CATALOG_UNAVAILABLE", snapshot=snapshot)
+        return self._eligible(catalog, snapshot)
+
+    @staticmethod
+    def _eligible(catalog: CatalogSnapshot, snapshot: CodexAuthSnapshot) -> CodexBrokerState:
+        options = catalog.effective_options()
         defaults = ModelSelection(provider="codex-oauth")
-        if default_id is not None:
-            option = next((item for item in options if item.model == default_id), None)
-            if option is not None:
-                defaults = ModelSelection(
-                    provider="codex-oauth",
-                    model=default_id,
-                    reasoning_effort=option.default_effort,
+        option = next((item for item in options if item.model == catalog.default_model), None)
+        if option is not None:
+            defaults = ModelSelection(
+                provider="codex-oauth", model=option.model, reasoning_effort=option.default_effort
+            )
+        return CodexBrokerState(
+            True, True, "EXECUTION_UNVERIFIED", options, defaults, snapshot, catalog
+        )
+
+    @staticmethod
+    def _authority(snapshot: CodexAuthSnapshot) -> str:
+        return authority_digest("codex-oauth", snapshot.account_id)
+
+    def _stored_catalog(self, digest: str) -> CatalogSnapshot | None:
+        if self._catalog is not None and self._catalog.authority_digest == digest:
+            return self._catalog
+        self._catalog = self._store.load("codex-oauth", digest)
+        return self._catalog
+
+    def _publish(self, catalog: CatalogSnapshot) -> CatalogSnapshot:
+        self._catalog = catalog
+        # If the write fails the in-memory list still serves; the next good refresh tries again.
+        with suppress(CatalogStoreError):
+            self._store.save(catalog)
+        return catalog
+
+    def _catalog_for_refresh(
+        self, client: AppServerPort, snapshot: CodexAuthSnapshot, refresh: bool
+    ) -> CatalogSnapshot | None:
+        """The list to use now. A failed or bad candidate never replaces a good list."""
+
+        digest = self._authority(snapshot)
+        prior = self._stored_catalog(digest)
+        if prior is not None and not refresh:
+            return prior
+        now = datetime.now(UTC)
+        try:
+            options, default_id, excluded = self._models(client)
+        except CodexProfileHold as exc:
+            if prior is None:
+                return None
+            return self._publish(
+                prior.model_copy(
+                    update={
+                        "status": "STALE_LAST_GOOD",
+                        "failure_reason": str(exc)[:160],
+                        "last_attempt_at": now,
+                    }
                 )
-        return CodexBrokerState(True, True, "EXECUTION_UNVERIFIED", options, defaults, snapshot)
+            )
+        listed = {option.model for option in options}
+        kept = tuple(
+            mark
+            for mark in (() if prior is None else prior.executions)
+            if mark.state == "VERIFIED" and mark.model in listed
+        )
+        return self._publish(
+            CatalogSnapshot(
+                provider="codex-oauth",
+                source="PROVIDER_LIST",
+                authority_digest=digest,
+                fetched_at=now,
+                validated_at=now,
+                options=options,
+                excluded=excluded,
+                default_model=default_id,
+                last_attempt_at=now,
+                executions=kept,
+            )
+        )
+
+    def catalog_snapshot(self) -> CatalogSnapshot | None:
+        """The stored list of the signed-in account."""
+
+        try:
+            auth = self.profile.read_auth(require_fresh=False)
+        except CodexProfileHold:
+            return None
+        return self._stored_catalog(self._authority(auth))
+
+    def record_execution(self, model: str, state: str, reason_code: str | None) -> None:
+        """Remember what a real request showed about one listed model; nothing is switched."""
+
+        with self._lock:
+            catalog = self.catalog_snapshot()
+            if catalog is None or state not in {"VERIFIED", "REJECTED"}:
+                return
+            marks = tuple(mark for mark in catalog.executions if mark.model != model)
+            if model in {option.model for option in catalog.options}:
+                marks = (
+                    *marks,
+                    ExecutionMark(
+                        model=model,
+                        state="VERIFIED" if state == "VERIFIED" else "REJECTED",
+                        reason_code=reason_code,
+                        observed_at=datetime.now(UTC),
+                    ),
+                )
+            updated = self._publish(catalog.model_copy(update={"executions": marks}))
+            cached = self._cached
+            if cached is not None and cached.snapshot is not None:
+                self._cached = self._eligible(updated, cached.snapshot)
 
     def state(self, *, force: bool = False) -> CodexBrokerState:
+        refresh_catalog = force
         with self._lock:
             if not force and self._cached is not None and time.monotonic() - self._cached_at < 30:
                 snapshot = self._cached.snapshot
@@ -265,7 +398,7 @@ class CodexAuthBroker:
                 except CodexProfileHold:
                     force = True
             try:
-                result = self._refresh()
+                result = self._refresh(refresh_catalog=refresh_catalog)
             except CodexProfileHold as exc:
                 result = CodexBrokerState(False, False, str(exc))
             self._cached, self._cached_at = result, time.monotonic()
@@ -273,7 +406,23 @@ class CodexAuthBroker:
 
     def cached_state(self) -> CodexBrokerState:
         """In-memory projection only; safe for callers inside an existing SQLite UoW."""
-        return self._cached or CodexBrokerState(False, False, "CATALOG_UNAVAILABLE")
+        if self._cached is not None:
+            return self._cached
+        return self._saved_state() or CodexBrokerState(False, False, "CATALOG_UNAVAILABLE")
+
+    def _saved_state(self) -> CodexBrokerState | None:
+        """The stored list of the signed-in account; no provider call, no version probe."""
+
+        if not self.profile.auth_path.is_file():
+            return None
+        try:
+            snapshot = self.profile.read_auth(require_fresh=False)
+        except CodexProfileHold:
+            return None
+        catalog = self._stored_catalog(self._authority(snapshot))
+        if catalog is None or not catalog.options:
+            return None
+        return self._eligible(catalog, snapshot)
 
     def local_status(self) -> CodexBrokerState:
         """Inspect this THOTH profile without App Server refresh or model discovery."""
@@ -310,21 +459,110 @@ class CodexAuthBroker:
                 except CodexProfileHold as exc:
                     return CodexBrokerState(False, False, str(exc))
                 return cached
+            saved = self._saved_state()
+            if saved is not None:
+                try:
+                    identity = self.profile.executable(version_runner=self._version_runner)
+                    self.profile.check_pin(identity)
+                except CodexProfileHold as exc:
+                    return CodexBrokerState(False, False, str(exc))
+                return saved
             return CodexBrokerState(True, False, "CATALOG_UNAVAILABLE", snapshot=snapshot)
 
+    def _auth_digest(self) -> str | None:
+        try:
+            return self.profile.read_auth(require_fresh=False).content_digest
+        except (CodexProfileHold, OSError):
+            return None
+
+    def _login_view(
+        self, login_id: str | None, state: CodexBrokerState, login_state: str, refresh: str | None
+    ) -> dict[str, object]:
+        view: dict[str, object] = {
+            **state.public(),
+            "login_id": login_id,
+            "login_state": login_state,
+            "auth_state": "CONNECTED" if state.connected else "DISCONNECTED",
+            "catalog_state": "AVAILABLE" if state.execution_eligible else "UNAVAILABLE",
+        }
+        if refresh is not None:
+            view["catalog_refresh"] = refresh
+        return view
+
     def login_status(self, login_id: str | None = None) -> dict[str, object]:
+        if login_id is not None:
+            with self._login_lock:
+                run = self._login_runs.get(login_id)
+            if run == "REFRESHING":
+                # The sign-in is done and the list is loading; answering needs no provider call.
+                return self._login_view(
+                    login_id,
+                    CodexBrokerState(True, False, "CATALOG_UNAVAILABLE"),
+                    "PENDING",
+                    "RUNNING",
+                )
+            if run is not None:
+                return self._login_view(login_id, self.local_status(), "CONNECTED", run)
         with self._lock:
             pending = self._pending_login_id or self.profile.pending_login_id()
             if login_id is not None and login_id != pending:
                 raise CodexProfileHold("CODEX_LOGIN_NOT_FOUND")
+            if (
+                login_id is not None
+                and login_id in self._login_starts
+                and self._auth_digest() not in (None, self._login_starts[login_id])
+            ):
+                threading.Thread(target=self._finish_login, args=(login_id,), daemon=True).start()
+                return self._login_view(
+                    login_id,
+                    CodexBrokerState(True, False, "CATALOG_UNAVAILABLE"),
+                    "PENDING",
+                    "RUNNING",
+                )
             state = self.local_status()
-            return {
-                **state.public(),
-                "login_id": pending,
-                "login_state": "PENDING" if pending is not None else "IDLE",
-                "auth_state": "CONNECTED" if state.connected else "DISCONNECTED",
-                "catalog_state": "AVAILABLE" if state.execution_eligible else "UNAVAILABLE",
-            }
+            return self._login_view(
+                pending, state, "PENDING" if pending is not None else "IDLE", None
+            )
+
+    def _watch_login(self, login_id: str, stop: threading.Event) -> None:
+        """Wait for the sign-in to produce new credentials, then finish the login once."""
+
+        while not stop.wait(self._login_watch_interval):
+            if self._pending_login_id != login_id:
+                return
+            if self._auth_digest() not in (None, self._login_starts.get(login_id)):
+                self._finish_login(login_id)
+                return
+
+    def _finish_login(self, login_id: str) -> None:
+        with self._login_lock:
+            if login_id in self._login_runs:
+                return
+            self._login_runs[login_id] = "REFRESHING"
+        outcome = "FAILED"
+        try:
+            loaded: list[CodexBrokerState] = []
+            worker = threading.Thread(
+                target=lambda: loaded.append(self.state(force=True)), daemon=True
+            )
+            worker.start()
+            worker.join(LOGIN_LIST_DEADLINE_SECONDS)
+            if loaded and loaded[0].execution_eligible:
+                outcome = "DONE"
+        except Exception:  # a failed list never undoes a finished login
+            outcome = "FAILED"
+        finally:
+            with self._lock:
+                if self._login_timer is not None:
+                    self._login_timer.cancel()
+                    self._login_timer = None
+                if self.profile.root.is_dir():
+                    with self.profile.lock():
+                        self.profile.clear_login_pending()
+                if self._pending_login_id == login_id:
+                    self._pending_login_id = None
+            with self._login_lock:
+                self._login_runs[login_id] = outcome
 
     def cancel_login(self, login_id: str) -> dict[str, object]:
         with self._lock:
@@ -345,6 +583,7 @@ class CodexAuthBroker:
             with self.profile.lock():
                 self.profile.clear_login_pending()
             self._pending_login_id = None
+            self._login_stop.set()
             state = self.local_status()
             return {
                 **state.public(),
@@ -429,6 +668,7 @@ class CodexAuthBroker:
             with self.profile.lock():
                 self.profile.clear_login_pending()
             self._pending_login_id = None
+            self._login_stop.set()
             self._cached = None
 
     def start_login(
@@ -437,6 +677,7 @@ class CodexAuthBroker:
         with self._lock:
             identity = self.profile.executable(version_runner=self._version_runner)
             self.profile.root.mkdir(parents=True, exist_ok=True, mode=0o700)
+            before_login = self._auth_digest()
             with self.profile.lock():
                 if self.profile.pending_login():
                     raise CodexProfileHold("CODEX_LOGIN_ALREADY_PENDING")
@@ -456,6 +697,7 @@ class CodexAuthBroker:
                     raise CodexProfileHold("CODEX_LOGIN_START_FAILED")
                 self.profile.mark_login_pending(login_id)
                 self._pending_login_id = login_id
+                self._login_starts[login_id] = before_login
             self._cached = None
             if not self._browser_opener(url):
                 self._expire_login(login_id)
@@ -500,10 +742,15 @@ class CodexAuthBroker:
             timer.daemon = True
             self._login_timer = timer
             timer.start()
+            self._login_stop = threading.Event()
+            threading.Thread(
+                target=self._watch_login, args=(login_id, self._login_stop), daemon=True
+            ).start()
             return response
 
     def close(self) -> None:
         with self._lock:
+            self._login_stop.set()
             if self._login_timer is not None:
                 self._login_timer.cancel()
                 self._login_timer = None

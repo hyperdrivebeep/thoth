@@ -13,8 +13,10 @@ const fixture = vi.hoisted(() => ({ workspace: "A" as "A" | "B", executionReady:
   setupFailure: null as "CORRUPT" | "UNREADABLE" | null,
   projects: ["p"] as string[], threads: ["t"] as string[], failAdmission: false,
   admissionKind: "RUNNING" as "RUNNING" | "QUEUED" | "COMPLETED_REPLAY" | "MALFORMED",
+  threadOperation: "SUCCEEDED" as "SUCCEEDED" | "RUNNING",
   oldResultGate: null as Promise<void> | null,
   projectListGate: null as Promise<void> | null,
+  threadListGate: null as Promise<void> | null,
   admissionGate: null as Promise<void> | null,
   lostResponseOnce: false, replayTerminal: false, createdOperations: 0, operationByKey: new Map<string, string>(),
   calls: [] as { method: string; input: Record<string, unknown>; workspace: "A" | "B"; key: string }[] }));
@@ -34,12 +36,13 @@ vi.mock("../api/rpcClient", async importOriginal => ({ ...(await importOriginal<
     if (method === "project/list") {
       if (fixture.projectListGate) await fixture.projectListGate;
       value = { projects: fixture.projects.map(project_id =>
-        ({ project_id, name: `${currentWorkspace} synthetic project`, overlay: "test", lifecycle: "ACTIVE", revision: 1 })) };
+        ({ project_id, name: `${currentWorkspace} synthetic project`, overlay: "test", lifecycle: "ACTIVE", revision: 1, cutoff_at: "2026-09-26T00:00:00Z" })) };
     }
-    if (method === "thread/list") value = { threads: fixture.threads.map(thread_id => ({ project_id: input.project_id, thread_id,
-      problem: `${currentWorkspace} stored work`, execution_state: "IDLE", lifecycle: "OPEN" })) };
+    if (method === "thread/list" && fixture.threadListGate) await fixture.threadListGate;
+    if (method === "thread/list") value = { threads: fixture.threads.map((thread_id, index) => ({ project_id: input.project_id, thread_id,
+      updated_at: `2026-09-2${index}T00:00:00Z`, problem: `${currentWorkspace} stored work`, execution_state: "IDLE", lifecycle: "OPEN" })) };
     if (method === "thread/read") value = { project_id: input.project_id, thread_id: input.thread_id,
-      problem: `${currentWorkspace} stored work`, lifecycle: "OPEN", execution_state: "IDLE", current_object_ids: [], operation_state: "SUCCEEDED", current_result: null };
+      problem: `${currentWorkspace} stored work`, lifecycle: "OPEN", execution_state: "IDLE", current_object_ids: [], operation_state: fixture.threadOperation, current_result: null };
     if (method === "thread/activity/list") value = { conversation: { turns: [{ request_epoch: 1, request_revision_digest: "1".repeat(64),
       operation_id: "op-stored", text: "synthetic question", edit_kind: "INITIAL", created_at: "2026-09-26T00:00:00Z",
       authored_text_ref: { revision_digest: "1".repeat(64) } }], next_before_epoch: null, history_limited: false } };
@@ -107,8 +110,8 @@ afterEach(async () => {
   fixture.workspace = "A"; fixture.executionReady = false; fixture.workspaceReadable = true; fixture.setupComplete = true;
   fixture.setupFailure = null;
   fixture.projects = ["p"]; fixture.threads = ["t"];
-  fixture.failAdmission = false; fixture.admissionKind = "RUNNING"; fixture.oldResultGate = null;
-  fixture.projectListGate = null; fixture.admissionGate = null; fixture.lostResponseOnce = false; fixture.replayTerminal = false;
+  fixture.failAdmission = false; fixture.admissionKind = "RUNNING"; fixture.threadOperation = "SUCCEEDED"; fixture.oldResultGate = null;
+  fixture.projectListGate = null; fixture.threadListGate = null; fixture.admissionGate = null; fixture.lostResponseOnce = false; fixture.replayTerminal = false;
   fixture.createdOperations = 0; fixture.operationByKey.clear(); fixture.calls = [];
 });
 
@@ -242,8 +245,9 @@ it("preserves a corrupt LOCAL context until the user explicitly selects a projec
   expect(localStorage.getItem(key)).toBe("{corrupt-context");
   expect(fixture.calls.some(call => call.method === "thread/read" || call.method === "thread/input" || call.method === "thread/start")).toBe(false);
   await act(async () => { container.querySelector<HTMLButtonElement>(".project-home-item")!.click(); });
-  await settle(() => readWorkspaceContext(scope("A")).projectId === "p");
-  expect(readWorkspaceContext(scope("A"))).toEqual({ projectId: "p", threadId: "" });
+  // A8: explicitly opening a project lands on its most recently updated work.
+  await settle(() => readWorkspaceContext(scope("A")).threadId === "t");
+  expect(readWorkspaceContext(scope("A"))).toEqual({ projectId: "p", threadId: "t" });
 });
 
 it("removes displayed research after the server withdraws project access", async () => {
@@ -471,3 +475,79 @@ it.each([{ kind: "QUEUED", admitted: true }, { kind: "COMPLETED_REPLAY", admitte
     expect(readDraft("p", "t", scope("A"))).toBe(admitted ? "" : "synthetic queued draft");
     expect(fixture.calls.filter(call => call.method === "thread/input")).toHaveLength(1);
   });
+
+const QUEUED_NOTICE = "현재 조사가 끝나면 이 지시를 이어서 반영합니다";
+async function submitDraft() {
+  await act(async () => container.querySelector("form.prompt-composer")!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
+}
+
+it("shows a queued-instruction notice in the timeline until the running investigation ends", async () => {
+  fixture.executionReady = true; fixture.admissionKind = "QUEUED"; fixture.threadOperation = "RUNNING";
+  saveWorkspaceContext("p", "t", scope("A")); writeDraft("p", "t", "synthetic queued draft", scope("A"));
+  await mount(); await settle(() => Boolean(container.querySelector("#live-problem")));
+  expect(container.textContent).not.toContain(QUEUED_NOTICE);
+  await submitDraft();
+  await settle(() => Boolean(container.textContent?.includes(QUEUED_NOTICE)));
+  expect(container.querySelector(".conversation-timeline")?.textContent).toContain(QUEUED_NOTICE);
+  fixture.threadOperation = "SUCCEEDED";
+  await act(async () => { await client.invalidateQueries({ queryKey: ["research", "p", "t"] }); });
+  await settle(() => !container.textContent?.includes(QUEUED_NOTICE));
+});
+
+it("opens the project at its most recently updated work and shows the project cutoff in the header", async () => {
+  fixture.executionReady = true; fixture.threads = ["old-work", "t"];
+  await mount(); await settle(() => Boolean(container.querySelector(".project-button")));
+  expect(container.querySelector(".workstation-topbar")?.textContent).not.toContain("기준시점");
+  await act(async () => (container.querySelector(".project-button") as HTMLButtonElement).click());
+  await settle(() => fixture.calls.some(call => call.method === "thread/read"));
+  const reads = fixture.calls.filter(call => call.method === "thread/read");
+  expect(reads.every(call => call.input.thread_id === "t")).toBe(true);
+  await settle(() => Boolean(container.textContent?.includes("stored synthetic answer")));
+  expect(container.querySelector(".workstation-topbar")?.textContent).toContain("기준시점");
+  expect(container.querySelector(".workstation-topbar")?.textContent).toContain("2026");
+  expect(container.textContent).not.toContain("저장된 작업의 접근 범위를 다시 확인하는 중");
+});
+
+it("keeps the new-session screen when the user chooses 새 세션 after opening a project", async () => {
+  fixture.executionReady = true;
+  await mount(); await settle(() => Boolean(container.querySelector(".project-button")));
+  await act(async () => (container.querySelector(".project-button") as HTMLButtonElement).click());
+  await settle(() => Boolean(container.textContent?.includes("stored synthetic answer")));
+  const fresh = container.querySelector(".new-session-button") as HTMLButtonElement;
+  await act(async () => fresh.click());
+  await settle(() => Boolean(container.querySelector('[aria-label="첫 조사 시작"]')));
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 60)); });
+  expect(container.querySelector('[aria-label="첫 조사 시작"]')).not.toBeNull();
+  expect(container.textContent).not.toContain("stored synthetic answer");
+});
+
+it("keeps the typed first question and lets it start a new work when the work list arrives late", async () => {
+  fixture.executionReady = true; fixture.threads = ["old-work"];
+  let release!: () => void;
+  fixture.threadListGate = new Promise<void>(resolve => { release = resolve; });
+  await mount(); await settle(() => Boolean(container.querySelector(".project-button")));
+  await act(async () => (container.querySelector(".project-button") as HTMLButtonElement).click());
+  await settle(() => Boolean(container.querySelector("#live-problem")));
+  await act(async () => {
+    const input = container.querySelector<HTMLTextAreaElement>("#live-problem")!;
+    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")!.set!.call(input, "synthetic first question");
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  await act(async () => { release(); await new Promise(resolve => setTimeout(resolve, 60)); });
+  await settle(() => Boolean(container.querySelector('[aria-label="첫 조사 시작"]')));
+  expect(container.querySelector<HTMLTextAreaElement>("#live-problem")!.value).toBe("synthetic first question");
+  expect(fixture.calls.some(call => call.method === "thread/read" && call.input.thread_id === "old-work")).toBe(false);
+  await submitDraft();
+  await settle(() => fixture.calls.some(call => call.method === "thread/start"));
+  await settle(() => readWorkspaceContext(scope("A")).threadId === "t");
+  expect(fixture.calls.some(call => call.method === "thread/read" && call.input.thread_id === "old-work")).toBe(false);
+});
+
+it("does not show the queued notice for a normally accepted instruction", async () => {
+  fixture.executionReady = true; fixture.admissionKind = "RUNNING";
+  saveWorkspaceContext("p", "t", scope("A")); writeDraft("p", "t", "synthetic normal draft", scope("A"));
+  await mount(); await settle(() => Boolean(container.querySelector("#live-problem")));
+  await submitDraft();
+  await settle(() => readDraft("p", "t", scope("A")) === "");
+  expect(container.textContent).not.toContain(QUEUED_NOTICE);
+});

@@ -36,7 +36,7 @@
 > [!NOTE]
 > **개인·로컬 사용을 위한 실험적 소스 공개본입니다.** UI는 한국어 중심입니다.
 > 집중 기능 검사는 통과했지만 최신 전체 회귀 검사는 통과하지 못했습니다. 아래 검증 범위를 확인하세요.
-> **2026-09-29 반영:** 모델별 전용 인증과 재시작·저장 복구 수정을 포함합니다. 실제 모델 분석과 현재 소스의 전체 검사 통과는 미확인이고, Claude 구독 로그인은 클라이언트 설정이 없어 비활성입니다.
+> **2026-09-29 반영:** 모델별 전용 인증과 재시작·저장 복구 수정을 포함합니다. 실제 모델 분석과 현재 소스의 전체 검사 통과는 미확인이고, Claude 로그인은 공식 Claude Code 실행 파일을 거치며 실계정으로는 아직 확인하지 않았습니다.
 > 결과를 사용하기 전에 [현재 상태와 한계](#현재-상태)를 확인하세요.
 
 ## 무엇을 할 수 있나요
@@ -73,38 +73,50 @@ cd thoth
 
 GitHub의 **Code → Download ZIP**으로 받았다면 압축을 풀고 `thoth-main` 폴더에서 PowerShell을
 엽니다. 압축을 푼 상위 폴더에 있다면 `cd thoth-main`을 실행하세요.
-먼저 [공식 Python으로 Windows 실행 환경을 준비](docs/INSTALL.md#prepare-python-on-windows)한 뒤,
-저장소 폴더에서 잠금 파일에 맞춰 의존성을 설치합니다.
+
+**1. Python을 확인하고 잠금 파일에 맞춰 의존성을 설치합니다.** 저장소 폴더에서 실행하세요.
 
 ```powershell
+$thothPython = Join-Path $env:LOCALAPPDATA 'Programs\Python\Python313\python.exe'
+Test-Path -LiteralPath $thothPython
+& $thothPython -m venv --copies --without-pip .venv
 uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev
 pnpm.cmd install --frozen-lockfile
 ```
 
-첫 번째 터미널에서 API를 시작합니다.
+`Test-Path`가 `False`를 출력하면 공식 Python을 먼저 설치하세요. 서명 확인을 포함한 절차는
+[Windows Python 준비](docs/INSTALL.md#prepare-python-on-windows)에 있습니다.
+
+Python을 다른 경로에 설치했다면 위 `$thothPython`을 설치한 `python.exe` 경로로 바꿉니다.
+
+**2. 첫 번째 터미널에서 API를 시작합니다.**
 
 ```powershell
 .\.venv\Scripts\python.exe -m thoth.cli workspace
 .\.venv\Scripts\python.exe -m thoth.cli serve --port 8765
 ```
 
-두 번째 터미널에서도 같은 `thoth` 또는 `thoth-main` 폴더로 이동한 뒤 웹 화면을 시작합니다.
+**3. 두 번째 터미널에서** 같은 `thoth` 또는 `thoth-main` 폴더로 이동한 뒤 웹 화면을 시작합니다.
 
 ```powershell
 pnpm.cmd --dir apps/web run dev
 ```
 
-**<http://127.0.0.1:5173/>**을 엽니다. 처음 설정 또는 설정 화면에서 지원되는 로그인 경로를 선택하거나 본인의 API 키를 입력한 뒤 모델을 고릅니다. 실제 호출에는 해당 서비스의 사용량이 소모될 수 있습니다.
+**4. 앱 안에서 모델을 연결합니다.** **<http://127.0.0.1:5173/>**을 열면 처음 설정 화면에 ChatGPT·Claude·xAI가
+표시됩니다. 원하는 서비스의 로그인 버튼을 눌러 브라우저에서 로그인을 마치면 THOTH가 그 계정의 모델 목록을
+불러옵니다. 본인의 API 키로 연결할 수도 있으며, 이 단계에는 터미널이 필요 없습니다.
+필요한 도구(ChatGPT의 Codex CLI, Claude의 Claude Code)가 없으면 카드에 자동 설치 버튼이 나옵니다.
+Node.js가 필요하고 `%LOCALAPPDATA%\THOTH\tools`에만 설치하며, 전역 설치나 다른 프로그램의 로그인은 건드리지 않습니다.
+수동 명령은 [docs/INSTALL.md](docs/INSTALL.md)에 있습니다. 계정 로그인은 그 계정의 다른 앱과 사용량 한도를 함께 쓰고,
+실제 호출에는 해당 서비스의 사용량이 소모될 수 있습니다.
 
 새 Windows 설치의 연구 데이터는 소스 폴더와 별개인 `%LOCALAPPDATA%\THOTH`에 저장됩니다.
 이전 버전을 사용했다면 `serve --workspace "C:\기존경로\.thoth-local" --port 8765`로
 원래 데이터 폴더를 지정하세요. 시작할 때 실제 저장 위치를 표시하며, 기존 자료를 자동 이동하지 않습니다.
 
-Codex 로그인은 THOTH 전용 프로필을 사용하며 호환되는 공식 standalone CLI가 필요합니다.
-THOTH의 연결 절차로 로그인하세요. 기존 Codex Desktop 로그인은 가져오지 않습니다.
-이번 소스에는 THOTH 전용 프로필을 사용하는 실험적 xAI 기기 코드 로그인도 추가됐습니다.
-가짜 제공자와 연결한 실제 Chrome/RPC 흐름은 통과했고, 실계정 검증은 아직 남아 있습니다.
-Claude와 xAI의 API 키 연결은 별도로 유지합니다.
+로그인은 THOTH 전용 프로필을 사용하며, 다른 프로그램의 기존 로그인 정보는 가져오지 않습니다.
+Claude 로그인은 그 프로필에서 공식 Claude Code를 실행하고, xAI는 기기 코드 로그인을 사용합니다.
+둘 다 가짜 제공자·가짜 실행 파일로만 확인했고(xAI는 Chrome/RPC 흐름도 통과), 실계정 검증은 아직 남아 있습니다.
 [연결 조건과 재시작 안내](docs/INSTALL.md)를 확인하세요.
 
 API는 로컬 루프백 주소에 바인딩되고, Vite는 API 요청을 8765 포트로 전달합니다. 소스와 migration 디렉터리를 함께 사용해야 하며, 이 공개본은 독립 wheel 설치를 지원하지 않습니다.

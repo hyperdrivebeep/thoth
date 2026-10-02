@@ -1,5 +1,16 @@
 # Publication content review
 
+## 2026-10-02 candidate boundary
+
+Private plans, research, process verification records, captures and development Wiki pages are
+excluded from the candidate. The public RPC catalog has moved into `docs/architecture` with its
+method and notification content preserved. Public provider guidance describes isolated profiles
+without naming personal development tools. License attribution is retained.
+
+The local old-record fixture test still has a machine-specific default path; its publication
+policy is pending. Existing public branch history has not been rewritten. These edits affect the
+candidate snapshot only. Product verification status is recorded in [VERIFICATION.md](VERIFICATION.md).
+
 ## 2026-09-29 source update
 
 The latest source includes authentication/restart changes and accumulated public-package repairs.

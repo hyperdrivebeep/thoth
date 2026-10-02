@@ -15,6 +15,8 @@ CREDENTIAL_METHODS = frozenset(
         "model/credential/register",
         "model/credential/login/status",
         "model/credential/login/cancel",
+        "model/catalog/refresh",
+        "model/tooling/install",
     }
 )
 DISPATCH_GATE_TRUTHY = frozenset({"1", "true", "yes", "on"})

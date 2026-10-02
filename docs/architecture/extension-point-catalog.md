@@ -35,7 +35,7 @@ to research context assembly; table semantics are represented by typed relations
 The independent JSON structure fixture exercises registration, source connection, structure read,
 context expansion and the research/readback path. It does not establish universal PDF correctness.
 The dedicated WSL dependency/asset arm, limitations and live acceptance are recorded in
-`docs/verification/research-context-implementation-20260915.md`. Existing owner10/FULL status is
+local controlled verification records. Existing owner10/FULL status is
 unchanged, and this entry does not reactivate archived development hooks.
 
 `config/architecture-conformance.json` names an actual source symbol for every `IMPLEMENTED`

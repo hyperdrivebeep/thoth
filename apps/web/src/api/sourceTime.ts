@@ -38,6 +38,15 @@ export function cutoffLabel(state: string) {
   return state;
 }
 
+/** Project-level cutoff shown in the header. Source-level states use cutoffLabel. */
+export function projectCutoffText(cutoffAt?: string | null) {
+  if (!cutoffAt) return "";
+  const date = new Date(cutoffAt);
+  if (Number.isNaN(date.getTime())) return "";
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 export async function confirmSourceTime(input: z.infer<typeof sourceTimeMutationBasisSchema> & {assertion:"ON_OR_BEFORE_CUTOFF"|"AFTER_CUTOFF"}) {
   return rpc<{source_time: SourceTimeAssessment}>("project/source/time/confirm", input, crypto.randomUUID());
 }

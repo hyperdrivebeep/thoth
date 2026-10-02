@@ -34,6 +34,118 @@
       "title": "BasisCurrentness",
       "type": "object"
     },
+    "CriterionDelta": {
+      "additionalProperties": false,
+      "properties": {
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CriterionState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CriterionState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence_refs_added": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs Added",
+          "type": "array"
+        },
+        "evidence_refs_removed": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs Removed",
+          "type": "array"
+        },
+        "match": {
+          "enum": [
+            "SAME",
+            "ADDED",
+            "REMOVED"
+          ],
+          "title": "Match",
+          "type": "string"
+        },
+        "question": {
+          "title": "Question",
+          "type": "string"
+        },
+        "requirement_id": {
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "unchanged_hold": {
+          "default": false,
+          "title": "Unchanged Hold",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "target",
+        "question",
+        "match"
+      ],
+      "title": "CriterionDelta",
+      "type": "object"
+    },
+    "CriterionState": {
+      "additionalProperties": false,
+      "properties": {
+        "blocker": {
+          "title": "Blocker",
+          "type": "string"
+        },
+        "relation": {
+          "title": "Relation",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "SATISFIED",
+            "UNRESOLVED",
+            "NOT_APPLICABLE",
+            "NOT_ASSESSED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "validation": {
+          "title": "Validation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "relation",
+        "validation",
+        "blocker"
+      ],
+      "title": "CriterionState",
+      "type": "object"
+    },
     "DecisionDeltaGroup": {
       "additionalProperties": false,
       "properties": {
@@ -197,6 +309,23 @@
       "default": 2,
       "title": "Contract Version",
       "type": "integer"
+    },
+    "criteria": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/CriterionDelta"
+      },
+      "title": "Criteria",
+      "type": "array"
+    },
+    "criteria_state": {
+      "default": "UNAVAILABLE",
+      "enum": [
+        "AVAILABLE",
+        "UNAVAILABLE"
+      ],
+      "title": "Criteria State",
+      "type": "string"
     },
     "groups": {
       "default": [],

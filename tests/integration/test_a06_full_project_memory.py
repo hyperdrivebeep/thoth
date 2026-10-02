@@ -230,10 +230,10 @@ async def test_memory_reducer_quarantines_poison_revises_weak_content_and_holds_
 
         assert {item.memory_id for item in result.quarantined} == {"memory:a06:poison"}
         assert {item.memory_id for item in result.revised} == {"memory:a06:revise"}
-        assert {item.memory_id for item in result.held} == {
-            "memory:a06:authority-hold",
-            "memory:a06:conflict",
-        }
+        # It shares words with stored memories but points at a different record: since the
+        # relation no longer comes from word overlap, that is not a conflict and it is kept.
+        assert {item.memory_id for item in result.held} == {"memory:a06:authority-hold"}
+        assert "memory:a06:conflict" in {item.memory_id for item in result.committed}
         poison = result.quarantined[0]
         assert poison.assertion == "[REDACTED_QUARANTINED_MEMORY]"
         assert poison.content_excerpt == "[REDACTED_QUARANTINED_MEMORY]"

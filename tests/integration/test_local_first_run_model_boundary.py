@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from tests.integration.storage_coverage_helpers import request, value
 
-from thoth.adapters.models import codex_oauth
+from thoth.adapters.models import codex_broker, codex_oauth
 from thoth.adapters.models.catalog import StaticModelCatalog
 from thoth.apps.runtime import AppRuntime, create_runtime
 from thoth.domain.model_settings import ModelOption, ModelSelection
@@ -267,15 +267,12 @@ async def test_codex_status_needs_matching_catalog_option_for_ready(
 ) -> None:
     _isolated_home(tmp_path, monkeypatch)
 
-    def connected(_workspace: Path) -> dict[str, object]:
-        return {
-            "provider": "codex-oauth",
-            "connected": True,
-            "execution_eligible": True,
-            "connection_state": "EXECUTION_UNVERIFIED",
-        }
+    def connected(_broker: codex_broker.CodexAuthBroker) -> codex_broker.CodexBrokerState:
+        return codex_broker.CodexBrokerState(True, True, "EXECUTION_UNVERIFIED")
 
-    monkeypatch.setattr(codex_oauth, "codex_oauth_status", connected)
+    # account_connections() reads the Codex state from the broker's local_status(), so that is the
+    # seam to replace; codex_oauth.codex_oauth_status is not on the workspace/ready path.
+    monkeypatch.setattr(codex_broker.CodexAuthBroker, "local_status", connected)
 
     class MutableCatalog(StaticModelCatalog):
         def set_options(self, options: tuple[ModelOption, ...]) -> None:

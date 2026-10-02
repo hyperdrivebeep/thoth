@@ -308,7 +308,7 @@ async def test_normal_memory_is_hidden_until_all_sources_are_shared(
                 "beta-memory-thread",
                 {
                     "thread_id": "thread:beta:memory",
-                    "problem": "Which trial method should we compare?",
+                    "problem": "Which previous trial method should we compare?",
                     "scope": {"workstream": reader},
                 },
             )
@@ -323,6 +323,7 @@ async def test_normal_memory_is_hidden_until_all_sources_are_shared(
                 },
             )
         )
+        # Explicit follow-up makes recall eligible under the independent narrowing gate.
         recalled = followup["full_project_memory_context"]["included"]
         assert recalled, "B must permit cross-workstream recall after source sharing"
         assert all(m["origin_thread_id"] == "thread:alpha:memory" for m in recalled)

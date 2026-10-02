@@ -6,7 +6,10 @@ from thoth.application.commands.research_history import ResearchHistoryHandlers
 from thoth.application.services.baseline_service import BaselineService
 from thoth.application.services.historical_result import HistoricalResultReader
 from thoth.application.services.history_projection import HistoryProjection
-from thoth.application.services.research_followup_projection import ProjectReviewReader
+from thoth.application.services.research_followup_projection import (
+    CriterionViewReader,
+    ProjectReviewReader,
+)
 from thoth.application.services.research_freshness import ResearchFreshnessService
 from thoth.application.services.research_history import ResearchHistoryService
 from thoth.application.services.research_history_scope import HistoryScopeValidator
@@ -19,7 +22,7 @@ from thoth.ports.store_bundle import StoreBundlePort
 from thoth.protocol.registry import MethodRegistry
 
 # Scoped H3/H5 normal-entry, access, CAS, rollback and consumer checks are recorded in
-# docs/verification/research-history-restore-20260921.md. This is not global owner closure.
+# Process-level reopen checks do not establish global owner closure.
 RESTORE_APPLY_READY = True
 
 
@@ -27,19 +30,25 @@ def register_research_history(
     registry: MethodRegistry, stores: StoreBundlePort, access: ResourceScopeService
 ) -> None:
     ledger = stores.scoped_ledger(access)
+    memory = stores.full_memory()
     projection = HistoryProjection(
         ledger,
         stores.research_history,
         access,
         ResearchFreshnessService(
-            ledger, stores.projects, stores.governance, stores.artifacts, stores.operations
+            ledger,
+            stores.projects,
+            stores.governance,
+            stores.artifacts,
+            stores.operations,
+            memory,
         ),
         restore_profiles(),
         RESTORE_APPLY_READY,
     )
     scopes = HistoryScopeValidator(ledger, access, stores.projects, stores.threads)
     freshness = ResearchFreshnessService(
-        ledger, stores.projects, stores.governance, stores.artifacts, stores.operations
+        ledger, stores.projects, stores.governance, stores.artifacts, stores.operations, memory
     )
     handlers = ResearchHistoryHandlers(
         ResearchHistoryService(projection, scopes, OpaqueHistoryCursors()),
@@ -66,6 +75,7 @@ def register_research_history(
             freshness=freshness,
         ),
         scopes=scopes,
+        criteria=CriterionViewReader(ledger=ledger, access=access),
     )
     registry.register("thread/result/compare/read", followup.compare_read)
     registry.register("project/review/list", followup.review_list)

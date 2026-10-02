@@ -4,6 +4,7 @@ from pydantic import JsonValue
 
 from thoth.application.services.historical_result import HistoricalResultReader
 from thoth.application.services.research_followup_projection import (
+    CriterionViewReader,
     ProjectReviewReader,
     decision_delta,
 )
@@ -31,10 +32,12 @@ class ResearchFollowupHandlers:
         results: HistoricalResultReader,
         reviews: ProjectReviewReader,
         scopes: HistoryScopeValidator,
+        criteria: CriterionViewReader,
     ) -> None:
         self.results = results
         self.reviews = reviews
         self.scopes = scopes
+        self.criteria = criteria
 
     def authorize_before_claim(self, method: str, value: dict[str, JsonValue]) -> None:
         try:
@@ -72,6 +75,8 @@ class ResearchFollowupHandlers:
                 after_manifest=after.manifest,
                 before_currentness=before.basis_currentness.model_dump(mode="json"),
                 after_currentness=after.basis_currentness.model_dump(mode="json"),
+                before_criteria=self.criteria.read(request.project_id, before.manifest),
+                after_criteria=self.criteria.read(request.project_id, after.manifest),
             ).model_dump(mode="json")
         except RestoreError as exc:
             raise followup_rpc_error(exc) from exc

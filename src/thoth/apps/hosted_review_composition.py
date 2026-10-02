@@ -211,6 +211,8 @@ def install_hosted_review_rpc_guards(
     registry.decorate("model/credential/login/status", lambda _: deny_hosted_credentials)
     registry.decorate("model/credential/login/cancel", lambda _: deny_hosted_credentials)
     registry.decorate("model/credential/login/complete", lambda _: deny_hosted_credentials)
+    registry.decorate("model/catalog/refresh", lambda _: deny_hosted_credentials)
+    registry.decorate("model/tooling/install", lambda _: deny_hosted_credentials)
     registry.decorate("model/settings/update", lock_hosted_model_route)
     if projects is not None:
 

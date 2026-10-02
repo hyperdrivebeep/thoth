@@ -60,8 +60,14 @@ def default_auth_registry() -> AuthRegistry:
 
         return broker_for_workspace(workspace)
 
+    def claude_code(workspace: Path) -> AuthHandler:
+        from thoth.adapters.models.claude_code_login import broker_for_workspace
+
+        return broker_for_workspace(workspace)
+
     registry = AuthRegistry()
     registry.register(AuthRoute("openai", "codex_isolated_browser", "codex-oauth", codex))
     registry.register(AuthRoute("xai", "xai_device_code", "xai-oauth", xai))
     registry.register(AuthRoute("anthropic", "claude_pkce", "claude-oauth", claude, True))
+    registry.register(AuthRoute("anthropic", "claude_code_login", "claude-code", claude_code, True))
     return registry

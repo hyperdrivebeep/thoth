@@ -1,9 +1,10 @@
 import { Button, Callout, Tag } from "@blueprintjs/core";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { HistorySelection } from "../../api/historyModels";
 import { readDecisionDelta, type DecisionDelta, type ResultIdentity } from "../../api/researchFollowup";
 import { currentnessLabel } from "./historyPresentation";
+import { CriteriaChange } from "./CriteriaChange";
 
 const exactDigest = /^[a-f0-9]{64}$/i;
 
@@ -110,7 +111,13 @@ export function DecisionDeltaView({ delta }: { delta: DecisionDelta }) {
   const [reasonDetailsOpen, setReasonDetailsOpen] = useState(false);
   const totalChanges = delta.groups.reduce((total, group) => total + group.changes.length, 0);
   const preview = previewSelection(delta.groups);
+  const byCriterion = delta.criteria_state === "AVAILABLE";
+  // A plain function, not a component: its children keep their state when this view re-renders.
+  const fold = (children: ReactNode) => byCriterion
+    ? <details className="decision-delta-details"><summary>세부 변경</summary>{children}</details> : <>{children}</>;
   return <section className="decision-delta-view" aria-label="선택한 두 답변의 판단 변화">
+    {delta.state !== "UNAVAILABLE" && <CriteriaChange delta={delta}/>}
+    {fold(<>
     <div className="section-title-row"><h3>답변 전체 변경</h3><Tag minimal intent={delta.state === "UNAVAILABLE" ? "warning" : "none"}>
       {delta.state === "CHANGED" ? "변경 있음" : delta.state === "NO_CHANGE" ? "변경 없음" : delta.state === "PARTIAL" ? "일부만 확인" : "확인 불가"}
     </Tag></div>
@@ -120,6 +127,7 @@ export function DecisionDeltaView({ delta }: { delta: DecisionDelta }) {
     {delta.state !== "UNAVAILABLE" && totalChanges > 0 && <p className="decision-delta-count">서버 기록 변경 {totalChanges}건 중 {preview.size}건을 먼저 표시합니다. 나머지 {totalChanges - preview.size}건은 그룹별 상세에서 확인할 수 있습니다.</p>}
     {delta.state !== "UNAVAILABLE" && delta.groups.map((group, index) => <DecisionGroup key={`${group.kind}-${index}`} group={group} groupIndex={index} preview={preview} />)}
     {delta.state === "CHANGED" && delta.groups.length === 0 && <p>변경 상태가 기록됐지만 표시할 세부 항목은 없습니다.</p>}
+    </>)}
     <div className="decision-delta-reasons"><h4>기록된 변경 이유</h4>
       {delta.reason_state === "UNKNOWN_REASON" ? <p>변경 이유가 기록되지 않았습니다. 이유를 추정하지 않습니다.</p>
         : <>{delta.reason_codes.length ? <ul>{delta.reason_codes.slice(0, 3).map((code, index) => <li key={`${code}-${index}`}>{code}</li>)}</ul> : <p>기록된 이유 문구가 없습니다.</p>}

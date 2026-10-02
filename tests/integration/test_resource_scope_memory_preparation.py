@@ -1,5 +1,6 @@
 """Private memories must not influence another actor's review or embedding inputs."""
 
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import pytest
@@ -8,9 +9,13 @@ from tests.integration.test_a02_autonomous_acquisition import DynamicA02Model, S
 
 from thoth.adapters.memory import LocalMemoryEmbedding
 from thoth.adapters.storage import SqliteFullMemoryStore
-from thoth.application.services.full_project_memory import FullProjectMemoryService
+from thoth.application.services.memory_relation import MemorySubject
+from thoth.application.services.memory_relation_resolver import (
+    MemoryRelationBudget,
+    MemoryRelationResolver,
+    RelationVerdict,
+)
 from thoth.domain.auth import current_authenticated_actor
-from thoth.domain.enums import MemoryKind
 from thoth.domain.memory import FullMemoryRevision, MemoryProjection
 from thoth.domain.resource_scope import ResourceScopePolicy, ResourceScopeTemplate
 
@@ -31,29 +36,27 @@ async def test_private_memories_are_excluded_before_review_and_projection(
     )
     leaked: list[str] = []
     excerpts: set[str] = set()
-    original_conflict = FullProjectMemoryService._has_conflict  # pyright: ignore[reportPrivateUsage]
+    original_resolve = MemoryRelationResolver.resolve
     original_embed = LocalMemoryEmbedding.embed
 
-    def conflict(
-        self: FullProjectMemoryService,
-        *,
-        revisions: tuple[FullMemoryRevision, ...],
-        kind: MemoryKind,
-        query_terms: frozenset[str],
-        content_excerpt: str,
-    ) -> bool:
+    async def resolve(
+        self: MemoryRelationResolver,
+        new: MemorySubject,
+        new_text: str,
+        existing: Sequence[FullMemoryRevision],
+        by_digest: Mapping[str, FullMemoryRevision],
+        budget: MemoryRelationBudget,
+        subjects: dict[str, MemorySubject] | None = None,
+    ) -> RelationVerdict:
         actor = current_authenticated_actor()
         if actor is not None and actor.actor_id.endswith(":beta"):
             leaked.extend(
-                "review" for r in revisions if r.origin_thread_id == "thread:alpha:private"
+                "review" for r in existing if r.origin_thread_id == "thread:alpha:private"
             )
-        return original_conflict(
-            self,
-            revisions=revisions,
-            kind=kind,
-            query_terms=query_terms,
-            content_excerpt=content_excerpt,
-        )
+            leaked.extend(
+                "review" for r in by_digest.values() if r.origin_thread_id == "thread:alpha:private"
+            )
+        return await original_resolve(self, new, new_text, existing, by_digest, budget, subjects)
 
     def embed(self: LocalMemoryEmbedding, text: str) -> tuple[int, ...]:
         actor = current_authenticated_actor()
@@ -61,7 +64,7 @@ async def test_private_memories_are_excluded_before_review_and_projection(
             leaked.append("embedding")
         return original_embed(self, text)
 
-    monkeypatch.setattr(FullProjectMemoryService, "_has_conflict", conflict)
+    monkeypatch.setattr(MemoryRelationResolver, "resolve", resolve)
     monkeypatch.setattr(LocalMemoryEmbedding, "embed", embed)
     async with scope_harness(
         tmp_path, policy, model_resolver=StaticModelResolver(DynamicA02Model())

@@ -252,6 +252,67 @@ def test_isolated_auth_catalog_and_restart_pin(
     assert desktop.read_bytes() == b"desktop-sentinel"
 
 
+def _documented_prefix_package(local: Path, *, version: str = "0.157.1") -> Path:
+    prefix = local / "THOTH" / "tools" / "codex"
+    root = prefix / "node_modules" / "@openai" / "codex"
+    platform = root / "node_modules" / "@openai" / "codex-win32-x64"
+    native = platform / "vendor" / "x86_64-pc-windows-msvc" / "bin" / "codex.exe"
+    native.parent.mkdir(parents=True)
+    native.write_bytes(b"synthetic-native-not-executed")
+    (root / "package.json").write_text(
+        json.dumps({"name": "@openai/codex", "version": version}), encoding="utf-8"
+    )
+    (platform / "package.json").write_text(
+        json.dumps({"name": "@openai/codex", "version": "0.157.1-win32-x64"}), encoding="utf-8"
+    )
+    (prefix / "node_modules" / ".package-lock.json").write_text(
+        json.dumps(
+            {
+                "packages": {
+                    "node_modules/@openai/codex": {"integrity": WRAPPER_INTEGRITY},
+                    "node_modules/@openai/codex/node_modules/@openai/codex-win32-x64": {
+                        "integrity": PLATFORM_INTEGRITY
+                    },
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    return native
+
+
+@pytest.mark.skipif(os.name != "nt", reason="the pinned Codex package is Windows x64 only")
+def test_documented_tools_prefix_is_found_without_env_or_global_codex(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    local = tmp_path / "localappdata"
+    native = _documented_prefix_package(local)
+    monkeypatch.delenv("THOTH_CODEX_PACKAGE_ROOT", raising=False)
+    monkeypatch.setenv("LOCALAPPDATA", str(local))
+    monkeypatch.setenv("PATH", str(tmp_path / "empty-path"))
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    identity = CodexProfile.for_workspace(workspace).executable(
+        version_runner=lambda _: PINNED_VERSION
+    )
+    assert identity.path == native.resolve()
+
+
+@pytest.mark.skipif(os.name != "nt", reason="the pinned Codex package is Windows x64 only")
+def test_documented_tools_prefix_still_rejects_an_unpinned_version(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    local = tmp_path / "localappdata"
+    _documented_prefix_package(local, version="0.158.0")
+    monkeypatch.delenv("THOTH_CODEX_PACKAGE_ROOT", raising=False)
+    monkeypatch.setenv("LOCALAPPDATA", str(local))
+    monkeypatch.setenv("PATH", str(tmp_path / "empty-path"))
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    with pytest.raises(CodexProfileHold, match="CODEX_STANDALONE_PIN_UNAVAILABLE"):
+        CodexProfile.for_workspace(workspace).executable(version_runner=lambda _: PINNED_VERSION)
+
+
 def test_local_status_and_matching_cancel_never_refresh_or_erase_old_auth(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -344,7 +405,7 @@ broker = CodexAuthBroker(workspace,
     client_factory=lambda profile, _: FakeAppServer(profile),
     version_runner=lambda _: PINNED_VERSION)
 codex_broker._BROKERS[workspace.resolve()] = broker
-assert not broker.cached_state().options
+assert [o.model for o in broker.cached_state().options] == ['synthetic-codex']
 assert broker.local_status().connected
 assert broker._client is None
 runtime = create_runtime(workspace)
@@ -358,8 +419,8 @@ try:
     assert result['effective_settings']['model'] == 'synthetic-codex'
     assert result['effective_settings']['reasoning_effort'] == 'medium'
     assert {option['model'] for option in result['model_options']} >= {'synthetic-codex'}
-    print(json.dumps({'discovery': 'AVAILABLE', 'methods': broker._client.methods,
-                      'refresh_requests': broker._client.refresh_requests}))
+    assert broker._client is None  # the saved list serves; nothing asked the provider
+    print(json.dumps({'discovery': 'AVAILABLE'}))
 finally:
     runtime.close()
 """
@@ -374,8 +435,6 @@ finally:
     assert reopened.returncode == 0, reopened.stderr
     observed = json.loads(reopened.stdout.strip().splitlines()[-1])
     assert observed["discovery"] == "AVAILABLE"
-    assert "account/read" in observed["methods"] and "model/list" in observed["methods"]
-    assert observed["refresh_requests"] == [False]
     assert broker.profile.auth_path.read_bytes() == auth_before_discovery
 
 
@@ -493,7 +552,8 @@ def test_expiring_token_concurrent_sessions_refresh_once(
         sessions = (first.result(timeout=5), second.result(timeout=5))
     assert all(item.account_id == "account:synthetic" for item in sessions)
     assert server.refresh_requests.count(True) == 1
-    assert server.methods.count("model/list") == 1
+    # A request-time token refresh checks the account; it does not fetch the model list again.
+    assert server.methods.count("model/list") == 0
 
 
 def test_login_is_pending_until_validated_and_waited_owner_closes(

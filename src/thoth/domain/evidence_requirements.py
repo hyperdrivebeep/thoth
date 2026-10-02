@@ -121,9 +121,25 @@ class ScopedConflictAssessment(DomainModel):
     decision: ConflictReviewDecision | None = None
 
 
+class ConfirmedFinding(DomainModel):
+    statement: str
+    evidence_refs: tuple[str, ...] = Field(
+        description="Exact provided span IDs; at least one. A finding citing any span that was "
+        "not provided is discarded."
+    )
+    requirement_id: str | None = None
+    kind: Literal["DOCUMENT_FACT", "VALID_NEGATIVE_FINDING"]
+
+
 class ReviewProposal(DomainModel):
     candidates: tuple[SemanticReviewCandidate, ...]
     answer: str
+    confirmed_findings: tuple[ConfirmedFinding, ...] = Field(
+        default=(),
+        description="Only what the provided documents state (DOCUMENT_FACT) and what was looked "
+        "for in the provided documents but not found (VALID_NEGATIVE_FINDING). Each cites the "
+        "provided span IDs. 성능 충족 주장 금지: never claim a requirement or performance is met.",
+    )
     unexamined_scope: tuple[str, ...] = Field(
         default=(),
         description="Informational scope limitations, including material outside "

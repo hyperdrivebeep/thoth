@@ -57,6 +57,42 @@ authorization. Stage persistence reuses existing records first; any necessary ne
 in the same revision/receipt system with atomic publication and codec/version validation.
 Incomplete or late model output is not a completed stage and cannot overwrite current results.
 
+## Interrupted model calls and resume
+
+A model call that stops the research early (cut off, slowed to a crawl, over its per-call time, or generating without end) is
+reported as a model-call failure with no answer; the operation itself stays a published HOLD.
+
+- **Per-call limits (Codex transport).** `TransportTimeouts` carries `dispatch_total_seconds` and the
+  stall limits (`stall_min_events_per_second`, `stall_warmup_seconds`, `stall_window_seconds`, `stall_sustain_seconds`).
+  Unset values take the adapter defaults in `stream_pace.py` (measured, see
+  local controlled checks). Output events are counted from the first one; nothing
+  is judged before it. A stall ends the call as `OAUTH_STALLED_STREAM_REMOTE_STOP_UNKNOWN`, the total limit as
+  `OAUTH_DISPATCH_DEADLINE_REMOTE_STOP_UNKNOWN`. There is still no whole-research clock.
+  The runaway limits (`runaway_max_output_events`, `runaway_visible_bytes_per_token` with a floor
+  `runaway_min_visible_bytes`, `runaway_blank_run`) end an output that never finishes as
+  `OAUTH_RUNAWAY_OUTPUT_REMOTE_STOP_UNKNOWN`; the observation records which limit was crossed.
+- **Resume is the user's action.** `thread/input` with `resume_from_operation_id` asks the same question
+  again as a new operation; it must name the latest finished run of that thread. A completed stage
+  of that run is reused only when this run's input basis for the stage (everything except the run's
+  own names: request revision, project head set, memory pack id and time) equals the stored one.
+  Any change of sources, scope, settings, policy, cutoff or behavior changes the digest and the
+  stage is called again. A reused stage is a new stage record with `reused_from`, no dispatch ids and
+  no usage; `thread/read` reports `stage_reuse` (reused / new). Nothing is reused without the request.
+- Stream pace observations use canonical decimal values for rates and elapsed-limit seconds.
+  Their JSON representation is decimal text, as with transport timeout controls; older numeric
+  observations remain readable. Recording an interrupted dispatch preserves its diagnostic
+  instead of failing while serializing the observation.
+- **Automatic retry is a project setting, off by default.** `model/callSettings/read|update`
+  (`auto_retry_interrupted_model_call`, digest-checked; the default is one line in
+  `domain/model_call_settings.py`). When on, a cut-off, slowed, over-long or runaway call (not a 429,
+  not an authentication refusal, not a format error, not a usage limit) is sent again as
+  `retry_of_dispatch_id`, at most twice per call, waiting about 2 s and then 4 s (each shaken by up to
+  25%). The transient-429 retry happens at most once and shares the limit of two. Usage counts every send. It is off because the server cannot say whether it already received a
+  request or whether the cut-off one stopped; the user continues with "이어서 조사" instead.
+- **A judgement review is never reused.** `NON_REUSABLE_ROLES` (`research_stage_reuse.py`) keeps
+  `REVIEW_ADJUDICATOR` out of resume: its conflict and gap decisions carry the requirement-set digest
+  of the run that made them, so a reused one would be discarded as stale.
+
 ## Completion and deferred decisions
 
 Execution/persistence success is not answer completeness. New read information should distinguish

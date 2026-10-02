@@ -6,10 +6,18 @@ import { rpc } from "../api/rpcClient";
 import type { WorkspaceReady } from "../api/research";
 import { canStartCredentialMethod, credentialAccountLabel, credentialAuthMethod, credentialAvailabilityNote, credentialCompanies, credentialConnectionHint, credentialGuideUrl, credentialLocallyConfigured, credentialResultMessage, loginSupported, loginUnavailable,
   xaiDeviceLoginSupported, type CredentialAccount, type CredentialRegisterResult } from "./modelCredentialPresentation";
+import { connectionErrorText, needsModelRefresh, providerStatus, type ProviderTone } from "./connectionCopy";
 import { XaiDeviceLogin } from "./XaiDeviceLogin";
+import { catalogResultLines, type CatalogStatusRow } from "./modelCatalogPresentation";
+import { providerLabel } from "./statusLabels";
 import { OAuthLoginFlow } from "./OAuthLoginFlow";
 import { localCredentialWorkspaceId } from "./localCredentialWorkspace";
 import { workspaceSetupIssue, workspaceSetupIssueText } from "./workspaceSetupIssue";
+
+const toneIntent: Record<ProviderTone, "success" | "primary" | "none" | "warning"> = {
+  ready: "success", pending: "primary", action: "none", blocked: "warning",
+};
+const keyPlaceholder: Record<string, string> = { openai: "sk-...", anthropic: "sk-ant-...", xai: "xai-..." };
 
 export function FirstRunSetup({ onDone }: { onDone: () => void }) {
   const client = useQueryClient();
@@ -37,6 +45,16 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
       ),
     onSuccess: async (result) => {
       if (result.value?.credential) { setApiKey(""); setKeyProvider(null); }
+      await Promise.all([
+        client.invalidateQueries({ queryKey: ["model-credentials", "system:workspace"] }),
+        client.invalidateQueries({ queryKey: ["model-settings"] }),
+        client.invalidateQueries({ queryKey: ["workspace-ready"] }),
+      ]);
+    },
+  });
+  const loadModels = useMutation({
+    mutationFn: () => rpc("model/catalog/refresh", { project_id: "system:workspace" }, crypto.randomUUID()),
+    onSettled: async () => {
       await Promise.all([
         client.invalidateQueries({ queryKey: ["model-credentials", "system:workspace"] }),
         client.invalidateQueries({ queryKey: ["model-settings"] }),
@@ -91,47 +109,51 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                 const xaiLogin = xaiDeviceLoginSupported(knownRow);
                 const xaiMethod = company.provider === "xai" ? credentialAuthMethod(knownRow, "xai_device_code") : null;
                 const codexMethod = company.provider === "openai" ? credentialAuthMethod(knownRow, "codex_isolated_browser") : null;
-                const claudeMethod = company.provider === "anthropic" ? credentialAuthMethod(knownRow, "claude_pkce") : null;
+                const claudeCodeMethod = company.provider === "anthropic" ? credentialAuthMethod(knownRow, "claude_code_login") : null;
+                const claudeMethod = company.provider === "anthropic" && !claudeCodeMethod ? credentialAuthMethod(knownRow, "claude_pkce") : null;
                 const keyMethod = credentialAuthMethod(knownRow, "api_key");
-                const connected = credentialLocallyConfigured(row);
                 const canStartLogin = loginSupported(row) && !row?.oauth && row?.connection_state !== "LOGIN_PENDING" && !loginUnavailable(row);
                 const canGuideKey = row?.login_supported === false && row.login_kind === "unsupported";
-                const canGuideClaude = company.provider === "anthropic" && Boolean(row);
                 const availabilityNote = credentialAvailabilityNote(row);
                 const keyOpen = keyProvider === company.provider;
+                const status = providerStatus(company.provider, row, listed.isFetching);
+                const legacyAction = !xaiLogin && !codexMethod && !claudeMethod && !claudeCodeMethod;
                 return (
-                  <article className={`first-run-provider${connected ? " connected" : ""}`} key={company.provider}>
-                    <div>
+                  <article className={`first-run-provider tone-${status.tone}`} key={company.provider}>
+                    <header className="first-run-provider-head">
+                      <span className="provider-mark" aria-hidden="true">{company.label.slice(0, 1)}</span>
                       <strong>{company.label}</strong>
-                      <Tag minimal intent={row?.connection_state === "EXECUTION_UNVERIFIED" || row?.execution_verified === false ? "warning"
-                        : connected ? "success" : row?.connection_state && row.connection_state !== "UNAVAILABLE" ? "warning" : "none"}>{credentialAccountLabel(row)}</Tag>
-                      <p>{credentialConnectionHint(row)}</p>
-                      {keyMethod && <small>API 키: {keyMethod.connected ? "등록됨" : "미등록"} · OAuth와 별도 경로</small>}
-                      {availabilityNote && <small>{availabilityNote}</small>}
-                      {row?.oauth && !value?.model_connected && <small>로그인은 확인됐지만 이 환경에서 사용할 모델 목록이 없습니다. 재로그인 대신 모델 경로를 확인하세요.</small>}
-                    </div>
-                    <div className="first-run-provider-actions">
-                      {!xaiLogin && !codexMethod && <Button disabled={!canStartLogin && !canGuideKey && !canGuideClaude} loading={connect.isPending} onClick={() => connect.mutate({ provider: company.provider })}>
-                        {canGuideClaude ? "Claude Code 연결 안내" : loginUnavailable(row) ? "설치·버전 확인 필요" : row?.connection_state === "LOGIN_PENDING" ? "로그인 완료 대기" : row?.oauth && loginSupported(row) ? "로그인 확인됨" : canStartLogin ? "Codex 로그인 시작" : canGuideKey ? "키 발급 안내" : "연결 방법 확인 중"}
-                      </Button>}
-                      <Button minimal onClick={() => { setKeyProvider(keyOpen ? null : company.provider); setApiKey(""); }}>
-                        {keyOpen ? "키 입력 닫기" : "API 키"}
+                      <Tag minimal round intent={toneIntent[status.tone]}>{status.label}</Tag>
+                      <Button className="provider-key-toggle" small minimal icon="key" aria-expanded={keyOpen}
+                        onClick={() => { setKeyProvider(keyOpen ? null : company.provider); setApiKey(""); }}>
+                        {keyOpen ? "키 입력 닫기" : "API 키로 연결"}
                       </Button>
+                    </header>
+                    <p className="first-run-provider-summary">{status.summary}</p>
+                    <div className="first-run-provider-body">
+                      {needsModelRefresh(row) && <Button intent="primary" loading={loadModels.isPending}
+                        onClick={() => loadModels.mutate()}>모델 목록 불러오기</Button>}
+                      {legacyAction && <Button disabled={!canStartLogin && !canGuideKey} loading={connect.isPending} onClick={() => connect.mutate({ provider: company.provider })}>
+                        {loginUnavailable(row) ? "설치·버전 확인 필요" : row?.connection_state === "LOGIN_PENDING" ? "로그인 완료 대기" : row?.oauth && loginSupported(row) ? "로그인 확인됨" : canStartLogin ? "Codex 로그인 시작" : canGuideKey ? "키 발급 안내" : "연결 방법 확인 중"}
+                      </Button>}
+                      {xaiLogin && <XaiDeviceLogin key={`${credentialWorkspaceId ?? "unknown"}:system:workspace`}
+                        projectId="system:workspace" workspaceId={credentialWorkspaceId} account={row} method={xaiMethod ?? undefined}
+                        methodStartAllowed={row?.auth_methods ? canStartCredentialMethod(row, "xai_device_code") : undefined} />}
+                      {codexMethod && <OAuthLoginFlow key={`${credentialWorkspaceId ?? "unknown"}:openai`}
+                        projectId="system:workspace" workspaceId={credentialWorkspaceId} provider="openai"
+                        authMethod="codex_isolated_browser" method={codexMethod} account={row} />}
+                      {claudeCodeMethod && <OAuthLoginFlow key={`${credentialWorkspaceId ?? "unknown"}:anthropic:claude-code`}
+                        projectId="system:workspace" workspaceId={credentialWorkspaceId} provider="anthropic"
+                        authMethod="claude_code_login" method={claudeCodeMethod} account={row} />}
+                      {claudeMethod && <OAuthLoginFlow key={`${credentialWorkspaceId ?? "unknown"}:anthropic`}
+                        projectId="system:workspace" workspaceId={credentialWorkspaceId} provider="anthropic"
+                        authMethod="claude_pkce" method={claudeMethod} account={row} />}
                     </div>
-                    {xaiLogin && <XaiDeviceLogin key={`${credentialWorkspaceId ?? "unknown"}:system:workspace`}
-                      projectId="system:workspace" workspaceId={credentialWorkspaceId} account={row} method={xaiMethod ?? undefined}
-                      methodStartAllowed={row?.auth_methods ? canStartCredentialMethod(row, "xai_device_code") : undefined} />}
-                    {codexMethod && <OAuthLoginFlow key={`${credentialWorkspaceId ?? "unknown"}:openai`}
-                      projectId="system:workspace" workspaceId={credentialWorkspaceId} provider="openai"
-                      authMethod="codex_isolated_browser" method={codexMethod} account={row} />}
-                    {claudeMethod && <OAuthLoginFlow key={`${credentialWorkspaceId ?? "unknown"}:anthropic`}
-                      projectId="system:workspace" workspaceId={credentialWorkspaceId} provider="anthropic"
-                      authMethod="claude_pkce" method={claudeMethod} account={row} />}
                     {keyOpen && (
                       <div className="first-run-key">
                         <InputGroup
                           type="password"
-                          placeholder="API 키"
+                          placeholder={keyPlaceholder[company.provider] ?? "API 키"}
                           value={apiKey}
                           onChange={(event) => setApiKey(event.target.value)}
                           aria-label={`${company.label} API 키`}
@@ -146,20 +168,32 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                         >
                           키 등록
                         </Button>
+                        <small>키는 이 PC의 THOTH 작업 공간에만 저장됩니다. 사용량은 해당 공급자 계정에 청구됩니다.</small>
                       </div>
                     )}
+                    <details className="connection-tech">
+                      <summary>상태 자세히</summary>
+                      <p>상태: {credentialAccountLabel(row)}</p>
+                      {row?.auth_methods?.map(item => <p key={item.auth_method}>{item.route} · {item.connection_state ?? "미조회"}{item.connected ? " · 연결됨" : ""}</p>)}
+                      <p>{credentialConnectionHint(row)}</p>
+                      {keyMethod && <p>API 키: {keyMethod.connected ? "등록됨" : "미등록"} · 계정 로그인과 별도 경로</p>}
+                      {availabilityNote && <p>{availabilityNote}</p>}
+                    </details>
                   </article>
                 );
               })}
             </div>
+            <small className="muted">ChatGPT·Claude 계정 로그인은 같은 계정의 Codex·Claude Code 사용량 한도를 함께 씁니다.</small>
             {connect.isSuccess && <Callout compact role="status">{credentialResultMessage(connect.data?.value)}
               {guideUrl && <p><a href={guideUrl} target="_blank" rel="noopener noreferrer">키 발급 사이트 열기</a></p>}</Callout>}
-            {connect.error && <Callout compact intent="danger">{connect.error.message}</Callout>}
+            {loadModels.data && <Callout compact role="status" data-catalog-result>{catalogResultLines((loadModels.data.value as { catalog_status?: CatalogStatusRow[] }).catalog_status, providerLabel).map(line => <p key={line}>{line}</p>)}</Callout>}
+            {loadModels.error && <Callout compact intent="warning" role="alert">{connectionErrorText(loadModels.error, "모델 목록을 불러오지 못했습니다. 잠시 뒤 다시 시도하세요.")}</Callout>}
+            {connect.error && <Callout compact intent="danger">{connectionErrorText(connect.error, connect.error.message)}</Callout>}
             {listed.error && <Callout compact intent="warning">계정 연결 방법을 확인하지 못했습니다. 연결 상태를 다시 확인하세요.</Callout>}
             <Button small minimal icon="refresh" loading={ready.isFetching || listed.isFetching}
               onClick={() => { void ready.refetch(); void listed.refetch(); }}>연결 상태 다시 확인</Button>
             <div className="first-run-footer">
-              <span>연결이 끝나면 인터넷 사용 여부를 고릅니다.</span>
+              <span>{modelConnected ? "연결됐습니다. 다음으로 인터넷 사용 여부를 고릅니다." : "모델을 하나 연결하면 다음으로 넘어갈 수 있습니다."}</span>
               <Button intent="primary" disabled={!modelConnected} onClick={() => setStep("internet")}>
                 다음
               </Button>
@@ -215,3 +249,4 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
     </main>
   );
 }
+

@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, cast
 
 from pydantic import JsonValue
 
+from thoth.application.services.model_outcomes import record_model_outcome
 from thoth.application.services.post_execution_resume import resume_post_execution_learning
 from thoth.application.services.research_boundary import RequestBoundary
 from thoth.application.services.research_termination import ResearchTerminationService
@@ -120,6 +121,31 @@ async def run_research_attempt(
                 )
 
 
+def _after_published(
+    host: ResearchThreadHandlers,
+    attempt: ResearchAttempt,
+    request: ThreadRequestRevision,
+    result: dict[str, object],
+    revision_digest: str,
+) -> None:
+    """Tell the review service a terminal result is durable; its failure never fails research."""
+
+    record_model_outcome(host.model_settings, request)
+    if host.on_result_published is None:
+        return
+    try:
+        host.on_result_published(
+            request.project_id,
+            request.thread_id,
+            attempt.operation_id,
+            result,
+            result_revision_digest=revision_digest,
+        )
+    except Exception:
+        # A review left REVIEWING is settled on the next read of the review list.
+        logging.getLogger(__name__).exception("judgment review resolution failed")
+
+
 async def _execute_owned(
     host: ResearchThreadHandlers,
     attempt: ResearchAttempt,
@@ -134,11 +160,13 @@ async def _execute_owned(
         phase: str, result: dict[str, object], gaps: tuple[str, ...], terminal: str | None = None
     ) -> None:
         try:
-            host.publish(attempt, request, work, phase, result, gaps, terminal=terminal)
+            ref = host.publish(attempt, request, work, phase, result, gaps, terminal=terminal)
         except (ResearchFence, ResearchLeaseLost, ResearchPaused, ModelExecutionHold):
             raise
         except Exception as exc:
             raise ResearchPublicationError(exc) from exc
+        if terminal is not None:
+            _after_published(host, attempt, request, result, ref.revision_digest)
 
     async def publish(phase: str, result: dict[str, object], gaps: tuple[str, ...]) -> None:
         publish_result(phase, result, gaps)
@@ -250,6 +278,7 @@ async def _execute_owned(
     except ModelExecutionHold as exc:
         # Preserve the observed primary before attempting a partial checkpoint.
         reason = failure_cause(exc, "MODEL_CALL").reason_code
+        record_model_outcome(host.model_settings, request, reason)
         try:
             host.publish(
                 attempt,
@@ -339,6 +368,9 @@ def _prepare_work(
 
     work.observe_context = lambda context: capture_rendered_memory(context, host.records.ledger)
     work.model_settings = request.model_settings
+    resume_from = attempt.continuation.get("resume_from_operation_id")
+    if isinstance(resume_from, str) and resume_from:
+        work.resume_from_operation_id = resume_from
     if request.model_settings is not None:
         work.context["model_settings"] = request.model_settings.model_dump(mode="json")
     if attempt.continuation.get("retry_policy") == "ONCE_TRANSIENT_429":
@@ -350,6 +382,17 @@ def _prepare_work(
             capability_source=settings.capability_source,
         ):
             work.oauth_retry_policy = OAuthRetryPolicy()
+    from thoth.domain.oauth_retry import allows_once_transient_429 as codex_family
+
+    settings = request.model_settings
+    if (
+        host.call_settings is not None
+        and settings is not None
+        and codex_family(provider=settings.provider, capability_source=settings.capability_source)
+        and host.call_settings.auto_retry_interrupted(request.project_id)
+    ):
+        # The project's own switch (off unless turned on): one cut-off call may be sent once more.
+        work.auto_retry_interrupted_call = True
     boundary.validate_sources = lambda: host.analysis.require_current_sources(
         work.evidence, work.context.get("source_context_digest")
     )

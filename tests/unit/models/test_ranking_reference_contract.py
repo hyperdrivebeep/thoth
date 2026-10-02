@@ -14,7 +14,7 @@ from thoth.adapters.models.codex_oauth import CodexOAuthModel, strict_output_sch
 from thoth.adapters.models.openai_responses import OpenAIResponsesModel
 from thoth.adapters.models.reference_schema import constrain_span_references
 from thoth.adapters.models.xai_model import XaiOAuthModel
-from thoth.adapters.models.xai_oauth import OmoXaiSessionReader, XaiSession
+from thoth.adapters.models.xai_oauth import XaiSession
 from thoth.adapters.models.xai_responses import XaiResponsesExecutor
 from thoth.application.services.research_context_assembler import assemble_context
 from thoth.domain.enums import ModelRole
@@ -69,10 +69,7 @@ class _CodexSession:
         return OAuthSession("fixture", "fixture", "fixture")
 
 
-class _XaiSession(OmoXaiSessionReader):
-    def __init__(self) -> None:
-        super().__init__(root=None)
-
+class _XaiSession:
     def read(self) -> XaiSession:
         return XaiSession("fixture", "fixture")
 

@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def mirror(root: Path) -> dict[str, Any]:
-    for name in ("config", "src", "PROJECT_WIKI"):
+    for name in ("config", "src"):
         shutil.copytree(ROOT / name, root / name, ignore=shutil.ignore_patterns("__pycache__"))
     return json.loads((root / "config/architecture-conformance.json").read_text())
 

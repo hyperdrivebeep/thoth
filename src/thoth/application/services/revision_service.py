@@ -72,12 +72,16 @@ class RevisionCommitService:
                 transaction.insert_revision(staged.revision)
             before_heads = dict(transaction.get_heads(changeset.project_id))
             before_digest = head_set_digest(before_heads)
-            expected_matches = all(
-                before_heads.get(key) == expected
-                for key, expected in changeset.expected_heads.items()
-            ) and (
-                changeset.expected_head_set_digest is None
-                or changeset.expected_head_set_digest == before_digest
+            expected_matches = (
+                all(
+                    before_heads.get(key) == expected
+                    for key, expected in changeset.expected_heads.items()
+                )
+                and all(key not in before_heads for key in changeset.expected_absent_heads)
+                and (
+                    changeset.expected_head_set_digest is None
+                    or changeset.expected_head_set_digest == before_digest
+                )
             )
             after_heads = dict(before_heads)
             if expected_matches:

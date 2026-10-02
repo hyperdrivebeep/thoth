@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pydantic import ValidationError
 
-from thoth.domain.action import ActionCandidate, ActionPlan
+from thoth.domain.action import ActionCandidate, ActionPlan, OrdinalEstimate
 from thoth.domain.action_full import ActionPlanRecord, ActionPortfolioRecord, ActionRecord
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.enums import RiskTier
@@ -43,6 +43,7 @@ def action_view(record: ActionRecord) -> ActionCandidate | None:
                 "primary_purpose": record.primary_purpose,
                 "effect_facts": details.effect_facts,
                 "effect_completeness_confirmed": details.effect_completeness_confirmed,
+                "effort_estimates": details.effort_estimates,
             }
         )
     except ValidationError:
@@ -86,6 +87,25 @@ def action_plan_view(
         last_r2_execution=details.last_r2_execution,
         recovery_candidate=details.recovery_candidate,
     ), ()
+
+
+def _merged_estimates(
+    candidate: ActionCandidate, current: ActionRecord | None, created_at: datetime
+) -> tuple[OrdinalEstimate, ...]:
+    """Fresh AI estimates plus every HUMAN estimate already on the record; nothing is averaged."""
+
+    previous = (
+        ()
+        if current is None or current.generation_details is None
+        else (current.generation_details.effort_estimates)
+    )
+    return (
+        *(
+            item.model_copy(update={"created_at": item.created_at or created_at})
+            for item in candidate.effort_estimates
+        ),
+        *(item for item in previous if item.estimator_type != "AI"),
+    )
 
 
 def full_action(
@@ -183,6 +203,7 @@ def full_action(
                 missing_evidence=candidate.missing_evidence,
                 effect_facts=candidate.effect_facts,
                 effect_completeness_confirmed=candidate.effect_completeness_confirmed,
+                effort_estimates=_merged_estimates(candidate, current, created_at),
             ),
             "supersedes_revision_digest": parent,
             "created_at": created_at,

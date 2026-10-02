@@ -1,6 +1,7 @@
 """Read/update local research preferences through the normal command bus."""
 
 import asyncio
+import re
 from collections.abc import Callable
 
 from pydantic import JsonValue, TypeAdapter
@@ -10,13 +11,19 @@ from thoth.domain.auth import current_authenticated_actor
 from thoth.domain.base import DomainModel
 from thoth.domain.model_settings import ModelSelection
 from thoth.ports.model import ModelResolutionError
+from thoth.ports.model_catalog import CatalogStatusPort
 from thoth.ports.model_credentials import ModelCredentialError, ModelCredentialPort
+from thoth.ports.model_tooling import ModelToolingError, ModelToolingPort
 from thoth.ports.project import ProjectStorePort
 from thoth.ports.thread import ThreadStorePort
 from thoth.protocol.deferred import EphemeralCommandResult
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 
 _JSON_RESULT = TypeAdapter(dict[str, JsonValue])
+_TOOL_ID = re.compile(r"[a-z][a-z0-9-]{0,31}")
+# npm may take up to 300 s; the adapter stops it and reports a typed reason first.
+_TOOL_INSTALL_TIMEOUT_SECONDS = 330
+_WORKSPACE_METHOD_PREFIXES = ("model/credential/", "model/catalog/", "model/tooling/")
 _DURABLE_AUTH_FIELDS = frozenset(
     {
         "started",
@@ -54,6 +61,10 @@ _COMPLETE_ERROR_REASONS = frozenset(
         "CLAUDE_LOGIN_SUPERSEDED",
         "CLAUDE_LOGIN_RESPONSE_INVALID",
         "CLAUDE_TOKEN_EXCHANGE_PENDING",
+        "CLAUDE_CODE_LOGIN_NOT_FOUND",
+        "CLAUDE_CODE_LOGIN_NOT_PENDING",
+        "CLAUDE_CODE_LOGIN_RESPONSE_INVALID",
+        "CLAUDE_CODE_LOGIN_INPUT_UNAVAILABLE",
     }
 )
 _UNAVAILABLE_REASONS = frozenset(
@@ -96,14 +107,16 @@ class ModelSettingsHandlers:
         threads: ThreadStorePort,
         credentials: ModelCredentialPort,
         unregistered_default_is_available: bool = True,
+        tooling: ModelToolingPort | None = None,
     ) -> None:
         self.service, self.projects, self.authorize = service, projects, authorize
         self.threads = threads
         self.credentials = credentials
+        self.tooling = tooling
         self.unregistered_default_is_available = unregistered_default_is_available
 
     def authorize_before_claim(self, method: str, value: dict[str, JsonValue]) -> None:
-        if method.startswith("model/credential/"):
+        if method.startswith(_WORKSPACE_METHOD_PREFIXES):
             return
         self.authorize(method, value)
         if self.projects.read(str(value.get("project_id", ""))) is None:
@@ -130,15 +143,33 @@ class ModelSettingsHandlers:
                     RpcErrorCode.DOMAIN_REJECTED, "MODEL_CATALOG_REFRESH_TIMEOUT"
                 ) from exc
 
-    async def read(
-        self, value: dict[str, JsonValue], *, catalog_refreshed: bool = False
-    ) -> dict[str, JsonValue]:
+    def _catalog_status(self) -> list[JsonValue]:
+        """Where each list came from and how fresh it is, from what is already stored."""
+
+        catalog = self.service.catalog
+        rows = catalog.statuses() if isinstance(catalog, CatalogStatusPort) else ()
+        return [row.model_dump(mode="json") for row in rows]
+
+    def _status_of(self, provider: str | None) -> str:
+        rows = self._catalog_status()
+        found = next(
+            (
+                row
+                for row in rows
+                if isinstance(row, dict) and (provider is None or row.get("provider") == provider)
+            ),
+            None,
+        )
+        return str(found["status"]) if isinstance(found, dict) else "NONE"
+
+    async def read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        """Settings come from the stored model list; a read never asks a provider for one."""
+
         self.authorize_before_claim("model/settings/read", value)
-        if not catalog_refreshed:
-            await self._refresh_catalog()
         request = SettingsInput.model_validate(value)
         digest, selection = self.service.preference(request.project_id, request.thread_id)
         options = [option.model_dump(mode="json") for option in self.service.catalog.options()]
+        catalog_status = self._catalog_status()
         try:
             resolved = self.service.resolve(
                 request.project_id, request.thread_id, request.selection
@@ -151,6 +182,7 @@ class ModelSettingsHandlers:
                     "selection": selection.model_dump(mode="json"),
                     "effective_settings": None,
                     "model_options": options,
+                    "catalog_status": catalog_status,
                     "availability": "UNAVAILABLE",
                     "reason_code": (
                         reason if reason in _UNAVAILABLE_REASONS else "MODEL_SETTINGS_UNAVAILABLE"
@@ -167,6 +199,7 @@ class ModelSettingsHandlers:
                     "selection": selection.model_dump(mode="json"),
                     "effective_settings": None,
                     "model_options": options,
+                    "catalog_status": catalog_status,
                     "availability": "UNAVAILABLE",
                     "reason_code": "MODEL_CAPABILITY_UNKNOWN",
                 }
@@ -177,6 +210,7 @@ class ModelSettingsHandlers:
                 "selection": selection.model_dump(mode="json"),
                 "effective_settings": resolved.model_dump(mode="json"),
                 "model_options": options,
+                "catalog_status": catalog_status,
                 "availability": "AVAILABLE",
                 "reason_code": None,
             },
@@ -184,7 +218,6 @@ class ModelSettingsHandlers:
 
     async def update(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         self.authorize_before_claim("model/settings/update", value)
-        await self._refresh_catalog()
         request = SettingsInput.model_validate(value)
         actor = current_authenticated_actor()
         try:
@@ -196,14 +229,19 @@ class ModelSettingsHandlers:
                 "human:local-user" if actor is None else actor.actor_id,
             )
         except ModelResolutionError as exc:
-            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
-        return await self.read(
-            {"project_id": request.project_id, "thread_id": request.thread_id},
-            catalog_refreshed=True,
-        )
+            raise RpcApplicationError(
+                RpcErrorCode.DOMAIN_REJECTED,
+                str(exc),
+                data={"catalog_status": self._status_of(request.selection.resolved_provider())},
+            ) from exc
+        return await self.read({"project_id": request.project_id, "thread_id": request.thread_id})
 
     async def list_credentials(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         self.authorize_before_claim("model/credential/list", value)
+        accounts, credentials = await self._read_accounts()
+        return _JSON_RESULT.validate_python({"accounts": accounts, "credentials": credentials})
+
+    async def _read_accounts(self) -> tuple[list[JsonValue], list[JsonValue]]:
         try:
             accounts = await asyncio.wait_for(
                 asyncio.to_thread(self.credentials.account_connections), timeout=20
@@ -215,11 +253,62 @@ class ModelSettingsHandlers:
             raise RpcApplicationError(
                 RpcErrorCode.DOMAIN_REJECTED, "MODEL_CREDENTIAL_STATUS_TIMEOUT"
             ) from exc
-        return _JSON_RESULT.validate_python(
-            {
-                "accounts": accounts,
-                "credentials": [dict(item) for item in credentials],
-            }
+        return (
+            TypeAdapter(list[JsonValue]).validate_python(accounts),
+            TypeAdapter(list[JsonValue]).validate_python([dict(item) for item in credentials]),
+        )
+
+    async def install_tool(self, value: dict[str, JsonValue]) -> EphemeralCommandResult:
+        """Install one named helper tool, then return the refreshed account rows."""
+        self.authorize_before_claim("model/tooling/install", value)
+        tool_id = value.get("tool_id")
+        if not isinstance(tool_id, str) or _TOOL_ID.fullmatch(tool_id) is None:
+            raise RpcApplicationError(RpcErrorCode.INVALID_PARAMS, "MODEL_TOOL_ID_INVALID")
+        if self.tooling is None:
+            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "MODEL_TOOLING_UNAVAILABLE")
+        try:
+            outcome = await asyncio.wait_for(
+                asyncio.to_thread(self.tooling.install, tool_id),
+                timeout=_TOOL_INSTALL_TIMEOUT_SECONDS,
+            )
+        except ModelToolingError as exc:
+            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
+        except TimeoutError as exc:
+            raise RpcApplicationError(
+                RpcErrorCode.DOMAIN_REJECTED, "MODEL_TOOL_INSTALL_TIMEOUT"
+            ) from exc
+        accounts, _credentials = await self._read_accounts()
+        summary: dict[str, JsonValue] = {
+            "tool_id": tool_id,
+            "installed": outcome.get("installed") is True,
+            "version": str(outcome.get("version") or ""),
+        }
+        return EphemeralCommandResult(
+            response_value=_JSON_RESULT.validate_python({**summary, "accounts": accounts}),
+            durable_value=summary,
+        )
+
+    async def refresh_catalog(self, value: dict[str, JsonValue]) -> EphemeralCommandResult:
+        """Fetch the provider model lists once, on an explicit request.
+
+        Login completion and the "load models" button call this. Status polling never does,
+        so a status read cannot start remote catalog traffic.
+        """
+        self.authorize_before_claim("model/catalog/refresh", value)
+        await self._refresh_catalog()
+        accounts, credentials = await self._read_accounts()
+        count = len(self.service.catalog.options())
+        return EphemeralCommandResult(
+            response_value=_JSON_RESULT.validate_python(
+                {
+                    "accounts": accounts,
+                    "credentials": credentials,
+                    "model_option_count": count,
+                    "catalog_status": self._catalog_status(),
+                    "catalog_refreshed": True,
+                }
+            ),
+            durable_value={"catalog_refreshed": True, "model_option_count": count},
         )
 
     @staticmethod
