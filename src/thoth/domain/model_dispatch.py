@@ -59,6 +59,18 @@ class TransportTimeouts(DomainModel):
     write_seconds: Decimal | None = Field(default=None, gt=0)
     pool_seconds: Decimal | None = Field(default=None, gt=0)
     policy_ref: str | None = None
+    # Per-call limits that read the stream itself. Unset values take the adapter's own defaults.
+    dispatch_total_seconds: Decimal | None = Field(default=None, gt=0)
+    stall_min_events_per_second: Decimal | None = Field(default=None, gt=0)
+    stall_warmup_seconds: Decimal | None = Field(default=None, gt=0)
+    stall_window_seconds: Decimal | None = Field(default=None, gt=0)
+    stall_sustain_seconds: Decimal | None = Field(default=None, gt=0)
+    # A reply that never finishes: too many output events, too many visible bytes (per requested
+    # output token, with a floor) or a long unbroken run of blank-only events ends the call.
+    runaway_max_output_events: int | None = Field(default=None, ge=1)
+    runaway_visible_bytes_per_token: int | None = Field(default=None, ge=1)
+    runaway_min_visible_bytes: int | None = Field(default=None, ge=1)
+    runaway_blank_run: int | None = Field(default=None, ge=1)
 
     def bounded(self, remaining: float | None) -> TransportTimeouts:
         if remaining is None:
@@ -116,9 +128,7 @@ class HttpRejectionMetadata(DomainModel):
 
     failure_category: Literal["HTTP_REJECTION"] = "HTTP_REJECTION"
     http_status: int = Field(ge=400, le=599, strict=True)
-    rejection_kind: Literal["TRANSIENT_RATE_LIMIT", "ACCOUNT_LIMIT", "OTHER", "UNKNOWN"] = (
-        "UNKNOWN"
-    )
+    rejection_kind: Literal["TRANSIENT_RATE_LIMIT", "ACCOUNT_LIMIT", "OTHER", "UNKNOWN"] = "UNKNOWN"
     classification_basis: str | None = Field(default=None, min_length=1, max_length=64)
     retry_after_seconds: int | None = Field(default=None, ge=0, le=86_400, strict=True)
     diagnostic_capture_state: Literal["CAPTURED", "PARTIAL", "UNAVAILABLE"] = "UNAVAILABLE"
@@ -146,6 +156,16 @@ class ModelReceiveObservation(DomainModel):
     max_frame_bytes: int | None = None
     transport_diagnostic: TransportDiagnostic | None = None
     http_rejection: HttpRejectionMetadata | None = None
+    # What the stream's own pace looked like when the call ended (output events, not bytes).
+    output_event_count: int | None = None
+    window_events_per_second: Decimal | None = None
+    stall_limit_events_per_second: Decimal | None = None
+    dispatch_total_limit_seconds: Decimal | None = None
+    # Which runaway limit ended the call (OUTPUT_EVENTS, VISIBLE_BYTES or BLANK_RUN) and its values.
+    runaway_limit: str | None = None
+    runaway_max_output_events: int | None = None
+    runaway_max_visible_bytes: int | None = None
+    runaway_blank_run: int | None = None
 
 
 UNVERIFIED_MODEL_CONTROL = ModelControlCapability(

@@ -36,7 +36,9 @@ async def finished(runtime: AppRuntime, question: str = "LAB-42 조건을 설명
     status = value(
         await runtime.bus.dispatch(
             request(
-                "thread/read", "status", {"project_id": "p", "thread_id": admitted["thread_id"]}
+                "thread/read",
+                "status",
+                {"project_id": "p", "thread_id": admitted["thread_id"], "view": "FULL"},
             )
         )
     )

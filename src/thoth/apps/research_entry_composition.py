@@ -9,8 +9,16 @@ from thoth.adapters.models.catalog import (
     CompositeModelCatalog,
     StaticModelCatalog,
 )
+from thoth.adapters.models.catalog_marks import MarkedCatalog
+from thoth.adapters.models.catalog_startup import CatalogStartupRefresher
 from thoth.adapters.models.claude_catalog import ClaudeOAuthCatalog
 from thoth.adapters.models.claude_code import ClaudeCodeCatalog
+from thoth.adapters.models.claude_code_login import (
+    release_workspace_broker as release_claude_code_login_broker,
+)
+from thoth.adapters.models.claude_code_login import (
+    retain_workspace_broker as retain_claude_code_login_broker,
+)
 from thoth.adapters.models.claude_oauth import (
     release_workspace_broker as release_claude_workspace_broker,
 )
@@ -23,6 +31,10 @@ from thoth.adapters.models.codex_broker import (
     retain_workspace_broker,
 )
 from thoth.adapters.models.local_credentials import LocalModelCredentials, ThothLocalCatalog
+from thoth.adapters.models.tool_installers import (
+    LocalModelTooling,
+    default_tool_installer_registry,
+)
 from thoth.adapters.models.xai_account_usage import XaiAccountUsageAdapter
 from thoth.adapters.models.xai_broker import (
     release_workspace_broker as release_xai_workspace_broker,
@@ -35,12 +47,14 @@ from thoth.adapters.storage.research_queue import ControlResearchQueueStore
 from thoth.adapters.storage.workspace_setup import FilesystemWorkspaceSetup
 from thoth.adapters.task_profiles import default_task_profiles
 from thoth.adapters.worker_identity import LocalWorkerIdentity
+from thoth.application.commands.model_call_settings import ModelCallSettingsHandlers
 from thoth.application.commands.model_settings import ModelSettingsHandlers
 from thoth.application.commands.research_threads import ResearchThreadHandlers
 from thoth.application.commands.threads import ThreadCommandHandlers
 from thoth.application.commands.workspace_setup import WorkspaceSetupHandlers
 from thoth.application.services.connector_service import ConnectorService
 from thoth.application.services.full_project_memory import FullProjectMemoryService
+from thoth.application.services.model_call_settings import ModelCallSettingsService
 from thoth.application.services.model_settings import ModelSettingsService
 from thoth.application.services.operation_journal import OperationJournal
 from thoth.application.services.request_records import RequestRecords
@@ -66,8 +80,11 @@ class ResearchEntryComposition:
     worker: LocalWorkerIdentity
     stores: StoreBundlePort
     broker_workspace: Path | None = None
+    catalog_refresher: CatalogStartupRefresher | None = None
 
     def close_storage(self) -> None:
+        if self.catalog_refresher is not None:
+            self.catalog_refresher.close()
         try:
             self.worker.close()
         finally:
@@ -76,12 +93,15 @@ class ResearchEntryComposition:
             finally:
                 if self.broker_workspace is not None:
                     try:
-                        release_claude_workspace_broker(self.broker_workspace)
+                        release_claude_code_login_broker(self.broker_workspace)
                     finally:
                         try:
-                            release_xai_workspace_broker(self.broker_workspace)
+                            release_claude_workspace_broker(self.broker_workspace)
                         finally:
-                            release_workspace_broker(self.broker_workspace)
+                            try:
+                                release_xai_workspace_broker(self.broker_workspace)
+                            finally:
+                                release_workspace_broker(self.broker_workspace)
 
 
 def _configured_model_available(
@@ -131,20 +151,50 @@ def create_research_entry(
         events=OperationJournal(stores.events, clock, ids),
     )
     worker = LocalWorkerIdentity()
+    mode = deployment_mode or parse_deployment_mode()
+    refresher: CatalogStartupRefresher | None = None
+    model_catalog: ModelCatalogPort
+    if catalog is not None:
+        model_catalog = catalog
+    elif use_codex_defaults and workspace is not None:
+        codex = CodexModelCatalog(workspace)
+        model_catalog = CompositeModelCatalog(
+            ThothLocalCatalog(workspace),
+            codex,
+            MarkedCatalog(
+                ClaudeCodeCatalog(workspace),
+                provider="claude-code",
+                source="CLI_ALIAS",
+                workspace=workspace,
+            ),
+            MarkedCatalog(
+                ClaudeOAuthCatalog(workspace),
+                provider="claude-oauth",
+                source="CURATED",
+                workspace=workspace,
+            ),
+            MarkedCatalog(
+                ThothXaiOAuthCatalog(workspace),
+                provider="xai-oauth",
+                source="CURATED",
+                workspace=workspace,
+            ),
+        )
+        if mode is DeploymentMode.LOCAL:
+            refresher = CatalogStartupRefresher((codex,))
+    elif use_codex_defaults:
+        model_catalog = CompositeModelCatalog(
+            ThothLocalCatalog(workspace),
+            StaticModelCatalog(),
+            StaticModelCatalog(),
+            StaticModelCatalog(),
+            StaticModelCatalog(),
+        )
+    else:
+        model_catalog = StaticModelCatalog()
     settings = ModelSettingsService(
         records,
-        catalog
-        or (
-            CompositeModelCatalog(
-                ThothLocalCatalog(workspace),
-                CodexModelCatalog(workspace) if workspace is not None else StaticModelCatalog(),
-                ClaudeCodeCatalog(workspace) if workspace is not None else StaticModelCatalog(),
-                ClaudeOAuthCatalog(workspace) if workspace is not None else StaticModelCatalog(),
-                ThothXaiOAuthCatalog(workspace) if workspace is not None else StaticModelCatalog(),
-            )
-            if use_codex_defaults
-            else StaticModelCatalog()
-        ),
+        model_catalog,
     )
     local_credentials = LocalModelCredentials(workspace)
     settings_handlers = ModelSettingsHandlers(
@@ -154,6 +204,7 @@ def create_research_entry(
         stores.threads,
         local_credentials,
         unregistered_default_is_available=not use_codex_defaults,
+        tooling=LocalModelTooling(default_tool_installer_registry(workspace)),
     )
     registry.register("model/settings/read", settings_handlers.read)
     registry.register("model/settings/update", settings_handlers.update)
@@ -162,7 +213,14 @@ def create_research_entry(
     registry.register("model/credential/login/status", settings_handlers.login_status)
     registry.register("model/credential/login/cancel", settings_handlers.cancel_login)
     registry.register("model/credential/login/complete", settings_handlers.complete_login)
-    mode = deployment_mode or parse_deployment_mode()
+    registry.register("model/catalog/refresh", settings_handlers.refresh_catalog)
+    registry.register("model/tooling/install", settings_handlers.install_tool)
+    call_settings = ModelCallSettingsService(records)
+    call_settings_handlers = ModelCallSettingsHandlers(
+        service=call_settings, projects=stores.projects
+    )
+    registry.register("model/callSettings/read", call_settings_handlers.read)
+    registry.register("model/callSettings/update", call_settings_handlers.update)
     ready_projection = None
     if mode is DeploymentMode.HOSTED_REVIEW:
         from thoth.apps.hosted_review_composition import hosted_ready_projection
@@ -205,6 +263,7 @@ def create_research_entry(
         queue_store=ControlResearchQueueStore(stores.controls, clock, ids),
         assessment_verifier=None if tests is None else tests.lifecycle.require_assessment,
         provider_usage=CodexAccountUsageAdapter(),
+        call_settings=call_settings,
     )
     entry.provider_usage.adapters = {
         "codex-oauth": CodexAccountUsageAdapter(),
@@ -243,10 +302,17 @@ def create_research_entry(
             retain_xai_workspace_broker(broker_workspace)
             try:
                 retain_claude_workspace_broker(broker_workspace)
+                try:
+                    retain_claude_code_login_broker(broker_workspace)
+                except BaseException:
+                    release_claude_workspace_broker(broker_workspace)
+                    raise
             except BaseException:
                 release_xai_workspace_broker(broker_workspace)
                 raise
         except BaseException:
             release_workspace_broker(broker_workspace)
             raise
-    return ResearchEntryComposition(entry, worker, stores, broker_workspace)
+    if refresher is not None:
+        refresher.start()
+    return ResearchEntryComposition(entry, worker, stores, broker_workspace, refresher)

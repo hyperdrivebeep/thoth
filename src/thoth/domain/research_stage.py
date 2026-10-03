@@ -30,6 +30,13 @@ OUTPUT_CODECS = {
 }
 
 
+class ReusedStageOrigin(DomainModel):
+    """Where a reused stage's output was first produced; a reuse is never a new model call."""
+
+    stage_ref: RevisionRef
+    operation_id: str
+
+
 class ResearchStageRecord(DomainModel):
     record_kind: Literal["ResearchStageRecord"] = "ResearchStageRecord"
     schema_version: Literal["2.0.0"] = "2.0.0"
@@ -43,6 +50,11 @@ class ResearchStageRecord(DomainModel):
     provider_input_digest: str
     provider_output_digest: str
     output_payload_digest: str
+    # The same basis without the request revision: equal only for the same question, context,
+    # role, prompt, schema, model settings, cutoff, policy and behavior. Absent in older records,
+    # which are therefore never reused.
+    reuse_basis_digest: str | None = None
+    reused_from: ReusedStageOrigin | None = None
     output: dict[str, object]
     model_id: str
     model_settings: ResolvedModelSettings | None
@@ -61,6 +73,8 @@ class ResearchStageRecord(DomainModel):
         if codec is None:
             raise ValueError("STAGE_OUTPUT_CODEC_UNSUPPORTED")
         codec.model_validate(self.output)
+        if self.reused_from is not None and self.dispatch_ids:
+            raise ValueError("REUSED_STAGE_HAS_NO_DISPATCH")
         if self.output_payload_digest != domain_digest(
             "RESEARCH_STAGE_OUTPUT", "2.0.0", canonical_payload(self.output)
         ):

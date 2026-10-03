@@ -10,7 +10,7 @@ export function App() {
   if (HistoryExample && example === "history") {
     return <Suspense fallback={<p role="status">이력 화면 예시를 여는 중…</p>}><HistoryExample /></Suspense>;
   }
-  if (ResultExample && (example === "result-before" || example === "result-after")) {
+  if (ResultExample && (example === "result-before" || example === "result-after" || example === "result-iris")) {
     return <Suspense fallback={<p role="status">결과 화면 예시를 여는 중…</p>}><ResultExample /></Suspense>;
   }
   return <LiveProjectWorkspace />;

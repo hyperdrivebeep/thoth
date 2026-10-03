@@ -51,6 +51,7 @@ from thoth.apps.improvement_composition import (
     create_improvement_components,
     register_improvement_handlers,
 )
+from thoth.apps.judgment_review_composition import install_judgment_review
 from thoth.apps.management_routes import (
     register_investigation_methods,
     register_project_methods,
@@ -62,6 +63,7 @@ from thoth.apps.memory_composition import (
     register_memory_handlers,
 )
 from thoth.apps.model_composition import create_models, wrap_research_models
+from thoth.apps.outcome_receipt_routes import register_outcome_and_receipt_methods
 from thoth.apps.projectpack_execution import ProjectPackExecutionFactory
 from thoth.apps.reference_composition import reference_thread_entry
 from thoth.apps.research_entry_composition import create_research_entry
@@ -436,6 +438,7 @@ def create_runtime(
             store=action_store,
             service=action_service,
             objects=decision_object_store,
+            operations=operations,
         )
         execution_handlers = ExecutionHandlers(
             store=execution_store,
@@ -543,15 +546,11 @@ def create_runtime(
             acquisition=acquisition_trace_store,
         )
         memory_full_handlers = create_memory_handlers(
-            control_store,
-            memory_store,
-            full_memory_store,
-            ledger,
-            clock,
-            ids,
+            stores, memory_store, full_memory_store,
+            ledger, clock, ids,
             artifact_ledger.scopes,
+            full_memory_service,
         )
-        memory_full_handlers.seed_policies()
         field_measurement_handlers = FieldMeasurementHandlers(field_measurement_service)
         registry = MethodRegistry()
         register_resource_handlers(registry, artifact_ledger.scopes)
@@ -647,6 +646,8 @@ def create_runtime(
         register_decision_chain_methods(
             registry, hypothesis_handlers, action_handlers, execution_handlers, projection_handlers
         )
+        judgment_review = install_judgment_review(
+            registry, stores, control_service, hypothesis_store, clock, ids)
         registry.register("criteria/list", criterion_handlers.list)
         registry.register("criteria/read", criterion_handlers.read)
         registry.register("criteria/profile/list", criterion_handlers.profile_list)
@@ -687,36 +688,7 @@ def create_runtime(
         registry.register("object/followup/create", object_handlers.followup_create)
         register_memory_handlers(registry, memory_full_handlers)
         register_improvement_handlers(registry, improvement_handlers, evaluation_handlers)
-        registry.register("outcome/list", outcome_handlers.list)
-        registry.register("outcome/read", outcome_handlers.read)
-        registry.register("outcome/series/list", outcome_handlers.series_list)
-        registry.register("outcome/series/read", outcome_handlers.series_read)
-        registry.register("outcome/profile/list", outcome_handlers.profile_list)
-        registry.register("outcome/profile/read", outcome_handlers.profile_read)
-        registry.register("outcome/attribution/read", outcome_handlers.attribution_read)
-        registry.register("outcome/changeSet/read", outcome_handlers.change_set_read)
-        registry.register("outcome/impact/read", outcome_handlers.impact_read)
-        registry.register("outcome/audit/read", outcome_handlers.audit_read)
-        registry.register("outcome/series/create", outcome_handlers.series_create)
-        registry.register("outcome/observation/link", outcome_handlers.observation_link)
-        registry.register("outcome/assess", outcome_handlers.assess)
-        registry.register("outcome/reassess", outcome_handlers.reassess)
-        registry.register("outcome/attribution/assess", outcome_handlers.attribution_assess)
-        registry.register("outcome/changeSet/propose", outcome_handlers.change_set_propose)
-        registry.register("outcome/followup/generate", outcome_handlers.followup_generate)
-        registry.register("outcome/impact/propose", outcome_handlers.impact_propose)
-        registry.register("receipt/list", receipt_handlers.list)
-        registry.register("receipt/read", receipt_handlers.read)
-        registry.register("receipt/stream/read", receipt_handlers.stream_read)
-        registry.register("receipt/lineage/read", receipt_handlers.lineage_read)
-        registry.register("receipt/bundle/read", receipt_handlers.bundle_read)
-        registry.register("receipt/verification/read", receipt_handlers.verification_read)
-        registry.register("receipt/audit/read", receipt_handlers.audit_read)
-        registry.register("receipt/seal", receipt_handlers.seal)
-        registry.register("receipt/verify", receipt_handlers.verify)
-        registry.register("receipt/bundle/create", receipt_handlers.bundle_create)
-        registry.register("receipt/bundle/verify", receipt_handlers.bundle_verify)
-        registry.register("receipt/correction/create", receipt_handlers.correction_create)
+        register_outcome_and_receipt_methods(registry, outcome_handlers, receipt_handlers)
         register_investigation_methods(registry, investigation_handlers)
         research_component = create_research_entry(
             registry,
@@ -755,6 +727,7 @@ def create_runtime(
             before_continue=before_continue,
             queued_admission=research_component.entry.queued_admission,
         )
+        judgment_review.connect(bus, research_component.entry)
         from thoth.application.commands.research_queue_cancel import QueueAwareOperationCancel
 
         registry.decorate(

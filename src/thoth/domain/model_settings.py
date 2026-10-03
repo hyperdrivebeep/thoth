@@ -27,6 +27,13 @@ class ModelOption(DomainModel):
     reasoning_efforts: tuple[str, ...]
     default_effort: str | None = None
     capability_source: str
+    # PROVIDER_LISTED: the account's own list names it. UNVERIFIED: a fixed list not yet checked
+    # against the account. Neither says a request will succeed.
+    entitlement: Literal["PROVIDER_LISTED", "UNVERIFIED"] = "UNVERIFIED"
+    # What real requests showed: nothing yet, a success, or a refusal of the model or account.
+    execution: Literal["UNVERIFIED", "VERIFIED", "REJECTED"] = "UNVERIFIED"
+    # A readable line for the picker, e.g. an alias with the CLI version behind it.
+    label: str | None = None
 
 
 class ResolvedModelSettings(DomainModel):

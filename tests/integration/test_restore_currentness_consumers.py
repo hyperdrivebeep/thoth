@@ -39,7 +39,12 @@ async def test_restored_basis_blocks_action_preflight_and_new_execution(
                 request(
                     "thread/read",
                     "initial-basis",
-                    {"project_id": "p", "thread_id": accepted["thread_id"], "contract_version": 2},
+                    {
+                        "project_id": "p",
+                        "thread_id": accepted["thread_id"],
+                        "contract_version": 2,
+                        "view": "FULL",
+                    },
                 )
             )
         )

@@ -38,7 +38,7 @@ Actual discover, fetch and close observations use bounded awaits and integer mil
 Cleanup is attempted even after the research budget or ownership fence closes. Remote termination
 is not inferred from local cancellation. Uncooperative driver cancellation is retained as UNKNOWN.
 
-Evidence for the implementation lives in `docs/verification/repair-u06-u09-20260913.md`; controlled
+Evidence for the implementation lives in local controlled verification records; controlled
 browser, public HTTP and live model evidence are separate.
 
 2026-09-14: WebPage navigation and WebTransformation 1.1 bind the broker-verified main-document

@@ -1,10 +1,12 @@
 """Bounded receive counters for Responses SSE. Credentials are never stored."""
 
 from dataclasses import dataclass, field
+from decimal import Decimal
 from time import monotonic
 
 import httpx
 
+from thoth.adapters.models.stream_pace import StreamPace
 from thoth.adapters.models.transport_diagnostic import (
     build_diagnostic,
     exception_detail,
@@ -17,6 +19,10 @@ from thoth.domain.model_dispatch import (
     TransportDiagnostic,
     TransportTimeouts,
 )
+
+
+def _observed_decimal(value: float | None) -> Decimal | None:
+    return None if value is None else Decimal(str(value))
 
 
 @dataclass
@@ -40,6 +46,7 @@ class ReceiveStats:
     diagnostic_unavailable: bool = False
     transport_diagnostic: TransportDiagnostic | None = None
     http_rejection: HttpRejectionMetadata | None = None
+    pace: StreamPace | None = None
 
     def capture_response(self, response: httpx.Response) -> None:
         try:
@@ -108,4 +115,18 @@ class ReceiveStats:
                 request.timeout_seconds
             ),
             http_rejection=self.http_rejection,
+            output_event_count=None if self.pace is None else self.pace.events,
+            window_events_per_second=None
+            if self.pace is None
+            else _observed_decimal(self.pace.window_rate()),
+            stall_limit_events_per_second=None
+            if self.pace is None
+            else _observed_decimal(self.pace.min_events_per_second),
+            dispatch_total_limit_seconds=None
+            if self.pace is None
+            else _observed_decimal(self.pace.dispatch_total_seconds),
+            runaway_limit=None if self.pace is None else self.pace.runaway_limit,
+            runaway_max_output_events=None if self.pace is None else self.pace.max_output_events,
+            runaway_max_visible_bytes=None if self.pace is None else self.pace.max_visible_bytes,
+            runaway_blank_run=None if self.pace is None else self.pace.max_blank_run,
         )

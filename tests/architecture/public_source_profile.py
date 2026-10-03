@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import subprocess
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
@@ -12,8 +13,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 _ANCHORS = (
-    "PROJECT_WIKI/NOW.md",
-    "PROJECT_WIKI/50_SEED_ROADMAP/behavioral-acceptance-contracts.md",
+    "docs/architecture/rpc-method-catalog.md",
     "config/architecture-conformance.json",
     "docs/PACKAGING.md",
     "docs/VERIFICATION.md",
@@ -30,6 +30,31 @@ _EXCLUDED_FILES = (
 
 class PublicPackageError(ValueError):
     """A declared public package path or byte contract does not match the tree."""
+
+
+def _private_local_directory(root: Path, relative: str) -> bool:
+    """Allow preserved ignored worktree notes, never files included in a source ZIP."""
+    if not (root / ".git").exists():
+        return False
+    top = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if top.returncode or Path(top.stdout.strip()).resolve() != root:
+        return False
+    ignored = subprocess.run(
+        ["git", "-C", str(root), "check-ignore", "--quiet", relative + "/"],
+        capture_output=True,
+        check=False,
+    )
+    tracked = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "--cached", "--", relative + "/"],
+        capture_output=True,
+        check=False,
+    )
+    return ignored.returncode == 0 and tracked.returncode == 0 and not tracked.stdout
 
 
 class _FileRow(BaseModel):
@@ -145,6 +170,11 @@ def public_source_profile(root: Path) -> PublicSourceProfile | None:
     for relative in _EXCLUDED_FILES:
         if relative in files or (root / relative).exists() or (root / relative).is_symlink():
             raise PublicPackageError(f"excluded internal path is present: {relative}")
+    for relative in ("PROJECT_WIKI", "docs/plans", "docs/research", "docs/verification"):
+        listed = any(path.startswith(relative + "/") for path in files)
+        present = (root / relative).exists() or (root / relative).is_symlink()
+        if listed or (present and not _private_local_directory(root, relative)):
+            raise PublicPackageError(f"excluded private process directory is present: {relative}")
     if (root / "deploy").exists() or (root / "deploy").is_symlink():
         raise PublicPackageError("deployment scaffold is present in source-only package")
     if any(path.startswith("deploy/") for path in files):

@@ -1,10 +1,12 @@
 """One dependency eligibility calculation for history and live consumers."""
 
+from thoth.application.services.memory_supersession import superseded_memory_digests
 from thoth.domain.enums import ImpactStatus
 from thoth.domain.research_basis import BasisCurrentness, ResearchResultBasis
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
 from thoth.ports.governance import GovernanceStorePort
 from thoth.ports.ledger import LedgerPort
+from thoth.ports.memory import FullMemoryStorePort
 from thoth.ports.operation import OperationStorePort
 from thoth.ports.project import ProjectStorePort
 
@@ -17,8 +19,10 @@ class ResearchFreshnessService:
         governance: GovernanceStorePort | None = None,
         artifacts: ArtifactLedgerPort | None = None,
         operations: OperationStorePort | None = None,
+        memory: FullMemoryStorePort | None = None,
     ) -> None:
         self.ledger = ledger
+        self.memory = memory
         self.projects, self.governance, self.artifacts = projects, governance, artifacts
         self.operations = operations
 
@@ -105,6 +109,12 @@ class ResearchFreshnessService:
                                 state="REVIEW_REQUIRED", reasons=("SOURCE_BASIS_CHANGED",)
                             )
                         )
+        if self._used_memory_was_corrected(project_id, basis):
+            issues.append(
+                BasisCurrentness(
+                    state="REVIEW_REQUIRED", reasons=("MEMORY_CORRECTED_AFTER_RESULT",)
+                )
+            )
         if basis.coverage != "COMPLETE":
             issues.append(
                 BasisCurrentness(
@@ -117,6 +127,14 @@ class ResearchFreshnessService:
             if matched is not None:
                 return BasisCurrentness(state=matched.state, reasons=reasons)
         return BasisCurrentness(state="CURRENT")
+
+    def _used_memory_was_corrected(self, project_id: str, basis: ResearchResultBasis) -> bool:
+        """True when an accepted correction replaced a memory version this result used."""
+
+        if self.memory is None or not basis.memory_revision_refs:
+            return False
+        replaced = superseded_memory_digests(self.memory.list_revisions(project_id))
+        return not replaced.isdisjoint(basis.memory_revision_refs)
 
     def owner_eligibility(self, project_id: str, owner_digest: str) -> BasisCurrentness:
         revision = self.ledger.read_revision_by_digest(project_id, owner_digest)

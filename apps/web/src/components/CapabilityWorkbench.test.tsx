@@ -62,6 +62,7 @@ it("does not expose ProjectPack or field fixtures in the local API workbench", a
 
 it("late capability response is not relabeled with the next project's context",async()=>{
   await mount(<CapabilityWorkbench projectId="p" initialNamespace="model"/>);
+  await click("model/settings/read");
   fixture.defer=true;await click("이 조회 실행");
   await render(<CapabilityWorkbench projectId="q" initialNamespace="model"/>);
   await act(async()=>{fixture.resolve!();await tick();});

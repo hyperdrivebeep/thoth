@@ -53,6 +53,8 @@ async def parse_responses_sse(
             if kind == "response.output_text.delta":
                 output += event.delta
                 stats.visible_output_bytes += len(event.delta.encode())
+                if stats.pace is not None and stats.pace.observe_output(event.delta) is not None:
+                    raise ModelExecutionHold(f"{reason_prefix}_RUNAWAY_OUTPUT_REMOTE_STOP_UNKNOWN")
                 if (
                     request.max_visible_output_bytes is not None
                     and stats.visible_output_bytes > request.max_visible_output_bytes
@@ -107,4 +109,6 @@ async def parse_responses_sse(
                 )
         if len(buffered) > request.max_frame_bytes:
             raise ModelExecutionHold(f"{reason_prefix}_SSE_FRAME_TOO_LARGE")
+        if stats.pace is not None and stats.pace.stalled():
+            raise ModelExecutionHold(f"{reason_prefix}_STALLED_STREAM_REMOTE_STOP_UNKNOWN")
     raise ModelExecutionHold(f"{reason_prefix}_STREAM_ENDED_WITHOUT_TERMINAL")

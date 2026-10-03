@@ -86,6 +86,18 @@ def read_codex_executable_version(path: Path) -> str:
     return completed.stdout.strip()
 
 
+def default_codex_package_root() -> Path | None:
+    """The documented THOTH tools prefix, used before any global `codex` shim.
+
+    The same pin, integrity and version checks still apply to this location.
+    """
+    base = os.environ.get("LOCALAPPDATA")
+    if not base:
+        return None
+    root = Path(base) / "THOTH" / "tools" / "codex" / "node_modules" / "@openai" / "codex"
+    return root if (root / "package.json").is_file() else None
+
+
 def _object(value: object) -> dict[str, object]:
     if not isinstance(value, dict):
         raise CodexProfileHold("CODEX_AUTH_SCHEMA_UNSUPPORTED")
@@ -321,6 +333,8 @@ class CodexProfile:
                 wrapper = Path(saved)
             except (OSError, ValueError) as exc:
                 raise CodexProfileHold("UPDATE_REVIEW_REQUIRED") from exc
+        elif (default_root := default_codex_package_root()) is not None:
+            wrapper = default_root
         else:
             shim = shutil.which("codex")
             if not shim:

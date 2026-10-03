@@ -30,7 +30,8 @@ function rowOf(item: WireHistoryItem, scope: HistoryScope): HistoryRow {
     : { kind: "record", scope, record };
   return { id: item.item_id, kind: item.kind, title: item.title, occurredAt: item.occurred_at,
     association: item.association, membership: item.head_membership, availability: item.availability,
-    currentness: item.currentness, selection, completion: item.completion, phase: item.phase };
+    currentness: item.currentness, selection, completion: item.completion, phase: item.phase,
+    changeSummary: item.change_summary };
 }
 
 export async function readHistoryPage(scope: HistoryScope, cursor: string | null, signal?: AbortSignal, kinds?: HistoryKind[]): Promise<HistoryPage> {
@@ -92,6 +93,7 @@ export async function readHistoryEntry(selection: HistorySelection, signal?: Abo
     question: item.kind === "REQUEST" && value.content ? questionOf(value.content) : null, result: null,
     content: item.availability === "UNAVAILABLE" ? null : value.content, currentness: item.currentness,
     availability: item.availability, reasons: value.coverage.reasons, currentHead: head, restoreSelection,
+    changeSummary: item.change_summary,
     capability: { restore: item.capability.restore, applyReady: item.capability.apply_ready, previewSupported: item.capability.preview_supported, reasons: item.capability.reason_codes },
     technical: item.availability === "UNAVAILABLE" ? { ...value, content: null } : value };
 }

@@ -68,6 +68,21 @@ const resultIdentitySchema = z.object({
   result_revision_digest: digestSchema,
 });
 
+const criterionStateSchema = z.object({
+  status: z.enum(["SATISFIED", "UNRESOLVED", "NOT_APPLICABLE", "NOT_ASSESSED"]),
+  relation: z.string(), validation: z.string(), blocker: z.string(),
+});
+
+const criterionDeltaSchema = z.object({
+  requirement_id: z.string(), target: z.string(), question: z.string(),
+  match: z.enum(["SAME", "ADDED", "REMOVED"]),
+  before: criterionStateSchema.nullable().optional().default(null),
+  after: criterionStateSchema.nullable().optional().default(null),
+  evidence_refs_added: z.array(z.string()).optional().default([]),
+  evidence_refs_removed: z.array(z.string()).optional().default([]),
+  unchanged_hold: z.boolean().optional().default(false),
+});
+
 const decisionDeltaSchema = z.object({
   schema_version: z.literal("1.0.0").optional().default("1.0.0"),
   contract_version: z.literal(2).optional().default(2),
@@ -91,6 +106,9 @@ const decisionDeltaSchema = z.object({
       after: z.unknown().nullable().optional(),
     })),
   })).optional().default([]),
+  // Results saved by an older server carry neither field: criteria are then reported as not comparable.
+  criteria: z.array(criterionDeltaSchema).optional().default([]),
+  criteria_state: z.enum(["AVAILABLE", "UNAVAILABLE"]).optional().default("UNAVAILABLE"),
 });
 
 const projectReviewItemSchema = z.object({
@@ -122,6 +140,7 @@ export type UserProgressSummary = z.infer<typeof userProgressSummarySchema>;
 export type CoverageMatrix = z.infer<typeof coverageMatrixSchema>;
 export type CoverageMatrixRow = z.infer<typeof coverageRowSchema>;
 export type DecisionDelta = z.infer<typeof decisionDeltaSchema>;
+export type CriterionDelta = z.infer<typeof criterionDeltaSchema>;
 export type ResultIdentity = z.infer<typeof resultIdentitySchema>;
 export type ProjectReviewList = z.infer<typeof projectReviewListSchema>;
 export type ProjectReviewItem = z.infer<typeof projectReviewItemSchema>;

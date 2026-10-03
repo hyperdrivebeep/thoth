@@ -9,9 +9,8 @@ from thoth.protocol.notifications import IMPLEMENTED_NOTIFICATIONS
 from thoth.protocol.registry import PUBLIC_METHODS
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKSPACE = ROOT if (ROOT / "PROJECT_WIKI").is_dir() else ROOT.parent
 MANIFEST = ROOT / "schemas/protocol/public-method-catalog.json"
-WIKI = WORKSPACE / "PROJECT_WIKI/30_ARCHITECTURE/rpc-method-catalog.md"
+WIKI = ROOT / "docs/architecture/rpc-method-catalog.md"
 
 
 def main() -> int:

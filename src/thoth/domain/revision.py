@@ -60,6 +60,8 @@ class RevisionChangeSet(DomainModel):
     project_id: ProjectId
     expected_heads: dict[str, Sha256]
     expected_head_set_digest: Sha256 | None = None
+    # Aggregate keys that must still have no head (a record this change creates).
+    expected_absent_heads: tuple[str, ...] = ()
     staged_revisions: tuple[StagedRevision, ...]
     impact_plan: ImpactPropagationPlan
     actor: ActorRef

@@ -113,6 +113,10 @@ class AuthorizationEnvelopeRecord(DomainModel):
     single_use: bool = True
     consumed_at: AwareDatetime | None = None
     stale_reason: str | None = None
+    # 2.0.0: the exact sent content this approval covers, and what changed after it was approved.
+    payload: dict[str, object] | None = None
+    payload_digest: Sha256 | None = None
+    material_changes: tuple[dict[str, object], ...] = ()
     revision_digest: Sha256
     supersedes_revision_digest: Sha256 | None = None
     created_at: AwareDatetime
@@ -122,6 +126,10 @@ class AuthorizationEnvelopeRecord(DomainModel):
     def content_bound_and_single_use(self) -> AuthorizationEnvelopeRecord:
         if self.state == "CONSUMED" and self.consumed_at is None:
             raise ValueError("consumed authorization requires consumed_at")
+        if self.schema_version == "2.0.0" and (self.payload is None or self.payload_digest is None):
+            raise ValueError("a 2.0.0 authorization carries the payload it covers")
+        if self.state == "STALE" and self.stale_reason is None:
+            raise ValueError("a stale authorization names its reason")
         return self
 
 

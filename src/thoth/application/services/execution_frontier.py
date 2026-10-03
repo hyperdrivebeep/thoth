@@ -1,6 +1,7 @@
 """Compute dispatch eligibility without blocking publication of completed effects."""
 
 from thoth.application.services.action_currentness import require_plan_current
+from thoth.application.services.authorization_currentness import authorization_applies
 from thoth.domain.action_full import ActionPlanRecord
 from thoth.ports.action import ActionStorePort
 from thoth.ports.ledger import LedgerPort
@@ -60,7 +61,7 @@ def execution_frontier(
                     item
                     for item in auth
                     if item.step_id == step_id
-                    and item.plan_revision_digest == plan.revision_digest
+                    and authorization_applies(item, plan, step)
                     and item.state == "APPROVED"
                     and item.consumed_at is None
                     and clock.now() < item.expires_at

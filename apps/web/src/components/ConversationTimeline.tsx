@@ -13,11 +13,17 @@ import {
 } from "../api/timelineExample";
 import { ResearchResultCard, type ResearchDetail } from "./ResearchResultCard";
 import { ResearchLiveProgress } from "./ResearchLiveProgress";
+import { resultUsageLine } from "./resultUsage";
 
-export function ConversationTimeline({ projectId, threadId, status, sourceUris, onDetail, onContinue, onOpenHistory }: {
-  projectId: string; threadId: string; status?: ResearchStatus; sourceUris?: string[];
+export function ConversationTimeline({ projectId, threadId, status, sourceUris, onDetail, onContinue, onOpenHistory, onRetry, onResume, resuming = false, queuedInstruction = false }: {
+  projectId: string; threadId: string; status?: ResearchStatus; sourceUris?: string[]; queuedInstruction?: boolean;
   onDetail: (detail: ResearchDetail) => void;
   onContinue?: () => void;
+  /** Put the question back in the composer for another run; nothing is sent until the user sends it. */
+  onRetry?: (question: string) => void;
+  /** Continue the latest interrupted run from where it stopped (the user pressed the button; it starts at once). */
+  onResume?: (operationId: string) => void;
+  resuming?: boolean;
   onOpenHistory?: () => void;
 }) {
   const example = isTimelineExampleRequested();
@@ -52,6 +58,8 @@ export function ConversationTimeline({ projectId, threadId, status, sourceUris, 
     : {};
   const currentQuestion = example || turns.length === 0 ? liveStatus?.request?.authored_text : undefined;
   const running = liveStatus?.operation_state === "RUNNING";
+  const finishedStages = (liveStatus?.completed_stages ?? []).filter(stage => stage.state === "COMPLETED").length;
+  const resumeOperation = liveStatus?.request?.operation_id;
   const emptyExistingThread = Boolean(threadId && query.data && turns.length === 0 && !currentQuestion && !running);
   return <section className="conversation-timeline" aria-label="연구 대화">
     {query.hasNextPage && <Button minimal loading={query.isFetchingNextPage} onClick={() => void query.fetchNextPage()}>이전 대화 불러오기</Button>}
@@ -59,7 +67,7 @@ export function ConversationTimeline({ projectId, threadId, status, sourceUris, 
     {query.data?.pages.some(page => page.limited) && <Callout compact>조회 범위를 넘는 과거 이력이 있습니다. 기록에서 확인할 수 있습니다.</Callout>}
     {turns.map(turn => <div className="conversation-turn" key={turn.input.request_revision_digest}>
       <article className="user-message"><header>질문 {turn.input.edit_kind === "REPLACE" ? "수정" : turn.input.edit_kind === "STEER" ? "· 방향 변경" : ""}<time dateTime={turn.input.created_at}>{new Date(turn.input.created_at).toLocaleString()}</time></header><p>{turn.input.text}</p></article>
-      <ResearchResultCard result={turn.result} state={turn.state} unavailable={turn.unavailable} error={turn.error} failure={turn.failure} terminalReason={turn.terminalReason} onDetail={onDetail}
+      <ResearchResultCard result={turn.result} state={turn.state} unavailable={turn.unavailable} error={turn.error} failure={turn.failure} terminalReason={turn.terminalReason} onDetail={onDetail} onRetry={onRetry ? () => onRetry(turn.input.text) : undefined} usageLine={resultUsageLine(liveStatus, turn.input.operation_id)}
         currentness={turn.currentness} historySelection={{kind:"result",scope:{projectId,threadId,requestDigest:turn.input.request_revision_digest},operationId:turn.input.operation_id,
           resultDigest:currentResultDigest(status,{projectId,threadId,requestDigest:turn.input.request_revision_digest},turn.input.operation_id)}} {...followupFor(turn.input.request_revision_digest)} />
     </div>)}
@@ -67,7 +75,9 @@ export function ConversationTimeline({ projectId, threadId, status, sourceUris, 
     {(currentQuestion || running) && <div className="conversation-turn">
       {currentQuestion && <article className="user-message"><header>질문{example ? " · 예시" : ""}{example ? <time dateTime={TIMELINE_EXAMPLE_ASKED_AT}>{new Date(TIMELINE_EXAMPLE_ASKED_AT).toLocaleString()}</time> : null}</header><p>{currentQuestion}</p></article>}
       <ResearchLiveProgress status={liveStatus} sourceUris={liveSources} />
-      {!running && <ResearchResultCard result={currentRequestResult?.result ?? null} state={liveStatus && ["FAILED", "CANCELLED"].includes(liveStatus.operation_state ?? "") ? liveStatus.operation_state! : liveStatus?.current_result ? liveStatus.operation_state ?? "UNKNOWN" : "STALE"} error={liveStatus?.operation_error} failure={liveStatus?.failure} terminalReason={currentRequestResult?.terminal_reason} onDetail={onDetail}
+      {queuedInstruction && <Callout compact icon="time" className="queued-instruction-notice" role="status">현재 조사가 끝나면 이 지시를 이어서 반영합니다</Callout>}
+      {!running && <ResearchResultCard result={currentRequestResult?.result ?? null} state={liveStatus && ["FAILED", "CANCELLED"].includes(liveStatus.operation_state ?? "") ? liveStatus.operation_state! : liveStatus?.current_result ? liveStatus.operation_state ?? "UNKNOWN" : "STALE"} error={liveStatus?.operation_error} failure={liveStatus?.failure} terminalReason={currentRequestResult?.terminal_reason} onDetail={onDetail} onRetry={onRetry && liveStatus?.request?.authored_text ? () => onRetry(liveStatus.request!.authored_text!) : undefined}
+        onResume={onResume && resumeOperation ? () => onResume(resumeOperation) : undefined} resumeCompleted={finishedStages} resuming={resuming} usageLine={resultUsageLine(liveStatus, currentRequestResult?.operation_id)}
         currentness={currentRequestResult ? liveStatus?.basis_currentness : undefined} historySelection={currentRequestResult?.request_ref?.revision_digest ? {kind:"result",scope:{projectId,threadId,requestDigest:currentRequestResult.request_ref.revision_digest},operationId:currentRequestResult.operation_id,
           resultDigest:currentResultDigest(liveStatus,{projectId,threadId,requestDigest:currentRequestResult.request_ref.revision_digest},currentRequestResult.operation_id)} : undefined} {...followupFor(currentRequestResult?.request_ref?.revision_digest)}/>}
     </div>}

@@ -2,13 +2,15 @@ import { Button, HTMLSelect } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { rpc } from "../api/rpcClient";
+import { providerLabel } from "./statusLabels";
+import { catalogLine, excludedModels, excludedReasonLabels, optionText, staleNotice, type CatalogStatusRow } from "./modelCatalogPresentation";
 
 export type ModelSelection = { provider: string; model: string; reasoning_effort?: string };
-type ModelOption = { provider: string; model: string; reasoning_efforts: string[]; default_effort: string | null };
+type ModelOption = { provider: string; model: string; reasoning_efforts: string[]; default_effort: string | null;   entitlement?: string; execution?: string; label?: string | null };
 type SavedSelection = { provider: string | null; model: string | null; reasoning_effort?: string | null };
 type EffectiveSettings = { provider: string; model: string | null; reasoning_effort?: string | null };
 type Settings = { settings_digest: string | null; selection?: SavedSelection; effective_settings: EffectiveSettings | null;
-  availability?: "AVAILABLE" | "UNAVAILABLE"; reason_code?: string | null; model_options: ModelOption[] };
+  availability?: "AVAILABLE" | "UNAVAILABLE"; reason_code?: string | null; model_options: ModelOption[]; catalog_status?: CatalogStatusRow[] };
 
 function unavailableReason(code?: string | null): string {
   if (code === "MODEL_CAPABILITY_UNKNOWN") return "현재 모델 목록에서 저장된 모델을 찾지 못했습니다.";
@@ -53,6 +55,9 @@ export function ModelSettings({ projectId, threadId, selection, onSelect, onSave
     ? Boolean(current?.reasoning_effort && option.reasoning_efforts.includes(current.reasoning_effort))
     : !current?.reasoning_effort || Boolean(option?.reasoning_efforts.includes(current.reasoning_effort));
   const explicitlyChosen = data?.availability !== "UNAVAILABLE" || Boolean(chosenReplacement);
+  const catalogRows = data?.catalog_status;
+  const catalogRow = catalogRows?.find(row => row.provider === (option?.provider ?? current?.provider)) ?? catalogRows?.[0];
+  const excluded = excludedModels(catalogRows);
   const choose = (next: ModelSelection) => {
     const chosen = { provider: next.provider, model: next.model, reasoning_effort: next.reasoning_effort };
     if (data?.availability === "UNAVAILABLE") setExplicitReplacement({ scope: scopeIdentity, readAt: query.dataUpdatedAt, choice: chosen });
@@ -88,7 +93,7 @@ export function ModelSettings({ projectId, threadId, selection, onSelect, onSave
         if (next) choose({ provider: next.provider, model: next.model,
           ...(data?.availability !== "UNAVAILABLE" && next.default_effort ? { reasoning_effort: next.default_effort } : {}) });
       }}><option value="">모델 선택</option>{data?.model_options.map(o =>
-        <option key={`${o.provider}/${o.model}`} value={`${o.provider}/${o.model}`}>{o.model} · {o.provider}</option>)}</HTMLSelect></label>
+        <option key={`${o.provider}/${o.model}`} value={`${o.provider}/${o.model}`}>{optionText(o, providerLabel(o.provider))}</option>)}</HTMLSelect></label>
     <label>추론강도 <HTMLSelect aria-label="연구 추론강도" disabled={!option} value={current?.reasoning_effort ?? ""}
       onChange={event => { if (current) choose({ ...current, reasoning_effort: event.target.value }); }}>
       <option value="">기본값</option>{option?.reasoning_efforts.map(e => <option key={e} value={e}>{e}</option>)}</HTMLSelect></label>
@@ -96,6 +101,10 @@ export function ModelSettings({ projectId, threadId, selection, onSelect, onSave
       if (current && option && validEffort && explicitlyChosen && data) save.mutate({scope, selection: current, digest: data.settings_digest, key, onSaved});
     }}>
       {threadId ? "이 작업의 기본값으로 저장" : "프로젝트 기본값으로 저장"}</Button>
+    {catalogRow && <small data-catalog-status>{catalogLine(catalogRow)}</small>}
+    {catalogRow?.status === "STALE_LAST_GOOD" && <small role="status" className="result-notice">{staleNotice}</small>}
+    {excluded.length > 0 && <details className="model-excluded"><summary>THOTH가 아직 지원하지 않는 모델 {excluded.length}개</summary>
+      {excluded.map(item => <small key={`${item.provider}/${item.model}`}>{item.model} · {excludedReasonLabels[item.reason] ?? item.reason}</small>)}</details>}
     <small>저장하지 않은 선택은 다음 요청 한 번에 적용됩니다. 모델 목록의 가용성은 공급자 인증이나 실행 성공을 뜻하지 않습니다.</small>
     {save.isSuccess && <small role="status">기본값을 저장했습니다.</small>}
     {(query.error || save.error) && <span role="alert">{(query.error ?? save.error)?.message}</span>}

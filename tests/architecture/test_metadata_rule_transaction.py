@@ -127,22 +127,26 @@ def test_source_drift_and_wrong_approval_reject_without_writing() -> None:
 
 
 def test_guard_and_authority_changes_are_outside_metadata_repair() -> None:
+    # This validation consumes bytes, not a Git checkout or private development state.
     with pytest.raises(ValueError, match="cannot change this file"):
         validate_metadata_change(".codex/hooks/pre_tool_policy.py", b"{}", b"{}")
-    with rule_repository() as root:
-        path = "config/architecture-conformance.json"
-        before = (root / path).read_bytes()
-        value = json.loads(before)
-        value["known_exceptions"] = [{"id": "NEW-EXCEPTION"}]
-        with pytest.raises(ValueError, match="owners, authority"):
-            validate_metadata_change(path, before, json.dumps(value).encode())
-        value = json.loads(before)
-        migration = next(
-            item for item in value["extension_points"] if item["name"] == "SCHEMA_MIGRATION"
-        )
-        del migration["consumer_targets"]
-        with pytest.raises(ValueError, match="consumer declarations"):
-            validate_metadata_change(path, before, json.dumps(value).encode())
+    path = "config/architecture-conformance.json"
+    before = json.dumps(
+        {
+            "known_exceptions": [],
+            "extension_points": [
+                {"name": "SCHEMA_MIGRATION", "consumer_targets": ["FixtureStore.open"]}
+            ],
+        }
+    ).encode()
+    value = json.loads(before)
+    value["known_exceptions"] = [{"id": "NEW-EXCEPTION"}]
+    with pytest.raises(ValueError, match="owners, authority"):
+        validate_metadata_change(path, before, json.dumps(value).encode())
+    value = json.loads(before)
+    del value["extension_points"][0]["consumer_targets"]
+    with pytest.raises(ValueError, match="consumer declarations"):
+        validate_metadata_change(path, before, json.dumps(value).encode())
 
 
 def test_failure_evidence_cannot_be_relabelled_pass_even_with_a_new_digest() -> None:

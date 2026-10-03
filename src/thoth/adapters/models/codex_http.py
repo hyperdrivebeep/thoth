@@ -8,6 +8,7 @@ import asyncio
 import json
 import time
 import weakref
+from collections.abc import Callable
 from contextlib import suppress
 from dataclasses import replace
 from decimal import Decimal
@@ -21,6 +22,7 @@ from thoth.adapters.models.codex_broker import CodexAuthBroker, broker_for_works
 from thoth.adapters.models.http_rejection import read_rejection_metadata
 from thoth.adapters.models.receive_stats import ReceiveStats
 from thoth.adapters.models.sse_stream import parse_responses_sse
+from thoth.adapters.models.stream_pace import StreamPace, with_pace_defaults
 from thoth.domain.model_dispatch import (
     ModelControlCapability,
     ModelTransportReply,
@@ -72,10 +74,12 @@ class CodexHttpExecutor:
         *,
         transport: httpx.AsyncBaseTransport | None = None,
         timeout_policy: TransportTimeouts | None = None,
+        clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.session = session
         self.transport = transport
         self.timeout_policy = timeout_policy
+        self._clock = clock
         self._model_label = "codex-oauth/current-settings"
         self._prepared_accounts: dict[
             int, tuple[weakref.ReferenceType[PreparedModelDispatch], str, str | None]
@@ -261,6 +265,14 @@ class CodexHttpExecutor:
         timeouts = (request.transport_timeouts or TransportTimeouts()).bounded(
             request.timeout_seconds
         )
+        # Per-call stream limits (T2 pace, T3 total time); a caller's own values win.
+        stats.pace = StreamPace(
+            with_pace_defaults(timeouts), self._clock, request.output_tokens_reserved
+        )
+        total = stats.pace.dispatch_total_seconds
+        limit, limit_kind = remaining, "OVERALL"
+        if total is not None and (remaining is None or total < remaining):
+            limit, limit_kind = total, "DISPATCH_TOTAL"
         # The immutable prepared request owns model/effort; read only current credentials here.
         client = httpx.AsyncClient(
             transport=self.transport,
@@ -282,14 +294,19 @@ class CodexHttpExecutor:
         try:
             reply = await asyncio.wait_for(
                 self._receive(client, request, settings, stats, expected_digest=auth_digest),
-                remaining,
+                limit,
             )
         except asyncio.CancelledError as exc:
             stats.local_cancel_requested = True
             cause = exc
         except TimeoutError as exc:
-            stats.timeout_kind = "OVERALL"
-            cause, reason = exc, "OAUTH_TRANSPORT_DEADLINE_REMOTE_STOP_UNKNOWN"
+            stats.timeout_kind = limit_kind
+            cause = exc
+            reason = (
+                "OAUTH_DISPATCH_DEADLINE_REMOTE_STOP_UNKNOWN"
+                if limit_kind == "DISPATCH_TOTAL"
+                else "OAUTH_TRANSPORT_DEADLINE_REMOTE_STOP_UNKNOWN"
+            )
         except httpx.TimeoutException as exc:
             stats.timeout_kind = (
                 "CONNECT"

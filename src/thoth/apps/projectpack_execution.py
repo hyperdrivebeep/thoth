@@ -173,7 +173,7 @@ async def run_project_pack(
                     (
                         pack.scenario.case_id,
                         "ACTION_PLANNER",
-                        "action_alternatives.v2",
+                        "action_alternatives.v3",
                     ): action_template,
                 }
             )

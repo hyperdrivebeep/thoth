@@ -92,7 +92,12 @@ class PostExecutionMemory:
                 )
                 if revision is None:
                     raise ValueError("POST_EXECUTION_OWNER_MISSING")
-                candidate = domain_reference_memory(revision, f"post-memory:{ref.revision_digest}")
+                snapshot = self.records.ledger.read_snapshot(revision.snapshot_id)
+                if snapshot is None:
+                    raise ValueError("POST_EXECUTION_OWNER_MISSING")
+                candidate = domain_reference_memory(
+                    revision, f"post-memory:{ref.revision_digest}", snapshot.content
+                )
                 if candidate is not None:
                     candidates.append(candidate)
             memory_basis = self.memory.capture_basis(

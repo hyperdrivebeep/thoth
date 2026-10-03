@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from contextlib import AbstractContextManager
-from datetime import timedelta
 from typing import cast
 
 from pydantic import JsonValue
@@ -11,6 +10,8 @@ from thoth.application.services.authorization_consumption import (
     consume_authorization,
     decide_authorization,
 )
+from thoth.application.services.authorization_currentness import mark_stale, stale_decisions
+from thoth.application.services.authorization_prepare import prepare_authorization
 from thoth.application.services.revision_service import CommitResult, RevisionCommitService
 from thoth.domain.action_full import (
     ActionAuditRecord,
@@ -551,56 +552,18 @@ class ActionService:
         target_baseline_digests: tuple[str, ...],
         policy_version: str,
     ) -> tuple[AuthorizationEnvelopeRecord | None, str]:
-        step = self._step(plan, step_id)
-        if step.get("risk_tier") == "R4":
-            raise ValueError("R4 has no authorization transition or executor")
-        if step.get("risk_tier") != "R3":
-            return None, "NOT_REQUIRED"
-        predecessors = {edge["from"] for edge in plan.dependency_edges if edge["to"] == step_id}
-        if predecessors and len(predecessor_output_digests) < len(predecessors):
-            return None, "PRECONDITION_NOT_READY"
-        if not target_baseline_digests:
-            return None, "PRECONDITION_NOT_READY"
-        scope = {
-            "project_id": plan.project_id,
-            "plan_id": plan.plan_id,
-            "step_id": step_id,
-            "plan_revision_digest": plan.revision_digest,
-            "predecessor_output_digests": predecessor_output_digests,
-            "target_baseline_digests": target_baseline_digests,
-            "policy_version": policy_version,
-        }
-        digest = domain_digest("ACTION_AUTHORIZATION_SCOPE", "1.0.0", canonical_payload(scope))
-        draft: dict[str, object] = {
-            "authorization_revision_id": self._ids.new("authorization-revision"),
-            "authorization_id": self._ids.new("authorization"),
-            "project_id": plan.project_id,
-            "plan_id": plan.plan_id,
-            "step_id": step_id,
-            "plan_revision_digest": plan.revision_digest,
-            "predecessor_output_digests": predecessor_output_digests,
-            "target_baseline_digests": target_baseline_digests,
-            "policy_version": policy_version,
-            "exact_scope_digest": digest,
-            "required_roles": self._string_tuple(step.get("required_roles", ())),
-            "state": "PENDING",
-            "decision_history": (),
-            "expires_at": self._clock.now() + timedelta(hours=1),
-            "single_use": True,
-            "created_at": self._clock.now(),
-        }
-        envelope = AuthorizationEnvelopeRecord.model_validate(
-            {**draft, "revision_digest": self._digest("AUTHORIZATION", draft)}
+        return prepare_authorization(
+            plan,
+            self._step(plan, step_id),
+            predecessor_output_digests=predecessor_output_digests,
+            target_baseline_digests=target_baseline_digests,
+            policy_version=policy_version,
+            ids=self._ids,
+            clock=self._clock,
+            store=self._store,
+            uow=self._semantic_uow,
+            audit=self.audit,
         )
-        with self._semantic_uow.transaction():
-            self._store.add_authorization(envelope)
-            self.audit(
-                envelope.project_id,
-                envelope.authorization_id,
-                "action/authorizationPrepared",
-                {"exact_scope_digest": digest},
-            )
-        return envelope, "PENDING"
 
     def decide_authorization(
         self,
@@ -749,6 +712,20 @@ class ActionService:
                 event_type,
                 {"revision": record.revision_digest},
             )
+            # Composing again and revising both replace the plan: open approvals that no longer
+            # match what would be sent are marked stale in the same transaction.
+            for stale in stale_decisions(
+                self._store.list_authorizations(record.project_id, record.plan_id), record
+            ):
+                mark_stale(
+                    stale,
+                    record,
+                    store=self._store,
+                    ledger=self._ledger,
+                    clock=self._clock,
+                    ids=self._ids,
+                    audit=self.audit,
+                )
         return record, commit
 
     def _revise_portfolio(

@@ -12,6 +12,7 @@ from thoth.domain.memory import (
     MemoryRoleReview,
     MemoryTransitionReceipt,
 )
+from thoth.domain.memory_relation import MemoryRelationProposal, MemoryRelationQuestion
 
 
 class MemoryStorePort(Protocol):
@@ -61,3 +62,15 @@ class MemoryReviewerPort(Protocol):
 
 class MemoryProjectionBuilderPort(Protocol):
     def build(self, records: tuple[tuple[str, str, str], ...]) -> dict[str, tuple[str, ...]]: ...
+
+
+class MemoryRelationJudgePort(Protocol):
+    """Proposes how two memories relate when the rules cannot tell; never an authority."""
+
+    async def judge(self, question: MemoryRelationQuestion) -> MemoryRelationProposal: ...
+
+
+class MemoryInjectionPort(Protocol):
+    """Whether a project gives its recalled memory to an investigation."""
+
+    def enabled(self, project_id: str) -> bool: ...

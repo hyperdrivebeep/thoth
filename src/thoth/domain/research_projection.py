@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from thoth.domain.action import ActionRiskFacts, DecisionAnalysis
+from thoth.domain.action import ActionRiskFacts, DecisionAnalysis, OrdinalEstimate
 from thoth.domain.base import DomainModel
 from thoth.domain.counterevidence import HypothesisCriticalReview
 from thoth.domain.enums import (
@@ -58,6 +58,7 @@ class ActionGenerationDetails(DomainModel):
     missing_evidence: tuple[str, ...]
     effect_facts: ActionRiskFacts | None = None
     effect_completeness_confirmed: bool = False
+    effort_estimates: tuple[OrdinalEstimate, ...] = ()
 
 
 class ActionPlanGenerationDetails(DomainModel):

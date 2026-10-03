@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 from typing import cast
 
@@ -28,13 +29,12 @@ _NOW = (
     "No complete current-source FULL pass is claimed.\n"
 )
 _ANCHOR_TEXT = {
-    "PROJECT_WIKI/NOW.md": _NOW,
-    "PROJECT_WIKI/50_SEED_ROADMAP/behavioral-acceptance-contracts.md": "# Behavioral acceptance\n",
+    "docs/architecture/rpc-method-catalog.md": "# Public RPC contract\n",
     "config/architecture-conformance.json": json.dumps(
         {"canonical_owners": [{"atomicity_debt": {"status": "OPEN"}}]}
     ),
     "docs/PACKAGING.md": _PACKAGING,
-    "docs/VERIFICATION.md": "No current-source FULL pass is claimed.\n",
+    "docs/VERIFICATION.md": _NOW,
     "docs/architecture/backend-runtime-boundaries.md": "# Backend runtime boundaries\n",
 }
 
@@ -116,7 +116,7 @@ def test_public_anchor_digest_or_length_drift_is_rejected(
 ) -> None:
     manifest = _public_fixture(tmp_path)
     rows = _rows(manifest)
-    row = next(item for item in rows if item["path"] == "PROJECT_WIKI/NOW.md")
+    row = next(item for item in rows if item["path"] == "docs/VERIFICATION.md")
     row[field] = value
     _write_manifest(tmp_path, manifest)
     with pytest.raises(PublicPackageError):
@@ -218,9 +218,9 @@ def test_old_completion_claim_is_rejected_even_with_rehashed_manifest(
 ) -> None:
     manifest = _public_fixture(tmp_path)
     manifest["full_suite_verified"] = claimed_full
-    now = tmp_path / "PROJECT_WIKI/NOW.md"
+    now = tmp_path / "docs/VERIFICATION.md"
     now.write_text(_NOW + "ratcheted exception 0\n", encoding="utf-8")
-    _refresh_row(tmp_path, manifest, "PROJECT_WIKI/NOW.md")
+    _refresh_row(tmp_path, manifest, "docs/VERIFICATION.md")
     with pytest.raises(AssertionError):
         assert_profile_status_has_no_stale_claims(tmp_path)
 
@@ -247,9 +247,9 @@ def test_excluded_internal_wiki_page_is_rejected(tmp_path: Path, listed: bool) -
 
 def test_atomicity_debt_mismatch_is_rejected_even_with_rehashed_manifest(tmp_path: Path) -> None:
     manifest = _public_fixture(tmp_path)
-    now = tmp_path / "PROJECT_WIKI/NOW.md"
+    now = tmp_path / "docs/VERIFICATION.md"
     now.write_text(_NOW.replace("1 OPEN", "0 OPEN"), encoding="utf-8")
-    _refresh_row(tmp_path, manifest, "PROJECT_WIKI/NOW.md")
+    _refresh_row(tmp_path, manifest, "docs/VERIFICATION.md")
     with pytest.raises(AssertionError):
         assert_profile_status_has_no_stale_claims(tmp_path)
 
@@ -293,3 +293,32 @@ def test_internal_insecure_image_scaffold_still_fails(tmp_path: Path) -> None:
     path.write_text(".thoth\n", encoding="utf-8")
     with pytest.raises(AssertionError):
         assert_hosted_review_package_contract(tmp_path)
+
+
+def test_git_worktree_preserves_ignored_private_notes_without_publishing_them(
+    tmp_path: Path,
+) -> None:
+    _public_fixture(tmp_path)
+    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True, capture_output=True)
+    (tmp_path / ".gitignore").write_text("docs/plans/\n", encoding="utf-8")
+    notes = tmp_path / "docs/plans/private.md"
+    notes.parent.mkdir(parents=True)
+    notes.write_text("preserved local notes\n", encoding="utf-8")
+    assert public_source_profile(tmp_path) is not None
+    assert notes.read_text(encoding="utf-8") == "preserved local notes\n"
+
+
+def test_git_ignore_cannot_hide_a_tracked_private_record(tmp_path: Path) -> None:
+    _public_fixture(tmp_path)
+    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True, capture_output=True)
+    (tmp_path / ".gitignore").write_text("docs/plans/\n", encoding="utf-8")
+    notes = tmp_path / "docs/plans/private.md"
+    notes.parent.mkdir(parents=True)
+    notes.write_text("must not be published\n", encoding="utf-8")
+    subprocess.run(
+        ["git", "-C", str(tmp_path), "add", "--force", "docs/plans/private.md"],
+        check=True,
+        capture_output=True,
+    )
+    with pytest.raises(PublicPackageError, match="excluded private process"):
+        public_source_profile(tmp_path)

@@ -36,13 +36,21 @@ const fixture = vi.hoisted(() => ({
   cancelError: null as string | null,
   completeResult: {} as Record<string, unknown>,
   completeError: null as string | null,
+  refreshError: null as string | null,
+  catalogStatus: [] as unknown[],
+  refreshEffect: null as null | (() => void),
+  installError: null as string | null,
+  installEffect: null as null | (() => void),
+  installGate: null as null | Promise<void>,
   deferredStatus: null as null | (() => void),
   holdStatus: false,
   forbidNetwork: false,
 }));
 
-vi.mock("../api/rpcClient", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../api/rpcClient")>()),
+vi.mock("../api/rpcClient", async (importOriginal) => {
+  const original = await importOriginal<typeof import("../api/rpcClient")>();
+  return {
+  ...original,
   rpc: async (method: string, input: Record<string, unknown>) => {
     fixture.calls.push({ method, input });
     if (method === "workspace/ready") {
@@ -55,7 +63,9 @@ vi.mock("../api/rpcClient", async (importOriginal) => ({
       return { state: "SUCCEEDED", operation_id: "", value: { accounts: fixture.accounts } };
     }
     if (method === "model/credential/register") {
-      if (fixture.registerError) throw new Error(fixture.registerError);
+      // "RPC:<REASON>" simulates the server's typed JSON-RPC rejection.
+      if (fixture.registerError) throw fixture.registerError.startsWith("RPC:")
+        ? new original.RpcError(fixture.registerError.slice(4), -32030, {}) : new Error(fixture.registerError);
       return { state: "SUCCEEDED", operation_id: "", value: fixture.registerResult };
     }
     if (method === "model/credential/login/status") {
@@ -71,6 +81,19 @@ vi.mock("../api/rpcClient", async (importOriginal) => ({
       if (fixture.completeError) throw new Error(fixture.completeError);
       return { state: "SUCCEEDED", operation_id: "", value: fixture.completeResult };
     }
+    if (method === "model/tooling/install") {
+      if (fixture.installGate) await fixture.installGate;
+      if (fixture.installError) throw new original.RpcError(fixture.installError.slice(4), -32030, {});
+      fixture.installEffect?.();
+      return { state: "SUCCEEDED", operation_id: "", value: { tool_id: input.tool_id, installed: true, version: "test",
+        accounts: fixture.accounts } };
+    }
+    if (method === "model/catalog/refresh") {
+      if (fixture.refreshError) throw new original.RpcError(fixture.refreshError, -32030, {});
+      fixture.refreshEffect?.();
+      return { state: "SUCCEEDED", operation_id: "", value: { accounts: fixture.accounts, credentials: [],
+        model_option_count: 1, catalog_refreshed: true, catalog_status: fixture.catalogStatus } };
+    }
     if (method === "workspace/setup/update") {
       fixture.ready = {
         ...fixture.ready,
@@ -81,7 +104,8 @@ vi.mock("../api/rpcClient", async (importOriginal) => ({
     }
     throw new Error(`unexpected method ${method}`);
   },
-}));
+  };
+});
 
 let root: Root;
 let container: HTMLDivElement;
@@ -206,6 +230,12 @@ afterEach(async () => {
   fixture.cancelError = null;
   fixture.completeResult = {};
   fixture.completeError = null;
+  fixture.refreshError = null;
+  fixture.catalogStatus = [];
+  fixture.refreshEffect = null;
+  fixture.installError = null;
+  fixture.installEffect = null;
+  fixture.installGate = null;
   fixture.deferredStatus = null;
   fixture.holdStatus = false;
   fixture.forbidNetwork = false;
@@ -237,7 +267,7 @@ it("starts xAI device login on first run and confirms it without changing the mo
   const opened = vi.spyOn(window, "open").mockImplementation(() => null);
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
-  const login = [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!;
+  const login = [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!;
   await act(async () => login.click()); await flush();
   expect(fixture.calls.filter(call => call.method === "model/credential/register" && call.input.provider === "xai" && call.input.api_key === "")).toHaveLength(1);
   expect(row.textContent).toContain("ABCD-EFGH");
@@ -276,7 +306,7 @@ it("keeps xAI API-key and Codex routes separate in the project account panel", a
   expect(fixture.calls.some(call => call.method === "workspace/ready")).toBe(false);
   const row = [...container.querySelectorAll(".company-account")].find(item => item.textContent?.includes("xAI"))!;
   expect(row.querySelector('input[type="password"]')).not.toBeNull();
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click());
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click());
   await flush();
   expect(row.textContent).toContain("ABCD-EFGH");
   expect(fixture.calls.some(call => call.method === "model/credential/register" && call.input.project_id === "project-example"
@@ -300,7 +330,7 @@ it("starts the explicit xAI device method beside an existing API key", async () 
   fixture.registerResult = xaiStart();
   await mount("panel");
   const row = [...container.querySelectorAll(".company-account")].find(item => item.textContent?.includes("xAI"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   expect(fixture.calls.some(call => call.method === "model/credential/register" && call.input.provider === "xai"
     && call.input.auth_method === "xai_device_code" && call.input.api_key === "")).toBe(true);
   expect(row.textContent).toContain("API 키: 등록됨");
@@ -321,7 +351,9 @@ it("keeps an xAI method disabled when its start capability is false", async () =
   fixture.accounts = accounts;
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
-  expect([...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")?.disabled).toBe(true);
+  // A start-incapable method offers no start control; the reason is stated instead.
+  expect([...row.querySelectorAll("button")].some(button => button.textContent === "xAI로 로그인")).toBe(false);
+  expect(row.textContent).toContain("이 PC에서는 xAI 로그인을 시작할 수 없습니다");
   expect(row.textContent).toContain("XAI_CLIENT_UNSUPPORTED");
   expect(fixture.calls.some(call => call.method === "model/credential/register" && call.input.provider === "xai")).toBe(false);
 });
@@ -338,8 +370,15 @@ it.each([
   fixture.registerResult = xaiStart();
   await mount(panel ? "panel" : false);
   const selector = panel ? ".company-account" : ".first-run-provider";
+  // Readiness enables a second query; wait for its rendered control instead of
+  // assuming one fixed tick is enough under a concurrent full-suite run.
+  await vi.waitFor(async () => {
+    await flush();
+    const renderedRow = [...container.querySelectorAll(selector)].find(item => item.textContent?.includes("xAI"));
+    expect([...renderedRow?.querySelectorAll("button") ?? []].some(button => button.textContent === "xAI로 로그인")).toBe(true);
+  });
   const row = [...container.querySelectorAll(selector)].find(item => item.textContent?.includes("xAI"))!;
-  const login = [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작") as HTMLButtonElement;
+  const login = [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인") as HTMLButtonElement;
   expect(login.disabled).toBe(true);
   expect(row.textContent).toContain("작업 공간을 확인한 뒤 xAI 로그인을 시작할 수 있습니다");
   expect(fixture.calls.some(call => call.method === "model/credential/register" && call.input.provider === "xai")).toBe(false);
@@ -367,13 +406,13 @@ it("cancels only the current xAI login id and leaves the key path visible", asyn
   fixture.cancelResult = xaiStatus("CANCELLED");
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "이 로그인 취소")!.click()); await flush();
   expect(fixture.calls.filter(call => call.method === "model/credential/login/cancel")).toEqual([
     { method: "model/credential/login/cancel", input: { provider: "xai", auth_method: "xai_device_code", login_id: "login_test_1" } },
   ]);
   expect(row.textContent).toContain("기존 API 키 연결은 유지됩니다");
-  expect([...row.querySelectorAll("button")].some(button => button.textContent === "API 키")).toBe(true);
+  expect([...row.querySelectorAll("button")].some(button => button.textContent === "API 키로 연결")).toBe(true);
 });
 
 it("checks the same xAI login after an uncertain cancel without issuing another cancel", async () => {
@@ -385,7 +424,7 @@ it("checks the same xAI login after an uncertain cancel without issuing another 
   fixture.loginStatusResult = xaiStatus("PENDING");
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "이 로그인 취소")!.click()); await flush();
   expect(row.textContent).toContain("취소 결과를 확인하지 못했습니다");
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click()); await flush();
@@ -401,7 +440,7 @@ it("ignores a late xAI status response after the workspace changes", async () =>
   fixture.registerResult = xaiStart();
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   fixture.holdStatus = true;
   await act(async () => { [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click(); });
   await flush();
@@ -424,7 +463,7 @@ it("clears a project account panel's xAI code when the LOCAL workspace changes",
   fixture.registerResult = xaiStart();
   await mount("panel");
   const row = [...container.querySelectorAll(".company-account")].find(item => item.textContent?.includes("xAI"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   expect(row.textContent).toContain("ABCD-EFGH");
   fixture.ready = localReady({ workspace_id: WORKSPACE_B });
   await act(async () => { root.render(<QueryClientProvider client={client}>
@@ -443,7 +482,7 @@ it("hides a pending xAI code when the workspace readiness read is denied", async
   fixture.registerResult = xaiStart();
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   expect(row.textContent).toContain("ABCD-EFGH");
   fixture.readyError = "AUTHORIZATION_DENIED";
   await act(async () => { await client.invalidateQueries({ queryKey: ["workspace-ready"] }); });
@@ -460,7 +499,7 @@ it("stops xAI device polling when its Unix-seconds expiry passes", async () => {
   fixture.registerResult = xaiStart(0.3);
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 1100)); });
   expect(row.textContent).toContain("유효 시간이 끝났습니다");
   expect(row.querySelector('a[href="https://grok.com/activate"]')).toBeNull();
@@ -475,7 +514,7 @@ it("stops automatic status checks on a network error without starting another xA
   fixture.loginStatusError = "synthetic network loss";
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click()); await flush();
   expect(row.textContent).toContain("자동 확인을 멈췄습니다");
   expect(fixture.calls.filter(call => call.method === "model/credential/register" && call.input.provider === "xai")).toHaveLength(1);
@@ -490,7 +529,7 @@ it("rejects an untrusted xAI approval URI before rendering a link or polling", a
   const opened = vi.spyOn(window, "open").mockImplementation(() => null);
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   expect(row.textContent).toContain("시작 응답을 확인하지 못했습니다");
   expect(row.querySelector("a")).toBeNull();
   expect(fixture.calls.some(call => call.method === "model/credential/login/status")).toBe(false);
@@ -506,7 +545,7 @@ it("automatically polls one xAI login and stops after a terminal result", async 
   fixture.loginStatusResult = xaiStatus("DENIED");
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 5200)); });
   expect(row.textContent).toContain("xAI 로그인이 거부됐습니다");
   expect(fixture.calls.filter(call => call.method === "model/credential/login/status")).toHaveLength(1);
@@ -523,7 +562,7 @@ it("shows unknown xAI login states without claiming a connection or retrying", a
   fixture.loginStatusResult = xaiStatus("NEW_UNRECOGNIZED_STATE");
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click()); await flush();
   expect(row.textContent).toContain("현재 로그인 요청의 상태를 확인하지 못했습니다");
   expect(row.textContent).not.toContain("xAI 로그인이 확인됐습니다");
@@ -538,7 +577,7 @@ it("shows xAI slow-down and a later login-required state without claiming succes
   fixture.loginStatusResult = xaiStatus("SLOW_DOWN");
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click()); await flush();
   expect(row.textContent).toContain("상태 확인 간격을 늘렸습니다");
   fixture.loginStatusResult = { provider: "xai", kind: "xai_device_code", state: "LOGIN_REQUIRED" };
@@ -568,8 +607,8 @@ it("keeps API-key and OAuth method rows separate when both are connected", async
   expect(openai.textContent).toContain("codex-oauth");
   expect(xai.textContent).toContain("API 키: 등록됨");
   expect(xai.textContent).toContain("xai-oauth");
-  expect([...openai.querySelectorAll("button")].find(button => button.textContent === "THOTH 전용 Codex 로그인 확인됨")?.disabled).toBe(true);
-  expect([...xai.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인 확인됨")?.disabled).toBe(true);
+  expect([...openai.querySelectorAll("button")].find(button => button.textContent === "ChatGPT 로그인됨")?.disabled).toBe(true);
+  expect([...xai.querySelectorAll("button")].find(button => button.textContent === "xAI 로그인됨")?.disabled).toBe(true);
   expect(fixture.calls.some(call => call.method === "model/settings/update" || call.method === "model/credential/register")).toBe(false);
   const next = [...container.querySelectorAll("button")].find(button => button.textContent === "다음") as HTMLButtonElement;
   expect(next.disabled).toBe(false);
@@ -577,20 +616,17 @@ it("keeps API-key and OAuth method rows separate when both are connected", async
   expect(container.textContent).toContain("허용 또는 거부를 고르면 프로젝트로 갑니다");
 });
 
-it("leaves Claude OAuth disabled when client registration is absent while preserving CLI guidance", async () => {
+it("shows the disabled client-ID route as a plain reason without the old Claude Code guidance button", async () => {
   fixture.forbidNetwork = true;
   fixture.ready = localReady();
   fixture.accounts = contractAccounts();
-  fixture.registerResult = { kind: "manual_device_auth", started: false, guidance: "Use Claude Code in this workspace" };
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("Claude"))!;
-  expect([...row.querySelectorAll("button")].find(button => button.textContent === "THOTH 전용 Claude 로그인 시작")?.disabled).toBe(true);
+  expect([...row.querySelectorAll("button")].some(button => button.textContent === "Claude로 로그인")).toBe(false);
+  expect([...row.querySelectorAll("button")].some(button => button.textContent === "Claude Code 연결 안내")).toBe(false);
   expect(row.textContent).toContain("CLAUDE_CLIENT_REGISTRATION_REQUIRED");
-  expect(row.textContent).toContain("수동 완료 기능만으로 새 로그인을 시작할 수는 없습니다");
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "Claude Code 연결 안내")!.click()); await flush();
-  expect(fixture.calls.some(call => call.method === "model/credential/register" && call.input.provider === "anthropic"
-    && !("auth_method" in call.input))).toBe(true);
-  expect(fixture.calls.some(call => call.method === "model/credential/login/complete")).toBe(false);
+  expect(row.textContent).toContain("Claude 구독 로그인은 이 PC에서 아직 켜지지 않았습니다");
+  expect(fixture.calls.some(call => call.method === "model/credential/register")).toBe(false);
   expect(vi.mocked(globalThis.fetch)).not.toHaveBeenCalled();
 });
 
@@ -612,7 +648,7 @@ it("shows a Claude OAuth method separately from the key route without selecting 
   expect(row.textContent).toContain("API 키: 미등록");
   expect(row.textContent).toContain("claude-oauth");
   expect(row.textContent).toContain("실제 제3자 사용 허용과 모델 실행 성공은 아직 확인되지 않았습니다");
-  expect([...row.querySelectorAll("button")].find(button => button.textContent === "THOTH 전용 Claude 로그인 확인됨")?.disabled).toBe(true);
+  expect([...row.querySelectorAll("button")].find(button => button.textContent === "Claude 로그인됨")?.disabled).toBe(true);
   expect(fixture.calls.some(call => call.method === "model/settings/update" || call.method === "model/credential/register")).toBe(false);
 });
 
@@ -632,7 +668,7 @@ it("starts explicit Claude PKCE and clears a manually submitted response from th
   const opened = vi.spyOn(window, "open").mockImplementation(() => null);
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("Claude"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "THOTH 전용 Claude 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "Claude로 로그인")!.click()); await flush();
   expect(fixture.calls.some(call => call.method === "model/credential/register" && call.input.provider === "anthropic"
     && call.input.auth_method === "claude_pkce")).toBe(true);
   expect(row.textContent).toContain("로그인 시도: PENDING · 저장 인증: DISCONNECTED · 모델 목록: UNAVAILABLE");
@@ -674,7 +710,7 @@ it("keeps a failed Claude manual response out of errors and browser storage", as
   fixture.completeError = "synthetic rejected response containing secret-code";
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("Claude"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "THOTH 전용 Claude 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "Claude로 로그인")!.click()); await flush();
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "코드·리디렉션 URL 직접 입력")!.click());
   const input = row.querySelector<HTMLInputElement>('[aria-label="Claude 인증 응답"]')!;
   await act(async () => {
@@ -703,7 +739,7 @@ it("clears an unsubmitted Claude response when cancelling its exact login", asyn
   fixture.cancelResult = { ...fixture.registerResult, started: false, login_state: "CANCELLED" };
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("Claude"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "THOTH 전용 Claude 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "Claude로 로그인")!.click()); await flush();
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "코드·리디렉션 URL 직접 입력")!.click());
   const input = row.querySelector<HTMLInputElement>('[aria-label="Claude 인증 응답"]')!;
   await act(async () => {
@@ -733,11 +769,11 @@ it("keeps a completed Claude login distinct from catalog and execution readiness
     catalog_state: "UNAVAILABLE", execution_eligible: false, execution_verified: false };
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("Claude"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "THOTH 전용 Claude 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "Claude로 로그인")!.click()); await flush();
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click()); await flush();
-  expect(row.textContent).toContain("로그인 시도가 완료됐습니다");
+  expect(row.textContent).toContain("로그인됐습니다. 실제 모델 응답은 첫 연구에서 확인합니다");
   expect(row.textContent).toContain("저장 인증: CONNECTED · 모델 목록: UNAVAILABLE");
-  expect([...row.querySelectorAll("button")].find(button => button.textContent === "THOTH 전용 Claude 로그인 확인됨")?.disabled).toBe(true);
+  expect([...row.querySelectorAll("button")].find(button => button.textContent === "Claude 로그인됨")?.disabled).toBe(true);
   expect(([...container.querySelectorAll("button")].find(button => button.textContent === "다음") as HTMLButtonElement).disabled).toBe(true);
   expect(fixture.calls.some(call => call.method === "model/settings/update" || call.method === "thread/start")).toBe(false);
 });
@@ -751,7 +787,7 @@ it("ignores a late Codex OAuth status from the previous workspace", async () => 
     catalog_state: "UNAVAILABLE", capabilities: { start: true, status: true, cancel: true, manual_complete: false } };
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("ChatGPT"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "THOTH 전용 Codex 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "ChatGPT로 로그인")!.click()); await flush();
   fixture.holdStatus = true;
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click());
   await flush();
@@ -778,7 +814,7 @@ it("uses one Codex login ID for explicit start, status and cancellation without 
   fixture.cancelResult = { ...fixture.registerResult, started: false, login_state: "CANCELLED" };
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("ChatGPT"))!;
-  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "THOTH 전용 Codex 로그인 시작")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "ChatGPT로 로그인")!.click()); await flush();
   expect(fixture.calls.some(call => call.method === "model/credential/register" && call.input.provider === "openai"
     && call.input.auth_method === "codex_isolated_browser")).toBe(true);
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click()); await flush();
@@ -847,7 +883,7 @@ it("keeps Codex login start and pending status separate from connection success"
   expect(fixture.calls.filter(call => call.method === "model/credential/register")).toHaveLength(1);
 });
 
-it("does not infer login or readiness from an OMO-only legacy account row", async () => {
+it("does not infer login or readiness from an unrelated legacy account row", async () => {
   fixture.ready = { ready: false, deployment_mode: "LOCAL", model_connected: true, setup: { internet_consent: "UNDECIDED" } };
   fixture.accounts = [{ provider: "xai", label: "xAI", connected: true, has_key: false, oauth: true }];
   await mount();
@@ -911,6 +947,24 @@ it("does not infer Codex login support from the OpenAI company name", async () =
   expect(unknown.disabled).toBe(true);
 });
 
+it("names a missing pinned Codex tool and offers its install command without retrying the login", async () => {
+  // Reproduces the first-run failure seen on a fresh PC: the server rejected the start with a
+  // typed reason, but the screen showed only a generic "could not confirm" message.
+  fixture.forbidNetwork = true;
+  fixture.ready = localReady();
+  fixture.accounts = contractAccounts();
+  fixture.registerError = "RPC:CODEX_STANDALONE_PIN_UNAVAILABLE";
+  await mount();
+  const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("ChatGPT"))!;
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "ChatGPT로 로그인")!.click()); await flush();
+  expect(row.textContent).toContain("Codex 연결 도구(0.157.1)를 찾지 못했습니다");
+  expect(row.textContent).toContain("@openai/codex@0.157.1");
+  expect(row.textContent).toContain("오류 코드: CODEX_STANDALONE_PIN_UNAVAILABLE");
+  expect(row.textContent).not.toContain("로그인 시작 결과를 확인하지 못했습니다");
+  expect(fixture.calls.filter(call => call.method === "model/credential/register" && call.input.provider === "openai")).toHaveLength(1);
+  expect(([...container.querySelectorAll("button")].find(button => button.textContent === "다음") as HTMLButtonElement).disabled).toBe(true);
+});
+
 it("shows a missing Codex CLI as an error without claiming login started", async () => {
   fixture.ready = { ready: false, deployment_mode: "LOCAL", model_connected: false, setup: { internet_consent: "UNDECIDED" } };
   fixture.registerError = "CODEX_CLI_NOT_FOUND";
@@ -927,7 +981,7 @@ it("calls THOTH key registration but does not claim provider validation from the
   fixture.registerResult = { credential: { provider: "xai", model: "grok-test" } };
   await mount();
   const xaiRow = [...container.querySelectorAll(".first-run-provider")].find(row => row.textContent?.includes("xAI"))!;
-  const keyButton = [...xaiRow.querySelectorAll("button")].find(button => button.textContent === "API 키")!;
+  const keyButton = [...xaiRow.querySelectorAll("button")].find(button => button.textContent === "API 키로 연결")!;
   await act(async () => keyButton.click()); await flush();
   const input = xaiRow.querySelector('input[type="password"]') as HTMLInputElement;
   await act(async () => {
@@ -1054,3 +1108,287 @@ it("removes ProjectPack and keeps hosted developer tools out of normal navigatio
   expect(container.textContent).toContain("운영 정보와 사용 현황은 프로젝트를 선택한 뒤 확인할 수 있습니다.");
   expect(container.querySelector("form.onboarding-card")).toBeNull();
 });
+
+function connectedCodexLogin() {
+  fixture.forbidNetwork = true;
+  fixture.ready = localReady();
+  fixture.accounts = contractAccounts();
+  fixture.registerResult = { started: true, provider: "codex-oauth", account_provider: "openai", auth_method: "codex_isolated_browser",
+    route: "codex-oauth", kind: "oauth", login_id: "login:synthetic-codex", login_state: "PENDING",
+    auth_state: "DISCONNECTED", catalog_state: "UNAVAILABLE",
+    capabilities: { start: true, status: true, cancel: true, manual_complete: false } };
+  fixture.loginStatusResult = { ...fixture.registerResult, started: false, login_state: "CONNECTED", auth_state: "CONNECTED" };
+}
+const refreshCalls = () => fixture.calls.filter(call => call.method === "model/catalog/refresh");
+
+it("loads the model list exactly once when a login first reports connected", async () => {
+  connectedCodexLogin();
+  await mount();
+  const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("ChatGPT"))!;
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "ChatGPT로 로그인")!.click()); await flush();
+  expect(refreshCalls()).toHaveLength(0);
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click()); await flush();
+  expect(refreshCalls()).toEqual([{ method: "model/catalog/refresh", input: { project_id: "system:workspace" } }]);
+  expect(row.textContent).toContain("로그인됐습니다");
+  await flush(); await flush();
+  expect(refreshCalls()).toHaveLength(1);
+  expect(fixture.calls.filter(call => call.method === "model/credential/login/status")).toHaveLength(1);
+});
+
+it("keeps a completed login and names the model-list failure when the refresh fails", async () => {
+  connectedCodexLogin();
+  fixture.refreshError = "RPC:MODEL_CATALOG_REFRESH_TIMEOUT";
+  await mount();
+  const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("ChatGPT"))!;
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "ChatGPT로 로그인")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click()); await flush();
+  expect(row.textContent).toContain("로그인됐습니다");
+  expect(row.textContent).toContain("모델 목록을 불러오지 못했습니다");
+  expect(refreshCalls()).toHaveLength(1);
+  expect(([...container.querySelectorAll("button")].find(button => button.textContent === "다음") as HTMLButtonElement).disabled).toBe(true);
+});
+
+it("offers a load-models button for a login without a model list and enables next after one refresh", async () => {
+  fixture.forbidNetwork = true;
+  fixture.ready = localReady({ model_connected: false });
+  const waiting = { provider: "openai", label: "ChatGPT", connected: true, has_key: false, oauth: true,
+    login_supported: true, login_kind: "codex_isolated_browser", available_model_providers: [] as string[],
+    connection_state: "CATALOG_UNAVAILABLE", reason_code: "CATALOG_UNAVAILABLE", profile_mode: "THOTH_ISOLATED",
+    execution_eligible: false, execution_verified: false, remote_auth_verified: null };
+  fixture.accounts = [waiting];
+  fixture.refreshEffect = () => {
+    fixture.ready = { ...fixture.ready, model_connected: true };
+    fixture.accounts = [{ ...waiting, available_model_providers: ["codex-oauth"],
+      connection_state: "EXECUTION_UNVERIFIED", execution_eligible: true }];
+  };
+  await mount();
+  const next = () => [...container.querySelectorAll("button")].find(button => button.textContent === "다음") as HTMLButtonElement;
+  expect(container.textContent).toContain("모델 확인 필요");
+  expect(next().disabled).toBe(true);
+  expect(refreshCalls()).toHaveLength(0);
+  const recheck = [...container.querySelectorAll("button")].find(button => button.textContent === "연결 상태 다시 확인")!;
+  await act(async () => recheck.click()); await flush();
+  expect(refreshCalls()).toHaveLength(0);
+  const load = [...container.querySelectorAll("button")].find(button => button.textContent === "모델 목록 불러오기")!;
+  await act(async () => load.click()); await flush();
+  expect(refreshCalls()).toEqual([{ method: "model/catalog/refresh", input: { project_id: "system:workspace" } }]);
+  expect(next().disabled).toBe(false);
+  expect([...container.querySelectorAll("button")].some(button => button.textContent === "모델 목록 불러오기")).toBe(false);
+  expect(fixture.calls.some(call => call.method === "model/settings/update" || call.method === "model/credential/register")).toBe(false);
+});
+
+function claudeCodeAccounts(state: { connection_state: string; reason_code: string; start: boolean; connected?: boolean }) {
+  const accounts: Record<string, unknown>[] = defaultAccounts();
+  accounts[1] = { provider: "anthropic", label: "Claude", connected: Boolean(state.connected), has_key: false, oauth: Boolean(state.connected),
+    login_supported: state.start, login_kind: state.start ? "claude_code_login" : "unsupported", remote_auth_verified: null,
+    available_model_providers: state.connected ? ["claude-code"] : [], connection_state: state.connection_state,
+    reason_code: state.reason_code, execution_eligible: Boolean(state.connected), execution_verified: false,
+    auth_methods: [
+      { auth_method: "api_key", route: "anthropic", connected: false, execution_eligible: false, connection_state: "LOGIN_REQUIRED",
+        reason_code: "MODEL_CREDENTIAL_UNAVAILABLE", capabilities: { start: false, status: true, cancel: false, manual_complete: false } },
+      { auth_method: "claude_code_login", route: "claude-code", connected: Boolean(state.connected), execution_eligible: Boolean(state.connected),
+        connection_state: state.connection_state, reason_code: state.reason_code,
+        capabilities: { start: state.start, status: true, cancel: true, manual_complete: true } },
+    ] };
+  return accounts as unknown as typeof fixture.accounts;
+}
+const claudeCodeStart = (url: string | undefined = "https://claude.ai/oauth/authorize?state=synthetic-state") => ({
+  started: true, provider: "claude-code", account_provider: "anthropic", auth_method: "claude_code_login", route: "claude-code",
+  kind: "claude_code_login", login_id: "login:synthetic-claude-code", login_state: "PENDING", auth_state: "DISCONNECTED",
+  catalog_state: "UNAVAILABLE", expires_at: Math.floor(Date.now() / 1000) + 600, authorization_url: url,
+  capabilities: { start: true, status: true, cancel: true, manual_complete: true } });
+const claudeRow = () => [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("Claude"))!;
+
+it("signs in with Claude through the official executable and loads the model list once", async () => {
+  fixture.forbidNetwork = true;
+  fixture.ready = localReady();
+  fixture.accounts = claudeCodeAccounts({ connection_state: "LOGIN_REQUIRED", reason_code: "CLAUDE_CODE_LOGIN_REQUIRED", start: true });
+  fixture.registerResult = claudeCodeStart();
+  fixture.loginStatusResult = { ...claudeCodeStart(undefined), started: false, login_state: "CONNECTED", auth_state: "CONNECTED", catalog_state: "AVAILABLE" };
+  await mount();
+  const row = claudeRow();
+  expect(row.textContent).toContain("Claude 계정으로 로그인하거나 Anthropic API 키로 연결합니다");
+  expect([...row.querySelectorAll("button")].some(button => button.textContent === "Claude Code 연결 안내")).toBe(false);
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "Claude로 로그인")!.click()); await flush();
+  expect(fixture.calls.filter(call => call.method === "model/credential/register")).toEqual([
+    { method: "model/credential/register", input: { project_id: "system:workspace", provider: "anthropic", auth_method: "claude_code_login" } },
+  ]);
+  expect(row.querySelector('a[href^="https://claude.ai/oauth/authorize"]')).not.toBeNull();
+  expect(refreshCalls()).toHaveLength(0);
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click()); await flush();
+  expect(row.textContent).toContain("로그인됐습니다");
+  expect(refreshCalls()).toHaveLength(1);
+  expect(fixture.calls.some(call => call.method === "model/settings/update" || call.method === "thread/start")).toBe(false);
+});
+
+it("accepts a claude.com login link and refuses any other host", async () => {
+  fixture.forbidNetwork = true;
+  fixture.ready = localReady();
+  fixture.accounts = claudeCodeAccounts({ connection_state: "LOGIN_REQUIRED", reason_code: "CLAUDE_CODE_LOGIN_REQUIRED", start: true });
+  fixture.registerResult = claudeCodeStart("https://claude.com/cai/oauth/authorize?state=synthetic-state");
+  await mount();
+  await act(async () => [...claudeRow().querySelectorAll("button")].find(button => button.textContent === "Claude로 로그인")!.click()); await flush();
+  expect(claudeRow().querySelector('a[href^="https://claude.com/cai/oauth/authorize"]')).not.toBeNull();
+  await act(async () => [...claudeRow().querySelectorAll("button")].find(button => button.textContent === "이 로그인 취소")!.click()); await flush();
+  fixture.registerResult = claudeCodeStart("https://claude.ai.evil.example/oauth/authorize");
+  await act(async () => [...claudeRow().querySelectorAll("button")].find(button => button.textContent === "Claude로 로그인")!.click()); await flush();
+  expect(claudeRow().querySelector("a[href]")).toBeNull();
+});
+
+it("explains a missing Claude Code with the THOTH-only folder install, never a global install", async () => {
+  fixture.forbidNetwork = true;
+  fixture.ready = localReady();
+  fixture.accounts = claudeCodeAccounts({ connection_state: "CLAUDE_CODE_NOT_INSTALLED", reason_code: "CLAUDE_CODE_NOT_INSTALLED", start: false });
+  await mount();
+  const row = claudeRow();
+  expect(row.textContent).toContain("도구 설치 필요");
+  expect(row.textContent).toContain("Claude Code가 이 PC에 없습니다");
+  expect(row.textContent).toContain("@anthropic-ai/claude-code@");
+  expect(row.textContent).toContain("THOTH\\tools\\claude-code");
+  expect(row.textContent).not.toContain("install -g");
+  expect([...row.querySelectorAll("button")].some(button => button.textContent === "Claude로 로그인")).toBe(false);
+  expect(fixture.calls.some(call => call.method === "model/credential/register")).toBe(false);
+});
+
+const installCalls = () => fixture.calls.filter(call => call.method === "model/tooling/install");
+const chatgptRow = () => [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("ChatGPT"))!;
+const buttonNamed = (scope: Element, label: string) => [...scope.querySelectorAll("button")].find(button => button.textContent === label) as HTMLButtonElement | undefined;
+
+it("installs the Codex tool from the missing-tool help, then lets the login be retried", async () => {
+  fixture.forbidNetwork = true;
+  fixture.ready = localReady();
+  fixture.accounts = contractAccounts();
+  fixture.registerError = "RPC:CODEX_STANDALONE_PIN_UNAVAILABLE";
+  await mount();
+  await act(async () => buttonNamed(chatgptRow(), "ChatGPT로 로그인")!.click()); await flush();
+  expect(chatgptRow().textContent).toContain("@openai/codex@0.157.1");
+  fixture.registerError = null;
+  fixture.installEffect = () => { fixture.ready = { ...fixture.ready }; };
+  await act(async () => buttonNamed(chatgptRow(), "자동 설치")!.click()); await flush();
+  expect(installCalls()).toEqual([{ method: "model/tooling/install", input: { project_id: "system:workspace", tool_id: "codex" } }]);
+  expect(chatgptRow().textContent).not.toContain("오류 코드: CODEX_STANDALONE_PIN_UNAVAILABLE");
+  expect(chatgptRow().textContent).toContain("설치했습니다");
+  expect(fixture.calls.filter(call => call.method === "model/credential/register")).toHaveLength(1);
+});
+
+it("installs Claude Code into the THOTH folder and then offers the login button", async () => {
+  fixture.forbidNetwork = true;
+  fixture.ready = localReady();
+  fixture.accounts = claudeCodeAccounts({ connection_state: "CLAUDE_CODE_NOT_INSTALLED", reason_code: "CLAUDE_CODE_NOT_INSTALLED", start: false });
+  fixture.installEffect = () => {
+    fixture.accounts = claudeCodeAccounts({ connection_state: "LOGIN_REQUIRED", reason_code: "CLAUDE_CODE_LOGIN_REQUIRED", start: true });
+  };
+  await mount();
+  expect(buttonNamed(claudeRow(), "Claude로 로그인")).toBeUndefined();
+  await act(async () => buttonNamed(claudeRow(), "자동 설치")!.click()); await flush();
+  expect(installCalls()).toEqual([{ method: "model/tooling/install", input: { project_id: "system:workspace", tool_id: "claude-code" } }]);
+  expect(buttonNamed(claudeRow(), "Claude로 로그인")).toBeDefined();
+  expect(claudeRow().textContent).not.toContain("@anthropic-ai/claude-code@");
+  expect(fixture.calls.some(call => call.method === "model/credential/register")).toBe(false);
+});
+
+it("keeps the copy-command fallback and names the reason when the automatic install fails", async () => {
+  fixture.forbidNetwork = true;
+  fixture.ready = localReady();
+  fixture.accounts = claudeCodeAccounts({ connection_state: "CLAUDE_CODE_NOT_INSTALLED", reason_code: "CLAUDE_CODE_NOT_INSTALLED", start: false });
+  fixture.installError = "RPC:NODE_NPM_UNAVAILABLE";
+  await mount();
+  await act(async () => buttonNamed(claudeRow(), "자동 설치")!.click()); await flush();
+  expect(claudeRow().textContent).toContain("Node.js");
+  expect(claudeRow().textContent).toContain("NODE_NPM_UNAVAILABLE");
+  expect(claudeRow().textContent).toContain("@anthropic-ai/claude-code@2.1.284");
+  expect(buttonNamed(claudeRow(), "명령 복사")).toBeDefined();
+  expect(installCalls()).toHaveLength(1);
+});
+
+it("does not start a second install while one is running", async () => {
+  fixture.forbidNetwork = true;
+  fixture.ready = localReady();
+  fixture.accounts = claudeCodeAccounts({ connection_state: "CLAUDE_CODE_NOT_INSTALLED", reason_code: "CLAUDE_CODE_NOT_INSTALLED", start: false });
+  let release = () => undefined as void;
+  fixture.installGate = new Promise<void>(resolve => { release = resolve; });
+  await mount();
+  await act(async () => buttonNamed(claudeRow(), "자동 설치")!.click()); await flush();
+  const running = claudeRow().querySelector("button[disabled], button.bp6-disabled");
+  expect(running).not.toBeNull();
+  expect(claudeRow().textContent).toContain("설치 중");
+  await act(async () => { [...claudeRow().querySelectorAll("button")].forEach(button => button.click()); }); await flush();
+  expect(installCalls()).toHaveLength(1);
+  await act(async () => release()); await flush();
+});
+
+it("shows when each list was last checked after the load-models button, and a failed refresh keeps the last list", async () => {
+  fixture.ready = localReady({ model_connected: false });
+  const waiting = { provider: "openai", label: "ChatGPT", connected: true, has_key: false, oauth: true,
+    login_supported: true, login_kind: "codex_isolated_browser", available_model_providers: [] as string[],
+    connection_state: "CATALOG_UNAVAILABLE", reason_code: "CATALOG_UNAVAILABLE", profile_mode: "THOTH_ISOLATED",
+    execution_eligible: false, execution_verified: false, remote_auth_verified: null };
+  fixture.accounts = [waiting];
+  fixture.catalogStatus = [{ provider: "codex-oauth", source: "PROVIDER_LIST", status: "STALE_LAST_GOOD", fetched_at: new Date().toISOString(),
+    failure_reason: "CATALOG_UNAVAILABLE", excluded: [] }];
+  await mount();
+  const load = [...container.querySelectorAll("button")].find(button => button.textContent === "모델 목록 불러오기")!;
+  await act(async () => load.click()); await flush();
+  const result = container.querySelector("[data-catalog-result]")?.textContent ?? "";
+  expect(result).toContain("마지막 확인: 오늘");
+  expect(result).toContain("갱신 실패");
+  expect(result).toContain("마지막으로 확인한 목록을 보여 줍니다");
+  expect(container.textContent).not.toContain("STALE_LAST_GOOD");
+});
+
+it("does not load the model list again when the server already did it after the login finished", async () => {
+  connectedCodexLogin();
+  fixture.loginStatusResult = { ...fixture.loginStatusResult, catalog_refresh: "DONE", catalog_state: "AVAILABLE" };
+  await mount();
+  const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("ChatGPT"))!;
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "ChatGPT로 로그인")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click()); await flush();
+  expect(row.textContent).toContain("로그인됐습니다");
+  expect(refreshCalls()).toHaveLength(0);
+  expect(row.textContent).not.toContain("모델 목록을 불러오지 못했습니다");
+});
+
+it("says the list failed when the server tried after the login and could not load it, without asking again", async () => {
+  connectedCodexLogin();
+  fixture.loginStatusResult = { ...fixture.loginStatusResult, catalog_refresh: "FAILED", catalog_state: "UNAVAILABLE" };
+  await mount();
+  const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("ChatGPT"))!;
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "ChatGPT로 로그인")!.click()); await flush();
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click()); await flush();
+  expect(row.textContent).toContain("로그인됐습니다");
+  expect(row.textContent).toContain("모델 목록을 불러오지 못했습니다");
+  expect(refreshCalls()).toHaveLength(0);
+});
+
+it("closes the progress panel once the account is connected, even while the server loads the list", async () => {
+  connectedCodexLogin();
+  fixture.loginStatusResult = { ...fixture.loginStatusResult, login_state: "PENDING", auth_state: "CONNECTED", catalog_refresh: "RUNNING" };
+  await mount();
+  const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("ChatGPT"))!;
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "ChatGPT로 로그인")!.click()); await flush();
+  expect(row.textContent).toContain("남은 상태 확인 시간");
+  await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click()); await flush();
+  expect(row.textContent).toContain("로그인이 확인됐습니다. 모델 목록을 받는 중입니다");
+  expect(row.textContent).not.toContain("남은 상태 확인 시간");
+  expect([...row.querySelectorAll("button")].some(button => button.textContent === "이 로그인 취소")).toBe(false);
+  expect(refreshCalls()).toHaveLength(0);
+});
+
+it("shows the server's English guidance in Korean and keeps unknown English out of the notes", async () => {
+  fixture.forbidNetwork = true;
+  fixture.ready = localReady();
+  const account = { ...contractAccounts()[0], guidance: "The Codex route is eligible; live execution has not been verified" };
+  fixture.accounts = [account, { ...contractAccounts()[1], guidance: "Sign in with the official Claude Code executable in the THOTH profile" },
+    { ...contractAccounts()[2], guidance: "Some brand new English hint from a newer server" }];
+  await mount("panel");
+  // The original English stays available, but only inside the collapsed technical details.
+  const clone = container.cloneNode(true) as HTMLElement;
+  clone.querySelectorAll("details").forEach(item => item.remove());
+  const text = clone.textContent ?? "";
+  expect(text).toContain("Codex 경로는 사용을 시도할 수 있지만 실제 실행은 아직 확인되지 않았습니다");
+  expect(text).toContain("공식 Claude Code로 로그인하세요");
+  expect(text).not.toContain("The Codex route is eligible");
+  expect(text).not.toContain("Sign in with the official Claude Code");
+  expect(text).not.toContain("Some brand new English hint");
+});
+

@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
-  "authority": "PROJECT_WIKI/30_ARCHITECTURE/rpc-method-catalog.md",
-  "canonical_method_count": 335,
+  "authority": "docs/architecture/rpc-method-catalog.md",
+  "canonical_method_count": 345,
   "compatibility_alias_count": 6,
-  "runtime_method_count": 341,
+  "runtime_method_count": 351,
   "notification_count": 221,
   "methods": [
     {
@@ -2096,6 +2096,36 @@
       "runtime_status": "IMPLEMENTED"
     },
     {
+      "name": "hypothesis/review/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/review/request",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
       "name": "hypothesis/revise",
       "namespace": "hypothesis",
       "surface": "COMMAND",
@@ -2701,6 +2731,20 @@
       "runtime_status": "IMPLEMENTED"
     },
     {
+      "name": "memory/edit/propose",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
       "name": "memory/gate/read",
       "namespace": "memory",
       "surface": "QUERY",
@@ -2855,6 +2899,48 @@
       "runtime_status": "IMPLEMENTED"
     },
     {
+      "name": "memory/revision/list",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/settings/read",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "memory/settings/update",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
       "name": "memory/validate",
       "namespace": "memory",
       "surface": "COMMAND",
@@ -2863,6 +2949,52 @@
       "normal_entrypoint": "thread/input",
       "behavioral_evidence": [
         "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "model/callSettings/read",
+      "namespace": "model",
+      "surface": "QUERY",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "research-model-settings:versioned",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "U08",
+        "U07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "model/callSettings/update",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "research-model-settings:versioned",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "U08",
+        "U07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "model/catalog/refresh",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied; explicit remote model-list refresh, never run by status polling",
+      "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via OAuthLoginFlow local /rpc",
+      "behavioral_evidence": [
+        "tests/integration/test_model_catalog_refresh_rpc.py",
+        "tests/unit/test_hosted_review_credential_rpc.py",
+        "apps/web/src/components/FirstRunSetup.test.tsx"
       ],
       "canonical": true,
       "alias_target": null,
@@ -2973,6 +3105,22 @@
       "behavioral_evidence": [
         "U08",
         "U07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "model/tooling/install",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied; installs one registered tool into the THOTH tools folder",
+      "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via CodexToolHelp|ClaudeCodeHelp local /rpc",
+      "behavioral_evidence": [
+        "tests/integration/test_model_tooling_rpc.py",
+        "tests/unit/models/test_tool_installers.py",
+        "tests/unit/test_hosted_review_credential_rpc.py"
       ],
       "canonical": true,
       "alias_target": null,
@@ -5138,5 +5286,5 @@
     "thread/waitingForInput",
     "thread/waitingForProtectedAction"
   ],
-  "catalog_digest": "5a7fa70e7a50e990d16bb2c320303f7065d9e8bea453b3716217c0a9553a5c21"
+  "catalog_digest": "9ab42a2fa3b67e648e1e7b5b9f38c609a93429597c769f7c00b780a7db1cae9b"
 }

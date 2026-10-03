@@ -29,7 +29,7 @@ def test_every_non_atomic_owner_has_acceptance_bound_debt() -> None:
 
 
 def test_atomicity_debt_is_not_described_as_full_namespace_completion() -> None:
-    matrix = (ROOT / "PROJECT_WIKI/50_SEED_ROADMAP/implementation-maturity-matrix.md").read_text(
+    matrix = (ROOT / "docs/VERIFICATION.md").read_text(
         encoding="utf-8"
     )
     manifest = json.loads((ROOT / "config/architecture-conformance.json").read_text())

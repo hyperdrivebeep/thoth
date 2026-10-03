@@ -11,11 +11,10 @@ from thoth.protocol.notifications import IMPLEMENTED_NOTIFICATIONS
 from thoth.protocol.registry import PUBLIC_METHODS
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKSPACE = ROOT if (ROOT / "PROJECT_WIKI").is_dir() else ROOT.parent
-CATALOG = WORKSPACE / "PROJECT_WIKI" / "30_ARCHITECTURE" / "rpc-method-catalog.md"
+CATALOG = ROOT / "docs/architecture/rpc-method-catalog.md"
 METHOD_MANIFEST = ROOT / "schemas" / "protocol" / "public-method-catalog.json"
 JSON_OUT = ROOT / "artifacts" / "qa" / "full-product-coverage.json"
-MARKDOWN_OUT = ROOT / "docs" / "verification" / "full-product-coverage.md"
+MARKDOWN_OUT = ROOT / "artifacts" / "qa" / "full-product-coverage.md"
 CSV_OUT = ROOT / "artifacts" / "qa" / "full-product-method-ledger.csv"
 
 METHOD = re.compile(r"^[a-z][A-Za-z0-9]*(?:/[A-Za-z][A-Za-z0-9]*)+$")

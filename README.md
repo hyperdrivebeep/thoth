@@ -37,7 +37,7 @@ see what remains unresolved, and compare two saved results before deciding what 
 > [!NOTE]
 > **Experimental source preview for personal/local use.** The interface is Korean-first.
 > Focused feature checks passed; the latest repository-wide verification is not passing. See the verification limits below.
-> **2026-09-29 update:** isolated model authentication and restart recovery are included. Real-provider analysis and a current-source FULL pass remain unverified; Claude subscription login is disabled without client configuration.
+> **2026-09-29 update:** isolated model authentication and restart recovery are included. Real-provider analysis and a current-source FULL pass remain unverified. Claude sign-in goes through the official Claude Code executable and has not been checked with a real account.
 > See [status and limits](#status) before relying on a result.
 
 ## What you can do
@@ -78,40 +78,52 @@ cd thoth
 
 Or choose **Code → Download ZIP** on GitHub, extract it, and open PowerShell in the extracted
 `thoth-main` folder. If PowerShell is in the folder containing that extraction, run `cd thoth-main`.
-First [prepare the Windows Python environment](docs/INSTALL.md#prepare-python-on-windows),
-then install the locked dependencies from the repository folder:
+
+**1. Check Python and install the locked dependencies** from the repository folder:
 
 ```powershell
+$thothPython = Join-Path $env:LOCALAPPDATA 'Programs\Python\Python313\python.exe'
+Test-Path -LiteralPath $thothPython
+& $thothPython -m venv --copies --without-pip .venv
 uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev
 pnpm.cmd install --frozen-lockfile
 ```
 
-Start the API in one terminal:
+If `Test-Path` prints `False`, set `$thothPython` to your installed Python 3.12/3.13
+`python.exe` path, or install the official Python first. The signature-checked version of
+these steps is in [Prepare Python on Windows](docs/INSTALL.md#prepare-python-on-windows).
+
+**2. Start the API** in one terminal:
 
 ```powershell
 .\.venv\Scripts\python.exe -m thoth.cli workspace
 .\.venv\Scripts\python.exe -m thoth.cli serve --port 8765
 ```
 
-Start the Web interface in a second terminal, after entering the same `thoth` or `thoth-main` folder:
+**3. Start the Web interface** in a second terminal, after entering the same `thoth` or `thoth-main` folder:
 
 ```powershell
 pnpm.cmd --dir apps/web run dev
 ```
 
-Open **<http://127.0.0.1:5173/>**. In setup/settings, select a supported login route or enter your
-own provider key, then choose a model before starting research. Provider use may consume its quota.
+**4. Connect a model inside the app.** Open **<http://127.0.0.1:5173/>**. The first-run screen
+lists ChatGPT, Claude and xAI: choose the sign-in button for a provider, finish the sign-in in your
+browser, and THOTH loads that account's model list. Or connect your own provider API key. No
+terminal is needed for this step. If a helper program is missing (the Codex CLI for ChatGPT,
+Claude Code for Claude), the card offers an automatic install. It needs Node.js, installs into
+`%LOCALAPPDATA%\THOTH\tools`, and leaves your global installs and other programs' logins alone.
+Manual commands are in [docs/INSTALL.md](docs/INSTALL.md). A sign-in uses the same account's
+usage limits as its other apps, and provider use may consume quota.
 
 New Windows installations keep research data in `%LOCALAPPDATA%\THOTH`, independently of the
 downloaded source folder. If you used an earlier version, open its existing data directory with
 `serve --workspace "C:\path\to\your\old\.thoth-local" --port 8765`.
 THOTH reports the selected directory at startup and does not move old data automatically.
 
-Codex sign-in uses a separate THOTH profile and requires a compatible official standalone CLI.
-Use THOTH's connection flow; an existing Desktop login is not imported. This source version adds
-experimental xAI device-code sign-in with a THOTH-owned profile. Its controlled Chrome/RPC flow
-passed with fake providers; real-account acceptance is pending. Claude and xAI API keys remain separate routes. See
-[connection requirements and restart behavior](docs/INSTALL.md).
+Sign-in uses separate THOTH profiles; existing login information from other programs is not
+imported. Claude sign-in runs the official Claude Code executable in that profile, and xAI uses
+a device-code flow. Both were checked only with fake providers or fake executables (xAI also with a
+Chrome/RPC flow); real-account acceptance is pending. See [connection requirements and restart behavior](docs/INSTALL.md).
 
 The API binds to loopback; Vite proxies API calls to port 8765. Keep the migration tree with the
 source checkout: a standalone wheel is not supported by this preview.
@@ -123,7 +135,7 @@ The isolated Windows check used Python 3.13.15, Node 24.19.0, pnpm 12.6.0 and uv
 The basic PDF path uses pypdf. Structured PDF parsing, browser acquisition, additional connectors
 and managed sandboxes have optional dependencies and prerequisites.
 
-The default connection does not import OMO or Codex Desktop credentials. The experimental Codex
+The default connection does not import credentials from other programs. The experimental Codex
 bridge uses its own profile for login, token refresh and model discovery. No account configuration
 is distributed here; successful login alone does not establish a successful model response.
 

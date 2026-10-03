@@ -4,10 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { readHistoryEntry } from "../../api/history";
 import { compareHistory } from "../../api/historyComparison";
 import { restoreKey, selectionKey, type HistorySelection, type RestoreResult, type RestoreSelection } from "../../api/historyModels";
+import { ChangeDetail } from "./HistoryChangeSummary";
 import { HistoryContent } from "./HistoryContent";
 import { RevisionComparison } from "./RevisionComparison";
 import { RestorePreviewDialog } from "./RestorePreviewDialog";
-import { currentnessLabel, currentnessTone, formatHistoryTime, kindLabel } from "./historyPresentation";
+import { currentnessLabel, currentnessReasonNote, currentnessTone, formatHistoryTime, kindLabel } from "./historyPresentation";
 import { Disclosure } from "../Disclosure";
 
 export function HistoryDetail({ selection, actorScope, onUseQuestion, onChooseResult }: {
@@ -49,7 +50,8 @@ export function HistoryDetail({ selection, actorScope, onUseQuestion, onChooseRe
   const answer = typeof entry.result?.answer === "string" ? entry.result.answer : null;
   return <section className="history-detail" aria-label="선택한 연구 기록">
     <header className="history-detail-heading"><span>{kindLabel(entry.kind)}<span aria-hidden="true"> · </span>{formatHistoryTime(entry.occurredAt)}</span><h2>{entry.title}</h2>
-      <Tag minimal intent={currentnessTone(entry.currentness)}>{currentnessLabel(entry.currentness)}</Tag></header>
+      <Tag minimal intent={currentnessTone(entry.currentness)}>{currentnessLabel(entry.currentness)}</Tag>
+      {currentnessReasonNote(entry.currentness) && <p className="history-coverage" role="status">{currentnessReasonNote(entry.currentness)}</p>}</header>
     {entry.availability === "UNAVAILABLE" ? <Callout compact intent="warning">현재 권한이나 자료 상태로 이 기록의 내용을 읽을 수 없습니다.</Callout> : <>
       {entry.availability === "PARTIAL" && <p className="history-coverage" role="status">이 기록의 일부만 확인할 수 있습니다.</p>}
       {entry.executionState === "FAILED" && <Callout compact intent="warning">이 연구 실행은 실패했습니다. 아래에는 실패 전에 저장된 내용이 포함될 수 있습니다.</Callout>}
@@ -58,6 +60,7 @@ export function HistoryDetail({ selection, actorScope, onUseQuestion, onChooseRe
       {entry.result?.answer_status === "PARTIAL_HOLD" && <p className="history-coverage">일부 판단이 보류된 답변입니다. 부족한 근거와 적용 조건을 함께 확인하세요.</p>}
       {entry.question && <section className="history-question"><h3>당시 질문</h3><p>{entry.question}</p></section>}
       {entry.kind === "RESULT" && <section className="history-answer"><h3>당시 저장된 답변</h3>{answer ? <p>{answer}</p> : <p className="history-help">이 요청에 연결된 답변 본문이 없습니다. 부분 기록은 아래에서 확인할 수 있습니다.</p>}</section>}
+      <ChangeDetail summary={entry.changeSummary} />
       {entry.result && <HistoryContent content={entry.result} />}
       {entry.content && <HistoryContent content={entry.content} />}
       <div className="history-detail-actions">

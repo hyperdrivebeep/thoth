@@ -7,6 +7,8 @@ from thoth.domain.enums import OperationState
 from thoth.domain.ids import OperationId, ProjectId, Sha256
 from thoth.domain.resource_scope import ResourceUse
 
+RESEARCH_OPERATION_METHODS = frozenset({"thread/start", "thread/input", "thread/steer"})
+
 
 class InternalFailureStateSnapshot(DomainModel):
     working_head_count: int

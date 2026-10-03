@@ -19,19 +19,29 @@ or code is never returned or persisted by that RPC. HOSTED_REVIEW rejects all fi
 methods before local I/O. A rejected or unsupported method does not silently switch provider.
 
 The Codex broker's local status and cancel use its THOTH-only profile and opaque pending ID.
-Local status does not advertise a cached model list after a fresh process start. The existing
-`model/settings/read` RPC is the explicit bounded discovery entry: its catalog refresh invokes
-the pinned App Server `account/read` and `model/list`, then resolves the saved model and effort.
-A synthetic new-process normal-RPC test verifies that path. Merely reading credential status does
-not discover models. An immediate execution attempted before that discovery can be held; callers
-should complete settings read before model admission. This is a scoped local behavior statement,
-not evidence of live Desktop coexistence.
+The Codex model list is kept per signed-in account as a typed snapshot in
+`model-profiles/catalog/<provider>-<account digest>.json` (status `ACTIVE`, `STALE_LAST_GOOD`
+or `UNAVAILABLE`; the account appears only as a one-way digest, never a token or account ID).
+A fresh process shows the saved list at once, without calling App Server. `model/settings/read`
+and `model/settings/update` use that stored list only; they never ask the provider. The list is
+fetched by App Server `account/read` and `model/list` (a) when a login finishes, (b) when the
+user presses "load models" (`model/catalog/refresh`), and (c) once in the background at app
+start when the list is missing or older than 24 hours (one fetch per provider at a time, 20-second
+deadline, stopped when the app closes). There is no timer. A failed or invalid candidate never
+replaces the saved list: the old list stays as `STALE_LAST_GOOD` with the failure reason, and only
+a lost login makes execution unavailable. Models left out of a list (`UNSUPPORTED_SLUG`,
+`UNKNOWN_EFFORT_ONLY`, `NAMESPACED_ID`) are recorded with their reason. A request the provider
+refuses for the model or account (not a network, timeout or quota failure) marks that model
+`execution=REJECTED`; a completed research marks it `VERIFIED`. A saved selection is never
+changed automatically. Merely reading credential status does not discover models. A saved list
+is not proof that a request will succeed. This is a scoped local behavior statement, not evidence
+of live Desktop coexistence.
 The Codex HTTP adapter rechecks the same isolated account and access token under the profile
 lock through the first physical send; a rotation after request preparation fails before network
 I/O rather than silently using another account.
 
 Codex model discovery and credential rotation are separate operations. A valid pinned THOTH
-snapshot is reused for normal model preparation; explicit `model/settings/read` discovery can
+snapshot is reused for normal model preparation; an explicit list refresh can
 call App Server `account/read(refreshToken=false)` and `model/list` without writing auth. Only an
 access token within the five-minute expiry margin requests `refreshToken=true`, under the
 profile owner lock. A refresh must produce a new, fresh same-account auth snapshot. Timeout,
@@ -64,13 +74,28 @@ single crash-atomic transaction.
 
 Claude OAuth and Messages are independently registered as a technical candidate. Without a
 THOTH-owned registered client identity, `start` is unavailable; a route or catalog entry alone
-does not establish third-party entitlement or successful inference. The existing `claude-code`
-HOLD route remains separate.
+does not establish third-party entitlement or successful inference.
+
+## Claude Code account route — 2026-09-29 candidate
+
+The `claude-code` route runs the official Claude Code executable in print mode with tools disabled.
+Sign-in is that executable's own `auth login --claudeai`, started by THOTH in an isolated
+`CLAUDE_CONFIG_DIR` (`model-profiles/claude-code`) and supervised as a process tree (Windows Job
+Object). THOTH extracts only a claude.ai or claude.com link from its output for the screen, may
+forward a pasted code to its stdin, and confirms the result through `auth status --json`. It never
+reads or copies credential files, and it never installs or updates a global `claude`.
+
+The route is admitted to research with `OBSERVATION_ONLY` control, like the Codex and xAI routes:
+token usage is recorded from the executable's JSON result, but one process can still make more
+than one provider request, so this is not a cost ceiling. Local eligibility requires a supported
+version and a subscription login; `execution_verified` stays false until a real run succeeds.
+Unverified with a real account: the login's terminal-less behavior, the exact `auth status --json`
+shape, and whether the installed executable still accepts `--max-turns`.
 
 ## Isolated workspace connection — 2026-09-26 candidate
 
 Codex login, status, refresh and model discovery are bound to the same THOTH workspace, executable
-identity and dedicated profile. Existing Codex Desktop, global CLI and OMO authentication is not
+identity and dedicated profile. Existing authentication from other programs is not
 imported. The login owner is the official Codex App Server in managed ChatGPT mode with a file
 credential store. It is used for authentication and catalog requests, with no thread/turn execution.
 
@@ -91,7 +116,7 @@ by themselves verify model execution. Saved model/effort preferences remain user
 
 Claude Code has a separate, unmodified-binary profile/login candidate. Its research route is held
 until bounded physical request/retry behavior is established. Anthropic and xAI API-key routes are
-independent. An OMO installation is not a prerequisite.
+independent. No other research application is a prerequisite.
 
 ## THOTH-owned xAI device route — 2026-09-27 candidate
 
@@ -114,7 +139,7 @@ The public client settings and model metadata were observed in MIT-licensed
 `@code-yeongyu/senpi-ai` 2026.9.26 (`auth/oauth/xai.js` SHA-256
 `d34783560dc2ac75d6e717b248136eb75a902fbd53b3e56fb9f2ec50c6c793d7`, `xai.json`
 SHA-256 `9b23faa5218e966a17108c05d2498a617ade1eae9b0d0684284c77d67949a3f1`).
-THOTH does not read OMON authentication or model caches at runtime. The installed source uses
+THOTH does not read other programs' authentication or model caches on its default runtime route. The installed source uses
 `auth.x.ai` device/token endpoints and the xAI Responses transport at `api.x.ai/v1`; xAI's
 [Grok Build documentation](https://docs.x.ai/build/enterprise) describes device login but
 distinguishes its inference endpoint from the [direct API-key Responses endpoint](https://docs.x.ai/developers/quickstart).

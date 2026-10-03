@@ -72,6 +72,12 @@ class ResearchWork:
     cleanup_usage: dict[str, CleanupUsage] = field(default_factory=dict)
     preprocessing_cache: dict[str, object] = field(default_factory=dict)
     oauth_retry_policy: OAuthRetryPolicy | None = None
+    # The project allows one cut-off model call to be sent once more (off unless it turned it on).
+    auto_retry_interrupted_call: bool = False
+    # A user-requested resume names the interrupted operation; its completed stages may be reused
+    # when this run's input for the same stage is exactly the same.
+    resume_from_operation_id: str | None = None
+    reused_stage_sources: set[str] = field(default_factory=set[str])
     consumed_heads: dict[str, str] = field(default_factory=dict)
     produced_refs: list[RevisionRef] = field(default_factory=list)
     produced_final_heads: dict[str, str] = field(default_factory=dict)

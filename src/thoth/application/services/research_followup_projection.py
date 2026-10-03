@@ -3,7 +3,9 @@
 from collections.abc import Iterable, Mapping
 from typing import Literal, cast
 
+from thoth.application.services.research_criterion_delta import CriterionView, pair_criteria
 from thoth.application.services.research_freshness import ResearchFreshnessService
+from thoth.application.services.resource_scope_read_context import scope_read_transaction
 from thoth.application.services.revision_diff import semantic_diff
 from thoth.domain.auth import authenticated_data_scope_allows
 from thoth.domain.enums import EntityType
@@ -113,6 +115,8 @@ def decision_delta(
     after_manifest: Mapping[str, object] | None,
     before_currentness: Mapping[str, object],
     after_currentness: Mapping[str, object],
+    before_criteria: tuple[CriterionView, ...] = (),
+    after_criteria: tuple[CriterionView, ...] = (),
 ) -> DecisionDelta:
     if before_manifest is None or after_manifest is None:
         return DecisionDelta(
@@ -133,6 +137,9 @@ def decision_delta(
     groups = _delta_groups(changes)
     reason_codes = _reason_codes(after_manifest)
     reason_refs = _reason_refs(after_manifest) if reason_codes else ()
+    # Criteria are paired only when both results' criteria were readable; one side alone would make
+    # every criterion look added or removed.
+    comparable = bool(before_criteria) and bool(after_criteria)
     return DecisionDelta(
         project_id=project_id,
         thread_id=thread_id,
@@ -147,7 +154,37 @@ def decision_delta(
             "before": _basis_currentness(before_currentness),
             "after": _basis_currentness(after_currentness),
         },
+        criteria=pair_criteria(before_criteria, after_criteria) if comparable else (),
+        criteria_state="AVAILABLE" if comparable else "UNAVAILABLE",
     )
+
+
+class CriterionViewReader:
+    """Reads a stored result's criteria and their coverage rows, within the reader's access."""
+
+    def __init__(self, *, ledger: LedgerPort, access: ResourceAccessPort) -> None:
+        self._ledger, self._access = ledger, access
+
+    def read(
+        self, project_id: str, manifest: Mapping[str, object] | None
+    ) -> tuple[CriterionView, ...]:
+        if manifest is None:
+            return ()
+        try:
+            typed = decode_current_result_manifest(dict(manifest))
+        except ValueError:
+            return ()
+        records = _related_records(self._ledger, self._access, project_id, typed)
+        entry = records.get("RequirementSetRevision")
+        if entry is None or not isinstance(entry[1], RequirementSetRevision):
+            return ()
+        matrix = _coverage_matrix(typed.request_ref, records)
+        rows = {row.requirement_id: row for row in matrix.rows}
+        return tuple(
+            CriterionView(requirement=requirement, row=rows[requirement.requirement_id])
+            for requirement in entry[1].requirements
+            if requirement.requirement_id in rows
+        )
 
 
 class ProjectReviewReader:
@@ -171,6 +208,12 @@ class ProjectReviewReader:
         self.freshness = freshness
 
     def list(self, value: ProjectReviewListInput) -> ProjectReviewList:
+        # One read transaction and one approval memo for the whole page: each thread's records share
+        # ancestors, so approving them once per request is enough.
+        with self.ledger.transaction(), scope_read_transaction():
+            return self._list(value)
+
+    def _list(self, value: ProjectReviewListInput) -> ProjectReviewList:
         start = _decode_cursor(value.cursor)
         threads = sorted(
             self.threads.list(value.project_id),
@@ -302,9 +345,7 @@ def _coverage_matrix(
 ) -> CoverageMatrix:
     requirement_entry = records.get("RequirementSetRevision")
     coverage_entry = records.get("CoverageAssessment")
-    requirement_set = (
-        requirement_entry[1] if requirement_entry is not None else None
-    )
+    requirement_set = requirement_entry[1] if requirement_entry is not None else None
     coverage = coverage_entry[1] if coverage_entry is not None else None
     if not isinstance(requirement_set, RequirementSetRevision):
         return CoverageMatrix(
@@ -650,9 +691,7 @@ def _reason_codes(manifest: Mapping[str, object]) -> tuple[str, ...]:
     gates_raw = coverage.get("gates")
     empty_gates: Mapping[object, object] = {}
     gates: Mapping[object, object] = (
-        cast(Mapping[object, object], gates_raw)
-        if isinstance(gates_raw, Mapping)
-        else empty_gates
+        cast(Mapping[object, object], gates_raw) if isinstance(gates_raw, Mapping) else empty_gates
     )
     values.extend(str(target) for target, state in gates.items() if state == "HOLD")
     return tuple(item for item in dict.fromkeys(values) if item and item != "None")

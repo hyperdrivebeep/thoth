@@ -250,12 +250,12 @@ async def test_scripted_two_document_cycle_commits_receipt_and_memory(tmp_path: 
             (
                 "case:cycle",
                 "ACTION_PLANNER",
-                "action_alternatives.v2",
+                "action_alternatives.v3",
             ): rejected_action_plan.model_dump(mode="python"),
             (
                 "case:cycle",
                 "ACTION_PLANNER",
-                "action_alternatives.semantic_repair.v2",
+                "action_alternatives.semantic_repair.v3",
             ): action_plan.model_dump(mode="python"),
         }
     )
@@ -307,8 +307,10 @@ async def test_scripted_two_document_cycle_commits_receipt_and_memory(tmp_path: 
     assert result.commit.receipt.semantic_truth_certified is False
     assert result.model_ids == ("SCRIPTED_MODEL", "SCRIPTED_MODEL")
     assert result.semantic_repair_attempted is True
-    assert len(result.memory_ids) == 3 + len(portfolio.hypotheses) + len(actions)
-    assert len(memory.list("project:cycle")) == 3 + len(portfolio.hypotheses) + len(actions)
+    # One candidate per hypothesis and action; the portfolio, plan and action portfolio only
+    # group them and are not remembered as memories of their own.
+    assert len(result.memory_ids) == len(portfolio.hypotheses) + len(actions)
+    assert len(memory.list("project:cycle")) == len(portfolio.hypotheses) + len(actions)
     full_plan = components.actions.read_plan("project:cycle", "plan:cycle", None)
     assert full_plan is not None and full_plan.generation_details is not None
     assert set(ledger.read_heads("project:cycle")) == {

@@ -1,14 +1,16 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import cast
 
 import pytest
 from pydantic import JsonValue
-from tests.atomicity.harness import assert_phase_delta, failed_command_allowances
+from tests.atomicity.harness import AllowedRow, Snapshot, assert_phase_delta
 from tests.atomicity.harness import snapshot as database_snapshot
 
 from thoth.apps.runtime import create_runtime
+from thoth.domain.restore import RestoreProposalV1
 from thoth.protocol.jsonrpc import JsonRpcRequest, JsonRpcResponse
 
 
@@ -28,6 +30,127 @@ def value(response: JsonRpcResponse) -> dict[str, JsonValue]:
     child = response.result["value"]
     assert isinstance(child, dict)
     return cast(dict[str, JsonValue], child)
+
+
+def assert_restore_proposal_delta(
+    before: Snapshot,
+    after: Snapshot,
+    response: JsonRpcResponse,
+    project_id: str,
+    current_head: str,
+    target_head: str,
+) -> None:
+    proposed = value(response)
+    proposal = proposed["restore_proposal"]
+    change_set = proposed["change_set"]
+    assert isinstance(proposal, dict) and isinstance(change_set, dict)
+    assert proposal["state"] == "DRAFT" and change_set["state"] == "STAGED"
+    payload = proposal["payload"]
+    assert isinstance(payload, dict)
+    typed_proposal = RestoreProposalV1.model_validate(payload)
+    assert typed_proposal.selection.expected_current_head == current_head
+    assert typed_proposal.restores_revision_digest == target_head
+    assert typed_proposal.profile_id == "decision-object-record.v1"
+    assert typed_proposal.parent_revision_digests == (current_head, target_head)
+    assert isinstance(change_set["payload"], dict)
+    assert change_set["payload"]["candidate_revision_digests"] == [proposal["record_digest"]]
+    expected_heads = change_set["payload"]["expected_head_set"]
+    assert isinstance(expected_heads, dict)
+    assert expected_heads[f"DECISION_OBJECT:{typed_proposal.selection.entity_id}"] == current_head
+    assert response.result is not None
+    operation_id = response.result["operation_id"]
+    identity = {"operation_id": operation_id}
+    rules = [
+        AllowedRow(
+            "operations",
+            {
+                **identity,
+                "project_id": project_id,
+                "method": "revision/restore/propose",
+                "idempotency_key": "revision-restore-propose",
+            },
+            "added",
+            {"state": ("SUCCEEDED",), "error_json": (None,)},
+        ),
+        AllowedRow(
+            "idempotency_keys",
+            {
+                **identity,
+                "project_id": project_id,
+                "method": "revision/restore/propose",
+                "idempotency_key": "revision-restore-propose",
+            },
+            "added",
+            {},
+        ),
+        AllowedRow(
+            "events",
+            {**identity, "project_id": project_id},
+            "added",
+            {
+                "event_type": (
+                    "operation.started",
+                    "operation.succeeded",
+                    "revision/restoreProposed",
+                )
+            },
+        ),
+        AllowedRow("checkpoints", identity, "added", {}),
+        AllowedRow(
+            "operation_resource_bindings", {**identity, "project_id": project_id}, "added", {}
+        ),
+    ]
+    for record in (proposal, change_set):
+        rules.append(
+            AllowedRow(
+                "control_records",
+                {
+                    "project_id": project_id,
+                    "namespace": "REVISION",
+                    "record_id": record["record_id"],
+                    "record_digest": record["record_digest"],
+                    "state": record["state"],
+                    "version": 1,
+                },
+                "added",
+                {},
+            )
+        )
+        for table in ("resource_scope_heads", "resource_scope_history", "resource_scope_receipts"):
+            rules.append(
+                AllowedRow(
+                    table,
+                    {
+                        "project_id": project_id,
+                        "resource_ref": f"control:{record['record_digest']}",
+                    },
+                    "added",
+                    {},
+                )
+            )
+    assert_phase_delta(before, after, tuple(rules))
+    expected_counts = {
+        "operations": 1,
+        "idempotency_keys": 1,
+        "events": 3,
+        "checkpoints": 1,
+        "operation_resource_bindings": 1,
+        "control_records": 2,
+        "resource_scope_heads": 2,
+        "resource_scope_history": 2,
+        "resource_scope_receipts": 2,
+    }
+    for table, count in expected_counts.items():
+        rows = [json.loads(row) for row in set(after[table]) - set(before[table])]
+        assert len(rows) == count
+        if table == "operation_resource_bindings":
+            binding = json.loads(rows[0]["content_json"])
+            assert binding["output_kind"] == "RESULT"
+            assert sorted(
+                (use["resource_ref"], use["capability"]) for use in binding["resource_uses"]
+            ) == sorted([(f"revision:{current_head}", "READ"), (f"revision:{target_head}", "READ")])
+        if table == "checkpoints":
+            assert json.loads(rows[0]["payload_json"])["state"] == "SUCCEEDED"
 
 
 @pytest.mark.asyncio
@@ -300,15 +423,14 @@ async def test_revision_atomic_changeset_merge_restore_and_baseline(tmp_path: Pa
         before_heads = dict(runtime.ledger.read_heads(project_id))
         restore_proposal = await runtime.bus.dispatch(restore_command)
         assert dict(runtime.ledger.read_heads(project_id)) == before_heads
-        assert_phase_delta(
+        assert_restore_proposal_delta(
             before_restore,
             database_snapshot(runtime.ledger.engine),
-            failed_command_allowances(
-                runtime.ledger.engine, restore_command, expected_reads=(f"revision:{old_head}",)
-            ),
+            restore_proposal,
+            project_id,
+            new_head,
+            old_head,
         )
-        assert restore_proposal.error is not None
-        assert restore_proposal.error.data["reason_code"] == "RESTORE_SCHEMA_UNSUPPORTED"
         recompute = value(
             await runtime.bus.dispatch(
                 request(

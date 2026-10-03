@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "purpose": "DEVELOPMENT_VERIFICATION_LEDGER_NOT_RUNTIME_POLICY",
   "baseline_head": "f0262732a0e79235f3839c3393f459b90bd53783",
-  "catalog_sha256": "1c4a5611fb2fe965d1ffd5e18a351b692b82b9819d6b15611b82ffebf0d50151",
+  "catalog_sha256": "e9c33b11d61e95b8946953dbc1fc7e792e4df4e6e99645971a9124b50222a7c5",
   "public_entries": [
     {
       "name": "action/audit/read",
@@ -3798,6 +3798,60 @@
       "mutation_observed_in_code": true
     },
     {
+      "name": "hypothesis/review/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "hypothesis/review/list",
+      "actual_callable": "thoth.application.commands.judgment_review.JudgmentReviewHandlers.list",
+      "source": "src/thoth/application/commands/judgment_review.py",
+      "line": 67,
+      "callable_sha256": "3f7c89515850849d671551390a35f4dd063746d0b11ea5aa1759e0579b8b7fc5",
+      "entry_kind": "public",
+      "path_id": "rpc:hypothesis/review/list",
+      "owner_scope": "HYPOTHESIS",
+      "phase_ids": [
+        "rpc:hypothesis/review/list"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
+      "name": "hypothesis/review/request",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "hypothesis/review/request",
+      "actual_callable": "thoth.application.commands.judgment_review.JudgmentReviewHandlers.request",
+      "source": "src/thoth/application/commands/judgment_review.py",
+      "line": 47,
+      "callable_sha256": "3e5dfd42965c8c1a188d92b15289c490681f392e9427baf3910af627c076ae2d",
+      "entry_kind": "public",
+      "path_id": "rpc:hypothesis/review/request",
+      "owner_scope": "HYPOTHESIS",
+      "phase_ids": [
+        "rpc:hypothesis/review/request"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
       "name": "hypothesis/revise",
       "namespace": "hypothesis",
       "surface": "COMMAND",
@@ -4919,6 +4973,32 @@
       "mutation_observed_in_code": false
     },
     {
+      "name": "memory/edit/propose",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "memory/edit/propose",
+      "actual_callable": "thoth.application.commands.memory_edits.MemoryEditHandlers.propose",
+      "source": "src/thoth/application/commands/memory_edits.py",
+      "line": 30,
+      "callable_sha256": "e2e8ce2f5b3eb780f6753d5ff7debe133fae782487d023c3122f87a3395ed732",
+      "entry_kind": "public",
+      "path_id": "rpc:memory/edit/propose",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:memory/edit/propose"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
       "name": "memory/gate/read",
       "namespace": "memory",
       "surface": "QUERY",
@@ -5205,6 +5285,84 @@
       "mutation_observed_in_code": true
     },
     {
+      "name": "memory/revision/list",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "memory/revision/list",
+      "actual_callable": "thoth.application.commands.memory_revisions.MemoryRevisionHandlers.revision_list",
+      "source": "src/thoth/application/commands/memory_revisions.py",
+      "line": 32,
+      "callable_sha256": "dd9dc3de0e1423eaf2fe7bbbeb67ec316b92b6510ee6affc00b1a57b78caf522",
+      "entry_kind": "public",
+      "path_id": "rpc:memory/revision/list",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:memory/revision/list"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
+      "name": "memory/settings/read",
+      "namespace": "memory",
+      "surface": "QUERY",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "memory/settings/read",
+      "actual_callable": "thoth.application.commands.memory_settings.MemorySettingsHandlers.read",
+      "source": "src/thoth/application/commands/memory_settings.py",
+      "line": 36,
+      "callable_sha256": "4b17e22c734fd60e98966b8566395ac0b92771885857ad1ebc8e0dc9a0c3cda6",
+      "entry_kind": "public",
+      "path_id": "rpc:memory/settings/read",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:memory/settings/read"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
+      "name": "memory/settings/update",
+      "namespace": "memory",
+      "surface": "COMMAND",
+      "canonical_owner": "MEMORY",
+      "policy": "memory:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A06"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "memory/settings/update",
+      "actual_callable": "thoth.application.commands.memory_settings.MemorySettingsHandlers.update",
+      "source": "src/thoth/application/commands/memory_settings.py",
+      "line": 41,
+      "callable_sha256": "c5b58a3ae355a0698f60cc66d268c08b9aafec0da16f3b2ea092305f6b957112",
+      "entry_kind": "public",
+      "path_id": "rpc:memory/settings/update",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:memory/settings/update"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
       "name": "memory/validate",
       "namespace": "memory",
       "surface": "COMMAND",
@@ -5227,6 +5385,88 @@
       "owner_scope": "SHARED_OR_OTHER_OWNER",
       "phase_ids": [
         "rpc:memory/validate"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "model/callSettings/read",
+      "namespace": "model",
+      "surface": "QUERY",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "research-model-settings:versioned",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "U08",
+        "U07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "model/callSettings/read",
+      "actual_callable": "thoth.application.commands.model_call_settings.ModelCallSettingsHandlers.read",
+      "source": "src/thoth/application/commands/model_call_settings.py",
+      "line": 39,
+      "callable_sha256": "c23bed8efc6e508c07591fefa70113ba60139f7f9129cb694e55f425f3eb063d",
+      "entry_kind": "public",
+      "path_id": "rpc:model/callSettings/read",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:model/callSettings/read"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
+      "name": "model/callSettings/update",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "research-model-settings:versioned",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "U08",
+        "U07"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "model/callSettings/update",
+      "actual_callable": "thoth.application.commands.model_call_settings.ModelCallSettingsHandlers.update",
+      "source": "src/thoth/application/commands/model_call_settings.py",
+      "line": 44,
+      "callable_sha256": "3175ca2098abd19baf68920b691d176862256059f9ef4f7025d00eee308e4244",
+      "entry_kind": "public",
+      "path_id": "rpc:model/callSettings/update",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:model/callSettings/update"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "model/catalog/refresh",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied; explicit remote model-list refresh, never run by status polling",
+      "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via OAuthLoginFlow local /rpc",
+      "behavioral_evidence": [
+        "tests/integration/test_model_catalog_refresh_rpc.py",
+        "tests/unit/test_hosted_review_credential_rpc.py",
+        "apps/web/src/components/FirstRunSetup.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "model/catalog/refresh",
+      "actual_callable": "thoth.application.commands.model_settings.ModelSettingsHandlers.refresh_catalog",
+      "source": "src/thoth/application/commands/model_settings.py",
+      "line": 269,
+      "callable_sha256": "f64f3300c3cbd1eb8bc1272ca375ce8d28965b2968d853f69cda7209e91f5a9c",
+      "entry_kind": "public",
+      "path_id": "rpc:model/catalog/refresh",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:model/catalog/refresh"
       ],
       "mutation_observed_in_code": true
     },
@@ -5283,6 +5523,33 @@
       "owner_scope": "THREAD_REQUEST_SETTINGS",
       "phase_ids": [
         "rpc:model/credential/login/cancel"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "model/credential/login/complete",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied; secret response is ephemeral",
+      "normal_entrypoint": "ModelCredentialPanel via local /rpc",
+      "behavioral_evidence": [
+        "tests/integration/test_xai_workspace_route.py",
+        "tests/unit/test_hosted_review_credential_rpc.py"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "model/credential/login/complete",
+      "actual_callable": "thoth.application.commands.model_settings.ModelSettingsHandlers.complete_login",
+      "source": "src/thoth/application/commands/model_settings.py",
+      "line": 366,
+      "callable_sha256": "b64222d23d228cdc404297390cf187d6f3cac45e18c9c219a8615b160a8a765d",
+      "entry_kind": "public",
+      "path_id": "rpc:model/credential/login/complete",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:model/credential/login/complete"
       ],
       "mutation_observed_in_code": true
     },
@@ -5394,6 +5661,34 @@
       "owner_scope": "SHARED_OR_OTHER_OWNER",
       "phase_ids": [
         "rpc:model/settings/update"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "model/tooling/install",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "THREAD_REQUEST_SETTINGS",
+      "policy": "system:workspace; LOCAL only; HOSTED_REVIEW denied; installs one registered tool into the THOTH tools folder",
+      "normal_entrypoint": "FirstRunSetup|ModelCredentialPanel via CodexToolHelp|ClaudeCodeHelp local /rpc",
+      "behavioral_evidence": [
+        "tests/integration/test_model_tooling_rpc.py",
+        "tests/unit/models/test_tool_installers.py",
+        "tests/unit/test_hosted_review_credential_rpc.py"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "model/tooling/install",
+      "actual_callable": "thoth.application.commands.model_settings.ModelSettingsHandlers.install_tool",
+      "source": "src/thoth/application/commands/model_settings.py",
+      "line": 239,
+      "callable_sha256": "2e7c7d8938e83a51d161275bd132d597d79212afaaa876e265362e68d084984f",
+      "entry_kind": "public",
+      "path_id": "rpc:model/tooling/install",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:model/tooling/install"
       ],
       "mutation_observed_in_code": true
     },
@@ -27644,6 +27939,70 @@
       }
     },
     {
+      "path_id": "rpc:hypothesis/review/request",
+      "owner": "HYPOTHESIS",
+      "catalog_owner": "HYPOTHESIS",
+      "entry_kind": "public",
+      "method_or_trigger": "hypothesis/review/request",
+      "actual_callable": "thoth.application.commands.judgment_review.JudgmentReviewHandlers.request",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/judgment_review_composition.py",
+          "line": 40,
+          "binding": "handlers.request"
+        }
+      ],
+      "producer_refs": [
+        "thoth.application.services.judgment_review_service.JudgmentReviewService.open_request",
+        "thoth.application.services.judgment_review_service.JudgmentReviewService.record_instruction"
+      ],
+      "phase_id": [
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "control_records"
+      ],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [
+        "hypothesis_audit",
+        "investigation_audit",
+        "receipts",
+        "resource_scope_receipts"
+      ],
+      "expected_basis": "A review request is one append-only control record (OPEN); it never changes a hypothesis or its relations. The instruction is sent afterwards through thread/input (a separate operation), and a failed send leaves the request OPEN for resending. At most one open request exists per hypothesis revision.",
+      "uow_participants": [
+        "thoth.adapters.storage.control_record.SqliteControlRecordStore.append"
+      ],
+      "irreversible_effect_boundary": "The instruction runs a model call outside any transaction; resolution is a later control record.",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "hypothesis/review/list",
+        "apps/web/src/components/JudgmentReview.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/services/test_judgment_review_service.py",
+        "tests/integration/test_judgment_review.py"
+      ],
+      "fault_points": "Record append and the instruction send are separate steps; a failed send is recorded on the request and retried by asking again.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/judgment_review.py",
+        "src/thoth/application/services/judgment_review_service.py",
+        "src/thoth/apps/judgment_review_composition.py",
+        "src/thoth/adapters/storage/control_record.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the B stage; owner closure evidence is not produced."
+      ]
+    },
+    {
       "path_id": "rpc:hypothesis/create",
       "owner": "HYPOTHESIS",
       "catalog_owner": "HYPOTHESIS",
@@ -28504,6 +28863,55 @@
           "call_graph": "hypothesis/list"
         }
       }
+    },
+    {
+      "path_id": "rpc:hypothesis/review/list",
+      "owner": "HYPOTHESIS",
+      "catalog_owner": "HYPOTHESIS",
+      "entry_kind": "public",
+      "method_or_trigger": "hypothesis/review/list",
+      "actual_callable": "thoth.application.commands.judgment_review.JudgmentReviewHandlers.list",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/judgment_review_composition.py",
+          "line": 41,
+          "binding": "handlers.list"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "Latest version of each review request, with a finished or failed instruction shown as it would be once settled. A read never writes.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/JudgmentReview.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/services/test_judgment_review_service.py",
+        "tests/integration/test_judgment_review.py"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/judgment_review.py",
+        "src/thoth/application/services/judgment_review_service.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the B stage; no owner closure receipt."
+      ]
     },
     {
       "path_id": "rpc:hypothesis/merge/propose",
@@ -36332,6 +36740,55 @@
       "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction."
     },
     {
+      "path_id": "rpc:memory/revision/list",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "MEMORY",
+      "entry_kind": "public",
+      "method_or_trigger": "memory/revision/list",
+      "actual_callable": "thoth.application.commands.memory_revisions.MemoryRevisionHandlers.revision_list",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/memory_composition.py",
+          "line": 109,
+          "binding": "handlers.revision_list"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "Every stored full memory version with its query-independent state (transition, support, authority, cutoff, owner currentness, latest version) and the first reason it would not be recalled. A read never writes; which memories a question recalls is decided per question by build_context.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/ProjectMemoryPanel.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/test_memory_revision_list.py",
+        "apps/web/src/components/ProjectMemoryPanel.test.tsx"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/memory_revisions.py",
+        "src/thoth/apps/memory_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the B stage; no owner closure receipt."
+      ]
+    },
+    {
       "path_id": "rpc:memory/policy/list",
       "owner": "SHARED_OR_OTHER_OWNER",
       "catalog_owner": "MEMORY",
@@ -37077,6 +37534,73 @@
       "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction."
     },
     {
+      "path_id": "rpc:memory/edit/propose",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "MEMORY",
+      "entry_kind": "public",
+      "method_or_trigger": "memory/edit/propose",
+      "actual_callable": "thoth.application.commands.memory_edits.MemoryEditHandlers.propose",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/memory_composition.py",
+          "line": 133,
+          "binding": "owners.edits.propose"
+        }
+      ],
+      "producer_refs": [
+        "thoth.application.services.memory_edit_service.MemoryEditService.propose"
+      ],
+      "phase_id": [
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "semantic_revisions (MEMORY:<edit_id>)",
+        "entity_snapshots",
+        "memory_records",
+        "memory_revision_ledger",
+        "memory_transition_receipts",
+        "memory_projections"
+      ],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "One user correction is one ledger revision MEMORY:<edit_id> (actor HUMAN) plus one new memory version whose parent is the corrected version. The ordinary role review decides COMMIT, REVISE, HOLD or QUARANTINE; only a COMMIT replaces the original for recall and for memory/revision/list. Prepare runs outside the transaction; the ledger commit and commit_prepared then share one ledger transaction with the head-set digest as the expected head.",
+      "uow_participants": [
+        "thoth.application.services.revision_service.RevisionCommitService.commit",
+        "thoth.application.services.full_project_memory.FullProjectMemoryService.commit_prepared"
+      ],
+      "irreversible_effect_boundary": "Reviewer calls (rules today) run before the transaction; there is no external effect and no model call.",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "memory/revision/list",
+        "memory/context/build",
+        "revision/timeline/read",
+        "apps/web/src/components/ProjectMemoryPanel.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_memory_edit.py",
+        "tests/unit/test_memory_supersession.py"
+      ],
+      "fault_points": "A failure after the ledger commit or while storing the memory rolls back both; a moved head set or a memory set that changed since prepare rejects the request without writing.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/memory_edits.py",
+        "src/thoth/application/services/memory_edit_service.py",
+        "src/thoth/application/services/memory_supersession.py",
+        "src/thoth/application/services/full_project_memory.py",
+        "src/thoth/apps/memory_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the B stage; owner closure evidence is not produced."
+      ]
+    },
+    {
       "path_id": "rpc:memory/revalidate",
       "owner": "SHARED_OR_OTHER_OWNER",
       "catalog_owner": "MEMORY",
@@ -37323,7 +37847,7 @@
       "canonical_records_and_projections": [],
       "head_selector": "Local workspace root; credential values are not returned by the index listing.",
       "audit_receipt_refs": [],
-      "expected_basis": "Selected THOTH workspace credential index+secret and separately observed Codex CLI login status. Additive login capability/route fields do not inspect OMO home; remote_auth_verified remains null.",
+      "expected_basis": "Selected THOTH workspace credential index+secret and separately observed Codex CLI login status. Additive login capability/route fields do not inspect external credential homes; remote_auth_verified remains null.",
       "uow_participants": [],
       "irreversible_effect_boundary": "No canonical publication or model dispatch in this query; access checks and reads may use short read transactions.",
       "allowed_phase_deltas": [
@@ -37656,6 +38180,180 @@
       },
       "blockers": [
         "Dynamic same-workspace resolver consumption is local focused evidence only; no remote credential validation or ten-owner closure is claimed."
+      ]
+    },
+    {
+      "path_id": "rpc:model/tooling/install",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "THREAD_REQUEST_SETTINGS",
+      "entry_kind": "public",
+      "method_or_trigger": "model/tooling/install",
+      "actual_callable": "thoth.application.commands.model_settings.ModelSettingsHandlers.install_tool",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/research_entry_composition.py",
+          "line": 180,
+          "binding": "settings_handlers.install_tool"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.models.tool_installers.ToolInstallerRegistry"
+      ],
+      "phase_id": [
+        "LOCAL_TOOL_INSTALL"
+      ],
+      "composite_not_one_transaction": true,
+      "canonical_records_and_projections": [
+        "tools folder"
+      ],
+      "head_selector": "Selected local workspace model-registry directory; no project research head moves.",
+      "audit_receipt_refs": [],
+      "expected_basis": "LOCAL system:workspace: one registered tool installer writes into the THOTH tools folder; global installs are never touched. HOSTED_REVIEW denies before the handler. No research head moves.",
+      "uow_participants": [
+        "thoth.adapters.models.tool_installers.ToolInstallerRegistry"
+      ],
+      "irreversible_effect_boundary": "A package install is an external effect, not a Ledger transaction.",
+      "allowed_phase_deltas": [
+        "On refusal before I/O the registry remains unchanged; after a partial file write or unknown login response do not claim an atomic rollback."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/ToolInstallHelp.tsx",
+        "apps/web/src/components/CodexToolHelp.tsx",
+        "apps/web/src/components/ClaudeCodeHelp.tsx",
+        "model/credential/list"
+      ],
+      "existing_tests": [
+        "tests/integration/test_model_tooling_rpc.py",
+        "tests/unit/models/test_tool_installers.py"
+      ],
+      "fault_points": "Installer failure leaves the tools folder as it was reported; no automatic retry.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/models/tool_installers.py",
+        "src/thoth/application/commands/model_settings.py",
+        "src/thoth/apps/research_entry_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Listed source-level regions are reachable candidates; the whole RPC, external I/O and operation terminal are not certified as one transaction.",
+      "blockers": [
+        "Added after the baseline inventory; owner closure evidence is not produced."
+      ]
+    },
+    {
+      "path_id": "rpc:model/credential/login/complete",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "THREAD_REQUEST_SETTINGS",
+      "entry_kind": "public",
+      "method_or_trigger": "model/credential/login/complete",
+      "actual_callable": "thoth.application.commands.model_settings.ModelSettingsHandlers.complete_login",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/research_entry_composition.py",
+          "line": 178,
+          "binding": "settings_handlers.complete_login"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.models.local_credentials.LocalModelCredentials.complete_login"
+      ],
+      "phase_id": [
+        "LOCAL_CREDENTIAL_IO"
+      ],
+      "composite_not_one_transaction": true,
+      "canonical_records_and_projections": [
+        "model-registry/index.json"
+      ],
+      "head_selector": "Selected local workspace model-registry directory; no project research head moves.",
+      "audit_receipt_refs": [],
+      "expected_basis": "LOCAL system:workspace: a pasted sign-in code is forwarded to the running login and never stored or echoed. HOSTED_REVIEW denies before the handler. No research head moves.",
+      "uow_participants": [
+        "thoth.adapters.models.local_credentials.LocalModelCredentials.complete_login"
+      ],
+      "irreversible_effect_boundary": "Forwarding a code to an external login process is not a Ledger transaction.",
+      "allowed_phase_deltas": [
+        "On refusal before I/O the registry remains unchanged; after a partial file write or unknown login response do not claim an atomic rollback."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/OAuthLoginFlow.tsx",
+        "model/credential/login/status"
+      ],
+      "existing_tests": [
+        "tests/unit/models/test_account_connections.py",
+        "tests/unit/test_hosted_review_credential_rpc.py"
+      ],
+      "fault_points": "An unknown login state rejects the code without retrying.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/models/local_credentials.py",
+        "src/thoth/application/commands/model_settings.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Listed source-level regions are reachable candidates; the whole RPC, external I/O and operation terminal are not certified as one transaction.",
+      "blockers": [
+        "Added after the baseline inventory; owner closure evidence is not produced."
+      ]
+    },
+    {
+      "path_id": "rpc:model/catalog/refresh",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "THREAD_REQUEST_SETTINGS",
+      "entry_kind": "public",
+      "method_or_trigger": "model/catalog/refresh",
+      "actual_callable": "thoth.application.commands.model_settings.ModelSettingsHandlers.refresh_catalog",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/research_entry_composition.py",
+          "line": 179,
+          "binding": "settings_handlers.refresh_catalog"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.models.local_credentials.LocalModelCredentials.refresh_catalog"
+      ],
+      "phase_id": [
+        "LOCAL_CREDENTIAL_IO"
+      ],
+      "composite_not_one_transaction": true,
+      "canonical_records_and_projections": [
+        "model-registry/index.json"
+      ],
+      "head_selector": "Selected local workspace model-registry directory; no project research head moves.",
+      "audit_receipt_refs": [],
+      "expected_basis": "LOCAL system:workspace: one explicit remote model-list fetch per provider; status reads and polling never call it. HOSTED_REVIEW denies before the handler. No research head moves.",
+      "uow_participants": [
+        "thoth.adapters.models.local_credentials.LocalModelCredentials.refresh_catalog"
+      ],
+      "irreversible_effect_boundary": "External model-list fetch and local index write are distinct effects, not one Ledger transaction.",
+      "allowed_phase_deltas": [
+        "On refusal before I/O the registry remains unchanged; after a partial file write or unknown login response do not claim an atomic rollback."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/OAuthLoginFlow.tsx",
+        "apps/web/src/components/ModelCredentialPanel.tsx",
+        "model/credential/list",
+        "model/settings/read"
+      ],
+      "existing_tests": [
+        "tests/integration/test_model_catalog_refresh_rpc.py",
+        "tests/unit/test_hosted_review_credential_rpc.py"
+      ],
+      "fault_points": "Provider fetch failure keeps the previous list; a partial provider result is reported per provider.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/models/local_credentials.py",
+        "src/thoth/application/commands/model_settings.py",
+        "src/thoth/apps/research_entry_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Listed source-level regions are reachable candidates; the whole RPC, external I/O and operation terminal are not certified as one transaction.",
+      "blockers": [
+        "Added after the baseline inventory; owner closure evidence is not produced."
       ]
     },
     {
@@ -65484,7 +66182,7 @@
         }
       },
       "blockers": [
-        "Ready composition changed after historical read-only review; exact pair and OMO independence are local focused gates, not owner closure."
+        "Ready composition changed after historical read-only review; exact pair and external credential independence are local focused gates, not owner closure."
       ]
     },
     {
@@ -67195,6 +67893,220 @@
           }
         ]
       }
+    },
+    {
+      "path_id": "rpc:memory/settings/read",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "MEMORY",
+      "entry_kind": "public",
+      "method_or_trigger": "memory/settings/read",
+      "actual_callable": "thoth.application.commands.memory_settings.MemorySettingsHandlers.read",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/memory_composition.py",
+          "line": 150,
+          "binding": "owners.settings.read"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "The project's memory on/off switch: on until a saved setting turns it off, with the digest of the setting version read. A read never writes.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/MemoryInjectionSwitch.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_memory_selection.py",
+        "apps/web/src/components/ProjectMemoryPanel.test.tsx"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/memory_settings.py",
+        "src/thoth/apps/memory_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the memory-selection stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:memory/settings/update",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "MEMORY",
+      "entry_kind": "public",
+      "method_or_trigger": "memory/settings/update",
+      "actual_callable": "thoth.application.commands.memory_settings.MemorySettingsHandlers.update",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/memory_composition.py",
+          "line": 151,
+          "binding": "owners.settings.update"
+        }
+      ],
+      "producer_refs": [
+        "thoth.application.services.memory_settings.MemorySettingsService.save"
+      ],
+      "phase_id": [
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "semantic_revisions (THREAD:memory-settings:project)",
+        "entity_snapshots"
+      ],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "One saved setting is one ledger revision THREAD:memory-settings:project (ProjectMemorySettings) written from the digest the caller read; a stale digest is rejected with MEMORY_SETTINGS_REVISION_CONFLICT and writes nothing. Turning the switch off changes no stored memory, list or correction; it only stops recalled memory from being given to an investigation.",
+      "uow_participants": [
+        "thoth.application.services.request_records.RequestRecords.save"
+      ],
+      "irreversible_effect_boundary": "No external effect and no model call.",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "memory/settings/read",
+        "memory/context/build",
+        "apps/web/src/components/MemoryInjectionSwitch.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_memory_selection.py",
+        "apps/web/src/components/ProjectMemoryPanel.test.tsx"
+      ],
+      "fault_points": "The save is one ledger transaction; a failure writes nothing.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/memory_settings.py",
+        "src/thoth/apps/memory_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the memory-selection stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:model/callSettings/read",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "THREAD_REQUEST_SETTINGS",
+      "entry_kind": "public",
+      "method_or_trigger": "model/callSettings/read",
+      "actual_callable": "thoth.application.commands.model_call_settings.ModelCallSettingsHandlers.read",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/research_entry_composition.py",
+          "line": 222,
+          "binding": "call_settings_handlers.read"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "Whether a model call cut off in the middle is sent again on its own (at most twice): off until a saved setting turns it on, with the digest of the setting version read. A read never writes.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/AutoRetrySwitch.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_model_call_settings.py",
+        "apps/web/src/components/AutoRetrySwitch.test.tsx"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/model_call_settings.py",
+        "src/thoth/apps/research_entry_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the model-call interruption stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:model/callSettings/update",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "THREAD_REQUEST_SETTINGS",
+      "entry_kind": "public",
+      "method_or_trigger": "model/callSettings/update",
+      "actual_callable": "thoth.application.commands.model_call_settings.ModelCallSettingsHandlers.update",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/research_entry_composition.py",
+          "line": 223,
+          "binding": "call_settings_handlers.update"
+        }
+      ],
+      "producer_refs": [
+        "thoth.application.services.model_call_settings.ModelCallSettingsService.save"
+      ],
+      "phase_id": [
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "semantic_revisions (THREAD:model-call-settings:project)",
+        "entity_snapshots"
+      ],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "One saved setting is one ledger revision THREAD:model-call-settings:project (ProjectModelCallSettings) written from the digest the caller read; a stale digest is rejected with MODEL_CALL_SETTINGS_REVISION_CONFLICT and writes nothing. Turning the switch on only lets a cut-off model call be sent again; it changes no stored research record.",
+      "uow_participants": [
+        "thoth.application.services.request_records.RequestRecords.save"
+      ],
+      "irreversible_effect_boundary": "No external effect and no model call.",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "model/callSettings/read",
+        "thread/input",
+        "apps/web/src/components/AutoRetrySwitch.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_model_call_settings.py",
+        "apps/web/src/components/AutoRetrySwitch.test.tsx"
+      ],
+      "fault_points": "The save is one ledger transaction; a failure writes nothing.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/model_call_settings.py",
+        "src/thoth/apps/research_entry_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the model-call interruption stage; no owner closure receipt."
+      ]
     }
   ],
   "discovery": "outputs/owner-atomicity-20260914/discovery-scope-fix.json",

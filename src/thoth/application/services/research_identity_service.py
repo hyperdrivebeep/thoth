@@ -20,6 +20,7 @@ from thoth.application.services.hypothesis_projection import (
 )
 from thoth.application.services.hypothesis_test_lifecycle import HypothesisTestLifecycle
 from thoth.application.services.research_basis_capture import capture_consumed
+from thoth.application.services.research_commit_scope import read_scope
 from thoth.application.services.research_currentness_view import currentness_view
 from thoth.application.services.research_freshness import ResearchFreshnessService
 from thoth.application.services.research_record_persistence import (
@@ -606,7 +607,16 @@ class ResearchIdentityService:
             plan, ids=self._ids, actor=actor, reason="bind selected research execution inputs"
         )
         with self._ledger.transaction():
-            if dict(context.heads) != dict(self._ledger.read_heads(context.project_id)):
+            plan_key = f"ACTION:{plan.plan_id}"
+            scope = read_scope(research_work.get(), context.project_id, context.heads, (plan_key,))
+            current_heads = self._ledger.read_heads(context.project_id)
+            if scope is None:
+                changed = dict(context.heads) != dict(current_heads)
+            else:
+                changed = any(
+                    current_heads.get(key) != digest for key, digest in scope.expected_heads.items()
+                ) or any(key in current_heads for key in scope.expected_absent)
+            if changed:
                 raise ResearchIdentityError("TEST_EXECUTION_PLAN_BASIS_CHANGED")
             commit = RevisionCommitService(
                 self._ledger, self._clock, self._ids, policy_version=spec.policy_digest
@@ -614,8 +624,14 @@ class ResearchIdentityService:
                 RevisionChangeSet(
                     changeset_id=self._ids.new("changeset"),
                     project_id=context.project_id,
-                    expected_heads={f"ACTION:{plan.plan_id}": current.revision_digest},
-                    expected_head_set_digest=head_set_digest(dict(context.heads)),
+                    expected_heads={
+                        **({} if scope is None else scope.expected_heads),
+                        plan_key: current.revision_digest,
+                    },
+                    expected_absent_heads=() if scope is None else scope.expected_absent,
+                    expected_head_set_digest=(
+                        head_set_digest(dict(context.heads)) if scope is None else None
+                    ),
                     staged_revisions=(staged,),
                     impact_plan=ImpactPropagationPlan(),
                     actor=actor,

@@ -17,6 +17,7 @@ export type WorkThread = {
   execution_state: string;
   current_object_ids: string[];
   working_head_digest: string;
+  updated_at?: string | null;
 };
 
 export type ConnectedArtifact = {

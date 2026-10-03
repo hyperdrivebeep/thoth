@@ -1,0 +1,287 @@
+{
+  "source": "Trimmed from QA IRIS run 2 operation/result/read (real model output). Only fields the judgment screen reads.",
+  "answer": "검증 보류 · 부분 초안: FACT — 기준은 IRIS 공고의 「붙임 08. 품목개요서(RFP).pdf」(IRIS 공고 HTML 1037행, span:1580e7b4-64bb-4eb0-99c2-5a8fc6113f70) 중 통합형-07-01 **1세부 ‘항만 모빌리티 무인 운용을 위한 항만 특화 자율주행 기술 개발’**이다(RFP p.36, 1·20행, span:3ac72414-5d0f-4a8c-a2eb-8b85a20b69e4, span:5107fe50-16bb-4bc1-a62b-5f1885de51e4). p.37, 20–22행은 계획서에 정량적 목표치를 제시하도록 하고 ‘비가시 객체 감지율(%)’과 ‘충돌 위험 인지 및 제어 지연시간(ms)’을 열거한다(span:b97dce8e-863b-4597-bfb9-0ffbfd7a97a7, span:f125282c-515c-476f-a320-b01c38bc6a62, span:d9af94fd-f4de-4b31-94ba-95121b9c5b90). p.44–45의 **3세부** ‘실시간 처리 지연시간(ms)’ 및 ‘위험 상황 감지 및 대응 지연시간(sec)’은 1세부 지표와 혼동하면 안 된다(span:54c64cdf-ddb9-405a-b2d5-d83b41266154, span:bddd96e1-9799-4768-b71a-3adc90134748).\n\n**참고 가능:** Yao 2023 survey의 융합 방법 논의와 CenterFusion 소개·nuScenes 결과 요약(p.14, 85–86행; p.16, 81–82행; p.39, 65–67행, span:5cafb75e-087e-41d1-b437-8f84f7668bbb, span:db2b956b-ba8c-4f5f-91ce-54ae20a143b7, span:dd70f6e8-a2bb-4f4a-b73f-45fb192decdc, span:2d934ff7-6931-46b2-a50b-f7a763b032fb, span:57c06842-fd12-4f29-aa3a-60b892f3832e), CenterFusion 원문의 레이더·카메라 결합 구조와 nuScenes 평가(p.2, 38–39·88–89행, span:e0190a7b-f6c9-458d-8101-ed7827d32fdd, span:76dd48db-22e6-4c3f-b740-2a8282ebb034, span:67964368-89f4-4caa-a451-e1c14cecce19), AI-Hub 4D 이미징 레이다 자료의 센서·라벨 설계(HTML 3697·3989–3998행, span:b3a66922-6ae1-4742-b639-5db27437b4d9, span:6cd5d0ab-63e1-45ef-91dc-65e4071836e2, span:10eab22b-a1f8-4ce5-a3d1-84c49cab909d)는 방법·데이터 설계에 참고할 수 있다. AI-Hub에는 카메라+레이다 융합 검증 모델로 CenterFusion이 열거된다(HTML 3649행, span:ff2c5ba7-ab7e-4f6a-8bd8-183d34cc017d).\n\n**항만 성능의 직접 근거로 사용 불가:** AI-Hub의 수집 환경은 고속도로·도심이다(HTML 3249행, span:7759d43a-1cc0-4e45-ba28-588554656458). `camera_visibility`의 ‘y’/‘n’은 카메라상 식별 가능 여부를 나타내는 라벨이지 항만 비가시 객체 감지율 측정값이 아니다(HTML 3989–3998행, span:6cd5d0ab-63e1-45ef-91dc-65e4071836e2, span:10eab22b-a1f8-4ce5-a3d1-84c49cab909d). survey의 CenterFusion 수치 32.6 mAP·44.9 NDS는 nuScenes 결과로 서술되어 있으며(p.16, 81–82행, span:db2b956b-ba8c-4f5f-91ce-54ae20a143b7, span:dd70f6e8-a2bb-4f4a-b73f-45fb192decdc), 항만 감지율(%)이나 인지·제어 지연시간(ms)으로 환산할 근거가 없다.\n\n**UNKNOWN — 추가 확보 필요:** 제공된 1세부 발췌에서는 레이더·카메라 **조합의 RFP 명시를 확인하지 못했다**. ‘RFP에 명시되지 않았다’는 결론도 RFP 전체 확인 전에는 유보한다. p.37의 지표와 단위는 **제출할 목표치의 항목**이지 실제 측정값이 아니다. 제공 자료에는 두 항만 지표의 실측값·원자료·시험 승인 기록이 없어 적합성, 성능 충족 또는 시험 승인을 판정할 수 없다. 다른 연결 국내외 데이터셋 전체의 조건·원문 위치 역시 이 발췌로 완결되지 않는다.",
+  "answer_status": "PARTIAL_HOLD",
+  "assessment": {
+    "missing_items": [
+      "criteria exist but official evaluator inputs are incomplete",
+      "evidence is extracted but not support-verified",
+      "comparison conditions have not been confirmed",
+      "counterevidence has not been checked"
+    ]
+  },
+  "portfolio": {
+    "hypotheses": [
+      {
+        "hypothesis_id": "hypothesis:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:rfp-sensor",
+        "statement": "UNKNOWN — AI-Hub의 ‘카메라 + 레이다 융합 | CenterFusion’ 표기를 RFP의 필수 센서 조합으로 옮겨 읽었을 가능성이 있다. 제공된 RFP 발췌만으로 조합의 명시 여부는 확정할 수 없다.",
+        "uncertainty": "RFP 발췌의 비명시는 RFP 전체의 비명시를 증명하지 않는다. 적용 문서 버전도 재확인이 필요하다.",
+        "support_evidence_refs": [
+          "span:3ac72414-5d0f-4a8c-a2eb-8b85a20b69e4",
+          "span:5107fe50-16bb-4bc1-a62b-5f1885de51e4",
+          "span:ff2c5ba7-ab7e-4f6a-8bd8-183d34cc017d"
+        ],
+        "counterevidence_refs": [],
+        "counterevidence_queries": [
+          "RFP p.36–37과 해당 1세부 전체에서 레이더·카메라 조합을 필수로 지정하는 문구가 있는가?"
+        ],
+        "critical_review": null,
+        "discriminating_tests": [
+          {
+            "expected_if_alternative": "적용 RFP 또는 공식 변경 문서에 필수 조합과 그 위치가 명시된다.",
+            "expected_if_true": "AI-Hub 표기만 확인되고 RFP의 필수 조합 지정은 확인되지 않는다.",
+            "procedure_candidate": "담당자에게 적용 RFP 원본·변경본과 센서 구성 문서를 요청해 1세부 문구를 AI-Hub HTML 3649행과 출처별로 대조한다.",
+            "risk_tier": "R0"
+          }
+        ],
+        "missing_evidence": [
+          "해당 공고에 적용되는 1세부 RFP 원본·변경본의 센서 구성 문구",
+          "공식 과제 설계 문서의 필수·선택 센서 구분"
+        ]
+      },
+      {
+        "hypothesis_id": "hypothesis:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:transfer",
+        "statement": "외부 자료는 융합 방법·데이터 설계의 참고자료일 수 있지만, 확인된 도로 환경과 nuScenes 평가 결과를 항만 비가시 객체 감지율(%) 또는 충돌 위험 인지 및 제어 지연시간(ms)의 직접 근거로 전용할 수는 없다.",
+        "uncertainty": "survey p.16, 81–82행 및 p.39, 65–67행의 CenterFusion 32.6 mAP·44.9 NDS는 nuScenes 결과로 제시된다. 연결 자료 전체의 범위는 아직 확인되지 않았다.",
+        "support_evidence_refs": [
+          "span:7759d43a-1cc0-4e45-ba28-588554656458",
+          "span:6cd5d0ab-63e1-45ef-91dc-65e4071836e2",
+          "span:10eab22b-a1f8-4ce5-a3d1-84c49cab909d",
+          "span:e0190a7b-f6c9-458d-8101-ed7827d32fdd",
+          "span:76dd48db-22e6-4c3f-b740-2a8282ebb034",
+          "span:67964368-89f4-4caa-a451-e1c14cecce19",
+          "span:57c06842-fd12-4f29-aa3a-60b892f3832e",
+          "span:f125282c-515c-476f-a320-b01c38bc6a62",
+          "span:d9af94fd-f4de-4b31-94ba-95121b9c5b90"
+        ],
+        "counterevidence_refs": [],
+        "counterevidence_queries": [
+          "연결된 다른 데이터셋이나 CenterFusion 후속 평가에 동일한 항만 조건과 동일한 두 지표의 측정 기록이 있는가?"
+        ],
+        "critical_review": null,
+        "discriminating_tests": [
+          {
+            "expected_if_alternative": "동일 항만 조건·지표·프로토콜의 결과와 원자료가 원문 위치와 함께 확인된다.",
+            "expected_if_true": "방법·라벨 설계의 참고 가능성은 확인되나, 항만의 동일 지표 실측은 확인되지 않는다.",
+            "procedure_candidate": "survey p.14·16·39, CenterFusion 원문 p.2, AI-Hub HTML 3249·3649·3989–3998행과 다른 연결 데이터셋의 원문에서 환경·지표·시험 조건을 대조한다.",
+            "risk_tier": "R0"
+          }
+        ],
+        "missing_evidence": [
+          "연결된 국내외 데이터셋 전체의 원문별 수집 환경·평가 프로토콜과 위치",
+          "외부 지표와 항만 지표의 비교 가능성을 입증하는 정의서·항만 재현시험"
+        ]
+      },
+      {
+        "hypothesis_id": "hypothesis:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:measurement",
+        "statement": "제공된 RFP p.37, 20–22행은 정량적 목표치 제출 항목을 열거한다. 이 발췌와 외부 결과만으로는 항만 비가시 객체 감지율(%)·충돌 위험 인지 및 제어 지연시간(ms)의 실제 측정 또는 시험 승인을 확인할 수 없다.",
+        "uncertainty": "UNKNOWN — 측정 수행·결과·승인 여부는 확인되지 않았다. RFP p.45, 20행의 3세부 ‘실시간 처리 지연시간(ms)’과 ‘위험 상황 감지 및 대응 지연시간(sec)’은 1세부 지표의 측정값이 아니다.",
+        "support_evidence_refs": [
+          "span:b97dce8e-863b-4597-bfb9-0ffbfd7a97a7",
+          "span:f125282c-515c-476f-a320-b01c38bc6a62",
+          "span:d9af94fd-f4de-4b31-94ba-95121b9c5b90",
+          "span:54c64cdf-ddb9-405a-b2d5-d83b41266154",
+          "span:bddd96e1-9799-4768-b71a-3adc90134748"
+        ],
+        "counterevidence_refs": [],
+        "counterevidence_queries": [
+          "항만 현장 시험에서 비가시 조건·감지율 분자와 분모, 지연시간 시작·종료점을 정의하고 두 값을 실제 측정한 날짜별 원자료와 승인 기록이 있는가?"
+        ],
+        "critical_review": null,
+        "discriminating_tests": [
+          {
+            "expected_if_alternative": "해당 장비 버전·항만 조건에서 측정한 두 값과 판정·승인 기록이 별도 문서로 확인된다.",
+            "expected_if_true": "제공된 RFP의 항목만으로는 실측·승인을 확인할 수 없으며, 별도 기록의 확인이 필요하다.",
+            "procedure_candidate": "담당자에게 1세부 지표 정의서·계획서·항만 시험계획서·원자료·시험성적서·승인 기록을 요청하고 목표치와 측정값을 구분한다.",
+            "risk_tier": "R0"
+          }
+        ],
+        "missing_evidence": [
+          "1세부 지표 정의서·연구개발계획서의 목표치",
+          "항만 시험계획서, 장비·센서 구성 및 동기화 기록",
+          "두 지표의 측정 원자료·시험성적서·승인 기준과 승인 기록"
+        ]
+      }
+    ]
+  },
+  "action_plan": {
+    "frontier": [
+      "action:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:compare",
+      "action:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:request-draft"
+    ],
+    "alternatives": [
+      {
+        "action_id": "action:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:compare",
+        "action_family": "READ_ONLY_ANALYSIS",
+        "specification": "제공된 span만 출처별로 대조해 RFP 1세부 목표 항목, AI-Hub의 검증 모델·라벨, survey와 CenterFusion의 nuScenes 평가를 분리한다. 각 주장의 원문 위치를 붙이고 센서 필수 지정·항만 실측·승인은 UNKNOWN으로 유지한다.",
+        "expected_information_value": "현재 자료로 뒷받침되는 참고 가능 범위와 항만 성능의 직접 근거가 아닌 범위를 정리한다. 미제공 문서의 존재 여부까지 확인하지는 못한다.",
+        "risk_tier": "R0",
+        "execution_authority": "AUTO_R0",
+        "reversibility": "FULL",
+        "state": "AUTO_ALLOWED",
+        "source_refs": [
+          "span:5107fe50-16bb-4bc1-a62b-5f1885de51e4",
+          "span:b97dce8e-863b-4597-bfb9-0ffbfd7a97a7",
+          "span:f125282c-515c-476f-a320-b01c38bc6a62",
+          "span:d9af94fd-f4de-4b31-94ba-95121b9c5b90",
+          "span:ff2c5ba7-ab7e-4f6a-8bd8-183d34cc017d",
+          "span:7759d43a-1cc0-4e45-ba28-588554656458",
+          "span:6cd5d0ab-63e1-45ef-91dc-65e4071836e2",
+          "span:10eab22b-a1f8-4ce5-a3d1-84c49cab909d",
+          "span:67964368-89f4-4caa-a451-e1c14cecce19",
+          "span:57c06842-fd12-4f29-aa3a-60b892f3832e"
+        ],
+        "missing_evidence": [
+          "적용 RFP 전체·변경본의 센서 구성 문구",
+          "다른 연결 데이터셋의 원문과 평가 조건",
+          "항만 시험 원자료·시험성적서·승인 기록"
+        ],
+        "estimated_cost": null,
+        "estimated_seconds": null
+      },
+      {
+        "action_id": "action:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:request-draft",
+        "action_family": "EVIDENCE_REQUEST",
+        "specification": "담당자에게 보낼 문서 요청·질문을 로컬 초안으로만 작성한다. 적용 RFP 원본·변경본의 필수 센서 문구, 각 연결 자료의 원문·프로토콜, 두 항만 지표의 정의·목표치·측정 원자료·승인 기록과 시험 당시 장비 버전을 요청한다. 발송은 이 행동에 포함하지 않는다.",
+        "expected_information_value": "초안 자체는 UNKNOWN을 해소하지 않는다. 별도 발송 후 회신을 받으면 필수 센서 여부와 실제 측정·승인 여부를 구별할 수 있다.",
+        "risk_tier": "R1",
+        "execution_authority": "PREAUTHORIZED_R1",
+        "reversibility": "FULL",
+        "state": "RISK_CLASSIFIED",
+        "source_refs": [
+          "span:1580e7b4-64bb-4eb0-99c2-5a8fc6113f70",
+          "span:3ac72414-5d0f-4a8c-a2eb-8b85a20b69e4",
+          "span:b97dce8e-863b-4597-bfb9-0ffbfd7a97a7",
+          "span:f125282c-515c-476f-a320-b01c38bc6a62",
+          "span:d9af94fd-f4de-4b31-94ba-95121b9c5b90",
+          "span:54c64cdf-ddb9-405a-b2d5-d83b41266154",
+          "span:bddd96e1-9799-4768-b71a-3adc90134748"
+        ],
+        "missing_evidence": [
+          "해당 공고에 적용되는 1세부 RFP 원본·변경 이력과 공식 센서 설계 문서",
+          "비가시 조건·감지율 분자와 분모·지연시간 시작점과 종료점의 정의",
+          "항만 시험계획서·로그·원자료·시험성적서·승인 기준과 기록"
+        ],
+        "estimated_cost": null,
+        "estimated_seconds": null
+      },
+      {
+        "action_id": "action:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:sandbox-mapping",
+        "action_family": "SANDBOX_REPLAY",
+        "specification": "sandbox-owner 승인 뒤, 제공된 인용문만 격리된 로컬 표에 수동 배치해 환경·라벨·지표의 대응 가능성을 점검한다. 외부 자료 수치의 항만 지표 환산, 코드 실행, 실제 시험은 하지 않는다.",
+        "expected_information_value": "비교 불가능한 지표를 전용할 위험과 추가로 필요한 항만 재현시험 조건을 드러낼 수 있다. 항만 성능값은 생성하지 못한다.",
+        "risk_tier": "R2",
+        "execution_authority": "SANDBOX_ONLY_R2",
+        "reversibility": "FULL",
+        "state": "RISK_CLASSIFIED",
+        "source_refs": [
+          "span:7759d43a-1cc0-4e45-ba28-588554656458",
+          "span:6cd5d0ab-63e1-45ef-91dc-65e4071836e2",
+          "span:10eab22b-a1f8-4ce5-a3d1-84c49cab909d",
+          "span:db2b956b-ba8c-4f5f-91ce-54ae20a143b7",
+          "span:dd70f6e8-a2bb-4f4a-b73f-45fb192decdc",
+          "span:67964368-89f4-4caa-a451-e1c14cecce19",
+          "span:f125282c-515c-476f-a320-b01c38bc6a62",
+          "span:d9af94fd-f4de-4b31-94ba-95121b9c5b90"
+        ],
+        "missing_evidence": [
+          "sandbox-owner 승인",
+          "외부 자료와 항만 지표의 정의·시험 조건 비교 자료",
+          "항만 재현시험 결과"
+        ],
+        "estimated_cost": null,
+        "estimated_seconds": null
+      }
+    ],
+    "decision_analysis": {
+      "criteria": [
+        {
+          "criterion_id": "criterion:evidence-boundary",
+          "mandatory": true,
+          "name": "근거와 결론의 분리",
+          "rationale": "RFP 목표 항목, 외부 평가 결과, 항만 실측값을 서로 대체하지 않는다."
+        },
+        {
+          "criterion_id": "criterion:missing-records",
+          "mandatory": true,
+          "name": "판정에 필요한 자료 확보",
+          "rationale": "센서 필수 지정과 측정·승인 여부는 적용 문서 및 시험 기록 없이는 확정할 수 없다."
+        },
+        {
+          "criterion_id": "criterion:action-scope",
+          "mandatory": true,
+          "name": "행동 범위와 승인",
+          "rationale": "로컬 분석·초안과 승인 필요한 sandbox 행동을 구분한다."
+        }
+      ],
+      "decision": "현재는 제공된 span의 읽기 전용 대조와 담당자 요청 초안 작성을 우선한다. sandbox 대조는 별도 승인 후 검토하며, 어느 행동도 적합성·성능 충족·시험 승인을 판정하지 않는다.",
+      "evaluations": [
+        {
+          "action_id": "action:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:compare",
+          "assessment": "우선 시행 가능. RFP p.37의 목표 항목과 도로·nuScenes 자료의 결과를 분리하되, RFP 전체의 센서 명시 여부는 UNKNOWN으로 둔다.",
+          "criterion_id": "criterion:evidence-boundary",
+          "evidence_refs": [
+            "span:b97dce8e-863b-4597-bfb9-0ffbfd7a97a7",
+            "span:ff2c5ba7-ab7e-4f6a-8bd8-183d34cc017d",
+            "span:7759d43a-1cc0-4e45-ba28-588554656458",
+            "span:67964368-89f4-4caa-a451-e1c14cecce19"
+          ],
+          "scenario": "제공된 span만 사용"
+        },
+        {
+          "action_id": "action:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:compare",
+          "assessment": "현재 근거의 한계는 명확히 할 수 있으나 실측·승인 여부를 새로 확인할 수는 없다.",
+          "criterion_id": "criterion:missing-records",
+          "evidence_refs": [
+            "span:f125282c-515c-476f-a320-b01c38bc6a62",
+            "span:d9af94fd-f4de-4b31-94ba-95121b9c5b90"
+          ],
+          "scenario": "추가 문서가 제공되지 않음"
+        },
+        {
+          "action_id": "action:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:request-draft",
+          "assessment": "회신을 받는 경우 가장 중요한 UNKNOWN을 해소할 가능성이 있다. 초안 작성만으로 자료가 확보된 것으로 취급하지 않는다.",
+          "criterion_id": "criterion:missing-records",
+          "evidence_refs": [
+            "span:1580e7b4-64bb-4eb0-99c2-5a8fc6113f70",
+            "span:b97dce8e-863b-4597-bfb9-0ffbfd7a97a7"
+          ],
+          "scenario": "로컬 초안 작성 후 별도 발송·회신"
+        },
+        {
+          "action_id": "action:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:request-draft",
+          "assessment": "로컬에서 되돌릴 수 있다. 담당자에게 실제 발송하는 행동은 이 계획의 범위 밖이다.",
+          "criterion_id": "criterion:action-scope",
+          "evidence_refs": [
+            "span:1580e7b4-64bb-4eb0-99c2-5a8fc6113f70"
+          ],
+          "scenario": "발송하지 않는 초안"
+        },
+        {
+          "action_id": "action:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:sandbox-mapping",
+          "assessment": "지표 불일치를 시각화하는 보조 수단이다. 누락된 항만 실측값이나 비교 가능성을 입증하지 못한다.",
+          "criterion_id": "criterion:evidence-boundary",
+          "evidence_refs": [
+            "span:6cd5d0ab-63e1-45ef-91dc-65e4071836e2",
+            "span:db2b956b-ba8c-4f5f-91ce-54ae20a143b7",
+            "span:f125282c-515c-476f-a320-b01c38bc6a62"
+          ],
+          "scenario": "승인된 격리 표에서 제공 인용문만 대조"
+        },
+        {
+          "action_id": "action:object:807e7119-d046-412c-a6ca-3cfa9d3f50a4:sandbox-mapping",
+          "assessment": "승인 전에는 시행 대상으로 올리지 않는다. 읽기 전용 대조보다 우선할 근거도 없다.",
+          "criterion_id": "criterion:action-scope",
+          "evidence_refs": [
+            "span:7759d43a-1cc0-4e45-ba28-588554656458",
+            "span:67964368-89f4-4caa-a451-e1c14cecce19"
+          ],
+          "scenario": "sandbox-owner 승인이 아직 없음"
+        }
+      ],
+      "preference_question": null,
+      "sensitivity": "적용 RFP에 필수 조합이 명시되거나 동일 항만 조건의 원자료·승인 기록이 회신되면 분석 결과를 수정해야 한다. 그 전에는 외부 지표로 항만 성능을 판정하지 않는다.",
+      "uncertainty": "UNKNOWN — 적용 RFP 전체·변경 이력의 센서 문구, 다른 연결 자료의 전체 범위, 두 항만 지표의 실측값 및 승인 기록은 확인되지 않았다."
+    }
+  }
+}

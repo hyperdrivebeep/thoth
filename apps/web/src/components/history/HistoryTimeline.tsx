@@ -1,6 +1,7 @@
 import { Button, Icon, Tag } from "@blueprintjs/core";
 import type { HistoryPage, HistoryRow, HistorySelection } from "../../api/historyModels";
 import { selectionKey } from "../../api/historyModels";
+import { ChangeBrief } from "./HistoryChangeSummary";
 import { currentnessLabel, currentnessTone, formatHistoryTime, kindLabel } from "./historyPresentation";
 
 export function HistoryTimeline({ pages, selected, loadingMore, onSelect, onMore, showCheckpoints = false, comparison }: {
@@ -33,6 +34,7 @@ export function HistoryTimeline({ pages, selected, loadingMore, onSelect, onMore
           aria-pressed={Boolean(selected && selectionKey(selected) === selectionKey(item.selection))} onClick={() => onSelect(item)}>
           <span className="history-event-meta"><span>{item.completion === "CHECKPOINT" ? "중간 저장" : kindLabel(item.kind)}</span><time dateTime={item.occurredAt}>{formatHistoryTime(item.occurredAt)}</time></span>
           <strong>{item.title}</strong>
+          <ChangeBrief summary={item.changeSummary}/>
           <span className="history-event-status"><Tag minimal intent={currentnessTone(item.currentness)}>{currentnessLabel(item.currentness)}</Tag>
             {item.membership === "BRANCH" && <Tag minimal>다른 분기</Tag>}
             {item.membership === "ANCESTOR" && <span>이전 버전</span>}

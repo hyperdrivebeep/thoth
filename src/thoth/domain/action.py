@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from datetime import datetime
 from decimal import Decimal
 from typing import Literal
 
-from pydantic import AwareDatetime, Field, model_validator
+from pydantic import AwareDatetime, Field, field_validator, model_validator
 
 from thoth.domain.base import DomainModel
 from thoth.domain.enums import (
@@ -31,6 +32,50 @@ ActionPurpose = Literal[
     "GOVERNANCE_ESCALATION",
     "RESTORE_COMPENSATE",
 ]
+
+
+EffortDimension = Literal["TIME", "COST_EFFORT"]
+EffortBand = Literal["LOW", "MEDIUM", "HIGH", "UNKNOWN"]
+EstimatorType = Literal["AI", "HUMAN", "RULE"]
+
+
+class EffortEstimateDraft(DomainModel):
+    """What the action-planning model writes. Values outside the band table become UNKNOWN."""
+
+    dimension: str = Field(description="TIME or COST_EFFORT")
+    band: str = Field(description="LOW, MEDIUM, HIGH or UNKNOWN, judged by the effort band table")
+    basis_text: str = Field(
+        default="", description="One sentence naming the work that decides this band"
+    )
+    assumptions: tuple[str, ...] = ()
+
+
+class OrdinalEstimate(DomainModel):
+    """A time or cost-effort band with who estimated it and why. Never a number."""
+
+    dimension: EffortDimension
+    band: EffortBand
+    estimator_type: EstimatorType
+    estimator_ref: str = Field(min_length=1, max_length=160)
+    basis_text: str = Field(default="", max_length=2_000)
+    assumptions: tuple[str, ...] = ()
+    profile_id: str = Field(min_length=1, max_length=80)
+    profile_version: str = Field(min_length=1, max_length=40)
+    created_at: AwareDatetime | None = None
+
+    @field_validator("created_at")
+    @classmethod
+    def millisecond_precision(cls, value: datetime | None) -> datetime | None:
+        # Ledger snapshots keep millisecond precision; keep the record identical after a round trip.
+        return (
+            None if value is None else value.replace(microsecond=value.microsecond // 1000 * 1000)
+        )
+
+    @model_validator(mode="after")
+    def band_needs_basis(self) -> OrdinalEstimate:
+        if self.band != "UNKNOWN" and not self.basis_text.strip():
+            raise ValueError("an effort band requires a basis sentence; otherwise use UNKNOWN")
+        return self
 
 
 class ActionRiskFacts(DomainModel):
@@ -66,6 +111,7 @@ class ActionDraft(DomainModel):
     source_refs: tuple[str, ...] = ()
     missing_evidence: tuple[str, ...] = ()
     primary_purpose: ActionPurpose | None = None
+    effort_estimates: tuple[EffortEstimateDraft, ...] = ()
 
 
 class ActionCompilationPolicy(DomainModel):
@@ -95,7 +141,8 @@ class ActionCandidate(DomainModel):
     primary_purpose: ActionPurpose | None = None
     effect_facts: ActionRiskFacts | None = None
     effect_completeness_confirmed: bool = False
-    schema_version: str = "1.0.0"
+    effort_estimates: tuple[OrdinalEstimate, ...] = ()
+    schema_version: str = "1.1.0"
 
     @model_validator(mode="after")
     def enforce_authority(self) -> ActionCandidate:

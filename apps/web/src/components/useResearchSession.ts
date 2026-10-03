@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { rpc } from "../api/rpcClient";
-import type { ResearchAdmission, ResearchStatus } from "../api/research";
+import { readResearchStatus } from "../api/researchStatusRead";
+import type { ResearchAdmission } from "../api/research";
 import type { ModelSelection } from "./ModelSettings";
 import { readDraft, writeDraft } from "../api/conversation";
 import { clearLocalPending, inspectLocalDraft, readLocalPending, submissionSignature, validWorkspaceId, writeLocalPending,
@@ -23,6 +24,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   const [pendingRead, setPendingRead] = useState<PendingRead>(() => storageScope.mode === "LOCAL"
     ? readLocalPending(storageScope.workspaceId, projectId, threadId) : { kind: "NONE" });
   const [pendingStorageError, setPendingStorageError] = useState<string | null>(null);
+  const [queuedNotice, setQueuedNotice] = useState(false);
   const setProblem = (text: string) => {
     const saved = writeDraft(projectId, threadId, text, storageScope);
     if (storageScope.mode === "LOCAL") {
@@ -44,6 +46,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     setPendingRead(storageScope.mode === "LOCAL" ? readLocalPending(storageScope.workspaceId, projectId, threadId) : { kind: "NONE" });
     pendingSubmission.current = null;
     setPendingStorageError(null);
+    setQueuedNotice(false);
   }, [projectId, threadId, storageScope]);
   const [modelSelection, setModelSelection] = useState<ModelSelection | null>(null);
   const draftRevision = useRef(0);
@@ -57,7 +60,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   const readKey = ["research", projectId, threadId];
   const research = useQuery({
     queryKey: readKey, enabled: Boolean(projectId && threadId),
-    queryFn: ({ signal }) => rpc<ResearchStatus>("thread/read", { project_id: projectId, thread_id: threadId }, crypto.randomUUID(), signal),
+    queryFn: ({ signal }) => readResearchStatus(client, readKey, projectId, threadId, signal),
     refetchInterval: query => query.state.data?.value.operation_state === "RUNNING" ? 1200 : false,
   });
   const basis = research.data?.value.current_result?.basis_digest;
@@ -68,6 +71,13 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     void client.invalidateQueries({queryKey:["sources",projectId]});
     void client.invalidateQueries({queryKey:["conversation",projectId,threadId]});
   }, [basis,operationState,projectId,threadId,client]);
+  // A queued instruction waits for the running investigation; the notice ends when that run leaves RUNNING.
+  const sawRunning = useRef(false);
+  useEffect(() => {
+    if (!queuedNotice) { sawRunning.current = false; return; }
+    if (operationState === "RUNNING") sawRunning.current = true;
+    else if (sawRunning.current) setQueuedNotice(false);
+  }, [queuedNotice, operationState]);
   const submit = useMutation({
     mutationFn: async (captured: { projectId: string; threadId: string; problem: string; selection: ModelSelection | null; revision: number; epoch: number; key: string; scope: BrowserScope }) => {
       const admission = await rpc<ResearchAdmission>(captured.threadId ? "thread/input" : "thread/start", {
@@ -102,6 +112,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
         else setPendingStorageError("접수는 확인됐지만 브라우저의 요청 복구 표시를 지우지 못했습니다. 원 요청을 다시 확인하세요.");
       }
       clearModel(captured.revision, captured.epoch);
+      setQueuedNotice(admission.status === "QUEUED_AFTER_CURRENT");
       const next = problemRef.current === captured.problem ? "" : problemRef.current;
       if (!next) {
         const saved = writeDraft(captured.projectId, captured.threadId, "", captured.scope);
@@ -123,6 +134,20 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     },
     onSettled: (_data, _error, captured) => { if (pendingSubmission.current?.key === captured.key) pendingSubmission.current.inFlight = false; },
   });
+  // "이어서 조사": the user asked to continue the interrupted run. The server reuses only the stages whose input is unchanged.
+  const resume = useMutation({
+    mutationFn: async (operationId: string) => {
+      if (!canExecute || !threadId) throw new Error("지금은 이어서 조사를 시작할 수 없습니다.");
+      return rpc<ResearchAdmission>("thread/input", { project_id: projectId, thread_id: threadId, contract_version: 2, resume_from_operation_id: operationId }, crypto.randomUUID());
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        client.invalidateQueries({ queryKey: ["threads"] }),
+        client.invalidateQueries({ queryKey: ["research", projectId, threadId] }),
+        client.invalidateQueries({ queryKey: ["conversation", projectId, threadId] }),
+      ]);
+    },
+  });
   const retryPending = () => {
     if (storageScope.mode !== "LOCAL" || !canExecute || pendingSubmission.current?.inFlight) return;
     const stored = readLocalPending(storageScope.workspaceId, projectId, threadId);
@@ -134,9 +159,9 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     submit.mutate({ projectId, threadId, problem: value.problem, selection: value.selection,
       revision: -1, epoch: epoch.current, key: value.key, scope: storageScope });
   };
-  return { research, problem, setProblem, draftSaveState, draftRestoreIssue, pendingRead, pendingBlocksNewInput, pendingStorageError,
+  return { research, queuedNotice, problem, setProblem, draftSaveState, draftRestoreIssue, pendingRead, pendingBlocksNewInput, pendingStorageError,
     retryPending, modelSelection, chooseModel, clearModel, draftRevision,
-    renderedRevision: draftRevision.current, submit,
+    renderedRevision: draftRevision.current, submit, resume,
     send: () => {
       if (!canExecute || !problem.trim() || pendingSubmission.current?.inFlight || pendingBlocksNewInput) return;
       if (storageScope.mode === "LOCAL") {

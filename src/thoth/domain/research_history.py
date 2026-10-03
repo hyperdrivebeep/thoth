@@ -45,6 +45,27 @@ class HistoryCapability(DomainModel):
     reason_codes: tuple[str, ...] = ()
 
 
+ChangeFlag = Literal["NUMBER", "NEGATION", "STATUS", "CITATION", "AUTHORITY", "TIME"]
+
+
+class ChangeLine(DomainModel):
+    label: str
+    before: str
+    after: str
+
+
+class ChangeSummary(DomainModel):
+    """Derived view of a revision's diff against its parent; never a second source of truth."""
+
+    lines: tuple[ChangeLine, ...]
+    more: int = Field(default=0, ge=0)
+    flags: tuple[ChangeFlag, ...] = ()
+    text_diff_recommended: bool = False
+    # Fields without a reader-facing name are only counted; their raw form stays in technical info.
+    other: int = Field(default=0, ge=0)
+    technical: tuple[ChangeLine, ...] = ()
+
+
 class HistoryItem(DomainModel):
     item_id: str
     kind: Literal["REQUEST", "RESULT", "REVISION", "RESTORE", "MEMORY"]
@@ -64,6 +85,7 @@ class HistoryItem(DomainModel):
     phase: str | None = None
     currentness: BasisCurrentness
     capability: HistoryCapability = Field(default_factory=HistoryCapability)
+    change_summary: ChangeSummary | None = None
 
 
 class HistoryTimelineInput(DomainModel):

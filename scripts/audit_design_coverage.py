@@ -101,7 +101,7 @@ SCENARIOS = {
     "FL08_atomic_failure": ("tests/integration/test_revision_service.py", "PASS"),
     "FL09_digest_tamper": ("tests/integration/test_ingestion_service.py", "PASS"),
     "FL10_prompt_cross_project_oracle": ("tests/adversarial", "PASS"),
-    "LIVE01_general_project_e2e": ("docs/verification/live-project-e2e-20260830.md", "PASS"),
+    "LIVE01_general_project_e2e": ("", "NOT_RUN_PRIVATE_RECORD_NOT_DISTRIBUTED"),
     "LIVE02_async_cancel": ("tests/contract/test_async_http.py", "PASS"),
     "LIVE03_closure_export": ("tests/integration/test_lifecycle_rpc.py", "PASS"),
     "DEMO01_rights_cleared": ("examples/projectpacks/public-demo-membrane/RIGHTS.md", "PASS"),

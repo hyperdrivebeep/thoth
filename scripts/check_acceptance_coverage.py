@@ -20,7 +20,16 @@ def main() -> int:
 
     wiki_root = ROOT / "PROJECT_WIKI"
     if not wiki_root.is_dir():
-        wiki_root = ROOT.parent / "PROJECT_WIKI"
+        print(
+            json.dumps(
+                {
+                    "verdict": "NOT_APPLICABLE",
+                    "errors": [],
+                    "reason": "Local development roadmap is not distributed.",
+                }
+            )
+        )
+        return 0
     contract_path = wiki_root / "50_SEED_ROADMAP/behavioral-acceptance-contracts.md"
     matrix_path = wiki_root / "50_SEED_ROADMAP/implementation-maturity-matrix.md"
     for path in (contract_path, matrix_path):

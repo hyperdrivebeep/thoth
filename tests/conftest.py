@@ -1,10 +1,27 @@
 """Opt-in test guards. The xAI fixture is applied only by xAI test modules."""
 
-from collections.abc import Generator
+from collections.abc import Generator, Mapping
 from typing import Any
 
 import httpx
 import pytest
+
+
+@pytest.fixture(autouse=True)
+def no_real_claude_binary(monkeypatch: pytest.MonkeyPatch) -> Generator[None]:
+    """Default tests never start the developer's real Claude Code executable.
+
+    Tests that need its status pass their own runner or patch the cached status.
+    """
+    from thoth.adapters.models import claude_code
+
+    def blocked(_argv: tuple[str, ...], _env: Mapping[str, str]) -> Any:
+        raise OSError("CLAUDE_CODE_BINARY_BLOCKED_IN_TESTS")
+
+    monkeypatch.setattr(claude_code, "_status_run", blocked)
+    claude_code.invalidate_claude_code_status()
+    yield
+    claude_code.invalidate_claude_code_status()
 
 
 @pytest.fixture

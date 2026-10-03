@@ -4,17 +4,24 @@ from pydantic import JsonValue
 
 from thoth.application.services.action_service import ActionService
 from thoth.application.services.research_freshness import ResearchFreshnessService
+from thoth.application.services.running_research import research_is_running
 from thoth.domain.action_full import ActionPlanRecord, ActionRecord, AuthorizationEnvelopeRecord
 from thoth.ports.action import ActionStorePort
 from thoth.ports.ledger import LedgerPort
+from thoth.ports.operation import OperationStorePort
 
 
-def action_read_view(action: ActionRecord, service: ActionService) -> dict[str, JsonValue]:
+def action_read_view(
+    action: ActionRecord, service: ActionService, operations: OperationStorePort | None = None
+) -> dict[str, JsonValue]:
     return {
         "action": action.model_dump(mode="json"),
         "currentness": service.currentness(
             action.project_id, action.action_id, action.revision_digest
         ),
+        # A person's estimate is refused while an investigation runs, so the screen can say so.
+        "research_running": operations is not None
+        and research_is_running(operations, action.project_id),
     }
 
 

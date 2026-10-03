@@ -1,7 +1,14 @@
 """Deterministic history items from exact immutable owners, never guessed episodes."""
 
+from thoth.application.services.history_change_summary import (
+    summarize_change,
+    summarize_user_correction,
+)
 from thoth.application.services.research_freshness import ResearchFreshnessService
+from thoth.domain.enums import EntityType
+from thoth.domain.memory import FullMemoryRevision
 from thoth.domain.research_history import (
+    ChangeSummary,
     HistoryCapability,
     HistoryItem,
     HistoryRecordRef,
@@ -13,6 +20,18 @@ from thoth.ports.ledger import LedgerPort
 from thoth.ports.research_history import HistoryRow, ResearchHistoryReadPort
 from thoth.ports.resource_scope import ResourceAccessPort
 from thoth.ports.restore import RestoreProfileRegistryPort
+
+_REVISION_TITLES = {
+    EntityType.HYPOTHESIS: "가설 변경",
+    EntityType.ACTION: "행동 계획 변경",
+    EntityType.EVIDENCE: "근거 연결 변경",
+    EntityType.MEMORY: "기억 변경",
+}
+
+
+def revision_fallback_title(entity_type: EntityType) -> str:
+    """Name a revision by what changed when no restore profile supplies a title."""
+    return _REVISION_TITLES.get(entity_type, "연구 항목 변경")
 
 
 class HistoryProjection:
@@ -55,6 +74,7 @@ class HistoryProjection:
                 title="연구 기억 기록",
                 schema_family="FullMemoryRevision",
                 currentness=self.freshness.owner_eligibility(project, memory.owner_revision_ref),
+                change_summary=self._memory_summary(project, memory),
             ), memory.model_dump(mode="json")
         if not self.access.may_read_revision(project, row.revision_digest):
             return None
@@ -73,7 +93,7 @@ class HistoryProjection:
         origin = None
         details: dict[str, object] = {}
         kind = "REVISION"
-        title = "연구 항목 변경"
+        title = revision_fallback_title(revision.entity_type)
         capability = HistoryCapability()
         if "record_kind" not in content:
             try:
@@ -136,9 +156,35 @@ class HistoryProjection:
                 else None,
                 "phase": content.get("phase") if family == "CurrentResultManifest" else None,
                 "currentness": currentness,
+                "change_summary": None
+                if family in {"ThreadRequestRevision", "CurrentResultManifest"}
+                else self._revision_summary(project, revision.parent_revision_digests, content),
                 **details,
             }
         ), content
+
+    def _revision_summary(
+        self, project: str, parents: tuple[str, ...], content: dict[str, object]
+    ) -> ChangeSummary | None:
+        """Diff against the single parent this revision was made from; None when unreadable."""
+
+        if len(parents) != 1 or not self.access.may_read_revision(project, parents[0]):
+            return None
+        parent = self.ledger.read_revision_by_digest(project, parents[0])
+        snapshot = None if parent is None else self.ledger.read_snapshot(parent.snapshot_id)
+        return None if snapshot is None else summarize_change(dict(snapshot.content), content)
+
+    def _memory_summary(self, project: str, memory: FullMemoryRevision) -> ChangeSummary | None:
+        if memory.parent_revision_digest is None:
+            return None
+        parent = self.reader.read_memory(project, memory.parent_revision_digest)
+        if parent is None or not self.access.may_read_revision(project, parent.owner_revision_ref):
+            return None
+        if memory.source_ref is not None and memory.source_ref.startswith("MEMORY:"):
+            return summarize_user_correction(
+                parent.assertion or parent.content_excerpt, memory.assertion or ""
+            )
+        return summarize_change(parent.model_dump(mode="json"), memory.model_dump(mode="json"))
 
     def _result(
         self, project: str, key: str, content: dict[str, object], digest: str

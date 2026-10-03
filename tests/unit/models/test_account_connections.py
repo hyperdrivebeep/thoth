@@ -141,25 +141,35 @@ def test_openai_api_key_stays_available_when_codex_profile_is_absent(tmp_path: P
 def test_key_and_oauth_methods_remain_independent_in_account_row(tmp_path: Path) -> None:
     register_api_key(provider="openai", model="gpt-4.1", api_key="synthetic-key", root=tmp_path)
     row = next(
-        item for item in account_connections(
-            {"connected": True, "execution_eligible": True,
-             "connection_state": "EXECUTION_UNVERIFIED", "reason_code": "EXECUTION_UNVERIFIED"},
+        item
+        for item in account_connections(
+            {
+                "connected": True,
+                "execution_eligible": True,
+                "connection_state": "EXECUTION_UNVERIFIED",
+                "reason_code": "EXECUTION_UNVERIFIED",
+            },
             tmp_path,
-        ) if item["provider"] == "openai"
+        )
+        if item["provider"] == "openai"
     )
     methods = row["auth_methods"]
     assert isinstance(methods, list)
     methods = cast(list[dict[str, object]], methods)
-    assert [method["auth_method"] for method in methods] == [
-        "api_key", "codex_isolated_browser"
-    ]
+    assert [method["auth_method"] for method in methods] == ["api_key", "codex_isolated_browser"]
     assert [method["route"] for method in methods] == ["openai", "codex-oauth"]
     assert [method["connected"] for method in methods] == [True, True]
     assert methods[0]["capabilities"] == {
-        "start": False, "status": True, "cancel": False, "manual_complete": False
+        "start": False,
+        "status": True,
+        "cancel": False,
+        "manual_complete": False,
     }
     assert methods[1]["capabilities"] == {
-        "start": True, "status": True, "cancel": True, "manual_complete": False
+        "start": True,
+        "status": True,
+        "cancel": True,
+        "manual_complete": False,
     }
 
 
@@ -189,3 +199,133 @@ def test_missing_isolated_codex_profile_reports_typed_hold(
 def test_legacy_global_device_login_never_starts_a_cli() -> None:
     with pytest.raises(codex_oauth.CodexOAuthUnavailable, match="ISOLATED_APP_SERVER"):
         codex_oauth.run_codex_device_login()
+
+
+_CODEX_OFF: dict[str, object] = {
+    "connected": False,
+    "execution_eligible": False,
+    "reason_code": "LOGIN_REQUIRED",
+}
+
+
+def _claude_row(
+    status: dict[str, object] | None,
+    tmp_path: Path,
+    claude: dict[str, object] | None = None,
+) -> dict[str, object]:
+    rows = account_connections(_CODEX_OFF, tmp_path, None, claude, status)
+    return next(row for row in rows if row["provider"] == "anthropic")
+
+
+def _methods(row: dict[str, object]) -> list[dict[str, object]]:
+    return cast(list[dict[str, object]], row["auth_methods"])
+
+
+def test_claude_row_without_the_official_binary_names_the_tool_problem(tmp_path: Path) -> None:
+    row = _claude_row(
+        {
+            "connection_state": "UNAVAILABLE",
+            "reason_code": "CLAUDE_CODE_NOT_INSTALLED",
+            "connected": False,
+            "execution_eligible": False,
+        },
+        tmp_path,
+    )
+    assert row["login_supported"] is False and row["connected"] is False
+    assert row["connection_state"] == "CLAUDE_CODE_NOT_INSTALLED"
+    assert row["available_model_providers"] == []
+    methods = _methods(row)
+    assert [method["auth_method"] for method in methods] == ["api_key", "claude_code_login"]
+    login = methods[1]
+    assert login["route"] == "claude-code"
+    assert login["reason_code"] == "CLAUDE_CODE_NOT_INSTALLED"
+    assert cast(dict[str, object], login["capabilities"])["start"] is False
+
+
+def test_claude_row_offers_the_binary_login_when_it_is_installed_and_signed_out(
+    tmp_path: Path,
+) -> None:
+    row = _claude_row(
+        {
+            "connection_state": "LOGIN_REQUIRED",
+            "reason_code": "CLAUDE_CODE_LOGIN_REQUIRED",
+            "connected": False,
+            "execution_eligible": False,
+        },
+        tmp_path,
+    )
+    assert row["login_supported"] is True and row["login_kind"] == "claude_code_login"
+    assert row["connection_state"] == "LOGIN_REQUIRED"
+    assert row["oauth"] is False and row["available_model_providers"] == []
+    login = _methods(row)[1]
+    assert login["auth_method"] == "claude_code_login" and login["route"] == "claude-code"
+    assert login["capabilities"] == {
+        "start": True,
+        "status": True,
+        "cancel": True,
+        "manual_complete": True,
+    }
+    assert all(method["auth_method"] != "claude_pkce" for method in _methods(row))
+
+
+def test_claude_row_is_eligible_after_a_subscription_login(tmp_path: Path) -> None:
+    row = _claude_row(
+        {
+            "connection_state": "EXECUTION_UNVERIFIED",
+            "reason_code": "CLAUDE_CODE_EXECUTION_UNVERIFIED",
+            "connected": True,
+            "execution_eligible": True,
+        },
+        tmp_path,
+    )
+    assert row["connected"] is True and row["oauth"] is True
+    assert row["available_model_providers"] == ["claude-code"]
+    assert row["execution_eligible"] is True and row["execution_verified"] is False
+    assert row["connection_state"] == "EXECUTION_UNVERIFIED"
+    login = _methods(row)[1]
+    assert login["connected"] is True and login["execution_eligible"] is True
+
+
+def test_claude_pkce_method_is_listed_only_when_a_client_id_enables_it(tmp_path: Path) -> None:
+    signed_out: dict[str, object] = {
+        "connection_state": "LOGIN_REQUIRED",
+        "reason_code": "CLAUDE_CODE_LOGIN_REQUIRED",
+        "connected": False,
+        "execution_eligible": False,
+    }
+    with_client = _claude_row(
+        signed_out, tmp_path, {"capabilities": {"start": True}, "auth_state": "DISCONNECTED"}
+    )
+    assert [method["auth_method"] for method in _methods(with_client)] == [
+        "api_key",
+        "claude_code_login",
+        "claude_pkce",
+    ]
+    without_client = _claude_row(signed_out, tmp_path, {"capabilities": {"start": False}})
+    assert [method["auth_method"] for method in _methods(without_client)] == [
+        "api_key",
+        "claude_code_login",
+    ]
+
+
+def test_local_credentials_reads_the_claude_binary_status_through_the_cache(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from thoth.adapters.models import claude_code
+
+    seen: list[Path] = []
+
+    def cached(workspace: Path) -> dict[str, object]:
+        seen.append(workspace)
+        return {
+            "connection_state": "LOGIN_REQUIRED",
+            "reason_code": "CLAUDE_CODE_LOGIN_REQUIRED",
+            "connected": False,
+            "execution_eligible": False,
+        }
+
+    monkeypatch.setattr(claude_code, "cached_claude_code_status", cached)
+    rows = LocalModelCredentials(tmp_path).account_connections()
+    anthropic = next(row for row in rows if row["provider"] == "anthropic")
+    assert seen == [tmp_path]
+    assert anthropic["login_kind"] == "claude_code_login"

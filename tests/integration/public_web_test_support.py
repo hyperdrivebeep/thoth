@@ -189,7 +189,7 @@ async def finished_result(
             request(
                 "thread/read",
                 "status",
-                {"project_id": "p", "thread_id": text(admitted["thread_id"])},
+                {"project_id": "p", "thread_id": text(admitted["thread_id"]), "view": "FULL"},
             )
         )
     )

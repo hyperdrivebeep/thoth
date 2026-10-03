@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import random
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Protocol, TypeVar, cast
@@ -13,13 +14,20 @@ from thoth.adapters.models.reference_schema import (
     constrain_span_references,
 )
 from thoth.domain.canonical import canonical_payload, domain_digest, model_digest
+from thoth.domain.effort_bands import effort_band_guidance
 from thoth.domain.model import ModelRequest, ModelResult
 from thoth.domain.model_dispatch import (
     UNVERIFIED_MODEL_CONTROL,
     ModelControlCapability,
     PreparedModelDispatch,
 )
-from thoth.domain.oauth_retry import is_approved_transient_429, retry_wait_seconds
+from thoth.domain.oauth_retry import (
+    MAX_RETRIES_PER_CALL,
+    interrupted_retry_delay_seconds,
+    is_approved_transient_429,
+    is_interrupted_model_call,
+    retry_wait_seconds,
+)
 from thoth.domain.research_execution import (
     check_research_boundary,
     research_work,
@@ -66,6 +74,7 @@ ProcessFactory = Callable[[tuple[str, ...]], Awaitable[ProcessPort]]
 
 class CodexCliExecutor(CodexExecutorPort):
     model_label = "codex-oauth/native-tools-unsupported"
+
     def __init__(
         self,
         *,
@@ -88,11 +97,14 @@ class CodexOAuthModel(ModelPort):
         executor: CodexExecutorPort | BoundedModelExecutorPort,
         *,
         max_repair_attempts: int = 2,
+        sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
+        jitter: Callable[[], float] = random.random,
     ) -> None:
         if max_repair_attempts < 0 or max_repair_attempts > 2:
             raise ValueError("max_repair_attempts must be between zero and two")
         self._executor = executor
         self._max_repair_attempts = max_repair_attempts
+        self._sleep, self._jitter = sleep, jitter
 
     @property
     def control_capability(self) -> ModelControlCapability:
@@ -206,7 +218,8 @@ class CodexOAuthModel(ModelPort):
         self, prepared: PreparedModelDispatch, dispatches: list[str]
     ) -> str:
         work = research_work.get()
-        retry_used = False
+        retries = 0
+        retried_429 = False
         previous: str | None = None
         while True:
             check_research_boundary()
@@ -233,14 +246,29 @@ class CodexOAuthModel(ModelPort):
                 if isinstance(exc, ModelTransportCancelled):
                     raise asyncio.CancelledError() from exc
                 policy = None if work is None else work.oauth_retry_policy
-                if (
-                    not retry_used
-                    and policy is not None
+                cap = MAX_RETRIES_PER_CALL if policy is None else policy.max_additional_transports
+                # The transient-429 retry happens once; cut-off retries use the rest of the cap.
+                retry_429 = (
+                    policy is not None
+                    and not retried_429
                     and is_approved_transient_429(str(exc), exc.observation.http_rejection)
-                ):
-                    retry_used = True
+                )
+                retry_cut_off = (
+                    work is not None
+                    and work.auto_retry_interrupted_call
+                    and is_interrupted_model_call(str(exc))
+                )
+                # Both reasons draw on one limit of extra sends per call.
+                if retries < cap and (retry_429 or retry_cut_off):
+                    delay = (
+                        retry_wait_seconds(exc.observation.http_rejection)
+                        if retry_429
+                        else interrupted_retry_delay_seconds(retries, self._jitter())
+                    )
+                    retried_429 = retried_429 or retry_429
+                    retries += 1
                     previous = dispatch_id
-                    await asyncio.sleep(retry_wait_seconds(exc.observation.http_rejection))
+                    await self._sleep(delay)
                     check_research_boundary()
                     continue
                 raise
@@ -424,9 +452,7 @@ def prompt_envelope(request: ModelRequest[BaseModel]) -> str:
         "Do not invent source IDs. "
         "Preserve uncertainty and explicit missing evidence. Keep narratives concise; "
         "use IDs instead of repeating source packets, metadata or paragraphs in every field. "
-        "Return only the schema object. "
-        + user_visible_language_contract()
-        + "\n\n"
+        "Return only the schema object. " + user_visible_language_contract() + "\n\n"
         "Each evidence span's source_index selects the exact source/version/authority/cutoff "
         "entry in the sources list. This is shared metadata, not missing information. "
         "Absent locator coordinates are unknown; do not invent them.\n\n"
@@ -494,11 +520,16 @@ def role_contract(role: str) -> str:
             "canonical records remain the current owner context. Propose primary_purpose when "
             "supported, or null when unclassified; do not infer authority from a candidate."
             " New action and plan IDs must be unique to the supplied object_id."
+            " For every action fill effort_estimates with one TIME and one COST_EFFORT entry: "
+            "band LOW, MEDIUM, HIGH or UNKNOWN plus a one-sentence basis_text naming the work "
+            "that decides it; use UNKNOWN with an empty basis when nothing supports a band. "
             " Use qualified canonical_test_assessments to choose the next action; failed or "
             "invalid "
             "tests require diagnosis or new evidence, not confirmation or repeated blind execution."
+            + effort_band_guidance()
             + _user_visible_language_fields(
-                "specification, expected_information_value, and missing_evidence explanations"
+                "specification, expected_information_value, missing_evidence explanations, "
+                "and effort_estimates basis_text and assumptions"
             )
         )
     if role == "SEMANTIC_REVIEWER":

@@ -249,7 +249,9 @@ async def test_normal_rpc_consumes_and_persists_the_same_scoped_conflict(
         readback = value(
             await runtime.bus.query(
                 request(
-                    "thread/read", "read", {"project_id": "p", "thread_id": accepted["thread_id"]}
+                    "thread/read",
+                    "read",
+                    {"project_id": "p", "thread_id": accepted["thread_id"], "view": "FULL"},
                 )
             )
         )

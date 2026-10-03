@@ -4,16 +4,19 @@ from typing import cast
 
 from pydantic import Field, JsonValue
 
+from thoth.application.commands.action_effort import HumanEffortEstimateInput, revise_action
 from thoth.application.commands.action_generation import GenerateInput as GenerateInput
 from thoth.application.commands.action_generation import generate_actions
 from thoth.application.services.action_currentness import action_read_view, plan_read_view
 from thoth.application.services.action_service import ActionService
+from thoth.application.services.authorization_currentness import authorization_read_view
 from thoth.application.services.revision_service import CommitResult
 from thoth.domain.action_full import ActionPlanRecord, ActionPortfolioRecord, ActionRecord
 from thoth.domain.base import DomainModel
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.ports.action import ActionStorePort
 from thoth.ports.decision_object import DecisionObjectStorePort
+from thoth.ports.operation import OperationStorePort
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 
 
@@ -87,9 +90,11 @@ class ActionRevisionBound(ActionReadInput):
 
 
 class ReviseInput(ActionRevisionBound):
-    patch: dict[str, JsonValue]
+    patch: dict[str, JsonValue] = Field(default_factory=dict)
     evidence_refs: tuple[str, ...]
     reason: str = Field(min_length=1, max_length=5_000)
+    human_effort_estimates: tuple[HumanEffortEstimateInput, ...] = ()
+    estimator_ref: str | None = Field(default=None, min_length=1, max_length=160)
 
 
 class PortfolioComposeInput(ProjectInput):
@@ -209,10 +214,12 @@ class ActionHandlers:
         store: ActionStorePort,
         service: ActionService,
         objects: DecisionObjectStorePort,
+        operations: OperationStorePort | None = None,
     ) -> None:
         self._store = store
         self._service = service
         self._objects = objects
+        self._operations = operations
 
     async def list(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ActionListInput.model_validate(value)
@@ -233,7 +240,7 @@ class ActionHandlers:
 
     async def read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ActionReadInput.model_validate(value)
-        return action_read_view(self._read_action(request), self._service)
+        return action_read_view(self._read_action(request), self._service, self._operations)
 
     async def portfolio_list(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = PortfolioListInput.model_validate(value)
@@ -335,15 +342,10 @@ class ActionHandlers:
         item = self._store.read_authorization(request.project_id, request.authorization_id)
         if item is None:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "authorization not found")
-        effective_state = (
-            "EXPIRED"
-            if item.state == "PENDING" and self._service.now() >= item.expires_at
-            else item.state
+        plan = self._store.read_plan(item.project_id, item.plan_id, None)
+        return authorization_read_view(
+            item, plan, now=self._service.now(), currentness=self._service.currentness
         )
-        return {
-            "authorization": item.model_dump(mode="json"),
-            "effective_state": effective_state,
-        }
 
     async def audit_read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = AuditReadInput.model_validate(value)
@@ -395,29 +397,12 @@ class ActionHandlers:
     async def revise(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ReviseInput.model_validate(value)
         current = self._read_action_expected(request)
-        allowed = {
-            "primary_purpose",
-            "secondary_purposes",
-            "specification",
-            "evidence_refs",
-            "expected_observation_or_change",
-        }
-        rejected = sorted(set(request.patch) - allowed)
-        if rejected:
-            raise RpcApplicationError(
-                RpcErrorCode.DOMAIN_REJECTED,
-                f"noncanonical Action patch: {', '.join(rejected)}",
-            )
-        updates: dict[str, object] = {
-            key: tuple(child) if key.endswith("_refs") and isinstance(child, list) else child
-            for key, child in request.patch.items()
-        }
-        revised, commit = self._revise_action(
+        revised, commit = revise_action(
+            self._revise_action,
+            self._service,
+            self._operations,
             current,
-            updates=updates,
-            event_type="action/updated",
-            evidence_refs=request.evidence_refs,
-            invalidate_downstream=True,
+            request,
         )
         return self._action_revision_result(current, revised, commit)
 

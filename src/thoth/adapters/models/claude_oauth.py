@@ -1,4 +1,4 @@
-"""THOTH-owned Claude PKCE attempt lifecycle; no OmO or Claude Code auth read."""
+"""THOTH-owned Claude PKCE attempt lifecycle; no external authentication read."""
 
 from __future__ import annotations
 
@@ -66,7 +66,7 @@ class _Attempt:
 class ClaudeOAuthBroker:
     """One workspace's pending login and execution credential owner.
 
-    A THOTH-registered client_id must be supplied explicitly. The installed OmO
+    A THOTH-registered client_id must be supplied explicitly. Another application's
     client ID is never used as a default or as a Claude Code identity.
     """
 

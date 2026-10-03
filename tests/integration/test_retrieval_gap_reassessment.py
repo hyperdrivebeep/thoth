@@ -57,7 +57,9 @@ async def test_current_semantic_scope_controls_hold_not_old_ranker_warning(
         status = value(
             await runtime.bus.query(
                 request(
-                    "thread/read", "read", {"project_id": "p", "thread_id": admitted["thread_id"]}
+                    "thread/read",
+                    "read",
+                    {"project_id": "p", "thread_id": admitted["thread_id"], "view": "FULL"},
                 )
             )
         )

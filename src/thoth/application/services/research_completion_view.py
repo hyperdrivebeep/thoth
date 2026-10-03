@@ -45,6 +45,9 @@ def completion_view(
                     "elapsed_ms": stage.elapsed_ms,
                     "dispatch_ids": list(stage.dispatch_ids),
                     "automatic_reuse_supported": False,
+                    "reused_from_operation_id": None
+                    if stage.reused_from is None
+                    else stage.reused_from.operation_id,
                 }
             )
     result = {} if manifest is None else manifest.result
@@ -125,4 +128,13 @@ def completion_view(
             else attempt.checkpoint_ref.model_dump(mode="json"),
         },
         "completed_stages": stages,
+        "stage_reuse": {
+            "schema_version": "1.0.0",
+            "reused": sum(1 for item in stages if item.get("reused_from_operation_id")),
+            "new": sum(
+                1
+                for item in stages
+                if item.get("state") == "COMPLETED" and not item.get("reused_from_operation_id")
+            ),
+        },
     }

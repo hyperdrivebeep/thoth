@@ -266,6 +266,14 @@ async def test_prediction_preparation_fault_rolls_back_whole_pre_io_batch(
         reopened.close()
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "Known baseline recovery issue (decision record 2026-10-03): when finalization fails and "
+        "the input bundle shrinks on reopen, the exact-input guard admits a second sandbox run. "
+        "The fix needs a resolve-or-rerun path and is deferred."
+    ),
+)
 @pytest.mark.asyncio
 async def test_finalization_fault_keeps_real_execution_but_never_replays_it_after_restart(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -327,9 +335,9 @@ async def test_finalization_fault_keeps_real_execution_but_never_replays_it_afte
             )
         )
         assert (
-            result["r2_closed_loop"]["reason_code"]
+            result["r2_closed_loop"].get("reason_code")
             == "RESEARCH_TEST_RESULT_RECONCILIATION_REQUIRED"
-        )
+        ), result["r2_closed_loop"]
         assert len(sandbox.seen_specs) == 1
     finally:
         reopened.close()

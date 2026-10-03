@@ -69,6 +69,23 @@ async def test_job_termination_confirms_synthetic_child_exit(tmp_path: Path) -> 
     assert code != 0
 
 
+def test_poll_reports_running_then_the_exit_code_without_blocking(tmp_path: Path) -> None:
+    from thoth.adapters.models.windows_process_job import spawn_windows_job
+
+    child = spawn_windows_job(
+        (sys.executable, "-c", "import time; time.sleep(30)"),
+        _synthetic_env(),
+        tmp_path,
+    )
+    assert child.poll() is None
+    child.kill()
+    deadline = time.monotonic() + 3.0
+    while child.poll() is None and time.monotonic() < deadline:
+        time.sleep(0.02)
+    assert child.poll() not in (None, 0)
+    assert child.returncode == child.poll()
+
+
 @pytest.mark.asyncio
 async def test_only_three_stdio_handles_are_inherited(tmp_path: Path) -> None:
     from thoth.adapters.models.windows_process_job import spawn_windows_job

@@ -220,6 +220,32 @@ class WindowsJobProcess:
     def returncode(self) -> int | None:
         return self._returncode
 
+    @property
+    def stdin(self) -> BinaryIO:
+        return self._stdin
+
+    @property
+    def stdout(self) -> BinaryIO:
+        return self._stdout
+
+    @property
+    def stderr(self) -> BinaryIO:
+        return self._stderr
+
+    def poll(self) -> int | None:
+        """Exit code without blocking, or None while the child still runs."""
+        exited = (
+            self._returncode is None
+            and not self._closed
+            and self._kernel.WaitForSingleObject(self._process, 0) == _WAIT_OBJECT_0
+        )
+        if exited:
+            exit_code = wintypes.DWORD()
+            _check(self._kernel.GetExitCodeProcess(self._process, ctypes.byref(exit_code)), "EXIT")
+            self._returncode = int(exit_code.value)
+            self._close_handles()
+        return self._returncode
+
     async def communicate(self, input: bytes | None = None) -> tuple[bytes, bytes]:
         def feed() -> None:
             try:

@@ -7,6 +7,7 @@ import { selectionKey, type HistoryKind, type HistoryScope, type HistorySelectio
 import { HistoryDetail } from "./HistoryDetail";
 import { HistoryTimeline } from "./HistoryTimeline";
 import { Disclosure } from "../Disclosure";
+import { eyebrowLabel } from "../statusLabels";
 import { ProjectReviewList } from "./ProjectReviewList";
 import { DecisionDeltaComparison } from "./DecisionDeltaComparison";
 
@@ -77,7 +78,7 @@ export function ResearchHistoryWorkspace({ projectId, threadId, requestDigest, i
   if (scope.projectId !== projectId) return <Callout intent="warning">선택한 기록의 프로젝트가 일치하지 않습니다.</Callout>;
   return <section className={`research-history ${compact ? "history-compact" : ""}`} aria-label="연구 이력">
     {import.meta.env.VITE_THOTH_TEST_MODE === "true" && <Callout compact intent="warning" className="history-test-banner">검증 모드 · 통제된 자료와 모델로 확인하는 화면입니다. 실제 연구 결과 검증이 아닙니다.</Callout>}
-    <header className="workspace-heading history-heading"><div><p className="eyebrow">RESEARCH HISTORY</p><h1>{kinds?.length === 1 && kinds[0] === "MEMORY" ? "프로젝트 기억" : "연구 이력"}</h1><p>당시의 답변과 근거를 보존하고, 바뀐 판단을 살펴봅니다.</p></div>
+    <header className="workspace-heading history-heading"><div><p className="eyebrow">{eyebrowLabel("RESEARCH HISTORY")}</p><h1>{kinds?.length === 1 && kinds[0] === "MEMORY" ? "프로젝트 기억" : "연구 이력"}</h1><p>당시의 답변과 근거를 보존하고, 바뀐 판단을 살펴봅니다.</p></div>
       {!initialSelection && !requestDigest && threadId && <div className="history-scope" aria-label="이력 범위"><Button small active={!allProject} onClick={() => setAllProject(false)}>현재 세션</Button><Button small active={allProject} onClick={() => setAllProject(true)}>프로젝트 전체</Button></div>}
     </header>
     <ScopedHistory key={JSON.stringify([scope, kinds, initialSelection ? selectionKey(initialSelection) : null])} scope={scope} initialSelection={initialSelection} onUseQuestion={onUseQuestion} kinds={kinds} />

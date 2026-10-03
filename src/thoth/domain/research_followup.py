@@ -109,6 +109,25 @@ class DecisionDeltaGroup(DomainModel):
     changes: tuple[SemanticDiffEntry, ...]
 
 
+class CriterionState(DomainModel):
+    status: Literal["SATISFIED", "UNRESOLVED", "NOT_APPLICABLE", "NOT_ASSESSED"]
+    relation: str
+    validation: str
+    blocker: str
+
+
+class CriterionDelta(DomainModel):
+    requirement_id: str
+    target: str
+    question: str
+    match: Literal["SAME", "ADDED", "REMOVED"]
+    before: CriterionState | None = None
+    after: CriterionState | None = None
+    evidence_refs_added: tuple[str, ...] = ()
+    evidence_refs_removed: tuple[str, ...] = ()
+    unchanged_hold: bool = False
+
+
 class DecisionDelta(DomainModel):
     schema_version: Literal["1.0.0"] = "1.0.0"
     contract_version: Literal[2] = 2
@@ -122,6 +141,9 @@ class DecisionDelta(DomainModel):
     reason_codes: tuple[str, ...] = ()
     reason_refs: tuple[RevisionRef, ...] = ()
     basis_currentness: dict[str, BasisCurrentness]
+    criteria: tuple[CriterionDelta, ...] = ()
+    # AVAILABLE only when both results' criteria could be read; otherwise nothing is paired.
+    criteria_state: Literal["AVAILABLE", "UNAVAILABLE"] = "UNAVAILABLE"
 
 
 class ProjectReviewListInput(DomainModel):

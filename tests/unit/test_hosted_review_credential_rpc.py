@@ -44,6 +44,8 @@ async def test_credential_rpc_is_denied_before_secrets_file(
             "model/credential/login/status",
             "model/credential/login/cancel",
             "model/credential/login/complete",
+            "model/catalog/refresh",
+            "model/tooling/install",
         ):
             denied_login = await runtime.bus.dispatch(
                 request(

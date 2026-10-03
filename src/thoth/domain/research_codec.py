@@ -8,6 +8,8 @@ from thoth.domain.evidence_requirements import (
     RequirementSetRevision,
     SemanticReviewRecord,
 )
+from thoth.domain.memory_settings import ProjectMemorySettings
+from thoth.domain.model_call_settings import ProjectModelCallSettings
 from thoth.domain.model_settings import ModelPreferenceRevision
 from thoth.domain.post_execution_learning import PostExecutionLearningResult
 from thoth.domain.research_request import (
@@ -23,6 +25,8 @@ CODECS: dict[str, type[DomainModel]] = {
         str(model.model_fields["record_kind"].default): model
         for model in (
             ModelPreferenceRevision,
+            ProjectMemorySettings,
+            ProjectModelCallSettings,
             CoverageAssessment,
             HypothesisSemanticReviewRecord,
             RequirementSetRevision,

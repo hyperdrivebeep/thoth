@@ -1,6 +1,7 @@
 """Observed dispatch usage, separate from reservation estimates and account billing."""
 
 from collections.abc import Iterable
+from datetime import datetime
 from typing import cast
 
 from pydantic import JsonValue, TypeAdapter
@@ -19,30 +20,9 @@ def summarize_usage(
 ) -> dict[str, JsonValue]:
     # The caller supplies latest journal versions; dispatch identity deduplicates rereads.
     dispatches = {r.dispatch_id: r for r in records if r.thread_id == thread}
-    inputs = [
-        r.input_tokens
-        for r in dispatches.values()
-        if r.input_tokens is not None and r.input_tokens >= 0
-    ]
-    outputs = [
-        r.output_tokens
-        for r in dispatches.values()
-        if r.output_tokens is not None and r.output_tokens >= 0
-    ]
-    complete = sum(
-        r.input_tokens is not None
-        and r.input_tokens >= 0
-        and r.output_tokens is not None
-        and r.output_tokens >= 0
-        for r in dispatches.values()
-    )
+    inputs, outputs, cached, complete = _observed(dispatches.values())
     unknown = max(0, len(dispatches) - complete)
     unknown = max(unknown, max(0, calls - complete))
-    cached = [
-        r.cached_input_tokens
-        for r in dispatches.values()
-        if r.cached_input_tokens is not None and r.cached_input_tokens >= 0
-    ]
     quota: dict[str, JsonValue]
     if isinstance(account_quota, dict):
         quota = _JSON_OBJECT.validate_python(account_quota)
@@ -70,6 +50,84 @@ def summarize_usage(
         "estimated_cost": None,
         "cost_state": "UNKNOWN",
         "cost_basis": None,
+    }
+
+
+def _observed(
+    dispatches: Iterable[ModelDispatchRecord],
+) -> tuple[list[int], list[int], list[int], int]:
+    """Reported input, output and cached tokens, and how many calls reported input and output."""
+    items = tuple(dispatches)
+    inputs = [r.input_tokens for r in items if r.input_tokens is not None and r.input_tokens >= 0]
+    outputs = [
+        r.output_tokens for r in items if r.output_tokens is not None and r.output_tokens >= 0
+    ]
+    cached = [
+        r.cached_input_tokens
+        for r in items
+        if r.cached_input_tokens is not None and r.cached_input_tokens >= 0
+    ]
+    complete = sum(
+        r.input_tokens is not None
+        and r.input_tokens >= 0
+        and r.output_tokens is not None
+        and r.output_tokens >= 0
+        for r in items
+    )
+    return inputs, outputs, cached, complete
+
+
+def _interrupted_retries(dispatches: dict[str, ModelDispatchRecord]) -> int:
+    """Calls sent again after the earlier one was cut off (a retry after a 429 is not counted)."""
+    count = 0
+    for record in dispatches.values():
+        parent = dispatches.get(record.retry_of_dispatch_id or "")
+        observation = None if parent is None else parent.transport_observation
+        if parent is not None and (observation is None or observation.http_rejection is None):
+            count += 1
+    return count
+
+
+def operation_wall_ms(started_at: datetime, completed_at: datetime | None) -> int | None:
+    """Recorded start to end in milliseconds; unknown if the end is missing or precedes it."""
+    if completed_at is None or completed_at < started_at:
+        return None
+    return round((completed_at - started_at).total_seconds() * 1000)
+
+
+def summarize_operation_usage(
+    records: Iterable[ModelDispatchRecord],
+    thread: str,
+    operation_id: str,
+    *,
+    wall_ms: int | None = None,
+) -> dict[str, JsonValue] | None:
+    """Usage of one result's operation only, computed when read; no stored total is involved.
+
+    Calls with no operation id cannot be attributed and belong to no result. Returns None when the
+    operation has no recorded call, so absence is never shown as zero.
+    """
+    dispatches = {
+        r.dispatch_id: r
+        for r in records
+        if r.thread_id == thread and r.operation_id == operation_id
+    }
+    if not dispatches:
+        return None
+    inputs, outputs, cached, complete = _observed(dispatches.values())
+    unreported = len(dispatches) - complete
+    known = bool(inputs or outputs)
+    return {
+        "operation_id": operation_id,
+        "calls": len(dispatches),
+        "auto_retries": _interrupted_retries(dispatches),
+        "input_tokens": sum(inputs) if inputs else None,
+        "output_tokens": sum(outputs) if outputs else None,
+        "total_tokens": sum(inputs) + sum(outputs) if known else None,
+        "cached_input_tokens": sum(cached) if cached else None,
+        "unreported_calls": unreported,
+        "state": "UNKNOWN" if not known else "PARTIAL" if unreported else "OBSERVED",
+        "wall_ms": wall_ms,
     }
 
 

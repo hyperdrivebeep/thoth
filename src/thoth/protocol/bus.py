@@ -15,6 +15,7 @@ from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.deployment_mode import STALE_RUNNING_MESSAGE, STALE_RUNNING_REASON
 from thoth.domain.enums import OperationState
 from thoth.domain.operation import (
+    RESEARCH_OPERATION_METHODS,
     InternalFailureDiagnostic,
     InternalFailureStateSnapshot,
     InternalFailureTopFrame,
@@ -83,7 +84,7 @@ READ_QUERY_METHODS = frozenset(
         "operation/checkpoint/read",
     }
 )
-RUNNING_RESEARCH_METHODS = frozenset({"thread/start", "thread/input", "thread/steer"})
+RUNNING_RESEARCH_METHODS = RESEARCH_OPERATION_METHODS
 
 
 @dataclass(frozen=True)
@@ -532,6 +533,8 @@ class CommandBus:
             "model/credential/login/status",
             "model/credential/login/cancel",
             "model/credential/login/complete",
+            "model/catalog/refresh",
+            "model/tooling/install",
         }:
             return "system:workspace"
         value = request.params.input.get("project_id")

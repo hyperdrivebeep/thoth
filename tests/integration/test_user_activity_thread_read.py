@@ -36,6 +36,7 @@ async def test_normal_thread_read_returns_safe_typed_user_activity_without_repla
                         "project_id": "p",
                         "thread_id": accepted["thread_id"],
                         "contract_version": 2,
+                        "view": "FULL",
                     },
                 )
             )

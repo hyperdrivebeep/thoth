@@ -140,7 +140,9 @@ async def test_connected_only_is_preserved_even_when_there_are_real_gaps(tmp_pat
         state = value(
             await runtime.bus.query(
                 request(
-                    "thread/read", "read", {"project_id": "p", "thread_id": admitted["thread_id"]}
+                    "thread/read",
+                    "read",
+                    {"project_id": "p", "thread_id": admitted["thread_id"], "view": "FULL"},
                 )
             )
         )

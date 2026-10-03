@@ -10,6 +10,7 @@ from thoth.domain.action import (
     ActionPlanCompilationResult,
     ActionPlanDraft,
 )
+from thoth.domain.effort_bands import ai_estimates_from_draft
 from thoth.domain.enums import (
     ActionCompilationStatus,
     ActionPlanCompilationStatus,
@@ -96,6 +97,7 @@ def compile_action(
         required_approver_role=approver,
         source_refs=draft.source_refs,
         missing_evidence=draft.missing_evidence,
+        effort_estimates=ai_estimates_from_draft(draft.effort_estimates),
     )
     status = {
         RiskTier.R0: ActionCompilationStatus.AUTO_CANDIDATE,

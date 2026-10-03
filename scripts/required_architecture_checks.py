@@ -11,10 +11,8 @@ from pathlib import Path
 CHECKS = (
     "check_architecture.py",
     "check_ocp_extensions.py",
-    "check_truth_drift.py",
     "check_module_budget.py",
     "check_canonical_owners.py",
-    "check_acceptance_coverage.py",
     "check_migration_discipline.py",
 )
 

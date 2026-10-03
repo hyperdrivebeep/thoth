@@ -1,5 +1,6 @@
 import { Button, Callout } from "@blueprintjs/core";
 import { objectList, objectValue, stringValues, textValue } from "../api/presentation";
+import excerpt from "../api/fixtures/iris-judgment-excerpt.json";
 import { ResearchResultCard } from "./ResearchResultCard";
 
 const result = {
@@ -41,6 +42,16 @@ const coverageMatrix = {
   ],
 };
 
+/** The seven criteria of the stored IRIS run2 result (values copied from its coverage assessments); preview only. */
+const irisRow = (id: string, relation: string, validation: string, blocker: string, target = "RESEARCH_GAP") =>
+  ({ requirement_id: id, target, question: `평가기준 ${id}`, status: "UNRESOLVED" as const, applicability: "APPLICABLE", relation, validation, blocker, review_refs: [], evidence_refs: [], reason_codes: [] });
+const irisCoverage = { ...coverageMatrix, summary: { ...coverageMatrix.summary, satisfied: 0, unresolved: 7 }, rows: [
+  irisRow("bound:0", "QUALIFIES", "INCONCLUSIVE", "answer:HOLD", "answer"), irisRow("bound:1", "QUALIFIES", "INCONCLUSIVE", "answer:HOLD", "answer"),
+  irisRow("bound:2", "QUALIFIES", "INCONCLUSIVE", "time:HOLD", "time"), irisRow("check:0", "QUALIFIES", "APPLIED", "RESEARCH_GAP"),
+  irisRow("check:1", "QUALIFIES", "INCONCLUSIVE", "RESEARCH_GAP"), irisRow("check:2", "INSUFFICIENT", "APPLIED", "RESEARCH_GAP"), irisRow("check:3", "SUPPORTS", "APPLIED", "RESEARCH_GAP"),
+] };
+const irisProgress = { ...progressSummary, next_user_action: { ...progressSummary.next_user_action, label: "Review unresolved evidence gaps" } };
+
 function LegacyResultCard() {
   const hypotheses=objectList(objectValue(result.portfolio).hypotheses);
   const actions=objectList(objectValue(result.action_plan).alternatives);
@@ -54,7 +65,12 @@ function LegacyResultCard() {
 }
 
 export default function ResultExample() {
-  const before = new URLSearchParams(window.location.search).get("example") === "result-before";
+  const example = new URLSearchParams(window.location.search).get("example");
+  const before = example === "result-before";
+  if (example === "result-iris") return <main className="bp6-dark result-example-page"><Callout intent="warning" title="검증용 결과 카드 · 저장된 IRIS 결과의 값으로 만든 미리보기입니다">모델을 호출하지 않았고 이 화면에서 새 조사를 시작하지 않습니다.</Callout>
+    <section className="conversation-timeline"><article className="user-message"><header>질문</header><p>IRIS 공고 1세부의 센서 조합과 지표 기준을 확인해 주세요.</p></article>
+      <ResearchResultCard state="SUCCEEDED" result={{ ...excerpt, answer_status: "PARTIAL_HOLD" } as Record<string, unknown>} progressSummary={irisProgress} coverageMatrix={irisCoverage} nextUserAction={irisProgress.next_user_action}
+        usageLine="이 결과의 사용량 기록 없음" historySelection={{kind:"result",scope:{projectId:"preview",threadId:"preview",requestDigest:digest},operationId:"preview",resultDigest:digest}} onDetail={()=>undefined}/></section></main>;
   return <main className="bp6-dark result-example-page"><Callout intent="warning" title="검증용 결과 카드 · 실제 연구 데이터가 아닙니다">현재 컴포넌트의 정보 구조만 비교하는 합성 화면입니다.</Callout>
     <section className="conversation-timeline"><article className="user-message"><header>질문</header><p>보고 결과를 계획된 수용 조건과 비교할 수 없는 이유는 무엇인가요?</p></article>
       {before?<LegacyResultCard/>:<ResearchResultCard state="SUCCEEDED" result={result} progressSummary={progressSummary} coverageMatrix={coverageMatrix} nextUserAction={progressSummary.next_user_action}
