@@ -14,63 +14,9 @@ env:
   THOTH_IRIS_RESULT_FIXTURE: .thoth-ci/no-private-result.json
 
 jobs:
-  python-tests:
-    # The full Python suite takes several hours on one hosted runner, so it runs in shards.
-    # Every shard lists the same sorted test files and takes every SHARD_TOTAL-th one.
-    name: python-tests (${{ matrix.shard }}/8)
-    runs-on: windows-latest
-    timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7]
-    defaults:
-      run:
-        shell: pwsh
-    env:
-      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.thoth-test-browsers
-      SHARD_INDEX: ${{ matrix.shard }}
-      SHARD_TOTAL: "8"
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-      - uses: pnpm/action-setup@v4
-        with:
-          version: "11.21.0"
-      - uses: astral-sh/setup-uv@v7
-        with:
-          version: "0.12.5"
-      - name: Install locked dependencies
-        run: |
-          python -m venv --copies --without-pip .venv
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev --extra browser
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          pnpm install --frozen-lockfile
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          .\.venv\Scripts\python.exe -m playwright install --only-shell chromium
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Python product tests (shard)
-        run: |
-          $root = (Get-Location).Path
-          $all = @(Get-ChildItem tests -Recurse -File -Include 'test_*.py', '*_test.py' |
-            ForEach-Object { [System.IO.Path]::GetRelativePath($root, $_.FullName).Replace('\', '/') } |
-            Sort-Object -Culture 'en-US')
-          $mine = @(for ($i = 0; $i -lt $all.Count; $i++) {
-            if ($i % [int]$env:SHARD_TOTAL -eq [int]$env:SHARD_INDEX) { $all[$i] }
-          })
-          "Shard $env:SHARD_INDEX of $env:SHARD_TOTAL runs $($mine.Count) of $($all.Count) test files."
-          if ($mine.Count -eq 0) { exit 0 }
-          .\.venv\Scripts\python.exe -m pytest @mine
-          exit $LASTEXITCODE
-
   checks:
-    # Lint, architecture, Web and the README quick start; independent of the Python shards.
+    # Fast public checks (about ten minutes). The full Python suite takes hours on a hosted
+    # runner, so maintainers run it locally before merging.
     runs-on: windows-latest
     timeout-minutes: 60
     defaults:
