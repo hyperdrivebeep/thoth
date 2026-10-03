@@ -1,4 +1,7 @@
-"""Inside one query the read-approval memo gives the same verdicts as no memo, with far fewer lookups."""
+"""Inside one query the read-approval memo gives the same verdicts as no memo.
+
+It does so with far fewer lookups.
+"""
 
 from __future__ import annotations
 

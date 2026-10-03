@@ -45,13 +45,13 @@ const fixture = vi.hoisted(() => ({
   deferredStatus: null as null | (() => void),
   holdStatus: false,
   forbidNetwork: false,
+  // Requests the fake server has received and not yet answered; the tests wait for it to reach 0.
+  inflight: 0,
 }));
 
 vi.mock("../api/rpcClient", async (importOriginal) => {
   const original = await importOriginal<typeof import("../api/rpcClient")>();
-  return {
-  ...original,
-  rpc: async (method: string, input: Record<string, unknown>) => {
+  const answer = async (method: string, input: Record<string, unknown>) => {
     fixture.calls.push({ method, input });
     if (method === "workspace/ready") {
       if (fixture.readyError) throw new Error(fixture.readyError);
@@ -103,7 +103,18 @@ vi.mock("../api/rpcClient", async (importOriginal) => {
       return { state: "SUCCEEDED", operation_id: "", value: fixture.ready };
     }
     throw new Error(`unexpected method ${method}`);
-  },
+  };
+  return {
+    ...original,
+    rpc: async (method: string, input: Record<string, unknown>) => {
+      // A response the test deliberately holds back is not waited for.
+      const held = (method === "workspace/ready" && fixture.deferReady)
+        || (method === "model/credential/login/status" && fixture.holdStatus)
+        || (method === "model/tooling/install" && fixture.installGate !== null);
+      if (held) return answer(method, input);
+      fixture.inflight += 1;
+      try { return await answer(method, input); } finally { fixture.inflight -= 1; }
+    },
   };
 });
 
@@ -186,9 +197,19 @@ it("keeps a normal MISSING setup state on the existing first-run path", async ()
   expect(container.textContent).not.toContain("기존 작업 공간 설정을 확인하세요");
   expect(fixture.calls.some(call => call.method === "workspace/setup/update")).toBe(false);
 });
+/** Lets the screen show what the fake server answered: waits until every request has been answered
+ *  and no new one starts for several ticks in a row (not a fixed time, which a slow machine overruns;
+ *  and not a single idle reading, because the screen sends the next request a moment after a response). */
 async function flush() {
   await act(async () => {
-    await tick();
+    let quiet = 0;
+    let seen = fixture.calls.length;
+    while (quiet < 3) {
+      await tick();
+      const idle = fixture.inflight === 0 && fixture.calls.length === seen;
+      seen = fixture.calls.length;
+      quiet = idle ? quiet + 1 : 0;
+    }
   });
 }
 
@@ -238,6 +259,7 @@ afterEach(async () => {
   fixture.installGate = null;
   fixture.deferredStatus = null;
   fixture.holdStatus = false;
+  fixture.inflight = 0;
   fixture.forbidNetwork = false;
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
@@ -444,7 +466,7 @@ it("ignores a late xAI status response after the workspace changes", async () =>
   fixture.holdStatus = true;
   await act(async () => { [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click(); });
   await flush();
-  expect(fixture.deferredStatus).not.toBeNull();
+  await vi.waitFor(() => expect(fixture.deferredStatus).not.toBeNull());
   fixture.ready = { ...fixture.ready, workspace_id: WORKSPACE_B };
   await act(async () => { await client.invalidateQueries({ queryKey: ["workspace-ready"] }); });
   await flush();
@@ -496,8 +518,9 @@ it("stops xAI device polling when its Unix-seconds expiry passes", async () => {
   fixture.forbidNetwork = true;
   fixture.ready = localReady();
   fixture.accounts = defaultAccounts().map((account) => account.provider === "xai" ? xaiAccount() : account);
-  fixture.registerResult = xaiStart(0.3);
   await mount();
+  // The short expiry runs from the start response, so it is set after the slow mount, not before.
+  fixture.registerResult = xaiStart(0.3);
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 1100)); });
@@ -791,7 +814,7 @@ it("ignores a late Codex OAuth status from the previous workspace", async () => 
   fixture.holdStatus = true;
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!.click());
   await flush();
-  expect(fixture.deferredStatus).not.toBeNull();
+  await vi.waitFor(() => expect(fixture.deferredStatus).not.toBeNull());
   fixture.ready = localReady({ workspace_id: WORKSPACE_B });
   await act(async () => { await client.invalidateQueries({ queryKey: ["workspace-ready"] }); });
   await flush();

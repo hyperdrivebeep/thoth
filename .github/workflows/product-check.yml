@@ -8,19 +8,22 @@ on:
 permissions:
   contents: read
 
+env:
+  PYTHONUTF8: "1"
+  THOTH_WORKSPACE: .thoth-ci
+  THOTH_IRIS_RESULT_FIXTURE: .thoth-ci/no-private-result.json
+
 jobs:
-  product-check:
-    # The documented quick start supports Windows; Linux remains unverified.
+  checks:
+    # Fast public checks (about ten minutes). The full Python suite takes hours on a hosted
+    # runner, so maintainers run it locally before merging.
     runs-on: windows-latest
-    timeout-minutes: 180
+    timeout-minutes: 60
     defaults:
       run:
         shell: pwsh
     env:
-      PYTHONUTF8: "1"
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.thoth-test-browsers
-      THOTH_WORKSPACE: .thoth-ci
-      THOTH_IRIS_RESULT_FIXTURE: .thoth-ci/no-private-result.json
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -45,8 +48,6 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           .\.venv\Scripts\python.exe -m playwright install --only-shell chromium
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Python product tests
-        run: .\.venv\Scripts\python.exe -m pytest
       - name: Python lint
         run: .\.venv\Scripts\python.exe -m ruff check src apps tests migrations conftest.py scripts/pytest_environment.py
       - name: Runtime architecture

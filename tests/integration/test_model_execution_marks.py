@@ -1,4 +1,7 @@
-"""A real request that the provider refuses for the model or account marks that model; nothing else."""
+"""A real request that the provider refuses for the model or account marks that model.
+
+Nothing else is marked.
+"""
 
 from __future__ import annotations
 
