@@ -74,9 +74,14 @@ class ResearchWork:
     oauth_retry_policy: OAuthRetryPolicy | None = None
     # The project allows one cut-off model call to be sent once more (off unless it turned it on).
     auto_retry_interrupted_call: bool = False
+    # The project turned on hypothesis generation contract v3 (off unless it did); read once when
+    # the attempt starts, so the value it ran with is the value recorded.
+    hypothesis_contract_v3: bool = False
     # A user-requested resume names the interrupted operation; its completed stages may be reused
     # when this run's input for the same stage is exactly the same.
     resume_from_operation_id: str | None = None
+    # Source spans the request names up front (a trace row's positions); the shortlist keeps them.
+    pinned_spans: tuple[str, ...] = ()
     reused_stage_sources: set[str] = field(default_factory=set[str])
     consumed_heads: dict[str, str] = field(default_factory=dict)
     produced_refs: list[RevisionRef] = field(default_factory=list)
@@ -90,6 +95,7 @@ class ResearchWork:
 
 research_work: ContextVar[ResearchWork | None] = ContextVar("research_work", default=None)
 model_call: ContextVar[ModelCallContext | None] = ContextVar("model_call", default=None)
+model_purpose: ContextVar[str | None] = ContextVar("model_purpose", default=None)
 
 
 def reserve_model_dispatch(

@@ -32,9 +32,10 @@ BUNDLE = {
     "portfolio_id": "portfolio:o:1",
     "hypothesis_refs": ["hypothesis:o:a", "hypothesis:o:b"],
 }
-LONG_JSON = json.dumps({"statement": "표본이 작으면 결론을 보류한다", "filler": "가" * 8_000})[
-    :8_000
-]
+# Stored the way a record is stored: readable text, not \uXXXX escapes (canonical_payload).
+LONG_JSON = json.dumps(
+    {"statement": "표본이 작으면 결론을 보류한다", "filler": "가" * 8_000}, ensure_ascii=False
+)[:8_000]
 
 
 class Ledger:
@@ -288,7 +289,8 @@ async def test_the_project_switch_is_read_and_changed_with_the_digest_it_read(
             )
 
         first = await call("memory/settings/read", "ms-read-1")
-        assert first == {"memory_injection": True, "settings_digest": None}
+        # query_expansion joined the settings (memory_query_expansion); its default is on.
+        assert first == {"memory_injection": True, "query_expansion": True, "settings_digest": None}
         off = await call(
             "memory/settings/update", "ms-off", memory_injection=False, expected_digest=None
         )
@@ -373,23 +375,23 @@ def listed_memories(runtime: Any, project: str) -> tuple[FullMemoryRevision, ...
     return SqliteFullMemoryStore(runtime.ledger.engine).list_revisions(project)
 
 
-def _correction(tag: str, terms: tuple[str, ...], minutes: int = 0) -> FullMemoryRevision:
+def _correction(
+    tag: str, assertion: str = "표본이 작으면 다시 확인한다", minutes: int = 0
+) -> FullMemoryRevision:
     return stored(tag, kind=MemoryKind.LESSON, minutes=minutes).model_copy(
         update={
             "payload_mode": MemoryPayloadMode.MEMORY_ASSERTION,
             "source_ref": f"MEMORY:{tag}",
-            "assertion": "표본이 작으면 다시 확인한다",
-            "query_terms": terms,
+            "assertion": assertion,
             "evidence_refs": (),
         }
     )
 
 
 def _five(common: str = "프로젝트") -> list[FullMemoryRevision]:
-    own = ("가설a", "가설b", "행동c", "행동d", "결과e")
+    own = ("사과", "포도", "수박", "참외", "딸기")
     return [
-        stored(f"w{n}", minutes=n).model_copy(update={"query_terms": (common, own[n])})
-        for n in range(5)
+        stored(f"w{n}", minutes=n, excerpt=f"HYPOTHESIS:w{n}\n{own[n]} {common}") for n in range(5)
     ]
 
 
@@ -411,14 +413,14 @@ def test_an_automatic_memory_that_meets_the_question_on_a_project_wide_word_is_l
         i.memory_revision_id for i in items
     }
     # two words of the memory's own bring it in; the project-wide word is not one of them
-    both = stored("both").model_copy(update={"query_terms": ("프로젝트", "가설a", "가설b")})
+    both = stored("both", excerpt="HYPOTHESIS:both\n사과 포도 프로젝트")
     svc, _ = _service_for([*items, both])
-    pack = context(svc, "프로젝트 가설a 가설b 는")
+    pack = context(svc, "프로젝트 사과 포도 는")
     assert [i.memory_id for i in pack.included] == ["memory:both"]
 
 
 def test_a_users_correction_is_still_recalled_on_one_shared_word() -> None:
-    fix = _correction("fix", ("프로젝트", "표본이"))
+    fix = _correction("fix", "프로젝트 표본이 작으면 다시 확인한다")
     svc, _ = _service_for([*_five(), fix])
     pack = context(svc, "프로젝트 일정은 어떻게 되나")
     assert [i.memory_id for i in pack.included] == ["memory:fix"]
@@ -426,7 +428,7 @@ def test_a_users_correction_is_still_recalled_on_one_shared_word() -> None:
 
 
 def test_a_follow_up_question_recalls_the_latest_memories_without_a_shared_word() -> None:
-    fix = _correction("fix", ("표본이",), minutes=-30)
+    fix = _correction("fix", minutes=-30)
     svc, _ = _service_for([*_five(), fix])
     pack = context(svc, "앞에서 세운 가설과 다음 행동을 정리해 줘")
     ids = [i.memory_id for i in pack.included]

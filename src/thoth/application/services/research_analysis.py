@@ -8,6 +8,7 @@ from pydantic import BaseModel, JsonValue, ValidationError
 
 from thoth.application.services.connector_service import ConnectorService
 from thoth.application.services.full_project_memory import FullProjectMemoryService
+from thoth.application.services.memory_query_expansion import ModelMemoryQueryExpander, widen_query
 from thoth.application.services.request_records import RequestRecords
 from thoth.application.services.requirement_compiler import compile_requirements
 from thoth.application.services.research_context_assembler import assemble_context
@@ -33,6 +34,7 @@ from thoth.domain.evidence_requirements import (
     ReviewAdjudication,
     ReviewProposal,
 )
+from thoth.domain.memory_expansion import MemoryExpansionOutcome
 from thoth.domain.model import ContextPack, ModelRequest
 from thoth.domain.project import Project, WorkThread
 from thoth.domain.public_web_access import PROJECT_PUBLIC_WEB_CONNECTOR_ID
@@ -255,6 +257,27 @@ class ResearchAnalysis:
         if expected_digest is not None and self.source_digest(evidence) != expected_digest:
             raise ResearchFence("SOURCE_CONTEXT_CHANGED")
 
+    async def widen_memory_question(
+        self, work: ResearchWork, project: Project, model: ModelPort
+    ) -> MemoryExpansionOutcome:
+        """One model call widens the question for memory recall; the legacy analysis step that
+        follows in this run takes the same answer."""
+        return await widen_query(
+            memory=self.memory,
+            expander=ModelMemoryQueryExpander(
+                model,
+                project_id=project.project_id,
+                cutoff_at=project.cutoff_at,
+                model_policy_ref=project.policy_binding_ref,
+                head_set_digest=head_set_digest(
+                    self.records.ledger.read_heads(project.project_id)
+                ),
+            ),
+            work=work,
+            project_id=project.project_id,
+            query=work.effective_question,
+        )
+
     async def run(
         self,
         work: ResearchWork,
@@ -263,6 +286,7 @@ class ResearchAnalysis:
         model: ModelPort,
         progress: Progress,
     ) -> dict[str, object]:
+        expansion = await self.widen_memory_question(work, project, model)
         try:
             memory_context = self.memory.build_context(
                 project_id=project.project_id,
@@ -271,6 +295,7 @@ class ResearchAnalysis:
                 target_use="WORKING_CONTEXT",
                 scope=thread.scope,
                 cutoff_at=project.cutoff_at,
+                expansion=expansion,
             )
             work.context["authorized_project_memory"] = memory_context.model_dump(mode="json")
         except ValidationError:
@@ -309,7 +334,7 @@ class ResearchAnalysis:
         )
         # Start with admissible connected source candidates; no fake evidence is needed.
         all_evidence = self.evidence(project.project_id)
-        shortlist = lexical_candidates(work.effective_question, (), all_evidence)
+        shortlist = lexical_candidates(work.effective_question, (), all_evidence, work.pinned_spans)
         if shortlist and all(span.cutoff_state == CutoffState.UNKNOWN_TIME for span in shortlist):
             work.context["source_time_limitation"] = "SOURCE_TIME_UNCONFIRMED"
         assembly = self.assemble(work, tuple(s.span_id for s in shortlist), shortlist, all_evidence)

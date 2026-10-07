@@ -13,6 +13,7 @@ from thoth.domain.enums import (
     RecallEligibility,
 )
 from thoth.domain.ids import ProjectId, Sha256
+from thoth.domain.memory_expansion import MemoryExpansionRecord
 
 
 class MemoryRecord(DomainModel):
@@ -157,6 +158,19 @@ class MemoryTransitionReceipt(DomainModel):
     recorded_at: AwareDatetime
 
 
+class MemoryMatch(DomainModel):
+    """Why one memory met the question: its own words, or words a model added to them."""
+
+    matched_by: Literal["QUERY", "EXPANSION"]
+    words: tuple[str, ...] = ()
+    added_words: tuple[str, ...] = ()
+    # WHOLE when every matched word was found as written; PARTIAL when some word was met only
+    # through a letter pair of it (자료를 met by 자료), which is the weaker kind of match.
+    match_strength: Literal["WHOLE", "PARTIAL"] = "WHOLE"
+    partial_words: tuple[str, ...] = ()
+    partial_added_words: tuple[str, ...] = ()
+
+
 class MemorySelectionRecord(DomainModel):
     """Which stored memory reached each stage of one recall, and why the rest did not.
 
@@ -182,6 +196,10 @@ class MemorySelectionRecord(DomainModel):
     # A question that continues the previous investigation skips the word gate; the markers found.
     follow_up: bool = False
     follow_up_markers: tuple[str, ...] = ()
+    # How each memory that reached the recall stage met the question, by memory revision id.
+    matches: dict[str, MemoryMatch] = Field(default_factory=dict)
+    # The question-widening step (None when the record was made before it existed).
+    expansion: MemoryExpansionRecord | None = None
 
 
 class FullMemoryContextPack(DomainModel):

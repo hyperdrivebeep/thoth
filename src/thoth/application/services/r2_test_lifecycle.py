@@ -7,6 +7,7 @@ from typing import cast
 
 from pydantic import JsonValue
 
+from thoth.application.services.execution_pending import PENDING_RESULT_CLEARED_EVENT, is_unsettled
 from thoth.application.services.execution_service import ExecutionService
 from thoth.application.services.hypothesis_service import HypothesisService
 from thoth.application.services.hypothesis_test_lifecycle import HypothesisTestLifecycle
@@ -46,6 +47,17 @@ class PreparedResearchExecution:
 class ResearchTestCompletion:
     commit: CommitResult
     projection: dict[str, JsonValue]
+
+
+RECONCILIATION_REQUIRED = "RESEARCH_TEST_RESULT_RECONCILIATION_REQUIRED"
+
+
+class PendingResultHold(ValueError):
+    """An earlier run of the same work has no settled result; says what it is and the two exits."""
+
+    def __init__(self, detail: dict[str, JsonValue]) -> None:
+        super().__init__(RECONCILIATION_REQUIRED)
+        self.detail = detail
 
 
 class R2TestLifecycle:
@@ -270,9 +282,23 @@ class R2TestLifecycle:
         action: ActionCandidate,
         spec: SandboxRunSpec,
     ) -> None:
+        """Hold when an earlier run of this same work has no settled result.
+
+        The same work is the project, the research object and the action. A different set of input
+        files does not make it different work: it is only recorded in the hold so the person can
+        see what changed. A result already settled, another action, or another object runs as usual.
+        """
         inputs = sorted(item.content_sha256 for item in spec.input_snapshots)
+        now_binding = canonical_payload(
+            {
+                "runtime_profile": spec.runtime_profile.value,
+                "image_digest": spec.image_digest,
+                "argv": spec.argv,
+                "policy_digest": spec.policy_digest,
+            }
+        )
         for execution in self._executions.list_executions(project_id):
-            if execution.object_id != action.object_id or execution.plan_id != spec.action_plan_id:
+            if execution.object_id != action.object_id:
                 continue
             revision = self._ledger.read_revision_by_digest(
                 project_id, execution.plan_revision_digest
@@ -283,12 +309,11 @@ class R2TestLifecycle:
             if snapshot is None:
                 raise ValueError("RESEARCH_TEST_PENDING_EXECUTION_UNRESOLVED")
             plan = ActionPlanRecord.model_validate(snapshot.content)
+            cleared = self._cleared_attempts(project_id, execution.plan_execution_id)
             for attempt in self._executions.list_attempts(project_id, execution.plan_execution_id):
-                if (
-                    attempt.state
-                    not in {"DISPATCHED", "RUNNING", "CANCEL_REQUESTED", "UNKNOWN_COMPLETION"}
-                    and attempt.observation_completeness != "NOT_ADMITTED"
-                ):
+                if attempt.attempt_id in cleared:
+                    continue
+                if not is_unsettled(attempt):
                     continue
                 step = next(
                     (
@@ -299,22 +324,47 @@ class R2TestLifecycle:
                     ),
                     None,
                 )
-                if step is None or sorted(attempt.input_digests) != inputs:
+                if step is None:
                     continue
                 binding = step.get("runtime_binding")
                 if not isinstance(binding, dict):
                     raise ValueError("RESEARCH_TEST_PENDING_EXECUTION_UNRESOLVED")
-                if canonical_payload(cast(dict[str, object], binding)) != canonical_payload(
+                previous = sorted(attempt.input_digests)
+                # Citation, hypothesis or input-file changes do not authorize duplicate work.
+                raise PendingResultHold(
                     {
-                        "runtime_profile": spec.runtime_profile.value,
-                        "image_digest": spec.image_digest,
-                        "argv": spec.argv,
-                        "policy_digest": spec.policy_digest,
+                        "plan_execution_id": execution.plan_execution_id,
+                        "execution_revision": execution.revision,
+                        "attempt_id": attempt.attempt_id,
+                        "attempt_state": attempt.state,
+                        "observation_completeness": attempt.observation_completeness,
+                        "action_id": action.action_id,
+                        "object_id": action.object_id,
+                        "plan_id": execution.plan_id,
+                        "input_difference": {
+                            "same": previous == inputs,
+                            "previous_count": len(previous),
+                            "current_count": len(inputs),
+                            "removed": [item for item in previous if item not in inputs],
+                            "added": [item for item in inputs if item not in previous],
+                        },
+                        "runtime_binding_same": canonical_payload(cast(dict[str, object], binding))
+                        == now_binding,
+                        # The one way out, whatever state the earlier run is in, is to clear it
+                        # (with a reason) and run again.
+                        "exits": ["CLEAR_AND_RERUN"],
                     }
-                ):
-                    continue
-                # Citation or hypothesis revisions do not authorize duplicate external work.
-                raise ValueError("RESEARCH_TEST_RESULT_RECONCILIATION_REQUIRED")
+                )
+
+    def _cleared_attempts(self, project_id: str, execution_id: str) -> frozenset[str]:
+        cleared: set[str] = set()
+        for record in self._executions.list_audit(project_id, execution_id):
+            if record.event_type != PENDING_RESULT_CLEARED_EVENT:
+                continue
+            attempt_id = record.payload.get("attempt_id")
+            if isinstance(attempt_id, str):
+                cleared.add(attempt_id)
+        return frozenset(cleared)
 
     def hold(
         self, prepared: PreparedResearchExecution, bundle: SandboxExecutionBundle, reason: str

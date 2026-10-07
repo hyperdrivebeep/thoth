@@ -1,0 +1,11 @@
+# SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+notice: SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+identity: THOTH-SYNTH-RADAR-DEMO-v1
+document: source_lineage
+origin: written by the THOTH project for this demo
+external_data_bytes: none
+statements:
+  - Every threshold, weather condition, trial, date and count in this folder is an assumption invented for the demo.
+  - Counts and rates are derived from the trial files in data/ by the validator script.
+  - No measurement, dataset, figure, table or sentence of any external radar dataset or report is included.
+  - Generic terms such as detection rate and false track are used only as ordinary engineering words.

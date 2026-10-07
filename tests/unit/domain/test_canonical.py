@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta, timezone
 from decimal import Decimal
 
 import pytest
@@ -10,6 +10,7 @@ from thoth.domain.canonical import (
     domain_digest,
     head_set_digest,
     normalize_timestamp,
+    same_stored_instant,
 )
 from thoth.domain.errors import CanonicalizationError
 
@@ -56,3 +57,33 @@ def test_head_set_digest_ignores_mapping_insertion_order() -> None:
     first = {"project:a": "a" * 64, "thread:b": "b" * 64}
     second = {"thread:b": "b" * 64, "project:a": "a" * 64}
     assert head_set_digest(first) == head_set_digest(second)
+
+
+def test_same_stored_instant_compares_at_the_stored_precision_across_time_zones() -> None:
+    stored = datetime(
+        2026, 10, 3, 10, 46, 12, 123000, tzinfo=UTC
+    )  # what a result keeps: milliseconds
+    typed = datetime(2026, 10, 3, 10, 46, 12, 123456, tzinfo=UTC)  # what a project can hold
+    assert stored != typed  # the plain comparison is what raised the false alarm
+    assert same_stored_instant(stored, typed)
+    assert same_stored_instant(typed, stored)
+    local = datetime(2026, 10, 3, 19, 46, 12, 123456, tzinfo=timezone(timedelta(hours=9)))
+    assert same_stored_instant(stored, local) and same_stored_instant(typed, local)
+
+
+def test_same_stored_instant_still_sees_a_real_change() -> None:
+    base = datetime(2026, 10, 3, 10, 46, 12, 123456, tzinfo=UTC)
+    assert not same_stored_instant(base, base + timedelta(milliseconds=1))
+    assert not same_stored_instant(base, base - timedelta(milliseconds=1))
+    assert not same_stored_instant(base, base + timedelta(seconds=1))
+    assert not same_stored_instant(
+        base, base.astimezone(timezone(timedelta(hours=9))) + timedelta(hours=1)
+    )
+
+
+def test_same_stored_instant_never_raises_for_missing_or_naive_values() -> None:
+    value = datetime(2026, 10, 3, tzinfo=UTC)
+    assert same_stored_instant(None, None) and not same_stored_instant(None, value)
+    assert not same_stored_instant(value, None)
+    naive = datetime(2026, 10, 3)
+    assert same_stored_instant(naive, naive) and not same_stored_instant(naive, value)

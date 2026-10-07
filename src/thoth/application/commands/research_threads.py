@@ -5,8 +5,10 @@ from typing import Literal, cast
 
 from pydantic import JsonValue
 
+from thoth.application.commands.research_resume import resume_payload
 from thoth.application.commands.thread_analysis import ThreadInputRequest
 from thoth.application.commands.threads import ThreadCommandHandlers
+from thoth.application.commands.trace_origin_admission import admit_trace_origin
 from thoth.application.services.connector_cleanup import cleanup_summary
 from thoth.application.services.model_call_settings import ModelCallSettingsService
 from thoth.application.services.model_settings import ModelSettingsService
@@ -164,10 +166,11 @@ class ResearchThreadHandlers:
             )
             if existing is not None:
                 return self.replay_attempt(existing, operation)
+            value = admit_trace_origin(self, "thread/start", value)
             data = {
                 k: v
                 for k, v in value.items()
-                if k not in {"contract_version", "provider", "model", "reasoning_effort"}
+                if k not in {"contract_version", "provider", "model", "reasoning_effort", "origin"}
             }
             result = await self.legacy.start(data)
             return self.submit(
@@ -176,8 +179,8 @@ class ResearchThreadHandlers:
                     "thread_id": result["thread_id"],
                     "instruction": value["problem"],
                     "provider": value.get("provider", "default"),
-                    "model": value.get("model"),
-                    "reasoning_effort": value.get("reasoning_effort"),
+                    **{k: value.get(k) for k in ("model", "reasoning_effort")},
+                    **({"origin": value["origin"]} if "origin" in value else {}),
                 },
                 initial=True,
             )
@@ -197,43 +200,18 @@ class ResearchThreadHandlers:
         )
         if existing is not None:
             return self.replay_attempt(existing, operation)
+        payload = admit_trace_origin(self, "thread/input", payload)
         if payload.get("resume_from_operation_id") is not None:
-            payload = self.resume_payload(payload)
+            payload = resume_payload(self, payload)
         queued = self.queue.accept_if_busy(self, operation, payload)
         if queued is not None:
             return queued
         return self.submit(payload)
 
-    def resume_payload(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
-        """The same question as the interrupted run, asked again as a new operation.
-
-        The user asked to continue the latest, finished run of this thread. Its completed stages
-        may then be reused (research_stage_reuse.py); nothing is reused without this request.
-        """
-        project_id, thread_id = str(value["project_id"]), str(value["thread_id"])
-        source_id = str(value["resume_from_operation_id"])
-        head = self.records.read(project_id, EntityType.THREAD, f"request:{thread_id}")
-        source = self.records.journal_read(project_id, source_id, ResearchAttempt)
-        finished = self.operations.read(source_id)
-        if head is None or source is None or source.request_ref != head[0]:
-            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "RESUME_SOURCE_NOT_CURRENT")
-        if finished is None or finished.project_id != project_id:
-            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "RESUME_SOURCE_NOT_CURRENT")
-        if finished.state == OperationState.RUNNING:
-            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "RESUME_SOURCE_STILL_RUNNING")
-        current = ThreadRequestRevision.model_validate(head[1])
-        if len(current.effective_question) > 20_000:
-            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "RESUME_QUESTION_TOO_LONG")
-        return {
-            **value,
-            "instruction": current.effective_question,
-            "edit_kind": "REPLACE",
-            "expected_request_epoch": current.request_epoch,
-        }
-
     async def steer(self, value: dict[str, JsonValue]) -> dict[str, JsonValue] | AcceptedRunning:
         if value.get("contract_version") != 2:
             return await self.legacy.steer(value)
+        admit_trace_origin(self, "thread/steer", value)
         with self.records.ledger.transaction():
             submitted = self.submit(
                 {
@@ -874,3 +852,5 @@ class ResearchThreadHandlers:
         if value.get("view") == "PROGRESS":
             return progress_thread_read(shown)
         return summarize_thread_read(shown)
+
+

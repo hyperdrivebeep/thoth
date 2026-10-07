@@ -208,7 +208,7 @@ def test_201_to_193_watch_retirement_uses_candidate_then_transaction() -> None:
         engine.apply(proposal.identity, proposal.identity)
         updated = json.loads((root / path).read_bytes())
         assert key not in updated["watched_long_functions"]
-        assert updated["function_line_limit"] == 200 and updated["module_line_limit"] == 900
+        assert updated["function_line_limit"] == 200 and updated["module_line_limit"] == 600
 
 
 def test_head_drift_rejects_before_metadata_write() -> None:

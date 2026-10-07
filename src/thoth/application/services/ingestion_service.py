@@ -8,6 +8,7 @@ from pathlib import Path
 
 from thoth.application.services.resource_scope_context import resource_stage_scope
 from thoth.domain.artifact import ArtifactEnvelope, ParserSelection, StructuralDocument
+from thoth.domain.canonical import same_stored_instant
 from thoth.domain.enums import (
     AuthorityState,
     CutoffState,
@@ -168,7 +169,7 @@ class IngestionService:
             raise ValueError("project revision changed before source ingestion")
         if (
             command.captured_cutoff_at is not None
-            and project.cutoff_at != command.captured_cutoff_at
+            and not same_stored_instant(project.cutoff_at, command.captured_cutoff_at)
         ):
             raise ValueError("project cutoff changed before source ingestion")
         pending_cutoff = (
@@ -222,7 +223,7 @@ class IngestionService:
             raise ValueError("project revision changed before source ingestion")
         if (
             command.captured_cutoff_at is not None
-            and project.cutoff_at != command.captured_cutoff_at
+            and not same_stored_instant(project.cutoff_at, command.captured_cutoff_at)
         ):
             raise ValueError("project cutoff changed before source ingestion")
         if command.classify_source_time:

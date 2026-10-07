@@ -6,6 +6,7 @@ from thoth.domain.base import DomainModel
 from thoth.domain.ids import ProjectId, Sha256
 from thoth.domain.research_projection import HypothesisGenerationDetails, PortfolioGenerationDetails
 from thoth.domain.test_validity import Prespecification, ResearchMeasurementContract
+from thoth.domain.verdict_link import VerdictLink
 
 
 class HypothesisRecord(DomainModel):
@@ -40,6 +41,8 @@ class HypothesisRecord(DomainModel):
     receipt_ref: str | None = None
     created_at: AwareDatetime
     generation_details: HypothesisGenerationDetails | None = None
+    # The trace verdict this hypothesis was investigated from; absent on any other hypothesis.
+    verdict_link: VerdictLink | None = None
     schema_version: str = "1.0.0"
 
     @model_validator(mode="after")

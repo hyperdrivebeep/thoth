@@ -15,8 +15,17 @@ import { ResearchFollowupSummary } from "./ResearchFollowupSummary";
 import { AnswerBody } from "./AnswerBody";
 import { AnswerHold } from "./AnswerHold";
 import { ConfirmedFacts } from "./ConfirmedFacts";
+import { TraceOriginLine } from "./TraceOriginLine";
+import { HypothesisLinkNotice } from "./HypothesisLinkNotice";
+import type { HypothesisLink } from "./hypothesisLinkText";
+import type { ReasonDistribution } from "../api/hypothesisLink";
 import { counterSearchLine } from "./hypothesisView";
+import { causeUnconfirmed } from "./hypothesisReview";
+import { CauseUnconfirmed } from "./HypothesisFields";
 import { nextActionLabel } from "./statusLabels";
+import { ReadableList } from "./ReadableList";
+import { ExecutionHoldNotice } from "./ExecutionHoldNotice";
+import type { ExecutionHold } from "../api/research";
 
 function selectedEvidenceCount(result: Record<string, unknown>): number | undefined {
   const direct = result.selected_evidence_count ?? objectValue(result.retrieval).selected_count;
@@ -24,11 +33,17 @@ function selectedEvidenceCount(result: Record<string, unknown>): number | undefi
   return Array.isArray(result.selected_evidence_refs) && result.selected_evidence_refs.length ? result.selected_evidence_refs.length : undefined;
 }
 
-export function ResearchResultCard({ result, state, unavailable, error, failure, terminalReason, onDetail, onRetry, onResume, resumeCompleted, resuming, historySelection, currentness, progressSummary, coverageMatrix, nextUserAction, decisionDelta, usageLine }: {
+export function ResearchResultCard({ result, state, unavailable, error, failure, terminalReason, onDetail, onRetry, onResume, resumeCompleted, resuming, historySelection, currentness, progressSummary, coverageMatrix, nextUserAction, decisionDelta, usageLine, executionHold, projectId, holdCauseRef, onOpenTrace, hypothesisLinks, linkDistribution }: {
   result: Record<string, unknown> | null; state: string; unavailable?: string; error?:ExecutionError | null; failure?:ResearchFailure | null; terminalReason?:string | null; onDetail: (detail: ResearchDetail) => void; onRetry?: () => void;
   /** Continue the interrupted run from where it stopped; only offered with the number of stages it had finished. */
   onResume?: () => void; resumeCompleted?: number; resuming?: boolean; historySelection?: HistorySelection; currentness?: Currentness;
   progressSummary?: UserProgressSummary | null; coverageMatrix?: CoverageMatrix | null; nextUserAction?: NextUserAction | null; decisionDelta?: DecisionDelta | null; usageLine?: string;
+  /** A held closed-loop test of this result, with the project and the revision that clearing it is recorded against. */
+  executionHold?: ExecutionHold | null; projectId?: string; holdCauseRef?: string;
+  /** Back to the trace row this investigation started from. */
+  onOpenTrace?: (row: { kind: string; id: string }) => void;
+  /** Which of this answer's hypotheses came from a trace row and whether that row's verdict has changed since. */
+  hypothesisLinks?: HypothesisLink[]; linkDistribution?: ReasonDistribution;
 }) {
   const hypotheses = objectList(objectValue(result?.portfolio).hypotheses);
   const actions = objectList(objectValue(result?.action_plan).alternatives);
@@ -71,16 +86,19 @@ export function ResearchResultCard({ result, state, unavailable, error, failure,
       : state === "STALE" && <p className="result-notice">현재 기준으로 다시 확인이 필요한 과거 답변입니다.</p>)}
     {unavailable && <p className="result-notice">{unavailable}</p>}
     {result && content && !unavailable ? <>
+      <TraceOriginLine result={result} onOpenTrace={onOpenTrace}/>
       {typeof result.answer === "string" && <AnswerBody answer={result.answer}
         onCite={(spanId, citations) => onDetail({kind:"evidence",result,historySelection,focusSpanId:spanId,citations})}/>}
       {typeof result.answer_status === "string" && <AnswerHold status={result.answer_status} coverage={coverageMatrix} counter={counterSearchLine(result)}
         facts={<ConfirmedFacts result={result} onCite={(spanId, citations) => onDetail({kind:"evidence",result,historySelection,focusSpanId:spanId,citations})}/>}
         next={(() => { const step = nextUserAction ?? progressSummary?.next_user_action; return step && step.action_type !== "NONE" ? nextActionLabel(step) : null; })()}/>}
+      {executionHold && projectId && <ExecutionHoldNotice hold={executionHold} projectId={projectId} causeRef={holdCauseRef ?? "hold:" + (executionHold.plan_execution_id ?? "none")} onCleared={onRetry}/>}
       <ResearchFollowupSummary answerEvidenceCount={selectedEvidenceCount(result)} progress={progressSummary} coverage={coverageMatrix} action={nextUserAction} delta={decisionDelta}
         onOpenEvidence={historySelection ? () => onDetail({kind:"evidence",result,historySelection}) : undefined}/>
-      {gaps.length > 0 && <div className="result-notice"><strong>아직 확인할 내용</strong><ul>{gaps.map((gap,index)=><li key={index}>{gap}</li>)}</ul></div>}
+      {gaps.length > 0 && <div className="result-notice"><strong>아직 확인할 내용</strong><ReadableList items={gaps}/></div>}
       {Object.hasOwn(objectValue(result.portfolio), "hypotheses") && <section className="conversation-findings"><h3>다른 설명과 확인할 점</h3>
-        {hypotheses.length ? hypotheses.map((h,index)=><div key={textValue(h.hypothesis_id)||index}><p>{textValue(h.statement)}</p>{textValue(h.uncertainty)&&<small>{textValue(h.uncertainty)}</small>}</div>) : <p>현재 자료로 제안된 가설이 없습니다.</p>}
+        {causeUnconfirmed(result) && <CauseUnconfirmed/>}
+        {hypotheses.length ? hypotheses.map((h,index)=><div key={textValue(h.hypothesis_id)||index}><p>{textValue(h.statement)}</p>{textValue(h.uncertainty)&&<small>{textValue(h.uncertainty)}</small>}{projectId&&<HypothesisLinkNotice projectId={projectId} link={hypothesisLinks?.find(item=>item.hypothesis_id===textValue(h.hypothesis_id))} all={hypothesisLinks} distribution={linkDistribution}/>}</div>) : <p>현재 자료로 제안된 가설이 없습니다.</p>}
       </section>}
       {actions.length > 0 && <section className="conversation-findings"><h3>다음에 해볼 일</h3>{actions.map((action,index)=><div key={textValue(action.action_id)||index}><p>{textValue(action.specification)}</p><small>{textValue(action.expected_information_value)}</small>{action.execution_authority === "HUMAN_REQUIRED_R3" && <p className="result-notice">실행 제안입니다. 대상과 영향을 검토한 권한 결정이 필요합니다.</p>}</div>)}</section>}
       <nav className="answer-actions" aria-label="답변 상세">

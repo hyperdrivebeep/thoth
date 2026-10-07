@@ -28,6 +28,12 @@ _EXCLUDED_FILES = (
 )
 
 
+_STALE_LIST_HINT = (
+    "; if the file list is stale, rebuild it with scripts/update_source_manifest.py "
+    "(--check shows what differs)"
+)
+
+
 class PublicPackageError(ValueError):
     """A declared public package path or byte contract does not match the tree."""
 
@@ -130,7 +136,9 @@ class PublicSourceProfile:
         except OSError as exc:
             raise PublicPackageError(f"listed public file is unreadable: {relative}") from exc
         if len(data) != row.bytes or hashlib.sha256(data).hexdigest() != row.sha256:
-            raise PublicPackageError(f"listed public file bytes differ: {relative}")
+            raise PublicPackageError(
+                f"listed public file bytes differ: {relative}{_STALE_LIST_HINT}"
+            )
         return data
 
     def read_text(self, relative: str) -> str:
@@ -163,7 +171,9 @@ def public_source_profile(root: Path) -> PublicSourceProfile | None:
             if path.is_symlink() or not resolved.is_relative_to(root) or not path.is_file():
                 raise PublicPackageError(f"listed public path is redirected: {row.path}")
         except OSError as exc:
-            raise PublicPackageError(f"listed public file is missing: {row.path}") from exc
+            raise PublicPackageError(
+                f"listed public file is missing: {row.path}{_STALE_LIST_HINT}"
+            ) from exc
         profile.read_bytes(row.path)
     for relative in _ANCHORS:
         profile.read_bytes(relative)

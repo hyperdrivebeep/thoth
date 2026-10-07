@@ -1,0 +1,4 @@
+format,row_type,base_set_digest,item_id,link_id,rule_id,result_id,target_kind,target_id,item_key,kind,title,fields_json,source_span_refs,from_id,to_id,relation,criterion_id,rule_revision,measure,comparator,threshold,unit,condition,rounding_digits,rounding_mode,required,result_revision,value,raw_value,numerator,denominator,observed_at
+thoth-trace-csv/1,ITEM,,007,,,,,,k-007,REQUIREMENT,title 007,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,0012,,,,,,k-0012,CRITERION,title 0012,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,00,,,,,,k-00,TEST_CASE,title 00,,,,,,,,,,,,,,,,,,,,,

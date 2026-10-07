@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+from thoth.application.services.hypothesis_link_view import HypothesisLinkReader
 from thoth.domain.action_full import ActionAuditRecord, AuthorizationEnvelopeRecord
 from thoth.domain.auth import require_authenticated_authority
 from thoth.domain.canonical import canonical_payload, domain_digest
@@ -157,6 +158,12 @@ def decide_authorization(
             raise ValueError("authorization revision changed before decision")
         if current.state != "PENDING":
             raise ValueError("authorization is not pending")
+        if decision == "APPROVE":
+            # Prepared in time is not enough: no approval is given on a hypothesis whose trace
+            # verdict has changed since, unless a person looked at that change (hypothesis link).
+            HypothesisLinkReader(ledger).require_plan_revision_hypotheses_current(
+                current.project_id, current.plan_revision_digest
+            )
         if approved_digest != current.exact_scope_digest:
             raise ValueError("approved digest does not match the content-bound scope")
         role = next(

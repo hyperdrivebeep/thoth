@@ -28,6 +28,25 @@ def normalize_timestamp(value: datetime) -> str:
     return utc_value.isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
+def same_stored_instant(left: object, right: object) -> bool:
+    """Whether two timestamps are the same moment at the precision timestamps are stored in.
+
+    A project keeps its cutoff exactly as typed (it can have microseconds), while a stored record
+    or result keeps milliseconds (normalize_timestamp). Comparing the two as plain datetimes
+    reports a change that never happened, so cutoffs are compared the way they are stored. A
+    difference of a millisecond or more is still a change, and the time zone does not matter.
+    Anything that is not a timezone-aware datetime is compared as it is.
+    """
+    if (
+        isinstance(left, datetime)
+        and isinstance(right, datetime)
+        and left.utcoffset() is not None
+        and right.utcoffset() is not None
+    ):
+        return normalize_timestamp(left) == normalize_timestamp(right)
+    return left == right
+
+
 def _canonical_key(value: object) -> bytes:
     return json.dumps(
         value,

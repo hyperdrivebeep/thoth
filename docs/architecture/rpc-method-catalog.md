@@ -2,7 +2,7 @@
 
 This source-preview index is derived from the public method catalog, registered runtime method names, and public source schemas. It lists available RPC names; it is not a live-service, account-authorization, model-execution, or full-suite verification receipt. The machine-readable metadata and notification names are in [`schemas/protocol/public-method-catalog.json`](../../schemas/protocol/public-method-catalog.json).
 
-Requests use the public JSON-RPC `/rpc` surface. The method classification below distinguishes reads from commands; each call still follows the runtime's authentication and resource-scope checks. The six compatibility aliases remain listed under their own method names. The catalog contains 351 public methods (345 canonical and 6 aliases) and 221 notifications.
+Requests use the public JSON-RPC `/rpc` surface. The method classification below distinguishes reads from commands; each call still follows the runtime's authentication and resource-scope checks. The six compatibility aliases remain listed under their own method names. The catalog contains 362 public methods (356 canonical and 6 aliases) and 221 notifications.
 
 ## Local model credential boundary
 
@@ -17,6 +17,10 @@ Requests use the public JSON-RPC `/rpc` surface. The method classification below
 | `model/credential/login/complete` | COMMAND | Accepts a matching manual response for a method that supports it. The raw response is ephemeral and must not appear in operation replay, receipt or telemetry; HOSTED_REVIEW denies before local I/O. |
 
 These credential RPCs use the `system:workspace` scope in LOCAL mode. HOSTED_REVIEW denies them before the local handler. The local setup and settings screens consume the login status and cancel methods through `XaiDeviceLogin`; they do not convert a status read into a new login start. A command's operation record, broker worker state, and workspace profile are distinct effects.
+
+## Research request origin (trace row)
+
+No method was added. `thread/start` and `thread/input` with `contract_version=2` accept one optional `origin` that names a row of the project's verification trace: `kind` (`TRACE_VERDICT`), `project_id`, `subject_kind` (`CRITERION` or `REQUIREMENT`), `subject_id` and the `verdict_revision` digest the client was looking at. Nothing else is accepted. The server checks the name against the stored trace with the same project read rule as `trace/read`, refuses a missing row, another project or a revision that is no longer the row's current verdict, and writes the facts itself (state, computed reasons, rule summary, chosen result IDs, source positions). That server-written origin is stored with the request attempt, given to the model as context with the instruction that the rule's verdict is not to be re-judged, pins the row's source positions into the evidence shortlist (only spans that are already retrievable), and appears in the result as `origin`. `thread/input` with an origin must target the thread whose own origin is the same row; `thread/steer`, `contract_version=1` and an origin of any other shape are refused. A resend of an already accepted request is not checked again. `thread/list` adds `origin` (`subject_kind`, `subject_id`, `verdict_revision`, or null) to each thread so a client can open the conversation of a row. The origin adds no model call and is not part of the thread's data scope or memory scope.
 
 ## Method index
 
@@ -45,6 +49,7 @@ action/authorization/decide
 action/authorization/prepare
 action/compensation/create
 action/create
+action/draft/fromTest
 action/generate
 action/impact/recalculate
 action/merge/propose
@@ -225,6 +230,7 @@ hypothesis/appraisal/read
 hypothesis/assumption/list
 hypothesis/audit/read
 hypothesis/graph/read
+hypothesis/link/list
 hypothesis/list
 hypothesis/portfolio/list
 hypothesis/portfolio/read
@@ -232,8 +238,10 @@ hypothesis/prediction/list
 hypothesis/prediction/read
 hypothesis/quality/read
 hypothesis/read
+hypothesis/test/result/list
 hypothesis/relation/list
 hypothesis/review/list
+hypothesis/same/list
 ```
 
 ### Commands
@@ -246,16 +254,20 @@ hypothesis/counterevidence/request
 hypothesis/create
 hypothesis/generate
 hypothesis/intent/update
+hypothesis/link/recheck
 hypothesis/merge/propose
 hypothesis/portfolio/compose
 hypothesis/portfolio/revalidate
 hypothesis/prediction/bind
+hypothesis/refutation/record
 hypothesis/relation/add
 hypothesis/relation/remove
 hypothesis/review/request
 hypothesis/revise
+hypothesis/same/record
 hypothesis/split/propose
 hypothesis/test/bind
+hypothesis/test/result/record
 ```
 
 ## 9. Improvement Namespace
@@ -598,7 +610,28 @@ thread/steer
 thread/stop
 ```
 
-## 21. Workspace Namespace
+## 21. Trace Namespace
+
+### Queries
+
+```text
+trace/closure/list
+trace/export
+trace/history
+trace/importPreview
+trace/lesson/list
+trace/read
+```
+
+### Commands
+
+```text
+trace/closure/record
+trace/confirm
+trace/importApply
+```
+
+## 22. Workspace Namespace
 
 ### Queries
 

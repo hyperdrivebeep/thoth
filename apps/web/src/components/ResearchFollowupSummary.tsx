@@ -3,6 +3,7 @@ import type { CoverageMatrix, CoverageMatrixRow, DecisionDelta, NextUserAction, 
 import { Disclosure } from "./Disclosure";
 import { currentnessLabel } from "./history/historyPresentation";
 import { DecisionDeltaView } from "./history/DecisionDeltaComparison";
+import { criterionText, isReadable, plainReason } from "./plainWording";
 import { coverageTermLabel, nextActionLabel, statusLabel } from "./statusLabels";
 
 function actionLabel(action?: NextUserAction | null): string {
@@ -61,15 +62,25 @@ function compactList(items: string[], empty: string) {
   const stages = items.filter(item => STAGE_ID.test(item));
   const requirements = items.filter(item => REQUIREMENT_ID.test(item));
   const rest = items.filter(item => !STAGE_ID.test(item) && !REQUIREMENT_ID.test(item));
-  const plain = rest.map(item => listItemLabel(item) ?? (CODE_LIKE.test(item) ? null : item)).filter((item): item is string => item !== null);
-  const codes = rest.filter(item => listItemLabel(item) === null && CODE_LIKE.test(item));
-  const technical = [...stages, ...requirements, ...codes];
+  const plain: string[] = [];
+  const codes: string[] = [];
+  const sentences: string[] = [];
+  const originals: string[] = [];
+  for (const item of rest) {
+    const label = listItemLabel(item) ?? plainReason(item);
+    if (label) { plain.push(label); if (plainReason(item)) originals.push(item); }
+    else if (CODE_LIKE.test(item)) codes.push(item);
+    else if (isReadable(item)) plain.push(item);
+    else sentences.push(item); // English the program wrote: shown only in the folded technical part
+  }
+  const technical = [...stages, ...requirements, ...codes, ...sentences, ...originals];
   if (!plain.length && !technical.length) return <p className="muted">{empty}</p>;
   return <>
     {plain.length > 0 && <ul>{plain.slice(0, 4).map(item => <li key={item}>{item}</li>)}</ul>}
     {stages.length > 0 && <p>검토 단계 {stages.length}개</p>}
     {requirements.length > 0 && <p>조건별 평가 {requirements.length}건</p>}
     {codes.length > 0 && <p>기록된 상세 코드 {codes.length}개</p>}
+    {sentences.length > 0 && <p>기록된 상세 문구 {sentences.length}개</p>}
     {technical.length > 0 && <details className="connection-tech"><summary>기술 정보</summary><small>{technical.join(" · ")}</small></details>}
   </>;
 }
@@ -119,10 +130,10 @@ export function ResearchFollowupSummary({
       <section><h4>바뀐 판단</h4><p>{deltaLabel(delta)}</p>{delta?.reason_state === "UNKNOWN_REASON" && <p className="muted">변경 이유는 저장된 기록에서 확인되지 않았습니다.</p>}</section>
       <section><h4>필요한 다음 행동</h4><p>{actionLabel(nextAction)}</p>{nextAction && <details className="connection-tech"><summary>기술 정보</summary><small>{nextAction.label}</small></details>}{nextAction?.requires_permission && <p className="result-notice">권한 결정이 필요한 행동입니다.</p>}</section>
     </div>}
-    {progress && (progress.recorded_checks.length > 0 || progress.remaining_gaps.length > 0 || progress.unknowns.length > 0) && <Disclosure label="확인한 항목과 남은 gap">
+    {progress && (progress.recorded_checks.length > 0 || progress.remaining_gaps.length > 0 || progress.unknowns.length > 0) && <Disclosure label="확인한 항목과 남은 확인 사항">
       <div className="followup-detail-columns">
         <section><h4>기록된 확인</h4>{compactList(progress.recorded_checks, "기록된 확인 항목이 없습니다.")}</section>
-        <section><h4>남은 gap</h4>{compactList(progress.remaining_gaps, "남은 gap이 없습니다.")}</section>
+        <section><h4>남은 확인 사항</h4>{compactList(progress.remaining_gaps, "남은 확인 사항이 없습니다.")}</section>
         <section><h4>확인 불가</h4>{compactList(progress.unknowns, "확인 불가 항목이 없습니다.")}</section>
       </div>
       <p className="muted">{currentnessLabel(progress.currentness)}</p>
@@ -131,14 +142,20 @@ export function ResearchFollowupSummary({
       {coverage.availability === "UNAVAILABLE" ? <p className="result-notice">현재 권한으로 평가기준 행을 읽을 수 없습니다.</p> : rows.length === 0 ? <p className="muted">이 답변에 연결된 평가기준 행이 없습니다.</p>
         : <div className="coverage-table" role="table" aria-label="평가기준 충족 상태">
           <div className="coverage-head" role="row"><span>기준</span><span>기준 상태</span><span>판단</span></div>
-          {rows.map(row => <article className="coverage-row" role="row" key={row.requirement_id}>
-            <div role="cell"><strong>{coverageTermLabel(row.target)}</strong><p>{row.question}</p></div>
+          {rows.map(row => {
+            const text = criterionText(row.target, row.question);
+            const term = coverageTermLabel(row.target);
+            const title = text.title ?? (term !== row.target ? term : null);
+            const technical = [...text.technical.filter(item => !(title !== null && item === row.target)), ...row.evidence_refs.slice(0, 3), ...row.reason_codes.slice(0, 3)];
+            return <article className="coverage-row" role="row" key={row.requirement_id}>
+            <div role="cell">{title !== null ? <strong>{title}</strong> : text.question === null && <strong>평가 기준</strong>}{text.question !== null && <p>{text.question}</p>}</div>
             <div role="cell"><Tag minimal intent={coverageIntent(row.status)}>{coverageLabel(row.status)}</Tag></div>
             <div role="cell"><small>{[row.relation, row.validation].filter(term => term && term !== "NOT_ASSESSED").map(coverageTermLabel).join(" · ")
               || (row.blocker ? coverageTermLabel(row.blocker) : "추가 설명 없음")}</small></div>
-            {(row.evidence_refs.length > 0 || row.reason_codes.length > 0) && <details className="connection-tech coverage-tech"><summary>기술 정보</summary>
-              <small>{[...row.evidence_refs.slice(0, 3), ...row.reason_codes.slice(0, 3)].join(" · ")}</small></details>}
-          </article>)}
+            {technical.length > 0 && <details className="connection-tech coverage-tech"><summary>기술 정보</summary>
+              <small>{technical.join(" · ")}</small></details>}
+          </article>;
+          })}
         </div>}
     </Disclosure>}
     {delta && <DecisionDeltaView delta={delta} />}

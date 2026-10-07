@@ -4,14 +4,17 @@ from typing import cast
 
 from pydantic import Field, JsonValue
 
+from thoth.application.services.execution_pending import PendingResultClearing
 from thoth.application.services.execution_service import ExecutionService
 from thoth.application.services.sandbox_service import SandboxService
 from thoth.domain.action_full import ActionPlanRecord
+from thoth.domain.auth import current_authenticated_actor
 from thoth.domain.base import DomainModel
 from thoth.domain.execution_full import PlanExecutionRecord, StepExecutionAttemptRecord
 from thoth.domain.sandbox import SandboxFailure, SandboxRunSpec
 from thoth.ports.action import ActionStorePort
 from thoth.ports.execution import ExecutionStorePort
+from thoth.ports.ledger import LedgerPort
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 
 
@@ -99,6 +102,12 @@ class CompensationInput(ProjectInput):
 class InvalidateInput(ExecutionReadInput):
     cause_revision_ref: str = Field(min_length=1, max_length=260)
     impact_refs: tuple[str, ...]
+    # Clearing an unsettled sandbox result so the same work may run again. The execution revision
+    # that was read is required then, and the earlier attempt and its result are kept.
+    clear_pending_attempt_id: str | None = Field(default=None, min_length=1, max_length=160)
+    expected_execution_revision: int | None = Field(default=None, ge=0)
+    reason: str | None = Field(default=None, min_length=1, max_length=2_000)
+    input_difference: dict[str, JsonValue] | None = None
 
 
 class ExecutionHandlers:
@@ -109,11 +118,17 @@ class ExecutionHandlers:
         actions: ActionStorePort,
         service: ExecutionService,
         sandbox: SandboxService | None = None,
+        ledger: LedgerPort | None = None,
     ) -> None:
         self._store = store
         self._actions = actions
         self._service = service
         self._sandbox = sandbox
+        self._clearing = (
+            None
+            if ledger is None
+            else PendingResultClearing(store=store, service=service, ledger=ledger)
+        )
 
     async def list(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ExecutionListInput.model_validate(value)
@@ -518,11 +533,35 @@ class ExecutionHandlers:
     async def invalidate(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = InvalidateInput.model_validate(value)
         current = self._read_execution(request)
-        execution, commit = self._service.invalidate(
-            current,
-            cause_revision_ref=request.cause_revision_ref,
-            impact_refs=request.impact_refs,
-        )
+        if request.clear_pending_attempt_id is not None and (
+            request.expected_execution_revision is None
+            or request.expected_execution_revision != current.revision
+        ):
+            raise RpcApplicationError(
+                RpcErrorCode.STALE_CHECKPOINT, "Execution revision changed before clearing"
+            )
+        try:
+            if request.clear_pending_attempt_id is None:
+                execution, commit = self._service.invalidate(
+                    current,
+                    cause_revision_ref=request.cause_revision_ref,
+                    impact_refs=request.impact_refs,
+                )
+            else:
+                if self._clearing is None or not request.reason:
+                    raise ValueError("clearing a pending result requires a reason")
+                actor = current_authenticated_actor()
+                execution, commit = self._clearing.clear(
+                    current,
+                    attempt_id=request.clear_pending_attempt_id,
+                    cause_revision_ref=request.cause_revision_ref,
+                    impact_refs=request.impact_refs,
+                    cleared_by="human:local-user" if actor is None else actor.actor_id,
+                    reason=request.reason,
+                    input_difference=cast(dict[str, object] | None, request.input_difference),
+                )
+        except ValueError as exc:
+            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
         return {
             "execution": execution.model_dump(mode="json"),
             "running_effect_warning": execution.blocked_steps.get("INVALIDATED"),

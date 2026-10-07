@@ -94,3 +94,43 @@ async def test_file_stage_rejects_corrupt_existing_digest_path(
         )
 
     assert second.status_code == 409
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("name", ["30_RESULT.yaml", "plan.YML"])
+async def test_file_stage_takes_yaml_as_plain_text_and_keeps_its_name(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, name: str
+) -> None:
+    workspace = tmp_path / "workspace"
+    monkeypatch.setenv("THOTH_WORKSPACE", str(workspace))
+    transport = httpx.ASGITransport(app=create_app())
+    body = b"identity: example\nnumerator: 19\n"
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.post(
+            "/files/stage",
+            files={"file": (name, body, "application/octet-stream")},
+            headers={"x-thoth-project-id": "project:file-upload"},
+        )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["media_type"] == "text/plain" and payload["filename"] == name
+    assert payload["relative_path"].lower().endswith(name.lower())
+    assert (workspace / "inbox" / payload["relative_path"]).read_bytes() == body
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("name", ["settings.toml", "notes.yaml.exe", "config.ini", "payload.yamlx"])
+async def test_file_stage_still_rejects_other_types_next_to_yaml(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, name: str
+) -> None:
+    monkeypatch.setenv("THOTH_WORKSPACE", str(tmp_path / "workspace"))
+    transport = httpx.ASGITransport(app=create_app())
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.post(
+            "/files/stage",
+            files={"file": (name, b"a: 1\n", "text/plain")},
+            headers={"x-thoth-project-id": "project:file-upload"},
+        )
+
+    assert response.status_code == 415

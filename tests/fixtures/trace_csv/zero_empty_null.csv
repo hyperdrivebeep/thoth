@@ -1,0 +1,12 @@
+format,row_type,base_set_digest,item_id,link_id,rule_id,result_id,target_kind,target_id,item_key,kind,title,fields_json,source_span_refs,from_id,to_id,relation,criterion_id,rule_revision,measure,comparator,threshold,unit,condition,rounding_digits,rounding_mode,required,result_revision,value,raw_value,numerator,denominator,observed_at
+thoth-trace-csv/1,ITEM,,C-1,,,,,,k-C-1,CRITERION,criterion,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,Z-1,,,,,,k-Z-1,RESULT,result Z-1,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,Z-2,,,,,,k-Z-2,RESULT,result Z-2,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,Z-3,,,,,,k-Z-3,RESULT,result Z-3,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,Z-4,,,,,,k-Z-4,RESULT,result Z-4,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,Z-5,,,,,,k-Z-5,RESULT,result Z-5,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,RESULT,,,,,Z-1,,,,,,,,,,,C-1,,,,,per_min,weather=dry,,,,1,0,,,,2026-01-01T00:00:00.000Z
+thoth-trace-csv/1,RESULT,,,,,Z-2,,,,,,,,,,,C-1,,,,,per_min,weather=dry,,,,1,"0",,,,2026-01-01T00:00:00.000Z
+thoth-trace-csv/1,RESULT,,,,,Z-3,,,,,,,,,,,C-1,,,,,per_min,weather=dry,,,,1,,,,,2026-01-01T00:00:00.000Z
+thoth-trace-csv/1,RESULT,,,,,Z-4,,,,,,,,,,,C-1,,,,,per_min,weather=dry,,,,1,null,,,,2026-01-01T00:00:00.000Z
+thoth-trace-csv/1,RESULT,,,,,Z-5,,,,,,,,,,,C-1,,,,,per_min,weather=dry,,,,1,"",,,,2026-01-01T00:00:00.000Z

@@ -3,7 +3,7 @@
     "scripts/check_module_budget.py": {
       "allowed_argv": [[]],
       "files": {
-        "scripts/check_module_budget.py": "7a90010afcaaad5cff0adabe8941fa06f5075badb01b0e374fe5d8d163355aac"
+        "scripts/check_module_budget.py": "b8bacdf729f183be2a633cad55d00ceb9520e4a6acef4830065953ad8d85bb54"
       }
     }
   },

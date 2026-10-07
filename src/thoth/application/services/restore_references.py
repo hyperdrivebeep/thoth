@@ -4,6 +4,7 @@ from collections.abc import Callable
 
 from thoth.domain.action_full import ActionPlanRecord
 from thoth.domain.base import DomainModel
+from thoth.domain.canonical import same_stored_instant
 from thoth.domain.hypothesis_full import (
     HypothesisPortfolioRecord,
     HypothesisRecord,
@@ -118,7 +119,7 @@ class HypothesisRestoreReferences:
                 or prediction.hypothesis_semantic_digest != semantic
             ):
                 raise RestoreError("RESTORE_MEMBERS_REQUIRE_REVIEW")
-            if prediction.knowledge_cutoff != project.cutoff_at or not set(
+            if not same_stored_instant(prediction.knowledge_cutoff, project.cutoff_at) or not set(
                 prediction.assumption_refs
             ).issubset(value.assumption_refs):
                 raise RestoreError("RESTORE_MEMBERS_REQUIRE_REVIEW")
@@ -163,7 +164,7 @@ class HypothesisRestoreReferences:
                 or binding.prediction_fit != assessment.prediction_fit
             ):
                 raise RestoreError("RESTORE_TARGET_MISMATCH")
-            if assessment.knowledge_cutoff != project.cutoff_at:
+            if not same_stored_instant(assessment.knowledge_cutoff, project.cutoff_at):
                 raise RestoreError("RESTORE_SOURCE_DRIFT")
             plan = self.ledger.read_revision_by_digest(
                 target.project_id, assessment.plan_revision_digest

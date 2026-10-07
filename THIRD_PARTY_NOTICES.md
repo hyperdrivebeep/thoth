@@ -24,6 +24,10 @@ included under the project's MIT license, copyright 2026 THOTH. No original bene
 upstream repository copy or private research dossier is distributed. Inclusion does not grant
 rights to the referenced external material or certify real-world project outcomes.
 
+The examples/synthetic-radar-demo-v1 folder, its scorer folder and the trace CSV exchange fixtures under tests/fixtures/trace_csv are newly written by THOTH as invented
+synthetic data. Every value, date and count is an assumption; no measurement, dataset or text from an external radar source is included. They are
+marked SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE and are included under the project's MIT license, copyright 2026 THOTH.
+
 ## xAI integration reference
 
 The experimental xAI device-code configuration and curated model capability metadata reference

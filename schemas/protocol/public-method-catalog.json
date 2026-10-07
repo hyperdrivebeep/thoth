@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
   "authority": "docs/architecture/rpc-method-catalog.md",
-  "canonical_method_count": 345,
+  "canonical_method_count": 362,
   "compatibility_alias_count": 6,
-  "runtime_method_count": 351,
+  "runtime_method_count": 368,
   "notification_count": 221,
   "methods": [
     {
@@ -83,6 +83,21 @@
     },
     {
       "name": "action/create",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "action/draft/fromTest",
       "namespace": "action",
       "surface": "COMMAND",
       "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
@@ -1886,6 +1901,36 @@
       "runtime_status": "IMPLEMENTED"
     },
     {
+      "name": "hypothesis/link/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/link/recheck",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
       "name": "hypothesis/list",
       "namespace": "hypothesis",
       "surface": "QUERY",
@@ -2051,6 +2096,21 @@
       "runtime_status": "IMPLEMENTED"
     },
     {
+      "name": "hypothesis/refutation/record",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
       "name": "hypothesis/relation/add",
       "namespace": "hypothesis",
       "surface": "COMMAND",
@@ -2141,6 +2201,36 @@
       "runtime_status": "IMPLEMENTED"
     },
     {
+      "name": "hypothesis/same/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/same/record",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
       "name": "hypothesis/split/propose",
       "namespace": "hypothesis",
       "surface": "COMMAND",
@@ -2157,6 +2247,36 @@
     },
     {
       "name": "hypothesis/test/bind",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/test/result/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "hypothesis/test/result/record",
       "namespace": "hypothesis",
       "surface": "COMMAND",
       "canonical_owner": "HYPOTHESIS",
@@ -5021,6 +5141,132 @@
       "runtime_status": "IMPLEMENTED"
     },
     {
+      "name": "trace/closure/list",
+      "namespace": "trace",
+      "surface": "QUERY",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "trace/closure/record",
+      "namespace": "trace",
+      "surface": "COMMAND",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "trace/confirm",
+      "namespace": "trace",
+      "surface": "COMMAND",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "trace/export",
+      "namespace": "trace",
+      "surface": "QUERY",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "trace/history",
+      "namespace": "trace",
+      "surface": "QUERY",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "trace/importApply",
+      "namespace": "trace",
+      "surface": "COMMAND",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "trace/importPreview",
+      "namespace": "trace",
+      "surface": "QUERY",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "trace/lesson/list",
+      "namespace": "trace",
+      "surface": "QUERY",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "trace/read",
+      "namespace": "trace",
+      "surface": "QUERY",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
       "name": "workspace/ready",
       "namespace": "workspace",
       "surface": "QUERY",
@@ -5286,5 +5532,5 @@
     "thread/waitingForInput",
     "thread/waitingForProtectedAction"
   ],
-  "catalog_digest": "9ab42a2fa3b67e648e1e7b5b9f38c609a93429597c769f7c00b780a7db1cae9b"
+  "catalog_digest": "1c7d4799ca9b778a5ba023f66a79b60671e68ffc1e8f57ba295144a403a35798"
 }

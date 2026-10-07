@@ -52,39 +52,8 @@ from thoth.protocol.jsonrpc import (
     RpcErrorCode,
 )
 from thoth.protocol.notifications import notifications_for
+from thoth.protocol.read_queries import READ_QUERY_METHODS
 from thoth.protocol.registry import CommandHandler, MethodRegistry
-
-READ_QUERY_METHODS = frozenset(
-    {
-        "revision/timeline/read",
-        "revision/restore/preview",
-        "revision/diff/read",
-        "revision/history/read",
-        "revision/read",
-        "revision/content/read",
-        "revision/head/read",
-        "revision/timeline/item/read",
-        "thread/result/read",
-        "thread/result/compare/read",
-        "thread/read",
-        "thread/list",
-        "thread/activity/list",
-        "model/settings/read",
-        "model/credential/list",
-        "model/credential/login/status",
-        "workspace/setup/read",
-        "workspace/ready",
-        "project/read",
-        "project/list",
-        "project/review/list",
-        "project/source/list",
-        "evidence/list",
-        "operation/read",
-        "operation/result/read",
-        "operation/checkpoint/read",
-    }
-)
-RUNNING_RESEARCH_METHODS = RESEARCH_OPERATION_METHODS
 
 
 @dataclass(frozen=True)
@@ -245,7 +214,7 @@ class CommandBus:
                     live_task = operation.operation_id in self._research_tasks
                     if (
                         self._seal_abandoned_running
-                        and request.method in RUNNING_RESEARCH_METHODS
+                        and request.method in RESEARCH_OPERATION_METHODS
                         and not live_task
                     ):
                         return self._fail_abandoned_running(request, operation)

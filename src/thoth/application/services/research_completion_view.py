@@ -1,5 +1,7 @@
 """Compatible answer meaning; operation success remains a technical publication state."""
 
+from typing import cast
+
 from thoth.application.services.request_records import RequestRecords
 from thoth.application.services.research_stages import read_stage
 from thoth.domain.evidence_requirements import CoverageAssessment
@@ -10,6 +12,28 @@ from thoth.domain.research_request import (
     ResearchBudget,
 )
 from thoth.ports.resource_scope import ResourceAccessPort
+
+
+def _execution_hold(closed_loop: dict[str, object]) -> dict[str, object]:
+    """What a held closed-loop test tells the reader (R2 replay guard), and the way out of it.
+
+    Only a hold that has an unsettled earlier run carries anything to clear; every other hold
+    has no exits."""
+    pending_value = closed_loop.get("pending_result")
+    pending: dict[str, object] = (
+        cast(dict[str, object], pending_value) if isinstance(pending_value, dict) else {}
+    )
+    exits = pending.get("exits")
+    return {
+        "schema_version": "1.0.0",
+        "reason_code": closed_loop.get("reason_code"),
+        "plan_execution_id": pending.get("plan_execution_id"),
+        "execution_revision": pending.get("execution_revision"),
+        "attempt_id": pending.get("attempt_id"),
+        "attempt_state": pending.get("attempt_state"),
+        "input_difference": pending.get("input_difference"),
+        "exits": list(cast(list[object], exits)) if isinstance(exits, list) else [],
+    }
 
 
 def completion_view(
@@ -51,6 +75,8 @@ def completion_view(
                 }
             )
     result = {} if manifest is None else manifest.result
+    closed_loop = result.get("r2_closed_loop")
+    held_test = isinstance(closed_loop, dict) and closed_loop.get("terminal_state") == "HOLD"
     has_answer = isinstance(result.get("answer"), str) and bool(str(result["answer"]).strip())
     kind = "NOT_PRODUCED"
     if manifest is not None:
@@ -58,6 +84,7 @@ def completion_view(
             manifest.phase == "HOLD"
             or operation_state == "FAILED"
             or result.get("answer_status") == "PARTIAL_HOLD"
+            or held_test
         ):
             kind = "HOLD"
         elif not fresh:
@@ -99,7 +126,7 @@ def completion_view(
             elif manifest.source_context_version is None:
                 kind = "LEGACY_UNKNOWN"
     terminal = operation_state in {"SUCCEEDED", "FAILED", "CANCELLED"}
-    return {
+    view: dict[str, object] = {
         "answer_outcome": {
             "schema_version": "1.0.0",
             "state": kind,
@@ -138,3 +165,6 @@ def completion_view(
             ),
         },
     }
+    if held_test and manifest is not None:
+        view["execution_hold"] = _execution_hold(cast(dict[str, object], closed_loop))
+    return view

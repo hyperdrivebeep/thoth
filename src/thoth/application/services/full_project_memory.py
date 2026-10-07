@@ -13,6 +13,7 @@ from thoth.application.services.memory_recall import (
     OMITTED_BY_BUDGET,
     RecallLimits,
     auto_memory_lacks_evidence,
+    follow_up_markers,
     lacks_evidence,
     narrow_recall,
     plan_recall,
@@ -36,7 +37,12 @@ from thoth.application.services.research_freshness import ResearchFreshnessServi
 from thoth.application.services.scoped_memory import MemoryResourceAccess
 from thoth.domain.actor import ActorRef
 from thoth.domain.auth import current_authenticated_actor
-from thoth.domain.canonical import canonical_payload, domain_digest, head_set_digest
+from thoth.domain.canonical import (
+    canonical_payload,
+    domain_digest,
+    head_set_digest,
+    same_stored_instant,
+)
 from thoth.domain.memory import (
     FullMemoryContextPack,
     FullMemoryRevision,
@@ -49,6 +55,7 @@ from thoth.domain.memory import (
     MemoryTransition,
     MemoryTransitionReceipt,
 )
+from thoth.domain.memory_expansion import MemoryExpansionOutcome
 from thoth.domain.memory_preparation import (
     FullMemoryPromotionResult,
     MemoryPreparationBasis,
@@ -57,11 +64,13 @@ from thoth.domain.memory_preparation import (
     PreparedMemoryPromotion,
 )
 from thoth.domain.memory_relation import MemoryRelationJudgment
+from thoth.domain.memory_terms import added_words, words
 from thoth.domain.revision import StagedRevision
 from thoth.ports.ledger import LedgerPort
 from thoth.ports.memory import (
     FullMemoryStorePort,
     MemoryEmbeddingPort,
+    MemoryExpansionSwitchPort,
     MemoryInjectionPort,
     MemoryProjectionBuilderPort,
     MemoryRelationJudgePort,
@@ -106,6 +115,7 @@ class FullProjectMemoryService:
         admission: MemoryAdmissionService | None = None,
         resource_access: MemoryResourceAccess | None = None,
         injection: MemoryInjectionPort | None = None,
+        expansion_switch: MemoryExpansionSwitchPort | None = None,
         relation_judge: MemoryRelationJudgePort | None = None,
         limits: RecallLimits | None = None,
     ) -> None:
@@ -122,6 +132,7 @@ class FullProjectMemoryService:
         self._admission = admission
         self._resource_access = resource_access
         self._injection = injection
+        self._expansion_switch = expansion_switch
         self._relations = MemoryRelationResolver(ledger, relation_judge)
         self._limits = limits or RecallLimits()
 
@@ -357,15 +368,15 @@ class FullProjectMemoryService:
             )
             # A free-text memory is judged by its own words, never by ids in its source reference.
             if candidate.assertion is not None:
-                words = candidate.assertion
+                words_text = candidate.assertion
             else:
-                words = content_excerpt if body is None else body[1]
-            query_terms = tuple(sorted(self._tokens(words)))
+                words_text = content_excerpt if body is None else body[1]
+            query_terms = tuple(sorted(self._tokens(words_text)))
             unsafe = (
                 memory_text_is_unsafe(content_excerpt) or candidate.assertion == REDACTED_MEMORY
             )
             owner_valid = owner is not None and owner.project_id == project_id
-            content_reusable = len(query_terms) >= 2
+            content_reusable = len(words(words_text)) >= 2
             verdict = await self._relations.resolve_candidate(
                 candidate,
                 content=content,
@@ -513,6 +524,32 @@ class FullProjectMemoryService:
                 self._store.replace_projections(prepared.basis.project_id, prepared.projections)
         return prepared.result
 
+    def expansion_skip_reason(self, project_id: str, query: str) -> str | None:
+        """Why the question should not be widened by a model call, or None when it should.
+
+        A candidate is a stored memory that was committed and is allowed to be recalled; whether
+        it also passes the finer recall conditions is decided later, by build_context.
+        """
+
+        if self._injection is not None and not self._injection.enabled(project_id):
+            return "MEMORY_OFF"
+        if self._expansion_switch is None:
+            return "NOT_CONFIGURED"
+        if not self._expansion_switch.expansion_enabled(project_id):
+            return "SETTING_OFF"
+        if follow_up_markers(query):
+            return "FOLLOW_UP"
+        if not any(
+            item.project_id == project_id
+            and item.transition == MemoryTransition.COMMIT
+            and item.recall_eligible
+            and item.support_status == "SUPPORTED"
+            and item.authority_status == "AUTHORITATIVE"
+            for item in self._store.list_revisions(project_id)
+        ):
+            return "NO_CANDIDATES"
+        return None
+
     def build_context(
         self,
         *,
@@ -522,10 +559,11 @@ class FullProjectMemoryService:
         target_use: Literal["WORKING_CONTEXT", "ACTION_CONTEXT"],
         scope: dict[str, str],
         cutoff_at: AwareDatetime,
+        expansion: MemoryExpansionOutcome | None = None,
     ) -> FullMemoryContextPack:
         excluded: dict[str, list[str]] = defaultdict(list)
         eligible: list[FullMemoryRevision] = []
-        query_terms = self._tokens(query)
+        query_words = words(query)
         stored = self._store.list_revisions(project_id)
         if self._injection is not None and not self._injection.enabled(project_id):
             excluded["MEMORY_INJECTION_OFF"] = [item.memory_revision_id for item in stored]
@@ -555,7 +593,7 @@ class FullProjectMemoryService:
                 reason = "AMBIGUOUS_OR_CONFLICTING"
             elif item.authority_status != "AUTHORITATIVE":
                 reason = "AUTHORITY_INVALID"
-            elif not item.cutoff_valid or item.cutoff_at != cutoff_at:
+            elif not item.cutoff_valid or not same_stored_instant(item.cutoff_at, cutoff_at):
                 reason = "CUTOFF_INVALID"
             elif item.owner_revision_ref not in current_heads:
                 reason = "OWNER_REVISION_NOT_CURRENT"
@@ -582,12 +620,23 @@ class FullProjectMemoryService:
                 excluded[reason].append(item.memory_revision_id)
                 continue
             eligible.append(item)
-        narrowing = narrow_recall(eligible, query, query_terms)
+        added = (
+            added_words(expansion.expansion.text(), query_words)
+            if expansion is not None and expansion.used and expansion.expansion is not None
+            else ()
+        )
+        narrowing = narrow_recall(eligible, query, query_words, added)
         relevant = narrowing.relevant
         for reason, ids in narrowing.excluded.items():
             excluded[reason].extend(ids)
         plan = plan_recall(
-            relevant, query, query_terms, self._limits, follow_up=bool(narrowing.follow_up_markers)
+            relevant,
+            query,
+            query_words,
+            self._limits,
+            follow_up=bool(narrowing.follow_up_markers),
+            added_words=added,
+            expansion_only=narrowing.expansion_only,
         )
         excluded[OMITTED_BY_BUDGET] = [item.memory_revision_id for item in plan.omitted]
         selection = MemorySelectionRecord(
@@ -603,6 +652,16 @@ class FullProjectMemoryService:
             common_terms=tuple(sorted(narrowing.common_terms)),
             follow_up=bool(narrowing.follow_up_markers),
             follow_up_markers=narrowing.follow_up_markers,
+            matches={
+                item.memory_revision_id: narrowing.matches[item.memory_revision_id]
+                for item in plan.retrieved
+                if item.memory_revision_id in narrowing.matches
+            },
+            expansion=None
+            if expansion is None
+            else expansion.record.model_copy(
+                update={"added_words": tuple(word.run for word in added)}
+            ),
         )
         return self._save_context(
             project_id,

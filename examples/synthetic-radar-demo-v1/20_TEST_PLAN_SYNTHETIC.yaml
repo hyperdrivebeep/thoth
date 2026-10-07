@@ -1,0 +1,8 @@
+# SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+notice: SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+identity: THOTH-SYNTH-RADAR-DEMO-v1
+document: test_plan
+test_cases:
+  - {id: SYN-TC-DRY, title: Dry weather run, condition: weather=dry, covers: [SYN-C-DET-DRY, SYN-C-FA-DRY], target_trials: 20, observation_minutes: 10}
+  - {id: SYN-TC-RAIN, title: Rain run, condition: weather=rain, covers: [SYN-C-DET-RAIN, SYN-C-FA-RAIN], target_trials: 20, observation_minutes: 10}
+  - {id: SYN-TC-FOG, title: Fog run, condition: weather=fog, covers: [SYN-C-DET-FOG, SYN-C-FA-FOG], target_trials: 20, observation_minutes: 10}

@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 import type { HistorySelection } from "../../api/historyModels";
 import { readDecisionDelta, type DecisionDelta, type ResultIdentity } from "../../api/researchFollowup";
+import { describeHistoryReasons } from "./historyReasonText";
 import { currentnessLabel } from "./historyPresentation";
 import { CriteriaChange } from "./CriteriaChange";
 
@@ -130,16 +131,17 @@ export function DecisionDeltaView({ delta }: { delta: DecisionDelta }) {
     </>)}
     <div className="decision-delta-reasons"><h4>기록된 변경 이유</h4>
       {delta.reason_state === "UNKNOWN_REASON" ? <p>변경 이유가 기록되지 않았습니다. 이유를 추정하지 않습니다.</p>
-        : <>{delta.reason_codes.length ? <ul>{delta.reason_codes.slice(0, 3).map((code, index) => <li key={`${code}-${index}`}>{code}</li>)}</ul> : <p>기록된 이유 문구가 없습니다.</p>}
-          {(delta.reason_codes.length > 3 || delta.reason_refs.length > 0) && <Button small minimal aria-expanded={reasonDetailsOpen} onClick={() => setReasonDetailsOpen(value => !value)}>
+        : <>{delta.reason_codes.length ? <ul>{describeHistoryReasons(delta.reason_codes).slice(0, 3).map(line => <li key={line}>{line}</li>)}</ul> : <p>기록된 이유 문구가 없습니다.</p>}
+          {(describeHistoryReasons(delta.reason_codes).length > 3 || delta.reason_refs.length > 0) && <Button small minimal aria-expanded={reasonDetailsOpen} onClick={() => setReasonDetailsOpen(value => !value)}>
             {reasonDetailsOpen ? "이유 상세 닫기" : `이유 상세 보기${delta.reason_refs.length ? ` · 연결 기록 ${delta.reason_refs.length}건` : ""}`}
           </Button>}
-          {reasonDetailsOpen && delta.reason_codes.length > 3 && <ul>{delta.reason_codes.slice(3).map((code, index) => <li key={`${code}-${index + 3}`}>{code}</li>)}</ul>}
+          {reasonDetailsOpen && describeHistoryReasons(delta.reason_codes).length > 3 && <ul>{describeHistoryReasons(delta.reason_codes).slice(3).map(line => <li key={line}>{line}</li>)}</ul>}
           {reasonDetailsOpen && delta.reason_refs.length > 0 && <p>연결 기록: {delta.reason_refs.map((ref, index) => {
             const kind = typeof ref.entity_type === "string" ? ref.entity_type : "기록";
             const id = typeof ref.entity_id === "string" ? ref.entity_id : "식별자 없음";
             return <span key={index}>{index > 0 ? " · " : ""}{kind} {id}</span>;
-          })}</p>}</>}
+          })}</p>}
+          {delta.reason_codes.length > 0 && <details className="connection-tech"><summary>기술 정보</summary>{delta.reason_codes.map((code, index) => <small key={`${code}-${index}`}>{code}</small>)}</details>}</>}
     </div>
     <p className="muted">비교 전: {currentnessLabel(delta.basis_currentness.before ?? { state: "UNKNOWN_BASIS", reasons: [] })} · 비교 후: {currentnessLabel(delta.basis_currentness.after ?? { state: "UNKNOWN_BASIS", reasons: [] })}</p>
   </section>;

@@ -14,6 +14,7 @@ from thoth.application.services.r2_sandbox_compiler import (
     SandboxTemplateRequired,
 )
 from thoth.application.services.r2_test_lifecycle import (
+    PendingResultHold,
     PreparedResearchExecution,
     R2TestLifecycle,
     ResearchTestCompletion,
@@ -457,6 +458,11 @@ class R2ClosedLoopCoordinator:
                 "sandbox_receipt": None
                 if bundle is None
                 else cast(JsonValue, bundle.receipt.model_dump(mode="json")),
+                **(
+                    {"pending_result": cast(JsonValue, error.detail)}
+                    if isinstance(error, PendingResultHold)
+                    else {}
+                ),
             }
         )
 

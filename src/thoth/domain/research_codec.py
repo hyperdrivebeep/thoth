@@ -1,6 +1,7 @@
 """Explicit kind/version dispatch; unsupported records are never treated as reviewed."""
 
 from thoth.domain.base import DomainModel
+from thoth.domain.discrimination import DiscriminationLedgerRecord
 from thoth.domain.evidence_requirements import (
     CoverageAssessment,
     HypothesisSemanticReviewRecord,
@@ -8,6 +9,8 @@ from thoth.domain.evidence_requirements import (
     RequirementSetRevision,
     SemanticReviewRecord,
 )
+from thoth.domain.hypothesis_same import SameHypothesisRecord
+from thoth.domain.lesson_ref import LessonReferenceRecord
 from thoth.domain.memory_settings import ProjectMemorySettings
 from thoth.domain.model_call_settings import ProjectModelCallSettings
 from thoth.domain.model_settings import ModelPreferenceRevision
@@ -18,6 +21,9 @@ from thoth.domain.research_request import (
     CurrentResultManifestV21,
 )
 from thoth.domain.research_stage import ResearchStageRecord
+from thoth.domain.trace_closure import TraceClosureRecord
+from thoth.domain.verdict_link import HypothesisLinkRecheckRecord
+from thoth.domain.verification_trace import VerificationTraceRecord, VerificationVerdictRecord
 
 CODECS: dict[str, type[DomainModel]] = {
     **REQUEST_CODECS,
@@ -27,6 +33,13 @@ CODECS: dict[str, type[DomainModel]] = {
             ModelPreferenceRevision,
             ProjectMemorySettings,
             ProjectModelCallSettings,
+            VerificationTraceRecord,
+            VerificationVerdictRecord,
+            HypothesisLinkRecheckRecord,
+            DiscriminationLedgerRecord,
+            SameHypothesisRecord,
+            TraceClosureRecord,
+            LessonReferenceRecord,
             CoverageAssessment,
             HypothesisSemanticReviewRecord,
             RequirementSetRevision,

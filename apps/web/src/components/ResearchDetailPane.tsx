@@ -7,7 +7,7 @@ import { objectList, objectValue, textValue } from "../api/presentation";
 import { ResearchHistoryWorkspace } from "./history/ResearchHistoryWorkspace";
 import { ResultEvidencePanel } from "./ResultEvidencePanel";
 import { HypothesisCompareLive } from "./HypothesisCompareLive";
-import { ActionCompare } from "./ActionCompare";
+import { ActionCompareLive } from "./ActionCompareLive";
 import { ProjectMemoryPanel } from "./ProjectMemoryPanel";
 import { hypothesisRows } from "./hypothesisView";
 import { selectionKey } from "../api/historyModels";
@@ -32,7 +32,7 @@ export function ResearchDetailPane({detail,project,thread,onClose}: {
     <div className="detail-scroll">
       {detail.kind==="evidence"&&selectedEvidence}
       {detail.kind==="hypotheses"&&<HypothesisCompareLive result={result} projectId={project.project_id} threadId={thread.thread_id}/>}
-      {detail.kind==="actions"&&<ActionCompare result={result} projectId={project.project_id}/>}
+      {detail.kind==="actions"&&<ActionCompareLive result={result} projectId={project.project_id}/>}
       {detail.kind==="reference"&&<><p>참고 후보와 공식 기준을 구분합니다. 값이 없으면 임의의 수치를 채우지 않습니다.</p><RecordInspector value={result.reference??result.reference_analysis??result.reference_inquiry??result.criteria??null}/></>}
       {detail.kind==="outcome"&&<><p>실제 기록된 관측과 해석입니다. 실행 제안만 있는 경우 결과로 표시하지 않습니다.</p><RecordInspector value={result.outcome??result.r2_closed_loop??null}/></>}
       {detail.kind==="memory"&&<ProjectMemoryPanel projectId={project.project_id}/>}

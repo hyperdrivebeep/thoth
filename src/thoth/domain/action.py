@@ -78,6 +78,15 @@ class OrdinalEstimate(DomainModel):
         return self
 
 
+# Effects no one may delegate (R4). Every classifier of action effects reads this one list.
+PROHIBITED_EFFECT_KEYS = (
+    "changes_official_kpi",
+    "grants_waiver",
+    "changes_safety_threshold",
+    "finalizes_model_weights",
+)
+
+
 class ActionRiskFacts(DomainModel):
     changes_local_draft: bool = False
     runs_untrusted_code: bool = False

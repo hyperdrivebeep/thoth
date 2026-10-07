@@ -402,15 +402,42 @@ class SqliteArtifactLedger(ArtifactLedgerPort):
         return None if document is None else document.source_time_assessment
 
     def list_source_times(self, project_id: str) -> tuple[SourceTimeAssessment, ...]:
+        # The list is read for every source on every request, so the nodes of each document are
+        # not read here: the assessment is kept in the version's structure metadata (as
+        # apply_source_time reads it). The node digest is still checked wherever nodes are read.
         assessments: list[SourceTimeAssessment] = []
         for artifact in self.list_artifacts(project_id):
             versions = self.list_source_versions(project_id, artifact.artifact_id)
             if not versions:
                 continue
-            assessment = self.read_source_time(project_id, artifact.artifact_id, versions[-1])
+            assessment = self._read_source_time_metadata(
+                project_id, artifact.artifact_id, versions[-1]
+            )
             if assessment is not None:
                 assessments.append(assessment)
         return tuple(assessments)
+
+    def _read_source_time_metadata(
+        self, project_id: str, artifact_id: str, source_version_id: str
+    ) -> SourceTimeAssessment | None:
+        with read_connection(self._engine) as connection:
+            row = (
+                connection.execute(
+                    select(artifact_versions.c.structure_metadata_json)
+                    .join(artifacts, artifacts.c.artifact_id == artifact_versions.c.artifact_id)
+                    .where(
+                        artifacts.c.project_id == project_id,
+                        artifacts.c.artifact_id == artifact_id,
+                        artifact_versions.c.source_version_id == source_version_id,
+                    )
+                )
+                .mappings()
+                .first()
+            )
+        if row is None or row["structure_metadata_json"] is None:
+            return None
+        recorded = orjson.loads(str(row["structure_metadata_json"])).get("source_time_assessment")
+        return None if recorded is None else SourceTimeAssessment.model_validate(recorded)
 
     def apply_source_time(
         self,

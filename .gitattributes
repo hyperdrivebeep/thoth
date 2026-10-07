@@ -9,3 +9,6 @@
 # Preserve published verification evidence byte-for-byte for SHA-256 readback.
 outputs/** -text
 .codex/verification/** -text
+
+# Trace CSV exchange fixtures keep their exact bytes (BOM, CRLF, tabs, CR).
+tests/fixtures/trace_csv/** -text

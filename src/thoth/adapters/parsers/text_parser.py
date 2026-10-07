@@ -14,7 +14,8 @@ class TextParser:
     name = "text"
     version = "1.0.0"
     media_types = frozenset({"text/plain", "text/markdown"})
-    suffixes = frozenset({".txt", ".md", ".markdown"})
+    # .yaml/.yml are read as plain lines of text. Nothing in them is interpreted or run.
+    suffixes = frozenset({".txt", ".md", ".markdown", ".yaml", ".yml"})
 
     def parse(self, artifact: ArtifactEnvelope, raw: bytes) -> StructuralDocument:
         validate_byte_hash(artifact, raw)

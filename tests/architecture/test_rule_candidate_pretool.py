@@ -7,6 +7,9 @@ import sys
 from pathlib import Path
 
 import pytest
+from scripts.rule_candidate_contract import (
+    _preserve_ratchets as preserve_ratchets,
+)
 from scripts.rule_candidate_contract import hook_smoke_applicability, validate_candidate
 from tests.architecture.owner_helpers import bind_owner
 
@@ -235,3 +238,73 @@ def test_guard_code_edit_requires_a11_even_when_file_scope_is_present(tmp_path: 
     )
     result = json.loads(hook.stdout)["hookSpecificOutput"]
     assert result["permissionDecision"] == "deny" and "A11" in result["permissionDecisionReason"]
+
+
+BUDGET = "config/module-responsibility-budget.json"
+
+
+def _budget() -> dict[str, object]:
+    return json.loads((ROOT / BUDGET).read_bytes())
+
+
+def test_a_candidate_that_keeps_the_web_size_scope_passes_the_ratchet_guard() -> None:
+    preserve_ratchets(ROOT, {BUDGET: json.dumps(_budget()).encode()})
+
+
+@pytest.mark.parametrize("new_roots", [[], ["apps/web/src/api"], ["apps/web/src", "apps/other"]])
+def test_a_candidate_cannot_change_the_web_scan_roots(new_roots: list[str]) -> None:
+    value = _budget()
+    value["web_scan_roots"] = new_roots
+    with pytest.raises(ValueError, match="web scan roots"):
+        preserve_ratchets(ROOT, {BUDGET: json.dumps(value).encode()})
+
+
+@pytest.mark.parametrize("new_suffixes", [[], [".test.ts"], [".test.ts", ".test.tsx", ".tsx"]])
+def test_a_candidate_cannot_widen_or_change_the_web_exclusions(new_suffixes: list[str]) -> None:
+    value = _budget()
+    value["web_excluded_suffixes"] = new_suffixes
+    with pytest.raises(ValueError, match="web scan exclusions"):
+        preserve_ratchets(ROOT, {BUDGET: json.dumps(value).encode()})
+
+
+@pytest.mark.parametrize("key", ["web_scan_roots", "web_excluded_suffixes"])
+def test_a_candidate_cannot_drop_a_web_size_key_that_the_repository_has(key: str) -> None:
+    value = _budget()
+    del value[key]
+    with pytest.raises(ValueError, match="web scan"):
+        preserve_ratchets(ROOT, {BUDGET: json.dumps(value).encode()})
+
+
+def test_before_the_web_keys_existed_a_candidate_may_add_them_and_may_leave_them_out(
+    tmp_path: Path,
+) -> None:
+    old = _budget()
+    del old["web_scan_roots"]
+    del old["web_excluded_suffixes"]
+    (tmp_path / "config").mkdir()
+    (tmp_path / BUDGET).write_text(json.dumps(old), encoding="utf-8")
+    preserve_ratchets(tmp_path, {BUDGET: json.dumps(old).encode()})
+    preserve_ratchets(tmp_path, {BUDGET: json.dumps(_budget()).encode()})
+
+
+def test_a_candidate_cannot_enlarge_or_add_a_watched_web_file(tmp_path: Path) -> None:
+    old = _budget()
+    old["watched_modules"]["apps/web/src/api/example.ts"] = {
+        "baseline_lines": 700,
+        "top_level_symbols": [],
+        "policy": "fixture",
+    }
+    (tmp_path / "config").mkdir()
+    (tmp_path / BUDGET).write_text(json.dumps(old), encoding="utf-8")
+    bigger = json.loads(json.dumps(old))
+    bigger["watched_modules"]["apps/web/src/api/example.ts"]["baseline_lines"] = 701
+    with pytest.raises(ValueError, match="module ratchet"):
+        preserve_ratchets(tmp_path, {BUDGET: json.dumps(bigger).encode()})
+    added = json.loads(json.dumps(old))
+    added["watched_modules"]["apps/web/src/api/another.ts"] = {
+        "baseline_lines": 650,
+        "top_level_symbols": [],
+        "policy": "fixture",
+    }
+    with pytest.raises(ValueError, match="module ratchet"):
+        preserve_ratchets(tmp_path, {BUDGET: json.dumps(added).encode()})

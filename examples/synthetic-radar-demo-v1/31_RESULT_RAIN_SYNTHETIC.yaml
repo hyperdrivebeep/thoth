@@ -1,0 +1,23 @@
+# SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+notice: SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+identity: THOTH-SYNTH-RADAR-DEMO-v1
+document: result
+available_from_phase: 2
+condition: weather=rain
+test_case: SYN-TC-RAIN
+observed_at: "2026-01-02T00:00:00Z"   # assumed date
+trials_csv: data/31_RAIN_TRIALS_SYNTHETIC.csv
+detection:
+  criterion: SYN-C-DET-RAIN
+  numerator: 16
+  denominator: 20
+  unit: ratio
+  value: "0.80"
+false_track:
+  criterion: SYN-C-FA-RAIN
+  numerator: 7
+  denominator: 10
+  unit: per_min
+  value: "0.70"
+  observation_minutes: 10
+  event_ids: [SYN-FT-RAIN-001, SYN-FT-RAIN-002, SYN-FT-RAIN-003, SYN-FT-RAIN-004, SYN-FT-RAIN-005, SYN-FT-RAIN-006, SYN-FT-RAIN-007]

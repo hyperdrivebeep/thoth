@@ -120,6 +120,14 @@ export type ResultUsage = {
   cached_input_tokens: number | null; unreported_calls: number; state: string; wall_ms: number | null;
   /** Calls sent again on their own after an earlier call was cut off. */
   auto_retries?: number;
+  /** Part of the figures above that a purpose-marked call used, such as widening the memory question. */
+  by_purpose?: Record<string, { label: string; calls: number; total_tokens: number | null }>;
+};
+/** A closed-loop test that was held instead of run. Only a hold with an unsettled earlier run has anything to clear (exits). */
+export type ExecutionHold = {
+  schema_version: string; reason_code: string | null; plan_execution_id: string | null; execution_revision: number | null;
+  attempt_id: string | null; attempt_state: string | null; exits: string[];
+  input_difference: { same?: boolean; previous_count?: number; current_count?: number; removed?: string[]; added?: string[] } | null;
 };
 export type ResearchStatus = WorkThread & {
   usage?: { input_tokens: number | null; output_tokens: number | null; total_tokens: number | null; state: string; unreported_calls: number; cumulative_token_limit_enforced: boolean; cached_input_tokens?: number | null };
@@ -130,6 +138,8 @@ export type ResearchStatus = WorkThread & {
   execution_summary?: {effective_execution_state:string;state_inconsistent:boolean;last_checkpoint_only:boolean;automatic_retry:boolean};
   freshness?: string; current_result?: ResultManifest | null; previous_result?: ResultManifest | null;
   basis_currentness?: Currentness;
+  /** Present when the stored result carries a held closed-loop test. */
+  execution_hold?: ExecutionHold | null;
   user_progress_summary?: UserProgressSummary | null;
   coverage_matrix?: CoverageMatrix | null;
   next_user_action?: NextUserAction | null;

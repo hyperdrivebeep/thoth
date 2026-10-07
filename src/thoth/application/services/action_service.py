@@ -5,6 +5,7 @@ from typing import cast
 
 from pydantic import JsonValue
 
+from thoth.application.services.action_effect_vector import checked_effect_vector
 from thoth.application.services.action_plan_validation import validate_action_plan_dag
 from thoth.application.services.authorization_consumption import (
     consume_authorization,
@@ -13,11 +14,13 @@ from thoth.application.services.authorization_consumption import (
 from thoth.application.services.authorization_currentness import mark_stale, stale_decisions
 from thoth.application.services.authorization_prepare import prepare_authorization
 from thoth.application.services.revision_service import CommitResult, RevisionCommitService
+from thoth.domain.action import PROHIBITED_EFFECT_KEYS
 from thoth.domain.action_full import (
     ActionAuditRecord,
     ActionPlanRecord,
     ActionPortfolioRecord,
     ActionRecord,
+    ActionTestRef,
     AuthorizationEnvelopeRecord,
 )
 from thoth.domain.actor import ActorRef
@@ -56,28 +59,21 @@ PURPOSES = {
 def classify_effect_vector(
     effect: dict[str, object],
 ) -> tuple[str, str, tuple[str, ...], tuple[str, ...]]:
-    complete = effect.get("effect_completeness_confirmed") is True
-    if not complete:
-        return (
-            "R3",
-            "POLICY_UNDEFINED",
-            ("EFFECT_COMPLETENESS_REVIEW",),
-            ("effect-owner",),
-        )
-    if any(
-        effect.get(key) is True
-        for key in (
-            "changes_official_kpi",
-            "grants_waiver",
-            "changes_safety_threshold",
-            "finalizes_model_weights",
-        )
-    ):
+    # A forbidden effect is R4 whether or not the declaration is complete; completeness is only
+    # asked of effects that are not forbidden.
+    if any(effect.get(key) is True for key in PROHIBITED_EFFECT_KEYS):
         return (
             "R4",
             "PROHIBITED",
             ("PROHIBITED_SEMANTIC_AUTHORITY",),
             ("institution-authority",),
+        )
+    if effect.get("effect_completeness_confirmed") is not True:
+        return (
+            "R3",
+            "POLICY_UNDEFINED",
+            ("EFFECT_COMPLETENESS_REVIEW",),
+            ("effect-owner",),
         )
     if any(
         effect.get(key) is True
@@ -168,6 +164,7 @@ class ActionService:
         secondary_purposes: tuple[str, ...],
         specification: dict[str, object],
         evidence_refs: tuple[str, ...],
+        test_refs: tuple[ActionTestRef, ...] = (),
     ) -> tuple[ActionRecord, tuple[str, ...], CommitResult]:
         self._object(project_id, object_id)
         self._validate_purposes(primary_purpose, secondary_purposes)
@@ -200,6 +197,7 @@ class ActionService:
             if item.object_id == object_id
             and item.primary_purpose == primary_purpose
             and item.specification == specification
+            and item.test_refs == test_refs
             and item.freshness != "INVALIDATED"
         )
         draft: dict[str, object] = {
@@ -209,6 +207,7 @@ class ActionService:
             "object_id": object_id,
             "portfolio_id": portfolio_id,
             "hypothesis_refs": hypothesis_refs,
+            "test_refs": test_refs,
             "primary_purpose": primary_purpose,
             "secondary_purposes": secondary_purposes,
             "specification": {**specification, "missing_fields": missing},
@@ -250,10 +249,7 @@ class ActionService:
             specification = updates["specification"]
             if not isinstance(specification, dict):
                 raise ValueError("Action specification must be an object")
-            specification_value = {
-                str(key): child for key, child in cast(dict[object, object], specification).items()
-            }
-            effect = self._effect_vector(specification_value)
+            effect = self._effect_vector(self._mapping(specification))
             risk_tier, policy_state, processes, roles = classify_effect_vector(effect)
             draft.update(
                 {
@@ -844,17 +840,10 @@ class ActionService:
 
     @staticmethod
     def _effect_vector(specification: dict[str, object]) -> dict[str, object]:
-        raw = specification.get("effect_vector", {})
-        effect: dict[str, object] = (
-            {str(key): child for key, child in cast(dict[object, object], raw).items()}
-            if isinstance(raw, dict)
-            else {}
-        )
-        effect.setdefault(
-            "effect_completeness_confirmed",
+        return checked_effect_vector(
+            specification.get("effect_vector", {}),
             specification.get("effect_completeness_confirmed", False),
         )
-        return effect
 
     @staticmethod
     def _impact(effect: dict[str, object]) -> dict[str, object]:
@@ -879,12 +868,7 @@ class ActionService:
         step_id = step.get("step_id")
         if not isinstance(step_id, str) or not step_id:
             step["step_id"] = self._ids.new("action-step")
-        effect_raw = step.get("effect_vector", {})
-        effect: dict[str, object] = (
-            {str(key): child for key, child in cast(dict[object, object], effect_raw).items()}
-            if isinstance(effect_raw, dict)
-            else {}
-        )
+        effect = checked_effect_vector(step.get("effect_vector", {}))
         risk, policy, processes, roles = classify_effect_vector(effect)
         step.update(
             {

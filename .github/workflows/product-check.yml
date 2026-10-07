@@ -52,6 +52,8 @@ jobs:
         run: .\.venv\Scripts\python.exe -m ruff check src apps tests migrations conftest.py scripts/pytest_environment.py
       - name: Runtime architecture
         run: .\.venv\Scripts\python.exe scripts/check_architecture.py
+      - name: Module size budget
+        run: .\.venv\Scripts\python.exe scripts/check_module_budget.py
       - name: Web tests
         run: pnpm --dir apps/web run test --run
       - name: Web lint

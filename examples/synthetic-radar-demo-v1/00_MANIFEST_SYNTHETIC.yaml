@@ -1,0 +1,15 @@
+# SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+notice: SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+identity: THOTH-SYNTH-RADAR-DEMO-v1
+document: manifest
+integrity_statement: "The SHA-256 values below only show that these files have not changed since the manifest was written. They do not show that the data is true, measured, approved or fit for any use."
+hash_scope: "Raw file bytes (files are stored with LF line endings). This manifest is not hashed."
+files:
+  - {path: "01_SOURCE_LINEAGE.yaml", sha256: "6b0991c6b74e779d6809717717abbd1bf7ee5b681a3db971b3d76e283fbd3a2b", bytes: 727}
+  - {path: "10_REQUIREMENTS_SYNTHETIC.yaml", sha256: "bf368e4e1391ffd76bcdce9b8a8ea1447da20a7cdac735aad337181802e714c7", bytes: 1569}
+  - {path: "20_TEST_PLAN_SYNTHETIC.yaml", sha256: "5838eba3660b34b763e60019892f6070523414cd9c896744b3b9f7fbcd880b32", bytes: 675}
+  - {path: "30_RESULT_DRY_SYNTHETIC.yaml", sha256: "77acaacd120bec4c30431bb32a204e183a83139111a231d2a21d89aef816914a", bytes: 676}
+  - {path: "31_RESULT_RAIN_SYNTHETIC.yaml", sha256: "a0b0ffc698ef898a8e9fd6e426d1ec12ff995a59fbedb1f025d2e8873f677d33", bytes: 752}
+  - {path: "data/30_DRY_TRIALS_SYNTHETIC.csv", sha256: "af10b01f1885b8d9147c88d609af0c428d205d69b151e2b29af198acf0fd18c6", bytes: 3684}
+  - {path: "data/31_RAIN_TRIALS_SYNTHETIC.csv", sha256: "e915da8c2a225784a27ecf5c0d9cdb0aa59498cfb57285eb56c4b85f99173a98", bytes: 4224}
+  - {path: "schema/synthetic-radar-demo-v1.schema.json", sha256: "91162758f0232e372703d5ecef6ede7102956df959728b8e1bdcd4acf3690996", bytes: 6804}

@@ -1,0 +1,7 @@
+format,row_type,base_set_digest,item_id,link_id,rule_id,result_id,target_kind,target_id,item_key,kind,title,fields_json,source_span_refs,from_id,to_id,relation,criterion_id,rule_revision,measure,comparator,threshold,unit,condition,rounding_digits,rounding_mode,required,result_revision,value,raw_value,numerator,denominator,observed_at
+thoth-trace-csv/1,ITEM,,REQ-1,,,,,,k-REQ-1,REQUIREMENT,One,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,CRIT-1,,,,,,k-CRIT-1,CRITERION,Two,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,TC-1,,,,,,k-TC-1,TEST_CASE,Three,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,LINK,,,L-1,,,,,,,,,,CRIT-1,REQ-1,REFINES,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,LINK,,,L-2,,,,,,,,,,CRIT-1,TC-1,VERIFIED_BY,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,RULE,,,,R-1,,,,,,,,,,,,CRIT-1,1,detection_rate,>=,0.90,ratio,weather=dry,2,HALF_UP,true,,,,,,

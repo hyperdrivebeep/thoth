@@ -6,6 +6,10 @@ from typing import cast
 
 from pydantic import JsonValue, TypeAdapter
 
+from thoth.domain.memory_expansion import (
+    MEMORY_QUERY_EXPANSION_LABEL,
+    MEMORY_QUERY_EXPANSION_PURPOSE,
+)
 from thoth.domain.model_dispatch import ModelDispatchRecord
 
 _JSON_OBJECT = TypeAdapter(dict[str, JsonValue])
@@ -117,7 +121,7 @@ def summarize_operation_usage(
     inputs, outputs, cached, complete = _observed(dispatches.values())
     unreported = len(dispatches) - complete
     known = bool(inputs or outputs)
-    return {
+    entry: dict[str, JsonValue] = {
         "operation_id": operation_id,
         "calls": len(dispatches),
         "auto_retries": _interrupted_retries(dispatches),
@@ -128,6 +132,30 @@ def summarize_operation_usage(
         "unreported_calls": unreported,
         "state": "UNKNOWN" if not known else "PARTIAL" if unreported else "OBSERVED",
         "wall_ms": wall_ms,
+    }
+    expansion = _purpose_usage(dispatches.values(), MEMORY_QUERY_EXPANSION_PURPOSE)
+    if expansion is not None:
+        # Already part of the totals above; shown apart so its share is visible.
+        entry["by_purpose"] = {
+            MEMORY_QUERY_EXPANSION_PURPOSE: {"label": MEMORY_QUERY_EXPANSION_LABEL, **expansion}
+        }
+    return entry
+
+
+def _purpose_usage(
+    dispatches: Iterable[ModelDispatchRecord], purpose: str
+) -> dict[str, JsonValue] | None:
+    items = tuple(r for r in dispatches if r.purpose == purpose)
+    if not items:
+        return None
+    inputs, outputs, _cached, complete = _observed(items)
+    known = bool(inputs or outputs)
+    return {
+        "calls": len(items),
+        "input_tokens": sum(inputs) if inputs else None,
+        "output_tokens": sum(outputs) if outputs else None,
+        "total_tokens": sum(inputs) + sum(outputs) if known else None,
+        "unreported_calls": len(items) - complete,
     }
 
 

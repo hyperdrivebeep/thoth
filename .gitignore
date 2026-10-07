@@ -28,6 +28,7 @@ field-validation/results/
 # Local research and verification artifacts
 docs/plans/
 docs/research/
+docs/decisions/
 docs/verification/
 PROJECT_WIKI/
 outputs/

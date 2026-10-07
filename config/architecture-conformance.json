@@ -170,7 +170,7 @@
   ],
   "known_exceptions": [],
   "watch_limits": {
-    "python_module_lines": 900,
+    "python_module_lines": 600,
     "warning_only": false,
     "enforced_by": "scripts/check_module_budget.py"
   }

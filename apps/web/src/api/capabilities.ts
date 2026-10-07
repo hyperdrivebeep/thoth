@@ -11,7 +11,7 @@ export const namespaceLabels: Record<string, string> = {
   execution: "실행 · 복구", revision: "이력 · 분기 · 복원", outcome: "관찰 결과", memory: "프로젝트 기억",
   improvement: "개선 · 평가", receipt: "영수증 · 추적", closure: "마감 · 보존", export: "내보내기",
   operation: "비동기 제어", model: "모델 설정", workspace: "워크스페이스 설정",
-  projectpack: "검증 예제", field: "현장 평가",
+  projectpack: "검증 예제", field: "현장 평가", trace: "추적표",
 };
 
 export function filterCapabilities(search: string, namespace = "all", surface = "all") {

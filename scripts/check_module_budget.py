@@ -45,6 +45,48 @@ def _long_functions(path: Path, tree: ast.Module, limit: int) -> dict[str, int]:
     return result
 
 
+def _check_size(
+    relative: str,
+    lines: int,
+    module_limit: int,
+    watched: dict[str, dict[str, object]],
+    seen_modules: set[str],
+    errors: list[str],
+) -> dict[str, object] | None:
+    """The size rule for one file, the same for Python and web files; returns its watch entry."""
+    if lines > module_limit and relative not in watched:
+        errors.append(f"new oversized module is not ratcheted: {relative}={lines}")
+    if relative not in watched:
+        return None
+    seen_modules.add(relative)
+    definition = watched[relative]
+    baseline = _integer(definition["baseline_lines"], f"{relative}.baseline_lines")
+    if lines != baseline:
+        direction = "grew" if lines > baseline else "shrank"
+        errors.append(
+            f"watched module {direction}; update/refactor the ratchet: "
+            f"{relative} actual={lines} baseline={baseline}"
+        )
+    return definition
+
+
+def _web_files(root: Path, manifest: dict[str, Any]) -> list[Path]:
+    """Web sources (.ts/.tsx) under the web scan roots, without the excluded suffixes.
+
+    Test files are not measured: like the Python tests (outside scan_roots) they are long by
+    nature and are not product responsibility. Lines only; there is no syntax tree for them.
+    """
+    excluded = tuple(
+        str(value) for value in cast(list[object], manifest.get("web_excluded_suffixes", []))
+    )
+    found: list[Path] = []
+    for scan_root in cast(list[object], manifest.get("web_scan_roots", [])):
+        base = root / str(scan_root)
+        for pattern in ("*.ts", "*.tsx"):
+            found.extend(path for path in base.rglob(pattern) if not path.name.endswith(excluded))
+    return sorted(found)
+
+
 def build_report(root: Path, manifest_path: Path) -> dict[str, object]:
     manifest = _load(manifest_path)
     module_limit = int(manifest["module_line_limit"])
@@ -66,19 +108,9 @@ def build_report(root: Path, manifest_path: Path) -> dict[str, object]:
             lines = len(text.splitlines())
             tree = ast.parse(text, filename=str(path))
             actual_long.update(_long_functions(Path(relative), tree, function_limit))
-            if lines > module_limit and relative not in watched:
-                errors.append(f"new oversized module is not ratcheted: {relative}={lines}")
-            if relative not in watched:
+            definition = _check_size(relative, lines, module_limit, watched, seen_modules, errors)
+            if definition is None:
                 continue
-            seen_modules.add(relative)
-            definition = watched[relative]
-            baseline = _integer(definition["baseline_lines"], f"{relative}.baseline_lines")
-            if lines != baseline:
-                direction = "grew" if lines > baseline else "shrank"
-                errors.append(
-                    f"watched module {direction}; update/refactor the ratchet: "
-                    f"{relative} actual={lines} baseline={baseline}"
-                )
             expected_symbols = tuple(
                 str(value) for value in cast(list[object], definition["top_level_symbols"])
             )
@@ -89,11 +121,15 @@ def build_report(root: Path, manifest_path: Path) -> dict[str, object]:
                     f"actual={list(symbols)} expected={list(expected_symbols)}"
                 )
 
+    for path in _web_files(root, manifest):
+        relative = path.relative_to(root).as_posix()
+        lines = len(path.read_text(encoding="utf-8").splitlines())
+        _check_size(relative, lines, module_limit, watched, seen_modules, errors)
+
     missing_modules = sorted(set(watched) - seen_modules)
     if missing_modules:
         errors.append(
-            "watched modules missing; update ratchet after extraction: "
-            f"{missing_modules}"
+            f"watched modules missing; update ratchet after extraction: {missing_modules}"
         )
 
     if actual_long != expected_long:

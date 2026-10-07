@@ -43,3 +43,10 @@ Git history. The private development repository and hosted service are not part 
 `SOURCE_MANIFEST.json` tracks hashes of the current reviewed public files. Its
 `source_archive_sha256` is the digest of the original assembled 2026-09-25 archive, retained as
 historical publication evidence; it is not a digest of later GitHub source ZIPs.
+
+Before opening a public pull request, run `python scripts/update_source_manifest.py` and commit the
+rebuilt `SOURCE_MANIFEST.json` with the change. The script lists every tracked file (plus untracked
+files that are not ignored) except the list itself, keeps the header fields, and sets `created_at` to
+the time of the rebuild. `python scripts/update_source_manifest.py --check` writes nothing and shows
+whether the list is stale. The package checks compare every listed file byte for byte, so a file
+edited after the rebuild fails them until the list is rebuilt again.

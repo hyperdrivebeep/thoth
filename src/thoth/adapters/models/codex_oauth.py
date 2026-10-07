@@ -9,6 +9,7 @@ from typing import Protocol, TypeVar, cast
 
 from pydantic import BaseModel, ValidationError
 
+from thoth.adapters.models.hypothesis_contract_text import hypothesis_contract_addendum
 from thoth.adapters.models.reference_schema import (
     apply_hypothesis_review_contract,
     constrain_span_references,
@@ -463,13 +464,13 @@ def prompt_envelope(request: ModelRequest[BaseModel]) -> str:
         + "\n\nTASK\n"
         + request.role.value
         + "\nTASK_CONTRACT\n"
-        + role_contract(request.role.value)
+        + role_contract(request.role.value, request.prompt_version)
         + "\nPROMPT_VERSION\n"
         + request.prompt_version
     )
 
 
-def role_contract(role: str) -> str:
+def role_contract(role: str, prompt_version: str = "") -> str:
     if role == "RESEARCH_PLANNER":
         return (
             "Plan the evidence checks needed for the user's current question, not the final "
@@ -503,6 +504,7 @@ def role_contract(role: str) -> str:
             "INVALID, NOT_ASSESSABLE and unresolved references are not empirical support."
             " Respect execution_security_tier; TEST_ONLY observations do not establish live "
             "or field validity. A false substantive_update_allowed means diagnostic only."
+            + hypothesis_contract_addendum(prompt_version)
             + _user_visible_language_fields(
                 "statement, uncertainty, counterevidence_queries, predicted_observations, "
                 "and discriminating_tests procedure/expected text"
@@ -547,8 +549,8 @@ def user_visible_language_contract() -> str:
     return (
         "Write user-facing prose in the same language as context_pack.problem; "
         "do not switch that prose to English when the question is not English. "
-        "Keep identifiers, FACT/UNKNOWN labels, GPU/model names, table numbers, units, "
-        "span IDs, file names, and quoted source text exactly as supplied."
+        "Keep identifiers, GPU/model names, table numbers, units, "
+        "span IDs, file names, and quoted source text exactly as supplied. " + _PLAIN_WORDING
     )
 
 
@@ -557,5 +559,18 @@ def _user_visible_language_fields(fields: str) -> str:
         " User-facing fields ("
         + fields
         + ") follow the question language. Do not translate identifiers, "
-        "quoted evidence, FACT/UNKNOWN labels, or numeric/table citations."
+        "quoted evidence, or numeric/table citations."
     )
+
+
+# The wording rule for everything the reader sees. It changes only how prose is written: the
+# structured fields, their names and values, and the source-linking rules stay as they are.
+_PLAIN_WORDING = (
+    "Write so the person who asked can read it at once, in short plain sentences. For a Korean "
+    "question write easy Korean. Keep the technical terms, units and standard abbreviations "
+    "that appear in the user's own material (for example SNR, RCS, CFAR, dB) exactly as they "
+    "are. Do not use program-internal codes, field names, variable names or made-up ids in "
+    "prose; say conditions in words (write '탐지율 0.90 이상', not 'detection_rate >= 0.90 "
+    "ratio') and use Korean words for internal terms such as sandbox-owner or gap. Write the "
+    "FACT/UNKNOWN labels as '사실' and '확인 불가'."
+)

@@ -41,7 +41,11 @@ async def test_the_switch_is_read_and_changed_with_the_digest_it_read(tmp_path: 
             )
 
         first = await call("model/callSettings/read", "r1")
-        assert first == {"auto_retry_interrupted_model_call": False, "settings_digest": None}
+        assert first == {
+            "auto_retry_interrupted_model_call": False,
+            "hypothesis_contract_v3": False,
+            "settings_digest": None,
+        }
         on = await call(
             "model/callSettings/update",
             "on",

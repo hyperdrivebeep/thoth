@@ -20,7 +20,9 @@ class ModelCallSettingsRead(DomainModel):
 
 class ModelCallSettingsUpdate(DomainModel):
     project_id: str = Field(min_length=1, max_length=160)
-    auto_retry_interrupted_model_call: bool
+    # A switch left out keeps its value.
+    auto_retry_interrupted_model_call: bool | None = None
+    hypothesis_contract_v3: bool | None = None
     expected_digest: str | None = Field(default=None, min_length=64, max_length=64)
 
 
@@ -33,8 +35,12 @@ class ModelCallSettingsHandlers:
             raise RpcApplicationError(RpcErrorCode.PROJECT_NOT_FOUND, "project not found")
 
     def _value(self, project_id: str) -> dict[str, JsonValue]:
-        digest, enabled = self._service.read(project_id)
-        return {"auto_retry_interrupted_model_call": enabled, "settings_digest": digest}
+        digest, enabled, contract = self._service.snapshot(project_id)
+        return {
+            "auto_retry_interrupted_model_call": enabled,
+            "hypothesis_contract_v3": contract,
+            "settings_digest": digest,
+        }
 
     async def read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ModelCallSettingsRead.model_validate(value)
@@ -51,6 +57,7 @@ class ModelCallSettingsHandlers:
                 request.auto_retry_interrupted_model_call,
                 request.expected_digest,
                 "human:local-user" if actor is None else actor.actor_id,
+                request.hypothesis_contract_v3,
             )
         except ModelCallSettingsConflict as exc:
             raise RpcApplicationError(RpcErrorCode.STALE_CHECKPOINT, str(exc)) from exc

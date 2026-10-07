@@ -8,7 +8,7 @@ from datetime import datetime
 
 from thoth.application.services.revision_service import RevisionCommitService
 from thoth.domain.actor import ActorRef
-from thoth.domain.canonical import canonical_payload, domain_digest
+from thoth.domain.canonical import canonical_payload, domain_digest, same_stored_instant
 from thoth.domain.enums import ActorKind, CutoffState, EntityType
 from thoth.domain.execution_full import PlanExecutionRecord, StepExecutionAttemptRecord
 from thoth.domain.hypothesis_full import HypothesisRecord, HypothesisTestBinding, PredictionRecord
@@ -154,7 +154,7 @@ class HypothesisTestLifecycle:
             raise ValueError("PREDICTION_CUTOFF_INVALID")
         # The source eligibility seal is for the Project cutoff. It contains no finer
         # temporal provenance that could establish eligibility at an earlier cutoff.
-        if knowledge_cutoff != project.cutoff_at:
+        if not same_stored_instant(knowledge_cutoff, project.cutoff_at):
             raise ValueError("PREDICTION_CUTOFF_BASIS_UNRESOLVED")
         if current.primary_intent is None:
             raise ValueError("PREDICTION_INTENT_REQUIRED")
@@ -212,7 +212,7 @@ class HypothesisTestLifecycle:
             or artifact is None
             or artifact.byte_sha256 != basis.contract_digest
             or artifact.cutoff_state != CutoffState.ELIGIBLE
-            or prediction.knowledge_cutoff != basis.knowledge_cutoff
+            or not same_stored_instant(prediction.knowledge_cutoff, basis.knowledge_cutoff)
             or prediction.conditions != basis.contract.conditions
             or ExpectedRange.model_validate(prediction.expected_outcome) != basis.expected_outcome
         ):

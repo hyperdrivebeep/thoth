@@ -22,6 +22,7 @@ from thoth.application.services.behavior_context import (
 from thoth.application.services.criterion_projection import (
     criterion_projection as _criterion_projection,
 )
+from thoth.application.services.memory_query_expansion import ModelMemoryQueryExpander, widen_query
 from thoth.application.services.post_execution_memory import PostExecutionMemory
 from thoth.application.services.r2_closed_loop import R2ClosedLoopExecution
 from thoth.application.services.research_basis_capture import (
@@ -37,7 +38,7 @@ from thoth.domain.actor import ActorRef
 from thoth.domain.auth import authenticated_data_scope_allows, current_authenticated_actor
 from thoth.domain.base import DomainModel
 from thoth.domain.baseline import MultiBaselineProjection
-from thoth.domain.canonical import head_set_digest
+from thoth.domain.canonical import head_set_digest, same_stored_instant
 from thoth.domain.criterion import CriterionCandidate
 from thoth.domain.enums import (
     ActorKind,
@@ -46,7 +47,7 @@ from thoth.domain.enums import (
     ThreadExecutionState,
 )
 from thoth.domain.evidence import EvidenceSpan
-from thoth.domain.hypothesis import HypothesisPortfolio
+from thoth.domain.hypothesis import HypothesisPortfolio, is_v3, portfolio_from_json
 from thoth.domain.improvement import RecursiveImprovementResult
 from thoth.domain.memory_preparation import FullMemoryPromotionResult
 from thoth.domain.post_execution_learning import PostExecutionLearningResult
@@ -234,6 +235,20 @@ class ThreadAnalysisCommandHandlers:
             analysis_problem += "\n\nAuthorized queued context:\n" + "\n".join(
                 f"[{item.kind}] {item.text}" for item in pending_inputs
             )
+        # One model call widens the question for memory recall; a research run already made it.
+        expansion = await widen_query(
+            memory=self._full_memory,
+            expander=ModelMemoryQueryExpander(
+                model,
+                project_id=request.project_id,
+                cutoff_at=project.cutoff_at,
+                model_policy_ref=f"model-policy:{request.provider}-v1",
+                head_set_digest=head_set_digest(self._ledger.read_heads(request.project_id)),
+            ),
+            work=work,
+            project_id=request.project_id,
+            query=analysis_problem,
+        )
         try:
             full_memory_context = self._full_memory.build_context(
                 project_id=request.project_id,
@@ -242,6 +257,7 @@ class ThreadAnalysisCommandHandlers:
                 target_use="WORKING_CONTEXT",
                 scope=thread.scope,
                 cutoff_at=project.cutoff_at,
+                expansion=expansion,
             )
         except ValidationError:
             full_memory_context = None
@@ -441,10 +457,10 @@ class ThreadAnalysisCommandHandlers:
         )
         if critical_counter is not None:
             critical_counter_projection = critical_counter.projection
-            final_portfolio = critical_counter.projection.get("portfolio")
-            if isinstance(final_portfolio, dict):
+            final = critical_counter.projection.get("portfolio")
+            if isinstance(final, dict):
                 result = result.model_copy(
-                    update={"portfolio": HypothesisPortfolio.model_validate(final_portfolio)}
+                    update={"portfolio": portfolio_from_json(final, v3=is_v3(result.portfolio))}
                 )
         check_research_boundary()
         r2_execution = await self._execute_r2(
@@ -612,7 +628,7 @@ class ThreadAnalysisCommandHandlers:
         current = self._projects.read(project.project_id)
         if (
             current is None
-            or current.cutoff_at != project.cutoff_at
+            or not same_stored_instant(current.cutoff_at, project.cutoff_at)
             or current.policy_binding_ref != project.policy_binding_ref
             or current.overlay != project.overlay
             or current.lifecycle in {ProjectLifecycle.CLOSING, ProjectLifecycle.ARCHIVED_READ_ONLY}

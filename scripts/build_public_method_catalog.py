@@ -67,6 +67,7 @@ OWNER = {
     "export": "CLOSURE_EXPORT",
     "projectpack": "PROJECTPACK_MANIFEST",
     "field": "FIELD_MEASUREMENT_LEDGER",
+    "trace": "VERIFICATION_TRACE",
 }
 
 ACCEPTANCE = {
@@ -91,6 +92,7 @@ ACCEPTANCE = {
     "export": "A10",
     "projectpack": "A01",
     "field": "A12",
+    "trace": "B3",
 }
 
 ENTRYPOINT = {
@@ -117,6 +119,7 @@ ENTRYPOINT = {
     "export": "export/plan/create",
     "projectpack": "projectpack/run",
     "field": "field/protocol/seal|normal RPC fieldSessionId",
+    "trace": "trace/read|trace/importApply",
 }
 
 CREDENTIAL_METHOD_METADATA: dict[str, dict[str, object]] = {

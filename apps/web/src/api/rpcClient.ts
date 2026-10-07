@@ -12,7 +12,7 @@ export const readQueries = new Set(["thread/read", "thread/list", "thread/activi
   "revision/timeline/read", "revision/timeline/item/read", "thread/result/read",
   "thread/result/compare/read", "project/review/list",
   "revision/diff/read", "revision/restore/preview", "revision/read", "revision/content/read",
-  "revision/head/read", "revision/history/read"]);
+  "revision/head/read", "revision/history/read", "trace/read", "trace/export", "trace/importPreview", "trace/history", "hypothesis/link/list", "hypothesis/test/result/list", "hypothesis/same/list", "trace/closure/list", "trace/lesson/list"]);
 
 export class RpcError extends Error {
   constructor(message: string, readonly code: number, readonly details: Record<string, unknown>) {

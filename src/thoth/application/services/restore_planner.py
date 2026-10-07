@@ -10,7 +10,7 @@ from thoth.application.services.restore_profiles import semantic_groups
 from thoth.application.services.restore_source_basis import content_origin
 from thoth.application.services.revision_diff import semantic_diff
 from thoth.domain.auth import current_authenticated_actor
-from thoth.domain.canonical import canonical_payload, domain_digest
+from thoth.domain.canonical import canonical_payload, domain_digest, same_stored_instant
 from thoth.domain.research_history import HistoryCapability
 from thoth.domain.resource_scope import ResourceScopeError
 from thoth.domain.restore import RestoreBasis, RestoreError, RestorePreview, RestoreSelection
@@ -149,7 +149,7 @@ class RestorePlanner:
         if str(project_record.lifecycle) in {"ARCHIVED", "ARCHIVED_READ_ONLY"}:
             raise RestoreError("RESTORE_PROTECTED_STATE")
         cutoff = record.model_dump(mode="python").get("cutoff_at")
-        if cutoff is not None and cutoff != project_record.cutoff_at:
+        if cutoff is not None and not same_stored_instant(cutoff, project_record.cutoff_at):
             raise RestoreError("RESTORE_SOURCE_DRIFT")
         source_refs = profile.evidence_refs(record)
         frozen_sources = self.sources.resolve(project, origin.revision_digest, source_refs)

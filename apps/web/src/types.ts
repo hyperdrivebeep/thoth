@@ -18,6 +18,8 @@ export type WorkThread = {
   current_object_ids: string[];
   working_head_digest: string;
   updated_at?: string | null;
+  /** The trace row this thread was started from; null or missing for an ordinary or older thread. */
+  origin?: { subject_kind: string; subject_id: string; verdict_revision: string } | null;
 };
 
 export type ConnectedArtifact = {

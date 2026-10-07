@@ -1,0 +1,6086 @@
+{
+  "schema": "hypothesis-eval-cases/1",
+  "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+  "cases": [
+    {
+      "id": "fog-no-result",
+      "title": "A tested condition has no result yet",
+      "origin": "demo: fog row, phase 1",
+      "mode": "plain",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-DRY",
+            "item_key": "k-SYN-C-DET-DRY",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-DRY",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-FOG",
+            "item_key": "k-SYN-C-DET-FOG",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-FOG",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-1",
+            "item_key": "k-SYN-TC-1",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-1",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-DRY",
+            "item_key": "k-SYN-RES-DET-DRY",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-DRY",
+            "from_id": "SYN-C-DET-DRY",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-DRY",
+            "from_id": "SYN-C-DET-DRY",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          },
+          {
+            "link_id": "L-ref-SYN-C-DET-FOG",
+            "from_id": "SYN-C-DET-FOG",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-FOG",
+            "from_id": "SYN-C-DET-FOG",
+            "to_id": "SYN-TC-1",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-DRY",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-DRY",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=dry",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          },
+          {
+            "rule_id": "R-SYN-C-DET-FOG",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-FOG",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=fog",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-DRY",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-DRY",
+            "condition": "weather=dry",
+            "value": "0.95",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 19,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-DRY"
+            ]
+          }
+        ]
+      },
+      "after_trace_set": null,
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-FOG",
+          "state": "HOLD_NO_RESULT",
+          "reason_codes": [
+            "NO_RESULT"
+          ],
+          "tags": [
+            "UNTESTED"
+          ],
+          "next_step": true,
+          "stale": false
+        },
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-DRY",
+          "state": "PASS_COMPUTED",
+          "reason_codes": [],
+          "tags": [],
+          "next_step": false,
+          "stale": false
+        },
+        {
+          "kind": "REQUIREMENT",
+          "subject_id": "SYN-REQ-1",
+          "state": "HOLD_INCOMPLETE",
+          "reason_codes": [
+            "SYN-C-DET-FOG"
+          ],
+          "tags": [
+            "REQUIRED_INCOMPLETE"
+          ],
+          "next_step": true,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "f7a37287717cbafe375e6d26b21e0abe2457ffca3e4e346ef69fffe33eeb6e74",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-DRY",
+            "item_key": "k-SYN-C-DET-DRY",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-DRY",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-FOG",
+            "item_key": "k-SYN-C-DET-FOG",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-FOG",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-1",
+            "item_key": "k-SYN-TC-1",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-1",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-DRY",
+            "item_key": "k-SYN-RES-DET-DRY",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-DRY",
+            "from_id": "SYN-C-DET-DRY",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-DRY",
+            "from_id": "SYN-C-DET-DRY",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          },
+          {
+            "link_id": "L-ref-SYN-C-DET-FOG",
+            "from_id": "SYN-C-DET-FOG",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-FOG",
+            "from_id": "SYN-C-DET-FOG",
+            "to_id": "SYN-TC-1",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-DRY",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-DRY",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=dry",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          },
+          {
+            "rule_id": "R-SYN-C-DET-FOG",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-FOG",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=fog",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-DRY",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-DRY",
+            "condition": "weather=dry",
+            "value": "0.95",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 19,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-DRY"
+            ]
+          }
+        ],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-DRY",
+            "state": "PASS_COMPUTED",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "068194228704bec79641eb9f34d5e7cff023942d263c2a5e47db8cf88da24118",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-DRY"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-DRY",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-DRY",
+                  "result_revision": 1
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-DRY",
+              "rule_revision": 1,
+              "condition": "weather=dry",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "a132542a80e53090e753aa039f6eb695f5ac4aff4f9bd3e77de8ba63146077ec",
+            "revision_digest": "5e2ae89df0d68e1ca093fdd633379a12abe2a5646b1665fef297c453ec53b1ff",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-FOG",
+            "state": "HOLD_NO_RESULT",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "1cf128fd38a5dc67da406cb676e8d095d02e4ceb49af4e9602ed77a44003d990",
+              "source_span_refs": [],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [],
+              "chosen": [],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-FOG",
+              "rule_revision": 1,
+              "condition": "weather=fog",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "NO_RESULT:weather=fog"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "c059638c27046c3d31f66a3bfe39c5a7841026672f30e896e7e83234302aac40",
+            "revision_digest": "152cc15834d82f0b9b85ac6adcadcefa3fe6bfd2d56059851feea9efa6bbff13",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "HOLD_INCOMPLETE",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "2b6c702a9c81db30b813dd21ef6ec4809e2ad0d3ed38188714e5114e26c81a30",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-DRY"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "a132542a80e53090e753aa039f6eb695f5ac4aff4f9bd3e77de8ba63146077ec",
+                "c059638c27046c3d31f66a3bfe39c5a7841026672f30e896e7e83234302aac40"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-DRY",
+                "SYN-C-DET-FOG"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "SYN-C-DET-FOG:HOLD_NO_RESULT"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "4f2428af5f6d7126edfebd42fb54aac4300f53d04824cea56981c478f15e24bb",
+            "revision_digest": "6f24af4a6a05fca04588277be5deb364544b07fddaec6484fd28c9de636945c5",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    },
+    {
+      "id": "rain-valid-miss",
+      "title": "A usable result misses the threshold",
+      "origin": "demo: rain row, phase 2",
+      "mode": "plain",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.80",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 16,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ]
+      },
+      "after_trace_set": null,
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-RAIN",
+          "state": "FAIL_COMPUTED",
+          "reason_codes": [
+            "THRESHOLD_NOT_MET"
+          ],
+          "tags": [
+            "VALID_MISS"
+          ],
+          "next_step": true,
+          "stale": false
+        },
+        {
+          "kind": "REQUIREMENT",
+          "subject_id": "SYN-REQ-1",
+          "state": "FAIL",
+          "reason_codes": [
+            "SYN-C-DET-RAIN"
+          ],
+          "tags": [],
+          "next_step": true,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "38df3f3318e1558f1baadf8f73dd5eb7e5b347a837915e1dfae70a59c43344e9",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.80",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 16,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "state": "FAIL_COMPUTED",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "fb04ca2e941377a6b6afc255ae652b018e54f00881839090870fe44dff8118b1",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-RAIN",
+              "rule_revision": 1,
+              "condition": "weather=rain",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "THRESHOLD_NOT_MET:SYN-RES-DET-RAIN:value=0.80 need >= 0.90 ratio"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "9b3c31762a13829734688a7b9d77131dcad6f2e38a3e2d5719f41cf7323d3923",
+            "revision_digest": "4f227ec96462d428dba48207a00537c7b9a919c081bd1500ebb015675eba7048",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "FAIL",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "5fe28aa8309f26ccf26a9b87ba69e97f439f57ab41592b93a67c6d1df7f3b8ab",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "9b3c31762a13829734688a7b9d77131dcad6f2e38a3e2d5719f41cf7323d3923"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-RAIN"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "SYN-C-DET-RAIN:FAIL_COMPUTED"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "ee890b9d2a7bb2d6e70c88c343e797f3c8a5033c4d8df40c0ae2b1112eac1660",
+            "revision_digest": "3da56089801a66bf21cb3f7452ff68b2ea421adb727d56ca23eeef01a8985a39",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    },
+    {
+      "id": "rain-miss-and-fog-untested",
+      "title": "A miss and an untested condition at once",
+      "origin": "demo: requirement row, phase 2",
+      "mode": "plain",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-FOG",
+            "item_key": "k-SYN-C-DET-FOG",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-FOG",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-1",
+            "item_key": "k-SYN-TC-1",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-1",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          },
+          {
+            "link_id": "L-ref-SYN-C-DET-FOG",
+            "from_id": "SYN-C-DET-FOG",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-FOG",
+            "from_id": "SYN-C-DET-FOG",
+            "to_id": "SYN-TC-1",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          },
+          {
+            "rule_id": "R-SYN-C-DET-FOG",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-FOG",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=fog",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.80",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 16,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ]
+      },
+      "after_trace_set": null,
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-RAIN",
+          "state": "FAIL_COMPUTED",
+          "reason_codes": [
+            "THRESHOLD_NOT_MET"
+          ],
+          "tags": [
+            "VALID_MISS"
+          ],
+          "next_step": true,
+          "stale": false
+        },
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-FOG",
+          "state": "HOLD_NO_RESULT",
+          "reason_codes": [
+            "NO_RESULT"
+          ],
+          "tags": [
+            "UNTESTED"
+          ],
+          "next_step": true,
+          "stale": false
+        },
+        {
+          "kind": "REQUIREMENT",
+          "subject_id": "SYN-REQ-1",
+          "state": "FAIL_WITH_INCOMPLETE_COVERAGE",
+          "reason_codes": [
+            "SYN-C-DET-RAIN",
+            "SYN-C-DET-FOG"
+          ],
+          "tags": [
+            "REQUIRED_INCOMPLETE"
+          ],
+          "next_step": true,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "f9a10b6ccae9da5df3bf8de45945fa6373ba87ffe0cfc7efad8e4aa7282843f7",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-FOG",
+            "item_key": "k-SYN-C-DET-FOG",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-FOG",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-1",
+            "item_key": "k-SYN-TC-1",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-1",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          },
+          {
+            "link_id": "L-ref-SYN-C-DET-FOG",
+            "from_id": "SYN-C-DET-FOG",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-FOG",
+            "from_id": "SYN-C-DET-FOG",
+            "to_id": "SYN-TC-1",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          },
+          {
+            "rule_id": "R-SYN-C-DET-FOG",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-FOG",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=fog",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.80",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 16,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-FOG",
+            "state": "HOLD_NO_RESULT",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "1cf128fd38a5dc67da406cb676e8d095d02e4ceb49af4e9602ed77a44003d990",
+              "source_span_refs": [],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [],
+              "chosen": [],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-FOG",
+              "rule_revision": 1,
+              "condition": "weather=fog",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "NO_RESULT:weather=fog"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "c059638c27046c3d31f66a3bfe39c5a7841026672f30e896e7e83234302aac40",
+            "revision_digest": "152cc15834d82f0b9b85ac6adcadcefa3fe6bfd2d56059851feea9efa6bbff13",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "state": "FAIL_COMPUTED",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "fb04ca2e941377a6b6afc255ae652b018e54f00881839090870fe44dff8118b1",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-RAIN",
+              "rule_revision": 1,
+              "condition": "weather=rain",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "THRESHOLD_NOT_MET:SYN-RES-DET-RAIN:value=0.80 need >= 0.90 ratio"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "9b3c31762a13829734688a7b9d77131dcad6f2e38a3e2d5719f41cf7323d3923",
+            "revision_digest": "4f227ec96462d428dba48207a00537c7b9a919c081bd1500ebb015675eba7048",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "FAIL_WITH_INCOMPLETE_COVERAGE",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "e2836b04039ad2b17baf5ad0208c6b1517b3b8a709c26a388a1506d0ff684d12",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "c059638c27046c3d31f66a3bfe39c5a7841026672f30e896e7e83234302aac40",
+                "9b3c31762a13829734688a7b9d77131dcad6f2e38a3e2d5719f41cf7323d3923"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-FOG",
+                "SYN-C-DET-RAIN"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "SYN-C-DET-FOG:HOLD_NO_RESULT",
+                "SYN-C-DET-RAIN:FAIL_COMPUTED"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "608b4992ff579bc73e2a93519d223da32a31e2c461fd03cbb3dcd827fa63b17a",
+            "revision_digest": "792218117ab1b1346d3ea4c0e6d7f8ad19606b18cfad91960e880cff444a92fb",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    },
+    {
+      "id": "dry-pass",
+      "title": "A met line gets no tags and no next check",
+      "origin": "demo: dry row",
+      "mode": "plain",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-DRY",
+            "item_key": "k-SYN-C-DET-DRY",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-DRY",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-DRY",
+            "item_key": "k-SYN-RES-DET-DRY",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-DRY",
+            "from_id": "SYN-C-DET-DRY",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-DRY",
+            "from_id": "SYN-C-DET-DRY",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-DRY",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-DRY",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=dry",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-DRY",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-DRY",
+            "condition": "weather=dry",
+            "value": "0.95",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 19,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-DRY"
+            ]
+          }
+        ]
+      },
+      "after_trace_set": null,
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-DRY",
+          "state": "PASS_COMPUTED",
+          "reason_codes": [],
+          "tags": [],
+          "next_step": false,
+          "stale": false
+        },
+        {
+          "kind": "REQUIREMENT",
+          "subject_id": "SYN-REQ-1",
+          "state": "PASS",
+          "reason_codes": [],
+          "tags": [],
+          "next_step": false,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "b3318e0f7fd7afd69b65193cbaa37517f289149a32dfb453e90766b86bdd9fc2",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-DRY",
+            "item_key": "k-SYN-C-DET-DRY",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-DRY",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-DRY",
+            "item_key": "k-SYN-RES-DET-DRY",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-DRY",
+            "from_id": "SYN-C-DET-DRY",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-DRY",
+            "from_id": "SYN-C-DET-DRY",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-DRY",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-DRY",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=dry",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-DRY",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-DRY",
+            "condition": "weather=dry",
+            "value": "0.95",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 19,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-DRY"
+            ]
+          }
+        ],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-DRY",
+            "state": "PASS_COMPUTED",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "068194228704bec79641eb9f34d5e7cff023942d263c2a5e47db8cf88da24118",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-DRY"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-DRY",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-DRY",
+                  "result_revision": 1
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-DRY",
+              "rule_revision": 1,
+              "condition": "weather=dry",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "a132542a80e53090e753aa039f6eb695f5ac4aff4f9bd3e77de8ba63146077ec",
+            "revision_digest": "5e2ae89df0d68e1ca093fdd633379a12abe2a5646b1665fef297c453ec53b1ff",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "PASS",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "7c6bc3ce48b0389f462b92d84a2c85cd715a1092de662418841a698391b1dcc5",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-DRY"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "a132542a80e53090e753aa039f6eb695f5ac4aff4f9bd3e77de8ba63146077ec"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-DRY"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "cbd70bf1e8c0de47e8a5378dc0e9188a426d850fb17d81977789f0e2ebcbb16b",
+            "revision_digest": "3ce4c78909103fb55cd9de11af225bd923468d503534b440a776ac740fc8b962",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    },
+    {
+      "id": "rain-result-edited",
+      "title": "A result is edited and the verdict is not yet recomputed",
+      "origin": "demo: rain row, edited",
+      "mode": "stale",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.80",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 16,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ]
+      },
+      "after_trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 2,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.92",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 23,
+            "denominator": 25,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-RAIN",
+          "state": "FAIL_COMPUTED",
+          "reason_codes": [
+            "THRESHOLD_NOT_MET"
+          ],
+          "tags": [
+            "VALID_MISS",
+            "BASIS_CHANGED"
+          ],
+          "next_step": true,
+          "stale": true
+        },
+        {
+          "kind": "REQUIREMENT",
+          "subject_id": "SYN-REQ-1",
+          "state": "FAIL",
+          "reason_codes": [
+            "SYN-C-DET-RAIN"
+          ],
+          "tags": [
+            "BASIS_CHANGED"
+          ],
+          "next_step": true,
+          "stale": true
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "d78a5f408eee24c4e55c0f5cffd69cb8181e61f86a5141e84037b57d527dbaee",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 2,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.92",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 23,
+            "denominator": 25,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "state": "FAIL_COMPUTED",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "fb04ca2e941377a6b6afc255ae652b018e54f00881839090870fe44dff8118b1",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-RAIN",
+              "rule_revision": 1,
+              "condition": "weather=rain",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "THRESHOLD_NOT_MET:SYN-RES-DET-RAIN:value=0.80 need >= 0.90 ratio"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "9b3c31762a13829734688a7b9d77131dcad6f2e38a3e2d5719f41cf7323d3923",
+            "revision_digest": "4f227ec96462d428dba48207a00537c7b9a919c081bd1500ebb015675eba7048",
+            "currentness": {
+              "state": "STALE_BASIS",
+              "changed_dependencies": [
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "denominator",
+                  "before": "20",
+                  "after": "25",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                },
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "numerator",
+                  "before": "16",
+                  "after": "23",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                },
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "result_revision",
+                  "before": "1",
+                  "after": "2",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                },
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "value",
+                  "before": "0.80",
+                  "after": "0.92",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                }
+              ]
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "FAIL",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "5fe28aa8309f26ccf26a9b87ba69e97f439f57ab41592b93a67c6d1df7f3b8ab",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "9b3c31762a13829734688a7b9d77131dcad6f2e38a3e2d5719f41cf7323d3923"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-RAIN"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "SYN-C-DET-RAIN:FAIL_COMPUTED"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "ee890b9d2a7bb2d6e70c88c343e797f3c8a5033c4d8df40c0ae2b1112eac1660",
+            "revision_digest": "3da56089801a66bf21cb3f7452ff68b2ea421adb727d56ca23eeef01a8985a39",
+            "currentness": {
+              "state": "STALE_BASIS",
+              "changed_dependencies": [
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "denominator",
+                  "before": "20",
+                  "after": "25",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                },
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "numerator",
+                  "before": "16",
+                  "after": "23",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                },
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "result_revision",
+                  "before": "1",
+                  "after": "2",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                },
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "value",
+                  "before": "0.80",
+                  "after": "0.92",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                }
+              ]
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": [
+          {
+            "kind": "RESULT",
+            "ref_id": "SYN-RES-DET-RAIN",
+            "field": "denominator",
+            "before": "20",
+            "after": "25",
+            "before_revision": 1,
+            "after_revision": 2,
+            "criterion_ids": [
+              "SYN-C-DET-RAIN"
+            ],
+            "requirement_ids": [
+              "SYN-REQ-1"
+            ]
+          },
+          {
+            "kind": "RESULT",
+            "ref_id": "SYN-RES-DET-RAIN",
+            "field": "numerator",
+            "before": "16",
+            "after": "23",
+            "before_revision": 1,
+            "after_revision": 2,
+            "criterion_ids": [
+              "SYN-C-DET-RAIN"
+            ],
+            "requirement_ids": [
+              "SYN-REQ-1"
+            ]
+          },
+          {
+            "kind": "RESULT",
+            "ref_id": "SYN-RES-DET-RAIN",
+            "field": "result_revision",
+            "before": "1",
+            "after": "2",
+            "before_revision": 1,
+            "after_revision": 2,
+            "criterion_ids": [
+              "SYN-C-DET-RAIN"
+            ],
+            "requirement_ids": [
+              "SYN-REQ-1"
+            ]
+          },
+          {
+            "kind": "RESULT",
+            "ref_id": "SYN-RES-DET-RAIN",
+            "field": "value",
+            "before": "0.80",
+            "after": "0.92",
+            "before_revision": 1,
+            "after_revision": 2,
+            "criterion_ids": [
+              "SYN-C-DET-RAIN"
+            ],
+            "requirement_ids": [
+              "SYN-REQ-1"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rain-result-edited-recomputed",
+      "title": "The edited result is recomputed and now meets the threshold",
+      "origin": "demo: rain row, edited and recomputed",
+      "mode": "recomputed",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.80",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 16,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ]
+      },
+      "after_trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 2,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.92",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 23,
+            "denominator": 25,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ]
+      },
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-RAIN",
+          "state": "PASS_COMPUTED",
+          "reason_codes": [],
+          "tags": [],
+          "next_step": false,
+          "stale": false
+        },
+        {
+          "kind": "REQUIREMENT",
+          "subject_id": "SYN-REQ-1",
+          "state": "PASS",
+          "reason_codes": [],
+          "tags": [],
+          "next_step": false,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "d78a5f408eee24c4e55c0f5cffd69cb8181e61f86a5141e84037b57d527dbaee",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 2,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.92",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 23,
+            "denominator": 25,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "state": "PASS_COMPUTED",
+            "cause": {
+              "trigger": "RECOMPUTE",
+              "changed": [
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "denominator",
+                  "before": "20",
+                  "after": "25",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                },
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "numerator",
+                  "before": "16",
+                  "after": "23",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                },
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "result_revision",
+                  "before": "1",
+                  "after": "2",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                },
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "value",
+                  "before": "0.80",
+                  "after": "0.92",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                }
+              ]
+            },
+            "basis": {
+              "input_digest": "d7a69ee39700393a9627f6630f35181894e29e3121e2df5435d8efcb8c20f93b",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 2
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 2
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-RAIN",
+              "rule_revision": 1,
+              "condition": "weather=rain",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T10:00:00Z"
+            },
+            "reasons": {
+              "computed": [],
+              "human": []
+            },
+            "parent_digest": "4f227ec96462d428dba48207a00537c7b9a919c081bd1500ebb015675eba7048",
+            "verdict_digest": "5db922c1155bc3405f7ee661eea5b35cff4090d07f8e0f3fb9f9db76b4784959",
+            "revision_digest": "96c4f8aecc2c7333ecbec5c8e2f677aa4acd7128f745f23dda1ccb3beb38761b",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "PASS",
+            "cause": {
+              "trigger": "RECOMPUTE",
+              "changed": [
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "denominator",
+                  "before": "20",
+                  "after": "25",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                },
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "numerator",
+                  "before": "16",
+                  "after": "23",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                },
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "result_revision",
+                  "before": "1",
+                  "after": "2",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                },
+                {
+                  "kind": "RESULT",
+                  "ref_id": "SYN-RES-DET-RAIN",
+                  "field": "value",
+                  "before": "0.80",
+                  "after": "0.92",
+                  "before_revision": 1,
+                  "after_revision": 2,
+                  "criterion_ids": [
+                    "SYN-C-DET-RAIN"
+                  ],
+                  "requirement_ids": [
+                    "SYN-REQ-1"
+                  ]
+                }
+              ]
+            },
+            "basis": {
+              "input_digest": "65ad41bcb6ea9155e5f594c1640b627d3b818b32ca4e0817cfe091652e00ac68",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "5db922c1155bc3405f7ee661eea5b35cff4090d07f8e0f3fb9f9db76b4784959"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-RAIN"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T10:00:00Z"
+            },
+            "reasons": {
+              "computed": [],
+              "human": []
+            },
+            "parent_digest": "3da56089801a66bf21cb3f7452ff68b2ea421adb727d56ca23eeef01a8985a39",
+            "verdict_digest": "17858b8d0d482b5e32aab5e6c3d8f537106aa8312c728056bce2964580736f6b",
+            "revision_digest": "ea91d7a140c5e778d7a49c4c9092a5e297e56383394314aa1066c1b3116e77a3",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    },
+    {
+      "id": "unit-mismatch",
+      "title": "The result unit differs from the rule unit",
+      "origin": "new",
+      "mode": "plain",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "80",
+            "raw_value": null,
+            "unit": "percent",
+            "numerator": null,
+            "denominator": null,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ]
+      },
+      "after_trace_set": null,
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-RAIN",
+          "state": "HOLD_INVALID_RESULT",
+          "reason_codes": [
+            "UNIT_MISMATCH"
+          ],
+          "tags": [
+            "UNIT"
+          ],
+          "next_step": true,
+          "stale": false
+        },
+        {
+          "kind": "REQUIREMENT",
+          "subject_id": "SYN-REQ-1",
+          "state": "HOLD_INCOMPLETE",
+          "reason_codes": [
+            "SYN-C-DET-RAIN"
+          ],
+          "tags": [
+            "REQUIRED_INCOMPLETE"
+          ],
+          "next_step": true,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "6e56347cca37cac214d70850c608b1a57d5168c0e88d3d469e4deb0f9e76d9dd",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "80",
+            "raw_value": null,
+            "unit": "percent",
+            "numerator": null,
+            "denominator": null,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "state": "HOLD_INVALID_RESULT",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "a0abe4cfc34bc619ad54e471893f318b83ceac626e187143e833f0bb946ca110",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-RAIN",
+              "rule_revision": 1,
+              "condition": "weather=rain",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "UNIT_MISMATCH:SYN-RES-DET-RAIN:percent!=ratio"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "1c77ff458430a0a0060f4e2d7e7d9bec9f16c1d5317a6a449af5b98794ffe6ad",
+            "revision_digest": "d7133c7122d3a8fe7ba913aa25aedc0c6000ade868811a2dcb300ef5d61bda37",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "HOLD_INCOMPLETE",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "26bfdc39a6e95edef1a3ea2229f6648324bc5bc82cbf036d40158fd39fa4eb54",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "1c77ff458430a0a0060f4e2d7e7d9bec9f16c1d5317a6a449af5b98794ffe6ad"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-RAIN"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "SYN-C-DET-RAIN:HOLD_INVALID_RESULT"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "cd4e7e87e3fa518f623492f10135b561ab3fcaa9d4bcfc128fb614f4ee342e68",
+            "revision_digest": "cdb46f70191e68a48552b4b115c6390386d9530a08082c0cc04d89e3dd0ef85e",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    },
+    {
+      "id": "denominator-zero",
+      "title": "The denominator is zero",
+      "origin": "new",
+      "mode": "plain",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.50",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 5,
+            "denominator": 0,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ]
+      },
+      "after_trace_set": null,
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-RAIN",
+          "state": "HOLD_INVALID_RESULT",
+          "reason_codes": [
+            "DENOMINATOR_NOT_POSITIVE"
+          ],
+          "tags": [
+            "DENOMINATOR"
+          ],
+          "next_step": true,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "0df214806c295c023d40b7705a3bbea11971af69df094357bd0fff615cd2ad41",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.50",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 5,
+            "denominator": 0,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "state": "HOLD_INVALID_RESULT",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "abb102f39c1821a1bd3ce6e9770056ca25726d8931c31b8c9463da0a58984aa2",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-RAIN",
+              "rule_revision": 1,
+              "condition": "weather=rain",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "DENOMINATOR_NOT_POSITIVE:SYN-RES-DET-RAIN"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "53b80e31667b9d01066d18437e8ede1a98d123fdc57620ec8cfd7132e58e3138",
+            "revision_digest": "0633fbe1fc43531efc743a26fde8b6e2699161e453852fcb34c58cc1fdb5391b",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "HOLD_INCOMPLETE",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "50315e333e3defc6a6012d07fd95e404cadd4e368eddece41303a229c307718e",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "53b80e31667b9d01066d18437e8ede1a98d123fdc57620ec8cfd7132e58e3138"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-RAIN"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "SYN-C-DET-RAIN:HOLD_INVALID_RESULT"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "f54afc8037778ba400588918a1bec62da19cb35ff58f86acf2de3981c56ddb22",
+            "revision_digest": "810e8e11091ce0f4c0a7c2c4cf046c19027486d5ffd81ee4008c2b6744e8dc12",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    },
+    {
+      "id": "value-disagrees-with-counts",
+      "title": "The value is not numerator over denominator",
+      "origin": "new",
+      "mode": "plain",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.50",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 9,
+            "denominator": 10,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ]
+      },
+      "after_trace_set": null,
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-RAIN",
+          "state": "HOLD_INVALID_RESULT",
+          "reason_codes": [
+            "VALUE_DISAGREES_WITH_COUNTS"
+          ],
+          "tags": [
+            "DENOMINATOR"
+          ],
+          "next_step": true,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "137b05b3dd5821a928556a988c6475f2f14a12be54e94d8075a546562b58283d",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.50",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 9,
+            "denominator": 10,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "state": "HOLD_INVALID_RESULT",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "420eca40d2c0fe1acf9e679caeaf71256a50728efee9b3ef0d545d4f3c10c112",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-RAIN",
+              "rule_revision": 1,
+              "condition": "weather=rain",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "VALUE_DISAGREES_WITH_COUNTS:SYN-RES-DET-RAIN"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "4d83ec6ff2795ef93d73a7c65aa885be4032ee9148660c58e986e2e7f9dfe270",
+            "revision_digest": "61556a554e7d51bf61e6675849860e2dc8ca52d91e2a582538cb1569f286b958",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "HOLD_INCOMPLETE",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "4ac1b7bf1c91517f9310006c684986742c29d497d9c6a4c6ae1818c67450517f",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "4d83ec6ff2795ef93d73a7c65aa885be4032ee9148660c58e986e2e7f9dfe270"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-RAIN"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "SYN-C-DET-RAIN:HOLD_INVALID_RESULT"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "dada16bf0c429116818c41383129aee880ecfce1de975acf999f573f1a4bfb50",
+            "revision_digest": "e07468944ce01ecbc5dcec6f38327f2101ae313c51c2a46845392d93b409b069",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    },
+    {
+      "id": "value-not-a-number",
+      "title": "The value was written as text",
+      "origin": "new",
+      "mode": "plain",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": null,
+            "raw_value": "n/a",
+            "unit": "ratio",
+            "numerator": null,
+            "denominator": null,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ]
+      },
+      "after_trace_set": null,
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-RAIN",
+          "state": "HOLD_INVALID_RESULT",
+          "reason_codes": [
+            "VALUE_NOT_A_NUMBER"
+          ],
+          "tags": [
+            "VALUE"
+          ],
+          "next_step": true,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "3b705a103a04b00cc34953cfca4a88afb3b27ddb7a078e1ae931a69253f8d290",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": null,
+            "raw_value": "n/a",
+            "unit": "ratio",
+            "numerator": null,
+            "denominator": null,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "state": "HOLD_INVALID_RESULT",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "ce99ae5bb212826001cb161d86543c5885131cdc73a1cf79eb8169953202f131",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-RAIN",
+              "rule_revision": 1,
+              "condition": "weather=rain",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "VALUE_NOT_A_NUMBER:SYN-RES-DET-RAIN"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "91a9d792a558ef668e18ecf20028e1a880d44d9b9774ce26ca391d3ce2f0ef97",
+            "revision_digest": "2fdbcaf62ede8740ff946345971fce302cb4a68515ee4c6ddc111ebfadfeebec",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "HOLD_INCOMPLETE",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "7f1e869828043014d870fdd63a02426186aa70830ef73eca9cd7198eafcc69b3",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "91a9d792a558ef668e18ecf20028e1a880d44d9b9774ce26ca391d3ce2f0ef97"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-RAIN"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "SYN-C-DET-RAIN:HOLD_INVALID_RESULT"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "b0968899d8192537a2131f2a0637d2ebb8510bf4583b5241b9f23db847090cbf",
+            "revision_digest": "d0e32cc0a3edbedd2456e5a21863b55dd85217eb773cacca637e8524b00c7825",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    },
+    {
+      "id": "condition-mismatch",
+      "title": "A result exists but for another condition",
+      "origin": "new",
+      "mode": "plain",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=fog",
+            "value": "0.95",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": null,
+            "denominator": null,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ]
+      },
+      "after_trace_set": null,
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-RAIN",
+          "state": "HOLD_NO_RESULT",
+          "reason_codes": [
+            "NO_RESULT"
+          ],
+          "tags": [
+            "CONDITION_MISMATCH"
+          ],
+          "next_step": true,
+          "stale": false
+        },
+        {
+          "kind": "REQUIREMENT",
+          "subject_id": "SYN-REQ-1",
+          "state": "HOLD_INCOMPLETE",
+          "reason_codes": [
+            "SYN-C-DET-RAIN"
+          ],
+          "tags": [
+            "REQUIRED_INCOMPLETE"
+          ],
+          "next_step": true,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "5c053e513cb1e271d0261412228e73d072582bdc206fd6d05970639a20ead79c",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=fog",
+            "value": "0.95",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": null,
+            "denominator": null,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          }
+        ],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "state": "HOLD_NO_RESULT",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "d6eb57d77d477789a4e84e64282dcbcbef6d0f3707e296c0d0ad85571bc9b3e3",
+              "source_span_refs": [],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [],
+              "excluded": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1,
+                  "reason": "CONDITION_MISMATCH"
+                }
+              ]
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-RAIN",
+              "rule_revision": 1,
+              "condition": "weather=rain",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "NO_RESULT:weather=rain"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "b07be21ffec3771e28574a253d58d860385a9ac74a94d5f3637ff202f244ba2f",
+            "revision_digest": "3c055800a16eab9838aa9aa819b3fa1935f857d4f93395c9bb42b98368a5f2f3",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "HOLD_INCOMPLETE",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "952cbf737f3ded44b7cae93e1479ab1c86c8d742d0dbc8cb70efa1b952082c30",
+              "source_span_refs": [],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "b07be21ffec3771e28574a253d58d860385a9ac74a94d5f3637ff202f244ba2f"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-RAIN"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "SYN-C-DET-RAIN:HOLD_NO_RESULT"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "210ac70710dad553f4e560a0cd545883bdaac02bef4cd8fc1cea4fcf52ce6ad4",
+            "revision_digest": "4b26337d966a2b155de492779c2bfd48af09932b56d55edbf09d48d07fb7c7e5",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    },
+    {
+      "id": "no-rule",
+      "title": "A criterion has no rule",
+      "origin": "new",
+      "mode": "plain",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [],
+        "results": []
+      },
+      "after_trace_set": null,
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-RAIN",
+          "state": "HOLD_NO_RULE",
+          "reason_codes": [
+            "NO_RULE"
+          ],
+          "tags": [
+            "NO_RULE"
+          ],
+          "next_step": true,
+          "stale": false
+        },
+        {
+          "kind": "REQUIREMENT",
+          "subject_id": "SYN-REQ-1",
+          "state": "HOLD_INCOMPLETE",
+          "reason_codes": [
+            "SYN-C-DET-RAIN"
+          ],
+          "tags": [
+            "REQUIRED_INCOMPLETE"
+          ],
+          "next_step": true,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "f8a24b258e514923f7ac950ab132aeda25b4b7512a9b38a553a4418d5b6af362",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [],
+        "results": [],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "state": "HOLD_NO_RULE",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "596f01ecb31eefd937c823fe4d9b01cff137c6ac3b8bf4547b7ffcc698d9aec9",
+              "source_span_refs": [],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "NO_RULE"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "33a75140937999b2961a74835518a343bead8f8996fa84b8101037d8da54b97a",
+            "revision_digest": "29f9e06190ac0bb710d7d126c75ca2194fe870ef8500e4b6763930f0abac8392",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "HOLD_INCOMPLETE",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "e76cc72ce1b03ad3832dcf17e0ff1b80c6fe9db166dc96289fc32c5435d70062",
+              "source_span_refs": [],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "33a75140937999b2961a74835518a343bead8f8996fa84b8101037d8da54b97a"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-RAIN"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "SYN-C-DET-RAIN:HOLD_NO_RULE"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "f801abbb066668b249eac5cefbf80762d5c829d160c6d96550211931f5d08eb4",
+            "revision_digest": "a899ef3e6c3719d1b1c7a659cbe5f024a389c82d48bc7cd347ffeb1705d17603",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    },
+    {
+      "id": "no-test-linked",
+      "title": "A criterion has a rule but no test is linked",
+      "origin": "new",
+      "mode": "plain",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": []
+      },
+      "after_trace_set": null,
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-RAIN",
+          "state": "HOLD_NO_RESULT",
+          "reason_codes": [
+            "NO_RESULT"
+          ],
+          "tags": [
+            "UNLINKED"
+          ],
+          "next_step": true,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "2801b03ccee16f1bd5c6ece502ea70fc9eb20703670e4adb11b122d6909d8eb4",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "state": "HOLD_NO_RESULT",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "08eff1bb3f9e3321ce7d93ab37ebd9847bfbd881ddd83776e0e530fe017a43f3",
+              "source_span_refs": [],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [],
+              "chosen": [],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-RAIN",
+              "rule_revision": 1,
+              "condition": "weather=rain",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "NO_RESULT:weather=rain"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "aab511e55de22485bc0b4a4fd1803120d0a1c100ce5dbbeb98a41d9c2c738da0",
+            "revision_digest": "3127f32a6c14fc1a551145f59b586e7da07ae653fc2550ec77b440261485a91d",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "HOLD_INCOMPLETE",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "0fbedd77cef44ff20c9b60769ee0cebb5e9dd04db5b517826f8ecdfc81755f6a",
+              "source_span_refs": [],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "aab511e55de22485bc0b4a4fd1803120d0a1c100ce5dbbeb98a41d9c2c738da0"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-RAIN"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "SYN-C-DET-RAIN:HOLD_NO_RESULT"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "c88d981152ef43aef2a3214afc9d5cc47e84a576846d70ab18b989cc07e95d79",
+            "revision_digest": "2b365edfc1c6079e205a04f79396226a746b019e288dd3fb5297ab87423ba2ee",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    },
+    {
+      "id": "two-conditions-miss",
+      "title": "Two conditions miss at the same time",
+      "origin": "new",
+      "mode": "plain",
+      "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE",
+      "trace_set": {
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-DRY",
+            "item_key": "k-SYN-C-DET-DRY",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-DRY",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-1",
+            "item_key": "k-SYN-TC-1",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-1",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-FOG",
+            "item_key": "k-SYN-C-DET-FOG",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-FOG",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-2",
+            "item_key": "k-SYN-TC-2",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-2",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-DRY",
+            "item_key": "k-SYN-RES-DET-DRY",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-FOG",
+            "item_key": "k-SYN-RES-DET-FOG",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-DRY",
+            "from_id": "SYN-C-DET-DRY",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-DRY",
+            "from_id": "SYN-C-DET-DRY",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          },
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-1",
+            "relation": "VERIFIED_BY"
+          },
+          {
+            "link_id": "L-ref-SYN-C-DET-FOG",
+            "from_id": "SYN-C-DET-FOG",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-FOG",
+            "from_id": "SYN-C-DET-FOG",
+            "to_id": "SYN-TC-2",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-DRY",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-DRY",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=dry",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          },
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          },
+          {
+            "rule_id": "R-SYN-C-DET-FOG",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-FOG",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=fog",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-DRY",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-DRY",
+            "condition": "weather=dry",
+            "value": "0.95",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 19,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-DRY"
+            ]
+          },
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.80",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 16,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          },
+          {
+            "result_id": "SYN-RES-DET-FOG",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-FOG",
+            "condition": "weather=fog",
+            "value": "0.70",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 14,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-FOG"
+            ]
+          }
+        ]
+      },
+      "after_trace_set": null,
+      "checks": [
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-DRY",
+          "state": "PASS_COMPUTED",
+          "reason_codes": [],
+          "tags": [],
+          "next_step": false,
+          "stale": false
+        },
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-RAIN",
+          "state": "FAIL_COMPUTED",
+          "reason_codes": [
+            "THRESHOLD_NOT_MET"
+          ],
+          "tags": [
+            "VALID_MISS"
+          ],
+          "next_step": true,
+          "stale": false
+        },
+        {
+          "kind": "CRITERION",
+          "subject_id": "SYN-C-DET-FOG",
+          "state": "FAIL_COMPUTED",
+          "reason_codes": [
+            "THRESHOLD_NOT_MET"
+          ],
+          "tags": [
+            "VALID_MISS"
+          ],
+          "next_step": true,
+          "stale": false
+        },
+        {
+          "kind": "REQUIREMENT",
+          "subject_id": "SYN-REQ-1",
+          "state": "FAIL",
+          "reason_codes": [
+            "SYN-C-DET-RAIN",
+            "SYN-C-DET-FOG"
+          ],
+          "tags": [],
+          "next_step": true,
+          "stale": false
+        }
+      ],
+      "banned_phrases": [
+        "재시험 필수",
+        "원인은",
+        "기준을 낮추",
+        "통과 가능",
+        "승인됨",
+        "종결",
+        "해결",
+        "면제",
+        "AI 추천"
+      ],
+      "view": {
+        "record_digest": null,
+        "set_digest": "62dec0f492ca3d2f7a660030266fe1ca1b3259b2412dfefcfceed18c4d34b13f",
+        "items": [
+          {
+            "item_id": "SYN-REQ-1",
+            "item_key": "k-SYN-REQ-1",
+            "kind": "REQUIREMENT",
+            "title": "Synthetic requirement (invented example)",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-DRY",
+            "item_key": "k-SYN-C-DET-DRY",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-DRY",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-0",
+            "item_key": "k-SYN-TC-0",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-0",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-RAIN",
+            "item_key": "k-SYN-C-DET-RAIN",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-RAIN",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-1",
+            "item_key": "k-SYN-TC-1",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-1",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-C-DET-FOG",
+            "item_key": "k-SYN-C-DET-FOG",
+            "kind": "CRITERION",
+            "title": "Criterion SYN-C-DET-FOG",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-TC-2",
+            "item_key": "k-SYN-TC-2",
+            "kind": "TEST_CASE",
+            "title": "Test SYN-TC-2",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-DRY",
+            "item_key": "k-SYN-RES-DET-DRY",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-RAIN",
+            "item_key": "k-SYN-RES-DET-RAIN",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          },
+          {
+            "item_id": "SYN-RES-DET-FOG",
+            "item_key": "k-SYN-RES-DET-FOG",
+            "kind": "RESULT",
+            "title": "",
+            "fields": {
+              "synthetic_notice": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
+            },
+            "source_span_refs": []
+          }
+        ],
+        "links": [
+          {
+            "link_id": "L-ref-SYN-C-DET-DRY",
+            "from_id": "SYN-C-DET-DRY",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-DRY",
+            "from_id": "SYN-C-DET-DRY",
+            "to_id": "SYN-TC-0",
+            "relation": "VERIFIED_BY"
+          },
+          {
+            "link_id": "L-ref-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-RAIN",
+            "from_id": "SYN-C-DET-RAIN",
+            "to_id": "SYN-TC-1",
+            "relation": "VERIFIED_BY"
+          },
+          {
+            "link_id": "L-ref-SYN-C-DET-FOG",
+            "from_id": "SYN-C-DET-FOG",
+            "to_id": "SYN-REQ-1",
+            "relation": "REFINES"
+          },
+          {
+            "link_id": "L-ver-SYN-C-DET-FOG",
+            "from_id": "SYN-C-DET-FOG",
+            "to_id": "SYN-TC-2",
+            "relation": "VERIFIED_BY"
+          }
+        ],
+        "rules": [
+          {
+            "rule_id": "R-SYN-C-DET-DRY",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-DRY",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=dry",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          },
+          {
+            "rule_id": "R-SYN-C-DET-RAIN",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          },
+          {
+            "rule_id": "R-SYN-C-DET-FOG",
+            "rule_revision": 1,
+            "criterion_id": "SYN-C-DET-FOG",
+            "measure": "detection_rate",
+            "comparator": ">=",
+            "threshold": "0.90",
+            "unit": "ratio",
+            "condition": "weather=fog",
+            "rounding": {
+              "digits": 2,
+              "mode": "HALF_UP"
+            },
+            "required": true
+          }
+        ],
+        "results": [
+          {
+            "result_id": "SYN-RES-DET-DRY",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-DRY",
+            "condition": "weather=dry",
+            "value": "0.95",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 19,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-DRY"
+            ]
+          },
+          {
+            "result_id": "SYN-RES-DET-RAIN",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-RAIN",
+            "condition": "weather=rain",
+            "value": "0.80",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 16,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-RAIN"
+            ]
+          },
+          {
+            "result_id": "SYN-RES-DET-FOG",
+            "result_revision": 1,
+            "criterion_id": "SYN-C-DET-FOG",
+            "condition": "weather=fog",
+            "value": "0.70",
+            "raw_value": null,
+            "unit": "ratio",
+            "numerator": 14,
+            "denominator": 20,
+            "observed_at": "2026-10-05T12:00:00Z",
+            "source_span_refs": [
+              "SYN-SOURCE.yaml#DET-FOG"
+            ]
+          }
+        ],
+        "policy": {
+          "name": "LATEST_PER_CONDITION",
+          "version": 1
+        },
+        "verdicts": [
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-DRY",
+            "state": "PASS_COMPUTED",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "068194228704bec79641eb9f34d5e7cff023942d263c2a5e47db8cf88da24118",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-DRY"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-DRY",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-DRY",
+                  "result_revision": 1
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-DRY",
+              "rule_revision": 1,
+              "condition": "weather=dry",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "a132542a80e53090e753aa039f6eb695f5ac4aff4f9bd3e77de8ba63146077ec",
+            "revision_digest": "5e2ae89df0d68e1ca093fdd633379a12abe2a5646b1665fef297c453ec53b1ff",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-FOG",
+            "state": "FAIL_COMPUTED",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "bf4a92fd9b268077745e477656da6f57817c72b40ee9c374038773ad447cadf4",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-FOG"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-FOG",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-FOG",
+                  "result_revision": 1
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-FOG",
+              "rule_revision": 1,
+              "condition": "weather=fog",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "THRESHOLD_NOT_MET:SYN-RES-DET-FOG:value=0.70 need >= 0.90 ratio"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "d724437ee1ef6dd350bc49ce8e11292b1c9404f4ddf96ce8c74fe88d70c623bf",
+            "revision_digest": "16b8a47904ad3a62b8c4d9a2329b471dcfbf9f1de8638ce7a75eb96afdbd6fa7",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "state": "FAIL_COMPUTED",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "fb04ca2e941377a6b6afc255ae652b018e54f00881839090870fe44dff8118b1",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": []
+            },
+            "selection": {
+              "policy": {
+                "name": "LATEST_PER_CONDITION",
+                "version": 1
+              },
+              "candidates": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "chosen": [
+                {
+                  "result_id": "SYN-RES-DET-RAIN",
+                  "result_revision": 1
+                }
+              ],
+              "excluded": []
+            },
+            "conditions": {
+              "required": true,
+              "rule_id": "R-SYN-C-DET-RAIN",
+              "rule_revision": 1,
+              "condition": "weather=rain",
+              "unit": "ratio",
+              "comparator": ">=",
+              "threshold": "0.90",
+              "rounding": {
+                "digits": 2,
+                "mode": "HALF_UP"
+              },
+              "required_criteria": []
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "THRESHOLD_NOT_MET:SYN-RES-DET-RAIN:value=0.80 need >= 0.90 ratio"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "9b3c31762a13829734688a7b9d77131dcad6f2e38a3e2d5719f41cf7323d3923",
+            "revision_digest": "4f227ec96462d428dba48207a00537c7b9a919c081bd1500ebb015675eba7048",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          },
+          {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "state": "FAIL",
+            "cause": {
+              "trigger": "INITIAL_COMPUTE",
+              "changed": []
+            },
+            "basis": {
+              "input_digest": "2f3c8302fd7ff7e64025766b10f32a6373e3b9924e98fb25f11d946fd461c722",
+              "source_span_refs": [
+                "SYN-SOURCE.yaml#DET-DRY",
+                "SYN-SOURCE.yaml#DET-FOG",
+                "SYN-SOURCE.yaml#DET-RAIN"
+              ],
+              "evidence_text_preserved": false,
+              "child_verdict_digests": [
+                "a132542a80e53090e753aa039f6eb695f5ac4aff4f9bd3e77de8ba63146077ec",
+                "d724437ee1ef6dd350bc49ce8e11292b1c9404f4ddf96ce8c74fe88d70c623bf",
+                "9b3c31762a13829734688a7b9d77131dcad6f2e38a3e2d5719f41cf7323d3923"
+              ]
+            },
+            "selection": null,
+            "conditions": {
+              "required": true,
+              "rule_id": null,
+              "rule_revision": null,
+              "condition": null,
+              "unit": null,
+              "comparator": null,
+              "threshold": null,
+              "rounding": null,
+              "required_criteria": [
+                "SYN-C-DET-DRY",
+                "SYN-C-DET-FOG",
+                "SYN-C-DET-RAIN"
+              ]
+            },
+            "actor": {
+              "actor_id": "system:verification-trace",
+              "computed_at": "2026-10-06T09:00:00Z"
+            },
+            "reasons": {
+              "computed": [
+                "SYN-C-DET-FOG:FAIL_COMPUTED",
+                "SYN-C-DET-RAIN:FAIL_COMPUTED"
+              ],
+              "human": []
+            },
+            "parent_digest": null,
+            "verdict_digest": "b31f54009ab8bb0251f17233864a0e1ba370aa3740273fbec1bae4a4ae7f44ba",
+            "revision_digest": "753a61c34a13e21456962c2be15c24e7b102bc28f1a27c12da2005079cab5a7c",
+            "currentness": {
+              "state": "CURRENT",
+              "changed_dependencies": []
+            },
+            "confirmations": [],
+            "recent_history": [],
+            "history_total": 1
+          }
+        ],
+        "confirmations": [],
+        "pending_changes": []
+      }
+    }
+  ]
+}

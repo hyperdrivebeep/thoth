@@ -1,0 +1,7 @@
+format,row_type,base_set_digest,item_id,link_id,rule_id,result_id,target_kind,target_id,item_key,kind,title,fields_json,source_span_refs,from_id,to_id,relation,criterion_id,rule_revision,measure,comparator,threshold,unit,condition,rounding_digits,rounding_mode,required,result_revision,value,raw_value,numerator,denominator,observed_at
+thoth-trace-csv/1,ITEM,,F-1,,,,,,k-F-1,REQUIREMENT,=1+1,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,F-2,,,,,,k-F-2,REQUIREMENT,+SUM(A1),,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,F-3,,,,,,k-F-3,REQUIREMENT,-2+3,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,F-4,,,,,,k-F-4,REQUIREMENT,@cmd,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,F-5,,,,,,k-F-5,REQUIREMENT,	Tab first,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,F-6,,,,,,k-F-6,REQUIREMENT,"CR first",,,,,,,,,,,,,,,,,,,,,

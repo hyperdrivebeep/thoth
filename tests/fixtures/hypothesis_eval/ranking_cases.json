@@ -1,0 +1,1615 @@
+{
+  "schema_version": "hypothesis-ranking-cases/1",
+  "notice": "SYNTHETIC CASES - NO MODEL IS CALLED - THE EXPECTED ORDER IS WHAT THE RULE GIVES",
+  "cases": [
+    {
+      "id": "order-balanced-split",
+      "about": "A test that splits the candidates evenly goes before one that isolates a single candidate, and a confirm-only test goes below.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        },
+        {
+          "id": "h4",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tIsolate",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE",
+            "h3": "WITH_ALTERNATIVE",
+            "h4": "WITH_ALTERNATIVE"
+          }
+        },
+        {
+          "id": "tSplit",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_TEST",
+            "h3": "WITH_ALTERNATIVE",
+            "h4": "WITH_ALTERNATIVE"
+          }
+        },
+        {
+          "id": "tConfirm",
+          "kind": "TEST",
+          "hypothesisId": "h3",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null
+        }
+      ],
+      "expected": {
+        "candidates": 4,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "tSplit",
+              "tIsolate"
+            ]
+          },
+          {
+            "group": "UNCOUNTABLE",
+            "ids": [
+              "tConfirm"
+            ]
+          }
+        ],
+        "worst": {
+          "tSplit": 2,
+          "tIsolate": 3,
+          "tConfirm": 3
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "order-confirm-only",
+      "about": "A test with no stated outcome for the other hypotheses is counted as removing one candidate and goes below the tests that can be counted.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tConfirm",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null
+        },
+        {
+          "id": "tSplit",
+          "kind": "TEST",
+          "hypothesisId": "h2",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h1": "WITH_ALTERNATIVE",
+            "h3": "WITH_ALTERNATIVE"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 3,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "tSplit"
+            ]
+          },
+          {
+            "group": "UNCOUNTABLE",
+            "ids": [
+              "tConfirm"
+            ]
+          }
+        ],
+        "worst": {
+          "tSplit": 2,
+          "tConfirm": 2
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "order-cost-unknown",
+      "about": "An unknown cost is not zero: that test is set apart after the tests whose cost is known.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tUnknown",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": null,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE"
+          }
+        },
+        {
+          "id": "tKnown",
+          "kind": "TEST",
+          "hypothesisId": "h2",
+          "riskTier": "R0",
+          "cost": 5,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h1": "WITH_ALTERNATIVE"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 2,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "tKnown"
+            ]
+          },
+          {
+            "group": "COST_UNKNOWN",
+            "ids": [
+              "tUnknown"
+            ]
+          }
+        ],
+        "worst": {
+          "tKnown": 1,
+          "tUnknown": 1
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "order-cost-unknown-among-uncountable",
+      "about": "Among tests whose split cannot be counted, an unknown cost still comes after a known one.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tUnknown",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": null,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null
+        },
+        {
+          "id": "tKnown",
+          "kind": "TEST",
+          "hypothesisId": "h2",
+          "riskTier": "R0",
+          "cost": 3,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null
+        }
+      ],
+      "expected": {
+        "candidates": 3,
+        "groups": [
+          {
+            "group": "UNCOUNTABLE",
+            "ids": [
+              "tKnown",
+              "tUnknown"
+            ]
+          }
+        ],
+        "worst": {
+          "tKnown": 2,
+          "tUnknown": 2
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "order-tie",
+      "about": "Equal tests keep the order they were made in and are marked as a tie.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "t1",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R1",
+          "cost": 2,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE"
+          }
+        },
+        {
+          "id": "t2",
+          "kind": "TEST",
+          "hypothesisId": "h2",
+          "riskTier": "R1",
+          "cost": 2,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h1": "WITH_ALTERNATIVE"
+          }
+        },
+        {
+          "id": "t3",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R1",
+          "cost": 2,
+          "reversibility": "PARTIAL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 2,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "t1",
+              "t2",
+              "t3"
+            ]
+          }
+        ],
+        "worst": {
+          "t1": 1,
+          "t2": 1,
+          "t3": 1
+        },
+        "tie": [
+          "t1",
+          "t2"
+        ],
+        "excluded": []
+      }
+    },
+    {
+      "id": "order-risk-before-cost",
+      "about": "With the same split, the lower rule risk goes first even when it costs more; a risk that was never declared counts as protected.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tCheapProtected",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R2",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE"
+          }
+        },
+        {
+          "id": "tDear",
+          "kind": "TEST",
+          "hypothesisId": "h2",
+          "riskTier": "R0",
+          "cost": 9,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h1": "WITH_ALTERNATIVE"
+          }
+        },
+        {
+          "id": "tUndeclared",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": null,
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 2,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "tDear",
+              "tCheapProtected",
+              "tUndeclared"
+            ]
+          }
+        ],
+        "worst": {
+          "tDear": 1,
+          "tCheapProtected": 1,
+          "tUndeclared": 1
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "order-reversible-before-created",
+      "about": "With everything else equal, a test that can be undone goes first.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tFinal",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "NONE",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE"
+          }
+        },
+        {
+          "id": "tUndoable",
+          "kind": "TEST",
+          "hypothesisId": "h2",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h1": "WITH_ALTERNATIVE"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 2,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "tUndoable",
+              "tFinal"
+            ]
+          }
+        ],
+        "worst": {
+          "tUndoable": 1,
+          "tFinal": 1
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "order-infeasible",
+      "about": "A test that cannot be run now is named apart, and a forbidden-level test is left out of the list.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tBlocked",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": false,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE"
+          }
+        },
+        {
+          "id": "tForbidden",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R4",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE"
+          }
+        },
+        {
+          "id": "tOk",
+          "kind": "TEST",
+          "hypothesisId": "h2",
+          "riskTier": "R0",
+          "cost": 4,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h1": "WITH_ALTERNATIVE"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 2,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "tOk"
+            ]
+          },
+          {
+            "group": "NOT_EXECUTABLE",
+            "ids": [
+              "tBlocked"
+            ]
+          }
+        ],
+        "worst": {
+          "tOk": 1,
+          "tBlocked": 1
+        },
+        "tie": [],
+        "excluded": [
+          "tForbidden"
+        ]
+      }
+    },
+    {
+      "id": "order-no-decision-change",
+      "about": "When every remaining candidate leads to the same action whatever the result, the test is named apart.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "a1",
+          "hypothesisIds": [
+            "h1",
+            "h2",
+            "h3"
+          ]
+        }
+      ],
+      "items": [
+        {
+          "id": "tSame",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE",
+            "h3": "WITH_ALTERNATIVE"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 3,
+        "groups": [
+          {
+            "group": "NO_DECISION_CHANGE",
+            "ids": [
+              "tSame"
+            ]
+          }
+        ],
+        "worst": {
+          "tSame": 2
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "order-decision-changes",
+      "about": "When the results lead to different actions, the test stays in the main list.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "a1",
+          "hypothesisIds": [
+            "h1"
+          ]
+        },
+        {
+          "id": "a2",
+          "hypothesisIds": [
+            "h2",
+            "h3"
+          ]
+        }
+      ],
+      "items": [
+        {
+          "id": "tDiffers",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE",
+            "h3": "WITH_ALTERNATIVE"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 3,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "tDiffers"
+            ]
+          }
+        ],
+        "worst": {
+          "tDiffers": 2
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "order-multi-cause",
+      "about": "Causes that can both be true: a test that cannot tell them apart removes nothing and goes after one that can.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tBoth",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_TEST"
+          }
+        },
+        {
+          "id": "tApart",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 2,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "tApart",
+              "tBoth"
+            ]
+          }
+        ],
+        "worst": {
+          "tApart": 1,
+          "tBoth": 2
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "noisy-single-result",
+      "about": "One result that fits the other explanation leaves the hypothesis in the count and only marks it.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": "SINGLE"
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tOnce",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE",
+            "h3": "WITH_ALTERNATIVE"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 3,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "tOnce"
+            ]
+          }
+        ],
+        "worst": {
+          "tOnce": 2
+        },
+        "tie": [],
+        "excluded": [],
+        "eliminatedOnce": [
+          "tOnce"
+        ]
+      }
+    },
+    {
+      "id": "repeated-elimination",
+      "about": "A hypothesis eliminated by repeated results leaves the candidates; its tests go to their own group and others no longer need to cover it.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": "REPEATED"
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tOld",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE",
+            "h3": "WITH_ALTERNATIVE"
+          }
+        },
+        {
+          "id": "tLive",
+          "kind": "TEST",
+          "hypothesisId": "h2",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h3": "WITH_ALTERNATIVE"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 2,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "tLive"
+            ]
+          },
+          {
+            "group": "HYPOTHESIS_ELIMINATED",
+            "ids": [
+              "tOld"
+            ]
+          }
+        ],
+        "worst": {
+          "tLive": 1
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "result-recorded",
+      "about": "A test whose result is already recorded is not offered as the next one.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tDone",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": true,
+          "predictions": {
+            "h2": "WITH_ALTERNATIVE"
+          }
+        },
+        {
+          "id": "tNext",
+          "kind": "TEST",
+          "hypothesisId": "h2",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": {
+            "h1": "WITH_ALTERNATIVE"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 2,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "tNext"
+            ]
+          },
+          {
+            "group": "RESULT_RECORDED",
+            "ids": [
+              "tDone"
+            ]
+          }
+        ],
+        "worst": {
+          "tNext": 1,
+          "tDone": 1
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "single-hypothesis",
+      "about": "With one candidate nothing can be narrowed: the test is counted as one, never as zero.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tOnly",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null
+        }
+      ],
+      "expected": {
+        "candidates": 1,
+        "groups": [
+          {
+            "group": "UNCOUNTABLE",
+            "ids": [
+              "tOnly"
+            ]
+          }
+        ],
+        "worst": {
+          "tOnly": 1
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "actions-in-the-same-order",
+      "about": "Action candidates use the same rule: rule risk, then cost, then reversibility; a forbidden one is left out.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "aDear",
+          "kind": "ACTION",
+          "hypothesisId": null,
+          "riskTier": "R0",
+          "cost": 8,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null
+        },
+        {
+          "id": "aProtected",
+          "kind": "ACTION",
+          "hypothesisId": null,
+          "riskTier": "R3",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null
+        },
+        {
+          "id": "aForbidden",
+          "kind": "ACTION",
+          "hypothesisId": null,
+          "riskTier": "R4",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null
+        },
+        {
+          "id": "aNoCost",
+          "kind": "ACTION",
+          "hypothesisId": null,
+          "riskTier": "R0",
+          "cost": null,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null
+        }
+      ],
+      "expected": {
+        "candidates": 2,
+        "groups": [
+          {
+            "group": "UNCOUNTABLE",
+            "ids": [
+              "aDear",
+              "aNoCost",
+              "aProtected"
+            ]
+          }
+        ],
+        "worst": {
+          "aDear": 1
+        },
+        "tie": [],
+        "excluded": [
+          "aForbidden"
+        ]
+      }
+    },
+    {
+      "id": "order-uncountable-before-blocked",
+      "about": "A test that can be run but whose split cannot be counted still goes before one that cannot be run now.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "tBlocked",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": false,
+          "resultRecorded": false,
+          "predictions": null
+        },
+        {
+          "id": "tRun",
+          "kind": "TEST",
+          "hypothesisId": "h2",
+          "riskTier": "R0",
+          "cost": 9,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null
+        }
+      ],
+      "expected": {
+        "candidates": 3,
+        "groups": [
+          {
+            "group": "UNCOUNTABLE",
+            "ids": [
+              "tRun"
+            ]
+          },
+          {
+            "group": "NOT_EXECUTABLE",
+            "ids": [
+              "tBlocked"
+            ]
+          }
+        ],
+        "worst": {
+          "tRun": 2,
+          "tBlocked": 2
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "v3-three-way",
+      "about": "When every hypothesis expects a different result, the test leaves one candidate whichever way it goes.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "t1",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null,
+          "labels": {
+            "h1": "A",
+            "h2": "B",
+            "h3": "C"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 3,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "t1"
+            ]
+          }
+        ],
+        "worst": {
+          "t1": 1
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "v3-same-label",
+      "about": "Hypotheses that expect the same label are the same result: the biggest group is what is left.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "t1",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null,
+          "labels": {
+            "h1": "worse",
+            "h2": " Worse ",
+            "h3": "same"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 3,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "t1"
+            ]
+          }
+        ],
+        "worst": {
+          "t1": 2
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "v3-unknown",
+      "about": "A hypothesis whose expectation is not known stays under every result.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "t1",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null,
+          "labels": {
+            "h1": "A",
+            "h2": "B",
+            "h3": "모름"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 3,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "t1"
+            ]
+          }
+        ],
+        "worst": {
+          "t1": 2
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "v3-all-unknown",
+      "about": "When nothing else is known the test removes nothing; it is counted, not hidden.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "t1",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null,
+          "labels": {
+            "h1": "A",
+            "h2": "모름",
+            "h3": "모름"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 3,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "t1"
+            ]
+          }
+        ],
+        "worst": {
+          "t1": 3
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "v3-missing-row",
+      "about": "A candidate with no entry in the table means the split cannot be counted.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "t1",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null,
+          "labels": {
+            "h1": "A",
+            "h2": "B"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 3,
+        "groups": [
+          {
+            "group": "UNCOUNTABLE",
+            "ids": [
+              "t1"
+            ]
+          }
+        ],
+        "worst": {
+          "t1": 2
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "v3-eliminated-row-ignored",
+      "about": "A hypothesis eliminated by repeated results is out of the count and its row is not needed.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": "REPEATED"
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "t2",
+          "kind": "TEST",
+          "hypothesisId": "h2",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null,
+          "labels": {
+            "h2": "A",
+            "h3": "B"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 2,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "t2"
+            ]
+          }
+        ],
+        "worst": {
+          "t2": 1
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "v3-order",
+      "about": "With tables the tests are ordered by how many candidates they can leave; one with no table goes below.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        },
+        {
+          "id": "h3",
+          "elimination": null
+        }
+      ],
+      "actions": [],
+      "items": [
+        {
+          "id": "t2",
+          "kind": "TEST",
+          "hypothesisId": "h2",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null,
+          "labels": {
+            "h1": "x",
+            "h2": "y",
+            "h3": "y"
+          }
+        },
+        {
+          "id": "t1",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 9,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null,
+          "labels": {
+            "h1": "A",
+            "h2": "B",
+            "h3": "C"
+          }
+        },
+        {
+          "id": "t3",
+          "kind": "TEST",
+          "hypothesisId": "h3",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null,
+          "labels": null
+        }
+      ],
+      "expected": {
+        "candidates": 3,
+        "groups": [
+          {
+            "group": "READY",
+            "ids": [
+              "t1",
+              "t2"
+            ]
+          },
+          {
+            "group": "UNCOUNTABLE",
+            "ids": [
+              "t3"
+            ]
+          }
+        ],
+        "worst": {
+          "t1": 1,
+          "t2": 2,
+          "t3": 2
+        },
+        "tie": [],
+        "excluded": []
+      }
+    },
+    {
+      "id": "v3-no-decision-change",
+      "about": "With tables, a test whose every result leads to the same action is named apart.",
+      "hypotheses": [
+        {
+          "id": "h1",
+          "elimination": null
+        },
+        {
+          "id": "h2",
+          "elimination": null
+        }
+      ],
+      "actions": [
+        {
+          "id": "a1",
+          "hypothesisIds": [
+            "h1",
+            "h2"
+          ]
+        }
+      ],
+      "items": [
+        {
+          "id": "t1",
+          "kind": "TEST",
+          "hypothesisId": "h1",
+          "riskTier": "R0",
+          "cost": 1,
+          "reversibility": "FULL",
+          "executable": true,
+          "resultRecorded": false,
+          "predictions": null,
+          "labels": {
+            "h1": "A",
+            "h2": "B"
+          }
+        }
+      ],
+      "expected": {
+        "candidates": 2,
+        "groups": [
+          {
+            "group": "NO_DECISION_CHANGE",
+            "ids": [
+              "t1"
+            ]
+          }
+        ],
+        "worst": {
+          "t1": 1
+        },
+        "tie": [],
+        "excluded": []
+      }
+    }
+  ]
+}
