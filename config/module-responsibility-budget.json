@@ -1,18 +1,146 @@
 {
   "schema_version": "1.0.0",
-  "module_line_limit": 900,
+  "module_line_limit": 600,
   "function_line_limit": 200,
   "scan_roots": [
     "src/thoth"
   ],
+  "web_scan_roots": [
+    "apps/web/src"
+  ],
+  "web_excluded_suffixes": [
+    ".test.ts",
+    ".test.tsx"
+  ],
   "watched_modules": {
+    "src/thoth/adapters/http/app.py": {
+      "baseline_lines": 833,
+      "top_level_symbols": [
+        "_hosted_transport_denial",
+        "_hosted_transport_block",
+        "_local_identity_denial",
+        "_dispatch_local_rpc",
+        "_claim_local_rpc",
+        "_dispatch_authenticated_rpc",
+        "healthz",
+        "create_app",
+        "_mount_async_rpc_route",
+        "_mount_internal_routes",
+        "web_ui_dist",
+        "_mount_web_ui",
+        "_cancel_async_operation",
+        "_stage_file",
+        "_resolve_bus_for_request",
+        "_resolve_bus",
+        "_bind_operation_task_canceller",
+        "_workspace_path",
+        "_workspace_path_for_request",
+        "_authenticate_rpc",
+        "_hosted_credential_rpc_block",
+        "_hosted_credential_rpc_block_request",
+        "_auth_denied"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/adapters/models/claude_code.py": {
+      "baseline_lines": 777,
+      "top_level_symbols": [
+        "ClaudeCodeUnavailable",
+        "ClaudeProcess",
+        "claude_profile_dir",
+        "_child_environment",
+        "_native_target_of_shim",
+        "_find_on_path",
+        "thoth_claude_code_executable",
+        "_fallback_locations",
+        "resolve_claude_executable",
+        "_status_run",
+        "_version",
+        "_detect_auth_mode",
+        "claude_code_status",
+        "ClaudeCodeStatusCache",
+        "cached_claude_code_status",
+        "invalidate_claude_code_status",
+        "claude_code_login_guidance",
+        "run_claude_code_login",
+        "ClaudeCodeCatalog",
+        "_finish_shielded",
+        "spawn_claude_process",
+        "_stop_process_tree",
+        "claude_print_argv",
+        "_token_count",
+        "_reported_usage",
+        "ClaudeCodeModel",
+        "_login_required",
+        "claude_code_model_factory"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/adapters/models/claude_oauth.py": {
+      "baseline_lines": 672,
+      "top_level_symbols": [
+        "ClaudeOAuthHold",
+        "ClaudeSession",
+        "_Attempt",
+        "ClaudeOAuthBroker",
+        "broker_for_workspace",
+        "close_workspace_broker",
+        "retain_workspace_broker",
+        "release_workspace_broker"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/adapters/models/codex_broker.py": {
+      "baseline_lines": 831,
+      "top_level_symbols": [
+        "AppServerPort",
+        "CodexBrokerState",
+        "CodexAuthBroker",
+        "broker_for_workspace",
+        "close_workspace_broker",
+        "retain_workspace_broker",
+        "release_workspace_broker",
+        "close_all_brokers"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/adapters/models/local_credentials.py": {
+      "baseline_lines": 638,
+      "top_level_symbols": [
+        "LocalCredentialHold",
+        "registry_dir",
+        "_read_json",
+        "_write_json",
+        "list_credentials",
+        "register_api_key",
+        "local_secret",
+        "available_credentials",
+        "ThothLocalCatalog",
+        "thoth_local_model",
+        "_account_auth_methods",
+        "account_connections",
+        "start_codex_login",
+        "start_console_login",
+        "register_thoth_local_providers",
+        "LocalModelCredentials"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/adapters/storage/artifacts.py": {
+      "baseline_lines": 604,
+      "top_level_symbols": [
+        "_json_dump",
+        "SqliteArtifactLedger"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
     "src/thoth/adapters/storage/schema.py": {
       "baseline_lines": 1182,
       "top_level_symbols": [],
       "policy": "schema registry only; new table families prefer owned schema modules"
     },
     "src/thoth/application/commands/actions_full.py": {
-      "baseline_lines": 987,
+      "baseline_lines": 978,
       "top_level_symbols": [
         "ProjectInput",
         "ActionListInput",
@@ -24,7 +152,6 @@
         "ImpactReadInput",
         "AuthorizationReadInput",
         "AuditReadInput",
-        "CreateInput",
         "ActionRevisionBound",
         "ReviseInput",
         "PortfolioComposeInput",
@@ -46,6 +173,30 @@
         "ActionHandlers"
       ],
       "policy": "existing Action RPC surface only; new responsibility goes to a new command/service module"
+    },
+    "src/thoth/application/commands/executions_full.py": {
+      "baseline_lines": 617,
+      "top_level_symbols": [
+        "ProjectInput",
+        "ExecutionListInput",
+        "ExecutionReadInput",
+        "StepInput",
+        "AttemptListInput",
+        "AttemptReadInput",
+        "ReconciliationReadInput",
+        "StartInput",
+        "RevisionBoundInput",
+        "PauseInput",
+        "ResumeInput",
+        "CancelInput",
+        "RetryInput",
+        "ReconcileInput",
+        "ObservationLinkInput",
+        "CompensationInput",
+        "InvalidateInput",
+        "ExecutionHandlers"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     },
     "src/thoth/application/commands/hypotheses_full.py": {
       "baseline_lines": 981,
@@ -80,6 +231,112 @@
       ],
       "policy": "existing Hypothesis RPC surface only; new responsibility goes to a new command/service module"
     },
+    "src/thoth/application/commands/improvement_full.py": {
+      "baseline_lines": 827,
+      "top_level_symbols": [
+        "ProjectInput",
+        "ListInput",
+        "ImprovementReadInput",
+        "RecordReadInput",
+        "ProposeInput",
+        "ReviseInput",
+        "EvaluationPlanInput",
+        "EvaluationAssessInput",
+        "ExposurePrepareInput",
+        "PromotionPrepareInput",
+        "PromotionDecideInput",
+        "RollbackPrepareInput",
+        "RetireInput",
+        "ImprovementHandlers"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/commands/memory_full.py": {
+      "baseline_lines": 840,
+      "top_level_symbols": [
+        "ProjectInput",
+        "MemoryListInput",
+        "MemoryReadInput",
+        "CandidateListInput",
+        "CandidateReadInput",
+        "ContextReadInput",
+        "PolicyListInput",
+        "PolicyReadInput",
+        "GateReadInput",
+        "ConflictListInput",
+        "RecallAuditInput",
+        "CandidateCreateInput",
+        "CandidateClassifyInput",
+        "ValidateInput",
+        "ChangeSetProposeInput",
+        "RevalidateInput",
+        "RetireProposeInput",
+        "ContextBuildInput",
+        "ProjectionRebuildInput",
+        "RetentionEvaluateInput",
+        "MemoryFullHandlers"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/commands/objects_full.py": {
+      "baseline_lines": 809,
+      "top_level_symbols": [
+        "ProjectInput",
+        "ObjectListInput",
+        "ObjectReadInput",
+        "CandidateListInput",
+        "CandidateReadInput",
+        "ProfileListInput",
+        "ProfileReadInput",
+        "RelationListInput",
+        "AttentionListInput",
+        "AuditReadInput",
+        "MaterializeInput",
+        "RevisionBoundInput",
+        "FrameReviseInput",
+        "ProfileApplyInput",
+        "FacetUpdateInput",
+        "RelationAddInput",
+        "RelationRemoveInput",
+        "RevalidateInput",
+        "WorkReplanInput",
+        "SplitProposeInput",
+        "MergeProposeInput",
+        "AttentionAcknowledgeInput",
+        "FollowupCreateInput",
+        "DecisionObjectHandlers"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/commands/projects.py": {
+      "baseline_lines": 603,
+      "top_level_symbols": [
+        "ProjectCreateInput",
+        "ProjectReadInput",
+        "ProjectListInput",
+        "ProjectExpectedRevisionInput",
+        "ProjectMetadataUpdateInput",
+        "ProjectOverlayUpdateInput",
+        "ProjectPolicyUpdateInput",
+        "ProjectRoleAssignInput",
+        "ProjectRoleRevokeInput",
+        "ProjectReferenceImportInput",
+        "ProjectCutoffImpactInput",
+        "ProjectCutoffUpdateInput",
+        "ProjectCommandHandlers",
+        "_merge_policy_payload",
+        "_public_web_execution",
+        "_string_tuple"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/commands/research_threads.py": {
+      "baseline_lines": 856,
+      "top_level_symbols": [
+        "ResearchThreadHandlers"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
     "src/thoth/application/commands/revisions_full.py": {
       "baseline_lines": 1323,
       "top_level_symbols": [
@@ -112,13 +369,48 @@
       ],
       "policy": "existing Revision RPC surface only; new responsibility goes to a new command/service module"
     },
+    "src/thoth/application/commands/thread_analysis.py": {
+      "baseline_lines": 709,
+      "top_level_symbols": [
+        "ThreadInputRequest",
+        "_CycleExecution",
+        "ThreadAnalysisCommandHandlers",
+        "_default_action_policy"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
     "src/thoth/application/services/action_service.py": {
-      "baseline_lines": 973,
+      "baseline_lines": 957,
       "top_level_symbols": [
         "classify_effect_vector",
         "ActionService"
       ],
       "policy": "Action domain orchestration only; extract new policy/evaluator/compiler responsibility"
+    },
+    "src/thoth/application/services/connector_service.py": {
+      "baseline_lines": 668,
+      "top_level_symbols": [
+        "public_web_search_attempts",
+        "ConnectorAcquisition",
+        "ConnectorService",
+        "_catalog_selectors"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/critical_counter_search_coordinator.py": {
+      "baseline_lines": 868,
+      "top_level_symbols": [
+        "CriticalCounterSearchExecution",
+        "CriticalCounterSearchCoordinator"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/decision_object_service.py": {
+      "baseline_lines": 650,
+      "top_level_symbols": [
+        "DecisionObjectService"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     },
     "src/thoth/application/services/execution_service.py": {
       "baseline_lines": 828,
@@ -127,18 +419,242 @@
       ],
       "policy": "Execution state orchestration only; extract new adapter/recovery responsibility"
     },
+    "src/thoth/application/services/full_project_memory.py": {
+      "baseline_lines": 846,
+      "top_level_symbols": [
+        "_hold_for_missing_evidence",
+        "FullProjectMemoryService"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/hypothesis_service.py": {
+      "baseline_lines": 853,
+      "top_level_symbols": [
+        "HypothesisService"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/improvement_exposure_service.py": {
+      "baseline_lines": 781,
+      "top_level_symbols": [
+        "ImprovementExposureService"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/outcome_service.py": {
+      "baseline_lines": 683,
+      "top_level_symbols": [
+        "OutcomeService"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/r2_closed_loop.py": {
+      "baseline_lines": 881,
+      "top_level_symbols": [
+        "R2ClosedLoopExecution",
+        "R2ClosedLoopCoordinator"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/recursive_improvement.py": {
+      "baseline_lines": 827,
+      "top_level_symbols": [
+        "PreparedImprovement",
+        "PreparedPair",
+        "RecursiveImprovementCoordinator"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/reference_service.py": {
+      "baseline_lines": 628,
+      "top_level_symbols": [
+        "ReferenceTransition",
+        "ReferenceService"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/research_analysis.py": {
+      "baseline_lines": 831,
+      "top_level_symbols": [
+        "ResearchAnalysis"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/research_followup_projection.py": {
+      "baseline_lines": 757,
+      "top_level_symbols": [
+        "project_thread_followup",
+        "decision_delta",
+        "CriterionViewReader",
+        "ProjectReviewReader",
+        "_related_records",
+        "_coverage_matrix",
+        "_matrix_row",
+        "_semantic_reviews",
+        "_matrix_summary",
+        "_next_action",
+        "_progress_state",
+        "_progress_items",
+        "_recorded_checks",
+        "_remaining_gaps",
+        "_unknowns",
+        "_delta_payload",
+        "_delta_groups",
+        "_change_kind",
+        "_reason_codes",
+        "_reason_refs",
+        "_basis_currentness",
+        "_object_tuple",
+        "_decode_cursor",
+        "_read_head",
+        "_operation_state"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/research_identity_service.py": {
+      "baseline_lines": 766,
+      "top_level_symbols": [
+        "ResearchContext",
+        "HypothesisOwnershipBatch",
+        "ActionOwnershipBatch",
+        "ResearchOwnershipBatch",
+        "ResearchIdentityService"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/resource_scope_service.py": {
+      "baseline_lines": 873,
+      "top_level_symbols": [
+        "ResourceScopeService"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/user_activity_projection.py": {
+      "baseline_lines": 674,
+      "top_level_symbols": [
+        "source_activity_contexts",
+        "_record",
+        "_items",
+        "_alias",
+        "_safe_code",
+        "_redaction_classes",
+        "_redaction",
+        "_public_origin",
+        "_safe_section",
+        "_source_target",
+        "_relation",
+        "_append_stage_events",
+        "_append_source_events",
+        "_append_judgement_events",
+        "_append_model_events",
+        "_append_terminal_event",
+        "project_user_activity_events"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/services/verification_trace.py": {
+      "baseline_lines": 815,
+      "top_level_symbols": [
+        "TraceError",
+        "TraceConflict",
+        "_Context",
+        "_ids_of",
+        "_children",
+        "_requirements_of",
+        "_show",
+        "_digest",
+        "_select",
+        "_value_to_compare",
+        "_meets",
+        "_judge",
+        "_chain",
+        "_criterion_revision",
+        "_requirement_state",
+        "_requirement_revision",
+        "compute_verdicts",
+        "_rule_summary",
+        "_result_summary",
+        "_field_changes",
+        "dependency_changes",
+        "mark_stale",
+        "_replaced",
+        "HistoryPage",
+        "VerificationTraceService"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/workflows/thread_cycle.py": {
+      "baseline_lines": 889,
+      "top_level_symbols": [
+        "ThreadCycleCommand",
+        "ThreadCycleResult",
+        "ThreadCycleBranchResult",
+        "ThreadCycleService"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
     "src/thoth/apps/runtime.py": {
       "baseline_lines": 746,
       "top_level_symbols": [
         "create_runtime"
       ],
       "policy": "composition only; new feature composition belongs in an owned module factory"
+    },
+    "src/thoth/cli.py": {
+      "baseline_lines": 827,
+      "top_level_symbols": [
+        "ModelProbeOutput",
+        "workspace_session_id",
+        "main",
+        "_interactive_shell",
+        "announce_workspace",
+        "_interactive_session",
+        "_module_available",
+        "_sandbox_adapter",
+        "version",
+        "workspace_info",
+        "claude_code_login",
+        "doctor",
+        "connector_sandbox_doctor",
+        "profile_check",
+        "auth_status",
+        "auth_connect",
+        "model_probe",
+        "source_stage",
+        "git_snapshot",
+        "run_request",
+        "rpc_stdio",
+        "events",
+        "run_pack",
+        "serve",
+        "hosted_review_serve",
+        "desktop_window_command",
+        "desktop"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/protocol/bus.py": {
+      "baseline_lines": 741,
+      "top_level_symbols": [
+        "DispatchTicket",
+        "PreClaimAuthorization",
+        "CommandBus"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/protocol/notifications.py": {
+      "baseline_lines": 717,
+      "top_level_symbols": [
+        "notifications_for",
+        "notifications_for_internal_event"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     }
   },
   "watched_long_functions": {
     "src/thoth/application/services/acquisition_coordinator.py::execute_if_required": 209,
     "src/thoth/application/services/critical_counter_search_coordinator.py::_execute_multi_wave": 380,
-    "src/thoth/application/workflows/thread_cycle.py::execute": 208,
+    "src/thoth/application/workflows/thread_cycle.py::execute": 207,
     "src/thoth/apps/runtime.py::create_runtime": 627,
     "src/thoth/protocol/notifications.py::notifications_for": 255
   }

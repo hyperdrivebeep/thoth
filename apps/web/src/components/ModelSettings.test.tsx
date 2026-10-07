@@ -279,8 +279,8 @@ it("a late admission cannot replace a different selected thread",async()=>{
 
 it("ordinary navigation only automatically calls the actual nonmutating query surface",async()=>{
   await mount();
-  // A8: opening a project also reads its latest work (read-only thread queries).
-  expect(fixture.calls.filter(call=>!["project/list","thread/list","project/source/list","evidence/list","model/settings/read","workspace/ready","thread/read","thread/activity/list"].includes(call.method)).map(call=>call.method)).toEqual([]);
+  // A8: opening a project also reads its latest work (read-only thread queries), and which hypotheses came from a trace row (a read-only query).
+  expect(fixture.calls.filter(call=>!["project/list","thread/list","project/source/list","evidence/list","model/settings/read","workspace/ready","thread/read","thread/activity/list","hypothesis/link/list"].includes(call.method)).map(call=>call.method)).toEqual([]);
   await act(async()=>{container.querySelector<HTMLElement>('[role="tab"][data-tab-id="records"]')?.click();});
   expect(fixture.calls.some(call=>call.method==="receipt/verify")).toBe(false);
 });

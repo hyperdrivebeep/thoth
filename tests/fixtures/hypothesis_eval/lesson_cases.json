@@ -1,0 +1,732 @@
+{
+  "schema_version": "hypothesis-lesson-cases/1",
+  "notice": "SYNTHETIC CASES - NO MODEL IS CALLED - THE EXPECTED STATE IS WHAT THE RULE GIVES",
+  "cases": [
+    {
+      "id": "lesson-same-condition",
+      "about": "A recorded result in the same criterion, unit, condition and rule revision is recalled.",
+      "current": {
+        "subject_kind": "CRITERION",
+        "subject_id": "SYN-C-DET-RAIN",
+        "unit": "ratio",
+        "condition": "weather=rain",
+        "rule_id": "R-RAIN",
+        "rule_revision": 1
+      },
+      "refs": [
+        {
+          "lesson_id": "a",
+          "kind": "TEST_RESULT",
+          "outcome": "ALTERNATIVE",
+          "hypothesis_id": "h1",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-a"
+        }
+      ],
+      "fingerprints": {
+        "a": "f-a"
+      },
+      "expected": {
+        "states": {
+          "a": "SAME_CONDITION"
+        },
+        "absent": []
+      }
+    },
+    {
+      "id": "lesson-other-condition",
+      "about": "A lesson that differs in the criterion, the unit, the condition or the rule revision is not recalled at all.",
+      "current": {
+        "subject_kind": "CRITERION",
+        "subject_id": "SYN-C-DET-RAIN",
+        "unit": "ratio",
+        "condition": "weather=rain",
+        "rule_id": "R-RAIN",
+        "rule_revision": 1
+      },
+      "refs": [
+        {
+          "lesson_id": "other-criterion",
+          "kind": "TEST_RESULT",
+          "outcome": "ALTERNATIVE",
+          "hypothesis_id": "h1",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-FOG",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-other-criterion"
+        },
+        {
+          "lesson_id": "other-unit",
+          "kind": "TEST_RESULT",
+          "outcome": "ALTERNATIVE",
+          "hypothesis_id": "h1",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "percent",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-other-unit"
+        },
+        {
+          "lesson_id": "other-condition",
+          "kind": "TEST_RESULT",
+          "outcome": "ALTERNATIVE",
+          "hypothesis_id": "h1",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=fog",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-other-condition"
+        },
+        {
+          "lesson_id": "other-rule",
+          "kind": "TEST_RESULT",
+          "outcome": "ALTERNATIVE",
+          "hypothesis_id": "h1",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 2
+          },
+          "fingerprint": "f-other-rule"
+        },
+        {
+          "lesson_id": "same",
+          "kind": "TEST_RESULT",
+          "outcome": "THIS_HYPOTHESIS",
+          "hypothesis_id": "h1",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-same"
+        }
+      ],
+      "fingerprints": {
+        "other-criterion": "f-other-criterion",
+        "other-unit": "f-other-unit",
+        "other-condition": "f-other-condition",
+        "other-rule": "f-other-rule",
+        "same": "f-same"
+      },
+      "expected": {
+        "states": {
+          "same": "SAME_CONDITION"
+        },
+        "absent": [
+          "other-criterion",
+          "other-unit",
+          "other-condition",
+          "other-rule"
+        ]
+      }
+    },
+    {
+      "id": "lesson-stale-fingerprint",
+      "about": "When the record the lesson points at has changed or is gone, the lesson is stale and left out of the recall (the record stays).",
+      "current": {
+        "subject_kind": "CRITERION",
+        "subject_id": "SYN-C-DET-RAIN",
+        "unit": "ratio",
+        "condition": "weather=rain",
+        "rule_id": "R-RAIN",
+        "rule_revision": 1
+      },
+      "refs": [
+        {
+          "lesson_id": "changed",
+          "kind": "TEST_RESULT",
+          "outcome": "ALTERNATIVE",
+          "hypothesis_id": "h1",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-changed"
+        },
+        {
+          "lesson_id": "gone",
+          "kind": "EFFECT_CONFIRMED",
+          "outcome": "CONFIRMED",
+          "hypothesis_id": null,
+          "test_id": null,
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-gone"
+        },
+        {
+          "lesson_id": "fine",
+          "kind": "HUMAN_CLOSURE",
+          "outcome": "WAIVER_RECORDED",
+          "hypothesis_id": null,
+          "test_id": null,
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-fine"
+        }
+      ],
+      "fingerprints": {
+        "changed": "f-something-else",
+        "gone": null,
+        "fine": "f-fine"
+      },
+      "expected": {
+        "states": {
+          "changed": "STALE",
+          "gone": "STALE",
+          "fine": "SAME_CONDITION"
+        },
+        "absent": []
+      }
+    },
+    {
+      "id": "lesson-refuted",
+      "about": "A later result in the same condition that says the opposite about the same hypothesis refutes the earlier lesson.",
+      "current": {
+        "subject_kind": "CRITERION",
+        "subject_id": "SYN-C-DET-RAIN",
+        "unit": "ratio",
+        "condition": "weather=rain",
+        "rule_id": "R-RAIN",
+        "rule_revision": 1
+      },
+      "refs": [
+        {
+          "lesson_id": "early",
+          "kind": "TEST_RESULT",
+          "outcome": "ALTERNATIVE",
+          "hypothesis_id": "h1",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-early"
+        },
+        {
+          "lesson_id": "late",
+          "kind": "TEST_RESULT",
+          "outcome": "THIS_HYPOTHESIS",
+          "hypothesis_id": "h1",
+          "test_id": "t2",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-late"
+        }
+      ],
+      "fingerprints": {
+        "early": "f-early",
+        "late": "f-late"
+      },
+      "expected": {
+        "states": {
+          "early": "REFUTED",
+          "late": "SAME_CONDITION"
+        },
+        "absent": []
+      }
+    },
+    {
+      "id": "lesson-refuted-both-ways",
+      "about": "The opposite also holds: a later result that eliminates refutes an earlier one that supported.",
+      "current": {
+        "subject_kind": "CRITERION",
+        "subject_id": "SYN-C-DET-RAIN",
+        "unit": "ratio",
+        "condition": "weather=rain",
+        "rule_id": "R-RAIN",
+        "rule_revision": 1
+      },
+      "refs": [
+        {
+          "lesson_id": "early",
+          "kind": "TEST_RESULT",
+          "outcome": "THIS_HYPOTHESIS",
+          "hypothesis_id": "h1",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-early"
+        },
+        {
+          "lesson_id": "late",
+          "kind": "TEST_RESULT",
+          "outcome": "ALTERNATIVE",
+          "hypothesis_id": "h1",
+          "test_id": "t2",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-late"
+        }
+      ],
+      "fingerprints": {
+        "early": "f-early",
+        "late": "f-late"
+      },
+      "expected": {
+        "states": {
+          "early": "REFUTED",
+          "late": "SAME_CONDITION"
+        },
+        "absent": []
+      }
+    },
+    {
+      "id": "lesson-elimination-refuted",
+      "about": "An elimination is refuted by a later result in the same condition that fits the hypothesis.",
+      "current": {
+        "subject_kind": "CRITERION",
+        "subject_id": "SYN-C-DET-RAIN",
+        "unit": "ratio",
+        "condition": "weather=rain",
+        "rule_id": "R-RAIN",
+        "rule_revision": 1
+      },
+      "refs": [
+        {
+          "lesson_id": "elim",
+          "kind": "ELIMINATION",
+          "outcome": "REPEATED",
+          "hypothesis_id": "h1",
+          "test_id": null,
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-elim"
+        },
+        {
+          "lesson_id": "support",
+          "kind": "TEST_RESULT",
+          "outcome": "THIS_HYPOTHESIS",
+          "hypothesis_id": "h1",
+          "test_id": "t3",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-support"
+        }
+      ],
+      "fingerprints": {
+        "elim": "f-elim",
+        "support": "f-support"
+      },
+      "expected": {
+        "states": {
+          "elim": "REFUTED",
+          "support": "SAME_CONDITION"
+        },
+        "absent": []
+      }
+    },
+    {
+      "id": "lesson-not-refuted-by-a-stale-or-other",
+      "about": "A later opposite result that is itself stale, or about another hypothesis, or in another condition, does not refute.",
+      "current": {
+        "subject_kind": "CRITERION",
+        "subject_id": "SYN-C-DET-RAIN",
+        "unit": "ratio",
+        "condition": "weather=rain",
+        "rule_id": "R-RAIN",
+        "rule_revision": 1
+      },
+      "refs": [
+        {
+          "lesson_id": "early",
+          "kind": "TEST_RESULT",
+          "outcome": "ALTERNATIVE",
+          "hypothesis_id": "h1",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-early"
+        },
+        {
+          "lesson_id": "stale-later",
+          "kind": "TEST_RESULT",
+          "outcome": "THIS_HYPOTHESIS",
+          "hypothesis_id": "h1",
+          "test_id": "t2",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-stale-later"
+        },
+        {
+          "lesson_id": "other-hypothesis",
+          "kind": "TEST_RESULT",
+          "outcome": "THIS_HYPOTHESIS",
+          "hypothesis_id": "h2",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-other-hypothesis"
+        },
+        {
+          "lesson_id": "other-condition",
+          "kind": "TEST_RESULT",
+          "outcome": "THIS_HYPOTHESIS",
+          "hypothesis_id": "h1",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=fog",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-other-condition"
+        }
+      ],
+      "fingerprints": {
+        "early": "f-early",
+        "stale-later": "f-changed",
+        "other-hypothesis": "f-other-hypothesis",
+        "other-condition": "f-other-condition"
+      },
+      "expected": {
+        "states": {
+          "early": "SAME_CONDITION",
+          "stale-later": "STALE",
+          "other-hypothesis": "SAME_CONDITION"
+        },
+        "absent": [
+          "other-condition"
+        ]
+      }
+    },
+    {
+      "id": "lesson-closure-and-effect-are-only-ever-stale",
+      "about": "A recorded closure and a confirmed effect are not refuted by test results; they only go stale.",
+      "current": {
+        "subject_kind": "CRITERION",
+        "subject_id": "SYN-C-DET-RAIN",
+        "unit": "ratio",
+        "condition": "weather=rain",
+        "rule_id": "R-RAIN",
+        "rule_revision": 1
+      },
+      "refs": [
+        {
+          "lesson_id": "closure",
+          "kind": "HUMAN_CLOSURE",
+          "outcome": "HUMAN_CLOSED",
+          "hypothesis_id": null,
+          "test_id": null,
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-closure"
+        },
+        {
+          "lesson_id": "effect",
+          "kind": "EFFECT_CONFIRMED",
+          "outcome": "CONFIRMED",
+          "hypothesis_id": null,
+          "test_id": null,
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-effect"
+        },
+        {
+          "lesson_id": "later",
+          "kind": "TEST_RESULT",
+          "outcome": "ALTERNATIVE",
+          "hypothesis_id": "h1",
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-later"
+        }
+      ],
+      "fingerprints": {
+        "closure": "f-closure",
+        "effect": "f-effect",
+        "later": "f-later"
+      },
+      "expected": {
+        "states": {
+          "closure": "SAME_CONDITION",
+          "effect": "SAME_CONDITION",
+          "later": "SAME_CONDITION"
+        },
+        "absent": []
+      }
+    },
+    {
+      "id": "lesson-without-a-hypothesis-is-never-refuted",
+      "about": "A test-result lesson that names no hypothesis cannot be matched with an opposite one.",
+      "current": {
+        "subject_kind": "CRITERION",
+        "subject_id": "SYN-C-DET-RAIN",
+        "unit": "ratio",
+        "condition": "weather=rain",
+        "rule_id": "R-RAIN",
+        "rule_revision": 1
+      },
+      "refs": [
+        {
+          "lesson_id": "a",
+          "kind": "TEST_RESULT",
+          "outcome": "ALTERNATIVE",
+          "hypothesis_id": null,
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-a"
+        },
+        {
+          "lesson_id": "b",
+          "kind": "TEST_RESULT",
+          "outcome": "THIS_HYPOTHESIS",
+          "hypothesis_id": null,
+          "test_id": "t1",
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-C-DET-RAIN",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-b"
+        }
+      ],
+      "fingerprints": {
+        "a": "f-a",
+        "b": "f-b"
+      },
+      "expected": {
+        "states": {
+          "a": "SAME_CONDITION",
+          "b": "SAME_CONDITION"
+        },
+        "absent": []
+      }
+    },
+    {
+      "id": "lesson-requirement-row",
+      "about": "A requirement row is recalled only for the same requirement.",
+      "current": {
+        "subject_kind": "REQUIREMENT",
+        "subject_id": "SYN-REQ-1",
+        "unit": null,
+        "condition": null,
+        "rule_id": null,
+        "rule_revision": null
+      },
+      "refs": [
+        {
+          "lesson_id": "same",
+          "kind": "HUMAN_CLOSURE",
+          "outcome": "CONDITION_CHANGED",
+          "hypothesis_id": null,
+          "test_id": null,
+          "context": {
+            "subject_kind": "REQUIREMENT",
+            "subject_id": "SYN-REQ-1",
+            "unit": null,
+            "condition": null,
+            "rule_id": null,
+            "rule_revision": null
+          },
+          "fingerprint": "f-same"
+        },
+        {
+          "lesson_id": "criterion-of-same-id",
+          "kind": "HUMAN_CLOSURE",
+          "outcome": "HUMAN_CLOSED",
+          "hypothesis_id": null,
+          "test_id": null,
+          "context": {
+            "subject_kind": "CRITERION",
+            "subject_id": "SYN-REQ-1",
+            "unit": "ratio",
+            "condition": "weather=rain",
+            "rule_id": "R-RAIN",
+            "rule_revision": 1
+          },
+          "fingerprint": "f-criterion-of-same-id"
+        }
+      ],
+      "fingerprints": {
+        "same": "f-same",
+        "criterion-of-same-id": "f-criterion-of-same-id"
+      },
+      "expected": {
+        "states": {
+          "same": "SAME_CONDITION"
+        },
+        "absent": [
+          "criterion-of-same-id"
+        ]
+      }
+    }
+  ],
+  "invalid_lessons": [
+    {
+      "about": "a kind the model could have written",
+      "patch": {
+        "kind": "MODEL_STATEMENT"
+      }
+    },
+    {
+      "about": "a free sentence as the outcome",
+      "patch": {
+        "outcome": "The antenna was probably misaligned"
+      }
+    },
+    {
+      "about": "an outcome that belongs to another kind",
+      "patch": {
+        "kind": "ELIMINATION",
+        "outcome": "ALTERNATIVE"
+      }
+    },
+    {
+      "about": "a fix with no confirmed effect as a closure lesson",
+      "patch": {
+        "kind": "HUMAN_CLOSURE",
+        "outcome": "FIX_APPLIED"
+      }
+    },
+    {
+      "about": "a source of the wrong kind",
+      "patch": {
+        "sources": [
+          {
+            "record_kind": "TRACE_CLOSURE",
+            "record_id": "c1"
+          }
+        ]
+      }
+    },
+    {
+      "about": "no source at all",
+      "patch": {
+        "sources": []
+      }
+    }
+  ]
+}

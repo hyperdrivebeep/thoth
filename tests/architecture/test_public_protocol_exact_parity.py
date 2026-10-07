@@ -17,11 +17,11 @@ def test_public_method_manifest_exactly_matches_runtime_and_notifications() -> N
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     methods = manifest["methods"]
     by_name = {item["name"]: item for item in methods}
-    assert len(methods) == len(by_name) == 351
+    assert len(methods) == len(by_name) == 368
     assert set(by_name) == set(PUBLIC_METHODS)
-    assert sum(item["canonical"] for item in methods) == 345
-    assert manifest["runtime_method_count"] == 351
-    assert manifest["canonical_method_count"] == 345
+    assert sum(item["canonical"] for item in methods) == 362
+    assert manifest["runtime_method_count"] == 368
+    assert manifest["canonical_method_count"] == 362
     assert manifest["compatibility_alias_count"] == 6
     assert {
         f"project/source/scope/{name}" for name in ("read", "grant", "revoke", "assign", "update")
@@ -83,6 +83,23 @@ def test_public_method_manifest_exactly_matches_runtime_and_notifications() -> N
             assert item["policy"] == "research-model-settings:versioned"
             assert item["behavioral_evidence"] == ["U08", "U07"]
     workspace = [item for item in methods if item["namespace"] == "workspace"]
+    trace = {name: item for name, item in by_name.items() if item["namespace"] == "trace"}
+    assert {name: trace[name]["surface"] for name in trace} == {
+        "trace/read": "QUERY",
+        "trace/export": "QUERY",
+        "trace/history": "QUERY",
+        "trace/importPreview": "QUERY",
+        "trace/importApply": "COMMAND",
+        "trace/confirm": "COMMAND",
+        "trace/closure/list": "QUERY",
+        "trace/closure/record": "COMMAND",
+        "trace/lesson/list": "QUERY",
+    }
+    for name, item in trace.items():
+        assert item["canonical_owner"] == "VERIFICATION_TRACE"
+        assert item["policy"] == "trace:versioned-policy"
+        assert item["behavioral_evidence"] == ["B3"]
+        assert (name in READ_QUERY_METHODS) == (item["surface"] == "QUERY")
     assert len(workspace) == 3
     for item in workspace:
         assert item["canonical_owner"] == "THREAD_REQUEST_SETTINGS"

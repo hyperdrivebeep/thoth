@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "purpose": "DEVELOPMENT_VERIFICATION_LEDGER_NOT_RUNTIME_POLICY",
   "baseline_head": "f0262732a0e79235f3839c3393f459b90bd53783",
-  "catalog_sha256": "e9c33b11d61e95b8946953dbc1fc7e792e4df4e6e99645971a9124b50222a7c5",
+  "catalog_sha256": "9c8e14688ccd2bc92bc2487213c7dd4fbe2cd625572a0673f1f2282a7b29e95a",
   "public_entries": [
     {
       "name": "action/audit/read",
@@ -163,6 +163,33 @@
       "owner_scope": "ACTION_PLAN_AUTHORIZATION",
       "phase_ids": [
         "rpc:action/create"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "action/draft/fromTest",
+      "namespace": "action",
+      "surface": "COMMAND",
+      "canonical_owner": "ACTION_PLAN_AUTHORIZATION",
+      "policy": "action:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A04",
+        "A05"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "action/draft/fromTest",
+      "actual_callable": "thoth.application.commands.action_from_test.ActionFromTestHandlers.draft",
+      "source": "src/thoth/application/commands/action_from_test.py",
+      "line": 38,
+      "callable_sha256": "6a4834d2b555c8f5d64715f34ee68ce0686519b3d94fe9a924e087a67e6639ef",
+      "entry_kind": "public",
+      "path_id": "rpc:action/draft/fromTest",
+      "owner_scope": "ACTION_PLAN_AUTHORIZATION",
+      "phase_ids": [
+        "rpc:action/draft/fromTest"
       ],
       "mutation_observed_in_code": true
     },
@@ -3420,6 +3447,141 @@
       "mutation_observed_in_code": true
     },
     {
+      "name": "hypothesis/link/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "hypothesis/link/list",
+      "actual_callable": "thoth.application.commands.hypothesis_link.HypothesisLinkHandlers.list",
+      "source": "src/thoth/application/commands/hypothesis_link.py",
+      "line": 87,
+      "callable_sha256": "8ff5bfa13aa41db1de62a7c69f40e2e7c97b47b441c7f701296fe9d47758a8dd",
+      "entry_kind": "public",
+      "path_id": "rpc:hypothesis/link/list",
+      "owner_scope": "HYPOTHESIS",
+      "phase_ids": [
+        "rpc:hypothesis/link/list"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
+      "name": "hypothesis/test/result/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "hypothesis/test/result/list",
+      "actual_callable": "thoth.application.commands.discrimination.DiscriminationHandlers.list",
+      "source": "src/thoth/application/commands/discrimination.py",
+      "line": 68,
+      "callable_sha256": "efddb148aa648ed435c004848421038b3710fcc5ea7d3b468633875d97e93966",
+      "entry_kind": "public",
+      "path_id": "rpc:hypothesis/test/result/list",
+      "owner_scope": "HYPOTHESIS",
+      "phase_ids": [
+        "rpc:hypothesis/test/result/list"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
+      "name": "hypothesis/link/recheck",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "hypothesis/link/recheck",
+      "actual_callable": "thoth.application.commands.hypothesis_link.HypothesisLinkHandlers.recheck",
+      "source": "src/thoth/application/commands/hypothesis_link.py",
+      "line": 97,
+      "callable_sha256": "f7bebb16c954a88318ab95570d1ea8f12f885d21fcd2ffec616ed2c6d7b77d62",
+      "entry_kind": "public",
+      "path_id": "rpc:hypothesis/link/recheck",
+      "owner_scope": "HYPOTHESIS",
+      "phase_ids": [
+        "rpc:hypothesis/link/recheck"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "hypothesis/refutation/record",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "hypothesis/refutation/record",
+      "actual_callable": "thoth.application.commands.discrimination.DiscriminationHandlers.record_conditions",
+      "source": "src/thoth/application/commands/discrimination.py",
+      "line": 93,
+      "callable_sha256": "745640d42e12d7a117237633ccd7b69c5572fbdb909777fc9d2de39406407fa3",
+      "entry_kind": "public",
+      "path_id": "rpc:hypothesis/refutation/record",
+      "owner_scope": "HYPOTHESIS",
+      "phase_ids": [
+        "rpc:hypothesis/refutation/record"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "hypothesis/test/result/record",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "hypothesis/test/result/record",
+      "actual_callable": "thoth.application.commands.discrimination.DiscriminationHandlers.record_result",
+      "source": "src/thoth/application/commands/discrimination.py",
+      "line": 73,
+      "callable_sha256": "b03a13d3ed0feb95c5730fd1860c6f92a9f8316ceb1f7298e9a1145a1241a57a",
+      "entry_kind": "public",
+      "path_id": "rpc:hypothesis/test/result/record",
+      "owner_scope": "HYPOTHESIS",
+      "phase_ids": [
+        "rpc:hypothesis/test/result/record"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
       "name": "hypothesis/list",
       "namespace": "hypothesis",
       "surface": "QUERY",
@@ -3825,6 +3987,33 @@
       "mutation_observed_in_code": false
     },
     {
+      "name": "hypothesis/same/list",
+      "namespace": "hypothesis",
+      "surface": "QUERY",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "hypothesis/same/list",
+      "actual_callable": "thoth.application.commands.hypothesis_same.SameHandlers.list",
+      "source": "src/thoth/application/commands/hypothesis_same.py",
+      "line": 45,
+      "callable_sha256": "8625ce7443ef24f1e649c50f8db067751de41f7534d6edbeed31f0679b0ca53a",
+      "entry_kind": "public",
+      "path_id": "rpc:hypothesis/same/list",
+      "owner_scope": "HYPOTHESIS",
+      "phase_ids": [
+        "rpc:hypothesis/same/list"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
       "name": "hypothesis/review/request",
       "namespace": "hypothesis",
       "surface": "COMMAND",
@@ -3875,6 +4064,33 @@
       "owner_scope": "HYPOTHESIS",
       "phase_ids": [
         "rpc:hypothesis/revise"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "hypothesis/same/record",
+      "namespace": "hypothesis",
+      "surface": "COMMAND",
+      "canonical_owner": "HYPOTHESIS",
+      "policy": "hypothesis:versioned-policy",
+      "normal_entrypoint": "thread/input",
+      "behavioral_evidence": [
+        "A01",
+        "A03"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "hypothesis/same/record",
+      "actual_callable": "thoth.application.commands.hypothesis_same.SameHandlers.record",
+      "source": "src/thoth/application/commands/hypothesis_same.py",
+      "line": 50,
+      "callable_sha256": "8e563f96a18bd74e0948896f61e71dc56c92c733a2b0462ce92086a319a6699f",
+      "entry_kind": "public",
+      "path_id": "rpc:hypothesis/same/record",
+      "owner_scope": "HYPOTHESIS",
+      "phase_ids": [
+        "rpc:hypothesis/same/record"
       ],
       "mutation_observed_in_code": true
     },
@@ -9195,6 +9411,240 @@
       "mutation_observed_in_code": true
     },
     {
+      "name": "trace/confirm",
+      "namespace": "trace",
+      "surface": "COMMAND",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "trace/confirm",
+      "actual_callable": "thoth.application.commands.verification_trace.TraceHandlers.confirm",
+      "source": "src/thoth/application/commands/verification_trace.py",
+      "line": 172,
+      "callable_sha256": "7f9c1c45756db4e4ec3ac97e60ff5ff0500fba5cd0a8c543160e4d9bccc31287",
+      "entry_kind": "public",
+      "path_id": "rpc:trace/confirm",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:trace/confirm"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "trace/closure/record",
+      "namespace": "trace",
+      "surface": "COMMAND",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "trace/closure/record",
+      "actual_callable": "thoth.application.commands.trace_closure.ClosureHandlers.record",
+      "source": "src/thoth/application/commands/trace_closure.py",
+      "line": 58,
+      "callable_sha256": "163c951da492107a86e51b02abde70c120f1add2af00b194c6bca58e233e1007",
+      "entry_kind": "public",
+      "path_id": "rpc:trace/closure/record",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:trace/closure/record"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "trace/export",
+      "namespace": "trace",
+      "surface": "QUERY",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "trace/export",
+      "actual_callable": "thoth.application.commands.verification_trace.TraceHandlers.export",
+      "source": "src/thoth/application/commands/verification_trace.py",
+      "line": 135,
+      "callable_sha256": "550494de063eaf5a0808eca4331cac1f11c3e67ac57e1fb38842b12952aa619a",
+      "entry_kind": "public",
+      "path_id": "rpc:trace/export",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:trace/export"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
+      "name": "trace/history",
+      "namespace": "trace",
+      "surface": "QUERY",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "trace/history",
+      "actual_callable": "thoth.application.commands.verification_trace.TraceHandlers.history",
+      "source": "src/thoth/application/commands/verification_trace.py",
+      "line": 109,
+      "callable_sha256": "fd843fb6d68eccc661c8af5a988672c84e320f04fd5420ebb760401b4123b823",
+      "entry_kind": "public",
+      "path_id": "rpc:trace/history",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:trace/history"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
+      "name": "trace/importApply",
+      "namespace": "trace",
+      "surface": "COMMAND",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "trace/importApply",
+      "actual_callable": "thoth.application.commands.verification_trace.TraceHandlers.import_apply",
+      "source": "src/thoth/application/commands/verification_trace.py",
+      "line": 156,
+      "callable_sha256": "0ff4ada9361e293d146f69eacd12d96a77dfba357eeca44f00f59671c03eb384",
+      "entry_kind": "public",
+      "path_id": "rpc:trace/importApply",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:trace/importApply"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "trace/importPreview",
+      "namespace": "trace",
+      "surface": "QUERY",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "trace/importPreview",
+      "actual_callable": "thoth.application.commands.verification_trace.TraceHandlers.import_preview",
+      "source": "src/thoth/application/commands/verification_trace.py",
+      "line": 150,
+      "callable_sha256": "d43512dc1699c40604c287764e974c519801e8930352ef0d1158ab64523e2dab",
+      "entry_kind": "public",
+      "path_id": "rpc:trace/importPreview",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:trace/importPreview"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
+      "name": "trace/read",
+      "namespace": "trace",
+      "surface": "QUERY",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "trace/read",
+      "actual_callable": "thoth.application.commands.verification_trace.TraceHandlers.read",
+      "source": "src/thoth/application/commands/verification_trace.py",
+      "line": 104,
+      "callable_sha256": "741009fdcf47c3a86e2184651159ddfa70d753ba822700d0531174d414ec2d1e",
+      "entry_kind": "public",
+      "path_id": "rpc:trace/read",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:trace/read"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
+      "name": "trace/closure/list",
+      "namespace": "trace",
+      "surface": "QUERY",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "trace/closure/list",
+      "actual_callable": "thoth.application.commands.trace_closure.ClosureHandlers.list",
+      "source": "src/thoth/application/commands/trace_closure.py",
+      "line": 53,
+      "callable_sha256": "5319e411d67ef2719042ace425cd9ba9156832e57be9f23d8234f8c5c51c7702",
+      "entry_kind": "public",
+      "path_id": "rpc:trace/closure/list",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:trace/closure/list"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
+      "name": "trace/lesson/list",
+      "namespace": "trace",
+      "surface": "QUERY",
+      "canonical_owner": "VERIFICATION_TRACE",
+      "policy": "trace:versioned-policy",
+      "normal_entrypoint": "trace/read|trace/importApply",
+      "behavioral_evidence": [
+        "B3"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "trace/lesson/list",
+      "actual_callable": "thoth.application.commands.lesson.LessonHandlers.list",
+      "source": "src/thoth/application/commands/lesson.py",
+      "line": 32,
+      "callable_sha256": "8c800d28257a1e4470d3a0e0a69fde36b99a59f8e909a09a3ec2842baa07ae76",
+      "entry_kind": "public",
+      "path_id": "rpc:trace/lesson/list",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:trace/lesson/list"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
       "name": "workspace/ready",
       "namespace": "workspace",
       "surface": "QUERY",
@@ -10213,6 +10663,159 @@
           }
         ]
       }
+    },
+    {
+      "path_id": "rpc:action/draft/fromTest",
+      "owner": "ACTION_PLAN_AUTHORIZATION",
+      "catalog_owner": "ACTION_PLAN_AUTHORIZATION",
+      "entry_kind": "public",
+      "method_or_trigger": "action/draft/fromTest",
+      "actual_callable": "thoth.application.commands.action_from_test.ActionFromTestHandlers.draft",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/action_draft_composition.py",
+          "line": 16,
+          "binding": "handlers.draft"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.storage.action.SqliteActionStore._add",
+        "thoth.adapters.storage.action.SqliteActionStore.append_audit",
+        "thoth.adapters.storage.sqlite.SqliteLedgerTransaction.apply_impact_plan",
+        "thoth.adapters.storage.sqlite.SqliteLedgerTransaction.insert_receipt",
+        "thoth.adapters.storage.sqlite.SqliteLedgerTransaction.insert_revision",
+        "thoth.adapters.storage.sqlite.SqliteLedgerTransaction.insert_snapshot",
+        "thoth.adapters.storage.sqlite.SqliteLedgerTransaction.set_head"
+      ],
+      "phase_id": [
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "action_audit",
+        "action_records",
+        "dependency_states",
+        "entity_snapshots",
+        "receipts",
+        "revision_parents",
+        "semantic_revisions",
+        "working_heads"
+      ],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [
+        "action_audit",
+        "receipts"
+      ],
+      "expected_basis": "A draft action request composed from one stored discriminating test is created by calling action/create, so the write is the same single ledger commit; the risk comes from the declared effects and the rules, no model is called, and a stale hypothesis is refused before anything is written.",
+      "uow_participants": [
+        "thoth.adapters.storage.action.SqliteActionStore._add",
+        "thoth.adapters.storage.action.SqliteActionStore.append_audit",
+        "thoth.adapters.storage.sqlite.SqliteLedgerTransaction.apply_impact_plan",
+        "thoth.adapters.storage.sqlite.SqliteLedgerTransaction.insert_receipt",
+        "thoth.adapters.storage.sqlite.SqliteLedgerTransaction.insert_revision",
+        "thoth.adapters.storage.sqlite.SqliteLedgerTransaction.insert_snapshot",
+        "thoth.adapters.storage.sqlite.SqliteLedgerTransaction.set_head"
+      ],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "action/audit/read",
+        "action/authorization/read",
+        "action/impact/read",
+        "action/list",
+        "action/plan/graph",
+        "action/plan/read",
+        "action/policy/read",
+        "action/portfolio/list",
+        "action/portfolio/read",
+        "action/read",
+        "action/step/read"
+      ],
+      "existing_tests": [
+        "tests/integration/test_hypothesis_action_guard.py"
+      ],
+      "fault_points": "The write is the one action/create commit; a failure writes nothing.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/storage/action.py",
+        "src/thoth/adapters/storage/artifacts.py",
+        "src/thoth/adapters/storage/auth.py",
+        "src/thoth/adapters/storage/control_record.py",
+        "src/thoth/adapters/storage/criterion_contract.py",
+        "src/thoth/adapters/storage/decision_object.py",
+        "src/thoth/adapters/storage/events.py",
+        "src/thoth/adapters/storage/evidence_graph.py",
+        "src/thoth/adapters/storage/execution.py",
+        "src/thoth/adapters/storage/governance.py",
+        "src/thoth/adapters/storage/governance_history.py",
+        "src/thoth/adapters/storage/hypothesis.py",
+        "src/thoth/adapters/storage/investigation.py",
+        "src/thoth/adapters/storage/operations.py",
+        "src/thoth/adapters/storage/outcome.py",
+        "src/thoth/adapters/storage/research_identity.py",
+        "src/thoth/adapters/storage/resource_scope.py",
+        "src/thoth/adapters/storage/sqlite.py",
+        "src/thoth/adapters/storage/thread_runtime.py",
+        "src/thoth/adapters/storage/transaction.py",
+        "src/thoth/application/commands/action_from_test.py",
+        "src/thoth/application/commands/actions_full.py",
+        "src/thoth/application/services/action_from_test.py",
+        "src/thoth/application/services/action_service.py",
+        "src/thoth/application/services/resource_scope_service.py",
+        "src/thoth/application/services/revision_service.py",
+        "src/thoth/application/services/scoped_artifacts.py",
+        "src/thoth/apps/projectpack_execution.py"
+      ],
+      "atomic_regions": [
+        {
+          "callable": "thoth.adapters.storage.sqlite.SqliteLedger.transaction",
+          "source": "src/thoth/adapters/storage/sqlite.py",
+          "line": 242,
+          "contexts": [
+            "SqliteAtomicUnitOfWork(self._engine, immediate=True).transaction()"
+          ]
+        },
+        {
+          "callable": "thoth.adapters.storage.transaction.SqliteAtomicUnitOfWork.transaction",
+          "source": "src/thoth/adapters/storage/transaction.py",
+          "line": 77,
+          "contexts": [
+            "resource_use_transaction()"
+          ]
+        },
+        {
+          "callable": "thoth.application.services.action_service.ActionService._persist_action",
+          "source": "src/thoth/application/services/action_service.py",
+          "line": 657,
+          "contexts": [
+            "self._semantic_uow.transaction()"
+          ]
+        },
+        {
+          "callable": "thoth.application.services.resource_scope_service.ResourceScopeService.require_reads",
+          "source": "src/thoth/application/services/resource_scope_service.py",
+          "line": 488,
+          "contexts": [
+            "self._ledger.transaction()"
+          ]
+        },
+        {
+          "callable": "thoth.application.services.revision_service.RevisionCommitService.commit",
+          "source": "src/thoth/application/services/revision_service.py",
+          "line": 53,
+          "contexts": [
+            "self._ledger.transaction()"
+          ]
+        }
+      ],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the test-to-action stage; no owner closure receipt."
+      ]
     },
     {
       "path_id": "rpc:action/generate",
@@ -28914,6 +29517,56 @@
       ]
     },
     {
+      "path_id": "rpc:hypothesis/same/list",
+      "owner": "HYPOTHESIS",
+      "catalog_owner": "HYPOTHESIS",
+      "entry_kind": "public",
+      "method_or_trigger": "hypothesis/same/list",
+      "actual_callable": "thoth.application.commands.hypothesis_same.SameHandlers.list",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/judgment_records_composition.py",
+          "line": 35,
+          "binding": "same.list"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "The current groups of hypotheses a person marked as the same, with what a screen shows about each member, read from committed records. A read never writes.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/SameHypothesis.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/domain/test_hypothesis_same_group.py",
+        "tests/integration/test_hypothesis_same.py"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/hypothesis_same.py",
+        "src/thoth/application/services/hypothesis_same.py",
+        "src/thoth/domain/hypothesis_same.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the follow-up stage; no owner closure receipt."
+      ]
+    },
+    {
       "path_id": "rpc:hypothesis/merge/propose",
       "owner": "HYPOTHESIS",
       "catalog_owner": "HYPOTHESIS",
@@ -31094,6 +31747,63 @@
           }
         ]
       }
+    },
+    {
+      "path_id": "rpc:hypothesis/same/record",
+      "owner": "HYPOTHESIS",
+      "catalog_owner": "HYPOTHESIS",
+      "entry_kind": "public",
+      "method_or_trigger": "hypothesis/same/record",
+      "actual_callable": "thoth.application.commands.hypothesis_same.SameHandlers.record",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/judgment_records_composition.py",
+          "line": 36,
+          "binding": "same.record"
+        }
+      ],
+      "producer_refs": [
+        "thoth.application.services.hypothesis_same.HypothesisSame.record"
+      ],
+      "phase_id": [
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "semantic_revisions (THREAD:hypothesis-discrimination)",
+        "entity_snapshots"
+      ],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "A person's mark that two hypotheses of different investigations are the same (or the taking back of it) is appended to the project's same-hypothesis record in one ledger commit; earlier marks are kept, neither hypothesis is changed and no model is called.",
+      "uow_participants": [
+        "thoth.application.services.request_records.RequestRecords.save"
+      ],
+      "irreversible_effect_boundary": "No external effect and no model call.",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/SameHypothesis.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/domain/test_hypothesis_same_group.py",
+        "tests/integration/test_hypothesis_same.py"
+      ],
+      "fault_points": "The write is one ledger transaction; a failure writes nothing.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/hypothesis_same.py",
+        "src/thoth/application/services/hypothesis_same.py",
+        "src/thoth/domain/hypothesis_same.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the follow-up stage; no owner closure receipt."
+      ]
     },
     {
       "path_id": "rpc:hypothesis/split/propose",
@@ -66110,6 +66820,478 @@
       }
     },
     {
+      "path_id": "rpc:trace/confirm",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "VERIFICATION_TRACE",
+      "entry_kind": "public",
+      "method_or_trigger": "trace/confirm",
+      "actual_callable": "thoth.application.commands.verification_trace.TraceHandlers.confirm",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/trace_composition.py",
+          "line": 25,
+          "binding": "handlers.confirm"
+        }
+      ],
+      "producer_refs": [
+        "thoth.application.services.verification_trace.VerificationTraceService.confirm"
+      ],
+      "phase_id": [
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "semantic_revisions (THREAD:verification-trace:project, THREAD:trace-verdict:<digest>)",
+        "entity_snapshots"
+      ],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "A confirmation is added to the stored trace record from the digest the caller read. It names one current verdict revision and changes no verdict; a revision that is no longer current is refused.",
+      "uow_participants": [
+        "thoth.application.services.request_records.RequestRecords.stage",
+        "thoth.application.services.request_records.RequestRecords.commit_staged"
+      ],
+      "irreversible_effect_boundary": "No external effect and no model call.",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "trace/read"
+      ],
+      "existing_tests": [
+        "tests/integration/test_trace_csv.py",
+        "tests/unit/services/test_verification_trace.py"
+      ],
+      "fault_points": "The write is one ledger transaction; a failure writes nothing.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/verification_trace.py",
+        "src/thoth/apps/trace_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the trace stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:trace/closure/record",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "VERIFICATION_TRACE",
+      "entry_kind": "public",
+      "method_or_trigger": "trace/closure/record",
+      "actual_callable": "thoth.application.commands.trace_closure.ClosureHandlers.record",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/judgment_records_composition.py",
+          "line": 32,
+          "binding": "closures.record"
+        }
+      ],
+      "producer_refs": [
+        "thoth.application.services.trace_closure.TraceClosures.record"
+      ],
+      "phase_id": [
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "semantic_revisions (THREAD:trace-closures)",
+        "entity_snapshots"
+      ],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "A person's closure of a trace row that was not met is appended to the project's closure record in one ledger commit with the document it rests on; the verdict is never changed and earlier events are kept.",
+      "uow_participants": [
+        "thoth.application.services.request_records.RequestRecords.save"
+      ],
+      "irreversible_effect_boundary": "No external effect and no model call.",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/ClosureMark.tsx",
+        "apps/web/src/components/TracePage.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/domain/test_trace_closure.py",
+        "tests/integration/test_judgment_records.py"
+      ],
+      "fault_points": "The write is one ledger transaction; a failure writes nothing.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/trace_closure.py",
+        "src/thoth/application/services/trace_closure.py",
+        "src/thoth/domain/trace_closure.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the judgment records stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:trace/export",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "VERIFICATION_TRACE",
+      "entry_kind": "public",
+      "method_or_trigger": "trace/export",
+      "actual_callable": "thoth.application.commands.verification_trace.TraceHandlers.export",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/trace_composition.py",
+          "line": 22,
+          "binding": "handlers.export"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "The trace set as one thoth-trace-csv/1 file with a loss manifest that lists what the file cannot carry. An export never writes.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "trace/importPreview",
+        "trace/importApply"
+      ],
+      "existing_tests": [
+        "tests/integration/test_trace_csv.py",
+        "tests/unit/services/test_verification_trace.py"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/verification_trace.py",
+        "src/thoth/apps/trace_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the trace stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:trace/history",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "VERIFICATION_TRACE",
+      "entry_kind": "public",
+      "method_or_trigger": "trace/history",
+      "actual_callable": "thoth.application.commands.verification_trace.TraceHandlers.history",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/trace_composition.py",
+          "line": 21,
+          "binding": "handlers.history"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "Older revisions of one verdict, newest first, in pages of at most 50, from the stored per-revision records. A read never writes.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "trace/read"
+      ],
+      "existing_tests": [
+        "tests/integration/test_trace_csv.py",
+        "tests/unit/services/test_verification_trace.py"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/verification_trace.py",
+        "src/thoth/apps/trace_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the trace stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:trace/importApply",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "VERIFICATION_TRACE",
+      "entry_kind": "public",
+      "method_or_trigger": "trace/importApply",
+      "actual_callable": "thoth.application.commands.verification_trace.TraceHandlers.import_apply",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/trace_composition.py",
+          "line": 24,
+          "binding": "handlers.import_apply"
+        }
+      ],
+      "producer_refs": [
+        "thoth.application.services.verification_trace.VerificationTraceService.apply_import"
+      ],
+      "phase_id": [
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "semantic_revisions (THREAD:verification-trace:project, THREAD:trace-verdict:<digest>)",
+        "entity_snapshots"
+      ],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "One apply is one ledger commit: the trace record THREAD:verification-trace:project (the new set and the digests of each subject's revisions) and one record THREAD:trace-verdict:<digest> per new verdict revision, written from the digest the caller read. A preview id or input hash that no longer matches, a file with a conflict, or a failure while computing verdicts writes nothing. No model is called.",
+      "uow_participants": [
+        "thoth.application.services.request_records.RequestRecords.stage",
+        "thoth.application.services.request_records.RequestRecords.commit_staged"
+      ],
+      "irreversible_effect_boundary": "No external effect and no model call.",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "trace/read",
+        "trace/export"
+      ],
+      "existing_tests": [
+        "tests/integration/test_trace_csv.py",
+        "tests/unit/services/test_verification_trace.py"
+      ],
+      "fault_points": "The commit is one ledger transaction; a conflict, a stale preview or a failed verdict step writes nothing.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/verification_trace.py",
+        "src/thoth/apps/trace_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the trace stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:trace/importPreview",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "VERIFICATION_TRACE",
+      "entry_kind": "public",
+      "method_or_trigger": "trace/importPreview",
+      "actual_callable": "thoth.application.commands.verification_trace.TraceHandlers.import_preview",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/trace_composition.py",
+          "line": 23,
+          "binding": "handlers.import_preview"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "What an import would add, change and delete, worked out from the exact text sent and the set the trace has right now; the preview id is bound to both. Nothing is stored.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "trace/importApply"
+      ],
+      "existing_tests": [
+        "tests/integration/test_trace_csv.py",
+        "tests/unit/services/test_verification_trace.py"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/verification_trace.py",
+        "src/thoth/apps/trace_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the trace stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:trace/read",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "VERIFICATION_TRACE",
+      "entry_kind": "public",
+      "method_or_trigger": "trace/read",
+      "actual_callable": "thoth.application.commands.verification_trace.TraceHandlers.read",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/trace_composition.py",
+          "line": 20,
+          "binding": "handlers.read"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "The project's trace set, each current verdict with its currentness, its confirmations and its three most recent revisions with the total count, with the digest of the record version read. A read never writes.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "trace/history",
+        "trace/export"
+      ],
+      "existing_tests": [
+        "tests/integration/test_trace_csv.py",
+        "tests/unit/services/test_verification_trace.py"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/verification_trace.py",
+        "src/thoth/apps/trace_composition.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the trace stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:trace/closure/list",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "VERIFICATION_TRACE",
+      "entry_kind": "public",
+      "method_or_trigger": "trace/closure/list",
+      "actual_callable": "thoth.application.commands.trace_closure.ClosureHandlers.list",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/judgment_records_composition.py",
+          "line": 31,
+          "binding": "closures.list"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "The closures people recorded on trace rows, and the effect the rules confirm from the row's own verdict history, read from committed records. A read never writes.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/ClosureMark.tsx",
+        "apps/web/src/components/TracePage.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/domain/test_trace_closure.py",
+        "tests/integration/test_judgment_records.py"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/trace_closure.py",
+        "src/thoth/application/services/trace_closure.py",
+        "src/thoth/domain/trace_closure.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the judgment records stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:trace/lesson/list",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "VERIFICATION_TRACE",
+      "entry_kind": "public",
+      "method_or_trigger": "trace/lesson/list",
+      "actual_callable": "thoth.application.commands.lesson.LessonHandlers.list",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/judgment_records_composition.py",
+          "line": 37,
+          "binding": "LessonHandlers(lessons=lessons, closures=trace_closures, projects=projects).list"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "The lessons recalled for each trace row from its exact context, read from committed records: each lesson points at a record a rule computed or a person made, and is marked stale or refuted when it is. A read never writes.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/LessonRecall.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/test_lesson_recall_cases.py",
+        "tests/integration/test_lesson_recall.py"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/lesson.py",
+        "src/thoth/application/services/lesson_ledger.py",
+        "src/thoth/domain/lesson_ref.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the learning loop stage; no owner closure receipt."
+      ]
+    },
+    {
       "path_id": "rpc:workspace/ready",
       "owner": "SHARED_OR_OTHER_OWNER",
       "catalog_owner": "THREAD_REQUEST_SETTINGS",
@@ -67893,6 +69075,282 @@
           }
         ]
       }
+    },
+    {
+      "path_id": "rpc:hypothesis/link/list",
+      "owner": "HYPOTHESIS",
+      "catalog_owner": "HYPOTHESIS",
+      "entry_kind": "public",
+      "method_or_trigger": "hypothesis/link/list",
+      "actual_callable": "thoth.application.commands.hypothesis_link.HypothesisLinkHandlers.list",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/hypothesis_link_composition.py",
+          "line": 28,
+          "binding": "handlers.list"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "Each hypothesis that came from a trace row, read against the trace's current verdicts from committed records, and the project's re-check reasons. A read never writes.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/HypothesisLinkNotice.tsx",
+        "apps/web/src/components/TracePage.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/domain/test_verdict_link.py",
+        "tests/integration/test_hypothesis_link.py"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/hypothesis_link.py",
+        "src/thoth/application/services/hypothesis_link_view.py",
+        "src/thoth/domain/verdict_link.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the hypothesis link stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:hypothesis/test/result/list",
+      "owner": "HYPOTHESIS",
+      "catalog_owner": "HYPOTHESIS",
+      "entry_kind": "public",
+      "method_or_trigger": "hypothesis/test/result/list",
+      "actual_callable": "thoth.application.commands.discrimination.DiscriminationHandlers.list",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/judgment_records_composition.py",
+          "line": 26,
+          "binding": "discrimination.list"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "What people recorded for the tests of hypotheses and the elimination those results amount to, read from committed records. A read never writes.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "Explicit IO phases where listed; code traversal does not treat a whole research cycle as one transaction",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/TestResultRecorder.tsx",
+        "apps/web/src/components/RefutationConditionsPanel.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/domain/test_discrimination.py",
+        "tests/integration/test_judgment_records.py"
+      ],
+      "fault_points": "See exact owner tests.",
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/discrimination.py",
+        "src/thoth/application/services/discrimination_ledger.py",
+        "src/thoth/domain/discrimination.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the judgment records stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:hypothesis/link/recheck",
+      "owner": "HYPOTHESIS",
+      "catalog_owner": "HYPOTHESIS",
+      "entry_kind": "public",
+      "method_or_trigger": "hypothesis/link/recheck",
+      "actual_callable": "thoth.application.commands.hypothesis_link.HypothesisLinkHandlers.recheck",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/hypothesis_link_composition.py",
+          "line": 29,
+          "binding": "handlers.recheck"
+        }
+      ],
+      "producer_refs": [
+        "thoth.application.services.hypothesis_link_recheck.HypothesisLinkRechecks.recheck"
+      ],
+      "phase_id": [
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "semantic_revisions (THREAD:hypothesis-link-rechecks)",
+        "entity_snapshots"
+      ],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "A person's re-check of hypotheses on one changed verdict is appended to the project's re-check record in one ledger commit; earlier events are kept, no hypothesis or verdict is changed, and a verdict that moved on since the person looked is refused.",
+      "uow_participants": [
+        "thoth.application.services.request_records.RequestRecords.save"
+      ],
+      "irreversible_effect_boundary": "No external effect and no model call.",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "hypothesis/link/list",
+        "apps/web/src/components/HypothesisLinkNotice.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/domain/test_verdict_link.py",
+        "tests/integration/test_hypothesis_link.py"
+      ],
+      "fault_points": "The write is one ledger transaction; a failure writes nothing.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/hypothesis_link.py",
+        "src/thoth/application/services/hypothesis_link_recheck.py",
+        "src/thoth/domain/verdict_link.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the hypothesis link stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:hypothesis/refutation/record",
+      "owner": "HYPOTHESIS",
+      "catalog_owner": "HYPOTHESIS",
+      "entry_kind": "public",
+      "method_or_trigger": "hypothesis/refutation/record",
+      "actual_callable": "thoth.application.commands.discrimination.DiscriminationHandlers.record_conditions",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/judgment_records_composition.py",
+          "line": 28,
+          "binding": "discrimination.record_conditions"
+        }
+      ],
+      "producer_refs": [
+        "thoth.application.services.discrimination_ledger.DiscriminationLedger.record_conditions"
+      ],
+      "phase_id": [
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "semantic_revisions (THREAD:hypothesis-discrimination)",
+        "entity_snapshots"
+      ],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "A person's list of refutation conditions for a hypothesis is appended to the project's discrimination record in one ledger commit; earlier lists are kept, the hypothesis is not changed and no model is called.",
+      "uow_participants": [
+        "thoth.application.services.request_records.RequestRecords.save"
+      ],
+      "irreversible_effect_boundary": "No external effect and no model call.",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/TestResultRecorder.tsx",
+        "apps/web/src/components/RefutationConditionsPanel.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/domain/test_discrimination.py",
+        "tests/integration/test_judgment_records.py"
+      ],
+      "fault_points": "The write is one ledger transaction; a failure writes nothing.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/discrimination.py",
+        "src/thoth/application/services/discrimination_ledger.py",
+        "src/thoth/domain/discrimination.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the judgment records stage; no owner closure receipt."
+      ]
+    },
+    {
+      "path_id": "rpc:hypothesis/test/result/record",
+      "owner": "HYPOTHESIS",
+      "catalog_owner": "HYPOTHESIS",
+      "entry_kind": "public",
+      "method_or_trigger": "hypothesis/test/result/record",
+      "actual_callable": "thoth.application.commands.discrimination.DiscriminationHandlers.record_result",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/judgment_records_composition.py",
+          "line": 27,
+          "binding": "discrimination.record_result"
+        }
+      ],
+      "producer_refs": [
+        "thoth.application.services.discrimination_ledger.DiscriminationLedger.record_result"
+      ],
+      "phase_id": [
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "semantic_revisions (THREAD:hypothesis-discrimination)",
+        "entity_snapshots"
+      ],
+      "head_selector": "Existing typed owner/current revision selector; see owner contract and concrete producer",
+      "audit_receipt_refs": [],
+      "expected_basis": "A person's result of one discriminating test is appended to the project's discrimination record in one ledger commit; earlier events are kept, the hypothesis is not changed and no model is called.",
+      "uow_participants": [
+        "thoth.application.services.request_records.RequestRecords.save"
+      ],
+      "irreversible_effect_boundary": "No external effect and no model call.",
+      "allowed_phase_deltas": [
+        "Only exact request/operation/attempt identities and stated transitions; tests/atomicity/harness.py validates error bindings and declared row witnesses. No whole table exclusions."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/TestResultRecorder.tsx",
+        "apps/web/src/components/RefutationConditionsPanel.tsx"
+      ],
+      "existing_tests": [
+        "tests/unit/domain/test_discrimination.py",
+        "tests/integration/test_judgment_records.py"
+      ],
+      "fault_points": "The write is one ledger transaction; a failure writes nothing.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/application/commands/discrimination.py",
+        "src/thoth/application/services/discrimination_ledger.py",
+        "src/thoth/domain/discrimination.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Reachable delegated transaction regions; this entry-level inventory is not a claim that the whole command/IO cycle is one atomic transaction.",
+      "blockers": [
+        "New in the judgment records stage; no owner closure receipt."
+      ]
     },
     {
       "path_id": "rpc:memory/settings/read",

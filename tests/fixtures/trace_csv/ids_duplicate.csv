@@ -1,0 +1,3 @@
+format,row_type,base_set_digest,item_id,link_id,rule_id,result_id,target_kind,target_id,item_key,kind,title,fields_json,source_span_refs,from_id,to_id,relation,criterion_id,rule_revision,measure,comparator,threshold,unit,condition,rounding_digits,rounding_mode,required,result_revision,value,raw_value,numerator,denominator,observed_at
+thoth-trace-csv/1,ITEM,,REQ-001,,,,,,k-REQ-001,REQUIREMENT,First,,,,,,,,,,,,,,,,,,,,,
+thoth-trace-csv/1,ITEM,,REQ-001,,,,,,k-REQ-001,REQUIREMENT,Second with the same id,,,,,,,,,,,,,,,,,,,,,

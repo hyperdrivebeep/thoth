@@ -6,11 +6,13 @@ import type { ResearchAdmission } from "../api/research";
 import type { ModelSelection } from "./ModelSettings";
 import { readDraft, writeDraft } from "../api/conversation";
 import { clearLocalPending, inspectLocalDraft, readLocalPending, submissionSignature, validWorkspaceId, writeLocalPending,
-  type BrowserScope, type DraftWriteResult, type PendingRead, type PendingSubmission } from "../api/localWorkspacePersistence";
+  type BrowserScope, type DraftWriteResult, type PendingOrigin, type PendingRead, type PendingSubmission } from "../api/localWorkspacePersistence";
 
 /** Draft ownership only. All execution/current-result states are server projections. */
 export function useResearchSession(projectId: string, threadId: string, epoch: RefObject<number>, onAdmitted: (id: string) => void,
-  storageScope: BrowserScope, canExecute: boolean) {
+  storageScope: BrowserScope, canExecute: boolean,
+  /** The trace row this question is about (set by "원인 조사"); it goes with the next request only, and is dropped when the question is emptied. */
+  origin: PendingOrigin | null = null, onOriginDone?: () => void) {
   const client = useQueryClient();
   const [problem, updateProblem] = useState(() => readDraft(projectId, threadId, storageScope));
   const problemRef = useRef(problem);
@@ -26,6 +28,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   const [pendingStorageError, setPendingStorageError] = useState<string | null>(null);
   const [queuedNotice, setQueuedNotice] = useState(false);
   const setProblem = (text: string) => {
+    if (origin && !text.trim()) onOriginDone?.();
     const saved = writeDraft(projectId, threadId, text, storageScope);
     if (storageScope.mode === "LOCAL") {
       setDraftSaveState(saved);
@@ -51,7 +54,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   const [modelSelection, setModelSelection] = useState<ModelSelection | null>(null);
   const draftRevision = useRef(0);
   const pendingSubmission = useRef<{ signature: string; key: string; inFlight: boolean } | null>(null);
-  const currentSignature = submissionSignature(projectId, threadId, problem, modelSelection);
+  const currentSignature = submissionSignature(projectId, threadId, problem, modelSelection, origin);
   const pendingBlocksNewInput = pendingRead.kind === "INVALID" || pendingRead.kind === "PENDING" && pendingRead.value.signature !== currentSignature;
   const chooseModel = (selection: ModelSelection) => { draftRevision.current += 1; setModelSelection(selection); };
   const clearModel = (revision: number, capturedEpoch = epoch.current) => {
@@ -79,9 +82,9 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     else if (sawRunning.current) setQueuedNotice(false);
   }, [queuedNotice, operationState]);
   const submit = useMutation({
-    mutationFn: async (captured: { projectId: string; threadId: string; problem: string; selection: ModelSelection | null; revision: number; epoch: number; key: string; scope: BrowserScope }) => {
+    mutationFn: async (captured: { projectId: string; threadId: string; problem: string; selection: ModelSelection | null; origin: PendingOrigin | null; revision: number; epoch: number; key: string; scope: BrowserScope }) => {
       const admission = await rpc<ResearchAdmission>(captured.threadId ? "thread/input" : "thread/start", {
-        project_id: captured.projectId, contract_version: 2, ...captured.selection,
+        project_id: captured.projectId, contract_version: 2, ...captured.selection, ...(captured.origin ? { origin: captured.origin } : {}),
         ...(captured.threadId ? { thread_id: captured.threadId, instruction: captured.problem } : { problem: captured.problem }),
       }, captured.key);
       const value = admission.value;
@@ -112,6 +115,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
         else setPendingStorageError("접수는 확인됐지만 브라우저의 요청 복구 표시를 지우지 못했습니다. 원 요청을 다시 확인하세요.");
       }
       clearModel(captured.revision, captured.epoch);
+      if (captured.origin) onOriginDone?.();
       setQueuedNotice(admission.status === "QUEUED_AFTER_CURRENT");
       const next = problemRef.current === captured.problem ? "" : problemRef.current;
       if (!next) {
@@ -156,7 +160,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     const { value } = stored;
     pendingSubmission.current = { signature: value.signature, key: value.key, inFlight: true };
     setPendingStorageError(null);
-    submit.mutate({ projectId, threadId, problem: value.problem, selection: value.selection,
+    submit.mutate({ projectId, threadId, problem: value.problem, selection: value.selection, origin: value.origin ?? null,
       revision: -1, epoch: epoch.current, key: value.key, scope: storageScope });
   };
   return { research, queuedNotice, problem, setProblem, draftSaveState, draftRestoreIssue, pendingRead, pendingBlocksNewInput, pendingStorageError,
@@ -170,7 +174,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
         if (stored.kind === "INVALID" || stored.kind === "PENDING" && stored.value.signature !== currentSignature) return;
         const record: PendingSubmission = stored.kind === "PENDING" ? stored.value : {
           version: 1, workspaceId: storageScope.workspaceId ?? "", projectId, threadId,
-          problem, selection: modelSelection, signature: currentSignature, key: crypto.randomUUID(), createdAt: Date.now(),
+          problem, selection: modelSelection, ...(origin ? { origin } : {}), signature: currentSignature, key: crypto.randomUUID(), createdAt: Date.now(),
         };
         if (stored.kind === "NONE") {
           const saved = writeLocalPending(record);
@@ -183,15 +187,15 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
         }
         pendingSubmission.current = { signature: record.signature, key: record.key, inFlight: true };
         setPendingStorageError(null);
-        submit.mutate({ projectId, threadId, problem: record.problem, selection: record.selection,
+        submit.mutate({ projectId, threadId, problem: record.problem, selection: record.selection, origin: record.origin ?? null,
           revision: draftRevision.current, epoch: epoch.current, key: record.key, scope: storageScope });
         return;
       }
-      const signature = JSON.stringify([projectId,threadId,problem,modelSelection,epoch.current]);
+      const signature = JSON.stringify([projectId,threadId,problem,modelSelection,epoch.current,...(origin ? [origin] : [])]);
       if (pendingSubmission.current?.signature !== signature) pendingSubmission.current = {signature,key:crypto.randomUUID(),inFlight:false};
       const request = pendingSubmission.current;
       request.inFlight = true;
-      submit.mutate({ projectId, threadId, problem, selection: modelSelection, revision: draftRevision.current, epoch: epoch.current, key:request.key, scope: storageScope });
+      submit.mutate({ projectId, threadId, problem, selection: modelSelection, origin, revision: draftRevision.current, epoch: epoch.current, key:request.key, scope: storageScope });
     },
   };
 }

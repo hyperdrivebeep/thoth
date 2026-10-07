@@ -61,7 +61,11 @@ from thoth.application.services.request_records import RequestRecords
 from thoth.application.services.research_analysis import ResearchAnalysis
 from thoth.application.services.research_leases import ResearchLeases
 from thoth.application.services.scoped_artifacts import ScopedArtifactLedger
+from thoth.apps.action_draft_composition import install_action_drafts
+from thoth.apps.hypothesis_link_composition import install_hypothesis_links
+from thoth.apps.judgment_records_composition import install_judgment_records
 from thoth.apps.test_runtime import TestComponents
+from thoth.apps.trace_composition import install_trace_origin, register_trace_methods
 from thoth.apps.workspace_paths import workspace_id
 from thoth.domain.deployment_mode import DeploymentMode, parse_deployment_mode
 from thoth.ports.criterion_contract import CriterionContractStorePort
@@ -221,6 +225,7 @@ def create_research_entry(
     )
     registry.register("model/callSettings/read", call_settings_handlers.read)
     registry.register("model/callSettings/update", call_settings_handlers.update)
+    register_trace_methods(registry, records, stores.projects)
     ready_projection = None
     if mode is DeploymentMode.HOSTED_REVIEW:
         from thoth.apps.hosted_review_composition import hosted_ready_projection
@@ -282,6 +287,10 @@ def create_research_entry(
     registry.decorate("thread/stop", lambda _: entry.stop)
     for method in ("thread/start", "thread/input", "thread/steer"):
         registry.register_reentry_authorizer(method, entry.authorize_reentry)
+    install_trace_origin(registry, records, stores.operations)
+    install_hypothesis_links(registry, records, stores.projects)
+    install_action_drafts(registry, records)
+    install_judgment_records(registry, records, stores.projects)
     if mode is DeploymentMode.HOSTED_REVIEW:
         from thoth.apps.hosted_review_composition import install_hosted_review_rpc_guards
         from thoth.apps.hosted_review_quota import HostedReviewLimits

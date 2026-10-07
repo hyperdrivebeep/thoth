@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "THOTH synthetic radar demo v1 - document shapes",
+  "description": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE. Checked by scripts/validate_synthetic_radar_demo.py, which understands only the keywords used here (type, required, properties, additionalProperties, items, enum, const, pattern, minItems, oneOf, $ref).",
+  "type": "object",
+  "required": ["notice", "identity", "document"],
+  "oneOf": [
+    {"$ref": "#/$defs/manifest"},
+    {"$ref": "#/$defs/source_lineage"},
+    {"$ref": "#/$defs/requirements"},
+    {"$ref": "#/$defs/test_plan"},
+    {"$ref": "#/$defs/result"}
+  ],
+  "$defs": {
+    "notice": {"const": "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"},
+    "identity": {"const": "THOTH-SYNTH-RADAR-DEMO-v1"},
+    "id": {"type": "string", "pattern": "^SYN-[A-Z0-9-]+$"},
+    "decimal": {"type": "string", "pattern": "^[0-9]+(\\.[0-9]+)?$"},
+    "condition": {"type": "string", "pattern": "^weather=(dry|rain|fog)$"},
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["notice", "identity", "document", "integrity_statement", "hash_scope", "files"],
+      "properties": {
+        "notice": {"$ref": "#/$defs/notice"},
+        "identity": {"$ref": "#/$defs/identity"},
+        "document": {"const": "manifest"},
+        "integrity_statement": {"type": "string"},
+        "hash_scope": {"type": "string"},
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256", "bytes"],
+            "properties": {
+              "path": {"type": "string"},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "bytes": {"type": "integer"}
+            }
+          }
+        }
+      }
+    },
+    "source_lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["notice", "identity", "document", "origin", "external_data_bytes", "statements"],
+      "properties": {
+        "notice": {"$ref": "#/$defs/notice"},
+        "identity": {"$ref": "#/$defs/identity"},
+        "document": {"const": "source_lineage"},
+        "origin": {"type": "string"},
+        "external_data_bytes": {"const": "none"},
+        "statements": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      }
+    },
+    "requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["notice", "identity", "document", "requirement"],
+      "properties": {
+        "notice": {"$ref": "#/$defs/notice"},
+        "identity": {"$ref": "#/$defs/identity"},
+        "document": {"const": "requirements"},
+        "requirement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "title", "statement", "criteria"],
+          "properties": {
+            "id": {"$ref": "#/$defs/id"},
+            "title": {"type": "string"},
+            "statement": {"type": "string"},
+            "criteria": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "title", "measure", "comparator", "threshold", "unit", "condition", "required"],
+                "properties": {
+                  "id": {"$ref": "#/$defs/id"},
+                  "title": {"type": "string"},
+                  "measure": {"enum": ["detection_rate", "false_track_rate"]},
+                  "comparator": {"enum": [">=", "<="]},
+                  "threshold": {"$ref": "#/$defs/decimal"},
+                  "unit": {"enum": ["ratio", "per_min"]},
+                  "condition": {"$ref": "#/$defs/condition"},
+                  "required": {"type": "boolean"}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "test_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["notice", "identity", "document", "test_cases"],
+      "properties": {
+        "notice": {"$ref": "#/$defs/notice"},
+        "identity": {"$ref": "#/$defs/identity"},
+        "document": {"const": "test_plan"},
+        "test_cases": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "title", "condition", "covers", "target_trials", "observation_minutes"],
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "title": {"type": "string"},
+              "condition": {"$ref": "#/$defs/condition"},
+              "covers": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/id"}},
+              "target_trials": {"type": "integer"},
+              "observation_minutes": {"type": "integer"}
+            }
+          }
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["notice", "identity", "document", "available_from_phase", "condition", "test_case", "observed_at", "trials_csv", "detection", "false_track"],
+      "properties": {
+        "notice": {"$ref": "#/$defs/notice"},
+        "identity": {"$ref": "#/$defs/identity"},
+        "document": {"const": "result"},
+        "available_from_phase": {"enum": [1, 2]},
+        "condition": {"$ref": "#/$defs/condition"},
+        "test_case": {"$ref": "#/$defs/id"},
+        "observed_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:]+Z$"},
+        "trials_csv": {"type": "string"},
+        "detection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["criterion", "numerator", "denominator", "unit", "value"],
+          "properties": {
+            "criterion": {"$ref": "#/$defs/id"},
+            "numerator": {"type": "integer"},
+            "denominator": {"type": "integer"},
+            "unit": {"const": "ratio"},
+            "value": {"$ref": "#/$defs/decimal"}
+          }
+        },
+        "false_track": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["criterion", "numerator", "denominator", "unit", "value", "observation_minutes", "event_ids"],
+          "properties": {
+            "criterion": {"$ref": "#/$defs/id"},
+            "numerator": {"type": "integer"},
+            "denominator": {"type": "integer"},
+            "unit": {"const": "per_min"},
+            "value": {"$ref": "#/$defs/decimal"},
+            "observation_minutes": {"type": "integer"},
+            "event_ids": {"type": "array", "items": {"$ref": "#/$defs/id"}}
+          }
+        }
+      }
+    }
+  }
+}

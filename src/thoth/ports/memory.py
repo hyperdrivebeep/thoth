@@ -12,6 +12,7 @@ from thoth.domain.memory import (
     MemoryRoleReview,
     MemoryTransitionReceipt,
 )
+from thoth.domain.memory_expansion import QueryExpansion
 from thoth.domain.memory_relation import MemoryRelationProposal, MemoryRelationQuestion
 
 
@@ -74,3 +75,15 @@ class MemoryInjectionPort(Protocol):
     """Whether a project gives its recalled memory to an investigation."""
 
     def enabled(self, project_id: str) -> bool: ...
+
+
+class MemoryExpansionSwitchPort(Protocol):
+    """Whether a project lets an investigation ask a model for extra search words."""
+
+    def expansion_enabled(self, project_id: str) -> bool: ...
+
+
+class MemoryQueryExpanderPort(Protocol):
+    """Other words for a question, to find memory written in different words; never an authority."""
+
+    async def expand(self, query: str) -> QueryExpansion: ...

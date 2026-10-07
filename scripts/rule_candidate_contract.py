@@ -200,6 +200,15 @@ def _preserve_ratchets(root: Path, candidates: dict[str, bytes]) -> None:
                 raise ValueError("rule update cannot change size limits")
         if new["scan_roots"] != old["scan_roots"]:
             raise ValueError("rule update cannot change scan roots")
+        # The web size scope is guarded like scan_roots once the repository has it: changing or
+        # dropping a key would shrink what is measured. A repository from before the keys existed
+        # has nothing to protect, so adding them there (more checking) is allowed.
+        for key, label in (
+            ("web_scan_roots", "web scan roots"),
+            ("web_excluded_suffixes", "web scan exclusions"),
+        ):
+            if key in old and new.get(key) != old[key]:
+                raise ValueError(f"rule update cannot change {label}")
         for name, baseline in new["watched_long_functions"].items():
             if (
                 name not in old["watched_long_functions"]

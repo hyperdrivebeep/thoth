@@ -6,14 +6,15 @@ import { afterEach, expect, it, vi } from "vitest";
 import { ProjectMemoryPanel } from "./ProjectMemoryPanel";
 
 const state = vi.hoisted(() => ({ revisions: [] as Record<string, unknown>[], fail: false, calls: [] as { method: string; input: Record<string, unknown> }[],
-  transition: "COMMIT", support: "SUPPORTED", editError: null as string | null, injection: true, digest: null as string | null }));
+  transition: "COMMIT", support: "SUPPORTED", editError: null as string | null, injection: true, expansion: true, digest: null as string | null }));
 vi.mock("../api/rpcClient", async importOriginal => ({ ...(await importOriginal<typeof import("../api/rpcClient")>()),
   rpc: async (method: string, input: Record<string, unknown>) => {
     state.calls.push({ method, input });
-    if (method === "memory/settings/read") return { value: { memory_injection: state.injection, settings_digest: state.digest }, state: "SUCCEEDED", operation_id: "" };
+    if (method === "memory/settings/read") return { value: { memory_injection: state.injection, query_expansion: state.expansion, settings_digest: state.digest }, state: "SUCCEEDED", operation_id: "" };
     if (method === "memory/settings/update") {
       state.injection = input.memory_injection as boolean; state.digest = "s".repeat(64);
-      return { value: { memory_injection: state.injection, settings_digest: state.digest }, state: "SUCCEEDED", operation_id: "" };
+      if ("query_expansion" in input) state.expansion = input.query_expansion as boolean;
+      return { value: { memory_injection: state.injection, query_expansion: state.expansion, settings_digest: state.digest }, state: "SUCCEEDED", operation_id: "" };
     }
     if (method === "memory/edit/propose") {
       if (state.editError) { const { RpcError } = await importOriginal<typeof import("../api/rpcClient")>(); throw new RpcError(state.editError, -32030, {}); }
@@ -47,7 +48,7 @@ const typeInto = async (label: string, value: string) => act(async () => {
   field.dispatchEvent(new Event("input", { bubbles: true }));
 });
 afterEach(async () => { if (root) await act(async () => root!.unmount()); root = undefined; container?.remove(); document.body.innerHTML = ""; state.revisions = []; state.fail = false; state.calls = []; state.transition = "COMMIT"; state.editError = null; });
-afterEach(() => { state.support = "SUPPORTED"; state.injection = true; state.digest = null; });
+afterEach(() => { state.support = "SUPPORTED"; state.injection = true; state.expansion = true; state.digest = null; });
 
 it("reads the memory version list and says plainly when it holds no stored record", async () => {
   await mount();
@@ -211,4 +212,26 @@ it("shows a memory list that is switched off as it is: nothing is hidden or dele
   expect(container.querySelector<HTMLInputElement>("[data-memory-switch] input[type=checkbox]")!.checked).toBe(false);
   expect(container.textContent).toContain("저장된 기억 기록 1개");
   expect(container.textContent).toContain("표본이 작으면 결론을 보류한다");
+});
+
+it("has a separate switch for widening the question that keeps the memory switch as it is", async () => {
+  await mount(); await settle();
+  expect(container.textContent).toContain("검색어 넓히기(조사마다 모델을 한 번 더 부릅니다)");
+  const boxes = container.querySelectorAll<HTMLInputElement>("[data-memory-switch] input[type=checkbox]");
+  expect(boxes).toHaveLength(2);
+  expect(boxes[1].checked).toBe(true);
+  await click(boxes[1]);
+  const sent = state.calls.find(call => call.method === "memory/settings/update")!;
+  expect(sent.input).toEqual({ project_id: "project:p", memory_injection: true, query_expansion: false, expected_digest: null });
+  const after = container.querySelectorAll<HTMLInputElement>("[data-memory-switch] input[type=checkbox]");
+  expect(after[0].checked).toBe(true);
+  expect(after[1].checked).toBe(false);
+});
+
+it("cannot widen the question while memory is switched off, and says nothing is asked then", async () => {
+  state.injection = false;
+  await mount(); await settle();
+  const boxes = container.querySelectorAll<HTMLInputElement>("[data-memory-switch] input[type=checkbox]");
+  expect(boxes[0].checked).toBe(false);
+  expect(boxes[1].disabled).toBe(true);
 });

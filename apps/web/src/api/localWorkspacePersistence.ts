@@ -5,8 +5,9 @@ export type ContextReadResult = { kind: "MISSING" | "VALID" | "CORRUPT" | "UNAVA
 export type DraftWriteResult = "SAVED" | "TOO_LARGE" | "UNAVAILABLE";
 export type DraftReadResult = { kind: "MISSING" | "VALID" | "CORRUPT" | "UNAVAILABLE"; text: string };
 export type PendingModelSelection = { provider: string; model: string; reasoning_effort?: string };
+export type PendingOrigin = { kind: "TRACE_VERDICT"; project_id: string; subject_kind: "CRITERION" | "REQUIREMENT"; subject_id: string; verdict_revision: string };
 export type PendingSubmission = { version: 1; workspaceId: string; projectId: string; threadId: string;
-  problem: string; selection: PendingModelSelection | null; signature: string; key: string; createdAt: number };
+  problem: string; selection: PendingModelSelection | null; origin?: PendingOrigin | null; signature: string; key: string; createdAt: number };
 export type PendingRead = { kind: "NONE" } | { kind: "PENDING"; value: PendingSubmission } | { kind: "INVALID" };
 
 const prefix = "thoth:local-workspace:v1:";
@@ -31,8 +32,10 @@ function pendingKey(workspaceId: string, projectId: string, threadId: string) {
   return `${prefix}pending:${JSON.stringify([workspaceId, projectId, threadId])}`;
 }
 
-export function submissionSignature(projectId: string, threadId: string, problem: string, selection: PendingModelSelection | null): string {
-  return JSON.stringify([projectId, threadId, problem, selection ? [selection.provider, selection.model, selection.reasoning_effort ?? null] : null]);
+/** The exact payload of a request; a request that starts from a trace row has that row in it, any other request keeps its old signature. */
+export function submissionSignature(projectId: string, threadId: string, problem: string, selection: PendingModelSelection | null, origin: PendingOrigin | null = null): string {
+  return JSON.stringify([projectId, threadId, problem, selection ? [selection.provider, selection.model, selection.reasoning_effort ?? null] : null,
+    ...(origin ? [[origin.kind, origin.project_id, origin.subject_kind, origin.subject_id, origin.verdict_revision]] : [])]);
 }
 
 export function inspectLocalContext(workspaceId: string | null): ContextReadResult {
@@ -105,19 +108,29 @@ export function readLocalPending(workspaceId: string | null, projectId: string, 
     if (raw.length > maxPendingLength) return { kind: "INVALID" };
     const value: unknown = JSON.parse(raw);
     if (!value || typeof value !== "object" || !("version" in value) || value.version !== 1 ||
-      !Object.keys(value).every(key => ["version", "workspaceId", "projectId", "threadId", "problem", "selection", "signature", "key", "createdAt"].includes(key)) ||
+      !Object.keys(value).every(key => ["version", "workspaceId", "projectId", "threadId", "problem", "selection", "origin", "signature", "key", "createdAt"].includes(key)) ||
       !("workspaceId" in value) || value.workspaceId !== workspaceId ||
       !("projectId" in value) || value.projectId !== projectId ||
       !("threadId" in value) || value.threadId !== threadId ||
       !("problem" in value) || typeof value.problem !== "string" || value.problem.length > maxDraftLength ||
       !("selection" in value) || !(value.selection === null || validPendingSelection(value.selection)) ||
+      ("origin" in value && !(value.origin === null || validPendingOrigin(value.origin))) ||
       !("signature" in value) || typeof value.signature !== "string" ||
       !("key" in value) || typeof value.key !== "string" || !/^[a-f0-9-]{36}$/i.test(value.key) ||
       !("createdAt" in value) || typeof value.createdAt !== "number" || !Number.isFinite(value.createdAt)) return { kind: "INVALID" };
     const pending = value as PendingSubmission;
-    return pending.signature === submissionSignature(projectId, threadId, pending.problem, pending.selection)
+    return pending.signature === submissionSignature(projectId, threadId, pending.problem, pending.selection, pending.origin ?? null)
       ? { kind: "PENDING", value: pending } : { kind: "INVALID" };
   } catch { return { kind: "INVALID" }; }
+}
+
+function validPendingOrigin(value: unknown): value is PendingOrigin {
+  const text = (item: unknown, max: number) => typeof item === "string" && item.length > 0 && item.length <= max;
+  return Boolean(value && typeof value === "object" && !Array.isArray(value) &&
+    Object.keys(value).every(key => ["kind", "project_id", "subject_kind", "subject_id", "verdict_revision"].includes(key)) &&
+    "kind" in value && value.kind === "TRACE_VERDICT" && "project_id" in value && text(value.project_id, maxIdentityLength) &&
+    "subject_kind" in value && (value.subject_kind === "CRITERION" || value.subject_kind === "REQUIREMENT") &&
+    "subject_id" in value && text(value.subject_id, 500) && "verdict_revision" in value && text(value.verdict_revision, 64));
 }
 
 function validPendingSelection(value: unknown): value is PendingModelSelection {
@@ -131,8 +144,8 @@ function validPendingSelection(value: unknown): value is PendingModelSelection {
 export function writeLocalPending(value: PendingSubmission): DraftWriteResult {
   if (value.problem.length > maxDraftLength) return "TOO_LARGE";
   if (!validWorkspaceId(value.workspaceId) || !value.projectId || !validRecordId(value.projectId) || !validRecordId(value.threadId) ||
-    !(value.selection === null || validPendingSelection(value.selection)) ||
-    value.signature !== submissionSignature(value.projectId, value.threadId, value.problem, value.selection)) return "UNAVAILABLE";
+    !(value.selection === null || validPendingSelection(value.selection)) || !(value.origin == null || validPendingOrigin(value.origin)) ||
+    value.signature !== submissionSignature(value.projectId, value.threadId, value.problem, value.selection, value.origin ?? null)) return "UNAVAILABLE";
   const raw = JSON.stringify(value);
   if (raw.length > maxPendingLength) return "TOO_LARGE";
   try { localStorage.setItem(pendingKey(value.workspaceId, value.projectId, value.threadId), raw); return "SAVED"; }

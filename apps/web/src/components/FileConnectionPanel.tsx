@@ -28,7 +28,7 @@ export function FileConnectionPanel({ projectId, hosted = false }: { projectId: 
   }, onError: () => setProgress("") });
   return <section className="source-connect-panel">
     <div className="section-title-row"><div><p className="eyebrow">{eyebrowLabel("AUTHORIZED SOURCES")}</p><h2>파일 자료 연결</h2></div><span className="muted">원문 · 버전 · 위치 보존</span></div>
-    <p className="muted">HWPX · PDF · DOCX · XLSX · CSV · JSON · MD · TXT · HTML 파일을 올리고, 자료의 성격과 사용 범위를 함께 기록합니다.{hosted?" 업로드한 파일은 이 심사 프로젝트에서 사용됩니다.":" 파일은 이 컴퓨터의 THOTH 작업공간에 준비됩니다."}</p>
+    <p className="muted">HWPX · PDF · DOCX · XLSX · CSV · JSON · MD · TXT · YAML · HTML 파일을 올리고, 자료의 성격과 사용 범위를 함께 기록합니다.{hosted?" 업로드한 파일은 이 심사 프로젝트에서 사용됩니다.":" 파일은 이 컴퓨터의 THOTH 작업공간에 준비됩니다."}</p>
     <div className="source-controls"><FileInput fill text={files.length ? `${files.length}개 선택` : "파일 선택…"} inputProps={{ref:fileInput,multiple:true,"aria-label":"연결할 파일 자료"}} onInputChange={event => setFiles(Array.from((event.target as HTMLInputElement).files ?? []))} />
       <label className="source-control-label"><span>자료 성격</span><HTMLSelect aria-label="자료 성격" value={authority} onChange={event=>setAuthority(event.target.value)} options={authorityOptions} /></label>
       <label className="source-control-label"><span>사용 범위</span><HTMLSelect aria-label="자료 사용 범위" value={visibility} onChange={event=>setVisibility(event.target.value)} options={[{value:"",label:"사용 범위를 선택하세요"},{value:"PROJECT_SHARED",label:"이 프로젝트에서 함께 사용"},{value:"EXPLICIT_GRANT",label:"명시적으로 허용된 작업만"}]} /></label>

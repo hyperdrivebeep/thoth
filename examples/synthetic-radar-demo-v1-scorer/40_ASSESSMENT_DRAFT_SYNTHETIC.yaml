@@ -1,0 +1,15 @@
+# SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+notice: SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+identity: THOTH-SYNTH-RADAR-DEMO-v1
+document: assessment_draft
+# Scorer only: never connect this file to a demo project. It states what the rule should give.
+rule_summary: comparator and threshold of each criterion are in 10_REQUIREMENTS_SYNTHETIC.yaml; no condition is averaged with another
+phases:
+  1:
+    available_results: [SYN-TC-DRY]
+    criteria: {SYN-C-DET-DRY: PASS_COMPUTED, SYN-C-FA-DRY: PASS_COMPUTED, SYN-C-DET-RAIN: HOLD_NO_RESULT, SYN-C-FA-RAIN: HOLD_NO_RESULT, SYN-C-DET-FOG: HOLD_NO_RESULT, SYN-C-FA-FOG: HOLD_NO_RESULT}
+    requirement: {SYN-REQ-RAD-001: HOLD_INCOMPLETE}
+  2:
+    available_results: [SYN-TC-DRY, SYN-TC-RAIN]
+    criteria: {SYN-C-DET-DRY: PASS_COMPUTED, SYN-C-FA-DRY: PASS_COMPUTED, SYN-C-DET-RAIN: FAIL_COMPUTED, SYN-C-FA-RAIN: FAIL_COMPUTED, SYN-C-DET-FOG: HOLD_NO_RESULT, SYN-C-FA-FOG: HOLD_NO_RESULT}
+    requirement: {SYN-REQ-RAD-001: FAIL_WITH_INCOMPLETE_COVERAGE}

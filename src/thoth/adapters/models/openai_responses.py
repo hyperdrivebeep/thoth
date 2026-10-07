@@ -243,7 +243,7 @@ class OpenAIResponsesModel(ModelPort):
             + " "
             + user_visible_language_contract()
             + " TASK_CONTRACT: "
-            + role_contract(request.role.value)
+            + role_contract(request.role.value, request.prompt_version)
         )
 
     @staticmethod
@@ -292,5 +292,5 @@ class OpenAIResponsesModel(ModelPort):
             + "\n\nTASK\n"
             + request.role.value
             + "\nTASK_CONTRACT\n"
-            + role_contract(request.role.value)
+            + role_contract(request.role.value, request.prompt_version)
         )

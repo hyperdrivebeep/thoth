@@ -65,6 +65,8 @@ MEDIA_TYPES = {
     ".md": "text/markdown",
     ".pdf": "application/pdf",
     ".txt": "text/plain",
+    ".yaml": "text/plain",
+    ".yml": "text/plain",
     ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 }
 LOCAL_ACTOR_ID = "human:local-user"

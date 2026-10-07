@@ -72,6 +72,22 @@ it("pins a bounded pending key to one workspace and exact submitted payload", ()
   expect(readLocalPending(a.mode === "LOCAL" ? a.workspaceId : null, "p", "t")).toEqual({ kind: "NONE" });
 });
 
+it("keeps a trace-row origin with the pending request, and a different origin is a different request", () => {
+  const id = a.mode === "LOCAL" ? a.workspaceId : null;
+  const origin = { kind: "TRACE_VERDICT" as const, project_id: "p", subject_kind: "CRITERION" as const, subject_id: "C-1", verdict_revision: "a".repeat(64) };
+  const value: PendingSubmission = { version: 1, workspaceId: id!, projectId: "p", threadId: "t", problem: "synthetic question", selection: null, origin,
+    signature: submissionSignature("p", "t", "synthetic question", null, origin), key: "11111111-1111-4111-8111-111111111111", createdAt: 1 };
+  expect(writeLocalPending(value)).toBe("SAVED");
+  expect(readLocalPending(id, "p", "t")).toEqual({ kind: "PENDING", value });
+  expect(submissionSignature("p", "t", "synthetic question", null, origin)).not.toBe(submissionSignature("p", "t", "synthetic question", null));
+  expect(submissionSignature("p", "t", "synthetic question", null, null)).toBe(submissionSignature("p", "t", "synthetic question", null)); // no origin: the old signature
+  expect(writeLocalPending({ ...value, signature: submissionSignature("p", "t", "synthetic question", null) })).toBe("UNAVAILABLE"); // the origin is part of the exact payload
+  // a made-up origin shape is not a pending request
+  localStorage.setItem(`thoth:local-workspace:v1:pending:${JSON.stringify([id, "p", "t"])}`, JSON.stringify({ ...value, origin: { ...origin, extra: 1 } }));
+  expect(readLocalPending(id, "p", "t")).toEqual({ kind: "INVALID" });
+  clearLocalPending(id, "p", "t");
+});
+
 it("blocks a corrupt pending marker instead of assigning a new key", () => {
   const workspaceId = a.mode === "LOCAL" ? a.workspaceId : "";
   localStorage.setItem(`thoth:local-workspace:v1:pending:${JSON.stringify([workspaceId, "p", "t"])}`, "{broken");

@@ -6,7 +6,7 @@ from pydantic import AwareDatetime
 
 from thoth.domain.actor import ActorRef
 from thoth.domain.auth import authenticated_data_scope_allows, current_authenticated_actor
-from thoth.domain.canonical import canonical_payload, domain_digest
+from thoth.domain.canonical import canonical_payload, domain_digest, same_stored_instant
 from thoth.domain.enums import ProjectLifecycle
 from thoth.domain.memory_preparation import MemoryAuthorityBasis
 from thoth.ports.auth import AuthSessionStorePort
@@ -44,7 +44,7 @@ class MemoryAdmissionService:
             or policy is None
             or policy.project_id != project_id
             or project.policy_binding_ref != policy.policy_id
-            or project.cutoff_at != cutoff_at
+            or not same_stored_instant(project.cutoff_at, cutoff_at)
             or project.lifecycle
             in {
                 ProjectLifecycle.CLOSING,

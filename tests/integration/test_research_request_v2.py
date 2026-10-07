@@ -30,6 +30,7 @@ from thoth.domain.enums import (
     ModelRole,
     PortfolioStatus,
     Reversibility,
+    RiskTier,
 )
 from thoth.domain.evidence_requirements import (
     EvidenceRanking,
@@ -45,7 +46,7 @@ from thoth.domain.evidence_requirements import (
     SemanticReviewDecision,
     SourceSelector,
 )
-from thoth.domain.hypothesis import Hypothesis, HypothesisPortfolio
+from thoth.domain.hypothesis import DiscriminatingTest, Hypothesis, HypothesisPortfolio
 from thoth.domain.model import ModelRequest, ModelResult
 from thoth.domain.model_dispatch import CONTROLLED_MODEL_CONTROL
 
@@ -61,6 +62,7 @@ class ControlledResearchModel:
         one: bool = False,
         na: bool = False,
         discover: bool = False,
+        tested: bool = False,
     ) -> None:
         self.started = asyncio.Event()
         self.release = asyncio.Event()
@@ -68,6 +70,7 @@ class ControlledResearchModel:
             self.release.set()
         self.missing = missing
         self.one, self.na, self.discover = one, na, discover
+        self.tested = tested
         self.calls: list[ModelRequest[BaseModel]] = []
 
     def resolve(self, *, provider: str, model: str | None = None):
@@ -178,7 +181,28 @@ class ControlledResearchModel:
                         assumptions=("Conditions remain stable",),
                         uncertainty="Not validated",
                         predicted_observations=(),
-                        discriminating_tests=(),
+                        discriminating_tests=(
+                            (
+                                DiscriminatingTest(
+                                    test_id="test-1",
+                                    procedure_candidate="Compare the rain run with a dry run",
+                                    expected_if_true="The rain run is worse",
+                                    expected_if_alternative="Both runs match",
+                                    risk_tier=RiskTier.R0,  # the model's own word; never used
+                                    reversibility=Reversibility.FULL,
+                                ),
+                                DiscriminatingTest(
+                                    test_id="test-2",
+                                    procedure_candidate="Repeat the rain run with the other sensor",
+                                    expected_if_true="The rain run is worse again",
+                                    expected_if_alternative="Both runs match",
+                                    risk_tier=RiskTier.R0,
+                                    reversibility=Reversibility.FULL,
+                                ),
+                            )
+                            if self.tested
+                            else ()
+                        ),
                         status=HypothesisStatus.DRAFT,
                     ),
                 ),

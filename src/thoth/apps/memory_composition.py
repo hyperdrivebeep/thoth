@@ -121,6 +121,7 @@ def create_memory_components(
 ) -> tuple[FullMemoryStorePort, FullProjectMemoryService]:
     store = stores.full_memory(fault_injector)
     access = None if resource_access is None else MemoryResourceAccess(store, resource_access)
+    settings = create_memory_settings(stores, clock, ids)
     service = FullProjectMemoryService(
         store=store,
         candidates=candidates,
@@ -138,7 +139,8 @@ def create_memory_components(
             clock=clock,
         ),
         resource_access=access,
-        injection=create_memory_settings(stores, clock, ids),
+        injection=settings,
+        expansion_switch=settings,
     )
     return (store if access is None else ScopedFullMemoryStore(store, access)), service
 

@@ -72,6 +72,7 @@ const coverageTerms: Record<string, string> = {
   RESEARCH_GAP: "조사 공백", APPLIED: "판단 반영됨", NOT_ASSESSED: "미평가", INCONCLUSIVE: "결론을 내지 못함",
   QUALIFIES: "조건부로 해당", SUPPORTS: "뒷받침", CONTRADICTS: "충돌", "answer:HOLD": "답변을 보류시킨 요인",
   APPLICABLE: "적용됨", COVERAGE_UNAVAILABLE: "평가기준 정보 없음", ASSESSMENT_UNAVAILABLE: "평가 결과 없음",
+  INSUFFICIENT: "근거 부족", REFUTES: "반박", IRRELEVANT: "관련 없음",
 };
 export function coverageTermLabel(value: string): string { return coverageTerms[value] ?? value; }
 const actionFamilies: Record<string, string> = {

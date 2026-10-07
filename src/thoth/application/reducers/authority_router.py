@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from thoth.domain.action import ActionCandidate, ActionRiskFacts
+from thoth.domain.action import PROHIBITED_EFFECT_KEYS, ActionCandidate, ActionRiskFacts
 from thoth.domain.base import DomainModel
 from thoth.domain.enums import ActionState, ExecutionAuthority, RiskTier
 from thoth.domain.errors import InvariantViolation
@@ -14,14 +14,7 @@ class AuthorityRoute(DomainModel):
 
 
 def classify_authority(facts: ActionRiskFacts) -> AuthorityRoute:
-    if any(
-        (
-            facts.changes_official_kpi,
-            facts.grants_waiver,
-            facts.changes_safety_threshold,
-            facts.finalizes_model_weights,
-        )
-    ):
+    if any(getattr(facts, key) for key in PROHIBITED_EFFECT_KEYS):
         return AuthorityRoute(
             risk_tier=RiskTier.R4,
             execution_authority=ExecutionAuthority.PROHIBITED_R4,

@@ -114,3 +114,41 @@ def test_user_facing_prose_follows_question_language_without_translating_identif
         "HYPOTHESIS_GENERATOR"
     )
     assert "specification, expected_information_value" in role_contract("ACTION_PLANNER")
+
+
+def test_user_facing_prose_is_asked_to_be_plain_korean_without_internal_names() -> None:
+    prompt = _prompt_envelope(
+        ModelRequest(
+            role=ModelRole.SEMANTIC_REVIEWER,
+            project_id="p",
+            cutoff_at=datetime.now(UTC),
+            context_pack=ContextPack(
+                case_id="c",
+                project_id="p",
+                object_id="o",
+                problem="한국어 질문",
+                evidence=(),
+                criteria=(),
+                sufficiency=None,
+                input_head_set_digest="a" * 64,
+            ),
+            output_model=EvidenceRanking,
+            prompt_version="fixture",
+            model_policy_ref="policy",
+            max_output_tokens=1000,
+        )
+    )
+    assert "easy Korean" in prompt
+    # The reader is a radar R&D engineer: standard terms and units stay as the material has them.
+    assert "standard abbreviations" in prompt and "SNR" in prompt and "dB" in prompt
+    assert "not an engineer" not in prompt and "English abbreviations" not in prompt
+    assert "internal codes" in prompt and "field names" in prompt and "made-up ids" in prompt
+    assert "탐지율 0.90 이상" in prompt  # a criterion is spelled out in words
+    assert "사실" in prompt and "확인 불가" in prompt  # the two labels are written in Korean
+    # Names that must reach the reader unchanged are still protected from translation.
+    assert "span IDs, file names" in prompt and "quoted source text" in prompt
+    # The old rule that kept the labels in English is gone; the new one names them once.
+    assert "FACT/UNKNOWN labels, GPU" not in prompt
+    assert "quoted evidence, FACT/UNKNOWN labels" not in prompt
+    # The structured output rules are untouched.
+    assert "Return only the schema object." in prompt and "Do not invent source IDs." in prompt

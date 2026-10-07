@@ -3,7 +3,20 @@
 Usage:
     python scripts/memory_selection_replay.py --source <workspace>/db/thoth.sqlite3 \
         --project project:eval2-memory-on --extra-question-from project:eval2-memory-off \
-        [--copy %TEMP%/memnarrow_eval_copy.sqlite3] [--markdown]
+        [--copy %TEMP%/memnarrow_eval_copy.sqlite3] [--markdown] [--expansion answers.json]
+
+    python scripts/memory_selection_replay.py --source <workspace>/db/thoth.sqlite3 \
+        --families families.jsonl --split dev|sealed [--split-file split.json] \
+        [--expansion-cache cache.json] [--conditions off,current,expansion] \
+        [--missing-out missing.json] [--output result.json] [--markdown]
+
+The second form measures recall by question family (see memory_eval_families.py for the file
+format and the measures). Sealed families are opened once: --confirm-sealed is required and a
+second opening needs --reopen-sealed, which turns that set into a development set.
+
+With --expansion, a file of the form {"Q5": {"synonyms": [...], "keywords": [...], "related": [...],
+"note_line": "..."}} gives the words a model added to each question (ask once, outside this
+script); the replay then also puts those words through the recall rules, with no model call here.
 
 The source database is opened read-only and copied with SQLite's backup API; every read after that
 is from the copy. For each question of the project (its first recorded context pack gives the
@@ -18,6 +31,7 @@ after the last recorded question; that is a replay on stored memories, not a rec
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sqlite3
@@ -29,6 +43,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import memory_eval_families as families
+
 from thoth.application.services.full_project_memory import FullProjectMemoryService
 from thoth.application.services.memory_recall import (
     RecallLimits,
@@ -39,6 +57,8 @@ from thoth.application.services.memory_recall import (
 from thoth.application.services.memory_supersession import superseded_memory_digests
 from thoth.domain.enums import MemoryKind
 from thoth.domain.memory import FullMemoryContextPack, FullMemoryRevision, MemoryTransition
+from thoth.domain.memory_expansion import QueryExpansion
+from thoth.domain.memory_terms import added_words, words
 
 # What the fixed answers (memory-eval-gold-20261001.md, "Q1 기억과 정답 대응") call
 # each automatic memory of the new-rule project, by the last part of its source reference.
@@ -68,8 +88,11 @@ class Replay:
     excluded: dict[str, int]
     common_terms: tuple[str, ...]
     follow_up_markers: tuple[str, ...]
-    # The earlier rule (any one shared word) on the same moment's pool, to check the replay itself.
+    # The earlier rule (any one word shared with the words stored at save time) on the same
+    # moment's pool, to check the replay itself.
     earlier_rule_included: int
+    # How each included memory met the question when added words were given (memory name -> how).
+    matched_by: dict[str, str]
 
 
 def copy_database(source: Path, destination: Path) -> None:
@@ -131,7 +154,10 @@ def allowed_at(
 
 
 def replay_question(
-    question: Question, revisions: Sequence[FullMemoryRevision], limits: RecallLimits
+    question: Question,
+    revisions: Sequence[FullMemoryRevision],
+    limits: RecallLimits,
+    expansion: QueryExpansion | None = None,
 ) -> Replay:
     rules = allowed_at(revisions, question.asked_at)
     if question.recorded is not None and question.recorded.selection is not None:
@@ -140,18 +166,22 @@ def replay_question(
         pool = [item for item in rules if item.memory_revision_id in recorded]
     else:
         pool = rules
-    query_terms = FullProjectMemoryService._tokens(question.text)  # pyright: ignore[reportPrivateUsage]
+    split = FullProjectMemoryService._tokens(question.text)  # pyright: ignore[reportPrivateUsage]
+    query_words = words(question.text)
+    added = () if expansion is None else added_words(expansion.text(), query_words)
     allowed = pool
     pool = [item for item in pool if not lacks_evidence(item)]
-    earlier = [item for item in allowed if not query_terms or query_terms & set(item.query_terms)]
-    earlier_rule = plan_recall(earlier, question.text, query_terms, limits)
-    narrowing = narrow_recall(pool, question.text, query_terms)
+    earlier = [item for item in allowed if not split or split & set(item.query_terms)]
+    earlier_rule = plan_recall(earlier, question.text, query_words, limits)
+    narrowing = narrow_recall(pool, question.text, query_words, added)
     plan = plan_recall(
         narrowing.relevant,
         question.text,
-        query_terms,
+        query_words,
         limits,
         follow_up=bool(narrowing.follow_up_markers),
+        added_words=added,
+        expansion_only=narrowing.expansion_only,
     )
     return Replay(
         question=question,
@@ -161,6 +191,11 @@ def replay_question(
         common_terms=tuple(sorted(narrowing.common_terms)),
         follow_up_markers=narrowing.follow_up_markers,
         earlier_rule_included=len(earlier_rule.included),
+        matched_by={
+            name_of(item): narrowing.matches[item.memory_revision_id].matched_by
+            for item in plan.included
+            if item.memory_revision_id in narrowing.matches
+        },
     )
 
 
@@ -219,13 +254,19 @@ def build_questions(
 
 
 def run(
-    db: Path, project: str, extra_project: str | None, limits: RecallLimits
+    db: Path,
+    project: str,
+    extra_project: str | None,
+    limits: RecallLimits,
+    expansions: dict[str, QueryExpansion] | None = None,
 ) -> list[dict[str, Any]]:
     packs, revisions = load(db, project)
     extra = load(db, extra_project)[0] if extra_project else None
     rows: list[dict[str, Any]] = []
     for question in build_questions(packs, extra):
-        replay = replay_question(question, revisions, limits)
+        replay = replay_question(
+            question, revisions, limits, (expansions or {}).get(question.label)
+        )
         ok, detail = judge(replay, revisions)
         recorded = question.recorded
         rows.append(
@@ -240,6 +281,7 @@ def run(
                 "excluded": replay.excluded,
                 "common_terms": list(replay.common_terms),
                 "follow_up": list(replay.follow_up_markers),
+                "matched_by": replay.matched_by,
                 "criterion": detail,
                 "pass": ok,
             }
@@ -267,23 +309,136 @@ def markdown(rows: Sequence[dict[str, Any]]) -> str:
 def main(argv: Sequence[str] | None = None, out: Callable[[str], object] = print) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", type=Path, required=True)
-    parser.add_argument("--project", required=True)
+    parser.add_argument("--project")
     parser.add_argument("--extra-question-from")
     parser.add_argument("--copy", type=Path)
     parser.add_argument("--markdown", action="store_true")
     parser.add_argument(
+        "--expansion", type=Path, help="JSON of the words a model added, by question label"
+    )
+    parser.add_argument(
         "--output", type=Path, help="write the result here (UTF-8) instead of printing"
     )
+    parser.add_argument("--families", type=Path, help="families.jsonl: recall by question family")
+    parser.add_argument("--split", choices=("dev", "sealed"))
+    parser.add_argument("--split-file", type=Path, help="split.json: {dev: [ids], sealed: [ids]}")
+    parser.add_argument(
+        "--expansion-cache", type=Path, help="added words by question, made outside"
+    )
+    parser.add_argument("--conditions", default=",".join(families.CONDITIONS))
+    parser.add_argument("--missing-out", type=Path, help="questions that lack cached added words")
+    parser.add_argument("--confirm-sealed", action="store_true")
+    parser.add_argument("--reopen-sealed", action="store_true")
     options = parser.parse_args(argv)
     copy = options.copy or Path(os.environ.get("TEMP", ".")) / "memory_replay_copy.sqlite3"
+    if options.families is not None:
+        return run_families(options, copy, out)
+    if options.project is None:
+        parser.error("--project is required without --families")
     copy_database(options.source, copy)
-    rows = run(copy, options.project, options.extra_question_from, RecallLimits())
+    expansions = (
+        None
+        if options.expansion is None
+        else {
+            label: QueryExpansion.model_validate(answer)
+            for label, answer in json.loads(options.expansion.read_text(encoding="utf-8")).items()
+        }
+    )
+    rows = run(copy, options.project, options.extra_question_from, RecallLimits(), expansions)
     text = markdown(rows) if options.markdown else json.dumps(rows, ensure_ascii=False, indent=2)
     if options.output is not None:
         options.output.write_text(text + "\n", encoding="utf-8")
     else:
         out(text)
     return 0 if all(bool(row["pass"]) for row in rows[1:]) else 1
+
+
+def family_player(limits: RecallLimits) -> families.Play:
+    def play(
+        text: str,
+        asked_at: datetime,
+        revisions: Sequence[FullMemoryRevision],
+        expansion: QueryExpansion | None,
+    ) -> Replay:
+        return replay_question(
+            Question("family", text, asked_at, None), revisions, limits, expansion
+        )
+
+    return play
+
+
+def run_families(options: argparse.Namespace, copy: Path, out: Callable[[str], object]) -> int:
+    """Recall by question family on a read-only copy of the memories; no model call."""
+    try:
+        if options.split is None:
+            raise families.FamilyError("--split dev|sealed is required with --families")
+        names = tuple(item for item in options.conditions.split(",") if item)
+        unknown = [item for item in names if item not in families.CONDITIONS]
+        if unknown:
+            raise families.FamilyError(f"unknown conditions: {unknown}")
+        raw = families.read_text(options.families)
+        split_file = (
+            None
+            if options.split_file is None
+            else json.loads(options.split_file.read_text(encoding="utf-8"))
+        )
+        chosen = families.select_split(families.parse_families(raw), options.split, split_file)
+        marker = families.sealed_marker(options.families)
+        if options.split == "sealed":
+            if not options.confirm_sealed:
+                raise families.FamilyError("sealed families are opened once: pass --confirm-sealed")
+            if marker.exists() and not options.reopen_sealed:
+                raise families.FamilyError(
+                    f"the sealed set was already opened ({marker.read_text(encoding='utf-8')!r}); "
+                    "opening it again makes it a development set: pass --reopen-sealed"
+                )
+        cache = (
+            {}
+            if options.expansion_cache is None
+            else families.load_expansion_cache(
+                json.loads(options.expansion_cache.read_text(encoding="utf-8"))
+            )
+        )
+        copy_database(options.source, copy)
+        revisions = {
+            project: load(copy, project)[1] for project in sorted({f.project for f in chosen})
+        }
+        report = families.evaluate(
+            chosen, revisions, families.RunSetup(family_player(RecallLimits()), cache, names)
+        )
+    except (families.FamilyError, OSError, ValueError) as exc:
+        sys.stderr.write(f"memory families: {exc}\n")
+        return 2
+    report["meta"] = {
+        "split": options.split,
+        "families": len(chosen),
+        "questions": sum(len(f.phrasings) for f in chosen),
+        "conditions": list(names),
+        "families_file_sha256": hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+        "expansion_cache_entries": len(cache),
+        "model_calls": 0,
+    }
+    if options.missing_out is not None:
+        options.missing_out.write_text(
+            json.dumps(report["missing_expansions"], ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+    text = (
+        families.markdown(report)
+        if options.markdown
+        else json.dumps(report, ensure_ascii=False, indent=2)
+    )
+    if options.output is not None:
+        options.output.write_text(text + "\n", encoding="utf-8")
+    else:
+        out(text)
+    if options.split == "sealed":
+        marker.write_text(
+            f"opened {datetime.now().astimezone().isoformat()} sha256 "
+            f"{report['meta']['families_file_sha256']}",
+            encoding="utf-8",
+        )
+    return 0
 
 
 if __name__ == "__main__":

@@ -443,8 +443,8 @@ def create_runtime(
         execution_handlers = ExecutionHandlers(
             store=execution_store,
             actions=action_store,
-            service=execution_service,
-            sandbox=sandbox_service,
+            service=execution_service, sandbox=sandbox_service,
+            ledger=ledger,
         )
         outcome_handlers = OutcomeHandlers(store=outcome_store, service=outcome_service)
         export_handlers = create_export_handlers(

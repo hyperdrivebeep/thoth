@@ -16,10 +16,25 @@ from thoth.domain.enums import (
     PortfolioStatus,
     Reversibility,
 )
-from thoth.domain.hypothesis import DiscriminatingTest
+from thoth.domain.hypothesis import DiscriminatingTest, ExpectedResult
 from thoth.domain.r2_loop import HypothesisExecutionAppraisal, R2ExecutionSummary
 from thoth.domain.recovery import RecoveryCandidateRevision
 from thoth.domain.test_validity import PredictionProposal
+
+
+class ExpectedByTest(DomainModel):
+    """What each hypothesis was said to expect from one discriminating test (contract v3)."""
+
+    test_id: str
+    rows: tuple[ExpectedResult, ...]
+
+
+class DroppedExpectation(DomainModel):
+    """An expected-result item that was not kept, and why; the rest of the output stands."""
+
+    test_id: str
+    hypothesis_id: str
+    reason: str
 
 
 class HypothesisGenerationDetails(DomainModel):
@@ -36,6 +51,12 @@ class HypothesisGenerationDetails(DomainModel):
     execution_appraisal: HypothesisExecutionAppraisal | None = None
     prediction_proposal: PredictionProposal | None = None
     semantic_review_ref: str | None = None
+    # Contract v3 only (absent means the v2 contract made it): the refutation conditions, what each
+    # hypothesis expects from each test, what was dropped, and the contract version.
+    refutation_conditions: tuple[str, ...] = ()
+    expected_results: tuple[ExpectedByTest, ...] = ()
+    dropped_expected_results: tuple[DroppedExpectation, ...] = ()
+    contract_version: str | None = None
 
 
 class PortfolioGenerationDetails(DomainModel):

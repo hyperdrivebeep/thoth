@@ -1,6 +1,8 @@
 """One dependency eligibility calculation for history and live consumers."""
 
+from thoth.application.services.hypothesis_link_view import HypothesisLinkReader
 from thoth.application.services.memory_supersession import superseded_memory_digests
+from thoth.domain.canonical import same_stored_instant
 from thoth.domain.enums import ImpactStatus
 from thoth.domain.research_basis import BasisCurrentness, ResearchResultBasis
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
@@ -82,7 +84,7 @@ class ResearchFreshnessService:
             if (
                 project is None
                 or policy is None
-                or project.cutoff_at != basis.cutoff_at
+                or not same_stored_instant(project.cutoff_at, basis.cutoff_at)
                 or policy.policy_digest != basis.policy_digest
             ):
                 issues.append(
@@ -147,6 +149,9 @@ class ResearchFreshnessService:
     def require_action_eligible(self, project_id: str, key: str, digest: str) -> None:
         if self.evaluate_entity(project_id, key, digest).state != "CURRENT":
             raise ValueError("DEPENDENCY_REVIEW_REQUIRED")
+        # An action or plan that rests on a hypothesis whose trace verdict has changed is not used
+        # for approval or execution until a person re-checks it (the hypothesis link).
+        HypothesisLinkReader(self.ledger).require_action_hypotheses_current(project_id, key)
 
     def ineligible_owner_refs(self, project_id: str) -> frozenset[str]:
         states = self.ledger.read_dependency_states(project_id)

@@ -27,6 +27,9 @@ export function resultUsageLine(status: ResearchStatus | undefined, operationId:
   const reuse = status.request?.operation_id === operationId ? status.stage_reuse : undefined;
   const reused = reuse && reuse.reused > 0 ? ` · 완료된 ${reuse.reused}단계 재사용 · 새로 부른 단계 ${reuse.new}` : "";
   const retried = usage.auto_retries ? ` · 자동 재시도 ${usage.auto_retries}회(연결 끊김)` : "";
-  return `이 조사: 토큰 ${tokens} · ${timeText(status, operationId, usage.wall_ms)}${reused}${retried} · 추정 비용 미확인`;
+  // The totals already include these calls; the share is shown so it is not a hidden cost.
+  const apart = Object.values(usage.by_purpose ?? {})
+    .map(part => ` · 그중 ${part.label} ${part.total_tokens == null ? "토큰 미확인" : `토큰 ${part.total_tokens.toLocaleString()}`}`).join("");
+  return `이 조사: 토큰 ${tokens} · ${timeText(status, operationId, usage.wall_ms)}${reused}${retried}${apart} · 추정 비용 미확인`;
 }
 

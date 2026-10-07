@@ -1,4 +1,4 @@
-"""memory/settings/read and memory/settings/update: the project's memory on/off switch."""
+"""memory/settings/read and memory/settings/update: the project's memory switches."""
 
 from __future__ import annotations
 
@@ -18,6 +18,8 @@ class MemorySettingsRead(DomainModel):
 class MemorySettingsUpdate(DomainModel):
     project_id: str = Field(min_length=1, max_length=160)
     memory_injection: bool
+    # Left out, it keeps what the project has; the web memory panel sends it with its own switch.
+    query_expansion: bool | None = None
     expected_digest: str | None = Field(default=None, min_length=64, max_length=64)
 
 
@@ -30,8 +32,12 @@ class MemorySettingsHandlers:
             raise RpcApplicationError(RpcErrorCode.PROJECT_NOT_FOUND, "project not found")
 
     def _value(self, project_id: str) -> dict[str, JsonValue]:
-        digest, enabled = self._service.read(project_id)
-        return {"memory_injection": enabled, "settings_digest": digest}
+        digest, settings = self._service.read_settings(project_id)
+        return {
+            "memory_injection": settings.memory_injection,
+            "query_expansion": settings.query_expansion,
+            "settings_digest": digest,
+        }
 
     async def read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = MemorySettingsRead.model_validate(value)
@@ -48,6 +54,7 @@ class MemorySettingsHandlers:
                 request.memory_injection,
                 request.expected_digest,
                 "human:local-user" if actor is None else actor.actor_id,
+                request.query_expansion,
             )
         except MemorySettingsConflict as exc:
             raise RpcApplicationError(RpcErrorCode.STALE_CHECKPOINT, str(exc)) from exc

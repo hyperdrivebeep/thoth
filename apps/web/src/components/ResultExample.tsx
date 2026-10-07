@@ -2,6 +2,7 @@ import { Button, Callout } from "@blueprintjs/core";
 import { objectList, objectValue, stringValues, textValue } from "../api/presentation";
 import excerpt from "../api/fixtures/iris-judgment-excerpt.json";
 import { ResearchResultCard } from "./ResearchResultCard";
+import { ReadableList } from "./ReadableList";
 
 const result = {
   answer: "현재 자료만으로는 보고 결과를 계획된 수용 조건과 직접 비교할 수 없습니다. 측정 환경과 평가 방법이 서로 달라 같은 조건의 결과인지 확인이 필요합니다.",
@@ -57,7 +58,7 @@ function LegacyResultCard() {
   const actions=objectList(objectValue(result.action_plan).alternatives);
   const gaps=stringValues(objectValue(result.assessment).missing_items);
   return <article className="assistant-message"><header>THOTH</header><div className="answer-text">{result.answer}</div>
-    <div className="result-notice"><strong>아직 확인할 내용</strong><ul>{gaps.map((gap,index)=><li key={index}>{gap}</li>)}</ul></div>
+    <div className="result-notice"><strong>아직 확인할 내용</strong><ReadableList items={gaps}/></div>
     <section className="conversation-findings"><h3>검토할 설명</h3>{hypotheses.map((item,index)=><div key={index}><p>{textValue(item.statement)}</p><small>{textValue(item.uncertainty)}</small></div>)}</section>
     <section className="conversation-findings"><h3>다음에 해볼 일</h3>{actions.map((item,index)=><div key={index}><p>{textValue(item.specification)}</p><small>{textValue(item.expected_information_value)}</small></div>)}</section>
     <nav className="answer-actions" aria-label="답변 상세">{["근거","가설 비교","참고값·조건","행동 비교","연구 지도","결과","기억","변경 이력"].map(label=><Button small minimal key={label}>{label}</Button>)}</nav>

@@ -43,6 +43,9 @@ class ModelDispatchRecord(DomainModel):
     cached_input_tokens: int | None = None
     retry_of_dispatch_id: str | None = None
     transport_index: int = 0
+    # Why the call was made when it is not the investigation's own work (for example
+    # MEMORY_QUERY_EXPANSION), so its usage can be shown apart.
+    purpose: str | None = None
 
 
 @dataclass

@@ -6,6 +6,8 @@ import { rpc } from "../api/rpcClient";
 import { HypothesisCompare } from "./HypothesisCompare";
 import { parseRequests, type ReviewControls, type ReviewTarget } from "./judgmentReview";
 import { ReviewDialog } from "./ReviewDialog";
+import { useHypothesisLinks } from "./useHypothesisLinks";
+import { useDiscrimination, useLessons, useSameHypotheses } from "./useJudgmentRecords";
 
 type SendInput = { hypothesisId: string; evidenceRef: string | null; reasons: string[]; note: string; digest?: string };
 
@@ -18,6 +20,10 @@ export function HypothesisCompareLive({ result, projectId, threadId }: { result:
     refetchInterval: query => parseRequests(query.state.data?.value.requests).some(item => item.status === "REVIEWING") ? 3000 : false });
   const requests = parseRequests(list.data?.value.requests);
   const [target, setTarget] = useState<ReviewTarget | null>(null);
+  const linked = useHypothesisLinks(projectId);
+  const discrimination = useDiscrimination(projectId);
+  const lessons = useLessons(projectId);
+  const same = useSameHypotheses(projectId);
   const send = useMutation({
     mutationFn: async (input: SendInput) => {
       const digest = input.digest ?? textValue(objectValue((await rpc<{ hypothesis: unknown }>("hypothesis/read",
@@ -39,7 +45,7 @@ export function HypothesisCompareLive({ result, projectId, threadId }: { result:
   return <>
     {list.error && <Callout compact intent="warning" role="status">재검토 요청 상태를 읽지 못했습니다.</Callout>}
     {!target && send.error && <Callout compact intent="danger" role="alert">재검토 요청을 보내지 못했습니다. {send.error.message}</Callout>}
-    <HypothesisCompare result={result} review={controls}/>
+    <HypothesisCompare result={result} review={controls} projectId={projectId} links={linked.links} distribution={linked.distribution} canDraft discrimination={discrimination.items} lessons={lessons.lessons} same={same.same}/>
     <ReviewDialog target={target} pending={send.isPending} error={target && send.error ? send.error.message : null} onClose={() => setTarget(null)}
       onSubmit={(reasons, note) => target && send.mutate({ hypothesisId: target.hypothesisId, evidenceRef: target.evidenceRef, reasons, note })}/>
   </>;

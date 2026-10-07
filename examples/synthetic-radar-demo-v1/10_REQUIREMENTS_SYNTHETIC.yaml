@@ -1,0 +1,15 @@
+# SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+notice: SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+identity: THOTH-SYNTH-RADAR-DEMO-v1
+document: requirements
+requirement:
+  id: SYN-REQ-RAD-001
+  title: Synthetic radar detects a target and avoids false tracks in dry, rain and fog (invented example)
+  statement: The synthetic radar meets its detection and false-track limits in every listed weather condition.
+  criteria:
+    - {id: SYN-C-DET-DRY, title: Detection rate in dry weather, measure: detection_rate, comparator: ">=", threshold: "0.90", unit: ratio, condition: weather=dry, required: true}
+    - {id: SYN-C-FA-DRY, title: False tracks per minute in dry weather, measure: false_track_rate, comparator: "<=", threshold: "0.50", unit: per_min, condition: weather=dry, required: true}
+    - {id: SYN-C-DET-RAIN, title: Detection rate in rain, measure: detection_rate, comparator: ">=", threshold: "0.90", unit: ratio, condition: weather=rain, required: true}
+    - {id: SYN-C-FA-RAIN, title: False tracks per minute in rain, measure: false_track_rate, comparator: "<=", threshold: "0.50", unit: per_min, condition: weather=rain, required: true}
+    - {id: SYN-C-DET-FOG, title: Detection rate in fog, measure: detection_rate, comparator: ">=", threshold: "0.90", unit: ratio, condition: weather=fog, required: true}
+    - {id: SYN-C-FA-FOG, title: False tracks per minute in fog, measure: false_track_rate, comparator: "<=", threshold: "0.50", unit: per_min, condition: weather=fog, required: true}

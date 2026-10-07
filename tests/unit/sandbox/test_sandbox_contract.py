@@ -61,9 +61,7 @@ def test_run_spec_forbids_secrets_and_unbounded_docker_image() -> None:
     with pytest.raises(ValidationError):
         spec(
             runtime_profile="DOCKER_POC",
-            image_digest=(
-                "--mount=type=bind,src=/,dst=/host@sha256:" + "a" * 64
-            ),
+            image_digest=("--mount=type=bind,src=/,dst=/host@sha256:" + "a" * 64),
             argv=[f"python@sha256:{'b' * 64}", "-c", "print(1)"],
         )
     with pytest.raises(ValidationError):
@@ -344,3 +342,52 @@ async def test_sandbox_rejects_cross_project_input_before_adapter(tmp_path: Path
     with pytest.raises(SandboxFailure, match="outside the project"):
         await service.run(cross_project_spec)
     assert adapter.seen_specs == []
+
+
+class MicrosecondProjectStore:
+    """A project whose cutoff was typed with sub-millisecond digits."""
+
+    def read(self, project_id: str) -> Project | None:
+        return Project(
+            project_id=project_id,
+            name="Sandbox",
+            cutoff_at=datetime(2026, 8, 31, 0, 0, 0, 456, tzinfo=UTC),
+            overlay="default",
+            policy_binding_ref="policy:sandbox:v1",
+        )
+
+
+def preflight_service() -> SandboxService:
+    router = RegisteredSandboxRouter()
+    router.register(
+        SandboxRuntimeProfile.SCRIPTED,
+        ScriptedSandboxAdapter(),
+        available=True,
+        version="scripted:test",
+    )
+    return SandboxService(
+        router=router,
+        artifacts=cast(ArtifactLedgerPort, object()),
+        objects=cast(ObjectStorePort, object()),
+        controls=cast(ControlRecordService, object()),
+        ingestion=cast(IngestionService, object()),
+        projects=cast(ProjectStorePort, MicrosecondProjectStore()),
+        policies=PolicyGate(policies=StaticSandboxPolicyStore(), clock=FixedClock()),
+        ledger=cast(LedgerPort, object()),
+        clock=cast(ClockPort, FixedClock()),
+        ids=cast(IdGeneratorPort, object()),
+    )
+
+
+def test_preflight_takes_the_stored_cutoff_for_the_project_cutoff_typed_with_microseconds() -> None:
+    stored = datetime(2026, 8, 31, tzinfo=UTC)  # what a stored basis keeps: milliseconds
+    try:
+        preflight_service().preflight(spec(cutoff_at=stored))
+    except SandboxFailure as exc:
+        assert "stale" not in str(exc)
+
+
+def test_preflight_still_refuses_a_cutoff_that_moved_by_a_millisecond() -> None:
+    moved = datetime(2026, 8, 31, 0, 0, 0, 1000, tzinfo=UTC)
+    with pytest.raises(SandboxFailure, match="stale"):
+        preflight_service().preflight(spec(cutoff_at=moved))

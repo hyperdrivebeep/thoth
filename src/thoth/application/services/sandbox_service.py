@@ -11,7 +11,12 @@ from thoth.application.services.ingestion_service import IngestArtifactCommand, 
 from thoth.application.services.policy_gate import PolicyDenied, PolicyGate
 from thoth.application.services.resource_scope_context import resource_stage_scope
 from thoth.domain.artifact import ArtifactEnvelope
-from thoth.domain.canonical import canonical_payload, domain_digest, head_set_digest
+from thoth.domain.canonical import (
+    canonical_payload,
+    domain_digest,
+    head_set_digest,
+    same_stored_instant,
+)
 from thoth.domain.enums import AuthorityState, CutoffState, SecurityClass
 from thoth.domain.ingestion import IngestionResult
 from thoth.domain.policy import (
@@ -297,13 +302,16 @@ class SandboxService:
         if (
             project is None
             or project.revision != basis.project_revision
-            or project.cutoff_at != basis.cutoff_at
+            or not same_stored_instant(project.cutoff_at, basis.cutoff_at)
             or project.policy_binding_ref != basis.policy_id
             or (
                 spec.project_revision is not None
                 and spec.project_revision != basis.project_revision
             )
-            or (spec.cutoff_at is not None and spec.cutoff_at != basis.cutoff_at)
+            or (
+                spec.cutoff_at is not None
+                and not same_stored_instant(spec.cutoff_at, basis.cutoff_at)
+            )
             or (
                 spec.current_head_set_digest is not None
                 and spec.current_head_set_digest != basis.head_set_digest
@@ -421,7 +429,8 @@ class SandboxService:
         if project is None:
             raise SandboxFailure(SandboxErrorCode.INPUT_INVALID, "sandbox project does not exist")
         if (spec.project_revision is not None and spec.project_revision != project.revision) or (
-            spec.cutoff_at is not None and spec.cutoff_at != project.cutoff_at
+            spec.cutoff_at is not None
+            and not same_stored_instant(spec.cutoff_at, project.cutoff_at)
         ):
             raise SandboxFailure(SandboxErrorCode.INPUT_INVALID, "sandbox project/cutoff is stale")
         if project.policy_binding_ref != policy.policy_id:

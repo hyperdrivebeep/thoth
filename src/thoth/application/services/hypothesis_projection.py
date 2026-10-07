@@ -4,10 +4,19 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from thoth.application.services.hypothesis_contract_v3 import CONTRACT_V3, base_tests, v3_details
+from thoth.application.services.hypothesis_verdict_link import running_verdict_link
 from thoth.domain.canonical import canonical_payload, domain_digest
-from thoth.domain.hypothesis import Hypothesis, HypothesisPortfolio
+from thoth.domain.hypothesis import (
+    Hypothesis,
+    HypothesisPortfolio,
+    HypothesisV3,
+)
 from thoth.domain.hypothesis_full import HypothesisPortfolioRecord, HypothesisRecord
-from thoth.domain.research_projection import HypothesisGenerationDetails, PortfolioGenerationDetails
+from thoth.domain.research_projection import (
+    HypothesisGenerationDetails,
+    PortfolioGenerationDetails,
+)
 from thoth.domain.test_validity import hypothesis_semantic_digest
 
 
@@ -15,30 +24,46 @@ def hypothesis_view(record: HypothesisRecord) -> Hypothesis | None:
     details = record.generation_details
     if details is None:
         return None
-    return Hypothesis.model_validate(
+    fields = {
+        "hypothesis_id": record.hypothesis_id,
+        "object_id": record.object_id,
+        "statement": record.statement,
+        "observed_problem": record.observed_problem,
+        "primary_locus": details.primary_locus,
+        "contributing_loci": details.contributing_loci,
+        "causal_depth": details.causal_depth,
+        "scope_conditions": record.scope,
+        "support_evidence_refs": record.evidence_refs,
+        "counterevidence_refs": record.counterevidence_refs,
+        "missing_evidence": details.missing_evidence,
+        "counterevidence_queries": record.counterevidence_queries,
+        "assumptions": details.assumptions,
+        "uncertainty": details.uncertainty,
+        "predicted_observations": details.predicted_observation_candidates,
+        "discriminating_tests": details.discriminating_test_candidates,
+        "status": details.candidate_status,
+        "primary_intent": record.primary_intent,
+        "critical_review": details.critical_review,
+        "execution_appraisal": details.execution_appraisal,
+        "prediction_proposal": details.prediction_proposal,
+        "semantic_review_ref": details.semantic_review_ref,
+    }
+    if details.contract_version != CONTRACT_V3:
+        return Hypothesis.model_validate(fields)
+    # The generator was shown the v3 form: give back what it said beside the v2 content.
+    rows = {item.test_id: item.rows for item in details.expected_results}
+    tests = [
         {
-            "hypothesis_id": record.hypothesis_id,
-            "object_id": record.object_id,
-            "statement": record.statement,
-            "observed_problem": record.observed_problem,
-            "primary_locus": details.primary_locus,
-            "contributing_loci": details.contributing_loci,
-            "causal_depth": details.causal_depth,
-            "scope_conditions": record.scope,
-            "support_evidence_refs": record.evidence_refs,
-            "counterevidence_refs": record.counterevidence_refs,
-            "missing_evidence": details.missing_evidence,
-            "counterevidence_queries": record.counterevidence_queries,
-            "assumptions": details.assumptions,
-            "uncertainty": details.uncertainty,
-            "predicted_observations": details.predicted_observation_candidates,
-            "discriminating_tests": details.discriminating_test_candidates,
-            "status": details.candidate_status,
-            "primary_intent": record.primary_intent,
-            "critical_review": details.critical_review,
-            "execution_appraisal": details.execution_appraisal,
-            "prediction_proposal": details.prediction_proposal,
-            "semantic_review_ref": details.semantic_review_ref,
+            **test.model_dump(),
+            "expected_by_hypothesis": [r.model_dump() for r in rows.get(test.test_id, ())],
+        }
+        for test in details.discriminating_test_candidates
+    ]
+    return HypothesisV3.model_validate(
+        {
+            **fields,
+            "discriminating_tests": tests,
+            "refutation_conditions": details.refutation_conditions,
         }
     )
 
@@ -97,12 +122,13 @@ def full_hypothesis(
         assumptions=candidate.assumptions,
         uncertainty=candidate.uncertainty,
         predicted_observation_candidates=candidate.predicted_observations,
-        discriminating_test_candidates=candidate.discriminating_tests,
+        discriminating_test_candidates=base_tests(candidate),
         candidate_status=candidate.status,
         critical_review=candidate.critical_review,
         execution_appraisal=candidate.execution_appraisal,
         prediction_proposal=candidate.prediction_proposal,
         semantic_review_ref=candidate.semantic_review_ref,
+        **v3_details(candidate),
     )
     draft: dict[str, object] = {} if current is None else current.model_dump(mode="python")
     invalidated = (
@@ -136,8 +162,10 @@ def full_hypothesis(
                 else candidate.primary_locus.value,
                 "causal_depth": candidate.causal_depth.value,
             }
+    link = running_verdict_link()
     draft.update(
         {
+            **({} if link is None else {"verdict_link": link}),
             "hypothesis_revision_id": revision_id,
             "hypothesis_id": candidate.hypothesis_id,
             "project_id": project_id,

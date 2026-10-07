@@ -1,0 +1,23 @@
+# SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+notice: SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE
+identity: THOTH-SYNTH-RADAR-DEMO-v1
+document: result
+available_from_phase: 1
+condition: weather=dry
+test_case: SYN-TC-DRY
+observed_at: "2026-01-01T00:00:00Z"   # assumed date
+trials_csv: data/30_DRY_TRIALS_SYNTHETIC.csv
+detection:
+  criterion: SYN-C-DET-DRY
+  numerator: 19
+  denominator: 20
+  unit: ratio
+  value: "0.95"
+false_track:
+  criterion: SYN-C-FA-DRY
+  numerator: 3
+  denominator: 10
+  unit: per_min
+  value: "0.30"
+  observation_minutes: 10
+  event_ids: [SYN-FT-DRY-001, SYN-FT-DRY-002, SYN-FT-DRY-003]

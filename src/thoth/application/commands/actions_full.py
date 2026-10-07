@@ -4,6 +4,7 @@ from typing import cast
 
 from pydantic import Field, JsonValue
 
+from thoth.application.commands.action_create_input import CreateInput
 from thoth.application.commands.action_effort import HumanEffortEstimateInput, revise_action
 from thoth.application.commands.action_generation import GenerateInput as GenerateInput
 from thoth.application.commands.action_generation import generate_actions
@@ -72,17 +73,6 @@ class AuditReadInput(ProjectInput):
     action_id: str | None = Field(default=None, max_length=160)
     plan_id: str | None = Field(default=None, max_length=160)
     revision_digest: str | None = Field(default=None, min_length=64, max_length=64)
-
-
-class CreateInput(ProjectInput):
-    object_id: str = Field(min_length=1, max_length=160)
-    portfolio_id: str | None = Field(default=None, max_length=160)
-    hypothesis_refs: tuple[str, ...] = ()
-    primary_purpose: str = Field(min_length=1, max_length=80)
-    secondary_purposes: tuple[str, ...] = ()
-    specification: dict[str, JsonValue]
-    evidence_refs: tuple[str, ...]
-    expected_object_revision: str | None = Field(default=None, min_length=64, max_length=64)
 
 
 class ActionRevisionBound(ActionReadInput):
@@ -375,6 +365,7 @@ class ActionHandlers:
                 secondary_purposes=request.secondary_purposes,
                 specification=cast(dict[str, object], request.specification),
                 evidence_refs=request.evidence_refs,
+                test_refs=request.test_refs,
             )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc

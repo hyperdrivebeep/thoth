@@ -1,0 +1,14 @@
+
+observed_at,denominator,numerator,raw_value,value,result_revision,required,rounding_mode,rounding_digits,condition,unit,threshold,comparator,measure,rule_revision,criterion_id,relation,to_id,from_id,source_span_refs,fields_json,title,kind,item_key,target_id,target_kind,result_id,rule_id,link_id,item_id,base_set_digest,row_type,format
+,,,,,,true,HALF_UP,2,weather=dry,ratio,0.90,>=,detection_rate,1,CRIT-1,,,,,,,,,,,,R-1,,,,RULE,thoth-trace-csv/1
+
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,Three,TEST_CASE,k-TC-1,,,,,,TC-1,,ITEM,thoth-trace-csv/1
+,,,,,,,,,,,,,,,,,,,,,One,REQUIREMENT,k-REQ-1,,,,,,REQ-1,,ITEM,thoth-trace-csv/1
+
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,VERIFIED_BY,TC-1,CRIT-1,,,,,,,,,,L-2,,,LINK,thoth-trace-csv/1
+,,,,,,,,,,,,,,,,,,,,,Two,CRITERION,k-CRIT-1,,,,,,CRIT-1,,ITEM,thoth-trace-csv/1
+
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,REFINES,REQ-1,CRIT-1,,,,,,,,,,L-1,,,LINK,thoth-trace-csv/1

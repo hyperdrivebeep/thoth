@@ -373,6 +373,9 @@ def _prepare_work(
         work.resume_from_operation_id = resume_from
     if request.model_settings is not None:
         work.context["model_settings"] = request.model_settings.model_dump(mode="json")
+    from thoth.application.services.trace_origin import apply_trace_origin
+
+    apply_trace_origin(work, attempt.continuation, request.project_id)
     if attempt.continuation.get("retry_policy") == "ONCE_TRANSIENT_429":
         from thoth.domain.oauth_retry import OAuthRetryPolicy, allows_once_transient_429
 
@@ -393,6 +396,9 @@ def _prepare_work(
     ):
         # The project's own switch (off unless turned on): one cut-off call may be sent once more.
         work.auto_retry_interrupted_call = True
+    calls = host.call_settings
+    if calls is not None and calls.hypothesis_contract_v3(request.project_id):
+        work.hypothesis_contract_v3 = True  # the project's own switch, off unless turned on
     boundary.validate_sources = lambda: host.analysis.require_current_sources(
         work.evidence, work.context.get("source_context_digest")
     )

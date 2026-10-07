@@ -133,6 +133,10 @@ it("says how many finished stages a resumed run reused and counts automatic retr
   const retried = resultUsageLine(status(entry({ auto_retries: 1, calls: 3 })), "op");
   expect(retried).toBe("이 조사: 토큰 15 · 걸린 시간 3분 · 자동 재시도 1회(연결 끊김) · 추정 비용 미확인");
   expect(resultUsageLine(status(entry({ auto_retries: 0 })), "op")).not.toContain("자동 재시도");
+  const widened = resultUsageLine(status(entry({ by_purpose: { MEMORY_QUERY_EXPANSION: { label: "기억 검색어 넓히기", calls: 1, total_tokens: 220 } } })), "op");
+  expect(widened).toBe("이 조사: 토큰 15 · 걸린 시간 3분 · 그중 기억 검색어 넓히기 토큰 220 · 추정 비용 미확인");
+  const unknown = resultUsageLine(status(entry({ by_purpose: { MEMORY_QUERY_EXPANSION: { label: "기억 검색어 넓히기", calls: 1, total_tokens: null } } })), "op");
+  expect(unknown).toContain("그중 기억 검색어 넓히기 토큰 미확인");
 });
 
 

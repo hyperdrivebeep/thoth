@@ -19,6 +19,7 @@ export const recordViews: RecordView[] = [
   {namespace:"export",label:"내보내기",description:"목적 · audience · 고정 snapshot · 공개 경계",method:"export/list"},
   {namespace:"operation",label:"비동기 제어",description:"실행 상태 · checkpoint · 복구 정보",method:"operation/read",scope:"operation"},
   {namespace:"model",label:"모델 · 설정",description:"기본값 · 추론강도 · 실제 소비 snapshot",method:"model/settings/read"},
+  {namespace:"trace",label:"추적표",description:"요구사항 · 기준 · 결과와 규칙으로 계산한 판정",method:"trace/read"},
   {namespace:"workspace",label:"워크스페이스 설정",description:"모델 연결 · 인터넷 동의 · 첫 실행 준비",method:"workspace/setup/read"},
   {namespace:"projectpack",label:"검증 예제",description:"등록된 ProjectPack · scripted/live 구분",method:"projectpack/list",note:"예제 조회는 실행하지 않습니다. 실제 연구 기본 흐름과 별도입니다."},
   {namespace:"field",label:"현장 평가",description:"프로토콜 · 참여 세션 · 점수 · privacy-safe export",method:null,note:"현재 공개 field namespace는 COMMAND만 제공합니다. 비변경 조회 API는 없으며 이 UI는 실제 참가자 평가나 시간절감·WTP를 입증하지 않습니다. 승인된 프로토콜·참여 동의가 있는 경우에만 고급 명령을 사용하세요."},

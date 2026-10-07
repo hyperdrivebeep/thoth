@@ -1,10 +1,19 @@
 from __future__ import annotations
 
-from pydantic import AwareDatetime, model_validator
+from typing import cast
+
+from pydantic import AwareDatetime, Field, model_validator
 
 from thoth.domain.base import DomainModel
 from thoth.domain.ids import ProjectId, Sha256
 from thoth.domain.research_projection import ActionGenerationDetails, ActionPlanGenerationDetails
+
+
+class ActionTestRef(DomainModel):
+    """The discriminating test (of one hypothesis) an action request was drafted from."""
+
+    hypothesis_id: str = Field(min_length=1, max_length=200)
+    test_id: str = Field(min_length=1, max_length=200)
 
 
 class ActionRecord(DomainModel):
@@ -14,6 +23,7 @@ class ActionRecord(DomainModel):
     object_id: str
     portfolio_id: str
     hypothesis_refs: tuple[str, ...] = ()
+    test_refs: tuple[ActionTestRef, ...] = ()
     primary_purpose: str | None
     secondary_purposes: tuple[str, ...] = ()
     specification: dict[str, object]
@@ -35,6 +45,28 @@ class ActionRecord(DomainModel):
     created_at: AwareDatetime
     generation_details: ActionGenerationDetails | None = None
     schema_version: str = "1.0.0"
+
+    @model_validator(mode="before")
+    @classmethod
+    def read_test_refs_from_the_specification(cls, data: object) -> object:
+        """An older record names its test in its specification; the record carries it as a field.
+
+        A new request sends the refs as a field of its own (covered by the revision digest), and
+        the specification does not carry them. A record stored before that kept them inside its
+        specification (also covered by the digest); they are read from there if the field is empty.
+        """
+        if not isinstance(data, dict):
+            return data
+        fields = cast("dict[str, object]", data)
+        if fields.get("test_refs"):
+            return fields
+        specification = fields.get("specification")
+        found = (
+            cast("dict[str, object]", specification).get("test_refs")
+            if isinstance(specification, dict)
+            else None
+        )
+        return {**fields, "test_refs": found} if found else fields
 
     @model_validator(mode="after")
     def enforce_policy_boundary(self) -> ActionRecord:

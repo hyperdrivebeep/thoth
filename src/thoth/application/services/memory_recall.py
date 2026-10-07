@@ -7,7 +7,18 @@ how many question words match, then a spread across kinds, then newest, then id.
 An automatic memory (a hypothesis, action or outcome saved after an investigation) is let in more
 narrowly than a user's correction: the question must name it, quote it, be a follow-up question
 ("앞에서 세운 가설"), or share two words that are not words every memory of the project shares.
-Counting words is all this does; no score is made.
+Counting words is all this does; no score is made. Words are counted per question word: a question
+word is matched once when it, or a pair of its letters, is in the memory (see memory_terms.py).
+The memory's words are made from its text when it is recalled, not read from the words stored with
+it, so memories saved under an older splitting rule are found by the current one.
+
+An automatic memory also needs at least one question word found as written (not only through a
+letter pair of it) besides the two; a word met only through a pair is marked as a partial match.
+
+Words a model added to the question (memory_expansion.py) take part the same way, in a second
+group: a memory the question's own words reach comes first, one reached only with the added words
+follows, and the count an automatic memory needs is made from both. An added word that the
+question already has (itself, or one letter pair of it) is not counted again.
 """
 
 from __future__ import annotations
@@ -18,7 +29,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 from thoth.domain.enums import MemoryKind, MemoryPayloadMode
-from thoth.domain.memory import FullMemoryRevision
+from thoth.domain.memory import FullMemoryRevision, MemoryMatch
+from thoth.domain.memory_terms import Word, matched_words, terms, word_runs
 
 OMITTED_BY_BUDGET = "OMITTED_BY_BUDGET"
 AUTO_MEMORY_WEAK_MATCH = "AUTO_MEMORY_WEAK_MATCH"
@@ -126,16 +138,38 @@ def follow_up_markers(query: str) -> tuple[str, ...]:
     return tuple(found)
 
 
-def common_terms(eligible: Sequence[FullMemoryRevision]) -> frozenset[str]:
-    """Words that appear in at least half of the memories allowed at all; counting only."""
+_LABEL = re.compile(r"^[A-Za-z_][\w ]{0,40}:\s+")
+
+
+def recall_text(item: FullMemoryRevision) -> str:
+    """The words a memory is found by: a correction's text, or a new memory's values without the
+    reference line and the field names that every memory of a kind shares."""
+
+    if item.assertion is not None:
+        return item.assertion
+    excerpt = item.content_excerpt
+    if item.source_ref and excerpt.startswith(item.source_ref + "\n"):
+        excerpt = excerpt[len(item.source_ref) + 1 :]
+    first, *rest = excerpt.split(" | ")
+    return " ".join([first, *(_LABEL.sub("", part) for part in rest)])
+
+
+def item_terms(item: FullMemoryRevision) -> frozenset[str]:
+    return terms(recall_text(item))
+
+
+def common_terms(
+    eligible: Sequence[FullMemoryRevision], query_words: Sequence[Word]
+) -> frozenset[str]:
+    """Question words that appear in at least half of the memories allowed at all; counting only."""
 
     if len(eligible) < COMMON_TERM_MIN_POOL:
         return frozenset()
     counts: dict[str, int] = defaultdict(int)
     for item in eligible:
-        for term in set(item.query_terms):
-            counts[term] += 1
-    return frozenset(term for term, count in counts.items() if count * 2 >= len(eligible))
+        for run in word_runs(matched_words(query_words, item_terms(item))):
+            counts[run] += 1
+    return frozenset(run for run, count in counts.items() if count * 2 >= len(eligible))
 
 
 @dataclass
@@ -144,39 +178,82 @@ class Narrowing:
     excluded: dict[str, list[str]] = field(default_factory=lambda: {})
     common_terms: frozenset[str] = frozenset()
     follow_up_markers: tuple[str, ...] = ()
+    # Memories that only the added words let in, and how each memory met the question.
+    expansion_only: frozenset[str] = frozenset()
+    matches: dict[str, MemoryMatch] = field(default_factory=lambda: {})
 
 
 def narrow_recall(
-    eligible: Sequence[FullMemoryRevision], query: str, query_terms: frozenset[str]
+    eligible: Sequence[FullMemoryRevision],
+    query: str,
+    query_words: Sequence[Word],
+    added_words: Sequence[Word] = (),
 ) -> Narrowing:
     """Which of the memories allowed at all meet this question, and why the others do not."""
 
     markers = follow_up_markers(query)
-    common = common_terms(eligible)
+    own_common = common_terms(eligible, query_words)
+    common = common_terms(eligible, (*query_words, *added_words)) if added_words else own_common
     narrowing = Narrowing(common_terms=common, follow_up_markers=markers)
     text = _norm(query)
+    later: set[str] = set()
 
     def leave_out(item: FullMemoryRevision, reason: str) -> None:
         narrowing.excluded.setdefault(reason, []).append(item.memory_revision_id)
 
+    def let_in(
+        item: FullMemoryRevision,
+        own: frozenset[str],
+        own_whole: frozenset[str],
+        added: frozenset[str],
+        added_whole: frozenset[str],
+    ) -> None:
+        narrowing.relevant.append(item)
+        by_expansion = item.memory_revision_id in later
+        added = added if by_expansion else frozenset()
+        partial, partial_added = own - own_whole, added - added_whole
+        narrowing.matches[item.memory_revision_id] = MemoryMatch(
+            matched_by="EXPANSION" if by_expansion else "QUERY",
+            words=tuple(sorted(own)),
+            added_words=tuple(sorted(added)),
+            match_strength="PARTIAL" if partial or partial_added else "WHOLE",
+            partial_words=tuple(sorted(partial)),
+            partial_added_words=tuple(sorted(partial_added)),
+        )
+
     for item in eligible:
-        shared = query_terms & set(item.query_terms)
-        if markers or not query_terms:
-            narrowing.relevant.append(item)
+        item_words = item_terms(item)
+        met = matched_words(query_words, item_words)
+        shared = word_runs(met)
+        whole = frozenset(word.run for word in met if word.run in item_words)
+        met_added = matched_words(added_words, item_words)
+        added = word_runs(met_added)
+        added_whole = frozenset(word.run for word in met_added if word.run in item_words)
+        if markers or not query_words:
+            let_in(item, shared, whole, frozenset(), frozenset())
         elif not is_auto_memory(item):
-            # A user's correction needs one shared word, as before.
+            # A user's correction needs one matched word, as before.
             if shared:
-                narrowing.relevant.append(item)
+                let_in(item, shared, whole, frozenset(), frozenset())
+            elif added:
+                later.add(item.memory_revision_id)
+                let_in(item, shared, whole, added, added_whole)
             else:
                 leave_out(item, QUERY_IRRELEVANT)
-        elif _names_it(item, text) or _quotes_it(item, text):
-            narrowing.relevant.append(item)
-        elif not shared:
+        elif (
+            _names_it(item, text)
+            or _quotes_it(item, text)
+            or (len(shared - own_common) >= 2 and whole - own_common)
+        ):
+            let_in(item, shared, whole, frozenset(), frozenset())
+        elif len((shared | added) - common) >= 2 and added_whole - common:
+            later.add(item.memory_revision_id)
+            let_in(item, shared, whole, added, added_whole)
+        elif not shared and not added:
             leave_out(item, QUERY_IRRELEVANT)
-        elif len(shared - common) >= 2:
-            narrowing.relevant.append(item)
         else:
             leave_out(item, AUTO_MEMORY_WEAK_MATCH)
+    narrowing.expansion_only = frozenset(later)
     return narrowing
 
 
@@ -195,7 +272,7 @@ def _names_it(item: FullMemoryRevision, query: str) -> bool:
 def order_recall(
     items: Sequence[FullMemoryRevision],
     query: str,
-    query_terms: frozenset[str],
+    query_words: Sequence[Word],
     follow_up: bool = False,
 ) -> list[FullMemoryRevision]:
     text = _norm(query)
@@ -203,7 +280,9 @@ def order_recall(
     for item in items:
         # A follow-up has no words to count: a user's correction goes first, the rest by recency.
         third = (
-            int(not is_auto_memory(item)) if follow_up else len(query_terms & set(item.query_terms))
+            int(not is_auto_memory(item))
+            if follow_up
+            else len(matched_words(query_words, item_terms(item)))
         )
         groups[(_names_it(item, text), _quotes_it(item, text), third)].append(item)
     ordered: list[FullMemoryRevision] = []
@@ -233,14 +312,26 @@ class RecallPlan:
 def plan_recall(
     candidates: Sequence[FullMemoryRevision],
     query: str,
-    query_terms: frozenset[str],
+    query_words: Sequence[Word],
     limits: RecallLimits,
     follow_up: bool = False,
+    added_words: Sequence[Word] = (),
+    expansion_only: frozenset[str] = frozenset(),
 ) -> RecallPlan:
     """Narrow the memories that may be recalled to the ones the question is given."""
 
     plan = RecallPlan()
-    ordered = order_recall(candidates, query, query_terms, follow_up)
+    ordered = order_recall(
+        [i for i in candidates if i.memory_revision_id not in expansion_only],
+        query,
+        query_words,
+        follow_up,
+    ) + order_recall(
+        [i for i in candidates if i.memory_revision_id in expansion_only],
+        query,
+        (*query_words, *added_words),
+        follow_up,
+    )
     plan.retrieved = ordered[: limits.candidates]
 
     def leave_out(item: FullMemoryRevision, limit: str) -> None:

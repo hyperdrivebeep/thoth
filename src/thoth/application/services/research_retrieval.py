@@ -85,7 +85,10 @@ def text_neighbors(
 
 
 def lexical_candidates(
-    question: str, queries: tuple[str, ...], evidence: tuple[EvidenceSpan, ...]
+    question: str,
+    queries: tuple[str, ...],
+    evidence: tuple[EvidenceSpan, ...],
+    pinned: tuple[str, ...] = (),
 ) -> tuple[EvidenceSpan, ...]:
     policy, started = retrieval_policy(), perf_counter_ns()
     terms = {token for token in tokens(" ".join((question, *queries))) if len(token) >= _MIN_TERM}
@@ -100,9 +103,10 @@ def lexical_candidates(
             if span.span_id in exact or _term_hits(span.exact_text, terms)
         ]
     # A bounded shortlist, not a claim that unselected source territory was searched.
-    selected: list[EvidenceSpan] = []
-    size = 0
-    for span in _interleave_artifacts(ranked):
+    # A pinned span is kept first when it is retrievable at all; it never widens what is eligible.
+    selected = [span for span in eligible if span.span_id in pinned][: policy.max_spans]
+    size = sum(len(span.exact_text) for span in selected)
+    for span in _interleave_artifacts([span for span in ranked if span.span_id not in pinned]):
         if (
             len(selected) >= policy.max_spans
             or size + len(span.exact_text) > policy.character_budget
@@ -117,7 +121,7 @@ def lexical_candidates(
         result,
         started,
     )
-    replay_retrieval_shadows(lambda: lexical_candidates(question, queries, evidence))
+    replay_retrieval_shadows(lambda: lexical_candidates(question, queries, evidence, pinned))
     return result
 
 

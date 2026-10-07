@@ -14,7 +14,7 @@ from thoth.domain.model_dispatch import (
     ModelReceiveObservation,
 )
 from thoth.domain.operation import OperationRecord
-from thoth.domain.research_execution import ResearchFence
+from thoth.domain.research_execution import ResearchFence, model_purpose
 from thoth.domain.research_lease import ResearchLeaseLost, ResearchPaused
 from thoth.domain.research_request import ResearchBudget, ThreadRequestRevision
 from thoth.ports.governance import GovernanceStorePort
@@ -170,6 +170,7 @@ class RequestBoundary:
             payload_digest=hashlib.sha256(payload).hexdigest(),
             output_reserved=output_tokens,
             model_settings=self.request.model_settings,
+            purpose=model_purpose.get(),
         )
         project = self.request.project_id
         with self.records.ledger.transaction():
