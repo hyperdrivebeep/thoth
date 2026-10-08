@@ -2,12 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-import importlib.util
 import json
 import os
 import platform
-import shutil
-import sqlite3
 import subprocess
 import sys
 from datetime import UTC, datetime
@@ -17,11 +14,11 @@ from typing import Annotated, Literal
 import orjson
 import typer
 from rich.console import Console
-from rich.table import Table
 
 from thoth import __version__
+from thoth.adapters.cli.diagnostics import register_diagnostic_commands
+from thoth.adapters.cli.sources import register_source_commands
 from thoth.adapters.connectors import load_connector_registry
-from thoth.adapters.environment import load_environment_profile
 from thoth.adapters.models import (
     codex_oauth_status,
 )
@@ -185,10 +182,6 @@ async def _interactive_session(
         runtime.close()
 
 
-def _module_available(name: str) -> bool:
-    return importlib.util.find_spec(name) is not None
-
-
 def _sandbox_adapter(profile: str, workspace: Path) -> SandboxPort | None:
     try:
         return default_sandbox_factory_registry().create(profile, workspace)
@@ -247,114 +240,7 @@ def claude_code_login(
     raise typer.Exit(code=code)
 
 
-@app.command()
-def doctor(
-    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
-    json_output: Annotated[bool, typer.Option("--json")] = False,
-) -> None:
-    """Check local runtime capabilities without external calls."""
-    checks = {
-        "python_supported": platform.python_version_tuple() >= ("3", "12", "0"),
-        "sqlite_fts5": False,
-        "fastapi": _module_available("fastapi"),
-        "pydantic": _module_available("pydantic"),
-        "sqlalchemy": _module_available("sqlalchemy"),
-        "pypdf": _module_available("pypdf"),
-        "openpyxl": _module_available("openpyxl"),
-        "workspace_parent_writable": workspace.parent.exists(),
-    }
-    with sqlite3.connect(":memory:") as connection:
-        try:
-            connection.execute("CREATE VIRTUAL TABLE probe USING fts5(text)")
-            checks["sqlite_fts5"] = True
-        except sqlite3.OperationalError:
-            checks["sqlite_fts5"] = False
-
-    payload = {"status": "PASS" if all(checks.values()) else "FAIL", "checks": checks}
-    if json_output:
-        console.print_json(json.dumps(payload))
-    else:
-        table = Table(title="THOTH doctor")
-        table.add_column("Capability")
-        table.add_column("Status")
-        for name, passed in checks.items():
-            table.add_row(name, "PASS" if passed else "FAIL")
-        console.print(table)
-        console.print(f"Overall: {payload['status']}")
-    if payload["status"] != "PASS":
-        raise typer.Exit(code=1)
-
-
-@app.command("connector-sandbox-doctor")
-def connector_sandbox_doctor(
-    json_output: Annotated[bool, typer.Option("--json")] = False,
-) -> None:
-    """Inspect optional connector SDKs and sandbox runtimes without executing code."""
-    docker_cli = shutil.which("docker") is not None
-    docker_daemon = False
-    docker_error: str | None = None
-    if docker_cli:
-        try:
-            completed = subprocess.run(
-                ["docker", "info", "--format", "{{.ServerVersion}}"],
-                capture_output=True,
-                text=True,
-                timeout=10,
-                check=False,
-            )
-            docker_daemon = completed.returncode == 0 and bool(completed.stdout.strip())
-            if not docker_daemon:
-                docker_error = "DAEMON_UNAVAILABLE"
-        except (OSError, subprocess.TimeoutExpired):
-            docker_error = "DOCKER_PROBE_FAILED"
-    checks = {
-        "mcp_sdk": _module_available("mcp"),
-        "boto3": _module_available("boto3"),
-        "psycopg": _module_available("psycopg"),
-        "docker_cli": docker_cli,
-        "docker_daemon": docker_daemon,
-    }
-    payload = {
-        "status": "PASS" if all(checks.values()) else "CONDITIONAL",
-        "checks": checks,
-        "docker_error": docker_error,
-        "execution_performed": False,
-        "production_accreditation_claimed": False,
-    }
-    if json_output:
-        console.print_json(json.dumps(payload))
-        return
-    table = Table(title="THOTH connector/sandbox doctor")
-    table.add_column("Capability")
-    table.add_column("Status")
-    for name, passed in checks.items():
-        table.add_row(name, "PASS" if passed else "CONDITIONAL")
-    console.print(table)
-    console.print(f"Overall: {payload['status']}")
-
-
-@app.command("profile-check")
-def profile_check(
-    profile: Annotated[Path, typer.Option("--profile", exists=True, dir_okay=False)],
-) -> None:
-    """Validate one deployment/model/connector boundary profile without activating it."""
-    value = load_environment_profile(profile)
-    status = (
-        "PASS"
-        if value.adapter_available
-        and (value.sandbox_route.value == "DISABLED" or value.sandbox_adapter_available)
-        else "CONDITIONAL"
-    )
-    console.print_json(
-        json.dumps(
-            {
-                "status": status,
-                "profile": value.model_dump(mode="json"),
-                "activation_performed": False,
-                "runtime_health_probed": False,
-            }
-        )
-    )
+register_diagnostic_commands(app, console, DEFAULT_WORKSPACE)
 
 
 @app.command("auth-status")
@@ -468,99 +354,7 @@ def model_probe(
     console.print_json(result.output.model_dump_json())
 
 
-@app.command("source-stage")
-def source_stage(
-    source: Annotated[Path, typer.Option("--source", exists=True, dir_okay=False)],
-    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
-) -> None:
-    """Copy one user-selected source into the bounded workspace inbox."""
-    raw = source.read_bytes()
-    digest = hashlib.sha256(raw).hexdigest()
-    inbox = workspace.resolve() / "inbox"
-    inbox.mkdir(parents=True, exist_ok=True)
-    destination = inbox / f"{digest[:16]}-{source.name}"
-    if destination.exists() and hashlib.sha256(destination.read_bytes()).hexdigest() != digest:
-        raise typer.BadParameter("existing staged path has different content")
-    if not destination.exists():
-        shutil.copy2(source, destination)
-    console.print_json(
-        json.dumps(
-            {
-                "relative_path": destination.relative_to(inbox).as_posix(),
-                "byte_sha256": digest,
-                "bytes": len(raw),
-            }
-        )
-    )
-
-
-@app.command("git-snapshot")
-def git_snapshot(
-    repository: Annotated[Path, typer.Option("--repository", exists=True, file_okay=False)],
-    workspace: Annotated[Path, typer.Option("--workspace")] = DEFAULT_WORKSPACE,
-) -> None:
-    """Create a read-only Git identity/status manifest in the workspace inbox."""
-    resolved = repository.resolve()
-
-    def git(*arguments: str) -> bytes:
-        completed = subprocess.run(
-            ["git", "-C", str(resolved), *arguments],
-            capture_output=True,
-            check=False,
-        )
-        if completed.returncode != 0:
-            raise typer.BadParameter("Git metadata command failed")
-        return completed.stdout
-
-    top = Path(git("rev-parse", "--show-toplevel").decode().strip()).resolve()
-    head = git("rev-parse", "HEAD").decode().strip()
-    status_records = [
-        item for item in git("status", "--porcelain=v1", "-z").decode().split("\0") if item
-    ]
-    status_by_path = {
-        record[3:]: record[:2]
-        for record in status_records
-        if len(record) >= 4 and " -> " not in record[3:]
-    }
-    entries: list[dict[str, object]] = []
-    for record in git("ls-files", "--stage", "-z").decode().split("\0"):
-        if not record:
-            continue
-        metadata_value, path = record.split("\t", 1)
-        mode, object_id, stage = metadata_value.split(" ", 2)
-        entries.append(
-            {
-                "path": path,
-                "mode": mode,
-                "object_id": object_id,
-                "stage": int(stage),
-                "status": status_by_path.get(path),
-            }
-        )
-    manifest: dict[str, object] = {
-        "repository": top.name,
-        "head": head,
-        "dirty": bool(status_records),
-        "entries": entries,
-    }
-    raw = orjson.dumps(manifest, option=orjson.OPT_SORT_KEYS)
-    digest = hashlib.sha256(raw).hexdigest()
-    inbox = workspace.resolve() / "inbox"
-    inbox.mkdir(parents=True, exist_ok=True)
-    destination = inbox / f"{digest[:16]}-{top.name}.git-manifest.json"
-    if not destination.exists():
-        destination.write_bytes(raw)
-    console.print_json(
-        json.dumps(
-            {
-                "relative_path": destination.relative_to(inbox).as_posix(),
-                "byte_sha256": digest,
-                "head": head,
-                "dirty": bool(status_records),
-                "entry_count": len(entries),
-            }
-        )
-    )
+register_source_commands(app, console, DEFAULT_WORKSPACE)
 
 
 @app.command("run")

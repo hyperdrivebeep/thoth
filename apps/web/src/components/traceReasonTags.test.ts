@@ -110,7 +110,9 @@ function serverReasonCodes(text: string): string[] {
   const found = [...text.matchAll(/f"([A-Z][A-Z_]+):\{/g), ...text.matchAll(/(?:computed=|else )\(\s*"([A-Z][A-Z_]+)",\s*\)/g)].map(match => match[1]);
   return [...new Set(found)].sort();
 }
-const traceSource = () => readFileSync(new URL("../../../../src/thoth/application/services/verification_trace.py", import.meta.url), "utf8");
+// The verdicts are computed in verification_trace_compute.py; verification_trace.py keeps the service around it.
+const traceSource = () => ["verification_trace.py", "verification_trace_compute.py"]
+  .map(name => readFileSync(new URL("../../../../src/thoth/application/services/" + name, import.meta.url), "utf8")).join("\n");
 
 describe("reason codes against the server", () => {
   it("reads the ten codes the server gives today", () => {

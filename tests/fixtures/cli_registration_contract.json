@@ -1,0 +1,79 @@
+{
+  "outputs": {
+    "--help": {
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "                                                                                                                       \n Usage: thoth [OPTIONS] COMMAND [ARGS]...                                                                              \n                                                                                                                       \n Open the CLI shell when no subcommand is supplied.                                                                    \n                                                                                                                       \n┌─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│ --workspace               PATH  [default: contract-workspace]                                                       │\n│ --sandbox-profile         TEXT  disabled, docker-poc, gvisor, or managed-e2b [default: disabled]                    │\n│ --connector-config        FILE                                                                                      │\n│ --help                          Show this message and exit.                                                         │\n└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n┌─ Commands ──────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│ version                   Report build and protocol versions.                                                       │\n│ workspace                 Show the selected data root and legacy paths without opening or moving them.              │\n│ claude-code-login         Open the official Claude Code sign-in for THOTH's isolated profile.                       │\n│ doctor                    Check local runtime capabilities without external calls.                                  │\n│ connector-sandbox-doctor  Inspect optional connector SDKs and sandbox runtimes without executing code.              │\n│ profile-check             Validate one deployment/model/connector boundary profile without activating it.           │\n│ auth-status               Report isolated Codex connectivity without exposing credentials.                          │\n│ auth-connect              Keep the official login listener owned until completion or bounded timeout.               │\n│ model-probe               Use the normal workspace-bound model-only transport for one synthetic canary.             │\n│ source-stage              Copy one user-selected source into the bounded workspace inbox.                           │\n│ git-snapshot              Create a read-only Git identity/status manifest in the workspace inbox.                   │\n│ run                       Execute one JSON-RPC request and emit one machine-readable JSON result.                   │\n│ rpc                       Serve JSON-RPC over stdin/stdout JSONL until EOF.                                         │\n│ events                    Read one operation's hash-chained events and latest checkpoint.                           │\n│ run-pack                  Run one late-bound ProjectPack through ScriptedModel or Codex OAuth.                      │\n│ serve                     Run the local HTTP app server on loopback by default.                                     │\n│ hosted-review-serve       Bind the judge-facing review server. Local serve/desktop stay on loopback.                │\n│ desktop                   Serve the existing web UI and local backend in one loopback window.                       │\n└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n"
+    },
+    "connector-sandbox-doctor --help": {
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "                                                                                                                       \n Usage: thoth connector-sandbox-doctor [OPTIONS]                                                                       \n                                                                                                                       \n Inspect optional connector SDKs and sandbox runtimes without executing code.                                          \n                                                                                                                       \n┌─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│ --json                                                                                                              │\n│ --help          Show this message and exit.                                                                         │\n└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n"
+    },
+    "doctor --help": {
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "                                                                                                                       \n Usage: thoth doctor [OPTIONS]                                                                                         \n                                                                                                                       \n Check local runtime capabilities without external calls.                                                              \n                                                                                                                       \n┌─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│ --workspace        PATH  [default: contract-workspace]                                                              │\n│ --json                                                                                                              │\n│ --help                   Show this message and exit.                                                                │\n└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n"
+    },
+    "doctor --unknown-option": {
+      "exit_code": 2,
+      "stderr": "Usage: thoth doctor [OPTIONS]\nTry 'thoth doctor --help' for help.\n┌─ Error ─────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│ No such option: --unknown-option                                                                                    │\n└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n",
+      "stdout": ""
+    },
+    "git-snapshot --help": {
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "                                                                                                                       \n Usage: thoth git-snapshot [OPTIONS]                                                                                   \n                                                                                                                       \n Create a read-only Git identity/status manifest in the workspace inbox.                                               \n                                                                                                                       \n┌─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│ *  --repository        DIRECTORY  [required]                                                                        │\n│    --workspace         PATH       [default: contract-workspace]                                                     │\n│    --help                         Show this message and exit.                                                       │\n└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n"
+    },
+    "profile-check": {
+      "exit_code": 2,
+      "stderr": "Usage: thoth profile-check [OPTIONS]\nTry 'thoth profile-check --help' for help.\n┌─ Error ─────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│ Missing option '--profile'.                                                                                         │\n└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n",
+      "stdout": ""
+    },
+    "profile-check --help": {
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "                                                                                                                       \n Usage: thoth profile-check [OPTIONS]                                                                                  \n                                                                                                                       \n Validate one deployment/model/connector boundary profile without activating it.                                       \n                                                                                                                       \n┌─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│ *  --profile        FILE  [required]                                                                                │\n│    --help                 Show this message and exit.                                                               │\n└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n"
+    },
+    "source-stage": {
+      "exit_code": 2,
+      "stderr": "Usage: thoth source-stage [OPTIONS]\nTry 'thoth source-stage --help' for help.\n┌─ Error ─────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│ Missing option '--source'.                                                                                          │\n└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n",
+      "stdout": ""
+    },
+    "source-stage --help": {
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "                                                                                                                       \n Usage: thoth source-stage [OPTIONS]                                                                                   \n                                                                                                                       \n Copy one user-selected source into the bounded workspace inbox.                                                       \n                                                                                                                       \n┌─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│ *  --source           FILE  [required]                                                                              │\n│    --workspace        PATH  [default: contract-workspace]                                                           │\n│    --help                   Show this message and exit.                                                             │\n└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n"
+    },
+    "unknown-command": {
+      "exit_code": 2,
+      "stderr": "Usage: thoth [OPTIONS] COMMAND [ARGS]...\nTry 'thoth --help' for help.\n┌─ Error ─────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│ No such command 'unknown-command'.                                                                                  │\n└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n",
+      "stdout": ""
+    }
+  },
+  "registered": [
+    "version",
+    "workspace",
+    "claude-code-login",
+    "doctor",
+    "connector-sandbox-doctor",
+    "profile-check",
+    "auth-status",
+    "auth-connect",
+    "model-probe",
+    "source-stage",
+    "git-snapshot",
+    "run",
+    "rpc",
+    "events",
+    "run-pack",
+    "serve",
+    "hosted-review-serve",
+    "desktop"
+  ],
+  "shared_defaults": {
+    "doctor": true,
+    "git-snapshot": true,
+    "source-stage": true
+  }
+}

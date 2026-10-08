@@ -44,6 +44,7 @@ from thoth.application.services import (
 )
 from thoth.apps.behavior_composition import create_behavior_runtime
 from thoth.apps.criteria_composition import create_criterion_service
+from thoth.apps.criterion_object_routes import register_criterion_and_object_methods
 from thoth.apps.decision_chain_routes import register_decision_chain_methods
 from thoth.apps.evidence_composition import create_evidence_components
 from thoth.apps.export_composition import create_export_handlers, create_lifecycle_handlers
@@ -52,6 +53,7 @@ from thoth.apps.improvement_composition import (
     register_improvement_handlers,
 )
 from thoth.apps.judgment_review_composition import install_judgment_review
+from thoth.apps.lifecycle_routes import register_closure_and_export_methods
 from thoth.apps.management_routes import (
     register_investigation_methods,
     register_project_methods,
@@ -84,6 +86,7 @@ from thoth.apps.source_composition import (
     create_source_handlers,
     create_source_time_service,
 )
+from thoth.apps.source_evidence_routes import register_source_and_evidence_methods
 from thoth.apps.storage_composition import create_shared_storage_services, open_stores
 from thoth.apps.test_runtime import create_execution_components
 from thoth.apps.thread_analysis_composition import create_thread_analysis
@@ -443,7 +446,8 @@ def create_runtime(
         execution_handlers = ExecutionHandlers(
             store=execution_store,
             actions=action_store,
-            service=execution_service, sandbox=sandbox_service,
+            service=execution_service,
+            sandbox=sandbox_service,
             ledger=ledger,
         )
         outcome_handlers = OutcomeHandlers(store=outcome_store, service=outcome_service)
@@ -546,8 +550,12 @@ def create_runtime(
             acquisition=acquisition_trace_store,
         )
         memory_full_handlers = create_memory_handlers(
-            stores, memory_store, full_memory_store,
-            ledger, clock, ids,
+            stores,
+            memory_store,
+            full_memory_store,
+            ledger,
+            clock,
+            ids,
             artifact_ledger.scopes,
             full_memory_service,
         )
@@ -563,60 +571,10 @@ def create_runtime(
         registry.register("projectpack/list", projectpack_handlers.list)
         registry.register("projectpack/run", projectpack_handlers.run)
         register_project_methods(registry, project_handlers)
-        registry.register("closure/prepare", lifecycle_handlers.prepare_closure)
-        registry.register("closure/read", lifecycle_handlers.read_closure)
-        registry.register("closure/finalize", lifecycle_handlers.finalize_closure)
-        registry.register("closure/list", closure_handlers.list)
-        registry.register("closure/readiness/read", closure_handlers.readiness_read)
-        registry.register("closure/package/read", closure_handlers.package_read)
-        registry.register("closure/openItem/list", closure_handlers.open_item_list)
-        registry.register("closure/reopen/read", closure_handlers.reopen_read)
-        registry.register("closure/retention/read", closure_handlers.retention_read)
-        registry.register("closure/audit/read", closure_handlers.audit_read)
-        registry.register("closure/readiness/assess", closure_handlers.readiness_assess)
-        registry.register("closure/decide", closure_handlers.decide)
-        registry.register("closure/followup/create", closure_handlers.followup_create)
-        registry.register("closure/reopen", closure_handlers.reopen)
-        registry.register("closure/retention/plan", closure_handlers.retention_plan)
-        registry.register("closure/purge/prepare", closure_handlers.purge_prepare)
-        registry.register("export/prepare", lifecycle_handlers.prepare_export)
-        registry.register("export/list", export_handlers.list)
-        registry.register("export/read", export_handlers.read)
-        registry.register("export/plan/read", export_handlers.plan_read)
-        registry.register("export/snapshot/read", export_handlers.snapshot_read)
-        registry.register("export/manifest/read", export_handlers.manifest_read)
-        registry.register("export/artifact/list", export_handlers.artifact_list)
-        registry.register("export/verification/read", export_handlers.verification_read)
-        registry.register("export/release/read", export_handlers.release_read)
-        registry.register("export/correction/read", export_handlers.correction_read)
-        registry.register("export/audit/read", export_handlers.audit_read)
-        registry.register("export/plan/create", export_handlers.plan_create)
-        registry.register("export/snapshot/create", export_handlers.snapshot_create)
-        registry.register("export/generate", export_handlers.generate)
-        registry.register("export/verify", export_handlers.verify)
-        registry.register("export/release/prepare", export_handlers.release_prepare)
-        registry.register("export/correction/create", export_handlers.correction_create)
-        registry.register("project/source/connect", source_handlers.connect)
-        registry.register("project/source/disconnect", source_handlers.disconnect)
-        registry.register("project/source/list", source_handlers.list_sources)
-        registry.register("project/source/time/confirm", source_handlers.confirm_time)
-        registry.register("project/source/time/correct", source_handlers.correct_time)
-        registry.register("evidence/list", evidence_handlers.list)
-        registry.register("evidence/read", evidence_handlers.read)
-        registry.register("evidence/packet/read", evidence_handlers.packet_read)
-        registry.register("evidence/conflict/list", evidence_handlers.conflict_list)
-        registry.register("evidence/conflict/read", evidence_handlers.conflict_read)
-        registry.register("evidence/audit/read", evidence_handlers.audit_read)
-        registry.register("evidence/source/add", evidence_handlers.source_add)
-        registry.register("evidence/source/refresh", evidence_handlers.source_refresh)
-        registry.register(
-            "evidence/source/metadata/correct", evidence_handlers.source_metadata_correct
+        register_closure_and_export_methods(
+            registry, lifecycle_handlers, closure_handlers, export_handlers
         )
-        registry.register("evidence/span/correct", evidence_handlers.span_correct)
-        registry.register("evidence/link/propose", evidence_handlers.link_propose)
-        registry.register("evidence/link/correct", evidence_handlers.link_correct)
-        registry.register("evidence/challenge", evidence_handlers.challenge)
-        registry.register("evidence/revalidate", evidence_handlers.revalidate)
+        register_source_and_evidence_methods(registry, source_handlers, evidence_handlers)
         register_thread_methods(registry, thread_handlers)
         behavior_runtime.register_thread(
             registry,
@@ -647,45 +605,9 @@ def create_runtime(
             registry, hypothesis_handlers, action_handlers, execution_handlers, projection_handlers
         )
         judgment_review = install_judgment_review(
-            registry, stores, control_service, hypothesis_store, clock, ids)
-        registry.register("criteria/list", criterion_handlers.list)
-        registry.register("criteria/read", criterion_handlers.read)
-        registry.register("criteria/profile/list", criterion_handlers.profile_list)
-        registry.register("criteria/profile/read", criterion_handlers.profile_read)
-        registry.register("criteria/reference/list", criterion_handlers.reference_list)
-        registry.register("criteria/reference/read", criterion_handlers.reference_read)
-        registry.register("criteria/conflict/list", criterion_handlers.conflict_list)
-        registry.register("criteria/conflict/read", criterion_handlers.conflict_read)
-        registry.register("criteria/audit/read", criterion_handlers.audit_read)
-        registry.register("criteria/compile", criterion_handlers.compile)
-        registry.register("criteria/field/correct", criterion_handlers.field_correct)
-        registry.register("criteria/profile/apply", criterion_handlers.profile_apply)
-        registry.register("criteria/revalidate", criterion_handlers.revalidate)
-        registry.register("criteria/recalculate", criterion_handlers.recalculate)
-        registry.register("criteria/reference/generate", criterion_handlers.reference_generate)
-        registry.register("criteria/change/propose", criterion_handlers.change_propose)
-        registry.register("object/list", object_handlers.list)
-        registry.register("object/read", object_handlers.read)
-        registry.register("object/candidate/list", object_handlers.candidate_list)
-        registry.register("object/candidate/read", object_handlers.candidate_read)
-        registry.register("object/profile/list", object_handlers.profile_list)
-        registry.register("object/profile/read", object_handlers.profile_read)
-        registry.register("object/relation/list", object_handlers.relation_list)
-        registry.register("object/impact/read", object_handlers.impact_read)
-        registry.register("object/attention/list", object_handlers.attention_list)
-        registry.register("object/audit/read", object_handlers.audit_read)
-        registry.register("object/materialize", object_handlers.materialize)
-        registry.register("object/frame/revise", object_handlers.frame_revise)
-        registry.register("object/profile/apply", object_handlers.profile_apply)
-        registry.register("object/facet/update", object_handlers.facet_update)
-        registry.register("object/relation/add", object_handlers.relation_add)
-        registry.register("object/relation/remove", object_handlers.relation_remove)
-        registry.register("object/revalidate", object_handlers.revalidate)
-        registry.register("object/work/replan", object_handlers.work_replan)
-        registry.register("object/split/propose", object_handlers.split_propose)
-        registry.register("object/merge/propose", object_handlers.merge_propose)
-        registry.register("object/attention/acknowledge", object_handlers.attention_acknowledge)
-        registry.register("object/followup/create", object_handlers.followup_create)
+            registry, stores, control_service, hypothesis_store, clock, ids
+        )
+        register_criterion_and_object_methods(registry, criterion_handlers, object_handlers)
         register_memory_handlers(registry, memory_full_handlers)
         register_improvement_handlers(registry, improvement_handlers, evaluation_handlers)
         register_outcome_and_receipt_methods(registry, outcome_handlers, receipt_handlers)
@@ -732,9 +654,11 @@ def create_runtime(
 
         registry.decorate(
             "operation/cancel",
-            lambda original: QueueAwareOperationCancel(
-                original, research_component.entry.records, research_component.entry.queue
-            ).cancel,
+            lambda original: (
+                QueueAwareOperationCancel(
+                    original, research_component.entry.records, research_component.entry.queue
+                ).cancel
+            ),
         )
 
         register_research_operations(registry, research_component.entry)

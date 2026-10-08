@@ -1,0 +1,1570 @@
+{
+  "ProjectInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "ProjectInput",
+    "type": "object"
+  },
+  "HypothesisListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "object_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Object Id"
+      },
+      "portfolio_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Portfolio Id"
+      },
+      "primary_intent": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Primary Intent"
+      },
+      "stage": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Stage"
+      },
+      "appraisal": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Appraisal"
+      },
+      "freshness": {
+        "anyOf": [
+          {
+            "maxLength": 40,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Freshness"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "HypothesisListInput",
+    "type": "object"
+  },
+  "HypothesisReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Hypothesis Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      }
+    },
+    "required": [
+      "project_id",
+      "hypothesis_id"
+    ],
+    "title": "HypothesisReadInput",
+    "type": "object"
+  },
+  "PortfolioListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "object_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Object Id"
+      },
+      "stage": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Stage"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "PortfolioListInput",
+    "type": "object"
+  },
+  "PortfolioReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "portfolio_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Portfolio Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      }
+    },
+    "required": [
+      "project_id",
+      "portfolio_id"
+    ],
+    "title": "PortfolioReadInput",
+    "type": "object"
+  },
+  "RelationListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Hypothesis Id"
+      },
+      "portfolio_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Portfolio Id"
+      },
+      "relation_type": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Relation Type"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "RelationListInput",
+    "type": "object"
+  },
+  "PredictionListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Hypothesis Id"
+      },
+      "prespecification_state": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Prespecification State"
+      },
+      "observation_bound": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Observation Bound"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "PredictionListInput",
+    "type": "object"
+  },
+  "PredictionReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "prediction_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Prediction Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "prediction_id"
+    ],
+    "title": "PredictionReadInput",
+    "type": "object"
+  },
+  "AssumptionListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Hypothesis Id"
+      },
+      "prediction_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Prediction Id"
+      },
+      "status": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Status"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "AssumptionListInput",
+    "type": "object"
+  },
+  "GenerateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "object_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Object Id",
+        "type": "string"
+      },
+      "portfolio_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Portfolio Id"
+      },
+      "question": {
+        "maxLength": 10000,
+        "minLength": 1,
+        "title": "Question",
+        "type": "string"
+      },
+      "evidence_scope": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Scope",
+        "type": "array"
+      },
+      "intent_hints": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "title": "Intent Hints",
+        "type": "array"
+      },
+      "generation_policy_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Generation Policy Ref",
+        "type": "string"
+      },
+      "budget_policy_ref": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Budget Policy Ref"
+      }
+    },
+    "required": [
+      "project_id",
+      "object_id",
+      "question",
+      "evidence_scope",
+      "generation_policy_ref"
+    ],
+    "title": "GenerateInput",
+    "type": "object"
+  },
+  "CreateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "object_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Object Id",
+        "type": "string"
+      },
+      "portfolio_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Portfolio Id",
+        "type": "string"
+      },
+      "statement": {
+        "maxLength": 10000,
+        "minLength": 1,
+        "title": "Statement",
+        "type": "string"
+      },
+      "primary_intent": {
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Primary Intent",
+        "type": "string"
+      },
+      "secondary_intents": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "title": "Secondary Intents",
+        "type": "array"
+      },
+      "evidence_basis": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Evidence Basis",
+        "type": "string"
+      },
+      "scope": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "Scope",
+        "type": "object"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "expected_object_revision": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Expected Object Revision"
+      },
+      "prespecification_state": {
+        "default": "UNKNOWN",
+        "maxLength": 80,
+        "title": "Prespecification State",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "object_id",
+      "portfolio_id",
+      "statement",
+      "primary_intent",
+      "evidence_basis",
+      "scope",
+      "evidence_refs"
+    ],
+    "title": "CreateInput",
+    "type": "object"
+  },
+  "RevisionBoundInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Hypothesis Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "hypothesis_id",
+      "expected_revision_digest"
+    ],
+    "title": "RevisionBoundInput",
+    "type": "object"
+  },
+  "ReviseInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Hypothesis Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      },
+      "patch": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Patch",
+        "type": "object"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "reason": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "hypothesis_id",
+      "expected_revision_digest",
+      "patch",
+      "evidence_refs",
+      "reason"
+    ],
+    "title": "ReviseInput",
+    "type": "object"
+  },
+  "IntentUpdateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Hypothesis Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      },
+      "primary_intent": {
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Primary Intent",
+        "type": "string"
+      },
+      "secondary_intents": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Secondary Intents",
+        "type": "array"
+      },
+      "intent_profile_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Intent Profile Refs",
+        "type": "array"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "reason": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "hypothesis_id",
+      "expected_revision_digest",
+      "primary_intent",
+      "secondary_intents",
+      "intent_profile_refs",
+      "evidence_refs",
+      "reason"
+    ],
+    "title": "IntentUpdateInput",
+    "type": "object"
+  },
+  "CausalUpdateInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Hypothesis Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      },
+      "causal_patch": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Causal Patch",
+        "type": "object"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "reason": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "hypothesis_id",
+      "expected_revision_digest",
+      "causal_patch",
+      "evidence_refs",
+      "reason"
+    ],
+    "title": "CausalUpdateInput",
+    "type": "object"
+  },
+  "RelationAddInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "portfolio_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Portfolio Id",
+        "type": "string"
+      },
+      "source_hypothesis_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Source Hypothesis Id",
+        "type": "string"
+      },
+      "relation_type": {
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Relation Type",
+        "type": "string"
+      },
+      "target_hypothesis_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Target Hypothesis Id",
+        "type": "string"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "semantic_role": {
+        "anyOf": [
+          {
+            "maxLength": 500,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Semantic Role"
+      },
+      "expected_portfolio_revision": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Portfolio Revision",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "portfolio_id",
+      "source_hypothesis_id",
+      "relation_type",
+      "target_hypothesis_id",
+      "evidence_refs",
+      "expected_portfolio_revision"
+    ],
+    "title": "RelationAddInput",
+    "type": "object"
+  },
+  "RelationRemoveInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "relation_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Relation Id",
+        "type": "string"
+      },
+      "reason": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "expected_portfolio_revision": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Portfolio Revision",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "relation_id",
+      "reason",
+      "evidence_refs",
+      "expected_portfolio_revision"
+    ],
+    "title": "RelationRemoveInput",
+    "type": "object"
+  },
+  "AssumptionAddInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Hypothesis Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      },
+      "statement": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Statement",
+        "type": "string"
+      },
+      "role": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Role",
+        "type": "string"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "validation_route": {
+        "anyOf": [
+          {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Validation Route"
+      }
+    },
+    "required": [
+      "project_id",
+      "hypothesis_id",
+      "expected_revision_digest",
+      "statement",
+      "role",
+      "evidence_refs"
+    ],
+    "title": "AssumptionAddInput",
+    "type": "object"
+  },
+  "PredictionBindInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Hypothesis Id",
+        "type": "string"
+      },
+      "hypothesis_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Hypothesis Revision Digest",
+        "type": "string"
+      },
+      "knowledge_cutoff": {
+        "format": "date-time",
+        "title": "Knowledge Cutoff",
+        "type": "string"
+      },
+      "prespecification_state": {
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Prespecification State",
+        "type": "string"
+      },
+      "conditions": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "Conditions",
+        "type": "object"
+      },
+      "measurement_contract_ref": {
+        "maxLength": 260,
+        "minLength": 1,
+        "title": "Measurement Contract Ref",
+        "type": "string"
+      },
+      "assumption_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Assumption Refs",
+        "type": "array"
+      },
+      "expected_outcome": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Expected Outcome",
+        "type": "object"
+      },
+      "discrimination_map": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Discrimination Map",
+        "type": "object"
+      }
+    },
+    "required": [
+      "project_id",
+      "hypothesis_id",
+      "hypothesis_revision_digest",
+      "knowledge_cutoff",
+      "prespecification_state",
+      "conditions",
+      "measurement_contract_ref",
+      "assumption_refs",
+      "expected_outcome",
+      "discrimination_map"
+    ],
+    "title": "PredictionBindInput",
+    "type": "object"
+  },
+  "CounterevidenceRequestInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Hypothesis Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "source_scope": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Source Scope",
+        "type": "array"
+      },
+      "budget_policy_ref": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Budget Policy Ref"
+      }
+    },
+    "required": [
+      "project_id",
+      "hypothesis_id",
+      "source_scope"
+    ],
+    "title": "CounterevidenceRequestInput",
+    "type": "object"
+  },
+  "PortfolioComposeInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "object_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Object Id",
+        "type": "string"
+      },
+      "hypothesis_ids": {
+        "items": {
+          "type": "string"
+        },
+        "minItems": 2,
+        "title": "Hypothesis Ids",
+        "type": "array"
+      },
+      "relation_candidates": {
+        "default": [],
+        "items": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        "title": "Relation Candidates",
+        "type": "array"
+      },
+      "unknown_reserve": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Unknown Reserve",
+        "type": "object"
+      },
+      "expected_object_revision": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Expected Object Revision"
+      },
+      "portfolio_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Portfolio Id"
+      }
+    },
+    "required": [
+      "project_id",
+      "object_id",
+      "hypothesis_ids",
+      "unknown_reserve"
+    ],
+    "title": "PortfolioComposeInput",
+    "type": "object"
+  },
+  "PortfolioRevalidateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "portfolio_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Portfolio Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "trigger_reason": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Trigger Reason",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "portfolio_id",
+      "trigger_reason"
+    ],
+    "title": "PortfolioRevalidateInput",
+    "type": "object"
+  },
+  "TestBindInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "prediction_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Prediction Id",
+        "type": "string"
+      },
+      "execution_ref": {
+        "maxLength": 260,
+        "minLength": 1,
+        "title": "Execution Ref",
+        "type": "string"
+      },
+      "observation_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Observation Refs",
+        "type": "array"
+      },
+      "test_validity_assessment_ref": {
+        "maxLength": 260,
+        "minLength": 1,
+        "title": "Test Validity Assessment Ref",
+        "type": "string"
+      },
+      "test_validity": {
+        "default": "NOT_ASSESSABLE",
+        "pattern": "^(VALID|LIMITED|INVALID|NOT_ASSESSABLE)$",
+        "title": "Test Validity",
+        "type": "string"
+      },
+      "prediction_fit": {
+        "default": "INCONCLUSIVE",
+        "pattern": "^(MATCH|PARTIAL_MATCH|MISMATCH|NOT_OBSERVED|INCONCLUSIVE)$",
+        "title": "Prediction Fit",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "prediction_id",
+      "execution_ref",
+      "observation_refs",
+      "test_validity_assessment_ref"
+    ],
+    "title": "TestBindInput",
+    "type": "object"
+  },
+  "AppraiseInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Hypothesis Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "test_assessment_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Test Assessment Refs",
+        "type": "array"
+      },
+      "appraisal_scope": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "Appraisal Scope",
+        "type": "object"
+      }
+    },
+    "required": [
+      "project_id",
+      "hypothesis_id",
+      "evidence_refs",
+      "test_assessment_refs",
+      "appraisal_scope"
+    ],
+    "title": "AppraiseInput",
+    "type": "object"
+  },
+  "SplitProposeInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Hypothesis Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      },
+      "subhypotheses": {
+        "items": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        "title": "Subhypotheses",
+        "type": "array"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "rationale": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Rationale",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "hypothesis_id",
+      "expected_revision_digest",
+      "subhypotheses",
+      "evidence_refs",
+      "rationale"
+    ],
+    "title": "SplitProposeInput",
+    "type": "object"
+  },
+  "MergeProposeInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "hypothesis_ids": {
+        "items": {
+          "type": "string"
+        },
+        "minItems": 2,
+        "title": "Hypothesis Ids",
+        "type": "array"
+      },
+      "field_mapping": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Field Mapping",
+        "type": "object"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "rationale": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Rationale",
+        "type": "string"
+      },
+      "expected_revision_digests": {
+        "items": {
+          "type": "string"
+        },
+        "minItems": 2,
+        "title": "Expected Revision Digests",
+        "type": "array"
+      }
+    },
+    "required": [
+      "project_id",
+      "hypothesis_ids",
+      "field_mapping",
+      "evidence_refs",
+      "rationale",
+      "expected_revision_digests"
+    ],
+    "title": "MergeProposeInput",
+    "type": "object"
+  }
+}
