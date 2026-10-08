@@ -5,7 +5,14 @@ from typing import cast
 
 from pydantic import JsonValue
 
+from thoth.application.services.action_effect_policy import (
+    classify_effect_vector as classify_effect_vector,
+)
+from thoth.application.services.action_effect_policy import (
+    effect_impact,
+)
 from thoth.application.services.action_effect_vector import checked_effect_vector
+from thoth.application.services.action_plan_derivation import derive_plan
 from thoth.application.services.action_plan_validation import validate_action_plan_dag
 from thoth.application.services.authorization_consumption import (
     consume_authorization,
@@ -14,7 +21,6 @@ from thoth.application.services.authorization_consumption import (
 from thoth.application.services.authorization_currentness import mark_stale, stale_decisions
 from thoth.application.services.authorization_prepare import prepare_authorization
 from thoth.application.services.revision_service import CommitResult, RevisionCommitService
-from thoth.domain.action import PROHIBITED_EFFECT_KEYS
 from thoth.domain.action_full import (
     ActionAuditRecord,
     ActionPlanRecord,
@@ -54,62 +60,6 @@ PURPOSES = {
     "GOVERNANCE_ESCALATION",
     "RESTORE_COMPENSATE",
 }
-
-
-def classify_effect_vector(
-    effect: dict[str, object],
-) -> tuple[str, str, tuple[str, ...], tuple[str, ...]]:
-    # A forbidden effect is R4 whether or not the declaration is complete; completeness is only
-    # asked of effects that are not forbidden.
-    if any(effect.get(key) is True for key in PROHIBITED_EFFECT_KEYS):
-        return (
-            "R4",
-            "PROHIBITED",
-            ("PROHIBITED_SEMANTIC_AUTHORITY",),
-            ("institution-authority",),
-        )
-    if effect.get("effect_completeness_confirmed") is not True:
-        return (
-            "R3",
-            "POLICY_UNDEFINED",
-            ("EFFECT_COMPLETENESS_REVIEW",),
-            ("effect-owner",),
-        )
-    if any(
-        effect.get(key) is True
-        for key in (
-            "external_write",
-            "physical_action",
-            "changes_official_baseline",
-            "operational_equipment_change",
-        )
-    ):
-        roles = ["project-owner"]
-        if effect.get("physical_action") is True:
-            roles.append("safety-owner")
-        if effect.get("external_write") is True:
-            roles.append("external-interface-owner")
-        return (
-            "R3",
-            "APPROVAL_REQUIRED",
-            ("PROTECTED_ACTION", "ACTION_TIME_PREFLIGHT"),
-            tuple(roles),
-        )
-    if effect.get("runs_untrusted_code") is True or effect.get("sandbox_required") is True:
-        return (
-            "R2",
-            "AUTO_ALLOWED",
-            ("ISOLATED_SANDBOX",),
-            ("sandbox-owner",),
-        )
-    if effect.get("changes_local_draft") is True:
-        return (
-            "R1",
-            "PREAUTHORIZED",
-            ("LOCAL_REVISION",),
-            (),
-        )
-    return "R0", "AUTO_ALLOWED", ("READ_ONLY",), ()
 
 
 class ActionService:
@@ -249,7 +199,7 @@ class ActionService:
             specification = updates["specification"]
             if not isinstance(specification, dict):
                 raise ValueError("Action specification must be an object")
-            effect = self._effect_vector(self._mapping(specification))
+            effect = self._effect_vector(self._mapping(cast("dict[object, object]", specification)))
             risk_tier, policy_state, processes, roles = classify_effect_vector(effect)
             draft.update(
                 {
@@ -847,21 +797,7 @@ class ActionService:
 
     @staticmethod
     def _impact(effect: dict[str, object]) -> dict[str, object]:
-        return {
-            "data": effect.get("data", "NONE"),
-            "code": effect.get("code", "NONE"),
-            "configuration": effect.get("configuration", "NONE"),
-            "equipment": effect.get("equipment", "NONE"),
-            "external_institution": effect.get("external_write", False),
-            "baseline": effect.get("changes_official_baseline", False),
-            "security": effect.get("security_consequence", "NONE"),
-            "privacy": effect.get("privacy_consequence", "NONE"),
-            "safety": effect.get("safety_consequence", "NONE"),
-            "legal": effect.get("legal_consequence", "NONE"),
-            "cost": effect.get("cost", "UNRESOLVED"),
-            "time": effect.get("time", "UNRESOLVED"),
-            "observability": effect.get("observability", "UNRESOLVED"),
-        }
+        return effect_impact(effect)
 
     def _normalize_step(self, project_id: str, value: dict[str, object]) -> dict[str, object]:
         step = dict(value)
@@ -892,46 +828,7 @@ class ActionService:
     def _derive_plan(
         self, steps: tuple[dict[str, object], ...], edges: tuple[dict[str, str], ...]
     ) -> dict[str, object]:
-        predecessor_targets = {edge["to"] for edge in edges}
-        frontier = tuple(
-            str(step["step_id"])
-            for step in steps
-            if str(step["step_id"]) not in predecessor_targets
-            and step.get("state") == "READY"
-            and step.get("risk_tier") in {"R0", "R1", "R2"}
-            and step.get("policy_state") in {"AUTO_ALLOWED", "PREAUTHORIZED"}
-        )
-        processes = tuple(
-            dict.fromkeys(
-                process
-                for step in steps
-                for process in self._string_tuple(step.get("required_processes", ()))
-            )
-        )
-        roles = tuple(
-            dict.fromkeys(
-                role
-                for step in steps
-                for role in self._string_tuple(step.get("required_roles", ()))
-            )
-        )
-        return {
-            "cumulative_impact": {
-                "per_step": {str(step["step_id"]): step.get("impact", {}) for step in steps},
-                "max_risk_tier_display_only": max(
-                    (str(step.get("risk_tier", "R0")) for step in steps),
-                    default="R0",
-                ),
-            },
-            "required_process_union": processes,
-            "required_role_union": roles,
-            "auto_executable_frontier": frontier,
-            "point_of_no_return_steps": tuple(
-                str(step["step_id"])
-                for step in steps
-                if self._mapping(step.get("effect_vector", {})).get("irreversible") is True
-            ),
-        }
+        return derive_plan(steps, edges, string_tuple=self._string_tuple, mapping=self._mapping)
 
     @staticmethod
     def _step(plan: ActionPlanRecord, step_id: str) -> dict[str, object]:

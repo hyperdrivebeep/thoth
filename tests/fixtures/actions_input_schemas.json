@@ -1,0 +1,1589 @@
+{
+  "ProjectInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "ProjectInput",
+    "type": "object"
+  },
+  "ActionListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "object_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Object Id"
+      },
+      "portfolio_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Portfolio Id"
+      },
+      "purpose": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Purpose"
+      },
+      "proposal_state": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Proposal State"
+      },
+      "policy_state": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Policy State"
+      },
+      "authorization_state": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Authorization State"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "ActionListInput",
+    "type": "object"
+  },
+  "ActionReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "action_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Action Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      }
+    },
+    "required": [
+      "project_id",
+      "action_id"
+    ],
+    "title": "ActionReadInput",
+    "type": "object"
+  },
+  "PortfolioListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "object_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Object Id"
+      },
+      "decision_state": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Decision State"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "PortfolioListInput",
+    "type": "object"
+  },
+  "PortfolioReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "portfolio_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Portfolio Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      }
+    },
+    "required": [
+      "project_id",
+      "portfolio_id"
+    ],
+    "title": "PortfolioReadInput",
+    "type": "object"
+  },
+  "PlanReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_id"
+    ],
+    "title": "PlanReadInput",
+    "type": "object"
+  },
+  "StepReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "step_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Step Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_id",
+      "step_id"
+    ],
+    "title": "StepReadInput",
+    "type": "object"
+  },
+  "ImpactReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "action_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Action Id"
+      },
+      "plan_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Plan Id"
+      },
+      "step_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Step Id"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "ImpactReadInput",
+    "type": "object"
+  },
+  "AuthorizationReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "authorization_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Authorization Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "authorization_id"
+    ],
+    "title": "AuthorizationReadInput",
+    "type": "object"
+  },
+  "AuditReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "action_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Action Id"
+      },
+      "plan_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Plan Id"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "AuditReadInput",
+    "type": "object"
+  },
+  "ActionRevisionBound": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "action_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Action Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "action_id",
+      "expected_revision_digest"
+    ],
+    "title": "ActionRevisionBound",
+    "type": "object"
+  },
+  "ReviseInput": {
+    "$defs": {
+      "HumanEffortEstimateInput": {
+        "additionalProperties": false,
+        "properties": {
+          "dimension": {
+            "enum": [
+              "TIME",
+              "COST_EFFORT"
+            ],
+            "title": "Dimension",
+            "type": "string"
+          },
+          "band": {
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH",
+              "UNKNOWN"
+            ],
+            "title": "Band",
+            "type": "string"
+          },
+          "basis_text": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Basis Text",
+            "type": "string"
+          },
+          "assumptions": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "dimension",
+          "band"
+        ],
+        "title": "HumanEffortEstimateInput",
+        "type": "object"
+      },
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "action_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Action Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      },
+      "patch": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Patch",
+        "type": "object"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "reason": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      },
+      "human_effort_estimates": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/HumanEffortEstimateInput"
+        },
+        "title": "Human Effort Estimates",
+        "type": "array"
+      },
+      "estimator_ref": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Estimator Ref"
+      }
+    },
+    "required": [
+      "project_id",
+      "action_id",
+      "expected_revision_digest",
+      "evidence_refs",
+      "reason"
+    ],
+    "title": "ReviseInput",
+    "type": "object"
+  },
+  "PortfolioComposeInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "object_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Object Id",
+        "type": "string"
+      },
+      "action_ids": {
+        "items": {
+          "type": "string"
+        },
+        "minItems": 2,
+        "title": "Action Ids",
+        "type": "array"
+      },
+      "decision_need": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Decision Need",
+        "type": "string"
+      },
+      "criteria_proposal": {
+        "default": [],
+        "items": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        "title": "Criteria Proposal",
+        "type": "array"
+      },
+      "expected_object_revision": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Expected Object Revision"
+      },
+      "portfolio_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Portfolio Id"
+      }
+    },
+    "required": [
+      "project_id",
+      "object_id",
+      "action_ids",
+      "decision_need"
+    ],
+    "title": "PortfolioComposeInput",
+    "type": "object"
+  },
+  "PortfolioEvaluateInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "portfolio_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Portfolio Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "evaluation_method": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Evaluation Method",
+        "type": "string"
+      },
+      "policy_criteria_ref": {
+        "maxLength": 260,
+        "minLength": 1,
+        "title": "Policy Criteria Ref",
+        "type": "string"
+      },
+      "preference_inputs": {
+        "default": [],
+        "items": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        "title": "Preference Inputs",
+        "type": "array"
+      }
+    },
+    "required": [
+      "project_id",
+      "portfolio_id",
+      "evaluation_method",
+      "policy_criteria_ref"
+    ],
+    "title": "PortfolioEvaluateInput",
+    "type": "object"
+  },
+  "RecommendInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "portfolio_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Portfolio Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "scenario_ref": {
+        "anyOf": [
+          {
+            "maxLength": 260,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Scenario Ref"
+      },
+      "rationale": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Rationale",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "portfolio_id",
+      "rationale"
+    ],
+    "title": "RecommendInput",
+    "type": "object"
+  },
+  "SelectInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "portfolio_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Portfolio Id",
+        "type": "string"
+      },
+      "action_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Action Id",
+        "type": "string"
+      },
+      "decision_context": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Decision Context",
+        "type": "object"
+      },
+      "actor_or_agent_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Actor Or Agent Ref",
+        "type": "string"
+      },
+      "expected_portfolio_revision": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Portfolio Revision",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "portfolio_id",
+      "action_id",
+      "decision_context",
+      "actor_or_agent_ref",
+      "expected_portfolio_revision"
+    ],
+    "title": "SelectInput",
+    "type": "object"
+  },
+  "PlanComposeInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "object_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Object Id",
+        "type": "string"
+      },
+      "selected_action_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Selected Action Refs",
+        "type": "array"
+      },
+      "step_candidates": {
+        "items": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        "title": "Step Candidates",
+        "type": "array"
+      },
+      "dependency_edges": {
+        "items": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "title": "Dependency Edges",
+        "type": "array"
+      },
+      "expected_object_revision": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Expected Object Revision"
+      },
+      "plan_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Plan Id"
+      }
+    },
+    "required": [
+      "project_id",
+      "object_id",
+      "selected_action_refs",
+      "step_candidates",
+      "dependency_edges"
+    ],
+    "title": "PlanComposeInput",
+    "type": "object"
+  },
+  "PlanRevisionBound": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_id",
+      "expected_revision_digest"
+    ],
+    "title": "PlanRevisionBound",
+    "type": "object"
+  },
+  "PlanReviseInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      },
+      "patch": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Patch",
+        "type": "object"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "reason": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_id",
+      "expected_revision_digest",
+      "patch",
+      "evidence_refs",
+      "reason"
+    ],
+    "title": "PlanReviseInput",
+    "type": "object"
+  },
+  "PlanRevalidateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "trigger_reason": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Trigger Reason",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_id",
+      "trigger_reason"
+    ],
+    "title": "PlanRevalidateInput",
+    "type": "object"
+  },
+  "StepAddInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Id",
+        "type": "string"
+      },
+      "step_spec": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Step Spec",
+        "type": "object"
+      },
+      "dependency_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Dependency Refs",
+        "type": "array"
+      },
+      "expected_plan_revision": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Plan Revision",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_id",
+      "step_spec",
+      "dependency_refs",
+      "expected_plan_revision"
+    ],
+    "title": "StepAddInput",
+    "type": "object"
+  },
+  "StepReviseInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Id",
+        "type": "string"
+      },
+      "step_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Step Id",
+        "type": "string"
+      },
+      "patch": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Patch",
+        "type": "object"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "reason": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      },
+      "expected_plan_revision": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Plan Revision",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_id",
+      "step_id",
+      "patch",
+      "evidence_refs",
+      "reason",
+      "expected_plan_revision"
+    ],
+    "title": "StepReviseInput",
+    "type": "object"
+  },
+  "ImpactRecalculateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "trigger_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Trigger Refs",
+        "type": "array"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_id",
+      "trigger_refs"
+    ],
+    "title": "ImpactRecalculateInput",
+    "type": "object"
+  },
+  "PolicyClassifyInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "policy_version": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Policy Version"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_id"
+    ],
+    "title": "PolicyClassifyInput",
+    "type": "object"
+  },
+  "AuthorizationPrepareInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Id",
+        "type": "string"
+      },
+      "step_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Step Id",
+        "type": "string"
+      },
+      "plan_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Plan Revision Digest",
+        "type": "string"
+      },
+      "predecessor_output_digests": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Predecessor Output Digests",
+        "type": "array"
+      },
+      "target_baseline_digests": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Target Baseline Digests",
+        "type": "array"
+      },
+      "policy_version": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Policy Version",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_id",
+      "step_id",
+      "plan_revision_digest",
+      "predecessor_output_digests",
+      "target_baseline_digests",
+      "policy_version"
+    ],
+    "title": "AuthorizationPrepareInput",
+    "type": "object"
+  },
+  "AuthorizationDecideInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "authorization_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Authorization Id",
+        "type": "string"
+      },
+      "decision": {
+        "pattern": "^(APPROVE|REJECT)$",
+        "title": "Decision",
+        "type": "string"
+      },
+      "actor_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Actor Ref",
+        "type": "string"
+      },
+      "role_assignment_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Role Assignment Ref",
+        "type": "string"
+      },
+      "approved_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Approved Digest",
+        "type": "string"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Reason"
+      },
+      "dissent": {
+        "anyOf": [
+          {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Dissent"
+      }
+    },
+    "required": [
+      "project_id",
+      "authorization_id",
+      "decision",
+      "actor_ref",
+      "role_assignment_ref",
+      "approved_digest"
+    ],
+    "title": "AuthorizationDecideInput",
+    "type": "object"
+  },
+  "CompensationCreateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "caused_by_execution_attempt_ref": {
+        "maxLength": 260,
+        "minLength": 1,
+        "title": "Caused By Execution Attempt Ref",
+        "type": "string"
+      },
+      "observed_effect_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Observed Effect Refs",
+        "type": "array"
+      },
+      "intended_mitigation": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Intended Mitigation",
+        "type": "string"
+      },
+      "residual_effect_expectation": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Residual Effect Expectation",
+        "type": "string"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      }
+    },
+    "required": [
+      "project_id",
+      "caused_by_execution_attempt_ref",
+      "observed_effect_refs",
+      "intended_mitigation",
+      "residual_effect_expectation",
+      "evidence_refs"
+    ],
+    "title": "CompensationCreateInput",
+    "type": "object"
+  },
+  "MergeProposeInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "action_ids": {
+        "items": {
+          "type": "string"
+        },
+        "minItems": 2,
+        "title": "Action Ids",
+        "type": "array"
+      },
+      "field_mapping": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Field Mapping",
+        "type": "object"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "rationale": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Rationale",
+        "type": "string"
+      },
+      "expected_revision_digests": {
+        "items": {
+          "type": "string"
+        },
+        "minItems": 2,
+        "title": "Expected Revision Digests",
+        "type": "array"
+      }
+    },
+    "required": [
+      "project_id",
+      "action_ids",
+      "field_mapping",
+      "evidence_refs",
+      "rationale",
+      "expected_revision_digests"
+    ],
+    "title": "MergeProposeInput",
+    "type": "object"
+  }
+}
