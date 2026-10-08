@@ -17,6 +17,9 @@ function backendCodes(): string[] {
     ["application/services/research_freshness.py", /reasons=\(\s*"([A-Z_]+)"|currentness\.reasons, "([A-Z_]+)"/g],
     ["application/services/research_coverage.py", /reasons\.append\("([A-Z_]+)"\)/g],
     ["application/services/research_followup_projection.py", /reason_codes=\(\s*"([A-Z_]+)"|\("([A-Z_]+)",\)\)/g],
+    // The review list and comparison reasons are built in these two modules, split out of the projection.
+    ["application/services/research_followup_calculations.py", /reason_codes=\(\s*"([A-Z_]+)"|\("([A-Z_]+)",\)\)/g],
+    ["application/services/research_decision_delta.py", /reason_codes=\(\s*"([A-Z_]+)"|\("([A-Z_]+)",\)\)/g],
     ["application/services/history_projection.py", /\*currentness\.reasons, "([A-Z_]+)"/g],
   ];
   for (const [path, pattern] of files) {

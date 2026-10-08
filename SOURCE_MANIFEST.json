@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-08T00:26:35.041071+00:00",
+  "created_at": "2026-10-08T08:01:31.524996+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -628,8 +628,8 @@
     },
     {
       "path": "apps/web/src/components/FirstRunSetup.tsx",
-      "sha256": "35d0edb9ac86654510eca08b05d9fc63327329a877d01eb9b8f0e8e74acd7fe0",
-      "bytes": 16988
+      "sha256": "6c19dbb637486d54cceb7bca4d848f7e2d2313fa616fbae968b2c2d677a5b3f4",
+      "bytes": 16736
     },
     {
       "path": "apps/web/src/components/HypothesisCompare.test.tsx",
@@ -1148,8 +1148,8 @@
     },
     {
       "path": "apps/web/src/components/history/historyReasonText.test.ts",
-      "sha256": "1b931370fc87d7ddc10c70a8843a1f1989994eb368f6f6bdf6009d81c6d7cbfa",
-      "bytes": 2686
+      "sha256": "07efcebfe9c4cbe73040274e6067139e7d99dfa5bf8a316a0e7c02b292e9d9b0",
+      "bytes": 3020
     },
     {
       "path": "apps/web/src/components/history/historyReasonText.ts",
@@ -1223,8 +1223,8 @@
     },
     {
       "path": "apps/web/src/components/modelCatalogPresentation.test.ts",
-      "sha256": "dc8b0a7cc215d406c8c75c2bd13adc9aa0a161d9b8329185618a88bf7f96d55d",
-      "bytes": 2801
+      "sha256": "b5d2fa2e8a1d3647de8fd04f166bbb0570099c5617b20a367977a30d7236f4ec",
+      "bytes": 2765
     },
     {
       "path": "apps/web/src/components/modelCatalogPresentation.ts",
@@ -1308,8 +1308,8 @@
     },
     {
       "path": "apps/web/src/components/traceReasonTags.test.ts",
-      "sha256": "66a0f0106ddc48c058bf86568c93d439109496ae157aded6c85f479e6acc8da6",
-      "bytes": 8695
+      "sha256": "0c645f6f882e9ffb9d34205120315d4b9f096fa1762c47d50692b5aa40ce0c8f",
+      "bytes": 8881
     },
     {
       "path": "apps/web/src/components/traceReasonTags.ts",
@@ -3033,13 +3033,13 @@
     },
     {
       "path": "src/thoth/adapters/models/catalog.py",
-      "sha256": "eb8291ff4afc71d351f04664b587eb9208977b8870e540fc1573c34df801d3cd",
-      "bytes": 6594
+      "sha256": "2ac2524024456caf9dce1a106b935fb282dff038454b1532e7a214f0f7b7a711",
+      "bytes": 6411
     },
     {
       "path": "src/thoth/adapters/models/catalog_marks.py",
-      "sha256": "384bd3fb6dff229a16f209e3c8f1cc2709bf2e4d488cb811de488ea82b0a677c",
-      "bytes": 4006
+      "sha256": "9b8aa5ab97e94392a0f66b0ea5da7d9392124bcf9cc49f4c092248d230a40d3a",
+      "bytes": 3895
     },
     {
       "path": "src/thoth/adapters/models/catalog_startup.py",
@@ -3098,8 +3098,8 @@
     },
     {
       "path": "src/thoth/adapters/models/codex_broker.py",
-      "sha256": "8400d588fc5c3ce46deb20587882a3f61e5d9970f05eaa468f4688968381be45",
-      "bytes": 36701
+      "sha256": "19b677314272b6dd2f5d58016fc82f5db186bc543278a656ea11ce3f1c13a535",
+      "bytes": 35870
     },
     {
       "path": "src/thoth/adapters/models/codex_http.py",
@@ -3838,8 +3838,8 @@
     },
     {
       "path": "src/thoth/application/commands/model_settings.py",
-      "sha256": "5ccd95a30f7adfda9d3b34e7292c05c07601d8fe934e153f193924e3930fa15f",
-      "bytes": 18612
+      "sha256": "114b13d9d77a8f3ceeb5f53a88a4451b8f1b3ab19e8b770ead37370c2ed30b93",
+      "bytes": 18176
     },
     {
       "path": "src/thoth/application/commands/object_inputs.py",
@@ -4498,8 +4498,8 @@
     },
     {
       "path": "src/thoth/application/services/model_outcomes.py",
-      "sha256": "9f83bb86686548ff4d46f6050c917c21e2c7b58556569cc0a4ee8955d1754223",
-      "bytes": 1373
+      "sha256": "a2ed2630d1dc52e1566606913b8b6dad97e76d65b9e8b9c87acdc42fecd29b43",
+      "bytes": 1337
     },
     {
       "path": "src/thoth/application/services/model_settings.py",
@@ -4628,8 +4628,8 @@
     },
     {
       "path": "src/thoth/application/services/research_attempt_runner.py",
-      "sha256": "04c8f2cc9dd5dc2bc5ae81f7136a2474cc79cb7dbb99724b1bb706d742f55c92",
-      "bytes": 19042
+      "sha256": "3a91ba468a650a9176eaa3045bd2ec5588339a8ca0f3143760dead5896a8f509",
+      "bytes": 18597
     },
     {
       "path": "src/thoth/application/services/research_basis_capture.py",
@@ -5588,8 +5588,8 @@
     },
     {
       "path": "src/thoth/domain/model_catalog.py",
-      "sha256": "a9215b161a1284353d89c4ad1f46d19cf64f5ac35861ad6ce94accc8a0dde5a7",
-      "bytes": 3752
+      "sha256": "bc2f241bb15778c37ed239161228e05fad2262d877a5303c91d6d16cdfe32953",
+      "bytes": 3652
     },
     {
       "path": "src/thoth/domain/model_dispatch.py",
@@ -6018,8 +6018,8 @@
     },
     {
       "path": "src/thoth/ports/model_catalog.py",
-      "sha256": "1b585ee3ad8565281ab95217241df376fdf39143f548dc9ce0845b1a6b48753f",
-      "bytes": 829
+      "sha256": "de04cfaacdcc1761f62b10f81a2a21b6ea997f93edd05449fd20366e69deaec2",
+      "bytes": 804
     },
     {
       "path": "src/thoth/ports/model_credentials.py",
@@ -8543,8 +8543,8 @@
     },
     {
       "path": "tests/unit/models/test_catalog_marks.py",
-      "sha256": "dc388e2ce94c2ddba2ff57e557f1b9762c8c407b56d9add7393b83a336188d53",
-      "bytes": 4162
+      "sha256": "3ad4e9d89a3ec0a4174bca0aab994c126497e8ed40ea84fe4824aabcfb540675",
+      "bytes": 4058
     },
     {
       "path": "tests/unit/models/test_catalog_startup_refresh.py",
@@ -8598,13 +8598,13 @@
     },
     {
       "path": "tests/unit/models/test_codex_catalog_snapshot.py",
-      "sha256": "935453cab2311691d94f44fdce27378e54d9aa04d366620a9e0900a1a2d71946",
-      "bytes": 9933
+      "sha256": "445ba715249b1370c8dc9c05c21e51c73fa85c1daf7967f6cafa7a3a8b770dc9",
+      "bytes": 9691
     },
     {
       "path": "tests/unit/models/test_codex_isolated_broker.py",
-      "sha256": "c43f89c16449bcb4fb486069fb69bf818acb472460dd29e826fcb3950c74812f",
-      "bytes": 37211
+      "sha256": "3eb985ccdb2e8030168f20f1d6757e1902cde23dd33dc167c3c762b7338810ba",
+      "bytes": 36281
     },
     {
       "path": "tests/unit/models/test_codex_login_completion.py",
