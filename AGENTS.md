@@ -51,8 +51,8 @@
 
 - 버그 수정은 별도 입력이나 실패 주입으로 재현하고 원하는 동작을 회귀 테스트에 남긴다. 새 기능은 정상 사용자 진입→소비자→저장 결과를 확인한다. 테스트 double의 고정 답은 live 의미 품질 증거가 아니다.
 - 현재 적용되는 검증 정책을 따르되, 개발 중에는 영향 범위의 검사부터 수행한다. 동일 source의 살아 있는 검증을 중복 실행하지 않는다. 검사 범위를 줄이려면 기존 정책을 조용히 무시하지 말고 변경안을 명시한다.
-- 개발 단계의 기본 검사는 가볍게 한다. 각 단계에서는 바꾼 코드의 테스트와 해당 언어의 lint(웹 lint·typecheck, Python ruff check·format)만 돌린다. 여러 화면·호출자가 함께 쓰는 컴포넌트나 모듈을 바꿨을 때만 그 소비자 테스트 또는 웹 테스트 전체를 추가한다. 빌드·architecture·basedpyright는 import 경계나 타입 계약을 바꾼 경우에만 돌린다.
-- 병합·공개 전에는 깨끗한 checkout에서 제품 확인(Python 제품 시험 전체, 웹 시험 전체, 웹 lint·typecheck·build, Python ruff check, 계층 검사, README 빠른 시작)을 한 번 실행하고, 결과를 보고 사용자가 병합을 승인한다. 비활성 개발 Hook·과정 점검 시험은 명시 목록에 따라 제외하고 제외 이유와 수를 보고한다. 실패·중단·NOT_RUN을 통과로 표현하지 않는다.
+- 개발 단계의 기본 검사는 가볍게 한다. 각 단계에서는 바꾼 코드의 테스트와 해당 언어의 lint(웹 lint·typecheck, Python ruff check·format)만 돌린다. 여러 화면·호출자가 함께 쓰는 컴포넌트나 모듈을 바꿨을 때만 그 소비자 테스트 또는 웹 테스트 전체를 추가한다. 빌드·architecture·basedpyright는 import 경계나 타입 계약을 바꾼 경우에만 돌린다. 서버 Python 파일을 옮기거나 나누면 서버 코드를 직접 읽는 웹 시험(예: traceReasonTags.test.ts, history/historyReasonText.test.ts)도 함께 돌린다.
+- 병합·공개 전 검사는 마지막 공개본 이후 바뀐 것에 맞춘다. 제품 코드(src, apps/web/src의 시험 아닌 파일, migrations)가 바뀌었으면 깨끗한 checkout에서 제품 확인(Python 제품 시험 전체, 웹 시험 전체, 웹 lint·typecheck·build, Python ruff check, 계층 검사, README 빠른 시작)을 한 번 실행한다. 시험·검사 스크립트·설정만 바뀌었으면 그 시험과 관련 검사를 돌린다. 문서만 바뀌었으면 공개 PR의 빠른 공개 검사로 충분하다. 결과를 보고 사용자가 병합을 승인한다. 비활성 개발 Hook·과정 점검 시험은 명시 목록에 따라 제외하고 제외 이유와 수를 보고한다. 실패·중단·NOT_RUN을 통과로 표현하지 않는다.
 - 실패/중단/NOT_RUN을 정확히 보고한다. 관련 테스트 PASS와 전체 회귀 PASS, controlled D4와 live D5를 구분한다. 파일/RPC/테스트 개수를 완성률로 쓰지 않는다.
 - step 완료는 key 존재가 아니라 exact input revision·실제 상태 전이·후속 소비로 증명한다. NOT_TRIGGERED/NO_CHANGE/NOT_RUN을 SUCCESS와 구분한다.
 - 인계에는 해결한 기능, 실제 검증, 미완료/차단, 관련 source와 기록 위치를 남긴다. 제품 의미가 바뀌면 정본을 먼저, 해당 Wiki projection을 다음으로 갱신한다. 상태만 바뀌면 NOW/검증 기록만 갱신한다. 이 기록은 커밋·병합·세션 인계처럼 넘기는 지점에서 짧게 남기고, 개발 중간 단계마다 쓰지 않는다.

@@ -311,7 +311,9 @@ it("starts xAI device login on first run and confirms it without changing the mo
   const check = [...row.querySelectorAll("button")].find(button => button.textContent === "상태 직접 확인")!;
   await act(async () => check.click()); await flush();
   expect(fixture.calls.some(call => call.method === "model/credential/login/status" && call.input.login_id === "login_test_1")).toBe(true);
-  expect(container.textContent).toContain("실제 모델 실행 성공은 별도 확인이 필요합니다");
+  // The row says once that the real run is not confirmed yet (it used to say it in the login box and again in the note).
+  expect(row.textContent).toContain("xAI 로그인이 확인됐습니다");
+  expect(row.textContent?.match(/실행 성공은 별도 확인|(확인|검증)되지 않았/g)).toHaveLength(1);
   expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
   expect(opened).not.toHaveBeenCalled();
 });

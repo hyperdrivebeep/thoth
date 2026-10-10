@@ -6,11 +6,10 @@ from typing import Literal
 
 from thoth.domain.base import DomainModel
 
-# The one place the default lives. Off: a cut-off call is shown to the user, who decides (the
-# result card offers "이어서 조사"). The server cannot tell whether it already received a request
-# (no idempotency) or whether the cut-off one stopped, so a send-again can repeat the same work
-# or a runaway; a project turns it on knowingly. When on: at most twice, 2 s then 4 s.
-AUTO_RETRY_INTERRUPTED_DEFAULT = False
+# 사용자 결정 20261010-01: on for projects without a saved choice; saved False stays off.
+# A retry can repeat remote work (no remote stop/idempotency proof). The existing limit remains
+# at most twice, waiting about 2 s then 4 s; projects can turn it off and resume manually.
+AUTO_RETRY_INTERRUPTED_DEFAULT = True
 # Hypothesis generation contract v3 (what each hypothesis expects from a test, and what would refute
 # it): off, so a project keeps the v2 contract exactly until it turns this on.
 HYPOTHESIS_CONTRACT_V3_DEFAULT = False

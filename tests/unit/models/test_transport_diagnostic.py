@@ -130,7 +130,10 @@ def test_nested_cause_bounds_cycles_ssl_and_no_message_access():
     oversized = OSError(2**40, "unused")
     error.__cause__ = oversized
     assert exception_detail(error)["nested_errno"] is None
-    assert exception_detail(httpx.ReadError("unused")) == {"httpx_error_type": "ReadError"}
+    assert exception_detail(httpx.ReadError("unused")) == {
+        "httpx_error_type": "ReadError",
+        "error_message_prefix": "[REDACTED]",
+    }
 
 
 @pytest.mark.parametrize(
@@ -182,7 +185,7 @@ def test_framing_and_unknown_version():
 
 
 async def test_collection_failure_does_not_replace_primary(monkeypatch: pytest.MonkeyPatch):
-    def broken(error: httpx.HTTPError) -> dict[str, object]:
+    def broken(error: httpx.HTTPError, sensitive_values: tuple[str, ...] = ()) -> dict[str, object]:
         raise ValueError("diagnostic helper fault")
 
     monkeypatch.setattr(receive_stats, "exception_detail", broken)

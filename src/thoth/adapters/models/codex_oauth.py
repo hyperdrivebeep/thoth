@@ -9,7 +9,11 @@ from typing import Protocol, TypeVar, cast
 
 from pydantic import BaseModel, ValidationError
 
-from thoth.adapters.models.hypothesis_contract_text import hypothesis_contract_addendum
+from thoth.adapters.models.hypothesis_contract_text import (
+    hypothesis_contract_addendum,
+    hypothesis_opening,
+    table_filler_contract,
+)
 from thoth.adapters.models.reference_schema import (
     apply_hypothesis_review_contract,
     constrain_span_references,
@@ -486,9 +490,14 @@ def role_contract(role: str, prompt_version: str = "") -> str:
         )
     if role == "HYPOTHESIS_GENERATOR":
         return (
-            "Create only justified source-grounded hypotheses. Zero or one is allowed when "
-            "alternatives_considered, next_checks and uncertainty_reserve explain the limitation. "
-            "Causal locus may be null for predictive or exploratory intent. Drafts may have gaps. "
+            hypothesis_opening(
+                prompt_version,
+                "Create only justified source-grounded hypotheses. Zero or one is allowed when "
+                "alternatives_considered, next_checks and uncertainty_reserve explain the "
+                "limitation. ",
+            )
+            + "Causal locus may be null for predictive or exploratory intent. "
+            "Drafts may have gaps. "
             "Every hypothesis needs support refs or explicit missing evidence, a "
             "counterevidence query, predicted observations, and a discriminating test. Use only "
             "provided span IDs and copy input_head_set_digest exactly. When previous_portfolio "
@@ -510,6 +519,8 @@ def role_contract(role: str, prompt_version: str = "") -> str:
                 "and discriminating_tests procedure/expected text"
             )
         )
+    if role == "HYPOTHESIS_TABLE_FILLER":
+        return table_filler_contract() + _user_visible_language_fields("expected labels")
     if role == "ACTION_PLANNER":
         return (
             "Create an ActionPlanDraft with at least three materially different action families. "
@@ -558,8 +569,9 @@ def _user_visible_language_fields(fields: str) -> str:
     return (
         " User-facing fields ("
         + fields
-        + ") follow the question language. Do not translate identifiers, "
-        "quoted evidence, or numeric/table citations."
+        + ") follow the question language: for a Korean question write them in Hangul and "
+        "do not use Chinese characters or kana that the question or the quoted evidence does "
+        "not contain. Do not translate identifiers, quoted evidence, or numeric/table citations."
     )
 
 

@@ -5,10 +5,10 @@ from typing import cast
 
 from pydantic import JsonValue
 
-from thoth.application.services.connector_service import ConnectorService
+from thoth.application.services.connector_service import ConnectorAcquisition, ConnectorService
 from thoth.application.services.evidence_graph_service import EvidenceGraphService
 from thoth.application.services.investigation_service import InvestigationService
-from thoth.domain.acquisition import AcquisitionLead, SearchIntent
+from thoth.domain.acquisition import AcquisitionLead, EvidenceAtomicCommit, SearchIntent
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.connectors import ConnectorAccessRequest, ConnectorFailure
 from thoth.domain.enums import (
@@ -18,6 +18,8 @@ from thoth.domain.enums import (
     SufficiencyStatus,
 )
 from thoth.domain.evidence import EvidenceSpan, InformationSufficiencyAssessment
+from thoth.domain.governance import ProjectPolicy
+from thoth.domain.investigation import InvestigationRecord
 from thoth.domain.policy import AcquisitionRoute, AuthoritativeExecutionPolicy
 from thoth.domain.project import Project, WorkThread
 from thoth.ports.acquisition import AcquisitionTraceStorePort, EvidenceUnitOfWorkPort
@@ -66,13 +68,10 @@ class AcquisitionCoordinator:
         stored_policy = self._policies.read_policy(project.project_id)
         if stored_policy is None:
             return None
-        policy = AuthoritativeExecutionPolicy.from_project_policy(stored_policy)
-        target_gaps = self._target_gaps(policy.acquisition_routes, evidence)
-        if not target_gaps:
+        prepared = self._prepare_route(stored_policy, evidence)
+        if prepared is None:
             return None
-        route = next(
-            item for item in policy.acquisition_routes if item.evidence_group == target_gaps[0]
-        )
+        policy, target_gaps, route = prepared
         investigation = self._investigations.start(
             thread=thread,
             trigger="SUFFICIENCY_GAP",
@@ -127,15 +126,11 @@ class AcquisitionCoordinator:
             stopped = self._investigations.stop(
                 investigation,
                 reason=(
-                    "PERMISSION_BLOCKED"
-                    if exc.policy_denial is not None
-                    else "CONNECTOR_FAILED"
+                    "PERMISSION_BLOCKED" if exc.policy_denial is not None else "CONNECTOR_FAILED"
                 ),
             )
             projection: dict[str, JsonValue] = {
-                "terminal_state": (
-                    "POLICY_BLOCKED" if exc.policy_denial is not None else "FAILED"
-                ),
+                "terminal_state": ("POLICY_BLOCKED" if exc.policy_denial is not None else "FAILED"),
                 "reanalysis_performed": False,
                 "minimum_question": (
                     f"Project policy must authorize evidence group {route.evidence_group}."
@@ -202,9 +197,7 @@ class AcquisitionCoordinator:
                     "remaining_target_gaps": list(target_gaps),
                     "search_intent": cast(JsonValue, intent.model_dump(mode="json")),
                     "investigation": cast(JsonValue, stopped.model_dump(mode="json")),
-                    "connector_run": cast(
-                        JsonValue, acquisition.run.model_dump(mode="json")
-                    ),
+                    "connector_run": cast(JsonValue, acquisition.run.model_dump(mode="json")),
                 },
                 acquired_evidence=all_acquired_spans,
             )
@@ -223,12 +216,51 @@ class AcquisitionCoordinator:
             waved,
             reason="SUFFICIENT" if route.evidence_group not in remaining else "SEARCH_SATURATED",
         )
+        return self._acquisition_result(
+            route=route,
+            remaining=remaining,
+            intent=intent,
+            stopped=stopped,
+            acquisition=acquisition,
+            staged=staged,
+            lead=lead,
+            spans=spans,
+            all_acquired_spans=all_acquired_spans,
+            route_capability=route_capability,
+        )
+
+    def _prepare_route(
+        self,
+        stored_policy: ProjectPolicy,
+        evidence: tuple[EvidenceSpan, ...],
+    ) -> tuple[AuthoritativeExecutionPolicy, tuple[str, ...], AcquisitionRoute] | None:
+        policy = AuthoritativeExecutionPolicy.from_project_policy(stored_policy)
+        target_gaps = self._target_gaps(policy.acquisition_routes, evidence)
+        if not target_gaps:
+            return None
+        route = next(
+            item for item in policy.acquisition_routes if item.evidence_group == target_gaps[0]
+        )
+        return policy, target_gaps, route
+
+    @staticmethod
+    def _acquisition_result(
+        *,
+        route: AcquisitionRoute,
+        remaining: tuple[str, ...],
+        intent: SearchIntent,
+        stopped: InvestigationRecord,
+        acquisition: ConnectorAcquisition,
+        staged: EvidenceAtomicCommit,
+        lead: AcquisitionLead,
+        spans: tuple[EvidenceSpan, ...],
+        all_acquired_spans: tuple[EvidenceSpan, ...],
+        route_capability: dict[str, JsonValue] | None,
+    ) -> AutonomousAcquisitionExecution:
         return AutonomousAcquisitionExecution(
             projection={
                 "terminal_state": (
-                    "SUFFICIENT"
-                    if route.evidence_group not in remaining
-                    else "SEARCH_SATURATED"
+                    "SUFFICIENT" if route.evidence_group not in remaining else "SEARCH_SATURATED"
                 ),
                 "reanalysis_performed": route.evidence_group not in remaining,
                 "minimum_question": (
@@ -240,14 +272,10 @@ class AcquisitionCoordinator:
                 "search_intent": cast(JsonValue, intent.model_dump(mode="json")),
                 "investigation": cast(JsonValue, stopped.model_dump(mode="json")),
                 "connector_run": cast(JsonValue, acquisition.run.model_dump(mode="json")),
-                "connector_receipt": cast(
-                    JsonValue, acquisition.receipt.model_dump(mode="json")
-                ),
+                "connector_receipt": cast(JsonValue, acquisition.receipt.model_dump(mode="json")),
                 "observation": cast(JsonValue, staged.observation.model_dump(mode="json")),
                 "lead": cast(JsonValue, lead.model_dump(mode="json")),
-                "claim_candidate": cast(
-                    JsonValue, staged.claim_candidate.model_dump(mode="json")
-                ),
+                "claim_candidate": cast(JsonValue, staged.claim_candidate.model_dump(mode="json")),
                 "acquired_evidence_refs": [item.span_id for item in spans],
                 "route_capability_snapshot": route_capability,
                 "route_usage": {
@@ -297,9 +325,7 @@ class AcquisitionCoordinator:
         return SearchIntent.model_validate(
             {
                 **draft,
-                "intent_digest": domain_digest(
-                    "SEARCH_INTENT", "1.0.0", canonical_payload(draft)
-                ),
+                "intent_digest": domain_digest("SEARCH_INTENT", "1.0.0", canonical_payload(draft)),
             }
         )
 
@@ -328,9 +354,7 @@ class AcquisitionCoordinator:
         return AcquisitionLead.model_validate(
             {
                 **draft,
-                "lead_digest": domain_digest(
-                    "ACQUISITION_LEAD", "1.0.0", canonical_payload(draft)
-                ),
+                "lead_digest": domain_digest("ACQUISITION_LEAD", "1.0.0", canonical_payload(draft)),
             }
         )
 

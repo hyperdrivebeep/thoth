@@ -11,9 +11,12 @@ from thoth.application.services.research_retrieval_policy import (
     retrieval_policy,
 )
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
+from thoth.domain.research_execution import ResearchWork
 
 _MIN_TERM = 3
 _MIN_SPAN_CHARS = 24
+# A block of short key-value lines is read together only while it stays small.
+_MAX_BLOCK_SPANS = 20
 
 
 def tokens(text: str) -> set[str]:
@@ -31,7 +34,7 @@ def _term_hits(text: str, terms: set[str]) -> int:
 
 def _is_chrome(span: EvidenceSpan) -> bool:
     text = span.exact_text.strip()
-    if len(text) < _MIN_SPAN_CHARS:
+    if len(text) < _MIN_SPAN_CHARS and not _block_key(span):
         return True
     lowered = text.casefold()
     if lowered in {"---", "article"}:
@@ -66,6 +69,15 @@ def _interleave_artifacts(ranked: list[EvidenceSpan]) -> list[EvidenceSpan]:
     return interleaved
 
 
+def _block_key(span: EvidenceSpan) -> str | None:
+    """The key path that groups a structured line with the lines under the same parent key."""
+    pointer = span.locator.json_pointer
+    if not pointer or not pointer.startswith("/"):
+        return None
+    parent, _, _ = pointer.rpartition("/")
+    return parent or pointer
+
+
 def text_neighbors(
     span: EvidenceSpan, source: tuple[EvidenceSpan, ...]
 ) -> tuple[EvidenceSpan, ...]:
@@ -81,7 +93,19 @@ def text_neighbors(
         key=lambda s: (s.locator.page or 0, s.locator.line or 0, s.span_id),
     )
     index = next(i for i, s in enumerate(siblings) if s.span_id == span.span_id)
-    return tuple([*siblings[:1], *siblings[max(0, index - 1) : index + 2]])
+    near = [*siblings[:1], *siblings[max(0, index - 1) : index + 2]]
+    key = _block_key(span)
+    if key is None:
+        return tuple(near)
+    block = [
+        s
+        for s in siblings
+        if (s.locator.json_pointer or "") == key
+        or (s.locator.json_pointer or "").startswith(f"{key}/")
+    ]
+    if len(block) > _MAX_BLOCK_SPANS:
+        return tuple(near)
+    return tuple(dict.fromkeys([*near, *block]))
 
 
 def lexical_candidates(
@@ -98,9 +122,7 @@ def lexical_candidates(
     ranked = sorted(pool, key=lambda span: _rank_key(span, exact=exact, terms=terms))
     if any(span.span_id in exact or _term_hits(span.exact_text, terms) for span in ranked):
         ranked = [
-            span
-            for span in ranked
-            if span.span_id in exact or _term_hits(span.exact_text, terms)
+            span for span in ranked if span.span_id in exact or _term_hits(span.exact_text, terms)
         ]
     # A bounded shortlist, not a claim that unselected source territory was searched.
     # A pinned span is kept first when it is retrievable at all; it never widens what is eligible.
@@ -123,6 +145,29 @@ def lexical_candidates(
     )
     replay_retrieval_shadows(lambda: lexical_candidates(question, queries, evidence, pinned))
     return result
+
+
+def work_candidates(
+    work: ResearchWork, queries: tuple[str, ...], evidence: tuple[EvidenceSpan, ...]
+) -> tuple[EvidenceSpan, ...]:
+    """The shortlist for a request: its question, its queries and the spans its start row pins."""
+    return lexical_candidates(work.effective_question, queries, evidence, work.pinned_spans)
+
+
+def pinned_first(
+    ranking: tuple[str, ...], candidates: tuple[EvidenceSpan, ...], pinned: tuple[str, ...]
+) -> tuple[str, ...]:
+    """The ranking with the pinned candidates the model left out put in front of it.
+
+    A pinned span is the starting row's own evidence, so a model's ordering cannot drop it. An id
+    the model repeated is left as it was: the assembly still refuses it.
+    """
+    left_out = tuple(
+        span.span_id
+        for span in candidates
+        if span.span_id in pinned and span.span_id not in ranking
+    )
+    return (*left_out, *ranking)
 
 
 def adjacent_packet(

@@ -82,13 +82,15 @@ reported as a model-call failure with no answer; the operation itself stays a pu
   Their JSON representation is decimal text, as with transport timeout controls; older numeric
   observations remain readable. Recording an interrupted dispatch preserves its diagnostic
   instead of failing while serializing the observation.
-- **Automatic retry is a project setting, off by default.** `model/callSettings/read|update`
+- **Automatic retry is a project setting, on by default (user decision 20261010-01).** `model/callSettings/read|update`
   (`auto_retry_interrupted_model_call`, digest-checked; the default is one line in
   `domain/model_call_settings.py`). When on, a cut-off, slowed, over-long or runaway call (not a 429,
   not an authentication refusal, not a format error, not a usage limit) is sent again as
   `retry_of_dispatch_id`, at most twice per call, waiting about 2 s and then 4 s (each shaken by up to
-  25%). The transient-429 retry happens at most once and shares the limit of two. Usage counts every send. It is off because the server cannot say whether it already received a
-  request or whether the cut-off one stopped; the user continues with "이어서 조사" instead.
+  25%). The transient-429 retry happens at most once and shares the limit of two. Usage counts every
+  send. An existing saved choice, including false, is preserved; only a project without a saved
+  choice uses the default. The server cannot say whether the cut-off request stopped, so retries
+  may repeat remote work. With the switch off, the user continues with "이어서 조사" instead.
 - **A judgement review is never reused.** `NON_REUSABLE_ROLES` (`research_stage_reuse.py`) keeps
   `REVIEW_ADJUDICATOR` out of resume: its conflict and gap decisions carry the requirement-set digest
   of the run that made them, so a reused one would be discarded as stale.

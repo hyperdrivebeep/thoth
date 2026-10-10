@@ -6,17 +6,26 @@ other workspace):
     python scripts/prepare_synthetic_radar_demo.py phase1 --api http://127.0.0.1:8861
     python scripts/prepare_synthetic_radar_demo.py phase2 --api http://127.0.0.1:8861
 
-phase1 makes a project, connects the requirement, test-plan and dry-weather result files as
-project materials (the same way a person uses "파일 자료 연결"), and writes the phase 1 trace CSV.
-The CSV's "근거 위치" are the ids of the sentences THOTH read from the connected result file, so
-choosing one in the trace table highlights that sentence. The person then imports the CSV on the
-trace page ("새로 만들기").
+phase1 makes a project, connects the requirement, test-plan and dry-weather result files, and the
+trial file the dry result names (its "trials_csv"), as project materials (the same way a person
+uses "파일 자료 연결"), and writes the phase 1 trace CSV. The CSV's "근거 위치" are the ids of the
+sentences THOTH read from the connected result file, so choosing one in the trace table highlights
+that sentence. The person then imports the CSV on the trace page ("새로 만들기").
 
-phase2 connects the rain result file to the same project and writes the CSV that adds the rain
-results ("기존 표 고치기"). It only writes a file; the import is done on the trace page.
+phase2 connects the rain result file and its trial file to the same project and writes the CSV that
+adds the rain results ("기존 표 고치기"). It only writes a file; the import is done on the trace
+page.
+
+Only material that can be evidence is connected: the requirement, the test plan, the results and
+the trial files they name. The manifest (file hashes), the source-lineage note and the JSON schema
+describe the folder, not what was observed, so they are left out.
 
 The demo files are invented example data. This script sends them as they are, under their own
 names (.yaml files are read as plain text). It never starts a model run.
+
+A demo folder for another field says in its 00_MANIFEST_SYNTHETIC.yaml what is specific to it:
+result_parts (the sections of a result file that hold a value, in order), requirement_file,
+test_plan_file and version_label. A folder without those entries is the radar demo.
 """
 
 from __future__ import annotations
@@ -31,7 +40,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from uuid import uuid4
 
 import yaml
@@ -51,9 +60,11 @@ from thoth.domain.verification_trace import (
 NOTICE = "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE"
 DEFAULT_DEMO = Path("examples/synthetic-radar-demo-v1")
 DEFAULT_OUT = Path("outputs/b5-demo/files")
+MANIFEST_FILE = "00_MANIFEST_SYNTHETIC.yaml"
 REQUIREMENT_FILE = "10_REQUIREMENTS_SYNTHETIC.yaml"
 TEST_PLAN_FILE = "20_TEST_PLAN_SYNTHETIC.yaml"
 RESULT_PARTS = ("detection", "false_track")
+VERSION_LABEL = "synthetic-radar-demo-v1"
 STATE_NAME = "state.json"
 
 # One call to the server: (path, body, headers) -> the decoded JSON answer.
@@ -62,6 +73,36 @@ Transport = Callable[[str, bytes, dict[str, str]], dict[str, Any]]
 
 class DemoError(Exception):
     pass
+
+
+@dataclass(frozen=True)
+class DemoSpec:
+    """What differs between demo folders; the radar demo is the default."""
+
+    result_parts: tuple[str, ...] = RESULT_PARTS
+    requirement_file: str = REQUIREMENT_FILE
+    test_plan_file: str = TEST_PLAN_FILE
+    version_label: str = VERSION_LABEL
+
+
+def demo_spec(demo: Path) -> DemoSpec:
+    """The demo's own names from its manifest; anything the manifest does not say is the radar's."""
+    manifest_path = demo / MANIFEST_FILE
+    loaded: Any = (
+        yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+        if manifest_path.exists()
+        else None
+    )
+    manifest = cast("dict[str, Any]", loaded) if isinstance(loaded, dict) else {}
+    default = DemoSpec()
+    return DemoSpec(
+        result_parts=tuple(
+            str(part) for part in manifest.get("result_parts", default.result_parts)
+        ),
+        requirement_file=str(manifest.get("requirement_file", default.requirement_file)),
+        test_plan_file=str(manifest.get("test_plan_file", default.test_plan_file)),
+        version_label=str(manifest.get("version_label", default.version_label)),
+    )
 
 
 def http_transport(base: str) -> Transport:
@@ -120,7 +161,9 @@ class Api:
 # --- connecting the demo files as project materials ------------------------------------------
 
 
-def connect_material(api: Api, project_id: str, path: Path) -> str:
+def connect_material(
+    api: Api, project_id: str, path: Path, version_label: str = VERSION_LABEL
+) -> str:
     """Connect one demo file the way the file panel does; returns the artifact id."""
     staged = api.stage(project_id, path.name, path.read_bytes())
     connected = api.rpc(
@@ -133,20 +176,30 @@ def connect_material(api: Api, project_id: str, path: Path) -> str:
             "cutoff_state": "ELIGIBLE",
             "security_class": "INTERNAL",
             "resource_scope": {"owner_kind": "PROJECT", "visibility": "PROJECT_SHARED"},
-            "version_label": "synthetic-radar-demo-v1",
+            "version_label": version_label,
         },
     )
     return str(connected["artifact"]["artifact_id"])
 
 
-def value_lines(text: str) -> dict[str, int]:
-    """The line of the "value:" entry under detection and under false_track (first line is 1)."""
+def connect_result(api: Api, project_id: str, demo: Path, path: Path) -> str:
+    """Connect a result file and the trial file it names; returns the result file's artifact id."""
+    label = demo_spec(demo).version_label
+    artifact = connect_material(api, project_id, path, label)
+    trials = _yaml(path).get("trials_csv")
+    if trials:
+        connect_material(api, project_id, demo / str(trials), label)
+    return artifact
+
+
+def value_lines(text: str, parts: tuple[str, ...] = RESULT_PARTS) -> dict[str, int]:
+    """The line of the "value:" entry under each result part (first line is 1)."""
     found: dict[str, int] = {}
     section: str | None = None
     for number, line in enumerate(text.splitlines(), start=1):
         if line and not line[0].isspace() and line.rstrip().endswith(":"):
             section = line.rstrip()[:-1]
-        elif section in RESULT_PARTS and line.strip().startswith("value:"):
+        elif section in parts and line.strip().startswith("value:"):
             found.setdefault(section, number)
     return found
 
@@ -161,14 +214,16 @@ def sentence_ids(api: Api, project_id: str, artifact_id: str) -> dict[int, str]:
     }
 
 
-def result_sentence_ids(api: Api, project_id: str, artifact_id: str, path: Path) -> dict[str, str]:
-    """For one result file: {"detection": sentence id, "false_track": sentence id}."""
-    lines = value_lines(path.read_text(encoding="utf-8"))
+def result_sentence_ids(
+    api: Api, project_id: str, artifact_id: str, path: Path, parts: tuple[str, ...] = RESULT_PARTS
+) -> dict[str, str]:
+    """For one result file: {part: sentence id of its value line}, for each result part."""
+    lines = value_lines(path.read_text(encoding="utf-8"), parts)
     sentences = sentence_ids(api, project_id, artifact_id)
-    missing = [part for part in RESULT_PARTS if lines.get(part) not in sentences]
+    missing = [part for part in parts if lines.get(part) not in sentences]
     if missing:
         raise DemoError(f"{path.name}: no connected sentence for {', '.join(missing)}")
-    return {part: sentences[lines[part]] for part in RESULT_PARTS}
+    return {part: sentences[lines[part]] for part in parts}
 
 
 # --- the trace set -----------------------------------------------------------------------------
@@ -185,11 +240,12 @@ def result_files(demo: Path) -> list[Path]:
 def build_trace_set(demo: Path, phase: int, spans: dict[str, dict[str, str]]) -> TraceSet:
     """The demo as a trace set.
 
-    spans: result file name -> {"detection" / "false_track": sentence id of its value line}.
+    spans: result file name -> {result part: sentence id of its value line}.
     """
+    spec = demo_spec(demo)
     marked = {"synthetic_notice": NOTICE}
-    requirement = _yaml(demo / REQUIREMENT_FILE)["requirement"]
-    cases = _yaml(demo / TEST_PLAN_FILE)["test_cases"]
+    requirement = _yaml(demo / spec.requirement_file)["requirement"]
+    cases = _yaml(demo / spec.test_plan_file)["test_cases"]
     items = [
         TraceItem(
             item_id=requirement["id"],
@@ -258,7 +314,7 @@ def build_trace_set(demo: Path, phase: int, spans: dict[str, dict[str, str]]) ->
             continue
         if path.name not in spans:
             raise DemoError(f"{path.name}: its sentences are not connected yet")
-        for part in RESULT_PARTS:
+        for part in spec.result_parts:
             body = data[part]
             rid = f"SYN-RES-{body['criterion']}"
             items.append(
@@ -279,8 +335,8 @@ def build_trace_set(demo: Path, phase: int, spans: dict[str, dict[str, str]]) ->
                     condition=data["condition"],
                     value=Decimal(body["value"]),
                     unit=body["unit"],
-                    numerator=body["numerator"],
-                    denominator=body["denominator"],
+                    numerator=body.get("numerator"),
+                    denominator=body.get("denominator"),
                     observed_at=datetime.fromisoformat(data["observed_at"]),
                     source_span_refs=(spans[path.name][part],),
                 )
@@ -354,11 +410,14 @@ def prepare_phase1(api: Api, demo: Path, out: Path, name: str) -> Prepared:
             "overlay": "general-rnd",
         },
     )
-    connect_material(api, project_id, demo / REQUIREMENT_FILE)
-    connect_material(api, project_id, demo / TEST_PLAN_FILE)
+    spec = demo_spec(demo)
+    connect_material(api, project_id, demo / spec.requirement_file, spec.version_label)
+    connect_material(api, project_id, demo / spec.test_plan_file, spec.version_label)
     dry = next(path for path in result_files(demo) if _yaml(path)["available_from_phase"] == 1)
     spans = {
-        dry.name: result_sentence_ids(api, project_id, connect_material(api, project_id, dry), dry)
+        dry.name: result_sentence_ids(
+            api, project_id, connect_result(api, project_id, demo, dry), dry, spec.result_parts
+        )
     }
     text = phase1_csv(demo, spans)
     preview = _preview(api, project_id, "CREATE", text)
@@ -379,8 +438,10 @@ def prepare_phase2(api: Api, demo: Path, out: Path) -> Prepared:
             "the project's trace is not the phase 1 import (import phase 1 first, unchanged)"
         )
     rain = next(path for path in result_files(demo) if _yaml(path)["available_from_phase"] == 2)
-    artifact = connect_material(api, project_id, rain)
-    spans[rain.name] = result_sentence_ids(api, project_id, artifact, rain)
+    artifact = connect_result(api, project_id, demo, rain)
+    spans[rain.name] = result_sentence_ids(
+        api, project_id, artifact, rain, demo_spec(demo).result_parts
+    )
     text = phase2_csv(demo, spans, current["set_digest"])
     preview = _preview(api, project_id, "UPDATE", text)
     csv_path = out / "trace_phase2_rain_update.csv"

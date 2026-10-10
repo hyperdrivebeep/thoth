@@ -93,6 +93,13 @@ it("lists what each hypothesis is expected to give for a test, in words, with ho
   expect(text).not.toMatch(LEAK);
 });
 
+it("marks a prediction that rests on no source, and leaves 모름 and sourced predictions as they were", async () => {
+  await mount(result([test("t1", "시험", rows([0, "나쁘다", ["span:a"]], [1, "같다"], [2, "모름"]))]));
+  const lines = [...card().querySelectorAll("details.expected-results li")].map(item => item.textContent);
+  expect(lines).toEqual(["가설 1: 나쁘다 · 근거 1개", "가설 2: 같다 · 근거 없는 예측", "가설 3: 모름"]);
+  expect(lines.join(" ")).not.toMatch(BANNED);
+});
+
 it("shows nothing of v3 on an old result", async () => {
   await mount(result([test("t1", "시험")]));
   expect(card().querySelector(".ai-refutation")).toBeNull();

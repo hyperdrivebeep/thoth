@@ -10,7 +10,9 @@ export function ExpectedResults({ test, rows }: { test: Record<string, unknown>;
     <ul>{table.map((item, at) => {
       const index = rows.findIndex(row => row.id === textValue(item.hypothesis_id));
       const sources = stringValues(item.basis).length;
-      return <li key={at}>{"가설 " + (index >= 0 ? index + 1 : "?") + ": " + textValue(item.expected) + (sources > 0 ? " · 근거 " + sources + "개" : "")}</li>;
+      const expected = textValue(item.expected);
+      const note = sources > 0 ? " · 근거 " + sources + "개" : expected.trim() === "모름" ? "" : " · 근거 없는 예측";
+      return <li key={at}>{"가설 " + (index >= 0 ? index + 1 : "?") + ": " + expected + note}</li>;
     })}</ul>
     <small className="muted">모델이 낸 제안이며 사람이 확인하기 전에는 미확정입니다. 같은 말은 같은 결과로 봅니다. 확률이나 점수가 아닙니다.</small>
   </details>;

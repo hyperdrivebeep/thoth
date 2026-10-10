@@ -63,6 +63,9 @@ class ResearchWork:
     boundary: ResearchBoundary
     evidence: tuple[EvidenceSpan, ...] = ()
     context: dict[str, object] = field(default_factory=dict)
+    # What the published result carries but no model call is shown: the context above is sent to
+    # the later model calls, so a record about one call's answers must not be put in it.
+    result_only: dict[str, object] = field(default_factory=dict)
     record_refs: list[RevisionRef] = field(default_factory=list)
     pending_revisions: list[StagedRevision] = field(default_factory=list)
     prepare: Callable[[], Awaitable[None]] | None = None

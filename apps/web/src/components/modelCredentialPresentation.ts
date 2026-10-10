@@ -141,6 +141,26 @@ export function guidanceText(value: string | null | undefined): string | null {
   return /[가-힣]/.test(value) ? value : null;
 }
 
+// The server sends two hints that are really this one statement (the real run is not confirmed yet).
+const GUIDANCE_THAT_IS_THE_STATUS = new Set([
+  "The Codex route is eligible; live execution has not been verified",
+  "Use the THOTH workspace xAI device login; remote execution is unverified",
+]);
+
+/** The one sentence that says a real model run is not confirmed yet, or null when nothing is open. The screen
+ * used to join every source (state, flags, guidance, the experimental note) so the same meaning came 5 times. */
+function executionStatusNote(account: CredentialAccount): string | null {
+  if (credentialAuthMethod(account, "claude_pkce")) return "실제 제3자 사용 허용과 모델 실행 성공은 아직 확인되지 않았습니다.";
+  if (credentialAuthMethod(account, "claude_code_login")) return "실제 모델 실행 성공은 첫 연구에서 확인합니다.";
+  if (account.connection_state === "EXECUTION_UNVERIFIED") return account.execution_eligible === true
+    ? "로컬 실행 시도 조건은 확인됐지만 실제 공급자 성공은 아직 검증되지 않았습니다."
+    : "새 모델 실행 시도 조건이 아직 확인되지 않았습니다.";
+  if (!account.connected) return null;
+  if (account.execution_verified === false) return "실제 모델 실행 성공은 아직 확인되지 않았습니다.";
+  if (account.remote_auth_verified !== true) return "실제 공급자 호출은 아직 확인되지 않았습니다.";
+  return null;
+}
+
 export function credentialAvailabilityNote(account?: CredentialAccount): string | null {
   if (!account) return null;
   const notes: string[] = [];
@@ -148,26 +168,24 @@ export function credentialAvailabilityNote(account?: CredentialAccount): string 
     ? "THOTH 전용 별도 프로필을 사용하며 기존 Codex Desktop 인증 파일을 가져오지 않습니다."
     : "THOTH 전용 별도 프로필을 사용합니다.");
   if (account.profile_mode === "THOTH_XAI_OAUTH") notes.push("xAI 로그인은 이 THOTH 작업 공간의 별도 인증을 사용합니다. API 키 연결은 유지됩니다.");
-  if (loginSupported(account) && !xaiDeviceLoginSupported(account)) notes.push("Codex 모델 연결은 실험적이며 실행 성공은 별도 확인이 필요합니다.");
-  if (xaiDeviceLoginSupported(account)) notes.push("xAI 로그인 확인과 실제 모델 실행 성공은 별도입니다.");
-  if (credentialAuthMethod(account, "claude_code_login")) notes.push("Claude 로그인은 공식 Claude Code가 THOTH 전용 프로필에서 처리합니다. 실제 모델 실행 성공은 첫 연구에서 확인합니다.");
-  if (credentialAuthMethod(account, "claude_pkce")) notes.push("Claude OAuth는 사용자가 명시적으로 선택하는 별도 경로입니다. 실제 제3자 사용 허용과 모델 실행 성공은 아직 확인되지 않았습니다.");
+  if (loginSupported(account) && !xaiDeviceLoginSupported(account)) notes.push("Codex 모델 연결은 실험적입니다.");
+  if (credentialAuthMethod(account, "claude_code_login")) notes.push("Claude 로그인은 공식 Claude Code가 THOTH 전용 프로필에서 처리합니다.");
+  if (credentialAuthMethod(account, "claude_pkce")) notes.push("Claude OAuth는 사용자가 명시적으로 선택하는 별도 경로입니다.");
   if (account.connection_state === "LOGIN_REQUIRED") notes.push("로그인을 완료한 뒤 연결 상태를 다시 확인하세요.");
   if (account.connection_state === "LOGIN_PENDING") notes.push("로그인 절차를 마친 뒤 연결 상태를 다시 확인하세요. 시작 응답은 연결 완료가 아닙니다.");
   if (loginUnavailable(account)) notes.push("실행 파일의 설치·지원 버전을 확인하세요. THOTH가 자동 설치하거나 기존 Desktop 인증을 변경하지 않습니다.");
   if (account.connection_state === "CATALOG_UNAVAILABLE") notes.push("로그인과 별개로 사용할 모델 목록을 확인하지 못했습니다.");
-  if (account.connection_state === "EXECUTION_UNVERIFIED") notes.push(account.execution_eligible === true
-    ? "로컬 실행 시도 조건은 확인됐지만 실제 공급자 성공은 아직 검증되지 않았습니다."
-    : "새 모델 실행 시도 조건이 아직 확인되지 않았습니다.");
   if (account.connection_state === "UNAVAILABLE" && account.reason_code) notes.push(`연결 경로를 사용할 수 없습니다 (${account.reason_code}).`);
   const guidance = guidanceText(account.guidance);
-  if (guidance) notes.push(guidance);
-  if (!account.connected) return notes.join(" ") || null;
+  // A hint that only says the run is not confirmed is the status itself: it is shown once, in the status place.
+  const guidanceIsStatus = account.guidance != null && GUIDANCE_THAT_IS_THE_STATUS.has(account.guidance);
+  if (guidance && !guidanceIsStatus) notes.push(guidance);
+  const status = guidanceIsStatus ? guidance : executionStatusNote(account);
+  if (!account.connected) return [...notes, ...(status ? [status] : [])].join(" ") || null;
   if (!credentialLocallyConfigured(account) && !account.has_key) notes.push("THOTH에서 사용할 수 있는 연결 경로를 확인하지 못했습니다.");
   const routes = account.available_model_providers;
   if (routes?.length === 0) notes.push("현재 선택 가능한 모델 경로가 없습니다.");
-  if (account.execution_verified === false) notes.push("실제 모델 실행 성공은 아직 확인되지 않았습니다.");
-  if (account.remote_auth_verified !== true) notes.push("실제 공급자 호출은 아직 확인되지 않았습니다.");
+  if (status) notes.push(status);
   return notes.join(" ") || null;
 }
 
@@ -175,7 +193,7 @@ export function credentialConnectionHint(account?: CredentialAccount): string {
   if (credentialAuthMethod(account, "claude_code_login")) return "Claude 로그인은 공식 Claude Code로 진행되며 직접 선택해야 시작됩니다. API 키 연결은 별도입니다.";
   if (credentialAuthMethod(account, "claude_pkce")) return "Claude Code 안내와 THOTH 전용 Claude OAuth는 별도입니다. OAuth 로그인은 직접 선택해야 시작됩니다.";
   if (xaiDeviceLoginSupported(account) && account?.oauth) return account.available_model_providers?.includes("xai-oauth")
-    ? "xAI 로그인이 확인됐습니다. 모델 목록에서 xai-oauth 경로를 직접 선택할 수 있습니다. 실제 실행 성공은 별도 확인이 필요합니다."
+    ? "xAI 로그인이 확인됐습니다. 모델 목록에서 xai-oauth 경로를 직접 선택할 수 있습니다."
     : "xAI 로그인은 확인됐지만 사용할 모델 경로가 아직 없습니다. 재로그인보다 모델 목록을 확인하세요.";
   if (xaiDeviceLoginSupported(account)) return "THOTH 작업 공간의 xAI 기기 코드 로그인을 시작하거나 API 키를 별도로 등록할 수 있습니다.";
   if (account?.oauth && loginSupported(account)) return "Codex 로그인은 확인됐습니다. 모델 목록이 없으면 재로그인 대신 모델 경로를 확인하세요.";

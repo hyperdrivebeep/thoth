@@ -5,7 +5,8 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, expect, it, vi } from "vitest";
 import { AutoRetrySwitch, autoRetryHelp } from "./AutoRetrySwitch";
 
-const state = vi.hoisted(() => ({ enabled: false, digest: null as string | null, calls: [] as { method: string; input: Record<string, unknown> }[], fail: false }));
+// 사용자 결정 20261010-01: a project without saved settings is on.
+const state = vi.hoisted(() => ({ enabled: true, digest: null as string | null, calls: [] as { method: string; input: Record<string, unknown> }[], fail: false }));
 vi.mock("../api/rpcClient", async importOriginal => ({ ...(await importOriginal<typeof import("../api/rpcClient")>()),
   rpc: async (method: string, input: Record<string, unknown>) => {
     state.calls.push({ method, input });
@@ -23,12 +24,13 @@ async function mount() {
   await act(async () => root!.render(<QueryClientProvider client={client}><AutoRetrySwitch projectId="project:p"/></QueryClientProvider>));
   await settle();
 }
-afterEach(async () => { if (root) await act(async () => root!.unmount()); root = undefined; container?.remove(); document.body.innerHTML = ""; state.enabled = false; state.digest = null; state.calls = []; state.fail = false; });
+afterEach(async () => { if (root) await act(async () => root!.unmount()); root = undefined; container?.remove(); document.body.innerHTML = ""; state.enabled = true; state.digest = null; state.calls = []; state.fail = false; });
 
-it("starts off as the server says, says what turning it on costs, and sends the digest it read when turned on", async () => {
+it("starts on as the server says, explains the cost, and sends the digest it read when turned off", async () => {
   await mount();
   const input = container.querySelector<HTMLInputElement>("input[type=checkbox]")!;
-  expect(input.checked).toBe(false);
+  // 사용자 결정 20261010-01: show the server's new default and let the user turn it off.
+  expect(input.checked).toBe(true);
   expect(container.textContent).toContain("모델 호출이 중간에 끊기면 그 호출만 최대 2번 자동으로 다시 시도합니다. 토큰이 더 쓰입니다.");
   expect(container.textContent).toContain("끄면 끊긴 결과 카드의 \"이어서 조사\"로 다시 할 수 있습니다.");
   expect(autoRetryHelp).toContain("토큰이 더 쓰입니다");
@@ -36,8 +38,15 @@ it("starts off as the server says, says what turning it on costs, and sends the 
   await act(async () => input.click());
   await settle();
   const update = state.calls.find(call => call.method === "model/callSettings/update")!;
-  expect(update.input).toEqual({ project_id: "project:p", auto_retry_interrupted_model_call: true, expected_digest: null });
-  expect(container.querySelector<HTMLInputElement>("input[type=checkbox]")!.checked).toBe(true);
+  expect(update.input).toEqual({ project_id: "project:p", auto_retry_interrupted_model_call: false, expected_digest: null });
+  expect(container.querySelector<HTMLInputElement>("input[type=checkbox]")!.checked).toBe(false);
+});
+
+it("keeps an existing saved off choice instead of replacing it with the default", async () => {
+  state.enabled = false; state.digest = "saved";
+  await mount();
+  expect(container.querySelector<HTMLInputElement>("input[type=checkbox]")!.checked).toBe(false);
+  expect(state.calls.map(call => call.method)).toEqual(["model/callSettings/read"]);
 });
 
 it("says so when the setting cannot be read instead of showing it as off", async () => {

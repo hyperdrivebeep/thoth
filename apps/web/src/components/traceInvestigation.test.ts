@@ -36,7 +36,7 @@ describe("the origin and the question a row gives", () => {
     const found = investigationFor("project:radar", "CRITERION", verdict(phase2, "CRITERION", "Detection rate in rain"), phase2)!;
     expect(found.question).toContain("Detection rate in rain");
     expect(found.question).toMatch(/기준 미달/);
-    expect(found.question).toMatch(/측정값 [0-9.]+이\(가\) 기준 [0-9.]+ 이상/);
+    expect(found.question).toMatch(/측정값 [0-9.]+[이가] 기준 [0-9.]+ 이상/);
     expect(found.question).toContain("원인 후보와 그것을 가를 시험을 찾아 주세요.");
   });
 

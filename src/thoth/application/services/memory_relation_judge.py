@@ -14,7 +14,7 @@ from thoth.domain.memory_relation import MemoryRelationProposal, MemoryRelationQ
 from thoth.domain.model import ContextPack, ModelRequest
 from thoth.ports.model import ModelPort
 
-PROMPT_VERSION = "memory_relation.v1"
+PROMPT_VERSION = "memory_relation.v2"
 _TASK = (
     "Two stored project memories are shown in the given order. Say how they relate: DUPLICATE, "
     "CONTAINS, UPDATE, CONTRADICTION_CANDIDATE, UNRELATED or AMBIGUOUS. Quote, word for word, "

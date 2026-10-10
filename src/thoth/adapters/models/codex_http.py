@@ -261,7 +261,7 @@ class CodexHttpExecutor:
         )
         if remaining is not None and remaining <= 0:
             raise ModelExecutionHold("OAUTH_TRANSPORT_DEADLINE_REMOTE_STOP_UNKNOWN")
-        stats = ReceiveStats()
+        stats = ReceiveStats(sensitive_values=(settings.access_token, settings.account_id))
         timeouts = (request.transport_timeouts or TransportTimeouts()).bounded(
             request.timeout_seconds
         )

@@ -11,6 +11,7 @@ from types import MappingProxyType
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+from scripts.update_source_manifest import read_source_bytes
 
 _ANCHORS = (
     "docs/architecture/rpc-method-catalog.md",
@@ -120,6 +121,12 @@ class _ArchitectureOwners(BaseModel):
     canonical_owners: tuple[_CanonicalOwner, ...]
 
 
+def _check_file_bytes(row: _FileRow, data: bytes) -> bytes:
+    if len(data) != row.bytes or hashlib.sha256(data).hexdigest() != row.sha256:
+        raise PublicPackageError(f"listed public file bytes differ: {row.path}{_STALE_LIST_HINT}")
+    return data
+
+
 @dataclass(frozen=True, slots=True)
 class PublicSourceProfile:
     root: Path
@@ -130,16 +137,11 @@ class PublicSourceProfile:
         row = self.files.get(relative)
         if row is None:
             raise PublicPackageError(f"required public anchor is not listed: {relative}")
-        path = self.root / relative
         try:
-            data = path.read_bytes()
-        except OSError as exc:
+            data = read_source_bytes(self.root, [relative])[relative]
+        except (OSError, subprocess.CalledProcessError, ValueError) as exc:
             raise PublicPackageError(f"listed public file is unreadable: {relative}") from exc
-        if len(data) != row.bytes or hashlib.sha256(data).hexdigest() != row.sha256:
-            raise PublicPackageError(
-                f"listed public file bytes differ: {relative}{_STALE_LIST_HINT}"
-            )
-        return data
+        return _check_file_bytes(row, data)
 
     def read_text(self, relative: str) -> str:
         return self.read_bytes(relative).decode("utf-8")
@@ -174,7 +176,12 @@ def public_source_profile(root: Path) -> PublicSourceProfile | None:
             raise PublicPackageError(
                 f"listed public file is missing: {row.path}{_STALE_LIST_HINT}"
             ) from exc
-        profile.read_bytes(row.path)
+    try:
+        contents = read_source_bytes(root, list(files))
+    except (OSError, subprocess.CalledProcessError, ValueError) as exc:
+        raise PublicPackageError("listed public files are unreadable") from exc
+    for row in manifest.files:
+        _check_file_bytes(row, contents[row.path])
     for relative in _ANCHORS:
         profile.read_bytes(relative)
     for relative in _EXCLUDED_FILES:
