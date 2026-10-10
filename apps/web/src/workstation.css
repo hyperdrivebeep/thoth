@@ -342,3 +342,4 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 .trace-evidence-dialog .evidence-item.focused{border-color:#8abbff;background:rgba(76,144,240,.16);box-shadow:0 0 0 2px rgba(76,144,240,.45)}
 .trace-import-dialog{width:min(720px,94vw)}
 .conversation-synthetic-notice{flex:none;margin:0 0 8px;padding:4px 10px;min-height:0;background:#3a2a10 !important;font-size:12px}
+.archived-project-row{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px}

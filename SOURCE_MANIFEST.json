@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-11T12:00:51.533659+00:00",
+  "created_at": "2026-10-11T12:00:52.485237+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -482,6 +482,11 @@
       "bytes": 3590
     },
     {
+      "path": "apps/web/src/components/ArchivedProjects.tsx",
+      "sha256": "0acefdc9d1ba41463f2b7017240971291e85f050b1fec813946437b7b3afcce4",
+      "bytes": 2392
+    },
+    {
       "path": "apps/web/src/components/AuditTrail.tsx",
       "sha256": "91e6d770cd55fe85c687dde67d4b92c125454b11f8e7ca07d8e2303cab989904",
       "bytes": 17633
@@ -718,8 +723,8 @@
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspace.tsx",
-      "sha256": "09114b62bea55d41764f811fa38932b92bb97d5e6a8b4f330afb99db50fed028",
-      "bytes": 42864
+      "sha256": "24764098e6ce17bcd6441a41b8d40894cc67f5bff95baca651dd09e8d06dfd91",
+      "bytes": 43374
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspaceConsent.test.tsx",
@@ -753,8 +758,8 @@
     },
     {
       "path": "apps/web/src/components/ModelSettings.test.tsx",
-      "sha256": "78d20aa3c8126b7f4a978826bc1119213b13615345a95d1bcfc6f24bd477d711",
-      "bytes": 23406
+      "sha256": "da9d04a0670973eb67d99da7cf1b4a4c59ce824be5160dd59395ce1489219ce5",
+      "bytes": 23343
     },
     {
       "path": "apps/web/src/components/ModelSettings.tsx",
@@ -765,6 +770,11 @@
       "path": "apps/web/src/components/OAuthLoginFlow.tsx",
       "sha256": "a94bc861fcb5403c5575f0424bcdf9f6548feb87d1b8eac090415d6a31829293",
       "bytes": 19518
+    },
+    {
+      "path": "apps/web/src/components/ProjectArchiveRestore.test.tsx",
+      "sha256": "0c4a5e09c15eebc5e65b228b9cf35eb0827a7421976add249b2ff0457ae75d6e",
+      "bytes": 7820
     },
     {
       "path": "apps/web/src/components/ProjectLanding.test.tsx",
@@ -1433,8 +1443,8 @@
     },
     {
       "path": "apps/web/src/workstation.css",
-      "sha256": "8f543e6734c2ab140a5b551cb7477fb0cd43a2844da67c1398dcc67b0f18acd5",
-      "bytes": 58339
+      "sha256": "267ede96732993f45f0e2e790555d5645322065580145536ca81cbc9a2a10256",
+      "bytes": 58447
     },
     {
       "path": "apps/web/timeline-preview.html",
@@ -1468,8 +1478,8 @@
     },
     {
       "path": "config/atomicity-paths.json",
-      "sha256": "7942ea74409013ca29f7cfd7bb4eddeda8e24486af54465a9b93cc585741e1f3",
-      "bytes": 3325795
+      "sha256": "bf9e73eebbaf8293b9afdcbb938eaa039afb2eeefa3e4ae63b9375ec2b7cabb5",
+      "bytes": 3331085
     },
     {
       "path": "config/atomicity-requirements.json",
@@ -1708,8 +1718,8 @@
     },
     {
       "path": "docs/architecture/rpc-method-catalog.md",
-      "sha256": "fbbf54d025d85e73ae93a32dc071de988ea87c5e554ea7461d58cdd434d06a85",
-      "bytes": 14166
+      "sha256": "c4fa7fb1183ff70cd5c1c79a7fc3099caaddbb5cac5ffd4f51e63524f008ec33",
+      "bytes": 14182
     },
     {
       "path": "docs/architecture/user-activity-projection.md",
@@ -2458,8 +2468,8 @@
     },
     {
       "path": "schemas/protocol/public-method-catalog.json",
-      "sha256": "9c8e14688ccd2bc92bc2487213c7dd4fbe2cd625572a0673f1f2282a7b29e95a",
-      "bytes": 157952
+      "sha256": "8a74465cef7448dd9315aec0d496cfba39685e6f5e693b059655cf079689e5e4",
+      "bytes": 158337
     },
     {
       "path": "schemas/protocol/restore-apply-input.schema.json",
@@ -3638,8 +3648,8 @@
     },
     {
       "path": "src/thoth/adapters/storage/projects.py",
-      "sha256": "c71c056c3a4937adc624f7b14c6f814f678ce908025eef8a9be1cae2d2d46505",
-      "bytes": 5271
+      "sha256": "1ca1ba845696b29ea386a88cde1e826008a40791ed552c9a3e2c405a21668ca1",
+      "bytes": 5871
     },
     {
       "path": "src/thoth/adapters/storage/receipt_dag.py",
@@ -3748,8 +3758,8 @@
     },
     {
       "path": "src/thoth/application/commands/__init__.py",
-      "sha256": "4690d507f942d1fa997d6704c4f36bf935a5e1b2bbf94776088b9d4f88c6aa1c",
-      "bytes": 2462
+      "sha256": "2487dec0f6120ed611c5d15185192dbc00c48610aec0d588b3de6d2ff610100e",
+      "bytes": 2570
     },
     {
       "path": "src/thoth/application/commands/action_create_input.py",
@@ -3925,6 +3935,11 @@
       "path": "src/thoth/application/commands/outcomes_full.py",
       "sha256": "067cfcdcfbe62c6a0b059d7f820d14f1254d0c896e5d308da57a303a9a32c520",
       "bytes": 20158
+    },
+    {
+      "path": "src/thoth/application/commands/project_restore.py",
+      "sha256": "b85ebb31635bf9a90f87c955106bb13eb61dc903fb47d04ca2c065b69bacb41a",
+      "bytes": 3391
     },
     {
       "path": "src/thoth/application/commands/projections.py",
@@ -5218,8 +5233,8 @@
     },
     {
       "path": "src/thoth/apps/management_routes.py",
-      "sha256": "7454abd0c5187480b00090a3c31c078a4760735fb28897d25bad02297354b321",
-      "bytes": 2949
+      "sha256": "e17ef04ae90adc48b944f0eb0529ca2a4264ba4235467f70b68ac5534f255a84",
+      "bytes": 3272
     },
     {
       "path": "src/thoth/apps/memory_composition.py",
@@ -5288,8 +5303,8 @@
     },
     {
       "path": "src/thoth/apps/runtime.py",
-      "sha256": "fe6fafe731562a6d0b301d4f48d6154c3ffc40e59030f28144b243da7b7a8f63",
-      "bytes": 26648
+      "sha256": "81f2718bbb0698f6a1c1cc3c83ac6be6f4d46306574052eb6af725b9018fa1d9",
+      "bytes": 26656
     },
     {
       "path": "src/thoth/apps/runtime_types.py",
@@ -6143,8 +6158,8 @@
     },
     {
       "path": "src/thoth/ports/project.py",
-      "sha256": "bae4b572d7adce68496411aea718d0392ee3d8fcc892c26f5e847fd293d9f39e",
-      "bytes": 458
+      "sha256": "200d58cb8d244aea66d1fe980f8f52d94992cf6f28e571bacdffd68026c466ba",
+      "bytes": 678
     },
     {
       "path": "src/thoth/ports/projectpack.py",
@@ -6268,8 +6283,8 @@
     },
     {
       "path": "src/thoth/protocol/notification_catalog.py",
-      "sha256": "122cfaa053962ecc6ca21e44fe7c14e402efcfc637b406ac98d6e6a7aa394234",
-      "bytes": 17850
+      "sha256": "da3c37d824d3636a1c3c2c1582a0cdea5cc750eb8ebe6b21fc790bd8d384ce38",
+      "bytes": 17901
     },
     {
       "path": "src/thoth/protocol/notification_rules.py",
@@ -6288,8 +6303,8 @@
     },
     {
       "path": "src/thoth/protocol/registry.py",
-      "sha256": "ae6ee4f18638e6a0fa4b21aff2fed4ce2eaad50059b9fc38710cb05b8a65cce8",
-      "bytes": 13225
+      "sha256": "413c7b4ac5079afac8e0cadc33126bfdd26c198ccdee6974a14b5be94608cee2",
+      "bytes": 13249
     },
     {
       "path": "src/thoth/protocol/schema_export.py",
@@ -6443,7 +6458,7 @@
     },
     {
       "path": "tests/architecture/test_public_protocol_exact_parity.py",
-      "sha256": "2cbc2a3db6641a5207120047e864a7649c98447e09fcb7720a5cfaef7c802f0e",
+      "sha256": "c228a0d87dcf771049d24a021737002013645f824d596ec5e8f06dbe8c7ea44b",
       "bytes": 5631
     },
     {
@@ -6823,8 +6838,8 @@
     },
     {
       "path": "tests/fixtures/runtime_registration_events.json",
-      "sha256": "937f5bdf6a1861031537acc2afb592dad64f1ba45095d4e3fb1366b432b3e84b",
-      "bytes": 112131
+      "sha256": "18b4236f9f0d283985bbfc15b170d9c62bfaa328248ea0f7974bbc76b9bf39d3",
+      "bytes": 112407
     },
     {
       "path": "tests/fixtures/structured_source_fixture.py",
@@ -7675,6 +7690,11 @@
       "path": "tests/integration/test_project_list_reads.py",
       "sha256": "c767beb6bff4187d94ec7cd8fc5effd76fea81ad566f85f2ee835e99d07e979b",
       "bytes": 10230
+    },
+    {
+      "path": "tests/integration/test_project_restore_rpc.py",
+      "sha256": "5ea3b65a3355d88a42351b48990d183a25fe6fc1cbc323d8e1543e25fbfba79e",
+      "bytes": 7902
     },
     {
       "path": "tests/integration/test_projectpack_rpc.py",

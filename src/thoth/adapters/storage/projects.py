@@ -127,3 +127,19 @@ class SqliteProjectStore(ProjectStorePort):
                     connection, "PROJECT", dict(after), before=dict(before)
                 )
         return changed == 1
+
+    def prior_lifecycle(self, project_id: str) -> ProjectLifecycle | None:
+        try:
+            recorded = SqliteGovernanceHistory(self._engine).history(
+                project_id, "PROJECT", project_id
+            )
+        except ValueError:
+            return None
+        for revision in reversed(recorded):
+            try:
+                lifecycle = ProjectLifecycle(str(revision.projection.get("lifecycle")))
+            except ValueError:
+                return None
+            if lifecycle != ProjectLifecycle.ARCHIVED_READ_ONLY:
+                return lifecycle
+        return None

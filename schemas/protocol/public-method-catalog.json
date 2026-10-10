@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
   "authority": "docs/architecture/rpc-method-catalog.md",
-  "canonical_method_count": 362,
+  "canonical_method_count": 363,
   "compatibility_alias_count": 6,
-  "runtime_method_count": 368,
+  "runtime_method_count": 369,
   "notification_count": 221,
   "methods": [
     {
@@ -4105,6 +4105,20 @@
       "runtime_status": "IMPLEMENTED"
     },
     {
+      "name": "project/restore",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
       "name": "project/review/list",
       "namespace": "project",
       "surface": "QUERY",
@@ -5532,5 +5546,5 @@
     "thread/waitingForInput",
     "thread/waitingForProtectedAction"
   ],
-  "catalog_digest": "1c7d4799ca9b778a5ba023f66a79b60671e68ffc1e8f57ba295144a403a35798"
+  "catalog_digest": "ca56eaf9f686e31a5c58640745c1dacbb14978bc50efc47f92bc8755714aee91"
 }

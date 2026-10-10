@@ -3,18 +3,26 @@
 from thoth.application.commands import (
     InvestigationQueryHandlers,
     ProjectCommandHandlers,
+    ProjectRestoreHandlers,
     ThreadCommandHandlers,
 )
+from thoth.ports.store_bundle import StoreBundlePort
 from thoth.protocol.registry import MethodRegistry
 
 
-def register_project_methods(registry: MethodRegistry, handlers: ProjectCommandHandlers) -> None:
+def register_project_methods(
+    registry: MethodRegistry, handlers: ProjectCommandHandlers, stores: StoreBundlePort
+) -> None:
+    restore = ProjectRestoreHandlers(
+        store=stores.projects, governance=stores.governance, ledger=stores.ledger, projects=handlers
+    )
     registry.register("project/create", handlers.create)
     registry.register("project/list", handlers.list)
     registry.register("project/read", handlers.read)
     registry.register("project/activate", handlers.activate)
     registry.register("project/archive", handlers.archive)
     registry.register("project/delete", handlers.archive)
+    registry.register("project/restore", restore.restore)
     registry.register("project/metadata/update", handlers.metadata_update)
     registry.register("project/overlay/update", handlers.overlay_update)
     registry.register("project/policy/read", handlers.policy_read)

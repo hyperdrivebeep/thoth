@@ -288,7 +288,7 @@ it("ordinary navigation only automatically calls the actual nonmutating query su
 it("project-create retry preserves project ID and key without a globally shared policy binding",async()=>{
   await mount();
   await act(async()=>{container.querySelector<HTMLButtonElement>("button.new-project-button")!.click();});
-  await act(async()=>{Array.from(container.querySelectorAll<HTMLButtonElement>(".project-home-list button")).find(button=>button.textContent==="새 프로젝트")!.click();});
+  // the left button now opens the create screen by itself (it used to need a second click on the list's button)
   await act(async()=>{
     const input=container.querySelector<HTMLInputElement>('input[placeholder="연구할 문제 또는 프로젝트 이름"]')!;
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value")!.set!.call(input,"second project");

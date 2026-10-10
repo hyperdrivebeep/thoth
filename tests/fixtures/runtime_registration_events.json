@@ -97,6 +97,11 @@
     ],
     [
       "register",
+      "project/restore",
+      "thoth.application.commands.project_restore.ProjectRestoreHandlers.restore"
+    ],
+    [
+      "register",
       "project/metadata/update",
       "thoth.application.commands.projects.ProjectCommandHandlers.metadata_update"
     ],
@@ -2046,6 +2051,11 @@
       "register",
       "project/delete",
       "thoth.application.commands.projects.ProjectCommandHandlers.archive"
+    ],
+    [
+      "register",
+      "project/restore",
+      "thoth.application.commands.project_restore.ProjectRestoreHandlers.restore"
     ],
     [
       "register",

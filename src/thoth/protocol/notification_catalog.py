@@ -7,6 +7,7 @@ STATIC_NOTIFICATIONS: dict[str, tuple[str, ...]] = {
     "project/activate": ("project/activated", "project/statusChanged"),
     "project/archive": ("project/archived", "project/statusChanged"),
     "project/delete": ("project/archived", "project/statusChanged"),
+    "project/restore": ("project/statusChanged",),
     "project/metadata/update": ("project/metadata/updated",),
     "project/source/connect": ("project/source/connected",),
     "project/role/assign": ("project/role/assigned",),
