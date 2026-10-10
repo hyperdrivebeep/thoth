@@ -42,5 +42,5 @@ export function resultText(result: TraceResult) {
 const MARK = "SYNTHETIC DEMO DATA";
 /** Data written for a demo says so on the screen; the table itself cannot tell a demo from real values. */
 export const isSyntheticTrace = (view: TraceView) =>
-  view.items.some(item => item.item_id.startsWith("SYN-") || item.title.includes(MARK)
+  view.items.some(item => item.title.includes(MARK)
     || Object.entries(item.fields).some(([key, value]) => key === "synthetic_notice" || value.includes(MARK)));

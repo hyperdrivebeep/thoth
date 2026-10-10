@@ -47,8 +47,8 @@ describe("trace wording stays in step with the backend", () => {
       expect(sentence, code).not.toContain("이유를 문장으로 바꾸지 못했습니다");
       expect(sentence, code).not.toMatch(RAW_CODE);
     }
-    expect(reasonSentence("THRESHOLD_NOT_MET:R-1:value=0.80 need >= 0.90 ratio", names)).toBe("측정값 0.80이(가) 기준 0.90 이상(ratio)에 못 미칩니다.");
-    expect(reasonSentence("THRESHOLD_NOT_MET:R-2:value=0.70 need <= 0.50 per_min", names)).toBe("측정값 0.70이(가) 기준 0.50 이하(per_min)를 넘습니다.");
+    expect(reasonSentence("THRESHOLD_NOT_MET:R-1:value=0.80 need >= 0.90 ratio", names)).toBe("측정값 0.80이 기준 0.90 이상(ratio)에 못 미칩니다.");
+    expect(reasonSentence("THRESHOLD_NOT_MET:R-2:value=0.70 need <= 0.50 per_min", names)).toBe("측정값 0.70이 기준 0.50 이하(per_min)를 넘습니다.");
     expect(reasonSentence("C-1:HOLD_NO_RESULT", names)).toBe("탐지율(맑음): 보류 · 결과 없음");
   });
 
@@ -190,5 +190,33 @@ describe("the next check for a held or failed line", () => {
         expect(nextStep(kind, state, false) === null, kind + " " + state).toBe(met);
       }
     }
+  });
+});
+
+describe("particles after a value or an id follow how it is spoken", () => {
+  const names = (id: string) => id;
+  const sentence = (value: string) => reasonSentence(`THRESHOLD_NOT_MET:R-1:value=${value} need >= 0.90 ratio`, names);
+
+  it("picks 이 or 가 after the measured value", () => {
+    expect(sentence("0.80")).toBe("측정값 0.80이 기준 0.90 이상(ratio)에 못 미칩니다.");
+    expect(sentence("0.95")).toBe("측정값 0.95가 기준 0.90 이상(ratio)에 못 미칩니다.");
+    expect(sentence("16/20")).toBe("측정값 16/20이 기준 0.90 이상(ratio)에 못 미칩니다.");
+    expect(reasonSentence("THRESHOLD_NOT_MET:R-2:value=0.70 need <= 0.50 per_min", names)).toBe("측정값 0.70이 기준 0.50 이하(per_min)를 넘습니다.");
+    expect(sentence("0.72")).toContain("0.72가 기준");
+    expect(sentence("0.45")).toContain("0.45가 기준");
+    // never both forms together for a number
+    for (const value of ["0.80", "0.95", "16/20", "0.70", "0.9", "1"]) expect(sentence(value)).not.toContain("이(가)");
+  });
+
+  it("picks the particle after the id in an import problem", () => {
+    const said = (code: string, ref: string | null) => issueText({ code, row: 4, ref, detail: "" }).message;
+    expect(said("DELETE_TARGET_NOT_FOUND", "SYN-C-DET-DRY")).toContain("지우려는 것 SYN-C-DET-DRY가 추적표에 없습니다");
+    expect(said("DELETE_TARGET_NOT_FOUND", "SYN-C-DET-RAIN")).toContain("지우려는 것 SYN-C-DET-RAIN이 추적표에 없습니다");
+    expect(said("DELETE_AND_UPSERT_SAME_TARGET", "SYN-C-DET-DRY")).toContain("SYN-C-DET-DRY를 같은 파일에서 고치면서");
+    expect(said("DELETE_AND_UPSERT_SAME_TARGET", "SYN-C-FA-RAIN")).toContain("SYN-C-FA-RAIN을 같은 파일에서 고치면서");
+    expect(said("DUPLICATE_ID_IN_FILE", "SYN-C-DET-DRY")).toContain("같은 ID SYN-C-DET-DRY가 파일에 두 번");
+    expect(said("DUPLICATE_ID_IN_FILE", "SYN-C-DET-RAIN")).toContain("같은 ID SYN-C-DET-RAIN이 파일에 두 번");
+    expect(said("EXCEL_ID_SUSPECTED", "SYN-C-DET-DRY")).toContain("ID SYN-C-DET-DRY는 스프레드시트가");
+    expect(said("EXCEL_ID_SUSPECTED", "SYN-C-DET-RAIN")).toContain("ID SYN-C-DET-RAIN은 스프레드시트가");
   });
 });

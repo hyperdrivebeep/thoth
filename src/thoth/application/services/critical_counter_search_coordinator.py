@@ -7,6 +7,11 @@ from typing import cast
 from pydantic import JsonValue
 
 from thoth.application.services.connector_service import ConnectorService
+from thoth.application.services.counter_search_calculations import (
+    aggregate_gate_inputs,
+    budget_snapshot,
+    resolve_loop_terminal,
+)
 from thoth.application.services.critical_counter_search import (
     CounterevidenceChallenger,
     CounterSearchBasis,
@@ -27,7 +32,6 @@ from thoth.domain.connectors import ConnectorAccessRequest, ConnectorFailure
 from thoth.domain.counterevidence import (
     CounterLoopTerminal,
     CounterReviewTerminal,
-    CounterSearchBudgetState,
     CounterSearchPlan,
     CounterWaveRecord,
 )
@@ -616,48 +620,20 @@ class CriticalCounterSearchCoordinator:
             if low_voi_streak >= 2:
                 loop_terminal = CounterLoopTerminal.SEARCH_SATURATED
                 break
-        if loop_terminal is None:
-            if budget_exhausted:
-                loop_terminal = CounterLoopTerminal.BUDGET_EXHAUSTED
-            elif counter_refs and support_refs:
-                loop_terminal = CounterLoopTerminal.ABSTAINED
-            elif policy_blocks and not waves:
-                loop_terminal = CounterLoopTerminal.POLICY_BLOCKED
-            elif authority_blocks and not waves:
-                loop_terminal = CounterLoopTerminal.AUTHORITY_REQUIRED
-            elif abstention_blocks:
-                loop_terminal = CounterLoopTerminal.ABSTAINED
-            else:
-                loop_terminal = CounterLoopTerminal.SEARCH_SATURATED
-        if (
-            counter_refs
-            and support_refs
-            and loop_terminal
-            not in {
-                CounterLoopTerminal.ELIMINATED_WITHIN_SCOPE,
-                CounterLoopTerminal.SUPPORTED,
-            }
-        ):
-            loop_terminal = CounterLoopTerminal.ABSTAINED
+        loop_terminal = resolve_loop_terminal(
+            loop_terminal=loop_terminal,
+            budget_exhausted=budget_exhausted,
+            counter_refs=counter_refs,
+            support_refs=support_refs,
+            policy_blocks=policy_blocks,
+            authority_blocks=authority_blocks,
+            abstention_blocks=abstention_blocks,
+            waves=waves,
+        )
         if not plans:
             raise ValueError("multi-wave counter-search produced no challenger plan")
-        gate_terminal = {
-            CounterLoopTerminal.ELIMINATED_WITHIN_SCOPE: (
-                CounterReviewTerminal.ELIMINATED_WITHIN_SCOPE
-            ),
-            CounterLoopTerminal.SUPPORTED: CounterReviewTerminal.SUPPORTED,
-            CounterLoopTerminal.SEARCH_SATURATED: CounterReviewTerminal.UNRESOLVED_NO_RESULTS,
-            CounterLoopTerminal.BUDGET_EXHAUSTED: CounterReviewTerminal.UNRESOLVED_FAILED,
-            CounterLoopTerminal.POLICY_BLOCKED: CounterReviewTerminal.UNRESOLVED_POLICY_BLOCKED,
-            CounterLoopTerminal.AUTHORITY_REQUIRED: CounterReviewTerminal.UNRESOLVED_AUTHORITY,
-            CounterLoopTerminal.ABSTAINED: CounterReviewTerminal.UNRESOLVED_CONFLICT,
-        }[loop_terminal]
-        accepted_refs = (
-            tuple(dict.fromkeys(counter_refs))
-            if loop_terminal == CounterLoopTerminal.ELIMINATED_WITHIN_SCOPE
-            else tuple(dict.fromkeys(support_refs))
-            if loop_terminal == CounterLoopTerminal.SUPPORTED
-            else ()
+        gate_terminal, accepted_refs = aggregate_gate_inputs(
+            loop_terminal, counter_refs, support_refs
         )
         gate = self._reviewer.aggregate(
             plans[0],
@@ -675,24 +651,15 @@ class CriticalCounterSearchCoordinator:
             reason=self._loop_stop_reason(loop_terminal),
         )
         elapsed = max(0, int((self._clock.now() - started_at).total_seconds()))
-        budget = CounterSearchBudgetState(
-            max_waves=limits.max_waves,
-            max_results=limits.max_results,
-            max_documents=limits.max_documents,
-            max_bytes=limits.max_bytes,
-            max_model_calls=limits.max_model_calls,
-            max_tool_calls=limits.max_tool_calls,
-            max_time_seconds=limits.max_time_seconds,
-            max_cost_microunits=limits.max_cost_microunits,
-            max_depth=limits.max_depth,
+        budget = budget_snapshot(
+            limits=limits,
             used_waves=used_waves,
             used_results=used_results,
             used_documents=used_documents,
             used_bytes=used_bytes,
-            used_model_calls=0,
             used_tool_calls=used_tool_calls,
-            used_time_seconds=min(elapsed, limits.max_time_seconds),
-            used_cost_microunits=used_cost,
+            used_cost=used_cost,
+            elapsed=elapsed,
         )
         return CriticalCounterSearchExecution(
             projection=self._finalizer.multi(

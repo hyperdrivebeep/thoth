@@ -85,9 +85,13 @@ def test_phase_1_connects_the_files_and_the_csv_points_at_real_sentences(
     done = prepare.prepare_phase1(api, DEMO, tmp_path / "files", "demo")
     assert done.mode == "CREATE" and done.preview["applicable"]
     sources = api.rpc("project/source/list", {"project_id": done.project_id}, query=True)
-    assert len(sources["artifacts"]) == 3  # requirements, test plan, dry result; no rain yet
+    # requirements, test plan, dry result and the trial file it names; no rain yet
+    assert len(sources["artifacts"]) == 4
     listed = json.dumps(sources)
     assert "10_REQUIREMENTS_SYNTHETIC.yaml" in listed and "30_RESULT_DRY_SYNTHETIC.yaml" in listed
+    assert "30_DRY_TRIALS_SYNTHETIC.csv" in listed
+    names = " ".join(str(item["source_uri"]) for item in sources["artifacts"])
+    assert "MANIFEST" not in names and "LINEAGE" not in names and ".schema." not in names
     assert ".txt" not in listed  # the files keep their own names
     apply_import(api, done.project_id, "CREATE", done.csv_path)
     view = api.rpc("trace/read", {"project_id": done.project_id}, query=True)
@@ -116,6 +120,9 @@ def test_phase_2_adds_only_the_rain_rows_and_the_requirement_fails_with_incomple
     apply_import(api, first.project_id, "CREATE", first.csv_path)
     second = prepare.prepare_phase2(api, DEMO, out)
     assert second.project_id == first.project_id and second.mode == "UPDATE"
+    sources = api.rpc("project/source/list", {"project_id": first.project_id}, query=True)
+    names = " ".join(str(item["source_uri"]) for item in sources["artifacts"])
+    assert len(sources["artifacts"]) == 6 and "31_RAIN_TRIALS_SYNTHETIC.csv" in names
     changes = second.preview["changes"]
     assert changes["updated"] == [] and changes["deleted"] == []
     assert sorted(change["kind"] for change in changes["added"]) == sorted(

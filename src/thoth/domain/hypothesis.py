@@ -145,6 +145,75 @@ class HypothesisPortfolioV3(HypothesisPortfolio):
     """The v3 output form: a v2 portfolio whose hypotheses may add expected results."""
 
     hypotheses: tuple[SerializeAsAny[HypothesisV3], ...]  # pyright: ignore[reportIncompatibleVariableOverride]
+    # What the table-filling call did (see hypothesis_table_filler); never part of the form the
+    # model fills in.
+    _table_fill: Any = PrivateAttr(default=None)
+
+    @property
+    def table_fill(self) -> TableFillRecord | None:
+        return self._table_fill
+
+    def note_table_fill(self, record: TableFillRecord) -> None:
+        self._table_fill = record
+
+
+class FilledRow(DomainModel):
+    """One cell the table filler answers. The limits are looser than ExpectedResult's: the server
+    settles what is too long or unknown instead of refusing the whole answer."""
+
+    hypothesis_id: HypothesisId
+    expected: str = Field(min_length=1, max_length=300)
+    basis: tuple[EvidenceSpanId, ...] = Field(default=(), max_length=20)
+    # Only for 모름: one sentence saying under which condition this test's result is left
+    # undetermined even if the hypothesis were true. Kept in the filling record, not in the table.
+    unknown_reason: str | None = Field(default=None, max_length=2000)
+
+
+class FilledTest(DomainModel):
+    """The cells the filler answers for one test (named by the hypothesis it was designed for)."""
+
+    designed_for: HypothesisId
+    test_id: str = Field(min_length=1, max_length=300)
+    rows: tuple[FilledRow, ...] = Field(default=(), max_length=40)
+
+
+class HypothesisTableFill(DomainModel):
+    """The output of the table-filling call: cells only, never a new test or hypothesis."""
+
+    tests: tuple[FilledTest, ...] = Field(default=(), max_length=60)
+
+
+TableFillState = Literal["CALLED", "SKIPPED_FULL", "SKIPPED_BUDGET", "FAILED"]
+TableFillOutcome = Literal["CHANGED", "STILL_UNKNOWN", "NOT_ANSWERED", "DROPPED"]
+
+
+class TableFillAnswer(DomainModel):
+    """What the filler said for one cell it was asked about (cells it was not asked are absent).
+
+    CHANGED: a value replaced a missing or 모름 cell. STILL_UNKNOWN: it answered 모름 (with its
+    reason). NOT_ANSWERED: it gave no row for the cell. DROPPED: its answer was not kept.
+    """
+
+    test_id: str = Field(max_length=300)
+    hypothesis_id: HypothesisId
+    expected: str = Field(default="", max_length=80)
+    unknown_reason: str | None = Field(default=None, max_length=200)
+    outcome: TableFillOutcome
+
+
+class TableFillRecord(DomainModel):
+    """Whether the table-filling call was made, and what it changed (kept beside the portfolio).
+
+    A cell is a (test, hypothesis) pair; it is open when its row is missing or says 모름.
+    """
+
+    state: TableFillState
+    reason_code: str | None = Field(default=None, max_length=200)
+    cells: int = Field(default=0, ge=0)
+    open_before: int = Field(default=0, ge=0)
+    open_after: int = Field(default=0, ge=0)
+    changed_cells: int = Field(default=0, ge=0)
+    answers: tuple[TableFillAnswer, ...] = ()
 
 
 def is_v3(portfolio: HypothesisPortfolio) -> bool:

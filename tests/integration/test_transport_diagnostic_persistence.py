@@ -34,13 +34,18 @@ async def test_normal_failure_keeps_diagnostic_private_and_thread_scoped_after_r
     initial = await setup(tmp_path, ControlledResearchModel(), source=False)
     initial.close()
     calls: list[httpx.Request] = []
-    original = kind(f"{SECRETS[4]} https://example.invalid/?key={SECRETS[3]}")
+    original = kind(
+        f"peer closed connection {SECRETS[4]} https://example.invalid/?key={SECRETS[3]}"
+    )
     original.__cause__ = OSError(104, SECRETS[4])
     stream = FailingStream(original)
 
     def serve(req: httpx.Request) -> httpx.Response:
         calls.append(req)
-        return failure_response(stream)
+        response = failure_response(stream)
+        response.headers["x-oai-request-id"] = "req_diagnostic_1234"
+        response.headers["cf-ray"] = "abcdef0123456789-ICN"
+        return response
 
     executor = CodexHttpExecutor(DiagnosticSession(), transport=httpx.MockTransport(serve))
     resolver = RegisteredModelResolver()
@@ -86,6 +91,9 @@ async def test_normal_failure_keeps_diagnostic_private_and_thread_scoped_after_r
         projected = dispatches[0]
         diagnostic = projected["transport_observation"]["transport_diagnostic"]
         assert diagnostic["httpx_error_type"] == kind.__name__
+        assert diagnostic["x_oai_request_id"] == "req_diagnostic_1234"
+        assert diagnostic["cf_ray"] == "abcdef0123456789-ICN"
+        assert diagnostic["error_message_prefix"].startswith("peer closed connection")
         assert diagnostic["nested_errno"] == 104
         assert projected["remote_stop"] == "UNKNOWN"
         assert_private(json.dumps(state))

@@ -16,7 +16,7 @@ from thoth.domain.enums import (
     PortfolioStatus,
     Reversibility,
 )
-from thoth.domain.hypothesis import DiscriminatingTest, ExpectedResult
+from thoth.domain.hypothesis import DiscriminatingTest, ExpectedResult, TableFillRecord
 from thoth.domain.r2_loop import HypothesisExecutionAppraisal, R2ExecutionSummary
 from thoth.domain.recovery import RecoveryCandidateRevision
 from thoth.domain.test_validity import PredictionProposal
@@ -30,11 +30,16 @@ class ExpectedByTest(DomainModel):
 
 
 class DroppedExpectation(DomainModel):
-    """An expected-result item that was not kept, and why; the rest of the output stands."""
+    """An item of the generator's output that was not kept, and why; the rest of the output stands.
+
+    An expected-result row names its test (`test_id`); a refutation condition has no test, so its
+    `test_id` is empty and its original `text` is kept so the drop can be audited.
+    """
 
     test_id: str
     hypothesis_id: str
     reason: str
+    text: str | None = None
 
 
 class HypothesisGenerationDetails(DomainModel):
@@ -65,6 +70,8 @@ class PortfolioGenerationDetails(DomainModel):
     alternatives_considered: tuple[str, ...] = ()
     next_checks: tuple[str, ...] = ()
     uncertainty_reserve: str = "UNASSESSED"
+    # Contract v3 only: whether the table-filling call was made and what it changed.
+    table_fill: TableFillRecord | None = None
 
 
 class ActionGenerationDetails(DomainModel):

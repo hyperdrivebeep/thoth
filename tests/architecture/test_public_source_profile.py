@@ -56,7 +56,7 @@ def _public_fixture(root: Path) -> dict[str, object]:
     for relative, text in sorted(_ANCHOR_TEXT.items()):
         path = root / relative
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
+        path.write_text(text, encoding="utf-8", newline="\n")
         raw = path.read_bytes()
         rows.append(
             {"path": relative, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}

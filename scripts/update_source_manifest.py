@@ -1,8 +1,8 @@
 """Rebuild or check SOURCE_MANIFEST.json, the byte inventory of the public source files.
 
 Run `python scripts/update_source_manifest.py` after the last file change and before opening a
-public pull request, then commit the result. `--check` writes nothing: it lists what differs and
-exits 1 when the list is stale.
+public pull request, then commit the result. `--check` leaves the repository unchanged: it lists
+what differs and exits 1 when the list is stale. Git clean conversion runs in disposable storage.
 
 The list names every file that is tracked (or untracked but not ignored) except the list itself,
 whose hash would depend on its own bytes. This is the same rule the current list follows. The
@@ -13,12 +13,16 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import json
+import os
 import subprocess
 import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from typing import Protocol, TypedDict, cast
 
 MANIFEST_NAME = "SOURCE_MANIFEST.json"
 EXCLUDED_PATHS = frozenset({MANIFEST_NAME})
@@ -46,6 +50,16 @@ REFRESH_HINT = (
 Manifest = dict[str, object]
 
 
+class FileRow(TypedDict):
+    path: str
+    sha256: str
+    bytes: int
+
+
+class _Reconfigurable(Protocol):
+    def reconfigure(self, *, encoding: str) -> None: ...
+
+
 @dataclass(frozen=True)
 class Difference:
     changed: tuple[str, ...]
@@ -70,8 +84,87 @@ def list_public_paths(root: Path) -> list[str]:
     )
 
 
-def _row(root: Path, relative: str) -> dict[str, object]:
-    data = (root / relative).read_bytes()
+def read_source_bytes(root: Path, paths: list[str]) -> dict[str, bytes]:
+    """Read working files as Git add would store them, or raw bytes in a source export.
+
+    hash-object does not load the index and differs from add for historical text=auto CRLF
+    blobs. Use add with a disposable index and object directory instead. The real index,
+    objects, refs and working files are never written. Configured clean filters still run.
+    """
+    if not paths:
+        return {}
+    root = root.resolve()
+    if not (root / ".git").exists():
+        return {relative: (root / relative).read_bytes() for relative in paths}
+
+    def git(*args: str, data: bytes | None = None, env: dict[str, str] | None = None) -> bytes:
+        return subprocess.run(
+            ["git", "-C", str(root), *args],
+            input=data,
+            capture_output=True,
+            check=True,
+            env=env,
+        ).stdout
+
+    # Preserve index contents (including the CRLF exception), but not stat caches or flags:
+    # every requested path must be read again, including unstaged and untracked content.
+    entries = git("ls-files", "--stage", "-z")
+    objects = git("rev-parse", "--path-format=absolute", "--git-path", "objects")
+    with TemporaryDirectory(prefix="thoth-manifest-") as temporary:
+        scratch = Path(temporary)
+        (scratch / "objects").mkdir()
+        (scratch / "hooks").mkdir()
+        alternates = json.dumps(objects.decode("utf-8").strip(), ensure_ascii=False)
+        if inherited := os.environ.get("GIT_ALTERNATE_OBJECT_DIRECTORIES"):
+            alternates += os.pathsep + inherited
+        env = {
+            **os.environ,
+            "GIT_INDEX_FILE": str(scratch / "index"),
+            "GIT_OBJECT_DIRECTORY": str(scratch / "objects"),
+            "GIT_ALTERNATE_OBJECT_DIRECTORIES": alternates,
+            "GIT_LITERAL_PATHSPECS": "1",
+            "GIT_OPTIONAL_LOCKS": "0",
+        }
+        options = (
+            "-c",
+            "core.splitIndex=false",
+            "-c",
+            "core.fsmonitor=false",
+            "-c",
+            f"core.hooksPath={scratch / 'hooks'}",
+        )
+        git(*options, "update-index", "-z", "--index-info", data=entries, env=env)
+        git(
+            *options,
+            "add",
+            "--sparse",
+            "--pathspec-from-file=-",
+            "--pathspec-file-nul",
+            data=b"\0".join(path.encode("utf-8") for path in paths) + b"\0",
+            env=env,
+        )
+        staged: dict[str, bytes] = {}
+        for entry in git(*options, "ls-files", "--stage", "-z", env=env).split(b"\0"):
+            if entry:
+                metadata, name = entry.split(b"\t", 1)
+                _, oid, stage = metadata.split()
+                if stage == b"0":
+                    staged[name.decode("utf-8")] = oid
+        oids = [staged[path] for path in paths]
+        output = io.BytesIO(git("cat-file", "--batch", data=b"\n".join(oids) + b"\n", env=env))
+        result: dict[str, bytes] = {}
+        for path, oid in zip(paths, oids, strict=True):
+            actual, kind, size = output.readline().split()
+            if actual != oid or kind != b"blob":
+                raise ValueError(f"Git did not return a source blob: {path}")
+            data = output.read(int(size))
+            if len(data) != int(size) or output.read(1) != b"\n":
+                raise ValueError(f"Git returned an incomplete source blob: {path}")
+            result[path] = data
+        return result
+
+
+def _row(relative: str, data: bytes) -> FileRow:
     return {"path": relative, "sha256": hashlib.sha256(data).hexdigest(), "bytes": len(data)}
 
 
@@ -83,14 +176,17 @@ def build_manifest(
     root: Path, paths: list[str], previous: Manifest, *, created_at: str
 ) -> Manifest:
     """A new list over `paths`; every header field of `previous` stays as it was."""
-    if set(previous) != HEADER_FIELDS:
+    if frozenset(previous) != HEADER_FIELDS:
         raise ValueError("the previous list has a different header than the checker accepts")
     built: Manifest = {}
     for key, value in previous.items():
         if key == "created_at":
             built[key] = created_at
         elif key == "files":
-            built[key] = [_row(root, relative) for relative in _listed(paths)]
+            built[key] = [
+                _row(relative, data)
+                for relative, data in read_source_bytes(root, _listed(paths)).items()
+            ]
         else:
             built[key] = value
     return built
@@ -99,12 +195,13 @@ def build_manifest(
 def compare(root: Path, manifest: Manifest, paths: list[str]) -> Difference:
     files = manifest["files"]
     assert isinstance(files, list)
-    rows: dict[str, dict[str, object]] = {item["path"]: item for item in files}
+    rows = {item["path"]: item for item in cast(list[FileRow], files)}
     current = set(_listed(paths))
+    contents = read_source_bytes(root, sorted(rows.keys() & current))
     changed = sorted(
         relative
         for relative in rows.keys() & current
-        if {k: v for k, v in _row(root, relative).items() if k != "path"}
+        if {k: v for k, v in _row(relative, contents[relative]).items() if k != "path"}
         != {k: v for k, v in rows[relative].items() if k != "path"}
     )
     return Difference(
@@ -133,7 +230,7 @@ def format_report(difference: Difference) -> str:
 
 
 def main(argv: list[str] | None = None, root: Path | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(description=(__doc__ or "Source manifest").splitlines()[0])
     parser.add_argument("--check", action="store_true", help="compare only; exit 1 if stale")
     options = parser.parse_args(argv)
     root = (root or Path(__file__).resolve().parents[1]).resolve()
@@ -142,7 +239,7 @@ def main(argv: list[str] | None = None, root: Path | None = None) -> int:
     paths = list_public_paths(root)
     stdout = sys.stdout
     if hasattr(stdout, "reconfigure"):
-        stdout.reconfigure(encoding="utf-8")
+        cast(_Reconfigurable, stdout).reconfigure(encoding="utf-8")
     if options.check:
         difference = compare(root, previous, paths)
         if difference.clean:
@@ -155,7 +252,7 @@ def main(argv: list[str] | None = None, root: Path | None = None) -> int:
     path.write_bytes(render(built))
     files = built["files"]
     assert isinstance(files, list)
-    print(f"{MANIFEST_NAME} rebuilt: {len(files)} files.")
+    print(f"{MANIFEST_NAME} rebuilt: {len(cast(list[object], files))} files.")
     return 0
 
 

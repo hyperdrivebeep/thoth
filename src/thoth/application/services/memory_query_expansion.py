@@ -28,7 +28,7 @@ from thoth.domain.research_lease import ResearchLeaseLost, ResearchPaused
 from thoth.ports.memory import MemoryQueryExpanderPort
 from thoth.ports.model import ModelOutputContractHold, ModelPort
 
-PROMPT_VERSION = "memory_query_expansion.v1"
+PROMPT_VERSION = "memory_query_expansion.v2"
 EXPANSION_MAX_OUTPUT_TOKENS = 300
 EXPANSION_TIMEOUT_SECONDS = 20.0
 CACHE_KEY = "memory_query_expansion"

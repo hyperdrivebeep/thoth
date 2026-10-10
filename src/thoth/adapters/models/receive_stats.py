@@ -27,6 +27,7 @@ def _observed_decimal(value: float | None) -> Decimal | None:
 
 @dataclass
 class ReceiveStats:
+    sensitive_values: tuple[str, ...] = field(default=(), repr=False, kw_only=True)
     received_bytes: int = 0
     visible_output_bytes: int = 0
     frame_counts: dict[str, int] = field(default_factory=dict)
@@ -50,7 +51,7 @@ class ReceiveStats:
 
     def capture_response(self, response: httpx.Response) -> None:
         try:
-            self.diagnostic_fields.update(response_detail(response))
+            self.diagnostic_fields.update(response_detail(response, self.sensitive_values))
         except Exception:
             self.diagnostic_unavailable = True
 
@@ -66,7 +67,7 @@ class ReceiveStats:
         # primary exception detail without moving the already frozen receive time.
         self.transport_diagnostic = None
         try:
-            self.diagnostic_fields.update(exception_detail(error))
+            self.diagnostic_fields.update(exception_detail(error, self.sensitive_values))
         except Exception:
             self.diagnostic_unavailable = True
 

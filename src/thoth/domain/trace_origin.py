@@ -15,6 +15,12 @@ from thoth.domain.base import DomainModel
 
 ORIGIN_SCHEMA_VERSION = "1.0.0"
 MAX_ORIGIN_REFS = 20
+# Other conditions of the same measure under the same requirement, shown beside the row so a cause
+# can be looked for in what differs. Few, with a few source positions each, to keep the context
+# small.
+MAX_SIBLING_VERDICTS = 4
+MAX_SIBLING_SPAN_REFS = 3
+MAX_COMPARISON_REFS = 8
 
 
 class TraceOriginInput(DomainModel):
@@ -25,6 +31,21 @@ class TraceOriginInput(DomainModel):
     subject_kind: Literal["CRITERION", "REQUIREMENT"]
     subject_id: str = Field(min_length=1, max_length=500)
     verdict_revision: str = Field(min_length=64, max_length=64)
+
+
+class TraceSiblingVerdict(DomainModel):
+    """The verdict of another condition of the same measure, as the stored trace has it."""
+
+    criterion_id: str = Field(min_length=1, max_length=500)
+    condition: str | None = Field(default=None, max_length=500)
+    state: str = Field(min_length=1, max_length=100)
+    rule_summary: str | None = Field(default=None, max_length=500)
+    # The chosen result the verdict was computed from (none while no result is chosen).
+    result_id: str | None = Field(default=None, max_length=500)
+    value: str | None = Field(default=None, max_length=100)
+    numerator: int | None = None
+    denominator: int | None = None
+    unit: str | None = Field(default=None, max_length=100)
 
 
 class TraceVerdictOrigin(DomainModel):
@@ -46,3 +67,8 @@ class TraceVerdictOrigin(DomainModel):
     rule_summary: str | None = Field(default=None, max_length=500)
     chosen_result_ids: tuple[str, ...] = Field(default=(), max_length=MAX_ORIGIN_REFS)
     source_span_refs: tuple[str, ...] = Field(default=(), max_length=MAX_ORIGIN_REFS)
+    sibling_verdicts: tuple[TraceSiblingVerdict, ...] = Field(
+        default=(), max_length=MAX_SIBLING_VERDICTS
+    )
+    # Where the siblings' own results are written; pinned beside source_span_refs.
+    comparison_span_refs: tuple[str, ...] = Field(default=(), max_length=MAX_COMPARISON_REFS)

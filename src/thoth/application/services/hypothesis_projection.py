@@ -10,6 +10,7 @@ from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.hypothesis import (
     Hypothesis,
     HypothesisPortfolio,
+    HypothesisPortfolioV3,
     HypothesisV3,
 )
 from thoth.domain.hypothesis_full import HypothesisPortfolioRecord, HypothesisRecord
@@ -284,6 +285,9 @@ def full_portfolio(
                 alternatives_considered=candidate.alternatives_considered,
                 next_checks=candidate.next_checks,
                 uncertainty_reserve=candidate.uncertainty_reserve,
+                table_fill=candidate.table_fill
+                if isinstance(candidate, HypothesisPortfolioV3)
+                else None,
             ),
             "supersedes_revision_digest": parent,
             "created_at": created_at,

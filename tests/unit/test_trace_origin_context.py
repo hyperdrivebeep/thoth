@@ -67,6 +67,14 @@ def test_a_valid_origin_goes_to_the_context_and_pins_its_source_positions() -> N
     assert item.pinned_spans == ("span:0",)
 
 
+def test_the_siblings_source_positions_are_pinned_after_the_rows_own_without_repeats() -> None:
+    item = work()
+    apply_trace_origin(
+        item, {"origin": origin(comparison_span_refs=("span:1", "span:0", "span:2"))}, "p"
+    )
+    assert item.pinned_spans == ("span:0", "span:1", "span:2")
+
+
 def test_no_origin_leaves_the_work_as_it_was() -> None:
     item = work()
     apply_trace_origin(item, {}, "p")

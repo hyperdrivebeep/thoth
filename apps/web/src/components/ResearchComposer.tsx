@@ -4,9 +4,9 @@ import { ResearchProgress, UsageSummary } from "./ResearchProgress";
 import { useCitationGate } from "./SourceCitationGate";
 import type { useResearchSession } from "./useResearchSession";
 
-export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOpenSettings,hosted=false,executionReady=true,readSuspended=false}: {
-  session:ReturnType<typeof useResearchSession>;projectId:string;threadId:string;epoch:number;onAttach:()=>void;onOpenSettings?:()=>void;
-  hosted?:boolean;executionReady?:boolean;readSuspended?:boolean;
+export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOpenSettings,hosted=false,executionReady=true,readSuspended=false,consentMissing=false,modelConnected}: {
+  session:ReturnType<typeof useResearchSession>;projectId:string;threadId:string;epoch:number;onAttach:()=>void;onOpenSettings?:(target?:"consent")=>void;
+  hosted?:boolean;executionReady?:boolean;readSuspended?:boolean;consentMissing?:boolean;modelConnected?:boolean;
 }) {
   const citation=useCitationGate(projectId);
   const submit = async () => {
@@ -27,8 +27,10 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
     {!hosted && session.pendingRead.kind === "INVALID" && <Callout compact intent="danger" role="alert">이전 요청의 복구 정보를 확인하지 못했습니다. 원 작업을 확인하기 전에는 새 key로 제출하지 않습니다.</Callout>}
     {!hosted && session.pendingStorageError && <Callout compact intent="warning" role="alert">{session.pendingStorageError}</Callout>}
     {readSuspended && <Callout compact intent="warning" role="status">접근 범위를 다시 확인하는 중입니다. 초안은 계속 쓸 수 있으며 확인이 끝나기 전에는 제출하지 않습니다.</Callout>}
-    {!readSuspended && !hosted && !executionReady && <Callout compact intent="warning" role="status">저장된 연구는 계속 볼 수 있습니다. 새 연구를 실행하려면 모델 연결과 초기 설정을 확인하세요.
-      {onOpenSettings && <Button small minimal onClick={onOpenSettings}>모델 연결 확인</Button>}</Callout>}
+    {!readSuspended && !hosted && !executionReady && <Callout compact intent="warning" role="status">저장된 연구는 계속 볼 수 있습니다. {blockedReason(consentMissing,modelConnected)}
+      {onOpenSettings && (consentMissing && modelConnected!==false
+        ? <Button small minimal onClick={()=>onOpenSettings("consent")}>동의 고르기</Button>
+        : <Button small minimal onClick={()=>onOpenSettings()}>모델 연결 확인</Button>)}</Callout>}
     {!hosted && session.draftRestoreIssue && <Callout compact intent="warning" role="alert">{session.draftRestoreIssue === "CORRUPT"
       ? "이전 초안 저장 기록을 읽지 못했습니다. 기록을 자동 삭제하지 않았으며 새 초안을 저장하면 대체될 수 있습니다."
       : "이 브라우저의 초안 저장 기록을 읽지 못했습니다. 브라우저 저장소와 작업 공간 식별자를 확인하세요."}
@@ -50,4 +52,10 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
     </form>
     {!readSuspended&&<UsageSummary status={session.research.data?.value}/>}
   </div>;
+}
+
+/** What actually blocks a new research: an empty internet consent, the model, both, or something the screen cannot name. */
+function blockedReason(consentMissing: boolean, modelConnected: boolean | undefined): string {
+  if (consentMissing) return modelConnected === false ? "새 연구를 실행하려면 모델 연결과 인터넷 사용 동의를 확인하세요." : "새 연구를 실행하려면 인터넷 사용 동의를 고르세요.";
+  return modelConnected === false ? "새 연구를 실행하려면 모델 연결을 확인하세요." : "새 연구를 실행하려면 모델 연결과 초기 설정을 확인하세요.";
 }

@@ -177,7 +177,7 @@ def test_the_contract_is_v2_unless_the_work_asks_for_v3() -> None:
     on = generator_contract(True)
     assert (off["prompt_version"], off["output_model"]) == (CONTRACT_V2, HypothesisPortfolio)
     assert (on["prompt_version"], on["output_model"]) == (CONTRACT_V3, HypothesisPortfolioV3)
-    assert CONTRACT_V2 == "hypothesis_portfolio.v2" and CONTRACT_V3 == "hypothesis_portfolio.v3"
+    assert CONTRACT_V2 == "hypothesis_portfolio.v2" and CONTRACT_V3 == "hypothesis_portfolio.v3.3"
 
 
 def _filled(*rows: dict[str, Any]) -> dict[str, Any]:

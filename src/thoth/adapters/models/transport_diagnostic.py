@@ -1,9 +1,11 @@
-"""Local, bounded normalization. Never stringify an exception or persist header values."""
+"""Bounded diagnostics: validated correlation headers and conservatively redacted excerpts."""
 
+import re
 import ssl
 
 import httpx
 
+from thoth.adapters.models.transport_message import safe_exception_prefix
 from thoth.domain.model_dispatch import TransportDiagnostic
 
 
@@ -28,7 +30,9 @@ def _next(error: BaseException) -> object:
     return error.__cause__ if error.__cause__ is not None else error.__context__
 
 
-def exception_detail(error: httpx.HTTPError) -> dict[str, object]:
+def exception_detail(
+    error: httpx.HTTPError, sensitive_values: tuple[str, ...] = ()
+) -> dict[str, object]:
     kind = type(error)
     name = kind.__name__
     verified = (
@@ -38,6 +42,8 @@ def exception_detail(error: httpx.HTTPError) -> dict[str, object]:
         and len(name) <= 64
     )
     detail: dict[str, object] = {"httpx_error_type": name if verified else "UNKNOWN"}
+    if verified and (message := safe_exception_prefix(error, sensitive_values)) is not None:
+        detail["error_message_prefix"] = message
     node = _next(error)
     if node is None:
         return detail
@@ -69,7 +75,9 @@ def exception_detail(error: httpx.HTTPError) -> dict[str, object]:
     return detail
 
 
-def response_detail(response: httpx.Response) -> dict[str, object]:
+def response_detail(
+    response: httpx.Response, sensitive_values: tuple[str, ...] = ()
+) -> dict[str, object]:
     version = response.http_version
     raw_encoding = response.headers.get("content-encoding")
     if raw_encoding is None:
@@ -94,11 +102,25 @@ def response_detail(response: httpx.Response) -> dict[str, object]:
         )
     else:
         framing = "CONTENT_LENGTH" if has_length else "ABSENT"
-    return {
+    detail: dict[str, object] = {
         "http_version": version if version in {"HTTP/1.0", "HTTP/1.1", "HTTP/2"} else "UNKNOWN",
         "content_encoding": encoding,
         "body_framing": framing,
     }
+    for header, field, limit, pattern in (
+        ("x-oai-request-id", "x_oai_request_id", 128, r"[A-Za-z0-9][A-Za-z0-9_-]*"),
+        ("cf-ray", "cf_ray", 20, r"[0-9a-fA-F]{16}(?:-[A-Z]{3})?"),
+    ):
+        value = response.headers.get(header)
+        if (
+            value is not None
+            and len(value) <= limit
+            and re.fullmatch(pattern, value) is not None
+            and not any(secret and secret in value for secret in sensitive_values)
+            and not value.lower().startswith(("sk-", "bearer", "basic"))
+        ):
+            detail[field] = value
+    return detail
 
 
 def build_diagnostic(fields: dict[str, object], unavailable: bool) -> TransportDiagnostic:

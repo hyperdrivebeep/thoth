@@ -1,3 +1,4 @@
+import { eulreul, eunneun, iga } from "../api/koreanParticles";
 import type { ChangedDependency, ImportIssue, TraceResult, TraceRule, VerdictChange } from "../api/trace";
 import { resultText, ruleText } from "./traceRows";
 import type { ReasonTagId } from "./traceReasonTags";
@@ -109,8 +110,8 @@ export function reasonSentence(code: string, titleOf: (id: string) => string, co
     if (!match) return "측정값이 기준을 만족하지 못합니다.";
     const unit = match[4] ? "(" + match[4] + ")" : "";
     return match[2] === ">="
-      ? "측정값 " + match[1] + "이(가) 기준 " + match[3] + " 이상" + unit + "에 못 미칩니다."
-      : "측정값 " + match[1] + "이(가) 기준 " + match[3] + " 이하" + unit + "를 넘습니다.";
+      ? "측정값 " + iga(match[1]) + " 기준 " + match[3] + " 이상" + unit + "에 못 미칩니다."
+      : "측정값 " + iga(match[1]) + " 기준 " + match[3] + " 이하" + unit + "를 넘습니다.";
   }
   if (head === "UNIT_MISMATCH") {
     const match = /:([^!]*)!=(.*)$/.exec(tail);
@@ -210,17 +211,17 @@ export function issueText(issue: ImportIssue): IssueText {
     BASE_DIGEST_INCONSISTENT: () => ({ message: "한 파일 안에 서로 다른 상태에서 내보낸 줄이 섞여 있습니다.", next: "한 번에 내보낸 파일 하나만 고치세요." }),
     MODE_CREATE_NEEDS_EMPTY_PROJECT: () => ({ message: "이 프로젝트에는 이미 추적표가 있어 '새로 만들기'를 할 수 없습니다.", next: "'기존 표 고치기'를 선택하세요." }),
     UPDATE_NEEDS_EXISTING_TRACE: () => ({ message: "고칠 추적표가 아직 없습니다.", next: "'새로 만들기'를 선택하세요." }),
-    DUPLICATE_ID_IN_FILE: () => ({ message: `같은 ID${ref(issue)}가 파일에 두 번 이상 있습니다${where(issue)}.`, next: "중복된 줄을 하나로 정리하세요." }),
+    DUPLICATE_ID_IN_FILE: () => ({ message: `${iga("같은 ID" + ref(issue))} 파일에 두 번 이상 있습니다${where(issue)}.`, next: "중복된 줄을 하나로 정리하세요." }),
     ROW_INVALID: () => ({ message: `${issue.row ?? "?"}번째 줄${ref(issue)}의 값을 읽지 못했습니다. 칸의 형식이 맞는지 확인하세요.`, next: "숫자 칸에는 숫자만, 종류 칸에는 정해진 값만 쓰세요." }),
     ITEM_KEY_CHANGED: () => ({ message: `항목${ref(issue)}의 내부 키는 바꿀 수 없습니다${where(issue)}.`, next: "내부 키 칸은 내보낸 값 그대로 두세요." }),
-    DELETE_TARGET_NOT_FOUND: () => ({ message: `지우려는 것${ref(issue)}이(가) 추적표에 없습니다${where(issue)}.`, next: "삭제 줄의 종류와 ID를 확인하세요." }),
+    DELETE_TARGET_NOT_FOUND: () => ({ message: `${iga("지우려는 것" + ref(issue))} 추적표에 없습니다${where(issue)}.`, next: "삭제 줄의 종류와 ID를 확인하세요." }),
     DELETE_BLOCKED_BY_LINK: () => ({ message: `항목${ref(issue)}에는 아직 연결이 남아 있어 지울 수 없습니다.`, next: "연결 줄의 삭제 줄도 함께 넣거나, 항목 삭제를 빼세요." }),
     DELETE_BLOCKED_BY_RULE: () => ({ message: `기준${ref(issue)}에는 판정 규칙이 남아 있어 지울 수 없습니다.`, next: "규칙의 삭제 줄도 함께 넣거나, 기준 삭제를 빼세요." }),
     DELETE_BLOCKED_BY_RESULT: () => ({ message: `항목${ref(issue)}에는 결과가 남아 있어 지울 수 없습니다.`, next: "결과의 삭제 줄도 함께 넣거나, 삭제를 빼세요." }),
-    DELETE_AND_UPSERT_SAME_TARGET: () => ({ message: `${ref(issue)}을(를) 같은 파일에서 고치면서 지우려 합니다${where(issue)}.`, next: "둘 중 하나만 남기세요." }),
+    DELETE_AND_UPSERT_SAME_TARGET: () => ({ message: `${eulreul(ref(issue).trim())} 같은 파일에서 고치면서 지우려 합니다${where(issue)}.`, next: "둘 중 하나만 남기세요." }),
     DELETE_NOT_ALLOWED_IN_CREATE: () => ({ message: "'새로 만들기'에는 삭제 줄을 쓸 수 없습니다.", next: "삭제 줄을 빼거나 '기존 표 고치기'를 선택하세요." }),
     DELETE_ROW_INCOMPLETE: () => ({ message: `삭제 줄에 종류나 ID가 비어 있습니다${where(issue)}.`, next: "삭제 줄에는 종류와 ID를 모두 쓰세요." }),
-    EXCEL_ID_SUSPECTED: () => ({ message: `ID${ref(issue)}는 스프레드시트가 바꾼 것처럼 보입니다${where(issue)}. ${issue.detail}`, next: "원래 ID로 되돌리고, ID 칸을 '텍스트' 서식으로 바꾼 뒤 다시 저장하세요." }),
+    EXCEL_ID_SUSPECTED: () => ({ message: `${eunneun("ID" + ref(issue))} 스프레드시트가 바꾼 것처럼 보입니다${where(issue)}. ${issue.detail}`, next: "원래 ID로 되돌리고, ID 칸을 '텍스트' 서식으로 바꾼 뒤 다시 저장하세요." }),
     GRAPH_INVALID: () => ({ message: "반영하면 연결이 맞지 않는 곳이 생깁니다.", next: "연결 줄의 양쪽 ID와 종류가 추적표에 있는지 확인하세요." }),
     HEADER_MISSING_COLUMNS: () => ({ message: "파일의 머리 줄에 꼭 필요한 열이 빠져 있습니다.", next: "'CSV로 내보내기'로 받은 파일의 머리 줄을 지우지 말고 쓰세요." }),
     HEADER_DUPLICATE_COLUMN: () => ({ message: "머리 줄에 같은 열 이름이 두 번 있습니다.", next: "중복된 열을 지우세요." }),

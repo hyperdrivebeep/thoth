@@ -15,7 +15,7 @@ from thoth.application.services.research_context_assembler import assemble_conte
 from thoth.application.services.research_coverage import answer_assessment_state, assess_coverage
 from thoth.application.services.research_findings import adopt_confirmed_findings
 from thoth.application.services.research_gaps import gap_targets, validate_gaps
-from thoth.application.services.research_retrieval import lexical_candidates
+from thoth.application.services.research_retrieval import pinned_first, work_candidates
 from thoth.application.services.research_retrieval_policy import record_selection, retrieval_policy
 from thoth.application.services.research_role_context import bundle_view, role_context
 from thoth.application.services.research_stage_reuse import reuse_stage_if_exact
@@ -84,6 +84,7 @@ class ResearchAnalysis:
     ) -> ContextAssembly:
         started = perf_counter_ns()
         work.boundary.check()
+        ranking = pinned_first(ranking, candidates, work.pinned_spans)
         # Re-read scoped structure and complete source identity before any cache reuse.
         key = domain_digest(
             "CONTEXT_ASSEMBLY_INPUT",
@@ -334,7 +335,7 @@ class ResearchAnalysis:
         )
         # Start with admissible connected source candidates; no fake evidence is needed.
         all_evidence = self.evidence(project.project_id)
-        shortlist = lexical_candidates(work.effective_question, (), all_evidence, work.pinned_spans)
+        shortlist = work_candidates(work, (), all_evidence)
         if shortlist and all(span.cutoff_state == CutoffState.UNKNOWN_TIME for span in shortlist):
             work.context["source_time_limitation"] = "SOURCE_TIME_UNCONFIRMED"
         assembly = self.assemble(work, tuple(s.span_id for s in shortlist), shortlist, all_evidence)
@@ -482,9 +483,8 @@ class ResearchAnalysis:
         proposal: RequirementProposal,
         source: tuple[EvidenceSpan, ...],
     ) -> tuple[CoverageAssessment, str]:
-        # Relevance ranking must see the original bounded candidates. Expanding before
-        # ranking can spend the context budget on prose and hide the very cell to rank.
-        candidates = lexical_candidates(work.effective_question, proposal.expanded_queries, source)
+        # Rank the original bounded candidates: expanding first spends the budget on prose.
+        candidates = work_candidates(work, proposal.expanded_queries, source)
         ranked, _ = await self.ask(
             model,
             project,

@@ -59,7 +59,7 @@ function stateMessage(state: LoginState): string {
   switch (state) {
     case "PENDING": return "xAI 승인을 기다리고 있습니다. 로그인 시작만으로 연결된 것은 아닙니다.";
     case "SLOW_DOWN": return "xAI 승인을 기다리고 있습니다. 상태 확인 간격을 늘렸습니다.";
-    case "CONNECTED": return "xAI 로그인이 확인됐습니다. 사용할 모델을 직접 선택하세요. 실제 모델 실행 성공은 별도 확인이 필요합니다.";
+    case "CONNECTED": return "xAI 로그인이 확인됐습니다. 사용할 모델을 직접 선택하세요.";
     case "DENIED": return "xAI 로그인이 거부됐습니다. 다시 시작하려면 새 코드를 요청하세요.";
     case "EXPIRED": return "기기 코드의 유효 시간이 끝났습니다. 다시 시작하려면 새 코드를 요청하세요.";
     case "CANCELLED": return "이 로그인 요청을 취소했습니다. 기존 API 키 연결은 유지됩니다.";

@@ -10,7 +10,6 @@ from pydantic import model_validator
 from thoth.application.reducers import (
     SufficiencySignals,
     assess_information_sufficiency,
-    validate_hypothesis_portfolio,
 )
 from thoth.application.services.action_compiler import compile_action_plan
 from thoth.application.services.behavior_context import (
@@ -23,7 +22,8 @@ from thoth.application.services.full_project_memory import (
     FullMemoryPromotionResult,
     FullProjectMemoryService,
 )
-from thoth.application.services.hypothesis_contract_v3 import generator_contract, settle_contract
+from thoth.application.services.hypothesis_contract_v3 import generator_contract
+from thoth.application.services.hypothesis_table_filler import accepted_portfolio
 from thoth.application.services.memory_relation_resolver import MemoryRelationBudget
 from thoth.application.services.research_commit_scope import ReadScope, read_scope
 from thoth.application.services.research_identity_service import (
@@ -36,6 +36,10 @@ from thoth.application.services.revision_service import (
     CommitDisposition,
     CommitResult,
     RevisionCommitService,
+)
+from thoth.application.workflows.thread_cycle_preparation import (
+    draft_portfolio,
+    expected_cycle_heads,
 )
 from thoth.domain.action import (
     ActionCompilationPolicy,
@@ -50,10 +54,8 @@ from thoth.domain.criterion import CriterionCandidate
 from thoth.domain.criterion_contract import CriterionContractRecord
 from thoth.domain.enums import (
     EntityType,
-    HypothesisStatus,
     ModelRole,
     OutcomeStatus,
-    PortfolioStatus,
     SufficiencyStatus,
 )
 from thoth.domain.evidence import EvidenceSpan, InformationSufficiencyAssessment
@@ -221,28 +223,13 @@ class ThreadCycleService:
             }
             for status in assessment.derived_status
         )
-        portfolio = validate_hypothesis_portfolio(
-            settle_contract(hypothesis_result.output, command.evidence),
-            evidence=command.evidence,
-            require_unknown_alternative=require_unknown,
+        portfolio = await accepted_portfolio(
+            self._model, hypothesis_result.output, context, command, require_unknown
         )
         review_id = self._ids.new("hypothesis-semantic-review") if work is not None else None
         if work is not None:
             # A generator cannot grant epistemic or empirical promotion to itself.
-            portfolio = portfolio.model_copy(
-                update={
-                    "status": PortfolioStatus.DRAFT,
-                    "hypotheses": tuple(
-                        h.model_copy(
-                            update={
-                                "status": HypothesisStatus.DRAFT,
-                                "semantic_review_ref": review_id,
-                            }
-                        )
-                        for h in portfolio.hypotheses
-                    ),
-                }
-            )
+            portfolio = draft_portfolio(portfolio, review_id)
         if portfolio.generated_from_head_set != head_digest:
             raise ValueError("hypothesis portfolio was generated from a different head set")
         if (
@@ -343,11 +330,7 @@ class ThreadCycleService:
                 )
             )
         staged = (*staged_items, *research_batch.additional_staged)
-        staged_keys = {
-            f"{item.revision.entity_type.value}:{item.revision.entity_id}" for item in staged
-        }
-        expected_heads = {key: value for key, value in heads.items() if key in staged_keys}
-        expected_heads.update(command.expected_head_overrides or {})
+        expected_heads = expected_cycle_heads(heads, staged, command.expected_head_overrides)
         commit, memories, full_memory_result = await self._commit_cycle(
             command=command,
             heads=heads,

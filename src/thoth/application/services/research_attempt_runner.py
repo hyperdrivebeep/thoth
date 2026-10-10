@@ -250,6 +250,7 @@ async def _execute_owned(
             return host.pending(attempt, "WAITING_FOR_LEGACY_THREAD")
         combined = {
             **work.context,
+            **work.result_only,
             **result,
             "cleanup_usage": [
                 usage.model_dump(mode="json") for usage in work.cleanup_usage.values()
@@ -285,7 +286,7 @@ async def _execute_owned(
                 request,
                 work,
                 "HOLD",
-                work.context,
+                {**work.context, **work.result_only},
                 (reason,),
                 terminal=reason,
                 check=False,
@@ -394,7 +395,7 @@ def _prepare_work(
         and codex_family(provider=settings.provider, capability_source=settings.capability_source)
         and host.call_settings.auto_retry_interrupted(request.project_id)
     ):
-        # The project's own switch (off unless turned on): one cut-off call may be sent once more.
+        # The project's saved choice, otherwise on (사용자 결정 20261010-01); at most two retries.
         work.auto_retry_interrupted_call = True
     calls = host.call_settings
     if calls is not None and calls.hypothesis_contract_v3(request.project_id):

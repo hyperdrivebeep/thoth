@@ -72,6 +72,16 @@ it("shows the first-phase data with rain and fog held, dry passing, and no inter
   expect(page()).not.toContain("엑셀 대체");
 });
 
+it("does not label SYN-prefixed IDs as synthetic without an explicit notice or marker", async () => {
+  const view = { ...structuredClone(demo.phase1), items: demo.phase1.items.map(item => ({ ...item, fields: {} })) };
+  expect(view.items.every(item => item.item_id.startsWith("SYN-"))).toBe(true);
+  expect(view.items.every(item => !item.title.includes("SYNTHETIC DEMO DATA"))).toBe(true);
+  state.view = view as Json;
+  await mount();
+  expect(rowOf("Detection rate in rain").textContent).toContain("보류 · 결과 없음");
+  expect(container.querySelector(".trace-synthetic-banner")).toBeNull();
+});
+
 it("is a labelled table whose rows open and close from a named button", async () => {
   await mount();
   expect(container.querySelector("table caption")?.textContent).toContain("판정");
@@ -116,7 +126,7 @@ it("previews the rain results, applies them, and then only the rain lines fail w
   expect(rowOf("Synthetic radar detects").textContent).toContain("기준 미달 · 결과 없는 조건도 있음");
   expect(rowOf("Detection rate in dry weather").textContent).toBe(dryBefore);
   expect(rowOf("Detection rate in fog").textContent).toContain("보류 · 결과 없음");
-  expect(rowOf("Detection rate in rain").textContent).toContain("측정값 0.80이(가) 기준 0.90 이상(ratio)에 못 미칩니다.");
+  expect(rowOf("Detection rate in rain").textContent).toContain("측정값 0.80이 기준 0.90 이상(ratio)에 못 미칩니다.");
   const notice = container.querySelector(".trace-notice")!.textContent!;
   expect(notice).toContain("반영했습니다."); expect(notice).toContain("보류 · 결과 없음 → 기준 미달");
   await click(buttonByLabel("Detection rate in rain 판정 이력 펼치기", container));

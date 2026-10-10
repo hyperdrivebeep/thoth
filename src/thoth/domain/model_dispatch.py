@@ -102,6 +102,15 @@ class TransportDiagnostic(DomainModel):
     httpx_error_type: str | None = Field(
         default=None, min_length=1, max_length=64, pattern=r"^[A-Za-z_][A-Za-z0-9_]*$"
     )
+    error_message_prefix: str | None = Field(
+        default=None, min_length=1, max_length=256, pattern=r"^[\x20-\x7e]+$"
+    )
+    x_oai_request_id: str | None = Field(
+        default=None, min_length=1, max_length=128, pattern=r"^[A-Za-z0-9][A-Za-z0-9_-]*$"
+    )
+    cf_ray: str | None = Field(
+        default=None, max_length=20, pattern=r"^[0-9a-fA-F]{16}(-[A-Z]{3})?$"
+    )
     nested_cause_category: Literal[
         "NONE",
         "OS_ERROR",

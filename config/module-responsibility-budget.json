@@ -320,7 +320,7 @@
       "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     },
     "src/thoth/application/services/critical_counter_search_coordinator.py": {
-      "baseline_lines": 868,
+      "baseline_lines": 835,
       "top_level_symbols": [
         "CriticalCounterSearchExecution",
         "CriticalCounterSearchCoordinator"
@@ -421,7 +421,7 @@
       "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     },
     "src/thoth/application/workflows/thread_cycle.py": {
-      "baseline_lines": 889,
+      "baseline_lines": 872,
       "top_level_symbols": [
         "ThreadCycleCommand",
         "ThreadCycleResult",
@@ -475,9 +475,7 @@
     }
   },
   "watched_long_functions": {
-    "src/thoth/application/services/acquisition_coordinator.py::execute_if_required": 209,
-    "src/thoth/application/services/critical_counter_search_coordinator.py::_execute_multi_wave": 380,
-    "src/thoth/application/workflows/thread_cycle.py::execute": 207,
+    "src/thoth/application/services/critical_counter_search_coordinator.py::_execute_multi_wave": 343,
     "src/thoth/apps/runtime.py::create_runtime": 548
   }
 }
