@@ -24,7 +24,7 @@ import { STANDING_NOTE, standingLine } from "./judgmentRecordText";
 import type { SameView } from "../api/hypothesisSame";
 import { SameHypothesis } from "./SameHypothesis";
 
-const relationLabel: Record<Relation, string> = { SUPPORT: "지지", COUNTER: "반박", NOT_APPLICABLE: "해당 없음", UNEVALUATED: "미평가" };
+const relationLabel: Record<Relation, string> = { SUPPORT: "지지", COUNTER: "반박", NOT_APPLICABLE: "해당 없음", UNEVALUATED: "대조 안 함" };
 const relationIntent = { SUPPORT: "success", COUNTER: "danger", NOT_APPLICABLE: "none", UNEVALUATED: "none" } as const;
 const standingOf = (items: DiscriminationItem[] | undefined, id: string) => items?.find(item => item.hypothesis_id === id)?.standing;
 
@@ -64,7 +64,7 @@ export function HypothesisCompare({ result, review, projectId, links, distributi
       {row.counterTerminal && row.counter.length === 0 && <p className="muted">반박 근거를 찾지 못함 (지지된다는 뜻은 아닙니다)</p>}
       <div className="hypothesis-counts">
         <Tag minimal intent="success">뒷받침 {row.support.length}</Tag>{" · "}<Tag minimal intent="danger">반박 {row.counterTerminal ? row.counter.length : "-"}</Tag>
-        {row.unevaluated !== null && <>{" · "}<Tag minimal>미평가 {row.unevaluated}</Tag></>}
+        {row.unevaluated !== null && <>{" · "}<Tag minimal>아직 대조 안 한 근거 {row.unevaluated}/{selected?.length}</Tag></>}
       </div>
       <h4>반대 근거를 찾을 질문</h4>{row.counterQueries.map((query, j) => <p key={j}>{query}</p>)}
       {row.aiRefutation.length > 0 && <div className="ai-refutation"><h4>AI 제안(미확정) 기각 조건</h4>
@@ -83,10 +83,10 @@ export function HypothesisCompare({ result, review, projectId, links, distributi
     </section>)}
     {table && shown && <section className="detail-card" aria-label="근거와 가설의 관계">
       <h3>근거와 가설의 관계</h3>
-      <p className="muted">AI가 판단한 관계입니다. 칸을 직접 고치지 않고, 자료 추가나 방향 지시로 다시 조사하게 합니다. 아직 살펴보지 않은 칸은 "미평가"로 보입니다.</p>
+      <p className="muted">AI가 판단한 관계입니다. 칸을 직접 고치지 않고, 자료 추가나 방향 지시로 다시 조사하게 합니다. 아직 견주어 보지 않은 칸은 "대조 안 함"으로 보입니다. 가설 카드의 "아직 대조 안 한 근거 N/M"은 선택된 근거 전체 중 이 가설과 아직 견주어 보지 않은 근거의 수입니다.</p>
       {counterNote && <p className="muted">{counterNote}</p>}
       <div className="relation-filter">
-        <Button small minimal active={onlyOpen} onClick={() => setOnlyOpen(true)}>반박·미평가만</Button>
+        <Button small minimal active={onlyOpen} onClick={() => setOnlyOpen(true)}>반박·대조 안 한 것만</Button>
         <Button small minimal active={!onlyOpen} onClick={() => setOnlyOpen(false)}>전체 보기</Button>
         <span className="relation-summary">{`표시 ${shown.length}/전체 ${table.length}`}</span>
       </div>

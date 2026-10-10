@@ -20,7 +20,7 @@ const render = (result: Record<string, unknown>, extra: Record<string, unknown> 
 it("puts two hold lines inside the answer card for a real held IRIS answer", () => {
   const html = render(excerpt, { coverageMatrix: coverage([row("SATISFIED"), row("SATISFIED"), row("UNRESOLVED"), row("NOT_ASSESSED"), row("NOT_APPLICABLE")]) });
   expect(html).toContain("결론 상태: <strong>판단 보류</strong>");
-  expect(html).toContain("답할 수 있는 범위: 기준 충족 2/5 · 확인 필요 2");
+  expect(html).toContain("답할 수 있는 범위: 답변 점검 항목 5개 중 충족 2 · 확인 필요 2");
   expect(html.indexOf("결론 상태")).toBeGreaterThan(html.indexOf("answer-text"));
   expect(html.indexOf("결론 상태")).toBeLessThan(html.indexOf("answer-actions"));
 });
@@ -28,7 +28,7 @@ it("puts two hold lines inside the answer card for a real held IRIS answer", () 
 it("names the other answer statuses and a missing coverage read", () => {
   expect(render({ answer: "a", answer_status: "ASSESSED_WITH_OPEN_CHECKS" })).toContain("<strong>부분 답변</strong>");
   expect(render({ answer: "a", answer_status: "ASSESSED_FOR_REQUEST" })).toContain("<strong>답변 완료</strong>");
-  expect(render({ answer: "a", answer_status: "PARTIAL_HOLD" })).toContain("답할 수 있는 범위: 평가기준 정보를 아직 읽지 못했습니다");
+  expect(render({ answer: "a", answer_status: "PARTIAL_HOLD" })).toContain("답할 수 있는 범위: 답변 점검 항목 정보를 아직 읽지 못했습니다");
   expect(render({ answer: "a" })).not.toContain("결론 상태");
 });
 
@@ -41,6 +41,22 @@ it("splits the criteria table into status and judgment so unresolved is not show
   expect(visible(html)).not.toMatch(/>\s*APPLIED\s*</);
   expect(visible(html)).not.toContain("answer:HOLD");
   expect(visible(html)).not.toContain("RESEARCH_GAP");
+});
+
+it("calls the answer's own checks 답변 점검 항목 so they are not mixed up with the trace table's criteria", () => {
+  const html = render({ answer: "a", answer_status: "PARTIAL_HOLD" }, { progressSummary: progress(), coverageMatrix: coverage([row("UNRESOLVED"), row("SATISFIED")]) });
+  const text = visible(html);
+  expect(html).toContain("답변 점검 항목 2개");
+  expect(html).toContain('aria-label="답변 점검 항목 충족 상태"');
+  expect(text).not.toContain("평가기준");
+  // The list stays folded when nothing is open, so only its title shows; the empty and unreadable wording sits inside it.
+  expect(render({ answer: "a" }, { progressSummary: progress(), coverageMatrix: coverage([]) })).toContain("답변 점검 항목 0개");
+});
+
+it("names the evidence linked to this summary without reusing the 직접 사용 가능 wording", () => {
+  const text = visible(render({ answer: "a" }, { progressSummary: progress(), coverageMatrix: coverage([row("SATISFIED", { evidence_refs: ["span:x"] })]) }));
+  expect(text).toContain("이 요약에 연결된 근거");
+  expect(text).not.toContain("직접 근거");
 });
 
 it("says where the answer's sources are instead of claiming none were recorded", () => {
@@ -63,7 +79,8 @@ it("words the terminal result marker and keeps other internal codes out of the v
     "requirement:req-1:UNRESOLVED", "requirement:req-2:SATISFIED", "EVIDENCE_TOO_OLD", "RESULT_NOT_PRODUCED", "자료가 오래됐습니다",
   ]) });
   const text = visible(html);
-  expect(text).toContain("답변이 최종 상태로 기록됐습니다");
+  expect(text).toContain("조사 실행이 끝났습니다");
+  expect(text).not.toContain("최종 상태로 기록");
   expect(text).toContain("평가 조건이 기록됐습니다");
   expect(text).toContain("아직 답변이 만들어지지 않았습니다");
   expect(text).toContain("자료가 오래됐습니다");

@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-11T12:00:49.692393+00:00",
+  "created_at": "2026-10-11T12:00:50.638112+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -458,8 +458,8 @@
     },
     {
       "path": "apps/web/src/components/AnswerHold.tsx",
-      "sha256": "e682f1265361256d4f5e433fa4e7098eba2e094c87fc38c9ce597019f9ccfb6e",
-      "bytes": 1561
+      "sha256": "887d4b5bd9396f712536ba523b6ce13f2005d68b010da156dab94afcb01f51fb",
+      "bytes": 1590
     },
     {
       "path": "apps/web/src/components/AnswerReadability.test.tsx",
@@ -543,13 +543,13 @@
     },
     {
       "path": "apps/web/src/components/ContractV3Screens.test.tsx",
-      "sha256": "ac7213a8ddf9973cc5c3afd1b905dd1866e05a3af8b385e942b37c2ec4a87f77",
-      "bytes": 7243
+      "sha256": "cc58a42347636f4d117d503d4f7495606cff79c5541327049f6ff543104ffdc0",
+      "bytes": 8555
     },
     {
       "path": "apps/web/src/components/ConversationTimeline.tsx",
-      "sha256": "48dc6fce194ebaa7bbea234f394edf74a5cb193754d77383e05558376d7362e3",
-      "bytes": 10085
+      "sha256": "2cea7be6a13f3a518f5ea28b9362e55f2f447fa6ef7844c3c3014bc43feba333",
+      "bytes": 10209
     },
     {
       "path": "apps/web/src/components/ConversationTimelineDeniedRetention.test.tsx",
@@ -568,8 +568,13 @@
     },
     {
       "path": "apps/web/src/components/ConversationTimelineRefetch.test.tsx",
-      "sha256": "3ca5886e9bbbe3c46d2b28723afe42898f8fd1347862d5a1502faf88b2e3bf12",
-      "bytes": 7547
+      "sha256": "cc09437334807466bc778342d6c8b3668af40492617b4660dc560aab0d69411e",
+      "bytes": 7602
+    },
+    {
+      "path": "apps/web/src/components/ConversationTimelineSynthetic.test.tsx",
+      "sha256": "68980715c34e1c3bea9d28dbd8bfb278defdcab6e104ba84a0a5ef5e35d9f502",
+      "bytes": 3886
     },
     {
       "path": "apps/web/src/components/Disclosure.tsx",
@@ -618,8 +623,8 @@
     },
     {
       "path": "apps/web/src/components/ExpectedResults.tsx",
-      "sha256": "3d0fdcae3969e2b8926316bf1196947c5c490c88164888b3f4ccc261bcba27d4",
-      "bytes": 1275
+      "sha256": "3de49d9ded39f4d7acd164d4296ec7de3b43cb87ad1a15ddc2e6e43cba0e4e68",
+      "bytes": 1547
     },
     {
       "path": "apps/web/src/components/FileConnectionPanel.tsx",
@@ -638,13 +643,13 @@
     },
     {
       "path": "apps/web/src/components/HypothesisCompare.test.tsx",
-      "sha256": "efd9ebb1f547365b188d4d0c34efb93dc945676eca6baaeb316ecfd7476dd818",
-      "bytes": 6869
+      "sha256": "244d2a05a9cf656a840230fa670ced4f1e6a91952d2fc083c0575b7212366802",
+      "bytes": 7220
     },
     {
       "path": "apps/web/src/components/HypothesisCompare.tsx",
-      "sha256": "71e230152818510e92a1e0ff33043e72ed8e7e0fd1bb082c0a97ec8196eba28b",
-      "bytes": 9156
+      "sha256": "e12e92e2c125ae7628ec599e12515b9d5dd34078096a65e3a17334445e7f3d70",
+      "bytes": 9372
     },
     {
       "path": "apps/web/src/components/HypothesisCompareDraft.test.tsx",
@@ -693,8 +698,8 @@
     },
     {
       "path": "apps/web/src/components/HypothesisScreen.test.tsx",
-      "sha256": "1d3f68fd3458e5a1b384c4f5f6d671ebae1c1abded92720bc966628f63edda02",
-      "bytes": 10645
+      "sha256": "ddf07819291960009011f0a3b7b9cbe139301af2461b125f5ec88a72542d5499",
+      "bytes": 10655
     },
     {
       "path": "apps/web/src/components/LessonRecall.test.tsx",
@@ -748,8 +753,8 @@
     },
     {
       "path": "apps/web/src/components/ModelSettings.test.tsx",
-      "sha256": "2a12649f0a89d9a3ba3cba7d5b6500680dbb5ba81e0079991695bbc1a2614b00",
-      "bytes": 23318
+      "sha256": "78d20aa3c8126b7f4a978826bc1119213b13615345a95d1bcfc6f24bd477d711",
+      "bytes": 23406
     },
     {
       "path": "apps/web/src/components/ModelSettings.tsx",
@@ -833,18 +838,18 @@
     },
     {
       "path": "apps/web/src/components/ResearchEvidenceDetail.test.tsx",
-      "sha256": "9b2e1573fa475382ba29a6af339263c29200e9971f2759a7dfb8874d392fa4d2",
-      "bytes": 10627
+      "sha256": "db7715c70ee563e82544944ea955b339ab1224b8de32ba9bd70398b68856601d",
+      "bytes": 10927
     },
     {
       "path": "apps/web/src/components/ResearchFollowupSummary.tsx",
-      "sha256": "dcf25f66a3e2ed86978828551022df13e51292c733f57dc5b9aef6bbc8492c0b",
-      "bytes": 10005
+      "sha256": "008da642697cd4cfa493399095768704d236f8b747199743e972d50899cc731b",
+      "bytes": 10033
     },
     {
       "path": "apps/web/src/components/ResearchHold.test.tsx",
-      "sha256": "4c99039a3f0189fb080f4dee407173673d4749bd6dca560d5aa7f33cc5615ad1",
-      "bytes": 5848
+      "sha256": "2107537ed6cf5fdfc34ce290175f63c33821df8fb645ccf7807c4d1b133462f8",
+      "bytes": 7061
     },
     {
       "path": "apps/web/src/components/ResearchLiveProgress.tsx",
@@ -873,8 +878,8 @@
     },
     {
       "path": "apps/web/src/components/ResultEvidencePanel.tsx",
-      "sha256": "46ac8d2966cfd8533ebae696ad7f232d1393d9d5da04d32d0b6fc9bab2fc7a11",
-      "bytes": 5106
+      "sha256": "897a8f56fef32d758bbe8a42e10dd2ed1af4b5a66a8cf3496e85068d40600598",
+      "bytes": 5396
     },
     {
       "path": "apps/web/src/components/ResultExample.tsx",
@@ -883,8 +888,8 @@
     },
     {
       "path": "apps/web/src/components/ResultScreen.test.tsx",
-      "sha256": "f8e0e257e0106bb792deb265842b461cb4263a7bba05b165e559278bb1b1c8a8",
-      "bytes": 11671
+      "sha256": "0933e4c6d988d3955de85e76118049fa2bd5f313c6e9acaa91101d6b9cb0245c",
+      "bytes": 11706
     },
     {
       "path": "apps/web/src/components/ReviewDialog.tsx",
@@ -930,6 +935,11 @@
       "path": "apps/web/src/components/StatusBadge.tsx",
       "sha256": "8ba883cf96879aa2254fd9d4919a4d33c0fc93d9e9bc77c8e653a58dc521c977",
       "bytes": 742
+    },
+    {
+      "path": "apps/web/src/components/SyntheticDataNotice.tsx",
+      "sha256": "df4bfdb7ce007d47e263a5920d317bd0b2d3b47bef3efdb718dc6724864bc659",
+      "bytes": 1093
     },
     {
       "path": "apps/web/src/components/TestActionDraft.test.tsx",
@@ -1278,8 +1288,8 @@
     },
     {
       "path": "apps/web/src/components/statusLabels.ts",
-      "sha256": "ae64b841f2787503a58fe55e44acc062651fd0c18612a4f5913b27dd98f62441",
-      "bytes": 9561
+      "sha256": "df8adae9511fb200d9cd52058c5e2d746a60ad3d0cea2e2aeab11380132fe612",
+      "bytes": 9569
     },
     {
       "path": "apps/web/src/components/testActionDraftText.ts",
@@ -1423,8 +1433,8 @@
     },
     {
       "path": "apps/web/src/workstation.css",
-      "sha256": "98455faba74c66ddd2589f44e0efab2a9eea7bc2540ddd8bc76aa84b894ff070",
-      "bytes": 58207
+      "sha256": "8f543e6734c2ab140a5b551cb7477fb0cd43a2844da67c1398dcc67b0f18acd5",
+      "bytes": 58339
     },
     {
       "path": "apps/web/timeline-preview.html",

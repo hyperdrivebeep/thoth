@@ -26,6 +26,12 @@ const result = (tests: Json[], conditions?: string[]) => {
   return copy as unknown as Record<string, unknown>;
 };
 const order = (html: string, names: string[]) => names.map(name => html.indexOf(name));
+// Gives the first hypotheses a statement (an empty string means none was written).
+const named = (value: Record<string, unknown>, statements: string[]) => {
+  const hypotheses = (value as unknown as { portfolio: { hypotheses: Json[] } }).portfolio.hypotheses;
+  statements.forEach((statement, at) => { hypotheses[at].statement = statement; });
+  return value;
+};
 const sorted = (positions: number[]) => positions.every((value, at) => value >= 0 && (at === 0 || value > positions[at - 1]));
 const section = (value: Record<string, unknown>) => renderToStaticMarkup(<TestOrderSection rows={hypothesisRows(value)} actions={[]}/>);
 
@@ -83,21 +89,30 @@ it("shows the model's refutation conditions apart, as an unconfirmed suggestion,
 });
 
 it("lists what each hypothesis is expected to give for a test, in words, with how many sources it rests on", async () => {
-  await mount(result([test("t1", "시험", rows([0, "나쁘다", ["span:a", "span:b"]], [1, "같다"], [2, "모름"]))]));
+  await mount(named(result([test("t1", "시험", rows([0, "나쁘다", ["span:a", "span:b"]], [1, "같다"], [2, "모름"]))]), ["탐지 정의 오류", "라벨 오류", "표본 부족"]));
   const text = card().querySelector("details.expected-results")!.textContent!;
   expect(text).toContain("각 가설의 예상 결과(AI 제안)");
-  expect(text).toContain("가설 1: 나쁘다 · 근거 2개");
-  expect(text).toContain("가설 2: 같다");
-  expect(text).toContain("가설 3: 모름");
+  expect(text).toContain("가설 1(탐지 정의 오류): 나쁘다 · 근거 2개");
+  expect(text).toContain("가설 2(라벨 오류): 같다");
+  expect(text).toContain("가설 3(표본 부족): 모름");
   expect(text).toContain("확률이나 점수가 아닙니다");
   expect(text).not.toMatch(LEAK);
 });
 
-it("marks a prediction that rests on no source, and leaves 모름 and sourced predictions as they were", async () => {
-  await mount(result([test("t1", "시험", rows([0, "나쁘다", ["span:a"]], [1, "같다"], [2, "모름"]))]));
+it("marks a prediction that no material confirmed, and leaves 모름 and sourced predictions as they were", async () => {
+  await mount(named(result([test("t1", "시험", rows([0, "나쁘다", ["span:a"]], [1, "같다"], [2, "모름"]))]), ["가", "나", "다"]));
   const lines = [...card().querySelectorAll("details.expected-results li")].map(item => item.textContent);
-  expect(lines).toEqual(["가설 1: 나쁘다 · 근거 1개", "가설 2: 같다 · 근거 없는 예측", "가설 3: 모름"]);
+  expect(lines).toEqual(["가설 1(가): 나쁘다 · 근거 1개", "가설 2(나): 같다 · 자료로 확인되지 않은 예상", "가설 3(다): 모름"]);
   expect(lines.join(" ")).not.toMatch(BANNED);
+});
+
+it("shortens a long hypothesis statement in the list and writes only the number when the statement is empty", async () => {
+  const long = "탐지 정의와 판정 기준이 서로 달라 같은 장면을 다르게 세는 오류가 생긴다고 보는 설명입니다";
+  await mount(named(result([test("t1", "시험", rows([0, "나쁘다", ["span:a"]], [1, "같다"], [2, "모름"]))]), [long, "", "표본 부족"]));
+  const lines = [...card().querySelectorAll("details.expected-results li")].map(item => item.textContent!);
+  expect(lines[0]).toBe(`가설 1(${long.slice(0, 39)}…): 나쁘다 · 근거 1개`);
+  expect(lines[1]).toBe("가설 2: 같다 · 자료로 확인되지 않은 예상");
+  expect(lines[2]).toBe("가설 3(표본 부족): 모름");
 });
 
 it("shows nothing of v3 on an old result", async () => {

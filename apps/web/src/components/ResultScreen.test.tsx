@@ -55,7 +55,7 @@ it("counts a value no rule covers as unclassified instead of guessing", () => {
 
 it("shows criteria fulfilled over the total, then the evidence-use groups, each criterion with its own fulfilment state", () => {
   const html = render(held, { coverageMatrix: coverage(iris) });
-  expect(html).toContain("기준 충족 0/7 · 확인 필요 7");
+  expect(html).toContain("답변 점검 항목 7개 중 충족 0 · 확인 필요 7");
   expect(html).not.toContain("근거 있음");
   expect(html).toContain("직접 사용 가능 1");
   expect(html).toContain("조건부·참고용 5");
@@ -72,8 +72,8 @@ it("puts the first-screen lines in the agreed order", () => {
   const at = (text: string) => html.indexOf(text);
   expect(at("결론 상태")).toBeGreaterThan(-1);
   expect(at("결론 상태")).toBeLessThan(at("근거 용도"));
-  expect(at("근거 용도")).toBeLessThan(at("기준 충족"));
-  expect(at("기준 충족")).toBeLessThan(at("반대 근거 탐색"));
+  expect(at("근거 용도")).toBeLessThan(at("답변 점검 항목"));
+  expect(at("답변 점검 항목")).toBeLessThan(at("반대 근거 탐색"));
   expect(at("반대 근거 탐색")).toBeLessThan(at("다음 확보"));
 });
 
