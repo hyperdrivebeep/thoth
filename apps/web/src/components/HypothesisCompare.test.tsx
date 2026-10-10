@@ -114,3 +114,23 @@ it("omits the unevaluated count when the answer's selected evidence list is unkn
   expect(cards()[0].textContent).not.toContain("대조 안 한");
   expect(node.querySelector("table.relation-table")).toBeNull();
 });
+it("shows the counter-evidence count when sources exist even though no search was recorded, and keeps the search state apart", async () => {
+  await mount(result(hyps => { hyps[0].counterevidence_refs = extra.slice(0, 3); }));
+  const text = cards()[0].textContent!;
+  expect(text).toContain("반박 3");
+  expect(text).not.toContain("반박 -");
+  expect(text).toContain("반대 근거 탐색 안 함"); // whether it was searched is a separate fact
+  expect(text).not.toContain("반박 근거를 찾지 못함");
+  expect(cards()[1].textContent).toContain("반박 -"); // nothing found and nothing searched stays a dash
+});
+
+it("shows a real zero and the not-found note for a finished search, and the count when it found some", async () => {
+  await mount(result(hyps => {
+    hyps[0].critical_review = { terminal: "UNRESOLVED_NO_RESULTS", reasons: ["x"] };
+    hyps[1].critical_review = { terminal: "UNRESOLVED_NO_RESULTS", reasons: ["x"] }; hyps[1].counterevidence_refs = extra.slice(0, 2);
+  }));
+  expect(cards()[0].textContent).toContain("반박 0");
+  expect(cards()[0].textContent).toContain("반박 근거를 찾지 못함 (지지된다는 뜻은 아닙니다)");
+  expect(cards()[1].textContent).toContain("반박 2");
+  expect(cards()[1].textContent).not.toContain("반박 근거를 찾지 못함");
+});

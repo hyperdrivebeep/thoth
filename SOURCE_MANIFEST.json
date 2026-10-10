@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-11T12:00:50.638112+00:00",
+  "created_at": "2026-10-11T12:00:51.533659+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -643,13 +643,13 @@
     },
     {
       "path": "apps/web/src/components/HypothesisCompare.test.tsx",
-      "sha256": "244d2a05a9cf656a840230fa670ced4f1e6a91952d2fc083c0575b7212366802",
-      "bytes": 7220
+      "sha256": "fcce6c8fd20a89b844518a0395a66cd8afc8f334bb60d6fbfe2cd61234d8de8f",
+      "bytes": 8536
     },
     {
       "path": "apps/web/src/components/HypothesisCompare.tsx",
-      "sha256": "e12e92e2c125ae7628ec599e12515b9d5dd34078096a65e3a17334445e7f3d70",
-      "bytes": 9372
+      "sha256": "ce858c804b4a1b266320f812270bb6efc6628ab39456ff8d162254fe0bc9490d",
+      "bytes": 9398
     },
     {
       "path": "apps/web/src/components/HypothesisCompareDraft.test.tsx",
@@ -888,8 +888,8 @@
     },
     {
       "path": "apps/web/src/components/ResultScreen.test.tsx",
-      "sha256": "0933e4c6d988d3955de85e76118049fa2bd5f313c6e9acaa91101d6b9cb0245c",
-      "bytes": 11706
+      "sha256": "1794413e19a4604e2a614d6b9f91123c177a17a91d82334ab131e3d02be05a2a",
+      "bytes": 12825
     },
     {
       "path": "apps/web/src/components/ReviewDialog.tsx",
@@ -1208,8 +1208,8 @@
     },
     {
       "path": "apps/web/src/components/hypothesisView.ts",
-      "sha256": "b44f62a2a2f4fea84b3c515770172f8c83243b78f24a6b425dbb4eed733890b3",
-      "bytes": 4319
+      "sha256": "a98e0ff4289c89f57fb7f599b137f77f7d7a197d974657aca1b567b4dc7f6d9a",
+      "bytes": 4530
     },
     {
       "path": "apps/web/src/components/judgmentRecordText.test.ts",

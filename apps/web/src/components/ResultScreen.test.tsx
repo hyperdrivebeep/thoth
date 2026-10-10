@@ -91,6 +91,22 @@ it("shows refutation 0 only for a finished search", () => {
   expect(html).not.toContain("반박 -");
 });
 
+it("counts the counter-evidence of every hypothesis on the answer line, searched or not", () => {
+  const withCounter = (searchedFirst: boolean) => {
+    const copy = structuredClone(held) as { portfolio: { hypotheses: Record<string, unknown>[] } };
+    copy.portfolio.hypotheses[0].counterevidence_refs = ["span:c1", "span:c2", "span:c3"];
+    copy.portfolio.hypotheses[1].counterevidence_refs = ["span:c4"];
+    if (searchedFirst) copy.portfolio.hypotheses[0].critical_review = { terminal: "UNRESOLVED_NO_RESULTS" };
+    return copy as unknown as Record<string, unknown>;
+  };
+  const none = render(withCounter(false), { coverageMatrix: coverage(iris) });
+  expect(none).toContain("반대 근거 탐색: 안 함 · 반박 4");
+  expect(none).not.toContain("반박 -");
+  const some = render(withCounter(true), { coverageMatrix: coverage(iris) });
+  const total = (held as unknown as { portfolio: { hypotheses: unknown[] } }).portfolio.hypotheses.length;
+  expect(some).toContain(`반대 근거 탐색: 1/${total}개 가설 · 반박 4`); // the count covers every hypothesis, the N/M part only the searched ones
+});
+
 it("picks the Korean next-step text from the action type and keeps the English server label out of view", () => {
   const html = render(held, { coverageMatrix: coverage(iris), progressSummary: progress(action("REVIEW_GAPS", "Review unresolved evidence gaps")) });
   const visible = html.replace(/<details[\s\S]*?<\/details>/g, "");

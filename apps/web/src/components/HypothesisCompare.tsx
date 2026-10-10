@@ -63,7 +63,7 @@ export function HypothesisCompare({ result, review, projectId, links, distributi
       <p className="counter-state">{row.counterTerminal ? `반대 근거 탐색: ${counterReviewLabel(row.counterTerminal)}` : "반대 근거 탐색 안 함"}</p>
       {row.counterTerminal && row.counter.length === 0 && <p className="muted">반박 근거를 찾지 못함 (지지된다는 뜻은 아닙니다)</p>}
       <div className="hypothesis-counts">
-        <Tag minimal intent="success">뒷받침 {row.support.length}</Tag>{" · "}<Tag minimal intent="danger">반박 {row.counterTerminal ? row.counter.length : "-"}</Tag>
+        <Tag minimal intent="success">뒷받침 {row.support.length}</Tag>{" · "}<Tag minimal intent="danger">반박 {row.counter.length > 0 || row.counterTerminal ? row.counter.length : "-"}</Tag>
         {row.unevaluated !== null && <>{" · "}<Tag minimal>아직 대조 안 한 근거 {row.unevaluated}/{selected?.length}</Tag></>}
       </div>
       <h4>반대 근거를 찾을 질문</h4>{row.counterQueries.map((query, j) => <p key={j}>{query}</p>)}
