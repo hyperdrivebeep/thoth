@@ -31,6 +31,11 @@ export function resultContentKey(value: unknown): string {
   if (value !== null && typeof value === "object") return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${resultContentKey((value as Record<string, unknown>)[key])}`).join(",")}}`;
   return JSON.stringify(value) ?? "null";
 }
+/** The screen may show a summary view of the stored result: every key it shows must be in the stored result with the
+ * same value, and a key it leaves out is taken as left out by the summary. A key the stored result does not have is not. */
+function isShownPartOf(shown: Record<string, unknown>, stored: Record<string, unknown>): boolean {
+  return Object.entries(shown).every(([key, value]) => Object.hasOwn(stored, key) && resultContentKey(value) === resultContentKey(stored[key]));
+}
 function mismatch(): never { throw new Error("선택한 답변과 근거의 연결을 확인하지 못했습니다. 답변을 다시 확인해 주세요."); }
 
 function answerContent(value: Record<string, unknown>, thread: string, epoch: unknown, terminal: unknown) {
@@ -56,12 +61,13 @@ async function read(selection: ResultSelection, displayed: Record<string, unknow
   if (!value.manifest || !value.result_revision_digest) throw new Error("이 답변의 저장 버전과 근거 목록을 확인하지 못했습니다.");
   if (value.request.project_id !== scope.projectId || value.request.thread_id !== scope.threadId || value.request.operation_id !== selection.operationId || !value.result) mismatch();
   const manifest = manifestSchema.parse(value.manifest);
-  const displayedContent = resultContentKey(answerContent(displayed, scope.threadId, value.request.request_epoch, value.manifest.terminal_reason));
-  const resultContent = resultContentKey(answerContent(value.result, scope.threadId, value.request.request_epoch, value.manifest.terminal_reason));
-  const manifestContent = resultContentKey(answerContent(manifest.result, scope.threadId, value.request.request_epoch, value.manifest.terminal_reason));
+  const displayedContent = answerContent(displayed, scope.threadId, value.request.request_epoch, value.manifest.terminal_reason);
+  const resultBody = answerContent(value.result, scope.threadId, value.request.request_epoch, value.manifest.terminal_reason);
+  const manifestBody = answerContent(manifest.result, scope.threadId, value.request.request_epoch, value.manifest.terminal_reason);
   if (manifest.operation_id !== selection.operationId || manifest.request_ref.project_id !== scope.projectId ||
       manifest.request_ref.entity_type !== "THREAD" || manifest.request_ref.entity_id !== `request:${scope.threadId}` ||
-      manifest.request_ref.revision_digest !== scope.requestDigest || resultContent !== displayedContent || manifestContent !== displayedContent) mismatch();
+      manifest.request_ref.revision_digest !== scope.requestDigest ||
+      resultContentKey(resultBody) !== resultContentKey(manifestBody) || !isShownPartOf(displayedContent, manifestBody)) mismatch();
   return { value, manifest };
 }
 
