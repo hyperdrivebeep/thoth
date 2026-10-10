@@ -87,3 +87,27 @@ it("binds the historical manifest body without requiring operation-only envelope
   await expect(readResultEvidence(selection, { ...partial.result, thread_id: "foreign" }, { offset: 0 })).rejects.toThrow();
   await expect(readResultEvidence(selection, { ...partial.result, request_epoch: 999 }, { offset: 0 })).rejects.toThrow();
 });
+
+it("reads the evidence when the screen shows a summary view that left some keys out", async () => {
+  const full = { ...partial.result, coverage: { rows: 3 }, requirements: ["r1"], source_packet: { spans: [1, 2] } };
+  vi.mocked(rpc).mockImplementation(async (_method, args) => evidenceResponse(Number(args.selected_evidence_offset ?? 0), args.include_selected_evidence === true, full));
+  // the displayed result is the stored one without the heavy keys, wrapper keys kept
+  expect((await readResultEvidence(selection, partial.result, { offset: 0 })).selected_count).toBe(149);
+  const { contract_version: _contract, ...withoutWrapperKey } = partial.result;
+  void _contract;
+  expect((await readResultEvidence(selection, withoutWrapperKey, { offset: 0 })).selected_count).toBe(149);
+  expect((await readResultEvidence(selection, full, { offset: 0 })).selected_count).toBe(149);
+});
+it("still rejects a displayed value that differs, or a key the stored result does not have", async () => {
+  const full = { ...partial.result, coverage: { rows: 3 } };
+  vi.mocked(rpc).mockImplementation(async (_method, args) => evidenceResponse(Number(args.selected_evidence_offset ?? 0), args.include_selected_evidence === true, full));
+  await expect(readResultEvidence(selection, { ...partial.result, answer: "another answer" }, { offset: 0 })).rejects.toThrow("연결을 확인하지 못했습니다");
+  await expect(readResultEvidence(selection, { ...partial.result, coverage: { rows: 4 } }, { offset: 0 })).rejects.toThrow("연결을 확인하지 못했습니다");
+  await expect(readResultEvidence(selection, { ...partial.result, invented_key: 1 }, { offset: 0 })).rejects.toThrow("연결을 확인하지 못했습니다");
+});
+it("still needs the server's own result and the manifest to be the same whole", async () => {
+  const response = evidenceResponse(0, true, { ...partial.result, coverage: { rows: 3 } });
+  response.value.manifest.result = { ...partial.result };
+  vi.mocked(rpc).mockResolvedValue(response);
+  await expect(readResultEvidence(selection, partial.result, { offset: 0 })).rejects.toThrow("연결을 확인하지 못했습니다");
+});
