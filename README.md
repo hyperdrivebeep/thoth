@@ -15,6 +15,7 @@
 
 <p align="center">
   <a href="#quick-start">Get started</a> ·
+  <a href="#see-it-work">Screens</a> ·
   <a href="#what-you-can-do">Features</a> ·
   <a href="docs/VERIFICATION.md">Verification</a> ·
   <a href="CONTRIBUTING.md">Contribute</a><br>
@@ -38,7 +39,42 @@ see what remains unresolved, and compare two saved results before deciding what 
 > **Experimental source preview for personal/local use.** The interface is Korean-first.
 > Focused feature checks passed; the latest repository-wide verification is not passing. See the verification limits below.
 > **2026-09-29 update:** isolated model authentication and restart recovery are included. Real-provider analysis and a current-source FULL pass remain unverified. Claude sign-in goes through the official Claude Code executable and has not been checked with a real account.
+> **2026-10-11:** one real model investigation on the synthetic radar demo ran end to end ([screens](#see-it-work)). Answer quality has not been evaluated.
 > See [status and limits](#status) before relying on a result.
+
+## See it work
+
+A real run on the bundled [synthetic radar demo](examples/synthetic-radar-demo-v1): invented data, not measurements.
+One model investigation took about 9 minutes 40 seconds. Screens are from a 2026-10-11 development build, so a few
+labels may differ slightly from `main`.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/01-trace-verdict.png" alt="Trace table after importing rain results: Detection rate in rain changes from held to below the criterion."></td>
+    <td width="50%"><img src="docs/screenshots/02-question.png" alt="The investigation question is filled in from the failing trace row."></td>
+  </tr>
+  <tr>
+    <td><b>1 · A result misses its criterion.</b> Import results into the trace table. Verdicts are computed by rules, not by the model: 0.80 against "0.90 or higher" becomes <i>below criterion</i>.</td>
+    <td><b>2 · Ask why, from that row.</b> "원인 조사" on the failing row writes the question with the measured value and the criterion.</td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/03-progress.png" alt="Live progress: the model reports which connected file and line it is checking."></td>
+    <td><img src="docs/screenshots/04-answer.png" alt="Answer separating confirmed facts from a held judgment and listing discriminating tests."></td>
+  </tr>
+  <tr>
+    <td><b>3 · Watch it read your material.</b> Progress names the connected file and line being checked.</td>
+    <td><b>4 · Get a held answer, not a guess.</b> Confirmed facts stay apart from the judgment that remains open; each candidate cause comes with a test that could tell it apart.</td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/05-hypotheses.png" alt="Hypothesis comparison showing what each hypothesis predicts for a test, marked as an AI suggestion."></td>
+    <td><img src="docs/screenshots/06-evidence.png" alt="Source evidence panel: searching 0.80 finds line 15 of the connected result file."></td>
+  </tr>
+  <tr>
+    <td><b>5 · Compare hypotheses.</b> For each test, see what every hypothesis would predict. These are marked as unconfirmed AI suggestions.</td>
+    <td><b>6 · Check the source line.</b> Search the evidence panel for "0.80" and land on the exact line of the connected file.</td>
+  </tr>
+</table>
+
 
 ## What you can do
 
