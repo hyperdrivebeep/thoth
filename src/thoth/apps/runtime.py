@@ -570,7 +570,7 @@ def create_runtime(
         registry.register("field/export/build", field_measurement_handlers.export_build)
         registry.register("projectpack/list", projectpack_handlers.list)
         registry.register("projectpack/run", projectpack_handlers.run)
-        register_project_methods(registry, project_handlers)
+        register_project_methods(registry, project_handlers, stores)
         register_closure_and_export_methods(
             registry, lifecycle_handlers, closure_handlers, export_handlers
         )

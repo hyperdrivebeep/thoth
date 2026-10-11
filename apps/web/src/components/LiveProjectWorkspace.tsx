@@ -30,6 +30,7 @@ import { isHttpUrl, sourceCardHost, sourceCardTitle } from "../sourceDisplay";
 import { eyebrowLabel } from "./statusLabels";
 import { WorkspaceErrorBoundary } from "./WorkspaceErrorBoundary";
 import { ConversationTimeline } from "./ConversationTimeline";
+import { ArchivedProjects } from "./ArchivedProjects";
 import { ResearchComposer } from "./ResearchComposer";
 import { ResearchSidePanel, type SidePanelTab } from "./ResearchSidePanel";
 import { TracePage } from "./TracePage";
@@ -187,16 +188,17 @@ function ProjectNavItem({ project, active, removing, onOpen, onRemove }: {
   </div>;
 }
 
-export function ProjectLanding({ projects, loading = false, contextRestoreIssue = null, setupIssue = null, onOpen, onCreated }: {
+export function ProjectLanding({ projects, loading = false, contextRestoreIssue = null, setupIssue = null, onOpen, onCreated, openCreate = false, onOpenCreateHandled }: {
   projects: ProjectSummary[];
   loading?: boolean;
   contextRestoreIssue?: "CORRUPT" | "UNAVAILABLE" | null;
   setupIssue?: WorkspaceSetupIssue | null;
   onOpen: (projectId: string) => void;
-  onCreated: (projectId: string) => void;
+  onCreated: (projectId: string) => void; openCreate?: boolean; onOpenCreateHandled?: () => void;
 }) {
   const [creating,setCreating] = useState(false);
   useEffect(()=>{if(!loading&&projects.length===0)setCreating(true);},[loading,projects.length]);
+  useEffect(()=>{if(openCreate){setCreating(true);onOpenCreateHandled?.();}},[openCreate,onOpenCreateHandled]);
   const restoreNotice = contextRestoreIssue && <Callout compact intent="warning" role="alert">{contextRestoreIssue === "CORRUPT"
     ? "마지막 작업 위치 기록을 읽지 못했습니다. 원본을 자동 삭제하지 않았습니다."
     : "이 브라우저의 마지막 작업 위치를 읽지 못했습니다. 저장소 접근과 작업 공간 식별자를 확인하세요."}
@@ -223,6 +225,7 @@ export function LiveProjectWorkspace() {
   const [selectionVersion,setSelectionVersion] = useState(0);
   const [rowOrigin,setRowOrigin] = useState<RowOrigin|null>(null);
   const [traceFocus,setTraceFocus] = useState<TraceRowRef|null>(null);
+  const [openCreate,setOpenCreate] = useState(false);
   const epoch = useRef(0);
   const previousScope = useRef<string | null>(null);
   const pendingAdmission = useRef<string | null>(null);
@@ -316,7 +319,7 @@ export function LiveProjectWorkspace() {
     },
   });
   const removeProject = (target: ProjectSummary) => {
-    if (!window.confirm(`프로젝트 "${target.name}"을 목록에서 제거할까요? 데이터는 보관되고 기본 목록에서 숨겨집니다.`)) return;
+    if (!window.confirm(`프로젝트 "${target.name}"을 보관할까요? 보관하면 읽기 전용이 되고 목록에서 숨겨집니다. '보관한 프로젝트 보기'에서 되살릴 수 있습니다.`)) return;
     archiveProject.mutate(target);
   };
   if (readyQuery.isPending || (readyQuery.isSuccess && !ready)) {
@@ -356,7 +359,7 @@ export function LiveProjectWorkspace() {
   }
   return <main className="workstation conversation-workstation bp6-dark">
     <aside className="navigation-rail"><div className="brand"><div className="brand-mark"><Icon icon="layout-grid" size={20}/></div><div><strong>THOTH</strong><span>RESEARCH WORKSTATION</span></div><Tag minimal>{hosted ? "REVIEW" : "LOCAL"}</Tag></div>
-      <Button icon="plus" intent="primary" className="new-project-button" onClick={()=>chooseProject("")}>새 프로젝트</Button>
+      <Button icon="plus" intent="primary" className="new-project-button" onClick={()=>{chooseProject("");setOpenCreate(true);}}>새 프로젝트</Button>
       <InputGroup small leftIcon="search" aria-label="프로젝트 검색" placeholder="프로젝트 찾기…" value={search} onChange={event=>setSearch(event.target.value)}/>
       <section className="nav-section"><div className="nav-section-heading"><p className="nav-label">PROJECTS</p><Button small minimal icon="refresh" aria-label="프로젝트 목록 새로고침" onClick={()=>void projectsQuery.refetch()}/></div>
         {visibleProjects.filter(item=>`${item.name} ${item.project_id}`.toLowerCase().includes(search.toLowerCase())).flatMap(item=>[
@@ -370,7 +373,7 @@ export function LiveProjectWorkspace() {
             {!threadsQuery.isPending&&!threadsQuery.error&&threads.length===0&&<p className="empty-copy">첫 질문을 보내면 이 프로젝트 아래 세션이 생깁니다.</p>}
           </div> : null,
         ])}
-        {!projectsQuery.isPending&&!projectsQuery.error&&projects.length===0&&<p className="empty-copy">아직 프로젝트가 없습니다.</p>}
+        {!projectsQuery.isPending&&!projectsQuery.error&&projects.length===0&&<p className="empty-copy">아직 프로젝트가 없습니다.</p>}<ArchivedProjects scopeKey={scopeKey}/>
       </section>
       <div className="sidebar-bottom"><Button minimal alignText="left" icon={hosted?"info-sign":"settings"} onClick={()=>setPage("settings")}>{hosted?"운영 정보":"설정 · 로컬 도구"}</Button></div>
     </aside>
@@ -383,7 +386,7 @@ export function LiveProjectWorkspace() {
       onUserInput={cancelOpenLatest} onAdmitted={threadId=>{pendingAdmission.current=threadId;setContext(current=>({...current,threadId}));}}
       rowOrigin={rowOrigin} onOriginDone={()=>setRowOrigin(null)} onInvestigate={investigate} traceFocus={traceFocus} onOpenTrace={openTraceRow}/></WorkspaceErrorBoundary> :
       isTimelineExampleRequested() && page === "research" ? <TimelineExamplePane /> :
-      <section className="workspace-content">{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?"저장된 프로젝트를 현재 목록에서 확인하지 못해 선택을 비웠습니다.":"저장된 작업 선택 확인 필요"} 저장된 초안은 자동 제출하지 않습니다.</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">이 브라우저에 마지막 작업 위치를 저장하지 못했습니다. 재시작 후 자동 복원이 제한될 수 있습니다.</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">워크스페이스 식별자를 확인하지 못해 브라우저 재시작용 초안 저장을 사용할 수 없습니다.</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title="프로젝트를 선택하세요">운영 정보와 사용 현황은 프로젝트를 선택한 뒤 확인할 수 있습니다.</Callout>:<section className="detail-card"><h2>모델 연결</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">프로젝트별 기본 모델은 프로젝트를 선택한 뒤 설정합니다.</p></section>}</>:<ProjectLanding contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</section>}
+      <section className="workspace-content">{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?"저장된 프로젝트를 현재 목록에서 확인하지 못해 선택을 비웠습니다.":"저장된 작업 선택 확인 필요"} 저장된 초안은 자동 제출하지 않습니다.</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">이 브라우저에 마지막 작업 위치를 저장하지 못했습니다. 재시작 후 자동 복원이 제한될 수 있습니다.</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">워크스페이스 식별자를 확인하지 못해 브라우저 재시작용 초안 저장을 사용할 수 없습니다.</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title="프로젝트를 선택하세요">운영 정보와 사용 현황은 프로젝트를 선택한 뒤 확인할 수 있습니다.</Callout>:<section className="detail-card"><h2>모델 연결</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">프로젝트별 기본 모델은 프로젝트를 선택한 뒤 설정합니다.</p></section>}</>:<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</section>}
   </main>;
 }
 

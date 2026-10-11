@@ -15,6 +15,7 @@ import { ResearchResultCard, type ResearchDetail } from "./ResearchResultCard";
 import { ResearchLiveProgress } from "./ResearchLiveProgress";
 import { resultUsageLine } from "./resultUsage";
 import { useHypothesisLinks } from "./useHypothesisLinks";
+import { SyntheticDataNotice } from "./SyntheticDataNotice";
 
 export function ConversationTimeline({ projectId, threadId, status, sourceUris, onDetail, onContinue, onOpenHistory, onOpenTrace, onRetry, onResume, resuming = false, queuedInstruction = false }: {
   projectId: string; threadId: string; status?: ResearchStatus; sourceUris?: string[]; queuedInstruction?: boolean;
@@ -66,6 +67,7 @@ export function ConversationTimeline({ projectId, threadId, status, sourceUris, 
   const resumeOperation = liveStatus?.request?.operation_id;
   const emptyExistingThread = Boolean(threadId && query.data && turns.length === 0 && !currentQuestion && !running);
   return <section className="conversation-timeline" aria-label="연구 대화">
+    {!example && <SyntheticDataNotice projectId={projectId}/>}
     {query.hasNextPage && <Button minimal loading={query.isFetchingNextPage} onClick={() => void query.fetchNextPage()}>이전 대화 불러오기</Button>}
     {query.error && <Callout intent="warning" role="alert">{query.data ? "대화를 다시 확인하지 못했습니다. 마지막으로 불러온 답변을 표시하며, 최신 상태는 확인되지 않았습니다. " : "대화를 불러오지 못했습니다. "}<Button small onClick={() => void query.refetch()}>다시 읽기</Button></Callout>}
     {query.data?.pages.some(page => page.limited) && <Callout compact>조회 범위를 넘는 과거 이력이 있습니다. 기록에서 확인할 수 있습니다.</Callout>}

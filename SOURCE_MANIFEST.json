@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-11T11:42:23.815981+00:00",
+  "created_at": "2026-10-11T12:00:52.485237+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -348,13 +348,13 @@
     },
     {
       "path": "apps/web/src/api/resultEvidence.test.ts",
-      "sha256": "5fc6731dbfa58e9e68dd93c7ea73b06119285d627b8fba117ae44b2b8a25b309",
-      "bytes": 5943
+      "sha256": "4ce2f6102016c86ad2d1881c0362ecb458502d5045cf2274b4b15d64b9bb9e07",
+      "bytes": 8096
     },
     {
       "path": "apps/web/src/api/resultEvidence.ts",
-      "sha256": "2ec47763b71b7afadbf596d1324c8e3e38d0c7266ce0d952e967cb4702b86d3a",
-      "bytes": 7869
+      "sha256": "badd582b14dc01f2ce422756700d72310948ac032ccd5a4b5a665b2e1a3a85b0",
+      "bytes": 8343
     },
     {
       "path": "apps/web/src/api/resultEvidenceIdentity.test.ts",
@@ -458,8 +458,8 @@
     },
     {
       "path": "apps/web/src/components/AnswerHold.tsx",
-      "sha256": "e682f1265361256d4f5e433fa4e7098eba2e094c87fc38c9ce597019f9ccfb6e",
-      "bytes": 1561
+      "sha256": "887d4b5bd9396f712536ba523b6ce13f2005d68b010da156dab94afcb01f51fb",
+      "bytes": 1590
     },
     {
       "path": "apps/web/src/components/AnswerReadability.test.tsx",
@@ -480,6 +480,11 @@
       "path": "apps/web/src/components/ApprovalSection.tsx",
       "sha256": "60e8441c6af7d4971832fb1cc6eebb18b0fa2d603028644b974d86c01982cace",
       "bytes": 3590
+    },
+    {
+      "path": "apps/web/src/components/ArchivedProjects.tsx",
+      "sha256": "0acefdc9d1ba41463f2b7017240971291e85f050b1fec813946437b7b3afcce4",
+      "bytes": 2392
     },
     {
       "path": "apps/web/src/components/AuditTrail.tsx",
@@ -543,13 +548,13 @@
     },
     {
       "path": "apps/web/src/components/ContractV3Screens.test.tsx",
-      "sha256": "ac7213a8ddf9973cc5c3afd1b905dd1866e05a3af8b385e942b37c2ec4a87f77",
-      "bytes": 7243
+      "sha256": "cc58a42347636f4d117d503d4f7495606cff79c5541327049f6ff543104ffdc0",
+      "bytes": 8555
     },
     {
       "path": "apps/web/src/components/ConversationTimeline.tsx",
-      "sha256": "48dc6fce194ebaa7bbea234f394edf74a5cb193754d77383e05558376d7362e3",
-      "bytes": 10085
+      "sha256": "2cea7be6a13f3a518f5ea28b9362e55f2f447fa6ef7844c3c3014bc43feba333",
+      "bytes": 10209
     },
     {
       "path": "apps/web/src/components/ConversationTimelineDeniedRetention.test.tsx",
@@ -568,8 +573,13 @@
     },
     {
       "path": "apps/web/src/components/ConversationTimelineRefetch.test.tsx",
-      "sha256": "3ca5886e9bbbe3c46d2b28723afe42898f8fd1347862d5a1502faf88b2e3bf12",
-      "bytes": 7547
+      "sha256": "cc09437334807466bc778342d6c8b3668af40492617b4660dc560aab0d69411e",
+      "bytes": 7602
+    },
+    {
+      "path": "apps/web/src/components/ConversationTimelineSynthetic.test.tsx",
+      "sha256": "68980715c34e1c3bea9d28dbd8bfb278defdcab6e104ba84a0a5ef5e35d9f502",
+      "bytes": 3886
     },
     {
       "path": "apps/web/src/components/Disclosure.tsx",
@@ -618,8 +628,8 @@
     },
     {
       "path": "apps/web/src/components/ExpectedResults.tsx",
-      "sha256": "3d0fdcae3969e2b8926316bf1196947c5c490c88164888b3f4ccc261bcba27d4",
-      "bytes": 1275
+      "sha256": "3de49d9ded39f4d7acd164d4296ec7de3b43cb87ad1a15ddc2e6e43cba0e4e68",
+      "bytes": 1547
     },
     {
       "path": "apps/web/src/components/FileConnectionPanel.tsx",
@@ -638,13 +648,13 @@
     },
     {
       "path": "apps/web/src/components/HypothesisCompare.test.tsx",
-      "sha256": "efd9ebb1f547365b188d4d0c34efb93dc945676eca6baaeb316ecfd7476dd818",
-      "bytes": 6869
+      "sha256": "fcce6c8fd20a89b844518a0395a66cd8afc8f334bb60d6fbfe2cd61234d8de8f",
+      "bytes": 8536
     },
     {
       "path": "apps/web/src/components/HypothesisCompare.tsx",
-      "sha256": "71e230152818510e92a1e0ff33043e72ed8e7e0fd1bb082c0a97ec8196eba28b",
-      "bytes": 9156
+      "sha256": "ce858c804b4a1b266320f812270bb6efc6628ab39456ff8d162254fe0bc9490d",
+      "bytes": 9398
     },
     {
       "path": "apps/web/src/components/HypothesisCompareDraft.test.tsx",
@@ -693,8 +703,8 @@
     },
     {
       "path": "apps/web/src/components/HypothesisScreen.test.tsx",
-      "sha256": "1d3f68fd3458e5a1b384c4f5f6d671ebae1c1abded92720bc966628f63edda02",
-      "bytes": 10645
+      "sha256": "ddf07819291960009011f0a3b7b9cbe139301af2461b125f5ec88a72542d5499",
+      "bytes": 10655
     },
     {
       "path": "apps/web/src/components/LessonRecall.test.tsx",
@@ -713,8 +723,8 @@
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspace.tsx",
-      "sha256": "09114b62bea55d41764f811fa38932b92bb97d5e6a8b4f330afb99db50fed028",
-      "bytes": 42864
+      "sha256": "24764098e6ce17bcd6441a41b8d40894cc67f5bff95baca651dd09e8d06dfd91",
+      "bytes": 43374
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspaceConsent.test.tsx",
@@ -748,8 +758,8 @@
     },
     {
       "path": "apps/web/src/components/ModelSettings.test.tsx",
-      "sha256": "2a12649f0a89d9a3ba3cba7d5b6500680dbb5ba81e0079991695bbc1a2614b00",
-      "bytes": 23318
+      "sha256": "da9d04a0670973eb67d99da7cf1b4a4c59ce824be5160dd59395ce1489219ce5",
+      "bytes": 23343
     },
     {
       "path": "apps/web/src/components/ModelSettings.tsx",
@@ -760,6 +770,11 @@
       "path": "apps/web/src/components/OAuthLoginFlow.tsx",
       "sha256": "a94bc861fcb5403c5575f0424bcdf9f6548feb87d1b8eac090415d6a31829293",
       "bytes": 19518
+    },
+    {
+      "path": "apps/web/src/components/ProjectArchiveRestore.test.tsx",
+      "sha256": "0c4a5e09c15eebc5e65b228b9cf35eb0827a7421976add249b2ff0457ae75d6e",
+      "bytes": 7820
     },
     {
       "path": "apps/web/src/components/ProjectLanding.test.tsx",
@@ -833,18 +848,18 @@
     },
     {
       "path": "apps/web/src/components/ResearchEvidenceDetail.test.tsx",
-      "sha256": "9b2e1573fa475382ba29a6af339263c29200e9971f2759a7dfb8874d392fa4d2",
-      "bytes": 10627
+      "sha256": "db7715c70ee563e82544944ea955b339ab1224b8de32ba9bd70398b68856601d",
+      "bytes": 10927
     },
     {
       "path": "apps/web/src/components/ResearchFollowupSummary.tsx",
-      "sha256": "dcf25f66a3e2ed86978828551022df13e51292c733f57dc5b9aef6bbc8492c0b",
-      "bytes": 10005
+      "sha256": "008da642697cd4cfa493399095768704d236f8b747199743e972d50899cc731b",
+      "bytes": 10033
     },
     {
       "path": "apps/web/src/components/ResearchHold.test.tsx",
-      "sha256": "4c99039a3f0189fb080f4dee407173673d4749bd6dca560d5aa7f33cc5615ad1",
-      "bytes": 5848
+      "sha256": "2107537ed6cf5fdfc34ce290175f63c33821df8fb645ccf7807c4d1b133462f8",
+      "bytes": 7061
     },
     {
       "path": "apps/web/src/components/ResearchLiveProgress.tsx",
@@ -873,8 +888,8 @@
     },
     {
       "path": "apps/web/src/components/ResultEvidencePanel.tsx",
-      "sha256": "46ac8d2966cfd8533ebae696ad7f232d1393d9d5da04d32d0b6fc9bab2fc7a11",
-      "bytes": 5106
+      "sha256": "897a8f56fef32d758bbe8a42e10dd2ed1af4b5a66a8cf3496e85068d40600598",
+      "bytes": 5396
     },
     {
       "path": "apps/web/src/components/ResultExample.tsx",
@@ -883,8 +898,8 @@
     },
     {
       "path": "apps/web/src/components/ResultScreen.test.tsx",
-      "sha256": "f8e0e257e0106bb792deb265842b461cb4263a7bba05b165e559278bb1b1c8a8",
-      "bytes": 11671
+      "sha256": "1794413e19a4604e2a614d6b9f91123c177a17a91d82334ab131e3d02be05a2a",
+      "bytes": 12825
     },
     {
       "path": "apps/web/src/components/ReviewDialog.tsx",
@@ -930,6 +945,11 @@
       "path": "apps/web/src/components/StatusBadge.tsx",
       "sha256": "8ba883cf96879aa2254fd9d4919a4d33c0fc93d9e9bc77c8e653a58dc521c977",
       "bytes": 742
+    },
+    {
+      "path": "apps/web/src/components/SyntheticDataNotice.tsx",
+      "sha256": "df4bfdb7ce007d47e263a5920d317bd0b2d3b47bef3efdb718dc6724864bc659",
+      "bytes": 1093
     },
     {
       "path": "apps/web/src/components/TestActionDraft.test.tsx",
@@ -1198,8 +1218,8 @@
     },
     {
       "path": "apps/web/src/components/hypothesisView.ts",
-      "sha256": "b44f62a2a2f4fea84b3c515770172f8c83243b78f24a6b425dbb4eed733890b3",
-      "bytes": 4319
+      "sha256": "a98e0ff4289c89f57fb7f599b137f77f7d7a197d974657aca1b567b4dc7f6d9a",
+      "bytes": 4530
     },
     {
       "path": "apps/web/src/components/judgmentRecordText.test.ts",
@@ -1278,8 +1298,8 @@
     },
     {
       "path": "apps/web/src/components/statusLabels.ts",
-      "sha256": "ae64b841f2787503a58fe55e44acc062651fd0c18612a4f5913b27dd98f62441",
-      "bytes": 9561
+      "sha256": "df8adae9511fb200d9cd52058c5e2d746a60ad3d0cea2e2aeab11380132fe612",
+      "bytes": 9569
     },
     {
       "path": "apps/web/src/components/testActionDraftText.ts",
@@ -1423,8 +1443,8 @@
     },
     {
       "path": "apps/web/src/workstation.css",
-      "sha256": "98455faba74c66ddd2589f44e0efab2a9eea7bc2540ddd8bc76aa84b894ff070",
-      "bytes": 58207
+      "sha256": "267ede96732993f45f0e2e790555d5645322065580145536ca81cbc9a2a10256",
+      "bytes": 58447
     },
     {
       "path": "apps/web/timeline-preview.html",
@@ -1458,8 +1478,8 @@
     },
     {
       "path": "config/atomicity-paths.json",
-      "sha256": "7942ea74409013ca29f7cfd7bb4eddeda8e24486af54465a9b93cc585741e1f3",
-      "bytes": 3325795
+      "sha256": "bf9e73eebbaf8293b9afdcbb938eaa039afb2eeefa3e4ae63b9375ec2b7cabb5",
+      "bytes": 3331085
     },
     {
       "path": "config/atomicity-requirements.json",
@@ -1698,8 +1718,8 @@
     },
     {
       "path": "docs/architecture/rpc-method-catalog.md",
-      "sha256": "fbbf54d025d85e73ae93a32dc071de988ea87c5e554ea7461d58cdd434d06a85",
-      "bytes": 14166
+      "sha256": "c4fa7fb1183ff70cd5c1c79a7fc3099caaddbb5cac5ffd4f51e63524f008ec33",
+      "bytes": 14182
     },
     {
       "path": "docs/architecture/user-activity-projection.md",
@@ -2448,8 +2468,8 @@
     },
     {
       "path": "schemas/protocol/public-method-catalog.json",
-      "sha256": "9c8e14688ccd2bc92bc2487213c7dd4fbe2cd625572a0673f1f2282a7b29e95a",
-      "bytes": 157952
+      "sha256": "8a74465cef7448dd9315aec0d496cfba39685e6f5e693b059655cf079689e5e4",
+      "bytes": 158337
     },
     {
       "path": "schemas/protocol/restore-apply-input.schema.json",
@@ -3628,8 +3648,8 @@
     },
     {
       "path": "src/thoth/adapters/storage/projects.py",
-      "sha256": "c71c056c3a4937adc624f7b14c6f814f678ce908025eef8a9be1cae2d2d46505",
-      "bytes": 5271
+      "sha256": "1ca1ba845696b29ea386a88cde1e826008a40791ed552c9a3e2c405a21668ca1",
+      "bytes": 5871
     },
     {
       "path": "src/thoth/adapters/storage/receipt_dag.py",
@@ -3738,8 +3758,8 @@
     },
     {
       "path": "src/thoth/application/commands/__init__.py",
-      "sha256": "4690d507f942d1fa997d6704c4f36bf935a5e1b2bbf94776088b9d4f88c6aa1c",
-      "bytes": 2462
+      "sha256": "2487dec0f6120ed611c5d15185192dbc00c48610aec0d588b3de6d2ff610100e",
+      "bytes": 2570
     },
     {
       "path": "src/thoth/application/commands/action_create_input.py",
@@ -3915,6 +3935,11 @@
       "path": "src/thoth/application/commands/outcomes_full.py",
       "sha256": "067cfcdcfbe62c6a0b059d7f820d14f1254d0c896e5d308da57a303a9a32c520",
       "bytes": 20158
+    },
+    {
+      "path": "src/thoth/application/commands/project_restore.py",
+      "sha256": "b85ebb31635bf9a90f87c955106bb13eb61dc903fb47d04ca2c065b69bacb41a",
+      "bytes": 3391
     },
     {
       "path": "src/thoth/application/commands/projections.py",
@@ -5208,8 +5233,8 @@
     },
     {
       "path": "src/thoth/apps/management_routes.py",
-      "sha256": "7454abd0c5187480b00090a3c31c078a4760735fb28897d25bad02297354b321",
-      "bytes": 2949
+      "sha256": "e17ef04ae90adc48b944f0eb0529ca2a4264ba4235467f70b68ac5534f255a84",
+      "bytes": 3272
     },
     {
       "path": "src/thoth/apps/memory_composition.py",
@@ -5278,8 +5303,8 @@
     },
     {
       "path": "src/thoth/apps/runtime.py",
-      "sha256": "fe6fafe731562a6d0b301d4f48d6154c3ffc40e59030f28144b243da7b7a8f63",
-      "bytes": 26648
+      "sha256": "81f2718bbb0698f6a1c1cc3c83ac6be6f4d46306574052eb6af725b9018fa1d9",
+      "bytes": 26656
     },
     {
       "path": "src/thoth/apps/runtime_types.py",
@@ -6133,8 +6158,8 @@
     },
     {
       "path": "src/thoth/ports/project.py",
-      "sha256": "bae4b572d7adce68496411aea718d0392ee3d8fcc892c26f5e847fd293d9f39e",
-      "bytes": 458
+      "sha256": "200d58cb8d244aea66d1fe980f8f52d94992cf6f28e571bacdffd68026c466ba",
+      "bytes": 678
     },
     {
       "path": "src/thoth/ports/projectpack.py",
@@ -6258,8 +6283,8 @@
     },
     {
       "path": "src/thoth/protocol/notification_catalog.py",
-      "sha256": "122cfaa053962ecc6ca21e44fe7c14e402efcfc637b406ac98d6e6a7aa394234",
-      "bytes": 17850
+      "sha256": "da3c37d824d3636a1c3c2c1582a0cdea5cc750eb8ebe6b21fc790bd8d384ce38",
+      "bytes": 17901
     },
     {
       "path": "src/thoth/protocol/notification_rules.py",
@@ -6278,8 +6303,8 @@
     },
     {
       "path": "src/thoth/protocol/registry.py",
-      "sha256": "ae6ee4f18638e6a0fa4b21aff2fed4ce2eaad50059b9fc38710cb05b8a65cce8",
-      "bytes": 13225
+      "sha256": "413c7b4ac5079afac8e0cadc33126bfdd26c198ccdee6974a14b5be94608cee2",
+      "bytes": 13249
     },
     {
       "path": "src/thoth/protocol/schema_export.py",
@@ -6433,7 +6458,7 @@
     },
     {
       "path": "tests/architecture/test_public_protocol_exact_parity.py",
-      "sha256": "2cbc2a3db6641a5207120047e864a7649c98447e09fcb7720a5cfaef7c802f0e",
+      "sha256": "c228a0d87dcf771049d24a021737002013645f824d596ec5e8f06dbe8c7ea44b",
       "bytes": 5631
     },
     {
@@ -6813,8 +6838,8 @@
     },
     {
       "path": "tests/fixtures/runtime_registration_events.json",
-      "sha256": "937f5bdf6a1861031537acc2afb592dad64f1ba45095d4e3fb1366b432b3e84b",
-      "bytes": 112131
+      "sha256": "18b4236f9f0d283985bbfc15b170d9c62bfaa328248ea0f7974bbc76b9bf39d3",
+      "bytes": 112407
     },
     {
       "path": "tests/fixtures/structured_source_fixture.py",
@@ -7665,6 +7690,11 @@
       "path": "tests/integration/test_project_list_reads.py",
       "sha256": "c767beb6bff4187d94ec7cd8fc5effd76fea81ad566f85f2ee835e99d07e979b",
       "bytes": 10230
+    },
+    {
+      "path": "tests/integration/test_project_restore_rpc.py",
+      "sha256": "5ea3b65a3355d88a42351b48990d183a25fe6fc1cbc323d8e1543e25fbfba79e",
+      "bytes": 7902
     },
     {
       "path": "tests/integration/test_projectpack_rpc.py",

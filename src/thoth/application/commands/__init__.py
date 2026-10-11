@@ -11,6 +11,7 @@ from thoth.application.commands.memory_full import MemoryFullHandlers
 from thoth.application.commands.objects_full import DecisionObjectHandlers
 from thoth.application.commands.operations import OperationCommandHandlers
 from thoth.application.commands.outcomes_full import OutcomeHandlers
+from thoth.application.commands.project_restore import ProjectRestoreHandlers
 from thoth.application.commands.projections import ProjectionQueryHandlers
 from thoth.application.commands.projectpacks import ProjectPackCommandHandlers
 from thoth.application.commands.projects import ProjectCommandHandlers
@@ -39,6 +40,7 @@ __all__ = [
     "OutcomeHandlers",
     "ProjectCommandHandlers",
     "ProjectPackCommandHandlers",
+    "ProjectRestoreHandlers",
     "ProjectionQueryHandlers",
     "ReceiptHandlers",
     "RevisionCommandHandlers",

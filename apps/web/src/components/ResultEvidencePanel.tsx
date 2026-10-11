@@ -45,6 +45,7 @@ export function ResultEvidencePanel({ selection, result, focusSpanId, citations 
     <h3>이 답변에 선택된 근거 {first.selected_count}개</h3>
     <p>연구에 선택된 원문 목록입니다. 답변 본문에서 직접 인용한 개수와 다를 수 있습니다.</p>
     {first.selected_count === 0 ? <p>이 저장 버전에 선택된 근거가 없습니다.</p> : <>
+      <p className="muted">‘확인된 원문’은 지금까지 불러온 근거 중 원문을 보여 줄 수 있는 것의 수입니다. 한 번에 일부만 불러오므로 선택된 근거 전체보다 적을 수 있고, 나머지는 ‘다음 근거 보기’로 불러옵니다.</p>
       {focusSpanId && !focusLoaded && !query.hasNextPage && <p className="result-notice" role="status">이 근거를 목록에서 찾지 못했습니다. 답변이 인용한 원문이 이 저장 버전의 선택 근거에 없습니다.</p>}
       {focusSpanId && unavailable.some(item => item.span_id === focusSpanId) && <p className="result-notice" role="status">이 근거는 원문을 표시할 수 없습니다. 아래 안내를 확인하세요.</p>}
       {available.length > 0 && <EvidenceRail evidence={available} heading={`확인된 원문 ${available.length}개`} focusSpanId={focusSpanId} citations={citations}/>}

@@ -37,7 +37,7 @@ function coverageIntent(status: CoverageMatrixRow["status"]) {
 
 /** Server progress keys with a user wording; anything else that looks like an internal id is only counted. */
 const progressTerms: Record<string, string> = {
-  "result:terminal": "답변이 최종 상태로 기록됐습니다",
+  "result:terminal": "조사 실행이 끝났습니다",
   "result:checkpoint": "답변이 중간 점검 상태로 기록됐습니다",
   requirements_recorded: "평가 조건이 기록됐습니다",
   coverage_assessed: "조건별 충족 여부를 평가했습니다",
@@ -126,7 +126,7 @@ export function ResearchFollowupSummary({
     </header>
     {progress && <div className="followup-grid">
       <section><h4>검토 요약</h4>{compactList(progress.progress_items, "기록된 진행 요약이 없습니다.")}</section>
-      <section><h4>직접 근거</h4>{evidenceRefs(rows, answerEvidenceCount)}{onOpenEvidence && <Button small minimal icon="search" onClick={onOpenEvidence}>근거 원문 열기</Button>}</section>
+      <section><h4>이 요약에 연결된 근거</h4>{evidenceRefs(rows, answerEvidenceCount)}{onOpenEvidence && <Button small minimal icon="search" onClick={onOpenEvidence}>근거 원문 열기</Button>}</section>
       <section><h4>바뀐 판단</h4><p>{deltaLabel(delta)}</p>{delta?.reason_state === "UNKNOWN_REASON" && <p className="muted">변경 이유는 저장된 기록에서 확인되지 않았습니다.</p>}</section>
       <section><h4>필요한 다음 행동</h4><p>{actionLabel(nextAction)}</p>{nextAction && <details className="connection-tech"><summary>기술 정보</summary><small>{nextAction.label}</small></details>}{nextAction?.requires_permission && <p className="result-notice">권한 결정이 필요한 행동입니다.</p>}</section>
     </div>}
@@ -138,9 +138,9 @@ export function ResearchFollowupSummary({
       </div>
       <p className="muted">{currentnessLabel(progress.currentness)}</p>
     </Disclosure>}
-    {coverage && <Disclosure defaultOpen={unresolved.length > 0} label={`평가기준 ${rows.length}개`}>
-      {coverage.availability === "UNAVAILABLE" ? <p className="result-notice">현재 권한으로 평가기준 행을 읽을 수 없습니다.</p> : rows.length === 0 ? <p className="muted">이 답변에 연결된 평가기준 행이 없습니다.</p>
-        : <div className="coverage-table" role="table" aria-label="평가기준 충족 상태">
+    {coverage && <Disclosure defaultOpen={unresolved.length > 0} label={`답변 점검 항목 ${rows.length}개`}>
+      {coverage.availability === "UNAVAILABLE" ? <p className="result-notice">현재 권한으로 답변 점검 항목을 읽을 수 없습니다.</p> : rows.length === 0 ? <p className="muted">이 답변에 연결된 답변 점검 항목이 없습니다.</p>
+        : <div className="coverage-table" role="table" aria-label="답변 점검 항목 충족 상태">
           <div className="coverage-head" role="row"><span>기준</span><span>기준 상태</span><span>판단</span></div>
           {rows.map(row => {
             const text = criterionText(row.target, row.question);

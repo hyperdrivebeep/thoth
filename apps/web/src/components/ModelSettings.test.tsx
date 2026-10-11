@@ -279,8 +279,8 @@ it("a late admission cannot replace a different selected thread",async()=>{
 
 it("ordinary navigation only automatically calls the actual nonmutating query surface",async()=>{
   await mount();
-  // A8: opening a project also reads its latest work (read-only thread queries), and which hypotheses came from a trace row (a read-only query).
-  expect(fixture.calls.filter(call=>!["project/list","thread/list","project/source/list","evidence/list","model/settings/read","workspace/ready","thread/read","thread/activity/list","hypothesis/link/list"].includes(call.method)).map(call=>call.method)).toEqual([]);
+  // A8: opening a project also reads its latest work (read-only thread queries), which hypotheses came from a trace row, and whether the trace is demo data for the conversation's synthetic-data line (read-only queries).
+  expect(fixture.calls.filter(call=>!["project/list","thread/list","project/source/list","evidence/list","model/settings/read","workspace/ready","thread/read","thread/activity/list","hypothesis/link/list","trace/read"].includes(call.method)).map(call=>call.method)).toEqual([]);
   await act(async()=>{container.querySelector<HTMLElement>('[role="tab"][data-tab-id="records"]')?.click();});
   expect(fixture.calls.some(call=>call.method==="receipt/verify")).toBe(false);
 });
@@ -288,7 +288,7 @@ it("ordinary navigation only automatically calls the actual nonmutating query su
 it("project-create retry preserves project ID and key without a globally shared policy binding",async()=>{
   await mount();
   await act(async()=>{container.querySelector<HTMLButtonElement>("button.new-project-button")!.click();});
-  await act(async()=>{Array.from(container.querySelectorAll<HTMLButtonElement>(".project-home-list button")).find(button=>button.textContent==="새 프로젝트")!.click();});
+  // the left button now opens the create screen by itself (it used to need a second click on the list's button)
   await act(async()=>{
     const input=container.querySelector<HTMLInputElement>('input[placeholder="연구할 문제 또는 프로젝트 이름"]')!;
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value")!.set!.call(input,"second project");

@@ -17,11 +17,11 @@ def test_public_method_manifest_exactly_matches_runtime_and_notifications() -> N
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     methods = manifest["methods"]
     by_name = {item["name"]: item for item in methods}
-    assert len(methods) == len(by_name) == 368
+    assert len(methods) == len(by_name) == 369
     assert set(by_name) == set(PUBLIC_METHODS)
-    assert sum(item["canonical"] for item in methods) == 362
-    assert manifest["runtime_method_count"] == 368
-    assert manifest["canonical_method_count"] == 362
+    assert sum(item["canonical"] for item in methods) == 363
+    assert manifest["runtime_method_count"] == 369
+    assert manifest["canonical_method_count"] == 363
     assert manifest["compatibility_alias_count"] == 6
     assert {
         f"project/source/scope/{name}" for name in ("read", "grant", "revoke", "assign", "update")

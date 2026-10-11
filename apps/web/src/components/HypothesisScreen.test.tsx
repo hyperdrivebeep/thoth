@@ -109,9 +109,9 @@ it("writes unevaluated cells as text, marks a row that tells hypotheses apart, a
   await mount(value);
   const rows = Array.from(node.querySelectorAll("table.relation-table tbody tr"));
   expect(rows[0].textContent).toContain("가설을 가름");
-  expect(rows[0].textContent).toContain("미평가"); // written as a word, not an empty cell
+  expect(rows[0].textContent).toContain("대조 안 함"); // written as a word, not an empty cell
   expect(rows[1].textContent).not.toContain("가설을 가름");
-  expect(Array.from(rows[1].querySelectorAll("td")).slice(1).every(cell => cell.textContent!.includes("미평가"))).toBe(true);
+  expect(Array.from(rows[1].querySelectorAll("td")).slice(1).every(cell => cell.textContent!.includes("대조 안 함"))).toBe(true);
 });
 
 it("does not mark a row as telling hypotheses apart when only one is evaluated and the rest are not", () => {

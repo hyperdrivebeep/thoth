@@ -490,6 +490,7 @@ project/metadata/update
 project/overlay/update
 project/policy/update
 project/reference/import
+project/restore
 project/role/assign
 project/role/revoke
 project/source/connect

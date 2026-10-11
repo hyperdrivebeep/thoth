@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "purpose": "DEVELOPMENT_VERIFICATION_LEDGER_NOT_RUNTIME_POLICY",
   "baseline_head": "f0262732a0e79235f3839c3393f459b90bd53783",
-  "catalog_sha256": "9c8e14688ccd2bc92bc2487213c7dd4fbe2cd625572a0673f1f2282a7b29e95a",
+  "catalog_sha256": "8a74465cef7448dd9315aec0d496cfba39685e6f5e693b059655cf079689e5e4",
   "public_entries": [
     {
       "name": "action/audit/read",
@@ -7485,6 +7485,32 @@
         "rpc:project/reference/list"
       ],
       "mutation_observed_in_code": false
+    },
+    {
+      "name": "project/restore",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "project/restore",
+      "actual_callable": "thoth.application.commands.project_restore.ProjectRestoreHandlers.restore",
+      "source": "src/thoth/application/commands/project_restore.py",
+      "line": 32,
+      "callable_sha256": "16298c9b366b9835610c72ffe4c352bcffdf211262b65cefc6651274b6e6179d",
+      "entry_kind": "public",
+      "path_id": "rpc:project/restore",
+      "owner_scope": "PROJECT_GOVERNANCE",
+      "phase_ids": [
+        "rpc:project/restore"
+      ],
+      "mutation_observed_in_code": true
     },
     {
       "name": "project/review/list",
@@ -35316,7 +35342,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 51,
+          "line": 59,
           "binding": "handlers.audit_read"
         }
       ],
@@ -35412,7 +35438,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 50,
+          "line": 58,
           "binding": "handlers.list"
         }
       ],
@@ -35508,7 +35534,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 54,
+          "line": 62,
           "binding": "handlers.pause"
         }
       ],
@@ -35666,7 +35692,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 49,
+          "line": 57,
           "binding": "handlers.read"
         }
       ],
@@ -35763,7 +35789,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 55,
+          "line": 63,
           "binding": "handlers.resume"
         }
       ],
@@ -35921,7 +35947,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 52,
+          "line": 60,
           "binding": "handlers.start"
         }
       ],
@@ -36080,7 +36106,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 56,
+          "line": 64,
           "binding": "handlers.stop"
         }
       ],
@@ -36238,7 +36264,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 53,
+          "line": 61,
           "binding": "handlers.update"
         }
       ],
@@ -48497,7 +48523,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 15,
+          "line": 22,
           "binding": "handlers.activate"
         }
       ],
@@ -48663,7 +48689,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 16,
+          "line": 23,
           "binding": "handlers.archive"
         }
       ],
@@ -48768,7 +48794,7 @@
         },
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 12,
+          "line": 19,
           "binding": "handlers.create"
         }
       ],
@@ -48938,7 +48964,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 27,
+          "line": 35,
           "binding": "handlers.cutoff_impact"
         }
       ],
@@ -49045,7 +49071,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 28,
+          "line": 36,
           "binding": "handlers.cutoff_update"
         }
       ],
@@ -49225,7 +49251,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 17,
+          "line": 24,
           "binding": "handlers.archive"
         }
       ],
@@ -49324,7 +49350,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 13,
+          "line": 20,
           "binding": "handlers.list"
         }
       ],
@@ -49404,7 +49430,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 18,
+          "line": 26,
           "binding": "handlers.metadata_update"
         }
       ],
@@ -49570,7 +49596,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 19,
+          "line": 27,
           "binding": "handlers.overlay_update"
         }
       ],
@@ -49736,7 +49762,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 20,
+          "line": 28,
           "binding": "handlers.policy_read"
         }
       ],
@@ -49815,7 +49841,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 21,
+          "line": 29,
           "binding": "handlers.policy_update"
         }
       ],
@@ -49978,7 +50004,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 14,
+          "line": 21,
           "binding": "handlers.read"
         }
       ],
@@ -50058,7 +50084,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 26,
+          "line": 34,
           "binding": "handlers.reference_import"
         }
       ],
@@ -50228,7 +50254,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 25,
+          "line": 33,
           "binding": "handlers.reference_list"
         }
       ],
@@ -50291,6 +50317,105 @@
           ],
           "call_graph": "project/reference/list"
         }
+      }
+    },
+    {
+      "path_id": "rpc:project/restore",
+      "owner": "PROJECT_GOVERNANCE",
+      "catalog_owner": "PROJECT_GOVERNANCE",
+      "entry_kind": "public",
+      "method_or_trigger": "project/restore",
+      "actual_callable": "thoth.application.commands.project_restore.ProjectRestoreHandlers.restore",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/management_routes.py",
+          "line": 25,
+          "binding": "restore.restore"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.storage.governance_history.SqliteGovernanceHistory._insert_record",
+        "thoth.adapters.storage.governance_history.SqliteGovernanceHistory.stage",
+        "thoth.adapters.storage.projects.SqliteProjectStore.update"
+      ],
+      "phase_id": [
+        "LIFECYCLE_PUBLICATION"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [
+        "governance_heads",
+        "governance_revisions",
+        "projects"
+      ],
+      "head_selector": "Project revision CAS and governance history head for the selected project.",
+      "audit_receipt_refs": [
+        "governance_revisions"
+      ],
+      "expected_basis": "Expected Project revision and ARCHIVED_READ_ONLY lifecycle; a project that is not archived is returned unchanged. The lifecycle comes from the governance history before the archive, or the activation rule when the history cannot say.",
+      "uow_participants": [
+        "thoth.adapters.storage.governance_history.SqliteGovernanceHistory._insert_record",
+        "thoth.adapters.storage.governance_history.SqliteGovernanceHistory.stage",
+        "thoth.adapters.storage.projects.SqliteProjectStore.update"
+      ],
+      "irreversible_effect_boundary": "Project/lifecycle and governance history publish inside the short ledger transaction; operation claim/terminal is separate.",
+      "allowed_phase_deltas": [
+        "Accepted restore moves lifecycle and project revision together; stale expected revision or audit failure leaves the archived project state."
+      ],
+      "downstream_reader": [
+        "project/read",
+        "project/list",
+        "project/policy/read"
+      ],
+      "existing_tests": [
+        "tests/integration/test_project_restore_rpc.py"
+      ],
+      "fault_points": "Expected-revision conflict, not-archived and unreadable-history cases need distinct assertions.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/storage/governance_history.py",
+        "src/thoth/adapters/storage/projects.py",
+        "src/thoth/application/commands/project_restore.py",
+        "src/thoth/apps/management_routes.py"
+      ],
+      "atomic_regions": [
+        {
+          "callable": "thoth.adapters.storage.sqlite.SqliteLedger.transaction",
+          "source": "src/thoth/adapters/storage/sqlite.py",
+          "line": 242,
+          "contexts": [
+            "SqliteAtomicUnitOfWork(self._engine, immediate=True).transaction()"
+          ]
+        },
+        {
+          "callable": "thoth.adapters.storage.transaction.SqliteAtomicUnitOfWork.transaction",
+          "source": "src/thoth/adapters/storage/transaction.py",
+          "line": 77,
+          "contexts": [
+            "resource_use_transaction()"
+          ]
+        },
+        {
+          "callable": "thoth.application.commands.project_restore.ProjectRestoreHandlers.restore",
+          "source": "src/thoth/application/commands/project_restore.py",
+          "line": 32,
+          "contexts": [
+            "self._ledger.transaction()"
+          ]
+        }
+      ],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Listed source-level regions are reachable candidates; the whole RPC, external I/O and operation terminal are not certified as one transaction.",
+      "verification": {
+        "classification": "MUTATION",
+        "required_callables": [
+          "thoth.application.commands.project_restore.ProjectRestoreHandlers.restore",
+          "thoth.adapters.storage.governance_history.SqliteGovernanceHistory._insert_record",
+          "thoth.adapters.storage.governance_history.SqliteGovernanceHistory.stage",
+          "thoth.adapters.storage.projects.SqliteProjectStore.update"
+        ],
+        "cases": [],
+        "status": "CURRENT_SOURCE_EXECUTION_EVIDENCE_PENDING"
       }
     },
     {
@@ -50410,7 +50535,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 23,
+          "line": 31,
           "binding": "handlers.role_assign"
         }
       ],
@@ -50580,7 +50705,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 22,
+          "line": 30,
           "binding": "handlers.role_list"
         }
       ],
@@ -50655,7 +50780,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 24,
+          "line": 32,
           "binding": "handlers.role_revoke"
         }
       ],
@@ -59147,7 +59272,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 35,
+          "line": 43,
           "binding": "handlers.activity_list"
         },
         {
@@ -59277,7 +59402,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 36,
+          "line": 44,
           "binding": "handlers.checkpoint_list"
         }
       ],
@@ -59360,7 +59485,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 37,
+          "line": 45,
           "binding": "handlers.checkpoint_read"
         }
       ],
@@ -59443,7 +59568,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 42,
+          "line": 50,
           "binding": "handlers.fork"
         }
       ],
@@ -61071,7 +61196,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 33,
+          "line": 41,
           "binding": "handlers.list"
         }
       ],
@@ -61149,7 +61274,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 43,
+          "line": 51,
           "binding": "handlers.metadata_update"
         }
       ],
@@ -61281,7 +61406,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 39,
+          "line": 47,
           "binding": "handlers.pause"
         },
         {
@@ -61478,7 +61603,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 34,
+          "line": 42,
           "binding": "handlers.read"
         },
         {
@@ -61918,7 +62043,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 40,
+          "line": 48,
           "binding": "handlers.resume"
         },
         {
@@ -63453,7 +63578,7 @@
         },
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 32,
+          "line": 40,
           "binding": "handlers.start"
         },
         {
@@ -65027,7 +65152,7 @@
         },
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 38,
+          "line": 46,
           "binding": "handlers.steer"
         },
         {
@@ -66548,7 +66673,7 @@
       "caller_refs": [
         {
           "source": "src/thoth/apps/management_routes.py",
-          "line": 41,
+          "line": 49,
           "binding": "handlers.stop"
         },
         {

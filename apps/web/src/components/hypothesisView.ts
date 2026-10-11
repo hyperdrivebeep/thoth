@@ -62,13 +62,17 @@ export function hypothesisRows(result: Record<string, unknown>): HypothesisRow[]
   });
 }
 
-/** One first-screen line about the counter-evidence search; "-" (not 0) while no search was recorded. */
+/**
+ * One first-screen line about the counter-evidence search. The count covers the counter sources of every hypothesis, searched or not;
+ * "-" (not 0) only when no search was recorded and no counter source exists. The "N/M" part counts only the searched hypotheses.
+ */
 export function counterSearchLine(result: Record<string, unknown>): string | null {
   const rows = hypothesisRows(result);
   if (!rows.length) return null;
   const searched = rows.filter(row => row.counterTerminal);
-  if (!searched.length) return "반대 근거 탐색: 안 함 · 반박 -";
-  return `반대 근거 탐색: ${searched.length}/${rows.length}개 가설 · 반박 ${searched.reduce((sum, row) => sum + row.counter.length, 0)}`;
+  const total = rows.reduce((sum, row) => sum + row.counter.length, 0);
+  if (!searched.length) return `반대 근거 탐색: 안 함 · 반박 ${total > 0 ? total : "-"}`;
+  return `반대 근거 탐색: ${searched.length}/${rows.length}개 가설 · 반박 ${total}`;
 }
 
 /** A source the review cited for this hypothesis and judged "not supporting" is shown as not applicable; a source never looked at stays unevaluated. */

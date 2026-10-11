@@ -58,6 +58,7 @@ it("opens the synthetic partial answer's sources and loads 50/50/49 selected ent
   expect(node.textContent).toContain(citations[0].exact_text);
   expect(node.textContent).toContain("p.1 · line 1");
   expect(node.textContent).toContain("확인된 원문 25개");
+  expect(node.textContent).toContain("‘확인된 원문’은 지금까지 불러온 근거 중 원문을 보여 줄 수 있는 것의 수입니다. 한 번에 일부만 불러오므로 선택된 근거 전체보다 적을 수 있고, 나머지는 ‘다음 근거 보기’로 불러옵니다.");
   expect(node.textContent).toContain("직접 인용한 개수와 다를 수 있습니다");
   expect(node.textContent).not.toContain("활성 근거 0개");
   expect(vi.mocked(rpc).mock.calls.map(([method]) => method)).toEqual(Array(4).fill("thread/result/read"));

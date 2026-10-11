@@ -19,7 +19,7 @@ export function AnswerHold({ status, coverage, facts, counter, next }: {
     <p>결론 상태: <strong>{label}</strong></p>
     {facts}
     {rows.length > 0 && <EvidenceUseSummary rows={rows}/>}
-    <p>답할 수 있는 범위: {rows.length ? `기준 충족 ${supported}/${rows.length} · 확인 필요 ${needsCheck}` : "평가기준 정보를 아직 읽지 못했습니다"}</p>
+    <p>답할 수 있는 범위: {rows.length ? `답변 점검 항목 ${rows.length}개 중 충족 ${supported} · 확인 필요 ${needsCheck}` : "답변 점검 항목 정보를 아직 읽지 못했습니다"}</p>
     {counter && <p>{counter}</p>}
     {next && <p>다음 확보: {next}</p>}
   </Callout>;

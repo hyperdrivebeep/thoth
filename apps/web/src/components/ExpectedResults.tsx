@@ -1,6 +1,9 @@
 import { objectList, stringValues, textValue } from "../api/presentation";
 import type { HypothesisRow } from "./hypothesisView";
 
+const SHORT = 40;
+const shortStatement = (text: string) => (text.length > SHORT ? text.slice(0, SHORT - 1) + "…" : text);
+
 /** What the generator said each hypothesis would give for one test (contract v3), in words. An unconfirmed suggestion; no probability or score. */
 export function ExpectedResults({ test, rows }: { test: Record<string, unknown>; rows: HypothesisRow[] }) {
   const table = objectList(test.expected_by_hypothesis);
@@ -11,8 +14,9 @@ export function ExpectedResults({ test, rows }: { test: Record<string, unknown>;
       const index = rows.findIndex(row => row.id === textValue(item.hypothesis_id));
       const sources = stringValues(item.basis).length;
       const expected = textValue(item.expected);
-      const note = sources > 0 ? " · 근거 " + sources + "개" : expected.trim() === "모름" ? "" : " · 근거 없는 예측";
-      return <li key={at}>{"가설 " + (index >= 0 ? index + 1 : "?") + ": " + expected + note}</li>;
+      const note = sources > 0 ? " · 근거 " + sources + "개" : expected.trim() === "모름" ? "" : " · 자료로 확인되지 않은 예상";
+      const statement = index >= 0 ? shortStatement(rows[index].statement.trim()) : "";
+      return <li key={at}>{"가설 " + (index >= 0 ? index + 1 : "?") + (statement ? "(" + statement + ")" : "") + ": " + expected + note}</li>;
     })}</ul>
     <small className="muted">모델이 낸 제안이며 사람이 확인하기 전에는 미확정입니다. 같은 말은 같은 결과로 봅니다. 확률이나 점수가 아닙니다.</small>
   </details>;
