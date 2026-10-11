@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-10T08:13:11.279804+00:00",
+  "created_at": "2026-10-11T11:42:23.815981+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -53,13 +53,13 @@
     },
     {
       "path": "README.ko.md",
-      "sha256": "e92c248d8605ecd6f502710e89293146ad4e63db88f20105fa91115e615b38e7",
-      "bytes": 11855
+      "sha256": "e81a1273aceec1a42828081c012a91b5632da162ffd49961fd2a8603f6305cc6",
+      "bytes": 14654
     },
     {
       "path": "README.md",
-      "sha256": "706bb9d807e7b339b0f5d18ee52a8ec5133388fccc0950f1140230665d811535",
-      "bytes": 10429
+      "sha256": "57698aa7ba73bc7a4a1a381ce2be8cb089513e8a666850967c849a79085e09f5",
+      "bytes": 12895
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -1735,6 +1735,36 @@
       "path": "docs/brand/thoth-readme-banner.svg",
       "sha256": "f997f3b91b0e785608fb7d801f1bbc3b397313e7677ae06ff1b3f018df1fe892",
       "bytes": 2446
+    },
+    {
+      "path": "docs/screenshots/01-trace-verdict.png",
+      "sha256": "800800b0e2bcfdd290d2f911618aab8a8e60e8e803d2400df9829cd61a351989",
+      "bytes": 169161
+    },
+    {
+      "path": "docs/screenshots/02-question.png",
+      "sha256": "a41bf8421b96d72c7a97c8a663d248f118dde6bad78aee75945e9e7797d74b22",
+      "bytes": 80357
+    },
+    {
+      "path": "docs/screenshots/03-progress.png",
+      "sha256": "7214715cdcc606c1c0f12368f7c6395c188204314446962be551ec875ed2235f",
+      "bytes": 164664
+    },
+    {
+      "path": "docs/screenshots/04-answer.png",
+      "sha256": "04f3cb6002ccc7ed1b58702cbfa0ebc43081021f421a9c85be6a97b05554d8ad",
+      "bytes": 242801
+    },
+    {
+      "path": "docs/screenshots/05-hypotheses.png",
+      "sha256": "a78447e9e5f8a63c8dd2bfeca76e943588cfb9e4f613d603c22c543bf987a14c",
+      "bytes": 406289
+    },
+    {
+      "path": "docs/screenshots/06-evidence.png",
+      "sha256": "2cff40afec991c105b4813fd4b1bf1d9092f836b8cd55b1239511ef480a488c5",
+      "bytes": 287062
     },
     {
       "path": "examples/projectpacks/6g-sandbox-hero/criteria.json",
