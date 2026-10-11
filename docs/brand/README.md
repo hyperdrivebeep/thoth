@@ -8,6 +8,7 @@ The three connected points in the mark form a `T`. They stand for source evidenc
 
 ## Assets
 
+- [`toti-mascot.png`](toti-mascot.png): Toti (토티), the little ibis researcher holding a notebook. Transparent PNG for the English and Korean README headers (220 px) and footers (64 px). Preserve its aspect ratio and clear space; use the geometric mark for tiny icons.
 - [`thoth-mark.svg`](thoth-mark.svg): square symbol for small surfaces.
 - [`thoth-lockup.svg`](thoth-lockup.svg): dark horizontal lockup for README and presentations.
 - [`thoth-ibis-hero.png`](thoth-ibis-hero.png): original ibis-headed Thoth illustration for a brand or README hero. Keep it as artwork rather than shrinking it into a small icon.
@@ -44,6 +45,12 @@ THOTH is an AI-assisted R&D workbench that connects research questions to source
 THOTH는 연구 질문부터 원문 근거, 경쟁 가설, 다음 행동, 변경 이력까지 한 흐름에서 살펴보는 AI 연구 워크벤치입니다. 근거가 모자라면 결론을 확정하지 않고 미해결 상태로 남깁니다.
 
 ## Asset provenance
+
+Toti was generated with Codex's built-in image generation tool on 2026-10-12 for THOTH
+and selected by the project owner for the README. The original generated PNG is preserved.
+The concept is a curious baby ibis with a curved beak, navy and gold scribe headdress,
+crescent accent, and a small notebook on a transparent background. It is a brand mascot,
+not a product screenshot. The existing illustration and vector assets remain available.
 
 The mark and lockup were drawn as SVG for THOTH. The ibis-headed Thoth illustration was generated
 with AI for this project and is used as brand artwork, not as a product screenshot or a reproduction

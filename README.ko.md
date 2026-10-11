@@ -1,10 +1,16 @@
 <p align="center">
-  <img src="docs/brand/thoth-readme-banner.svg" alt="THOTH — 근거, 판단, 변경 이력" width="960">
+  <img src="docs/brand/toti-mascot.png" alt="작은 기록장을 안고 있는 THOTH의 아기 따오기 연구원, 토티." width="220">
 </p>
+
+<h1 align="center">THOTH</h1>
 
 <p align="center">
   <strong>근거를 따라, 판단의 변화를 남기다.</strong><br>
   Follow the evidence. Keep the history of your judgment.
+</p>
+
+<p align="center">
+  <sub>토티를 소개합니다. 궁금한 건 많고, 찾은 근거는 꼭 적어두는 작은 따오기예요.</sub>
 </p>
 
 <p align="center">
@@ -28,11 +34,6 @@
 
 **THOTH는 연구 질문, 원문 근거, 경쟁 가설, 저장된 결과를 연결하는 로컬 AI 연구 워크벤치입니다.**
 판단을 뒷받침하는 근거와 아직 풀리지 않은 문제를 살펴보고, 저장된 두 결과를 비교하며 다음 행동을 정합니다.
-
-<p align="center">
-  <img src="docs/brand/thoth-ibis-hero.png" alt="초승달 아래 파피루스에 기록하는 따오기 머리의 토트. THOTH의 남색과 파랑을 사용한 브랜드 일러스트." width="960">
-  <br><sub>THOTH 브랜드 일러스트 — 기록의 신 토트를 연구 워크벤치의 이미지로 표현했습니다.</sub>
-</p>
 
 > [!NOTE]
 > **개인·로컬 사용을 위한 실험적 소스 공개본입니다.** UI는 한국어 중심입니다.
@@ -204,7 +205,7 @@ API는 로컬 루프백 주소에 바인딩되고, Vite는 API 요청을 8765 �
 의존성에는 각자의 라이선스가 적용됩니다. [외부 의존성·자산 고지](THIRD_PARTY_NOTICES.md)를 확인하세요.
 
 <p align="center">
-  <img src="docs/brand/thoth-mark.svg" alt="근거를 연결하는 THOTH 심볼" width="40"><br>
+  <img src="docs/brand/toti-mascot.png" alt="THOTH의 마스코트 토티" width="64"><br>
   <sub>Evidence. Judgment. Revision.</sub><br>
   <a href="https://github.com/hyperdrivebeep">Built by Hyperdrive</a>
 </p>
