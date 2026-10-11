@@ -46,5 +46,9 @@ reuses that mark and the existing product palette. `docs/brand/thoth-ibis-hero.p
 AI-generated illustration created for THOTH, not a reproduction of a museum artifact. The brand
 assets are included under this repository's MIT license. Their source files are preserved.
 
+`docs/brand/toti-mascot.png` is an original AI-generated mascot created for THOTH on
+2026-10-12 with Codex image generation. It depicts Toti, a little ibis researcher, and
+is included under the same license. The original generated PNG is preserved unchanged.
+
 The README's badges are rendered by Shields.io. No third-party logo, screenshot, testimonial or
 performance claim from another project is bundled into this presentation.

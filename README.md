@@ -1,10 +1,16 @@
 <p align="center">
-  <img src="docs/brand/thoth-readme-banner.svg" alt="THOTH — Evidence. Judgment. Revision." width="960">
+  <img src="docs/brand/toti-mascot.png" alt="Toti, THOTH's little ibis researcher, holding a notebook." width="220">
 </p>
+
+<h1 align="center">THOTH</h1>
 
 <p align="center">
   <strong>Follow the evidence. Keep the history of your judgment.</strong><br>
   근거를 따라, 판단의 변화를 남기다.
+</p>
+
+<p align="center">
+  <sub>Meet Toti — a curious little ibis who keeps notes on every clue.</sub>
 </p>
 
 <p align="center">
@@ -29,11 +35,6 @@ Your documents change. A result gets revised. A colleague needs to understand wh
 **THOTH is a local, AI-assisted research workbench that keeps the question, source evidence,
 competing explanations and recorded results connected.** Inspect what supports a judgment,
 see what remains unresolved, and compare two saved results before deciding what comes next.
-
-<p align="center">
-  <img src="docs/brand/thoth-ibis-hero.png" alt="The ibis-headed Thoth records on papyrus beneath a crescent moon, in the THOTH navy and blue palette." width="960">
-  <br><sub>Original THOTH brand illustration — the Egyptian scribe, reimagined for a research workbench.</sub>
-</p>
 
 > [!NOTE]
 > **Experimental source preview for personal/local use.** The interface is Korean-first.
@@ -222,7 +223,7 @@ snapshot are available under the **[MIT License](LICENSE)**, copyright 2026 THOT
 Dependencies retain their own licenses; see [third-party and asset notices](THIRD_PARTY_NOTICES.md).
 
 <p align="center">
-  <img src="docs/brand/thoth-mark.svg" alt="THOTH connected-evidence symbol" width="40"><br>
+  <img src="docs/brand/toti-mascot.png" alt="Toti, the THOTH mascot" width="64"><br>
   <sub>Evidence. Judgment. Revision.</sub><br>
   <a href="https://github.com/hyperdrivebeep">Built by Hyperdrive</a>
 </p>
