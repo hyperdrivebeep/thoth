@@ -162,7 +162,10 @@ it("says the preview went stale when the server refuses the apply and changes no
   await click(buttonByLabel("CSV 들여오기", container));
   await chooseFile(demo.rainCsv);
   await click(buttonByLabel("이 내용으로 반영", document.body.querySelector(".trace-import-dialog")!));
-  expect(visibleText(document.body.querySelector(".trace-import-dialog")!)).toContain("미리보기를 본 뒤에 추적표가 바뀌어 반영하지 않았습니다");
+  await vi.waitFor(async () => {
+    await settle();
+    expect(visibleText(document.body.querySelector(".trace-import-dialog")!)).toContain("미리보기를 본 뒤에 추적표가 바뀌어 반영하지 않았습니다");
+  });
   expect(rowOf("Detection rate in rain").textContent).toContain("보류 · 결과 없음");
 });
 

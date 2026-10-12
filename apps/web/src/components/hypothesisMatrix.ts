@@ -1,3 +1,4 @@
+import { t } from "../i18n/locale";
 import type { HypothesisRow, Relation } from "./hypothesisView";
 import { relationOf } from "./hypothesisView";
 
@@ -18,6 +19,6 @@ export function matrixLines(rows: HypothesisRow[], selected: string[]): MatrixLi
 export function noCounterNote(rows: HypothesisRow[], lines: MatrixLine[]): string | null {
   if (lines.some(line => line.cells.includes("COUNTER"))) return null;
   return rows.some(row => row.counterTerminal)
-    ? "반박 근거를 찾지 못함. 반박이 없다는 것이 지지된다는 뜻은 아닙니다."
-    : "반대 근거를 아직 찾아보지 않았습니다. 반박이 없다는 것이 지지된다는 뜻은 아닙니다.";
+    ? t("hypotheses.noRefutation")
+    : t("hypotheses.counterUnsearched");
 }

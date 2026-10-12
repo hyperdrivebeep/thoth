@@ -16,6 +16,7 @@ from thoth.domain.model_dispatch import (
 from thoth.domain.model_settings import ResolvedModelSettings
 from thoth.domain.oauth_retry import OAuthRetryPolicy
 from thoth.domain.research_request import RevisionRef
+from thoth.domain.response_language import ResponseLanguage
 from thoth.domain.revision import StagedRevision
 
 
@@ -71,6 +72,7 @@ class ResearchWork:
     prepare: Callable[[], Awaitable[None]] | None = None
     show_draft: Callable[[str, dict[str, object]], None] | None = None
     model_settings: ResolvedModelSettings | None = None
+    response_language: ResponseLanguage | None = None
     observe_external_effect: Callable[[str, str], None] | None = None
     cleanup_usage: dict[str, CleanupUsage] = field(default_factory=dict)
     preprocessing_cache: dict[str, object] = field(default_factory=dict)

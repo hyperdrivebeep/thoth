@@ -17,7 +17,9 @@ from typing import Protocol
 from pydantic import ValidationError
 
 from thoth.application.reducers import validate_hypothesis_portfolio
+from thoth.application.services.english_prose import EnglishProseCheck, record_english_check
 from thoth.application.services.hypothesis_contract_v3 import language_problem, settle_contract
+from thoth.application.services.request_language import validation_problem
 from thoth.domain.enums import ModelRole
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.hypothesis import (
@@ -31,6 +33,16 @@ from thoth.domain.hypothesis import (
     TableFillAnswer,
     TableFillOutcome,
     TableFillRecord,
+)
+from thoth.domain.hypothesis_v4 import (
+    FILLER_V5,
+    ExpectedResultV4,
+    FilledRowV4,
+    HypothesisPortfolioV4,
+    HypothesisTableFillV4,
+    TableFillAnswerV4,
+    TableFillRecordV4,
+    expected_is_unknown,
 )
 from thoth.domain.model import ContextPack, ModelRequest
 from thoth.domain.research_execution import research_work
@@ -59,12 +71,15 @@ class CycleInput(Protocol):
     def evidence(self) -> tuple[EvidenceSpan, ...]: ...
 
 
-def _label(value: str) -> str:
-    return " ".join(value.split())
+def _label(value: str | None) -> str:
+    return "" if value is None else " ".join(value.split())
 
 
-def _rows_of(test: DiscriminatingTestV3) -> dict[str, str]:
-    return {row.hypothesis_id: _label(row.expected) for row in test.expected_by_hypothesis}
+def _rows_of(test: DiscriminatingTestV3) -> dict[str, str | None]:
+    return {
+        row.hypothesis_id: None if expected_is_unknown(row) else _label(row.expected)
+        for row in test.expected_by_hypothesis
+    }
 
 
 def _emptied_by_language(owner: HypothesisV3, test: DiscriminatingTestV3) -> bool:
@@ -92,7 +107,7 @@ def _open_ids(
         item.hypothesis_id
         for item in portfolio.hypotheses
         if (item.hypothesis_id != owner.hypothesis_id or own_open)
-        and rows.get(item.hypothesis_id, UNKNOWN) == UNKNOWN
+        and rows.get(item.hypothesis_id) is None
     )
 
 
@@ -104,7 +119,7 @@ def count_cells(portfolio: HypothesisPortfolioV3) -> tuple[int, int]:
             rows = _rows_of(test)
             for item in portfolio.hypotheses:
                 cells += 1
-                opened += rows.get(item.hypothesis_id, UNKNOWN) == UNKNOWN
+                opened += rows.get(item.hypothesis_id) is None
     return cells, opened
 
 
@@ -126,8 +141,7 @@ def _payload(portfolio: HypothesisPortfolioV3) -> dict[str, object]:
                 "expected_if_true": test.expected_if_true,
                 "expected_if_alternative": test.expected_if_alternative,
                 "table": [
-                    {"hypothesis_id": row.hypothesis_id, "expected": row.expected}
-                    for row in test.expected_by_hypothesis
+                    {**row.model_dump(exclude={"basis"})} for row in test.expected_by_hypothesis
                 ],
                 "open_hypothesis_ids": list(open_ids),
             }
@@ -156,26 +170,33 @@ def _request_context(context: ContextPack, portfolio: HypothesisPortfolioV3) -> 
     )
 
 
-def _row_problem(row: FilledRow, open_ids: set[str], known: set[str], problem: str) -> str | None:
+def _row_problem(
+    row: FilledRow | FilledRowV4, open_ids: set[str], known: set[str], problem: str
+) -> str | None:
     """Why this answer for one cell is not kept, or None when it is."""
     label = _label(row.expected)
     if row.hypothesis_id not in known:
         return "UNKNOWN_HYPOTHESIS"
     if row.hypothesis_id not in open_ids:
         return "TABLE_FILL_CELL_NOT_OPEN"
-    if label == UNKNOWN:
+    if expected_is_unknown(row):
         return None
     if len(label) > MAX_LABEL_CHARS:
         return "EXPECTED_TOO_LONG"
-    mismatch = language_problem(label, problem)
+    work = research_work.get()
+    if work is not None and work.response_language == "en":
+        return None  # English fields are audited below, with original question/source quotes.
+    mismatch = language_problem(label, validation_problem(problem))
     return None if mismatch is None else f"EXPECTED_{mismatch}_MISMATCH"
 
 
 def merge_fill(
     portfolio: HypothesisPortfolioV3,
-    fill: HypothesisTableFill,
+    fill: HypothesisTableFill | HypothesisTableFillV4,
     known_spans: set[str],
     problem: str,
+    *,
+    context: ContextPack | None = None,
 ) -> tuple[HypothesisPortfolioV3, int, tuple[TableFillAnswer, ...]]:
     """The portfolio with the answered cells merged in, how many cells changed to a value, and
     what the filler said for each cell it was asked about.
@@ -183,13 +204,24 @@ def merge_fill(
     Every answer that is not kept is recorded on the hypothesis the test was designed for.
     """
     known = {item.hypothesis_id for item in portfolio.hypotheses}
+    work = research_work.get()
+    english = (
+        EnglishProseCheck.build(
+            problem,
+            () if context is None else context.evidence,
+            (*known, *known_spans, portfolio.object_id),
+            context,
+        )
+        if work is not None and work.response_language == "en"
+        else None
+    )
     position = {item.hypothesis_id: index for index, item in enumerate(portfolio.hypotheses)}
     tests = {
         (owner.hypothesis_id, test.test_id): (owner, test, set(_open_ids(portfolio, owner, test)))
         for owner in portfolio.hypotheses
         for test in owner.discriminating_tests
     }
-    kept: dict[tuple[str, str], dict[str, ExpectedResult]] = {}
+    kept: dict[tuple[str, str], dict[str, ExpectedResult | ExpectedResultV4]] = {}
     said: dict[tuple[str, str, str], TableFillAnswer] = {}
     dropped: dict[str, list[DroppedExpectation]] = {}
 
@@ -201,19 +233,28 @@ def merge_fill(
             )
         )
 
-    def note(cell: tuple[str, str, str], row: FilledRow, outcome: TableFillOutcome) -> None:
+    def note(
+        cell: tuple[str, str, str], row: FilledRow | FilledRowV4, outcome: TableFillOutcome
+    ) -> None:
         """What was said for an asked cell; a kept answer replaces a dropped one only."""
         before = said.get(cell)
         if before is not None and not (before.outcome == "DROPPED" and outcome != "DROPPED"):
             return
         label = _label(row.expected)
-        reason = (row.unknown_reason or "").strip()[:200] if label == UNKNOWN else ""
-        said[cell] = TableFillAnswer(
-            test_id=cell[1],
-            hypothesis_id=cell[2],
-            expected=label[:MAX_LABEL_CHARS],
-            unknown_reason=reason or None,
-            outcome=outcome,
+        reason = (row.unknown_reason or "").strip()[:200] if expected_is_unknown(row) else ""
+        codec = TableFillAnswerV4 if isinstance(row, FilledRowV4) else TableFillAnswer
+        extra = {"knowledge_state": row.knowledge_state} if isinstance(row, FilledRowV4) else {}
+        said[cell] = codec.model_validate(
+            {
+                **extra,
+                "test_id": cell[1],
+                "hypothesis_id": cell[2],
+                "expected": None
+                if isinstance(row, FilledRowV4) and expected_is_unknown(row)
+                else label[:MAX_LABEL_CHARS],
+                "unknown_reason": reason or None,
+                "outcome": outcome,
+            }
         )
 
     for item in fill.tests:
@@ -232,33 +273,53 @@ def merge_fill(
                 reason = "UNKNOWN_SPAN"
             if reason is not None:
                 text = row.expected if reason.startswith("EXPECTED_") else ""
-                drop(item.designed_for, item.test_id, row.hypothesis_id, reason, text)
+                drop(item.designed_for, item.test_id, row.hypothesis_id, reason, text or "")
                 if row.hypothesis_id in open_ids:
                     note(cell, row, "DROPPED")
                 continue
-            answers[row.hypothesis_id] = ExpectedResult(
-                hypothesis_id=row.hypothesis_id,
-                expected=_label(row.expected),
-                basis=row.basis[:MAX_BASIS],
+            if english is not None:
+                for field, text in (
+                    ("EXPECTED", row.expected),
+                    ("TABLE_FILL_REASON", row.unknown_reason),
+                ):
+                    if english.mismatch(text):
+                        drop(
+                            item.designed_for,
+                            item.test_id,
+                            row.hypothesis_id,
+                            f"{field}_LANGUAGE_FLAGGED",
+                            text or "",
+                        )
+            codec = ExpectedResultV4 if isinstance(row, FilledRowV4) else ExpectedResult
+            extra = {"knowledge_state": row.knowledge_state} if isinstance(row, FilledRowV4) else {}
+            answers[row.hypothesis_id] = codec.model_validate(
+                {
+                    **extra,
+                    "hypothesis_id": row.hypothesis_id,
+                    "expected": None
+                    if isinstance(row, FilledRowV4) and expected_is_unknown(row)
+                    else _label(row.expected),
+                    "basis": row.basis[:MAX_BASIS],
+                }
             )
-            note(cell, row, "STILL_UNKNOWN" if _label(row.expected) == UNKNOWN else "CHANGED")
+            note(cell, row, "STILL_UNKNOWN" if expected_is_unknown(row) else "CHANGED")
     changed = 0
     settled: list[HypothesisV3] = []
     for owner in portfolio.hypotheses:
         new_tests: list[DiscriminatingTestV3] = []
         for test in owner.discriminating_tests:
             answers = kept.get((owner.hypothesis_id, test.test_id), {})
-            rows = list(test.expected_by_hypothesis)
+            rows: list[ExpectedResult | ExpectedResultV4] = list(test.expected_by_hypothesis)
             at = {row.hypothesis_id: index for index, row in enumerate(rows)}
             for hypothesis_id in sorted(answers, key=position.__getitem__):
                 answer = answers[hypothesis_id]
                 if hypothesis_id in at:
-                    if answer.expected != UNKNOWN:
+                    if not expected_is_unknown(answer):
                         rows[at[hypothesis_id]] = answer
                         changed += 1
                 elif len(rows) < MAX_ROWS:
                     rows.append(answer)
-                    changed += answer.expected != UNKNOWN
+                    changed += not expected_is_unknown(answer)
                 else:
                     drop(owner.hypothesis_id, test.test_id, hypothesis_id, "TABLE_ROW_LIMIT")
                     cell = (owner.hypothesis_id, test.test_id, hypothesis_id)
@@ -287,9 +348,11 @@ def _answers(
             if item.hypothesis_id in open_ids:
                 found.append(
                     said.get((owner_id, test_id, item.hypothesis_id))
-                    or TableFillAnswer(
-                        test_id=test_id, hypothesis_id=item.hypothesis_id, outcome="NOT_ANSWERED"
-                    )
+                    or (
+                        TableFillAnswerV4
+                        if isinstance(portfolio, HypothesisPortfolioV4)
+                        else TableFillAnswer
+                    )(test_id=test_id, hypothesis_id=item.hypothesis_id, outcome="NOT_ANSWERED")
                 )
     return tuple(found)
 
@@ -315,7 +378,10 @@ async def fill_tables(
     cells, open_before = count_cells(portfolio)
     if cells == 0:
         return portfolio
-    base = TableFillRecord(state="SKIPPED_FULL", cells=cells, open_before=open_before)
+    record_codec = (
+        TableFillRecordV4 if isinstance(portfolio, HypothesisPortfolioV4) else TableFillRecord
+    )
+    base = record_codec(state="SKIPPED_FULL", cells=cells, open_before=open_before)
     if not _payload(portfolio)["tests"]:
         return _noted(portfolio, base.model_copy(update={"open_after": open_before}))
     try:
@@ -325,8 +391,12 @@ async def fill_tables(
                 project_id=context.project_id,
                 cutoff_at=command.cutoff_at,
                 context_pack=_request_context(context, portfolio),
-                output_model=HypothesisTableFill,
-                prompt_version=TABLE_FILLER_VERSION,
+                output_model=HypothesisTableFillV4
+                if isinstance(portfolio, HypothesisPortfolioV4)
+                else HypothesisTableFill,
+                prompt_version=FILLER_V5
+                if isinstance(portfolio, HypothesisPortfolioV4)
+                else TABLE_FILLER_VERSION,
                 model_policy_ref=command.model_policy_ref,
                 max_output_tokens=TABLE_FILLER_MAX_OUTPUT_TOKENS,
             )
@@ -339,7 +409,11 @@ async def fill_tables(
         )
         return _noted(portfolio, failed)
     merged, changed, answers = merge_fill(
-        portfolio, result.output, {span.span_id for span in command.evidence}, context.problem
+        portfolio,
+        result.output,
+        {span.span_id for span in command.evidence},
+        context.problem,
+        context=context,
     )
     _, open_after = count_cells(merged)
     called = base.model_copy(
@@ -361,8 +435,10 @@ async def accepted_portfolio(
     require_unknown: bool,
 ) -> HypothesisPortfolio:
     """The generator's output settled, its open table cells filled (v3), and validated."""
-    settled = settle_contract(generated, command.evidence, context.problem)
+    settled = settle_contract(generated, command.evidence, context.problem, context=context)
     filled = await fill_tables(model, settled, context, command)
-    return validate_hypothesis_portfolio(
+    accepted = validate_hypothesis_portfolio(
         filled, evidence=command.evidence, require_unknown_alternative=require_unknown
     )
+    record_english_check(accepted, context)
+    return accepted

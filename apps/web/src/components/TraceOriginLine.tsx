@@ -1,3 +1,5 @@
+import { message as formatMessage } from "../i18n/formatMessages";
+import { t } from "../i18n/locale";
 import { Button } from "@blueprintjs/core";
 import { objectValue, textValue } from "../api/presentation";
 
@@ -8,7 +10,7 @@ export function TraceOriginLine({ result, onOpenTrace }: { result: Record<string
   const id = textValue(origin.subject_id);
   if (origin.kind !== "TRACE_VERDICT" || !id || (kind !== "CRITERION" && kind !== "REQUIREMENT")) return null;
   return <p className="trace-origin-line" role="note">
-    이 조사는 추적표의 「{textValue(origin.subject_title) || id}」 줄에서 시작했습니다.
-    {onOpenTrace && <Button small minimal icon="th" onClick={() => onOpenTrace({ kind, id })}>추적표에서 보기</Button>}
+    {formatMessage("traceOrigin", textValue(origin.subject_title) || id)}
+    {onOpenTrace && <Button small minimal icon="th" onClick={() => onOpenTrace({ kind, id })}>{t("traceOrigin.open")}</Button>}
   </p>;
 }

@@ -1,3 +1,4 @@
+import { t, useTranslation } from "../i18n/locale";
 import { Button, Callout, InputGroup, Switch } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -17,6 +18,7 @@ type ProjectRead = {
 };
 
 export function ProjectWebSetup({ projectId }: { projectId: string }) {
+  useTranslation();
   const client = useQueryClient();
   const project = useQuery({
     queryKey: ["project-web", projectId],
@@ -60,10 +62,10 @@ export function ProjectWebSetup({ projectId }: { projectId: string }) {
   const consent = grant.data?.value.internet_consent;
   return (
     <section className="project-web-setup">
-      <h2>허용할 공개 웹 출처</h2>
-      <p className="muted">조회할 수 있는 도메인을 먼저 등록하세요. 저장하거나 켜는 것만으로 검색이 시작되지는 않습니다.</p>
+      <h2>{t("web.permittedSources")}</h2>
+      <p className="muted">{t("web.registerFirst")}</p>
       {consent !== "ALLOWED" && (
-        <Callout compact>워크스페이스에서 인터넷을 허용하지 않았습니다.</Callout>
+        <Callout compact>{t("web.workspaceDenied")}</Callout>
       )}
       {executionState && (
         <Callout compact>
@@ -71,8 +73,8 @@ export function ProjectWebSetup({ projectId }: { projectId: string }) {
         </Callout>
       )}
       <InputGroup
-        aria-label="허용할 공개 웹 도메인"
-        placeholder="예: arxiv.org"
+        aria-label={t("web.domainLabel")}
+        placeholder={t("web.domainExample")}
         value={host}
         onChange={(event) => setHost(event.target.value)}
         rightElement={
@@ -85,7 +87,7 @@ export function ProjectWebSetup({ projectId }: { projectId: string }) {
               setHost("");
             }}
           >
-            허용 도메인 추가
+            {t("web.addDomain")}
           </Button>
         }
       />
@@ -97,7 +99,7 @@ export function ProjectWebSetup({ projectId }: { projectId: string }) {
       <Switch
         checked={enabled}
         disabled={(!enabled && (consent !== "ALLOWED" || hosts.length === 0)) || save.isPending}
-        label="등록한 도메인의 공개 웹 사용"
+        label={t("web.useDomains")}
         onChange={(event) =>
           save.mutate({
             enabled: event.currentTarget.checked,
@@ -113,7 +115,7 @@ export function ProjectWebSetup({ projectId }: { projectId: string }) {
             save.mutate({ enabled: true, preferred_hosts: normalizePreferredHosts(hosts) })
           }
         >
-          저장된 웹 설정 다시 적용
+          {t("web.reapply")}
         </Button>
       )}
       {save.error && (

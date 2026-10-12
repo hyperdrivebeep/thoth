@@ -1,13 +1,15 @@
 /** Browser convenience only. Research records and permissions remain server-owned. */
-export type BrowserScope = { mode: "LOCAL"; workspaceId: string | null } | { mode: "HOSTED" };
+export type BrowserScope = { mode: "LOCAL"; workspaceId: string | null } | { mode: "HOSTED"; browserScopeId?: string | null };
 export type WorkspaceContext = { projectId: string; threadId: string };
 export type ContextReadResult = { kind: "MISSING" | "VALID" | "CORRUPT" | "UNAVAILABLE"; context: WorkspaceContext };
 export type DraftWriteResult = "SAVED" | "TOO_LARGE" | "UNAVAILABLE";
 export type DraftReadResult = { kind: "MISSING" | "VALID" | "CORRUPT" | "UNAVAILABLE"; text: string };
 export type PendingModelSelection = { provider: string; model: string; reasoning_effort?: string };
 export type PendingOrigin = { kind: "TRACE_VERDICT"; project_id: string; subject_kind: "CRITERION" | "REQUIREMENT"; subject_id: string; verdict_revision: string };
-export type PendingSubmission = { version: 1; workspaceId: string; projectId: string; threadId: string;
+export type ResponseLanguage = "ko" | "en";
+type PendingFields = { workspaceId: string; projectId: string; threadId: string;
   problem: string; selection: PendingModelSelection | null; origin?: PendingOrigin | null; signature: string; key: string; createdAt: number };
+export type PendingSubmission = PendingFields & ({ version: 1; responseLanguage?: never } | { version: 2; responseLanguage: ResponseLanguage });
 export type PendingRead = { kind: "NONE" } | { kind: "PENDING"; value: PendingSubmission } | { kind: "INVALID" };
 
 const prefix = "thoth:local-workspace:v1:";
@@ -33,7 +35,8 @@ function pendingKey(workspaceId: string, projectId: string, threadId: string) {
 }
 
 /** The exact payload of a request; a request that starts from a trace row has that row in it, any other request keeps its old signature. */
-export function submissionSignature(projectId: string, threadId: string, problem: string, selection: PendingModelSelection | null, origin: PendingOrigin | null = null): string {
+export function submissionSignature(projectId: string, threadId: string, problem: string, selection: PendingModelSelection | null, origin: PendingOrigin | null = null, responseLanguage?: ResponseLanguage): string {
+  if (responseLanguage !== undefined) return JSON.stringify(["response-language:v2", submissionSignature(projectId, threadId, problem, selection, origin), responseLanguage]);
   return JSON.stringify([projectId, threadId, problem, selection ? [selection.provider, selection.model, selection.reasoning_effort ?? null] : null,
     ...(origin ? [[origin.kind, origin.project_id, origin.subject_kind, origin.subject_id, origin.verdict_revision]] : [])]);
 }
@@ -100,15 +103,15 @@ export function writeLocalDraft(workspaceId: string | null, projectId: string, t
   } catch { return "UNAVAILABLE"; }
 }
 
-export function readLocalPending(workspaceId: string | null, projectId: string, threadId: string): PendingRead {
+export function readLocalPending(workspaceId: string | null, projectId: string, threadId: string, storage?: Storage): PendingRead {
   if (!validWorkspaceId(workspaceId) || !projectId || !validRecordId(projectId) || !validRecordId(threadId)) return { kind: "NONE" };
   try {
-    const raw = localStorage.getItem(pendingKey(workspaceId, projectId, threadId));
+    const raw = (storage ?? localStorage).getItem(pendingKey(workspaceId, projectId, threadId));
     if (raw === null) return { kind: "NONE" };
     if (raw.length > maxPendingLength) return { kind: "INVALID" };
     const value: unknown = JSON.parse(raw);
-    if (!value || typeof value !== "object" || !("version" in value) || value.version !== 1 ||
-      !Object.keys(value).every(key => ["version", "workspaceId", "projectId", "threadId", "problem", "selection", "origin", "signature", "key", "createdAt"].includes(key)) ||
+    if (!value || typeof value !== "object" || !("version" in value) || (value.version !== 1 && value.version !== 2) ||
+      !Object.keys(value).every(key => ["version", "workspaceId", "projectId", "threadId", "problem", "selection", "origin", "signature", "key", "createdAt", ...(value.version === 2 ? ["responseLanguage"] : [])].includes(key)) ||
       !("workspaceId" in value) || value.workspaceId !== workspaceId ||
       !("projectId" in value) || value.projectId !== projectId ||
       !("threadId" in value) || value.threadId !== threadId ||
@@ -118,8 +121,9 @@ export function readLocalPending(workspaceId: string | null, projectId: string, 
       !("signature" in value) || typeof value.signature !== "string" ||
       !("key" in value) || typeof value.key !== "string" || !/^[a-f0-9-]{36}$/i.test(value.key) ||
       !("createdAt" in value) || typeof value.createdAt !== "number" || !Number.isFinite(value.createdAt)) return { kind: "INVALID" };
+    if (value.version === 2 && (!("responseLanguage" in value) || !["ko", "en"].includes(String(value.responseLanguage)))) return { kind: "INVALID" };
     const pending = value as PendingSubmission;
-    return pending.signature === submissionSignature(projectId, threadId, pending.problem, pending.selection, pending.origin ?? null)
+    return pending.signature === submissionSignature(projectId, threadId, pending.problem, pending.selection, pending.origin ?? null, pending.responseLanguage)
       ? { kind: "PENDING", value: pending } : { kind: "INVALID" };
   } catch { return { kind: "INVALID" }; }
 }
@@ -141,19 +145,20 @@ function validPendingSelection(value: unknown): value is PendingModelSelection {
     (!("reasoning_effort" in value) || typeof value.reasoning_effort === "string" && value.reasoning_effort.length <= 32));
 }
 
-export function writeLocalPending(value: PendingSubmission): DraftWriteResult {
+export function writeLocalPending(value: PendingSubmission, storage?: Storage): DraftWriteResult {
   if (value.problem.length > maxDraftLength) return "TOO_LARGE";
   if (!validWorkspaceId(value.workspaceId) || !value.projectId || !validRecordId(value.projectId) || !validRecordId(value.threadId) ||
     !(value.selection === null || validPendingSelection(value.selection)) || !(value.origin == null || validPendingOrigin(value.origin)) ||
-    value.signature !== submissionSignature(value.projectId, value.threadId, value.problem, value.selection, value.origin ?? null)) return "UNAVAILABLE";
+    value.signature !== submissionSignature(value.projectId, value.threadId, value.problem, value.selection, value.origin ?? null, value.responseLanguage)) return "UNAVAILABLE";
+  if (value.version === 2 && value.responseLanguage !== "ko" && value.responseLanguage !== "en") return "UNAVAILABLE";
   const raw = JSON.stringify(value);
   if (raw.length > maxPendingLength) return "TOO_LARGE";
-  try { localStorage.setItem(pendingKey(value.workspaceId, value.projectId, value.threadId), raw); return "SAVED"; }
+  try { (storage ?? localStorage).setItem(pendingKey(value.workspaceId, value.projectId, value.threadId), raw); return "SAVED"; }
   catch { return "UNAVAILABLE"; }
 }
 
-export function clearLocalPending(workspaceId: string | null, projectId: string, threadId: string): boolean {
+export function clearLocalPending(workspaceId: string | null, projectId: string, threadId: string, storage?: Storage): boolean {
   if (!validWorkspaceId(workspaceId) || !validRecordId(projectId) || !validRecordId(threadId)) return false;
-  try { localStorage.removeItem(pendingKey(workspaceId, projectId, threadId)); return true; }
+  try { (storage ?? localStorage).removeItem(pendingKey(workspaceId, projectId, threadId)); return true; }
   catch { return false; }
 }

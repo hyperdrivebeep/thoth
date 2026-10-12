@@ -1,0 +1,116 @@
+{
+  "$defs": {
+    "FilledRowV4": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "default": [],
+          "items": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Basis",
+          "type": "array"
+        },
+        "expected": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Expected"
+        },
+        "hypothesis_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+          "title": "Hypothesis Id",
+          "type": "string"
+        },
+        "knowledge_state": {
+          "enum": [
+            "PREDICTED",
+            "UNKNOWN"
+          ],
+          "title": "Knowledge State",
+          "type": "string"
+        },
+        "unknown_reason": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unknown Reason"
+        }
+      },
+      "required": [
+        "hypothesis_id",
+        "knowledge_state",
+        "expected"
+      ],
+      "title": "FilledRowV4",
+      "type": "object"
+    },
+    "FilledTestV4": {
+      "additionalProperties": false,
+      "properties": {
+        "designed_for": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+          "title": "Designed For",
+          "type": "string"
+        },
+        "rows": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/FilledRowV4"
+          },
+          "maxItems": 40,
+          "title": "Rows",
+          "type": "array"
+        },
+        "test_id": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Test Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "designed_for",
+        "test_id"
+      ],
+      "title": "FilledTestV4",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "tests": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/FilledTestV4"
+      },
+      "maxItems": 60,
+      "title": "Tests",
+      "type": "array"
+    }
+  },
+  "title": "HypothesisTableFillV4",
+  "type": "object"
+}

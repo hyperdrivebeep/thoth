@@ -1,3 +1,5 @@
+import { message } from "../i18n/formatMessages";
+import { t, useTranslation, messageKey, uiText } from "../i18n/locale";
 import { Button, Callout } from "@blueprintjs/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -57,20 +59,21 @@ function statusState(value: LoginStatus | undefined, loginId: string): Pick<Sess
 
 function stateMessage(state: LoginState): string {
   switch (state) {
-    case "PENDING": return "xAI 승인을 기다리고 있습니다. 로그인 시작만으로 연결된 것은 아닙니다.";
-    case "SLOW_DOWN": return "xAI 승인을 기다리고 있습니다. 상태 확인 간격을 늘렸습니다.";
-    case "CONNECTED": return "xAI 로그인이 확인됐습니다. 사용할 모델을 직접 선택하세요.";
-    case "DENIED": return "xAI 로그인이 거부됐습니다. 다시 시작하려면 새 코드를 요청하세요.";
-    case "EXPIRED": return "기기 코드의 유효 시간이 끝났습니다. 다시 시작하려면 새 코드를 요청하세요.";
-    case "CANCELLED": return "이 로그인 요청을 취소했습니다. 기존 API 키 연결은 유지됩니다.";
-    case "FAILED": return "xAI 로그인에 실패했습니다. 연결 상태를 확인한 뒤 다시 시작하세요.";
-    case "LOGIN_REQUIRED": return "현재 로그인 요청을 확인할 수 없습니다. 계정 상태를 다시 확인하세요.";
+    case "PENDING": return t("xai.pending");
+    case "SLOW_DOWN": return t("xai.slowDown");
+    case "CONNECTED": return t("xai.connected");
+    case "DENIED": return t("xai.denied");
+    case "EXPIRED": return t("xai.expired");
+    case "CANCELLED": return t("xai.cancelled");
+    case "FAILED": return t("xai.failed");
+    case "LOGIN_REQUIRED": return t("xai.requestUnknown");
   }
 }
 
 export function XaiDeviceLogin({ projectId, workspaceId, account, method, methodStartAllowed }: {
   projectId: string; workspaceId?: string; account?: CredentialAccount; method?: CredentialAuthMethod; methodStartAllowed?: boolean;
 }) {
+  useTranslation();
   const client = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [now, setNow] = useState(() => Date.now() / 1000);
@@ -122,11 +125,11 @@ export function XaiDeviceLogin({ projectId, workspaceId, account, method, method
         { project_id: projectId, provider: "xai", auth_method: "xai_device_code", api_key: "" }, crypto.randomUUID(), controller.signal);
       if (!active.current || ticket !== generation.current) return;
       const next = startSession(response.value);
-      if (!next) { setError("xAI 로그인 시작 응답을 확인하지 못했습니다. 새 로그인은 자동으로 시작하지 않습니다."); return; }
+      if (!next) { setError(messageKey("xai.invalidStart")); return; }
       setNow(Date.now() / 1000);
       setSession(next);
     } catch (caught) {
-      if (active.current && ticket === generation.current) setError(connectionErrorText(caught, "xAI 로그인 시작 결과를 확인하지 못했습니다. 계정 상태를 확인한 뒤 다시 시도하세요."));
+      if (active.current && ticket === generation.current) setError(connectionErrorText(caught, t("xai.startUnknown")));
     } finally {
       requests.current.delete(controller);
       if (active.current && ticket === generation.current) { startBusy.current = false; setStarting(false); }
@@ -145,7 +148,7 @@ export function XaiDeviceLogin({ projectId, workspaceId, account, method, method
         { provider: "xai", auth_method: "xai_device_code", login_id: session.loginId }, crypto.randomUUID(), controller.signal);
       if (!active.current || ticket !== generation.current || cancelled.current || Date.now() / 1000 >= session.expiresAt) return;
       const next = statusState(response.value, session.loginId);
-      if (!next) { setError("현재 로그인 요청의 상태를 확인하지 못했습니다. 새 로그인은 자동으로 시작하지 않습니다."); return; }
+      if (!next) { setError(messageKey("xai.statusUnknown")); return; }
       setSession((current) => current?.loginId === session.loginId ? { ...current, ...next } : current);
       if (next.state === "CONNECTED") {
         const reads = await Promise.allSettled([
@@ -154,10 +157,10 @@ export function XaiDeviceLogin({ projectId, workspaceId, account, method, method
           client.invalidateQueries({ queryKey: ["workspace-ready"] }),
         ]);
         if (active.current && ticket === generation.current && reads.some(read => read.status === "rejected"))
-          setError("xAI 로그인은 확인됐지만 계정·모델 목록을 다시 읽지 못했습니다. 연결 상태를 직접 확인하세요.");
+          setError(messageKey("xai.refreshFailed"));
       }
     } catch {
-      if (active.current && ticket === generation.current && !cancelled.current) setError("로그인 상태 조회에 실패했습니다. 자동 확인을 멈췄습니다. 새 로그인은 시작하지 않았습니다.");
+      if (active.current && ticket === generation.current && !cancelled.current) setError(messageKey("xai.pollFailed"));
     } finally {
       requests.current.delete(controller);
       checkBusy.current = false;
@@ -185,9 +188,9 @@ export function XaiDeviceLogin({ projectId, workspaceId, account, method, method
       const next = statusState(response.value, session.loginId);
       if (next?.state === "CANCELLED") {
         setSession((current) => current?.loginId === session.loginId ? { ...current, ...next } : current);
-      } else setError("취소 결과를 확인하지 못했습니다. 같은 로그인 ID의 상태를 직접 확인하세요.");
+      } else setError(messageKey("xai.cancelUnknown"));
     } catch {
-      if (active.current && ticket === generation.current) setError("취소 결과를 확인하지 못했습니다. 자동으로 다시 취소하지 않습니다.");
+      if (active.current && ticket === generation.current) setError(messageKey("oauth.cancelNotRetried"));
     } finally {
       requests.current.delete(controller);
       cancelBusy.current = false;
@@ -197,34 +200,34 @@ export function XaiDeviceLogin({ projectId, workspaceId, account, method, method
 
   return <div className="xai-device-login">
     {method && method.capabilities?.start !== true
-      ? <p className="connection-note" role="status">{reasonText(method.reason_code) ?? "이 PC에서는 xAI 로그인을 시작할 수 없습니다. API 키로 연결하세요."}</p>
+      ? <p className="connection-note" role="status">{reasonText(method.reason_code) ?? t("xai.unsupported")}</p>
       : <Button intent={canStart ? "primary" : "none"} disabled={!canStart} loading={starting} onClick={() => void start()}>
-        {account?.oauth || shownState === "CONNECTED" ? "xAI 로그인됨" : session ? "xAI 로그인 다시 시작" : "xAI로 로그인"}
+        {account?.oauth || shownState === "CONNECTED" ? t("xai.loggedIn") : session ? t("xai.restart") : t("xai.login")}
       </Button>}
-    {!workspaceId && <small role="status">작업 공간을 확인한 뒤 xAI 로그인을 시작할 수 있습니다.</small>}
+    {!workspaceId && <small role="status">{t("xai.workspaceNeeded")}</small>}
     {session && <Callout compact>
       <p role="status">{stateMessage(shownState!)}</p>
       {!terminalStates.has(shownState!) && <>
-        <p className="device-code-row">사용자 코드: <code className="device-code">{session.userCode}</code></p>
-        <p><a href={session.verificationUri} target="_blank" rel="noopener noreferrer">xAI 승인 페이지 열기</a> — 열린 페이지에 위 코드를 입력하세요.</p>
-        <p className="connection-timer" aria-live="off">남은 유효 시간: {Math.max(0, Math.ceil(session.expiresAt - now))}초</p>
+        <p className="device-code-row">{t("labels.userCode")}{" "}<code className="device-code">{session.userCode}</code></p>
+        <p><a href={session.verificationUri} target="_blank" rel="noopener noreferrer">{t("xai.openApproval")}</a>{" "}{t("xai.enterCode")}</p>
+        <p className="connection-timer" aria-live="off">{message("expiry", Math.max(0, Math.ceil(session.expiresAt - now)), false)}</p>
         <div>
           <Button small minimal disabled={checking || cancelling} onClick={() => {
             // A previous status request has settled before this button is enabled again.
             // After an uncertain cancel, a deliberate read may inspect that same login ID.
             if (cancelAttempted) cancelled.current = false;
             void check();
-          }}>상태 직접 확인</Button>
-          <Button small minimal disabled={cancelAttempted || cancelling} loading={cancelling} onClick={() => void cancel()}>이 로그인 취소</Button>
+          }}>{t("oauth.checkManually")}</Button>
+          <Button small minimal disabled={cancelAttempted || cancelling} loading={cancelling} onClick={() => void cancel()}>{t("oauth.cancel")}</Button>
         </div>
       </>}
     </Callout>}
-    {error && <Callout compact intent="warning" role="alert">{error}</Callout>}
+    {error && <Callout compact intent="warning" role="alert">{uiText(error)}</Callout>}
     {(session || method && method.capabilities?.start !== true) && <details className="connection-tech">
-      <summary>기술 정보</summary>
-      {method && <p>{method.route} · 연결 {method.connection_state ?? "미조회"} · 모델 경로 {method.execution_eligible ? "시도 가능" : "준비 전"} · 실행 성공 {account?.execution_verified === true ? "확인됨" : "미검증"}</p>}
-      {method && method.capabilities?.start !== true && <p>로그인 시작 불가{method.reason_code ? ` (${method.reason_code})` : ""}</p>}
-      {session && <p>로그인 시도: {shownState} · 저장 인증: {session.authState} · 모델 목록: {session.catalogState}</p>}
+      <summary>{t("oauth.technical")}</summary>
+      {method && <p>{method.route}{" "}{t("labels.connection")}{" "}{method.connection_state ?? t("setup.notRead")}{" "}{t("labels.modelRoute")}{" "}{method.execution_eligible ? t("oauth.canAttempt") : t("oauth.notReady")}{" "}{t("labels.executionSuccess")}{" "}{account?.execution_verified === true ? t("oauth.verified") : t("oauth.unverified")}</p>}
+      {method && method.capabilities?.start !== true && <p>{t("labels.loginUnavailable")}{method.reason_code ? ` (${method.reason_code})` : ""}</p>}
+      {session && <p>{t("labels.loginAttempt")}{" "}{shownState}{" "}{t("labels.storedAuth")}{" "}{session.authState}{" "}{t("labels.modelList")}{" "}{session.catalogState}</p>}
     </details>}
   </div>;
 }

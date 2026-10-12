@@ -16,6 +16,7 @@ from thoth.adapters.models.codex_oauth import (
     strict_output_schema,
     user_visible_language_contract,
 )
+from thoth.adapters.models.language_contract_text import language_for
 from thoth.adapters.models.reference_schema import constrain_span_references
 from thoth.domain.canonical import canonical_payload, domain_digest, model_digest
 from thoth.domain.model import ModelRequest, ModelResult
@@ -241,9 +242,14 @@ class OpenAIResponsesModel(ModelPort):
             f"Perform only role {request.role.value} under prompt {request.prompt_version}. "
             "Return only the structured object required by the supplied schema."
             + " "
-            + user_visible_language_contract()
+            + user_visible_language_contract(request)
             + " TASK_CONTRACT: "
-            + role_contract(request.role.value, request.prompt_version)
+            + role_contract(request.role.value, request.prompt_version, language_for(request))
+            + (
+                " REQUEST_LANGUAGE_OVERRIDE: " + user_visible_language_contract(request)
+                if request.response_language is not None
+                else ""
+            )
         )
 
     @staticmethod
@@ -292,5 +298,10 @@ class OpenAIResponsesModel(ModelPort):
             + "\n\nTASK\n"
             + request.role.value
             + "\nTASK_CONTRACT\n"
-            + role_contract(request.role.value, request.prompt_version)
+            + role_contract(request.role.value, request.prompt_version, language_for(request))
+            + (
+                " REQUEST_LANGUAGE_OVERRIDE: " + user_visible_language_contract(request)
+                if request.response_language is not None
+                else ""
+            )
         )

@@ -143,7 +143,7 @@ export type ResearchStatus = WorkThread & {
   user_progress_summary?: UserProgressSummary | null;
   coverage_matrix?: CoverageMatrix | null;
   next_user_action?: NextUserAction | null;
-  request?: { operation_id: string; authored_text?: string; effective_question?: string; model_settings?: unknown; policy_digest?: string; cutoff_at?: string };
+  request?: { response_language?: "ko" | "en"; operation_id: string; authored_text?: string; effective_question?: string; model_settings?: unknown; policy_digest?: string; cutoff_at?: string };
   completed_stages?: CompletedStage[];
   stage_reuse?: { reused: number; new: number };
   activity_events?: ActivityEvent[];
@@ -159,6 +159,9 @@ export type ResearchStatus = WorkThread & {
 export type ResearchAdmission = { contract_version: number; project_id?: string; thread_id: string; operation_id?: string;
   status?: string; request_epoch?: number | null; terminal_reason?: string | null };
 export type WorkspaceReady = {
+  browser_scope_id?: string;
+  response_languages?: ("ko" | "en")[];
+  response_language_scope?: "REQUEST";
   ready: boolean;
   model_connected?: boolean;
   deployment_mode?: string;
@@ -202,13 +205,13 @@ const contextKey = "thoth:web-context:v1";
 export function readWorkspaceContext(scope?: BrowserScope): { projectId: string; threadId: string } {
   if (scope?.mode === "LOCAL") return readLocalContext(scope.workspaceId);
   try {
-    const value = JSON.parse(sessionStorage.getItem(contextKey) ?? "null");
+    const value = JSON.parse(sessionStorage.getItem(scope?.mode === "HOSTED" && scope.browserScopeId ? `${contextKey}:${scope.browserScopeId}` : contextKey) ?? "null");
     if (value?.version === 1 && typeof value.projectId === "string" && typeof value.threadId === "string") return value;
   } catch { /* Storage can be disabled; canonical data is always fetched from the server. */ }
   return { projectId: "", threadId: "" };
 }
 export function saveWorkspaceContext(projectId: string, threadId: string, scope?: BrowserScope) {
   if (scope?.mode === "LOCAL") return writeLocalContext(scope.workspaceId, { projectId, threadId });
-  try { sessionStorage.setItem(contextKey, JSON.stringify({ version: 1, projectId, threadId })); return true; }
+  try { sessionStorage.setItem(scope?.mode === "HOSTED" && scope.browserScopeId ? `${contextKey}:${scope.browserScopeId}` : contextKey, JSON.stringify({ version: 1, projectId, threadId })); return true; }
   catch { return false; }
 }

@@ -1,3 +1,4 @@
+import { t } from "../i18n/locale";
 import { z } from "zod";
 import { rpc } from "./rpcClient";
 import type { ExecutionError, ResearchFailure, ResultManifest } from "./research";
@@ -40,7 +41,7 @@ async function readConversationPage(projectId: string, threadId: string, before:
   if (response.value.conversation === undefined) return { turns: [], next: null, limited: false, supported: false };
   const page = pageSchema.parse(response.value.conversation);
   const observations = await Promise.all(page.turns.map(async input => {
-    const unavailable: ConversationTurn = { input, result: null, state: "UNAVAILABLE", unavailable: "이 답변은 현재 권한으로 읽을 수 없거나 저장 기준을 확인하지 못했습니다." };
+    const unavailable: ConversationTurn = { input, result: null, state: "UNAVAILABLE", get unavailable() { return t("conversation.unavailable"); } };
     let value;
     try {
       ({ value } = await rpc<{ operation_id: string; state: string; result: Record<string, unknown> | null; error?:ExecutionError | null }>(
@@ -86,13 +87,13 @@ export function withCurrentCheckpoint(turns: ConversationTurn[], status?: {curre
     } : turn);
 }
 
-const draftKey = (project: string, thread: string) => `thoth:draft:v1:${JSON.stringify([project, thread])}`;
+const draftKey = (project: string, thread: string, scope?: BrowserScope) => `thoth:draft:v1:${JSON.stringify([project, thread, ...(scope?.mode === "HOSTED" && scope.browserScopeId ? [scope.browserScopeId] : [])])}`;
 export function readDraft(project: string, thread: string, scope?: BrowserScope): string {
   if (scope?.mode === "LOCAL") return readLocalDraft(scope.workspaceId, project, thread);
-  try { return sessionStorage.getItem(draftKey(project, thread)) ?? ""; } catch { return ""; }
+  try { return sessionStorage.getItem(draftKey(project, thread, scope)) ?? ""; } catch { return ""; }
 }
 export function writeDraft(project: string, thread: string, text: string, scope?: BrowserScope): DraftWriteResult {
   if (scope?.mode === "LOCAL") return writeLocalDraft(scope.workspaceId, project, thread, text);
-  try { if (text) sessionStorage.setItem(draftKey(project, thread), text); else sessionStorage.removeItem(draftKey(project, thread)); return "SAVED"; }
+  try { if (text) sessionStorage.setItem(draftKey(project, thread, scope), text); else sessionStorage.removeItem(draftKey(project, thread, scope)); return "SAVED"; }
   catch { return "UNAVAILABLE"; }
 }

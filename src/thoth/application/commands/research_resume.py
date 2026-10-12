@@ -6,9 +6,13 @@ from typing import Protocol
 
 from pydantic import JsonValue
 
+from thoth.application.services.request_language import resume_language
 from thoth.application.services.request_records import RequestRecords
 from thoth.domain.enums import EntityType, OperationState
-from thoth.domain.research_request import ResearchAttempt, ThreadRequestRevision
+from thoth.domain.research_request import (
+    ResearchAttempt,
+    decode_thread_request,
+)
 from thoth.ports.operation import OperationStorePort
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 
@@ -35,11 +39,12 @@ def resume_payload(host: ResumeHost, value: dict[str, JsonValue]) -> dict[str, J
         raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "RESUME_SOURCE_NOT_CURRENT")
     if finished.state == OperationState.RUNNING:
         raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "RESUME_SOURCE_STILL_RUNNING")
-    current = ThreadRequestRevision.model_validate(head[1])
+    current = decode_thread_request(head[1])
     if len(current.effective_question) > 20_000:
         raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "RESUME_QUESTION_TOO_LONG")
     return {
         **value,
+        **resume_language(current, value),
         "instruction": current.effective_question,
         "edit_kind": "REPLACE",
         "expected_request_epoch": current.request_epoch,

@@ -236,9 +236,7 @@ def create_research_entry(
         deployment_mode=mode,
         model_connected=lambda: _configured_model_available(settings.catalog, local_credentials),
         ready_projection=ready_projection,
-        workspace_id=workspace_id(workspace)
-        if mode is DeploymentMode.LOCAL and workspace
-        else None,
+        workspace_id=workspace_id(workspace) if workspace else None,
     )
     registry.register("workspace/setup/read", workspace_setup.read)
     registry.register("workspace/setup/update", workspace_setup.update)

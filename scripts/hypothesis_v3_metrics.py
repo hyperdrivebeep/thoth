@@ -74,6 +74,12 @@ def readable_texts(hypothesis: Mapping[str, Any]) -> list[str]:
     return found
 
 
+def _unknown(row: Mapping[str, Any]) -> bool:
+    if "knowledge_state" in row:
+        return row["knowledge_state"] == "UNKNOWN"
+    return _normalized(str(row.get("expected", ""))) == UNKNOWN_LABEL
+
+
 def _normalized(label: str) -> str:
     return " ".join(label.split()).lower()
 
@@ -88,7 +94,15 @@ def _outcome_classes(
     if labels is not None:
         if not all(name in labels for name in candidates):
             return None
-        unknown = [name for name in candidates if _normalized(labels[name]) == UNKNOWN_LABEL]
+        unknown = [
+            name
+            for name in candidates
+            if (
+                item["knowledgeStates"][name] == "UNKNOWN"
+                if name in item.get("knowledgeStates", {})
+                else _normalized(labels[name]) == UNKNOWN_LABEL
+            )
+        ]
         by_label: dict[str, list[str]] = {}
         for name in candidates:
             if name not in unknown:
@@ -174,7 +188,7 @@ def measure(portfolio: Mapping[str, Any]) -> dict[str, Any]:
     tests = [test for item in hypotheses for test in _maps(item.get("discriminating_tests"))]
     tables = [_maps(test.get("expected_by_hypothesis")) for test in tests]
     rows = [row for table in tables for row in table]
-    unknown = [row for row in rows if _normalized(str(row.get("expected", ""))) == UNKNOWN_LABEL]
+    unknown = [row for row in rows if _unknown(row)]
     with_basis = [row for row in rows if row.get("basis")]
     unbased = [row for row in rows if row not in unknown and not row.get("basis")]
     hanja_labels = [row for row in rows if _HAN.search(str(row.get("expected", "")))]
@@ -187,7 +201,8 @@ def measure(portfolio: Mapping[str, Any]) -> dict[str, Any]:
     splitting = [
         table
         for table in countable
-        if len({_normalized(str(row.get("expected", ""))) for row in table} - {UNKNOWN_LABEL}) >= 2
+        if len({_normalized(str(row.get("expected", ""))) for row in table if not _unknown(row)})
+        >= 2
     ]
     conditions = sum(
         len(cast("list[object]", item.get("refutation_conditions") or [])) for item in hypotheses
@@ -205,6 +220,11 @@ def measure(portfolio: Mapping[str, Any]) -> dict[str, Any]:
                     "kind": "TEST",
                     "hypothesisId": str(item.get("hypothesis_id")),
                     "labels": labels if rows_of else None,
+                    "knowledgeStates": {
+                        str(row["hypothesis_id"]): row["knowledge_state"]
+                        for row in rows_of
+                        if "knowledge_state" in row
+                    },
                 },
                 candidates,
             )

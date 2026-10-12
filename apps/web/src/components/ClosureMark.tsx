@@ -1,3 +1,5 @@
+import { message as formatMessage } from "../i18n/formatMessages";
+import { t } from "../i18n/locale";
 import { Button, Tag } from "@blueprintjs/core";
 import type { ClosureRow } from "../api/judgmentRecords";
 import type { Verdict } from "../api/trace";
@@ -15,10 +17,10 @@ export function ClosureMark({ row, verdict, label, onRecord }: { row: ClosureRow
   return <div className="trace-closure-cell">
     {shown && <div className="trace-closure" role="note"><Tag minimal intent="primary" icon="annotation">{shown.label}</Tag>
       <ul className="trace-reasons">{shown.lines.map((line, index) => <li key={index}>{line}</li>)}</ul></div>}
-    {row && older.length > 0 && <Disclosure label={`이전 처분 기록 ${older.length}건`} className="trace-closure-history">
+    {row && older.length > 0 && <Disclosure label={formatMessage("earlierClosures", older.length)} className="trace-closure-history">
       {older.map(event => <div className="trace-closure" role="note" key={event.event_id}><Tag minimal icon="history">{eventKindLabel(event)}</Tag>
         <ul className="trace-reasons">{eventLines(row.subject_kind, event).map((line, index) => <li key={index}>{line}</li>)}</ul></div>)}
     </Disclosure>}
-    {!isMet(verdict.state) && <Button small minimal icon="annotation" aria-label={label + " 처분 기록 남기기"} onClick={() => onRecord(verdict)}>처분 기록</Button>}
+    {!isMet(verdict.state) && <Button small minimal icon="annotation" aria-label={formatMessage("recordDisposition", label)} onClick={() => onRecord(verdict)}>{t("lesson.disposition")}</Button>}
   </div>;
 }

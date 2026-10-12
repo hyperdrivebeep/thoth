@@ -3,7 +3,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, expect, it, vi } from "vitest";
-import { AutoRetrySwitch, autoRetryHelp } from "./AutoRetrySwitch";
+import { AutoRetrySwitch } from "./AutoRetrySwitch";
+import { modelHelpMessages } from "../i18n/modelHelpMessages";
 
 // 사용자 결정 20261010-01: a project without saved settings is on.
 const state = vi.hoisted(() => ({ enabled: true, digest: null as string | null, calls: [] as { method: string; input: Record<string, unknown> }[], fail: false }));
@@ -33,7 +34,7 @@ it("starts on as the server says, explains the cost, and sends the digest it rea
   expect(input.checked).toBe(true);
   expect(container.textContent).toContain("모델 호출이 중간에 끊기면 그 호출만 최대 2번 자동으로 다시 시도합니다. 토큰이 더 쓰입니다.");
   expect(container.textContent).toContain("끄면 끊긴 결과 카드의 \"이어서 조사\"로 다시 할 수 있습니다.");
-  expect(autoRetryHelp).toContain("토큰이 더 쓰입니다");
+  expect(modelHelpMessages["modelHelp.retry"].ko).toContain("토큰이 더 쓰입니다");
   expect(state.calls).toEqual([{ method: "model/callSettings/read", input: { project_id: "project:p" } }]);
   await act(async () => input.click());
   await settle();

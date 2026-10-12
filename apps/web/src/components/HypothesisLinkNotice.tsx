@@ -1,3 +1,4 @@
+import { t } from "../i18n/locale";
 import { Button, Callout } from "@blueprintjs/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -15,7 +16,7 @@ function RecheckWork({ projectId, link, siblings, distribution, onClose }: {
     onSuccess: async () => { await client.invalidateQueries({ queryKey: hypothesisLinksKey(projectId) }); onClose(); },
   });
   return <LinkRecheckDialog target={link} siblings={siblings} distribution={distribution} pending={send.isPending}
-    error={send.error ? "확인을 기록하지 못했습니다. 판정이 그 사이 다시 바뀌었을 수 있으니 화면을 새로 읽은 뒤 다시 시도해 주세요." : null}
+    error={send.error ? t("hypothesisLink.recordFailed") : null}
     onClose={onClose} onSubmit={(ids, reason, note, revision) => send.mutate({ ids, reason, note, revision })}/>;
 }
 
@@ -29,10 +30,10 @@ export function HypothesisLinkNotice({ projectId, link, all = [], distribution }
   const checked = recheckLine(link);
   return <Callout compact intent={link.state === "STALE" ? "warning" : "success"} className="hypothesis-link" role="note">
     {change && <p><strong>{change}</strong></p>}
-    {link.subject_title && <small className="muted">대상: 「{link.subject_title}」 {link.subject_kind === "CRITERION" ? "기준" : "요구사항"}</small>}
+    {link.subject_title && <small className="muted">{t("labels.target")} 「{link.subject_title}」 {link.subject_kind === "CRITERION" ? t("followup.criterion") : t("tracePage.requirement")}</small>}
     {checked && <p>{checked}</p>}
-    {link.state === "STALE" && <div><Button small icon="tick" onClick={() => setOpen(true)}>다시 확인</Button>
-      <small className="muted"> 이전 근거 기준인 가설은 행동 승인과 실행에 쓰이지 않습니다.</small></div>}
+    {link.state === "STALE" && <div><Button small icon="tick" onClick={() => setOpen(true)}>{t("workspace.checkAgain")}</Button>
+      <small className="muted">{" "}{t("hypothesisLink.staleNotice")}</small></div>}
     {open && <RecheckWork projectId={projectId} link={link} siblings={linkSiblings(link, all)} distribution={distribution} onClose={() => setOpen(false)}/>}
   </Callout>;
 }

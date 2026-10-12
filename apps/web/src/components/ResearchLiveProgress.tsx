@@ -1,3 +1,5 @@
+import { message as formatMessage } from "../i18n/formatMessages";
+import { t } from "../i18n/locale";
 import { Icon, Spinner } from "@blueprintjs/core";
 
 import { liveResearchProgress } from "../api/researchProgress";
@@ -19,23 +21,23 @@ export function ResearchLiveProgress({
   const notes = progress.events.filter(event => event.kind === "note" && !event.live).map(event=>event.text);
   const contextNotes = [...new Set([notes[0],notes.at(-1)])].filter((note):note is string=>Boolean(note)&&note!==progress.current.title);
   const evidenceScope = progress.evidenceLabels.length>0
-    ? `${progress.evidenceLabels.slice(0,2).join(" · ")}${progress.evidenceLabels.length>2?` 외 ${progress.evidenceLabels.length-2}곳`:""}`
-    : progress.evidenceTotal===0 ? "현재 연결 범위에서 선택된 근거 후보가 없습니다." : null;
+    ? `${progress.evidenceLabels.slice(0,2).join(" · ")}${progress.evidenceLabels.length>2?formatMessage("moreLocations", progress.evidenceLabels.length-2):""}`
+    : progress.evidenceTotal===0 ? t("liveProgress.noCandidates") : null;
   const judgement = progress.hypothesisCount==null ? progress.missing
-    : `가설 ${progress.hypothesisCount}개 중 ${progress.reviewCount??0}개를 검토했습니다.`;
+    : formatMessage("hypothesesReviewed", progress.hypothesisCount, progress.reviewCount??0);
   return (
-    <aside className="research-progress" aria-label="연구 진행 상황">
+    <aside className="research-progress" aria-label={t("liveProgress.title")}>
       <div className="research-progress-summary" role="status" aria-live="polite" aria-atomic="true">
-        {status?.operation_state === "RUNNING" ? <Spinner size={18}/> : <Icon icon="tick-circle" size={18}/>}<div><span>지금</span><strong>{progress.current.title}</strong></div>
+        {status?.operation_state === "RUNNING" ? <Spinner size={18}/> : <Icon icon="tick-circle" size={18}/>}<div><span>{t("liveProgress.now")}</span><strong>{progress.current.title}</strong></div>
       </div>
       <div className="research-progress-brief">
-        <div><span>왜</span><p>{progress.current.detail}</p></div>
-        {contextNotes.length>0&&<div><span>확인한 과정</span><p>{contextNotes.join(" · ")}</p></div>}
-        {evidenceScope&&<div><span>근거 범위</span><p>{evidenceScope}</p></div>}
-        {judgement&&<div><span>판단 상태</span><p>{judgement}</p></div>}
+        <div><span>{t("liveProgress.why")}</span><p>{progress.current.detail}</p></div>
+        {contextNotes.length>0&&<div><span>{t("liveProgress.checked")}</span><p>{contextNotes.join(" · ")}</p></div>}
+        {evidenceScope&&<div><span>{t("liveProgress.scope")}</span><p>{evidenceScope}</p></div>}
+        {judgement&&<div><span>{t("history.assessmentState")}</span><p>{judgement}</p></div>}
       </div>
       <ResearchActivityStrip events={status?.user_activity_events} />
-      <Disclosure label="작업 상세">
+      <Disclosure label={t("liveProgress.details")}>
         <ol className="research-progress-timeline">
           {progress.events.map((event) =>
             event.kind === "note" ? (

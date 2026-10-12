@@ -1,3 +1,5 @@
+import { UiError } from "../i18n/UiError";
+import { t } from "../i18n/locale";
 import { rpc } from "./rpcClient";
 import { historyDetailSchema, historyPageSchema, historicalResultSchema, type WireHistoryItem } from "./historySchemas";
 import type { HistoryEntry, HistoryKind, HistoryPage, HistoryRow, HistoryScope, HistorySelection, RecordReference } from "./historyModels";
@@ -11,11 +13,11 @@ export function wireRecord(record: RecordReference) {
 }
 async function query(method: string, input: Record<string, unknown>, signal?: AbortSignal): Promise<unknown> {
   const response = await rpc<unknown>(method, input, crypto.randomUUID(), signal);
-  if (response.state !== "SUCCEEDED") throw new Error("이력 조회가 완료되지 않았습니다.");
+  if (response.state !== "SUCCEEDED") throw new UiError("api.historyIncomplete");
   return response.value;
 }
 function rowOf(item: WireHistoryItem, scope: HistoryScope): HistoryRow {
-  if (item.record_ref.project_id !== scope.projectId) throw new Error("기록의 프로젝트 연결을 확인하지 못했습니다.");
+  if (item.record_ref.project_id !== scope.projectId) throw new UiError("api.historyProject");
   const record: RecordReference = { owner: item.record_ref.owner_kind, projectId: item.record_ref.project_id,
     id: item.record_ref.immutable_id, digest: item.record_ref.revision_digest,
     entityType: item.entity_type ?? undefined, entityId: item.entity_id ?? undefined };
@@ -59,7 +61,7 @@ export async function readHistoryEntry(selection: HistorySelection, signal?: Abo
     if (value.project_id !== scope.projectId || value.thread_id !== scope.threadId || value.request_revision_digest !== scope.requestDigest
       || (selection.operationId && value.operation_id !== selection.operationId)
       || (selection.resultDigest && value.result_revision_digest !== selection.resultDigest)) {
-      throw new Error("과거 답변의 요청·결과 연결을 확인하지 못했습니다.");
+      throw new UiError("api.historyResult");
     }
     const readable = value.availability !== "UNAVAILABLE";
     // Comparing a result uses its observed immutable record identity, never a guessed ID.
@@ -69,7 +71,7 @@ export async function readHistoryEntry(selection: HistorySelection, signal?: Abo
       try { comparisonEntry = await readHistoryEntry({ kind: "record", scope, record: selection.record }, signal); }
       catch (error) { if (signal?.aborted) throw error; }
     }
-    return { selection, title: selection.title ?? "당시 질문과 답변", occurredAt: selection.occurredAt ?? (typeof value.request.created_at === "string" ? value.request.created_at : null),
+    return { selection, title: selection.title ?? t("api.historyPair"), occurredAt: selection.occurredAt ?? (typeof value.request.created_at === "string" ? value.request.created_at : null),
       kind: "RESULT", question: readable ? questionOf(value.request) : null, result: readable ? value.result : null, content: null,
       executionState: value.operation_state ?? null, resultPhase: typeof value.manifest?.completion === "string" ? value.manifest.completion : null,
       currentness: value.basis_currentness, availability: value.availability, reasons: value.coverage.reasons,
@@ -83,7 +85,7 @@ export async function readHistoryEntry(selection: HistorySelection, signal?: Abo
   const ref = value.item.record_ref;
   if (ref.project_id !== selection.scope.projectId || ref.project_id !== selection.record.projectId || ref.owner_kind !== selection.record.owner
     || ref.immutable_id !== selection.record.id || ref.revision_digest !== selection.record.digest) {
-    throw new Error("선택한 기록의 연결을 확인하지 못했습니다.");
+    throw new UiError("api.historySelection");
   }
   const { item } = value;
   const head = value.current_head_digest ?? null;

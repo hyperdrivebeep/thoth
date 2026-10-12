@@ -1,3 +1,5 @@
+import { message } from "../i18n/formatMessages";
+import { t, useTranslation } from "../i18n/locale";
 import { Button, Callout, InputGroup, Tag } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -20,6 +22,7 @@ const toneIntent: Record<ProviderTone, "success" | "primary" | "none" | "warning
 const keyPlaceholder: Record<string, string> = { openai: "sk-...", anthropic: "sk-ant-...", xai: "xai-..." };
 
 export function FirstRunSetup({ onDone }: { onDone: () => void }) {
+  useTranslation();
   const client = useQueryClient();
   const ready = useQuery({
     queryKey: ["workspace-ready"],
@@ -85,10 +88,10 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
 
   if (setupIssue) return <main className="first-run-shell bp6-dark">
     <section className="first-run-card" aria-labelledby="first-run-title">
-      <p className="eyebrow">설정 확인 필요</p>
-      <h1 id="first-run-title">기존 작업 공간 설정을 확인하세요</h1>
-      <Callout intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} 저장된 연구 기록은 이 설정 파일과 별개이며 권한이 있으면 계속 읽을 수 있습니다.</Callout>
-      <Button small minimal icon="refresh" loading={ready.isFetching} onClick={() => void ready.refetch()}>설정 상태 다시 확인</Button>
+      <p className="eyebrow">{t("setup.checkNeeded")}</p>
+      <h1 id="first-run-title">{t("setup.checkWorkspace")}</h1>
+      <Callout intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} {t("setup.researchIndependent")}</Callout>
+      <Button small minimal icon="refresh" loading={ready.isFetching} onClick={() => void ready.refetch()}>{t("setup.checkAgain")}</Button>
     </section>
   </main>;
 
@@ -96,12 +99,12 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
     <main className="first-run-shell bp6-dark">
       <section className="first-run-card" aria-labelledby="first-run-title">
         <p className="eyebrow">
-          {hosted ? "심사 워크스페이스" : `처음 설정 · ${currentStep === "model" ? "1 / 2" : "2 / 2"}`}
+          {hosted ? t("setup.reviewWorkspace") : message("setupStep", currentStep === "model" ? 1 : 2)}
         </p>
         {!hosted && currentStep === "model" ? (
           <>
-            <h1 id="first-run-title">연구를 맡길 모델을 연결하세요</h1>
-            <p className="muted">하나만 있으면 됩니다. 나머지는 나중에 설정에서 추가할 수 있습니다.</p>
+            <h1 id="first-run-title">{t("setup.connectModel")}</h1>
+            <p className="muted">{t("setup.oneModelEnough")}</p>
             <div className="first-run-providers">
               {credentialCompanies.map((company) => {
                 const row = accounts.find((item) => item.provider === company.provider);
@@ -126,15 +129,15 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                       <Tag minimal round intent={toneIntent[status.tone]}>{status.label}</Tag>
                       <Button className="provider-key-toggle" small minimal icon="key" aria-expanded={keyOpen}
                         onClick={() => { setKeyProvider(keyOpen ? null : company.provider); setApiKey(""); }}>
-                        {keyOpen ? "키 입력 닫기" : "API 키로 연결"}
+                        {keyOpen ? t("setup.closeKey") : t("setup.useKey")}
                       </Button>
                     </header>
                     <p className="first-run-provider-summary">{status.summary}</p>
                     <div className="first-run-provider-body">
                       {needsModelRefresh(row) && <Button intent="primary" loading={loadModels.isPending}
-                        onClick={() => loadModels.mutate()}>모델 목록 불러오기</Button>}
+                        onClick={() => loadModels.mutate()}>{t("setup.loadModels")}</Button>}
                       {legacyAction && <Button disabled={!canStartLogin && !canGuideKey} loading={connect.isPending} onClick={() => connect.mutate({ provider: company.provider })}>
-                        {loginUnavailable(row) ? "설치·버전 확인 필요" : row?.connection_state === "LOGIN_PENDING" ? "로그인 완료 대기" : row?.oauth && loginSupported(row) ? "로그인 확인됨" : canStartLogin ? "Codex 로그인 시작" : canGuideKey ? "키 발급 안내" : "연결 방법 확인 중"}
+                        {loginUnavailable(row) ? t("setup.checkVersion") : row?.connection_state === "LOGIN_PENDING" ? t("setup.waitLogin") : row?.oauth && loginSupported(row) ? t("setup.loggedIn") : canStartLogin ? t("setup.startCodex") : canGuideKey ? t("setup.keyGuide") : t("setup.checkMethods")}
                       </Button>}
                       {xaiLogin && <XaiDeviceLogin key={`${credentialWorkspaceId ?? "unknown"}:system:workspace`}
                         projectId="system:workspace" workspaceId={credentialWorkspaceId} account={row} method={xaiMethod ?? undefined}
@@ -153,10 +156,10 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                       <div className="first-run-key">
                         <InputGroup
                           type="password"
-                          placeholder={keyPlaceholder[company.provider] ?? "API 키"}
+                          placeholder={keyPlaceholder[company.provider] ?? t("setup.apiKey")}
                           value={apiKey}
                           onChange={(event) => setApiKey(event.target.value)}
-                          aria-label={`${company.label} API 키`}
+                          aria-label={message("apiKeyLabel", company.label)}
                         />
                         <Button
                           intent="primary"
@@ -166,49 +169,49 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                             connect.mutate({ provider: company.provider, api_key: apiKey });
                           }}
                         >
-                          키 등록
+                          {t("setup.registerKey")}
                         </Button>
-                        <small>키는 이 PC의 THOTH 작업 공간에만 저장됩니다. 사용량은 해당 공급자 계정에 청구됩니다.</small>
+                        <small>{t("setup.keyStorage")}</small>
                       </div>
                     )}
                     <details className="connection-tech">
-                      <summary>상태 자세히</summary>
-                      <p>상태: {credentialAccountLabel(row)}</p>
-                      {row?.auth_methods?.map(item => <p key={item.auth_method}>{item.route} · {item.connection_state ?? "미조회"}{item.connected ? " · 연결됨" : ""}</p>)}
+                      <summary>{t("setup.details")}</summary>
+                      <p>{message("connectionStatus", credentialAccountLabel(row))}</p>
+                      {row?.auth_methods?.map(item => <p key={item.auth_method}>{item.route} · {item.connection_state ?? t("setup.notRead")}{item.connected ? t("setup.connectedSuffix") : ""}</p>)}
                       <p>{credentialConnectionHint(row)}</p>
-                      {keyMethod && <p>API 키: {keyMethod.connected ? "등록됨" : "미등록"} · 계정 로그인과 별도 경로</p>}
+                      {keyMethod && <p>{message("keyStatus", keyMethod.connected ? t("setup.registered") : t("setup.unregistered"))}</p>}
                       {availabilityNote && <p>{availabilityNote}</p>}
                     </details>
                   </article>
                 );
               })}
             </div>
-            <small className="muted">ChatGPT·Claude 계정 로그인은 같은 계정의 Codex·Claude Code 사용량 한도를 함께 씁니다.</small>
+            <small className="muted">{t("setup.sharedUsage")}</small>
             {connect.isSuccess && <Callout compact role="status">{credentialResultMessage(connect.data?.value)}
-              {guideUrl && <p><a href={guideUrl} target="_blank" rel="noopener noreferrer">키 발급 사이트 열기</a></p>}</Callout>}
+              {guideUrl && <p><a href={guideUrl} target="_blank" rel="noopener noreferrer">{t("setup.openKeySite")}</a></p>}</Callout>}
             {loadModels.data && <Callout compact role="status" data-catalog-result>{catalogResultLines((loadModels.data.value as { catalog_status?: CatalogStatusRow[] }).catalog_status, providerLabel).map(line => <p key={line}>{line}</p>)}</Callout>}
-            {loadModels.error && <Callout compact intent="warning" role="alert">{connectionErrorText(loadModels.error, "모델 목록을 불러오지 못했습니다. 잠시 뒤 다시 시도하세요.")}</Callout>}
+            {loadModels.error && <Callout compact intent="warning" role="alert">{connectionErrorText(loadModels.error, t("setup.catalogFailed"))}</Callout>}
             {connect.error && <Callout compact intent="danger">{connectionErrorText(connect.error, connect.error.message)}</Callout>}
-            {listed.error && <Callout compact intent="warning">계정 연결 방법을 확인하지 못했습니다. 연결 상태를 다시 확인하세요.</Callout>}
+            {listed.error && <Callout compact intent="warning">{t("setup.methodsFailed")}</Callout>}
             <Button small minimal icon="refresh" loading={ready.isFetching || listed.isFetching}
-              onClick={() => { void ready.refetch(); void listed.refetch(); }}>연결 상태 다시 확인</Button>
+              onClick={() => { void ready.refetch(); void listed.refetch(); }}>{t("setup.refreshConnection")}</Button>
             <div className="first-run-footer">
-              <span>{modelConnected ? "연결됐습니다. 다음으로 인터넷 사용 여부를 고릅니다." : "모델을 하나 연결하면 다음으로 넘어갈 수 있습니다."}</span>
+              <span>{modelConnected ? t("setup.modelReady") : t("setup.modelNeeded")}</span>
               <Button intent="primary" disabled={!modelConnected} onClick={() => setStep("internet")}>
-                다음
+                {t("setup.next")}
               </Button>
             </div>
           </>
         ) : (
           <>
-            <h1 id="first-run-title">공개 웹을 이 워크스페이스에서 쓸까요?</h1>
+            <h1 id="first-run-title">{t("setup.webQuestion")}</h1>
             <p className="muted">
               {hosted
-                ? value?.disclosure ?? "질문과 분석에 쓰인 자료는 운영자 OpenAI API로 전달됩니다. 공개 웹 허용은 자료 조회만 해당하고, 모델 호출과는 별개입니다."
-                : "모델 호출과 별개입니다. 지금 허용해도 프로젝트가 자동으로 켜지지 않습니다. 나중에 그 프로젝트에서 사이트를 등록한 뒤에만 웹을 찾습니다."}
+                ? value?.disclosure ?? t("setup.hostedDisclosure")
+                : t("setup.localDisclosure")}
             </p>
             {hosted && value?.model_connected === false && (
-              <Callout compact intent="warning">운영자 모델이 아직 준비되지 않았습니다. 키를 입력하지 마세요.</Callout>
+              <Callout compact intent="warning">{t("setup.operatorNotReady")}</Callout>
             )}
             <div className="first-run-choices">
               <Button
@@ -218,7 +221,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                 className={`first-run-choice${consent === "ALLOWED" ? " selected" : ""}`}
                 onClick={() => update.mutate("ALLOWED")}
               >
-                <span className="first-run-choice-copy"><strong>허용</strong><span>연결한 파일 다음에, 프로젝트에서 등록한 사이트만 찾습니다. 지금 허용해도 자동 검색은 없습니다.</span></span>
+                <span className="first-run-choice-copy"><strong>{t("setup.allow")}</strong><span>{t("setup.allowedScope")}</span></span>
               </Button>
               <Button
                 fill
@@ -227,20 +230,20 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                 className={`first-run-choice${consent === "DENIED" ? " selected" : ""}`}
                 onClick={() => update.mutate("DENIED")}
               >
-                <span className="first-run-choice-copy"><strong>거부</strong><span>
+                <span className="first-run-choice-copy"><strong>{t("setup.deny")}</strong><span>
                   {hosted
-                    ? "웹 자료 조회만 거부합니다. 질문과 분석은 계속 운영자 모델로 전달됩니다."
-                    : "웹 자료 조회만 거부합니다. 모델 호출은 계속됩니다."}
+                    ? t("setup.hostedDeny")
+                    : t("setup.localDeny")}
                 </span></span>
               </Button>
             </div>
             {update.error && <Callout compact intent="danger">{update.error.message}</Callout>}
             <div className="first-run-footer">
-              {hosted ? <span>로그인이나 API 키는 넣지 않습니다.</span> : <Button minimal onClick={() => setStep("model")}>모델로 돌아가기</Button>}
+              {hosted ? <span>{t("setup.noCredential")}</span> : <Button minimal onClick={() => setStep("model")}>{t("setup.backToModel")}</Button>}
               {setupReady ? (
-                <Button intent="primary" onClick={onDone}>프로젝트로</Button>
+                <Button intent="primary" onClick={onDone}>{t("setup.toProjects")}</Button>
               ) : (
-                <span>허용 또는 거부를 고르면 프로젝트로 갑니다.</span>
+                <span>{t("setup.chooseConsent")}</span>
               )}
             </div>
           </>

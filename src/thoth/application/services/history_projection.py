@@ -14,7 +14,7 @@ from thoth.domain.research_history import (
     HistoryRecordRef,
     HistoryScopeLink,
 )
-from thoth.domain.research_request import ThreadRequestRevision
+from thoth.domain.research_request import decode_thread_request
 from thoth.domain.restore import RestoreError
 from thoth.ports.ledger import LedgerPort
 from thoth.ports.research_history import HistoryRow, ResearchHistoryReadPort
@@ -108,7 +108,7 @@ class HistoryProjection:
             except RestoreError:
                 pass
         if family == "ThreadRequestRevision":
-            request = ThreadRequestRevision.model_validate(content)
+            request = decode_thread_request(content)
             if request.project_id != project or key != f"THREAD:request:{request.thread_id}":
                 raise RestoreError("HISTORY_SCOPE_MISMATCH")
             if not self.access.may_read_revision(
@@ -190,7 +190,7 @@ class HistoryProjection:
         self, project: str, key: str, content: dict[str, object], digest: str
     ) -> dict[str, object] | None:
         from thoth.domain.research_codec import decode_current_result_manifest
-        from thoth.domain.research_request import CurrentResultManifestV21
+        from thoth.domain.research_request import CurrentResultManifestV21, decode_thread_request
         from thoth.domain.resource_scope import ResourceUse
 
         try:
@@ -214,7 +214,7 @@ class HistoryProjection:
         )
         if request_rev is None or request_snap is None:
             raise RestoreError("HISTORY_REQUEST_UNAVAILABLE")
-        request = ThreadRequestRevision.model_validate(request_snap.content)
+        request = decode_thread_request(request_snap.content)
         if (
             manifest.operation_id != request.operation_id
             or key != f"DECISION_OBJECT:result:{request.thread_id}"

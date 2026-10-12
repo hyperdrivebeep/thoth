@@ -10,6 +10,7 @@ from pydantic import JsonValue
 
 from thoth.application.services.model_outcomes import record_model_outcome
 from thoth.application.services.post_execution_resume import resume_post_execution_learning
+from thoth.application.services.request_language import apply_request_language
 from thoth.application.services.research_boundary import RequestBoundary
 from thoth.application.services.research_termination import ResearchTerminationService
 from thoth.domain.enums import EntityType, OperationState, ThreadExecutionState
@@ -17,9 +18,13 @@ from thoth.domain.operation import OperationRecord
 from thoth.domain.research_execution import ResearchFence, ResearchWork, research_work
 from thoth.domain.research_failure import ResearchPublicationError, failure_cause
 from thoth.domain.research_lease import ResearchLease, ResearchLeaseLost, ResearchPaused
-from thoth.domain.research_request import InputDelivery, ResearchAttempt, ThreadRequestRevision
+from thoth.domain.research_request import (
+    InputDelivery,
+    ResearchAttempt,
+    ThreadRequestRevision,
+)
 from thoth.ports.model import ModelExecutionHold
-from thoth.protocol.deferred import AcceptedRunning, PendingExecution
+from thoth.protocol.deferred import AcceptedRunning, EphemeralCommandResult, PendingExecution
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 
 if TYPE_CHECKING:
@@ -243,7 +248,7 @@ async def _execute_owned(
         }
         legacy_input["instruction"] = request.authored_text
         result = await host.analyze_legacy(cast(dict[str, JsonValue], legacy_input))
-        if isinstance(result, (AcceptedRunning, PendingExecution)):
+        if isinstance(result, (AcceptedRunning, PendingExecution, EphemeralCommandResult)):
             raise ValueError("NESTED_RESEARCH_ADMISSION_FORBIDDEN")
         boundary.check()
         if result.get("queued") is True:
@@ -369,6 +374,7 @@ def _prepare_work(
 
     work.observe_context = lambda context: capture_rendered_memory(context, host.records.ledger)
     work.model_settings = request.model_settings
+    apply_request_language(work, request)
     resume_from = attempt.continuation.get("resume_from_operation_id")
     if isinstance(resume_from, str) and resume_from:
         work.resume_from_operation_id = resume_from

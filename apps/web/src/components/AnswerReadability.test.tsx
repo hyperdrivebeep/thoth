@@ -54,6 +54,17 @@ describe("the sentences the program writes about missing checks", () => {
 });
 
 describe("the answer screen", () => {
+  it("shows new English prose in a Korean interface when the saved request selected English", () => {
+    const result = {response_language: "en", answer: "The source says ‘온도’ and records 12 ms.",
+      assessment: {missing_items: ["An independent measurement is still needed."]}};
+    const before = JSON.stringify(result);
+    const text = visible(render(result));
+    expect(text).toContain("An independent measurement is still needed.");
+    expect(text).toContain("온도");
+    expect(text).toContain("12 ms");
+    expect(JSON.stringify(result)).toBe(before);
+  });
+
   it("shows no internal wording outside the folded technical information", () => {
     const html = render({ answer: "a", answer_status: "PARTIAL_HOLD", assessment: { missing_items: REASONS } }, {
       progressSummary: progress([REASONS[1]], [REASONS[2]]),

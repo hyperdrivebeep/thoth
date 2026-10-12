@@ -1,3 +1,7 @@
+import { getLocale } from "../i18n/locale";
+import { readDraftLanguage, writeDraftLanguage } from "../api/draftLanguage";
+import { message } from "../i18n/formatMessages";
+import { t, useTranslation } from "../i18n/locale";
 import { Button, Callout, Collapse, HTMLSelect, Icon, InputGroup, Tab, Tabs, Tag } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
@@ -67,6 +71,7 @@ function TimelineExamplePane() {
 }
 
 function ProjectForm({ onCreated }: { onCreated: (projectId: string) => void }) {
+  useTranslation();
   const client = useQueryClient();
   const [name, setName] = useState("");
   const [overlay, setOverlay] = useState("general-rnd");
@@ -84,15 +89,15 @@ function ProjectForm({ onCreated }: { onCreated: (projectId: string) => void }) 
     pending.current.inFlight=true;
     create.mutate({...pending.current,onCreated});
   };
-  return <div className="start-page"><div className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel("RESEARCH WORKSPACE")}</p><h1>질문에서 근거로,<br/>근거에서 다음 행동으로.</h1><p>왼쪽에서 프로젝트를 이어가거나 새로운 연구 맥락을 만드세요.</p></div><Icon icon="projects" size={50} /></div>
-    <form className="onboarding-card" onSubmit={event=>{event.preventDefault();submit();}}><h2>새 프로젝트</h2>
-      <label>프로젝트 이름<InputGroup required value={name} onChange={event=>setName(event.target.value)} placeholder="연구할 문제 또는 프로젝트 이름" /></label>
-      <div className="project-advanced"><Button minimal small icon={advancedOpen?"chevron-up":"chevron-down"} aria-expanded={advancedOpen} onClick={()=>setAdvancedOpen(value=>!value)}>기준시점 · 고급 설정</Button><Collapse isOpen={advancedOpen}><div className="form-row"><label>판단 기준시점<InputGroup required type="datetime-local" value={cutoff} onChange={event=>setCutoff(event.target.value)} /></label>
-        <label>도메인 프로필<InputGroup required value={overlay} onChange={event=>setOverlay(event.target.value)} /></label></div></Collapse></div>
-      <p className="muted">프로젝트를 만든 뒤 질문을 이어가고 필요한 자료를 연결할 수 있습니다.</p>
-      <Button type="submit" icon="plus" intent="primary" disabled={!name.trim() || !cutoff || !overlay.trim()} loading={create.isPending}>프로젝트 만들기</Button>
+  return <div className="start-page"><div className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel("RESEARCH WORKSPACE")}</p><h1>{t("workspace.questionEvidence")}</h1><p>{t("workspace.chooseOrCreate")}</p></div><Icon icon="projects" size={50} /></div>
+    <form className="onboarding-card" onSubmit={event=>{event.preventDefault();submit();}}><h2>{t("workspace.newProject")}</h2>
+      <label>{t("workspace.projectName")}<InputGroup required value={name} onChange={event=>setName(event.target.value)} placeholder={t("workspace.namePlaceholder")} /></label>
+      <div className="project-advanced"><Button minimal small icon={advancedOpen?"chevron-up":"chevron-down"} aria-expanded={advancedOpen} onClick={()=>setAdvancedOpen(value=>!value)}>{t("workspace.advanced")}</Button><Collapse isOpen={advancedOpen}><div className="form-row"><label>{t("workspace.cutoff")}<InputGroup required type="datetime-local" value={cutoff} onChange={event=>setCutoff(event.target.value)} /></label>
+        <label>{t("workspace.profile")}<InputGroup required value={overlay} onChange={event=>setOverlay(event.target.value)} /></label></div></Collapse></div>
+      <p className="muted">{t("workspace.createNotice")}</p>
+      <Button type="submit" icon="plus" intent="primary" disabled={!name.trim() || !cutoff || !overlay.trim()} loading={create.isPending}>{t("workspace.create")}</Button>
       {create.error && <Callout intent="danger" role="alert">{create.error.message}</Callout>}</form>
-    <div className="start-principles"><div><Icon icon="document-open"/><h3>연결 자료 우선</h3><p>원문 위치와 출처·기준시점을 함께 확인합니다.</p></div><div><Icon icon="comparison"/><h3>반증과 대안</h3><p>미확인·부분 결과를 보존하고 가설과 행동을 비교합니다.</p></div><div><Icon icon="history"/><h3>이어지는 연구 기록</h3><p>결과·기억·revision·복구의 근거를 추적합니다.</p></div></div>
+    <div className="start-principles"><div><Icon icon="document-open"/><h3>{t("workspace.sourcesFirst")}</h3><p>{t("workspace.sourceNotice")}</p></div><div><Icon icon="comparison"/><h3>{t("workspace.alternatives")}</h3><p>{t("workspace.alternativesNotice")}</p></div><div><Icon icon="history"/><h3>{t("workspace.historyTitle")}</h3><p>{t("workspace.historyNotice")}</p></div></div>
   </div>;
 }
 
@@ -100,14 +105,14 @@ type TraceRowRef = { kind: string; id: string };
 /** The trace row a question was started from: held here until it is sent, so the next request carries it. */
 type RowOrigin = { threadId: string; origin: PendingOrigin };
 
-function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, onUserInput, hosted = false, workspaceId = null, executionReady = true, readSuspended = false, setupIssue = null,
+function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, onUserInput, hosted = false, workspaceId = null, browserScopeId = null, executionReady = true, readSuspended = false, setupIssue = null,
   consent, modelConnected, rowOrigin = null, onOriginDone, onInvestigate, traceFocus = null, onOpenTrace }: {
   project: ProjectSummary; threadId: string; epoch: RefObject<number>; page: Page; onPage: (page: Page) => void; onAdmitted: (threadId: string) => void; onUserInput: () => void;
-  hosted?: boolean; workspaceId?: string | null; executionReady?: boolean; readSuspended?: boolean; setupIssue?: WorkspaceSetupIssue | null;
+  hosted?: boolean; workspaceId?: string | null; browserScopeId?: string | null; executionReady?: boolean; readSuspended?: boolean; setupIssue?: WorkspaceSetupIssue | null;
   consent?: string; modelConnected?: boolean;
   rowOrigin?: RowOrigin | null; onOriginDone?: () => void; onInvestigate?: (item: RowInvestigation) => void; traceFocus?: TraceRowRef | null; onOpenTrace?: (row: TraceRowRef) => void;
 }) {
-  const storageScope = useMemo<BrowserScope>(() => hosted ? { mode: "HOSTED" } : { mode: "LOCAL", workspaceId }, [hosted, workspaceId]);
+  const storageScope = useMemo<BrowserScope>(() => hosted ? { mode: "HOSTED", browserScopeId } : { mode: "LOCAL", workspaceId }, [hosted, workspaceId, browserScopeId]);
   const origin = rowOrigin && rowOrigin.threadId === threadId ? rowOrigin.origin : null;
   const session = useResearchSession(project.project_id, threadId, epoch, onAdmitted, storageScope, executionReady, origin, onOriginDone);
   useEffect(() => { if (origin && page === "research") document.getElementById("live-problem")?.focus(); }, [origin, page]);
@@ -135,38 +140,38 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
   const status = session.research.data?.value;
   const queryError = session.research.error ?? sources.error;
   if (readSuspended) return <section className="workspace-content conversation-page">
-    {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} 권한 있는 저장 연구는 계속 읽을 수 있습니다.</Callout>}
+    {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} {t("workspace.authorizedRead")}</Callout>}
     {page==="research"&&<ResearchComposer session={session} projectId={project.project_id} threadId={threadId} epoch={capturedEpoch}
       onAttach={openResourcePanel} hosted={hosted} executionReady={false} readSuspended/>}</section>;
   return <section ref={contentRef} className={`workspace-content ${page==="research"?"conversation-page":""}`}>
-    {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} 권한 있는 저장 연구는 계속 읽을 수 있지만 새 모델 실행과 동의 변경은 보류합니다.</Callout>}
+    {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} {t("workspace.readOnlyHold")}</Callout>}
     {page==="research" ? <div className={`conversation-layout ${panelOpen?"detail-open":""}`}><div className="conversation-center">
-      <header className="conversation-heading"><h1>{status?.problem??(threadId?"연구 이어가기":"새로운 질문")}</h1></header>
-      {import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Callout compact intent="warning" className="test-mode-banner">검증 모드 · 고정 응답/통제 자료로 확인하는 화면입니다.</Callout>}
+      <header className="conversation-heading"><h1>{status?.problem??(threadId?t("workspace.continue"):t("workspace.newQuestion"))}</h1></header>
+      {import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Callout compact intent="warning" className="test-mode-banner">{t("workspace.testModeNotice")}</Callout>}
       <div className="conversation-scroll"><ConversationTimeline projectId={project.project_id} threadId={threadId} status={status} sourceUris={(sources.data?.value.artifacts??[]).map(item=>item.source_uri)} onDetail={openDetail} queuedInstruction={session.queuedNotice} onContinue={()=>document.getElementById("live-problem")?.focus()} onRetry={question=>{session.setProblem(question);document.getElementById("live-problem")?.focus();}} onResume={operationId=>session.resume.mutate(operationId)} resuming={session.resume.isPending} onOpenHistory={()=>onPage("records")} onOpenTrace={onOpenTrace}/>
-        {session.resume.error&&<Callout intent="danger" role="alert">이어서 조사를 시작하지 못했습니다. {session.resume.error.message}</Callout>}
-        {queryError&&<Callout intent="danger" role="alert">{queryError.message}<Button small onClick={()=>{void session.research.refetch();void sources.refetch();}}>다시 읽기</Button></Callout>}
+        {session.resume.error&&<Callout intent="danger" role="alert">{t("workspace.resumeFailed")} {session.resume.error.message}</Callout>}
+        {queryError&&<Callout intent="danger" role="alert">{queryError.message}<Button small onClick={()=>{void session.research.refetch();void sources.refetch();}}>{t("workspace.reload")}</Button></Callout>}
       </div>
       <ResearchComposer session={session} projectId={project.project_id} threadId={threadId} epoch={capturedEpoch} onAttach={openResourcePanel}
         onOpenSettings={target=>{setFocusConsent(target==="consent");onPage("settings");}} hosted={hosted} executionReady={executionReady}
         consentMissing={!hosted && consent==="UNDECIDED"} modelConnected={modelConnected}/>
-    </div>{panelOpen&&<ResearchSidePanel tab={sideTab} onTab={setSideTab} detail={detail} onClose={closeDetail} sources={sources.data?.value.artifacts??[]} project={project} thread={{thread_id:threadId,problem:status?.problem??"연구",current_object_ids:status?.current_object_ids??[]}} onOpenRecords={()=>onPage("records")} onManageResources={()=>{closeDetail();onPage("resources");}}/>}</div> :
-    page==="capabilities" && !hosted ? <><Button minimal icon="arrow-left" onClick={()=>onPage("settings")}>설정으로 돌아가기</Button><CapabilityWorkbench projectId={project.project_id} threadId={threadId} initialNamespace={catalogNamespace}/></> :
-    page==="trace" ? <TracePage projectId={project.project_id} onInvestigate={onInvestigate} focusRow={traceFocus}/> : page==="records" ? <ResearchHistoryWorkspace key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId}
+    </div>{panelOpen&&<ResearchSidePanel tab={sideTab} onTab={setSideTab} detail={detail} onClose={closeDetail} sources={sources.data?.value.artifacts??[]} project={project} thread={{thread_id:threadId,problem:status?.problem??t("workspace.research"),current_object_ids:status?.current_object_ids??[]}} onOpenRecords={()=>onPage("records")} onManageResources={()=>{closeDetail();onPage("resources");}}/>}</div> :
+    page==="capabilities" && !hosted ? <><Button minimal icon="arrow-left" onClick={()=>onPage("settings")}>{t("workspace.backSettings")}</Button><CapabilityWorkbench projectId={project.project_id} threadId={threadId} initialNamespace={catalogNamespace}/></> :
+    page==="trace" ? <TracePage projectId={project.project_id} responseLanguage={session.responseLanguage} onInvestigate={onInvestigate} focusRow={traceFocus}/> : page==="records" ? <ResearchHistoryWorkspace key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId}
       onUseQuestion={session.problem.trim() ? undefined : question=>{session.setProblem(question);onPage("research");}}/> :
-    page==="raw-records" && !hosted ? <><Button minimal icon="arrow-left" onClick={()=>onPage("settings")}>설정으로 돌아가기</Button><DomainRecords key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId} operationId={status?.request?.operation_id} onOpenCatalog={namespace=>{setCatalogNamespace(namespace);onPage("capabilities");}}/></> :
-    page==="resources" ? <><header className="workspace-heading"><div><h1>자료·연결</h1><p>연구에 사용할 파일과 허용할 공개 웹 출처를 관리합니다.</p></div><Button minimal icon="arrow-left" onClick={()=>onPage("research")}>대화로 돌아가기</Button></header><ProjectWebSetup projectId={project.project_id}/><FileConnectionPanel projectId={project.project_id} hosted={hosted}/><h2>연결한 자료</h2>
-      {citation.dialog}{citation.message&&<Callout compact>{citation.message}</Callout>}{(sources.data?.value.artifacts??[]).map(artifact=>{ const assessment=(sources.data?.value.source_times??[]).find(item=>item.artifact_id===artifact.artifact_id); const detailsOpen=artifactDetailsId===artifact.artifact_id; return <article className="detail-card" key={artifact.artifact_id}><h3>{isHttpUrl(artifact.source_uri)?<a href={artifact.source_uri} target="_blank" rel="noreferrer">{sourceCardTitle(artifact.source_uri)}</a>:sourceCardTitle(artifact.source_uri)}</h3>{sourceCardHost(artifact.source_uri)?<p>{sourceCardHost(artifact.source_uri)}</p>:null}<p>{artifact.media_type}</p><p>{cutoffLabel(assessment?.cutoff_state ?? artifact.cutoff_state ?? "UNKNOWN_TIME")}</p><Button small onClick={()=>void citation.ask(artifact.artifact_id)}>인용에 사용</Button>{!hosted&&<SourceTimeAdvanced projectId={project.project_id} artifactId={artifact.artifact_id} assessment={assessment} cutoff={sources.data?.value.cutoff_basis}/>} {!hosted&&<><Button small minimal icon={detailsOpen?"chevron-up":"info-sign"} onClick={()=>setArtifactDetailsId(detailsOpen?"":artifact.artifact_id)} aria-expanded={detailsOpen}>출처·추출 상태</Button><Collapse isOpen={detailsOpen}><RecordInspector value={artifact}/></Collapse></>}</article>})}
+    page==="raw-records" && !hosted ? <><Button minimal icon="arrow-left" onClick={()=>onPage("settings")}>{t("workspace.backSettings")}</Button><DomainRecords key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId} operationId={status?.request?.operation_id} onOpenCatalog={namespace=>{setCatalogNamespace(namespace);onPage("capabilities");}}/></> :
+    page==="resources" ? <><header className="workspace-heading"><div><h1>{t("workspace.resources")}</h1><p>{t("workspace.resourcesNotice")}</p></div><Button minimal icon="arrow-left" onClick={()=>onPage("research")}>{t("workspace.backConversation")}</Button></header><ProjectWebSetup projectId={project.project_id}/><FileConnectionPanel projectId={project.project_id} hosted={hosted}/><h2>{t("workspace.connectedSources")}</h2>
+      {citation.dialog}{citation.message&&<Callout compact>{citation.message}</Callout>}{(sources.data?.value.artifacts??[]).map(artifact=>{ const assessment=(sources.data?.value.source_times??[]).find(item=>item.artifact_id===artifact.artifact_id); const detailsOpen=artifactDetailsId===artifact.artifact_id; return <article className="detail-card" key={artifact.artifact_id}><h3>{isHttpUrl(artifact.source_uri)?<a href={artifact.source_uri} target="_blank" rel="noreferrer">{sourceCardTitle(artifact.source_uri)}</a>:sourceCardTitle(artifact.source_uri)}</h3>{sourceCardHost(artifact.source_uri)?<p>{sourceCardHost(artifact.source_uri)}</p>:null}<p>{artifact.media_type}</p><p>{cutoffLabel(assessment?.cutoff_state ?? artifact.cutoff_state ?? "UNKNOWN_TIME")}</p><Button small onClick={()=>void citation.ask(artifact.artifact_id)}>{t("workspace.cite")}</Button>{!hosted&&<SourceTimeAdvanced projectId={project.project_id} artifactId={artifact.artifact_id} assessment={assessment} cutoff={sources.data?.value.cutoff_basis}/>} {!hosted&&<><Button small minimal icon={detailsOpen?"chevron-up":"info-sign"} onClick={()=>setArtifactDetailsId(detailsOpen?"":artifact.artifact_id)} aria-expanded={detailsOpen}>{t("workspace.sourceDetails")}</Button><Collapse isOpen={detailsOpen}><RecordInspector value={artifact}/></Collapse></>}</article>})}
       {sources.error&&<Callout intent="danger">{sources.error.message}</Callout>}
-    </> : <><header className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel(hosted?"REVIEW WORKSPACE":"LOCAL WORKSPACE")}</p><h1>{hosted?"운영 정보":"설정"}</h1><p>{hosted?"심사 환경의 모델과 사용 현황을 확인합니다.":"이 컴퓨터에서 사용할 모델과 프로젝트 도구를 관리합니다."}</p></div></header>
+    </> : <><header className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel(hosted?"REVIEW WORKSPACE":"LOCAL WORKSPACE")}</p><h1>{hosted?t("workspace.operations"):t("workspace.settings")}</h1><p>{hosted?t("workspace.reviewInfo"):t("workspace.localToolsInfo")}</p></div></header>
       {hosted ? (
-        <section className="detail-card"><h2>심사 모델</h2><p>운영자가 준비한 OpenAI 모델을 사용합니다. 브라우저에 키를 넣지 않습니다.</p></section>
+        <section className="detail-card"><h2>{t("workspace.reviewModel")}</h2><p>{t("workspace.operatorModel")}</p></section>
       ) : (
-        <section className="detail-card"><h2>모델 기본값</h2><ModelSettings projectId={project.project_id} threadId={threadId||undefined} selection={session.modelSelection} onSelect={session.chooseModel} onSaved={()=>session.clearModel(session.renderedRevision,capturedEpoch)}/><AutoRetrySwitch projectId={project.project_id}/><HypothesisContractSwitch projectId={project.project_id}/><ModelCredentialPanel projectId={project.project_id} workspaceId={workspaceId ?? undefined}/></section>
+        <section className="detail-card"><h2>{t("workspace.modelDefaults")}</h2><ModelSettings projectId={project.project_id} threadId={threadId||undefined} selection={session.modelSelection} onSelect={session.chooseModel} onSaved={()=>session.clearModel(session.renderedRevision,capturedEpoch)}/><AutoRetrySwitch projectId={project.project_id}/><HypothesisContractSwitch projectId={project.project_id}/><ModelCredentialPanel projectId={project.project_id} workspaceId={workspaceId ?? undefined}/></section>
       )}
       {!hosted && consent !== undefined && <WorkspaceInternetConsent consent={consent} focus={focusConsent} onFocused={clearConsentFocus}/>}
-      <section className="detail-card"><h2>사용량</h2><p>보고된 사용 토큰: {status?.usage?.total_tokens?.toLocaleString()??"아직 없음"}{status?.usage?.state==="PARTIAL"?" (부분 관측)":""}</p><p>진행 중인 호출의 사용량은 아직 포함되지 않을 수 있습니다.</p>{!hosted&&<><Button small minimal icon={projectDetailsOpen?"chevron-up":"settings"} onClick={()=>setProjectDetailsOpen(value=>!value)} aria-expanded={projectDetailsOpen}>현재 프로젝트 설정</Button><Collapse isOpen={projectDetailsOpen}><RecordInspector value={project}/></Collapse></>}</section>
-      <section className="detail-card"><h2>{hosted?"기록과 자료":"기록과 로컬 도구"}</h2><Button minimal icon="folder-open" onClick={()=>onPage("resources")}>자료·연결 관리</Button><Button minimal icon="history" onClick={()=>onPage("records")}>연구 이력</Button>{!hosted&&<><Button minimal icon={developerOpen?"chevron-up":"chevron-down"} onClick={()=>setDeveloperOpen(value=>!value)} aria-expanded={developerOpen}>로컬 개발자 도구</Button><Collapse isOpen={developerOpen}><div className="local-developer-tools"><Button minimal icon="database" onClick={()=>onPage("raw-records")}>상세 기록 열기</Button><Button minimal icon="code" onClick={()=>{setCatalogNamespace("all");onPage("capabilities");}}>상세 API 도구 열기</Button><RecordInspector value={{request:status?.request,attempt:status?.attempt,budget:status?.budget,usage:status?.usage,cleanup:status?.cleanup}}/></div></Collapse></>}</section>
+      <section className="detail-card"><h2>{t("workspace.usage")}</h2><p>{message("reportedTokens", status?.usage?.total_tokens?.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")??t("workspace.noUsage"), status?.usage?.state==="PARTIAL"?t("workspace.partialUsage"):"")}</p><p>{t("workspace.usagePending")}</p>{!hosted&&<><Button small minimal icon={projectDetailsOpen?"chevron-up":"settings"} onClick={()=>setProjectDetailsOpen(value=>!value)} aria-expanded={projectDetailsOpen}>{t("workspace.projectSettings")}</Button><Collapse isOpen={projectDetailsOpen}><RecordInspector value={project}/></Collapse></>}</section>
+      <section className="detail-card"><h2>{hosted?t("workspace.recordsSources"):t("workspace.recordsTools")}</h2><Button minimal icon="folder-open" onClick={()=>onPage("resources")}>{t("workspace.manageSources")}</Button><Button minimal icon="history" onClick={()=>onPage("records")}>{t("workspace.history")}</Button>{!hosted&&<><Button minimal icon={developerOpen?"chevron-up":"chevron-down"} onClick={()=>setDeveloperOpen(value=>!value)} aria-expanded={developerOpen}>{t("workspace.devTools")}</Button><Collapse isOpen={developerOpen}><div className="local-developer-tools"><Button minimal icon="database" onClick={()=>onPage("raw-records")}>{t("workspace.detailedRecords")}</Button><Button minimal icon="code" onClick={()=>{setCatalogNamespace("all");onPage("capabilities");}}>{t("workspace.apiTools")}</Button><RecordInspector value={{request:status?.request,attempt:status?.attempt,budget:status?.budget,usage:status?.usage,cleanup:status?.cleanup}}/></div></Collapse></>}</section>
     </>}
   </section>;
 }
@@ -183,8 +188,8 @@ function ProjectNavItem({ project, active, removing, onOpen, onRemove }: {
     <Button minimal alignText="left" className={`project-button ${active ? "active" : ""}`} onClick={onOpen}>
       <Icon icon={active ? "folder-open" : "folder-close"}/><span><strong>{project.name}</strong></span>
     </Button>
-    <Button small minimal icon="more" aria-label={`${project.name} 프로젝트 메뉴`} aria-expanded={menuOpen} loading={removing} onClick={()=>setMenuOpen(value=>!value)}/>
-    {menuOpen&&<div className="project-inline-menu" role="menu"><Button fill alignText="left" minimal role="menuitem" icon="trash" intent="danger" disabled={removing} onClick={()=>{setMenuOpen(false);onRemove();}}>프로젝트 제거</Button></div>}
+    <Button small minimal icon="more" aria-label={message("projectMenu", project.name)} aria-expanded={menuOpen} loading={removing} onClick={()=>setMenuOpen(value=>!value)}/>
+    {menuOpen&&<div className="project-inline-menu" role="menu"><Button fill alignText="left" minimal role="menuitem" icon="trash" intent="danger" disabled={removing} onClick={()=>{setMenuOpen(false);onRemove();}}>{t("workspace.removeProject")}</Button></div>}
   </div>;
 }
 
@@ -196,25 +201,27 @@ export function ProjectLanding({ projects, loading = false, contextRestoreIssue 
   onOpen: (projectId: string) => void;
   onCreated: (projectId: string) => void; openCreate?: boolean; onOpenCreateHandled?: () => void;
 }) {
+  useTranslation();
   const [creating,setCreating] = useState(false);
   useEffect(()=>{if(!loading&&projects.length===0)setCreating(true);},[loading,projects.length]);
   useEffect(()=>{if(openCreate){setCreating(true);onOpenCreateHandled?.();}},[openCreate,onOpenCreateHandled]);
   const restoreNotice = contextRestoreIssue && <Callout compact intent="warning" role="alert">{contextRestoreIssue === "CORRUPT"
-    ? "마지막 작업 위치 기록을 읽지 못했습니다. 원본을 자동 삭제하지 않았습니다."
-    : "이 브라우저의 마지막 작업 위치를 읽지 못했습니다. 저장소 접근과 작업 공간 식별자를 확인하세요."}
-    {" "}다른 주소·포트·브라우저 프로필 또는 작업 공간의 선택과 초안은 자동 병합되지 않습니다. 프로젝트를 직접 선택하면 현재 위치를 새로 저장합니다.</Callout>;
-  const setupNotice = setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} 기존 프로젝트가 있으면 권한 있는 저장 연구를 열 수 있습니다.</Callout>;
-  if (creating) return <>{setupNotice}{restoreNotice}<Button minimal icon="arrow-left" disabled={projects.length===0} onClick={()=>setCreating(false)}>프로젝트 선택으로 돌아가기</Button><ProjectForm onCreated={onCreated}/></>;
-  return <div className="start-page project-home">{setupNotice}{restoreNotice}<div className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel("RESEARCH WORKSPACE")}</p><h1>연구를 이어가거나<br/>새 문제를 시작하세요.</h1><p>기존 프로젝트를 열어 작업을 이어가거나, 새로운 연구 맥락을 만들 수 있습니다.</p></div><Icon icon="projects" size={50}/></div>
-    <section className="project-home-list" aria-label="이어갈 프로젝트"><div className="section-title-row"><h2>프로젝트</h2><Button icon="plus" intent="primary" onClick={()=>setCreating(true)}>새 프로젝트</Button></div>
-      {loading&&<p className="empty-copy" role="status">프로젝트를 읽는 중…</p>}
-      {projects.map(project=><Button fill large alignText="left" className="project-home-item" key={project.project_id} icon="folder-open" onClick={()=>onOpen(project.project_id)}><span><strong>{project.name}</strong><small>프로젝트 열기</small></span></Button>)}
+    ? t("workspace.contextCorrupt")
+    : t("workspace.contextUnavailable")}
+    {" "}{t("workspace.restoreScope")}</Callout>;
+  const setupNotice = setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} {t("workspace.existingRead")}</Callout>;
+  if (creating) return <>{setupNotice}{restoreNotice}<Button minimal icon="arrow-left" disabled={projects.length===0} onClick={()=>setCreating(false)}>{t("workspace.backProjects")}</Button><ProjectForm onCreated={onCreated}/></>;
+  return <div className="start-page project-home">{setupNotice}{restoreNotice}<div className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel("RESEARCH WORKSPACE")}</p><h1>{t("workspace.continueHeading")}</h1><p>{t("workspace.openOrCreate")}</p></div><Icon icon="projects" size={50}/></div>
+    <section className="project-home-list" aria-label={t("workspace.continueProject")}><div className="section-title-row"><h2>{t("workspace.projects")}</h2><Button icon="plus" intent="primary" onClick={()=>setCreating(true)}>{t("workspace.newProject")}</Button></div>
+      {loading&&<p className="empty-copy" role="status">{t("workspace.loadingProjects")}</p>}
+      {projects.map(project=><Button fill large alignText="left" className="project-home-item" key={project.project_id} icon="folder-open" onClick={()=>onOpen(project.project_id)}><span><strong>{project.name}</strong><small>{t("workspace.openProject")}</small></span></Button>)}
     </section>
-    <p className="muted">읽을 수 없는 기록은 새 답변으로 대체하지 않습니다.</p>
+    <p className="muted">{t("workspace.noReplacement")}</p>
   </div>;
 }
 
 export function LiveProjectWorkspace() {
+  useTranslation();
   const [context, setContext] = useState({ projectId: "", threadId: "" });
   const [restoredFor, setRestoredFor] = useState<string | null>(null);
   const [contextStoreFailed, setContextStoreFailed] = useState(false);
@@ -236,9 +243,10 @@ export function LiveProjectWorkspace() {
   const ready = readyQuery.error ? undefined : readyQuery.data?.value;
   const setupIssue = workspaceSetupIssue(ready);
   const hosted = ready?.deployment_mode === "HOSTED_REVIEW";
+  const browserScopeId = ready?.browser_scope_id ?? null;
   const workspaceId = !hosted && validWorkspaceId(ready?.workspace_id) ? ready.workspace_id : null;
-  const storageScope = useMemo<BrowserScope>(() => hosted ? { mode: "HOSTED" } : { mode: "LOCAL", workspaceId }, [hosted, workspaceId]);
-  const scopeKey = ready ? hosted ? "HOSTED" : `LOCAL:${workspaceId ?? "UNBOUND"}` : null;
+  const storageScope = useMemo<BrowserScope>(() => hosted ? { mode: "HOSTED", browserScopeId } : { mode: "LOCAL", workspaceId }, [hosted, workspaceId, browserScopeId]);
+  const scopeKey = ready ? hosted ? `HOSTED:${browserScopeId ?? "LEGACY"}` : `LOCAL:${workspaceId ?? "UNBOUND"}` : null;
   const projectsQuery = useQuery({queryKey:["projects",scopeKey],enabled:Boolean(scopeKey),queryFn:({signal})=>rpc<{projects:ProjectSummary[]}>("project/list",{project_id:"system:projects"},crypto.randomUUID(),signal)});
   const projects = useMemo(() => projectsQuery.error ? [] : projectsQuery.data?.value.projects ?? [],
     [projectsQuery.error, projectsQuery.data]);
@@ -298,7 +306,12 @@ export function LiveProjectWorkspace() {
   const investigate = (item: RowInvestigation) => {
     if (!project) return;
     const target = threadForRow(threads, item.origin.subject_kind, item.origin.subject_id)?.thread_id ?? "";
-    writeDraft(project.project_id, target, fillQuestion(readDraft(project.project_id, target, storageScope), item.question), storageScope);
+    const draft = readDraft(project.project_id, target, storageScope);
+    const priorLanguage = readDraftLanguage(storageScope, project.project_id, target);
+    const language = draft && priorLanguage !== undefined ? priorLanguage : item.responseLanguage;
+    const question = language !== undefined && item.questionForLanguage ? item.questionForLanguage(language) : item.question;
+    if (language !== undefined) writeDraftLanguage(storageScope, project.project_id, target, language);
+    writeDraft(project.project_id, target, fillQuestion(draft, question), storageScope);
     chooseThread(target);
     setRowOrigin({ threadId: target, origin: item.origin });
   };
@@ -319,74 +332,74 @@ export function LiveProjectWorkspace() {
     },
   });
   const removeProject = (target: ProjectSummary) => {
-    if (!window.confirm(`프로젝트 "${target.name}"을 보관할까요? 보관하면 읽기 전용이 되고 목록에서 숨겨집니다. '보관한 프로젝트 보기'에서 되살릴 수 있습니다.`)) return;
+    if (!window.confirm(message("archiveProject", target.name))) return;
     archiveProject.mutate(target);
   };
   if (readyQuery.isPending || (readyQuery.isSuccess && !ready)) {
-    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">준비 확인 중…</p></main>;
+    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">{t("workspace.preparing")}</p></main>;
   }
   if (readyQuery.error) {
-    return <main className="first-run-shell bp6-dark"><section className="first-run-card"><Callout intent="danger" title="서버 준비 확인 실패">서버 준비 상태를 확인하지 못했습니다. 연결 상태를 확인하고 다시 시도하세요.<Button small onClick={()=>void readyQuery.refetch()}>다시 확인</Button></Callout></section></main>;
+    return <main className="first-run-shell bp6-dark"><section className="first-run-card"><Callout intent="danger" title={t("workspace.readinessFailed")}>{t("workspace.readinessAdvice")}<Button small onClick={()=>void readyQuery.refetch()}>{t("workspace.checkAgain")}</Button></Callout></section></main>;
   }
   if (!ready || !scopeKey || restoredFor !== scopeKey) {
-    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">이 워크스페이스의 저장된 작업을 확인하는 중…</p></main>;
+    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">{t("workspace.loadingSaved")}</p></main>;
   }
   if (hosted && !ready.ready) return <FirstRunSetup onDone={()=>void readyQuery.refetch()}/>;
   if (projectsQuery.isPending && !projectsQuery.data) {
-    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">읽을 수 있는 프로젝트를 확인하는 중…</p></main>;
+    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">{t("workspace.checkingProjects")}</p></main>;
   }
   if (projectsQuery.error) {
-    return <main className="first-run-shell bp6-dark"><section className="first-run-card"><Callout intent="warning" role="alert">프로젝트 접근 범위를 확인하지 못했습니다. 저장된 작업을 새 프로젝트로 대체하지 않습니다.<Button small onClick={()=>void projectsQuery.refetch()}>다시 확인</Button></Callout></section></main>;
+    return <main className="first-run-shell bp6-dark"><section className="first-run-card"><Callout intent="warning" role="alert">{t("workspace.accessFailed")}<Button small onClick={()=>void projectsQuery.refetch()}>{t("workspace.checkAgain")}</Button></Callout></section></main>;
   }
   const workspaceReadable = hosted || ready.workspace_readable !== false;
   const setupComplete = ready.setup_complete ?? (ready.setup?.internet_consent !== undefined && ready.setup.internet_consent !== "UNDECIDED");
   const executionReady = hosted ? ready.ready : (ready.execution_ready ?? ready.ready);
   if (!workspaceReadable) {
-    return <main className="first-run-shell bp6-dark"><section className="first-run-card"><Callout intent="warning" role="alert">이 워크스페이스의 저장된 연구를 지금 읽을 수 없습니다. 접근 상태를 확인하세요.<Button small onClick={()=>void readyQuery.refetch()}>다시 확인</Button></Callout></section></main>;
+    return <main className="first-run-shell bp6-dark"><section className="first-run-card"><Callout intent="warning" role="alert">{t("workspace.savedUnavailable")}<Button small onClick={()=>void readyQuery.refetch()}>{t("workspace.checkAgain")}</Button></Callout></section></main>;
   }
   if (!hosted && ready.workspace_readable === undefined && !ready.ready) return <FirstRunSetup onDone={()=>void readyQuery.refetch()}/>;
   if (!hosted && !setupComplete && projects.length === 0) {
     return <FirstRunSetup onDone={()=>void readyQuery.refetch()}/>;
   }
   if (context.threadId && project && threadsQuery.isPending && !threadsQuery.data) {
-    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">선택한 작업의 접근 범위를 확인하는 중…</p></main>;
+    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">{t("workspace.checkingAccess")}</p></main>;
   }
   if (context.threadId && project && threadsQuery.error) {
-    return <main className="first-run-shell bp6-dark"><section className="first-run-card"><Callout intent="warning" role="alert">선택한 작업을 확인하지 못했습니다. 초안은 유지합니다.<Button small onClick={()=>void threadsQuery.refetch()}>다시 확인</Button></Callout></section></main>;
+    return <main className="first-run-shell bp6-dark"><section className="first-run-card"><Callout intent="warning" role="alert">{t("workspace.taskUnavailable")}<Button small onClick={()=>void threadsQuery.refetch()}>{t("workspace.checkAgain")}</Button></Callout></section></main>;
   }
   if (context.threadId && project && !threads.some(item=>item.thread_id===context.threadId) && pendingAdmission.current!==context.threadId) {
-    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">저장된 작업 선택을 다시 확인하는 중…</p></main>;
+    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">{t("workspace.selectionCheck")}</p></main>;
   }
   return <main className="workstation conversation-workstation bp6-dark">
     <aside className="navigation-rail"><div className="brand"><div className="brand-mark"><Icon icon="layout-grid" size={20}/></div><div><strong>THOTH</strong><span>RESEARCH WORKSTATION</span></div><Tag minimal>{hosted ? "REVIEW" : "LOCAL"}</Tag></div>
-      <Button icon="plus" intent="primary" className="new-project-button" onClick={()=>{chooseProject("");setOpenCreate(true);}}>새 프로젝트</Button>
-      <InputGroup small leftIcon="search" aria-label="프로젝트 검색" placeholder="프로젝트 찾기…" value={search} onChange={event=>setSearch(event.target.value)}/>
-      <section className="nav-section"><div className="nav-section-heading"><p className="nav-label">PROJECTS</p><Button small minimal icon="refresh" aria-label="프로젝트 목록 새로고침" onClick={()=>void projectsQuery.refetch()}/></div>
+      <Button icon="plus" intent="primary" className="new-project-button" onClick={()=>{chooseProject("");setOpenCreate(true);}}>{t("workspace.newProject")}</Button>
+      <InputGroup small leftIcon="search" aria-label={t("workspace.searchProjects")} placeholder={t("workspace.searchPlaceholder")} value={search} onChange={event=>setSearch(event.target.value)}/>
+      <section className="nav-section"><div className="nav-section-heading"><p className="nav-label">PROJECTS</p><Button small minimal icon="refresh" aria-label={t("workspace.refreshProjects")} onClick={()=>void projectsQuery.refetch()}/></div>
         {visibleProjects.filter(item=>`${item.name} ${item.project_id}`.toLowerCase().includes(search.toLowerCase())).flatMap(item=>[
           <ProjectNavItem project={item} active={item.project_id===context.projectId} removing={archiveProject.isPending} key={item.project_id} onOpen={()=>openProject(item.project_id)} onRemove={()=>removeProject(item)}/>,
           item.project_id===context.projectId ? <div className="project-sessions" key={`${item.project_id}-sessions`}>
-            <Button small minimal icon="plus" className="new-session-button" aria-label="새 작업" onClick={()=>chooseThread("")}>새 세션</Button>
+            <Button small minimal icon="plus" className="new-session-button" aria-label={t("workspace.newTask")} onClick={()=>chooseThread("")}>{t("workspace.newSession")}</Button>
             {archiveProject.error&&<Callout compact intent="danger">{archiveProject.error.message}</Callout>}
-            {threadsQuery.isPending&&<p className="empty-copy">세션을 읽는 중…</p>}
+            {threadsQuery.isPending&&<p className="empty-copy">{t("workspace.loadingSessions")}</p>}
             {threadsQuery.error&&<Callout compact intent="danger">{threadsQuery.error.message}</Callout>}
-            {visibleThreads.map(thread=><Button minimal alignText="left" className={`thread-button ${thread.thread_id===context.threadId?"active":""}`} key={thread.thread_id} onClick={()=>chooseThread(thread.thread_id)}><Icon icon="chat"/><span><strong>{thread.problem||"제목 없는 세션"}</strong><small>{thread.execution_state==="RUNNING"?"진행 중":thread.execution_state==="PAUSED"?"일시정지":"이어서 보기"}</small></span></Button>)}
-            {!threadsQuery.isPending&&!threadsQuery.error&&threads.length===0&&<p className="empty-copy">첫 질문을 보내면 이 프로젝트 아래 세션이 생깁니다.</p>}
+            {visibleThreads.map(thread=><Button minimal alignText="left" className={`thread-button ${thread.thread_id===context.threadId?"active":""}`} key={thread.thread_id} onClick={()=>chooseThread(thread.thread_id)}><Icon icon="chat"/><span><strong>{thread.problem||t("workspace.untitledSession")}</strong><small>{thread.execution_state==="RUNNING"?t("workspace.running"):thread.execution_state==="PAUSED"?t("workspace.paused"):t("workspace.reopen")}</small></span></Button>)}
+            {!threadsQuery.isPending&&!threadsQuery.error&&threads.length===0&&<p className="empty-copy">{t("workspace.firstQuestion")}</p>}
           </div> : null,
         ])}
-        {!projectsQuery.isPending&&!projectsQuery.error&&projects.length===0&&<p className="empty-copy">아직 프로젝트가 없습니다.</p>}<ArchivedProjects scopeKey={scopeKey}/>
+        {!projectsQuery.isPending&&!projectsQuery.error&&projects.length===0&&<p className="empty-copy">{t("workspace.noProjects")}</p>}<ArchivedProjects scopeKey={scopeKey}/>
       </section>
-      <div className="sidebar-bottom"><Button minimal alignText="left" icon={hosted?"info-sign":"settings"} onClick={()=>setPage("settings")}>{hosted?"운영 정보":"설정 · 로컬 도구"}</Button></div>
+      <div className="sidebar-bottom"><Button minimal alignText="left" icon={hosted?"info-sign":"settings"} onClick={()=>setPage("settings")}>{hosted?t("workspace.operations"):t("workspace.settingsTools")}</Button></div>
     </aside>
-    <header className="workstation-topbar"><div className="context-path"><Icon icon="projects"/><span>Workspace</span>{import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Tag intent="warning">검증 모드</Tag>}<span>/</span><strong>{projectsQuery.isFetching?"프로젝트 확인 중":project?.name??"프로젝트 선택"}</strong>{context.threadId&&<><span>/</span><small>{threadsQuery.isFetching?"작업 확인 중":visibleThreads.find(item=>item.thread_id===context.threadId)?.problem??"선택한 작업"}</small></>}</div>
-      <div className="header-status">{project&&projectCutoffText(project.cutoff_at)&&<Tag minimal icon="time" title="이 프로젝트가 판단에 쓰는 자료의 기준시점">기준시점 {projectCutoffText(project.cutoff_at)}</Tag>}<Tag minimal intent={health.data?.status==="ok"?"success":health.error?"danger":"none"}>{health.data?.status==="ok"?"서버 연결됨":health.error?"서버 연결 실패":"연결 확인 중"}</Tag>{!hosted&&!executionReady&&<Tag minimal intent="warning">새 연구 준비 필요</Tag>}{!hosted&&contextStoreFailed&&<Tag minimal intent="warning">작업 위치 저장 실패</Tag>}{missingSelection&&<Tag minimal intent="warning">저장된 {missingSelection==="project"?"프로젝트":"작업"} 선택 확인 필요</Tag>}<Button small minimal icon="refresh" aria-label="현재 맥락 새로고침" onClick={()=>void client.invalidateQueries()}/></div></header>
-    <div className="workspace-navigation"><Tabs id="workspace-tabs" selectedTabId={page} onChange={value=>setPage(value as Page)}><Tab id="research" title="대화"/><Tab id="resources" title="자료·연결" disabled={!project}/><Tab id="records" title="연구 이력" disabled={!project}/><Tab id="trace" title="추적표" disabled={!project}/><Tab id="settings" title="설정"/></Tabs>
-      {project&&<div className="context-policy"><HTMLSelect aria-label="현재 작업 선택" disabled={threadsQuery.isFetching} value={context.threadId} onChange={event=>chooseThread(event.target.value)} options={[{value:"",label:"새 작업"},...visibleThreads.map(item=>({value:item.thread_id,label:(item.problem||"제목 없는 작업").slice(0,40)}))]}/></div>}</div>
-    {project ? <WorkspaceErrorBoundary resetKey={`${scopeKey}:${project.project_id}:${context.threadId}:${page}`} onRetry={()=>client.invalidateQueries()}><ProjectSession key={`${scopeKey}:${project.project_id}:${selectionVersion}`} project={project} threadId={context.threadId} epoch={epoch} page={page} onPage={setPage} hosted={hosted} workspaceId={workspaceId} executionReady={executionReady && !threadsQuery.error} consent={ready.setup?.internet_consent} modelConnected={ready.model_connected}
+    <header className="workstation-topbar"><div className="context-path"><Icon icon="projects"/><span>Workspace</span>{import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Tag intent="warning">{t("workspace.testMode")}</Tag>}<span>/</span><strong>{projectsQuery.isFetching?t("workspace.checkingProject"):project?.name??t("workspace.selectProject")}</strong>{context.threadId&&<><span>/</span><small>{threadsQuery.isFetching?t("workspace.checkingTask"):visibleThreads.find(item=>item.thread_id===context.threadId)?.problem??t("workspace.selectedTask")}</small></>}</div>
+      <div className="header-status">{project&&projectCutoffText(project.cutoff_at)&&<Tag minimal icon="time" title={t("workspace.cutoffHint")}>{message("cutoff", projectCutoffText(project.cutoff_at))}</Tag>}<Tag minimal intent={health.data?.status==="ok"?"success":health.error?"danger":"none"}>{health.data?.status==="ok"?t("workspace.serverConnected"):health.error?t("workspace.serverFailed"):t("workspace.checkingConnection")}</Tag>{!hosted&&!executionReady&&<Tag minimal intent="warning">{t("workspace.setupNeeded")}</Tag>}{!hosted&&contextStoreFailed&&<Tag minimal intent="warning">{t("workspace.locationUnsaved")}</Tag>}{missingSelection&&<Tag minimal intent="warning">{message("missingSelection", missingSelection)}</Tag>}<Button small minimal icon="refresh" aria-label={t("workspace.refreshContext")} onClick={()=>void client.invalidateQueries()}/></div></header>
+    <div className="workspace-navigation"><Tabs id="workspace-tabs" selectedTabId={page} onChange={value=>setPage(value as Page)}><Tab id="research" title={t("workspace.conversation")}/><Tab id="resources" title={t("workspace.resources")} disabled={!project}/><Tab id="records" title={t("workspace.history")} disabled={!project}/><Tab id="trace" title={t("workspace.trace")} disabled={!project}/><Tab id="settings" title={t("workspace.settings")}/></Tabs>
+      {project&&<div className="context-policy"><HTMLSelect aria-label={t("workspace.chooseTask")} disabled={threadsQuery.isFetching} value={context.threadId} onChange={event=>chooseThread(event.target.value)} options={[{value:"",label:t("workspace.newTask")},...visibleThreads.map(item=>({value:item.thread_id,label:(item.problem||t("workspace.untitledTask")).slice(0,40)}))]}/></div>}</div>
+    {project ? <WorkspaceErrorBoundary resetKey={`${scopeKey}:${project.project_id}:${context.threadId}:${page}`} onRetry={()=>client.invalidateQueries()}><ProjectSession key={`${scopeKey}:${project.project_id}:${selectionVersion}`} project={project} threadId={context.threadId} epoch={epoch} page={page} onPage={setPage} hosted={hosted} workspaceId={workspaceId} browserScopeId={browserScopeId} executionReady={executionReady && !threadsQuery.error} consent={ready.setup?.internet_consent} modelConnected={ready.model_connected}
       readSuspended={readyQuery.isFetching || projectsQuery.isFetching || threadsQuery.isFetching} setupIssue={setupIssue}
       onUserInput={cancelOpenLatest} onAdmitted={threadId=>{pendingAdmission.current=threadId;setContext(current=>({...current,threadId}));}}
       rowOrigin={rowOrigin} onOriginDone={()=>setRowOrigin(null)} onInvestigate={investigate} traceFocus={traceFocus} onOpenTrace={openTraceRow}/></WorkspaceErrorBoundary> :
       isTimelineExampleRequested() && page === "research" ? <TimelineExamplePane /> :
-      <section className="workspace-content">{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?"저장된 프로젝트를 현재 목록에서 확인하지 못해 선택을 비웠습니다.":"저장된 작업 선택 확인 필요"} 저장된 초안은 자동 제출하지 않습니다.</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">이 브라우저에 마지막 작업 위치를 저장하지 못했습니다. 재시작 후 자동 복원이 제한될 수 있습니다.</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">워크스페이스 식별자를 확인하지 못해 브라우저 재시작용 초안 저장을 사용할 수 없습니다.</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title="프로젝트를 선택하세요">운영 정보와 사용 현황은 프로젝트를 선택한 뒤 확인할 수 있습니다.</Callout>:<section className="detail-card"><h2>모델 연결</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">프로젝트별 기본 모델은 프로젝트를 선택한 뒤 설정합니다.</p></section>}</>:<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</section>}
+      <section className="workspace-content">{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?t("workspace.missingProject"):t("workspace.taskSelectionNeeded")} {t("workspace.draftNotSent")}</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">{t("workspace.locationFailure")}</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">{t("workspace.identityMissing")}</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title={t("workspace.chooseProjectNotice")}>{t("workspace.selectForInfo")}</Callout>:<section className="detail-card"><h2>{t("workspace.connectModel")}</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">{t("workspace.selectForDefaults")}</p></section>}</>:<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</section>}
   </main>;
 }
 

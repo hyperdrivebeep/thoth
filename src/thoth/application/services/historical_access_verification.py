@@ -10,7 +10,11 @@ from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.operation import OperationRecord
 from thoth.domain.research_codec import decode_current_result_manifest
 from thoth.domain.research_execution import research_work
-from thoth.domain.research_request import CurrentResultPayload, RevisionRef, ThreadRequestRevision
+from thoth.domain.research_request import (
+    CurrentResultPayload,
+    RevisionRef,
+    decode_thread_request,
+)
 from thoth.domain.resource_scope import ResourceScopeError, ResourceUse, current_resource_uses
 from thoth.ports.ledger import LedgerPort
 from thoth.ports.operation import OperationStorePort
@@ -126,7 +130,7 @@ def require_historical_manifest_access(
         or request_snapshot.entity_id != request_ref.entity_id
     ):
         raise ResourceScopeError("RESOURCE_LINEAGE_UNKNOWN")
-    request = ThreadRequestRevision.model_validate(request_snapshot.content)
+    request = decode_thread_request(request_snapshot.content)
     if (
         request.project_id != project
         or request.thread_id != thread_id

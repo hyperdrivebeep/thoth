@@ -1,3 +1,5 @@
+import { message } from "../i18n/formatMessages";
+import { t, useTranslation } from "../i18n/locale";
 import { Button, Callout, InputGroup } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -9,6 +11,7 @@ import { XaiDeviceLogin } from "./XaiDeviceLogin";
 import { OAuthLoginFlow } from "./OAuthLoginFlow";
 
 export function ModelCredentialPanel({ projectId, workspaceId }: { projectId: string; workspaceId?: string }) {
+  useTranslation();
   const client = useQueryClient();
   const listed = useQuery({
     queryKey: ["model-credentials", projectId],
@@ -37,9 +40,9 @@ export function ModelCredentialPanel({ projectId, workspaceId }: { projectId: st
   const guideUrl = credentialGuideUrl(connect.data?.value);
   return (
     <section className="model-credential-panel">
-      <p className="eyebrow">계정 연결</p>
+      <p className="eyebrow">{t("credential.connections")}</p>
       <h2>ChatGPT · Claude · xAI</h2>
-      <p className="muted">지원되는 계정 로그인 절차를 시작하거나 API 키를 등록합니다. 키 발급 콘솔 방문만으로 THOTH 연결은 완료되지 않습니다.</p>
+      <p className="muted">{t("credential.registrationNotice")}</p>
       {credentialCompanies.map((company) => {
         const row = accounts.find((item) => item.provider === company.provider);
         const knownRow = listed.data?.value.accounts.find((item) => item.provider === company.provider);
@@ -59,14 +62,14 @@ export function ModelCredentialPanel({ projectId, workspaceId }: { projectId: st
         );
       })}
       {connect.isSuccess && <Callout compact role="status">{credentialResultMessage(connect.data?.value)}
-        {guideUrl && <p><a href={guideUrl} target="_blank" rel="noopener noreferrer">키 발급 사이트 열기</a></p>}</Callout>}
+        {guideUrl && <p><a href={guideUrl} target="_blank" rel="noopener noreferrer">{t("setup.openKeySite")}</a></p>}</Callout>}
       {connect.error && (
         <Callout compact intent="danger">
           {connect.error.message}
         </Callout>
       )}
-      {listed.error && <Callout compact intent="warning">계정 연결 방법을 확인하지 못했습니다. 다시 확인하세요.</Callout>}
-      <Button small minimal icon="refresh" loading={listed.isFetching} onClick={() => void listed.refetch()}>연결 상태 다시 확인</Button>
+      {listed.error && <Callout compact intent="warning">{t("credential.methodsFailed")}</Callout>}
+      <Button small minimal icon="refresh" loading={listed.isFetching} onClick={() => void listed.refetch()}>{t("setup.refreshConnection")}</Button>
     </section>
   );
 }
@@ -106,15 +109,15 @@ function CompanyRow({
         {company.label} · {credentialAccountLabel(row)}
       </p>
       {credentialAvailabilityNote(row) && <small>{credentialAvailabilityNote(row)}</small>}
-      {keyMethod && <small>API 키: {keyMethod.connected ? "등록됨" : "미등록"} · OAuth와 별도 경로</small>}
+      {keyMethod && <small>{message("keyRouteStatus", keyMethod.connected ? t("setup.registered") : t("setup.unregistered"))}</small>}
       <div className="company-account-actions">
         {!xaiLogin && !codexMethod && !claudeCodeMethod && !claudeMethod && <Button small disabled={!canStartLogin && !canGuideKey} loading={pending} onClick={onLogin}>
-          {loginUnavailable(row) ? "설치·버전 확인 필요" : row?.connection_state === "LOGIN_PENDING" ? "로그인 완료 대기" : row?.oauth && loginSupported(row) ? "로그인 확인됨" : canStartLogin ? "Codex 로그인 시작" : canGuideKey ? "키 발급 안내" : "연결 방법 확인 중"}
+          {loginUnavailable(row) ? t("setup.checkVersion") : row?.connection_state === "LOGIN_PENDING" ? t("setup.waitLogin") : row?.oauth && loginSupported(row) ? t("setup.loggedIn") : canStartLogin ? t("setup.startCodex") : canGuideKey ? t("setup.keyGuide") : t("setup.checkMethods")}
         </Button>}
         <InputGroup
           type="password"
-          placeholder="API 키"
-          aria-label={`${company.label} API 키`}
+          placeholder={t("setup.apiKey")}
+          aria-label={message("apiKeyLabel", company.label)}
           value={key}
           onChange={(event) => setKey(event.target.value)}
         />
@@ -128,7 +131,7 @@ function CompanyRow({
             setKey("");
           }}
         >
-          키 등록
+          {t("setup.registerKey")}
         </Button>
       </div>
       {xaiLogin && <XaiDeviceLogin key={`${workspaceId ?? "unknown"}:${projectId}`} projectId={projectId}

@@ -137,7 +137,12 @@ def decode_research(revision: SemanticRevision, snapshot: EntitySnapshot) -> Dec
         except ValidationError:
             continue
         payload = record.model_dump(mode="python")
-        if payload.get("schema_version", "1.0.0") not in {"1.0.0", "1.1.0"}:
+        versions = (
+            {"1.0.0", "1.1.0", "1.2.0"}
+            if model in (HypothesisRecord, HypothesisPortfolioRecord)
+            else {"1.0.0", "1.1.0"}
+        )
+        if payload.get("schema_version", "1.0.0") not in versions:
             continue
         if payload.get(identifier_field) != revision.entity_id:
             raise ResearchIdentityError("RESEARCH_RECORD_IDENTITY_MISMATCH")

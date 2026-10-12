@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import type { ResearchStatus } from "./research";
+import type { ResearchStatus, WorkspaceReady } from "./research";
 import { rpc, type RpcResult } from "./rpcClient";
 
 /**
@@ -10,11 +10,13 @@ import { rpc, type RpcResult } from "./rpcClient";
 export async function readResearchStatus(
   client: QueryClient, queryKey: readonly unknown[], projectId: string, threadId: string, signal?: AbortSignal,
 ): Promise<RpcResult<ResearchStatus>> {
+  const ready = client.getQueryData<RpcResult<WorkspaceReady>>(["workspace-ready"]);
+  const contract = ready?.value.response_language_scope === "REQUEST" ? { expected_result_contract: "v4" } : {};
   const prior = client.getQueryData<RpcResult<ResearchStatus>>(queryKey);
   if (prior?.value.operation_state === "RUNNING") {
-    const light = await rpc<ResearchStatus>("thread/read", { project_id: projectId, thread_id: threadId, view: "PROGRESS" }, crypto.randomUUID(), signal);
+    const light = await rpc<ResearchStatus>("thread/read", { project_id: projectId, thread_id: threadId, ...contract, view: "PROGRESS" }, crypto.randomUUID(), signal);
     if (light.value.operation_state === "RUNNING") return { ...light, value: { ...prior.value, ...light.value } };
   }
-  return rpc<ResearchStatus>("thread/read", { project_id: projectId, thread_id: threadId }, crypto.randomUUID(), signal);
+  return rpc<ResearchStatus>("thread/read", { project_id: projectId, thread_id: threadId, ...contract }, crypto.randomUUID(), signal);
 }
 

@@ -4,6 +4,20 @@ This source-preview index is derived from the public method catalog, registered 
 
 Requests use the public JSON-RPC `/rpc` surface. The method classification below distinguishes reads from commands; each call still follows the runtime's authentication and resource-scope checks. The six compatibility aliases remain listed under their own method names. The catalog contains 362 public methods (356 canonical and 6 aliases) and 221 notifications.
 
+
+## Request-scoped response language and expected-result views
+
+`thread/start`, `thread/input` and new-revision `thread/steer` with `contract_version=2` accept an optional `response_language` of `ko` or `en`. Omission retains the legacy question-language policy; null, empty and unsupported values are rejected. Explicit selections are stored in `ThreadRequestRevision` 2.1.0; legacy 2.0.0 records are not rewritten. Each new question may choose another language within the same thread. Queued inputs and retries retain the submitted payload and key. Resume uses its target request's language; conflicting overrides are caller-scoped rejections. Omission versus explicit `ko`, and `ko` versus `en`, are different idempotency inputs.
+
+`workspace/ready` advertises `response_languages: ["ko", "en"]` and `response_language_scope: "REQUEST"`. Hosted review also supplies an opaque `browser_scope_id` tied to its workspace and authenticated session when present. This is only a browser storage namespace and grants no authority. Local pending records use localStorage; hosted pending records use sessionStorage. Display locale changes make no model call or canonical write.
+
+When the existing expected-results option is enabled, explicit-language requests use `hypothesis_portfolio.v4` / table-filler v5: each provided row is `PREDICTED` with nonempty text, or `UNKNOWN` with `expected: null`. A missing row remains missing. Canonical hypothesis/portfolio generation details use record version 1.2.0 and retain the generating request reference and language. The old v2/v3 models and constants remain supported.
+
+`thread/read`, `operation/result/read` and `thread/result/read` accept `expected_result_contract: "v4"` for typed result rows. Without it, supported result DTOs receive a legacy display projection, identified by `expected_result_view: "LEGACY_DISPLAY_PROJECTION"`. Unknown rows display the old `모름` sentinel; raw canonical storage is unchanged. A literal prediction that would collide with that sentinel is rejected with `EXPECTED_RESULT_VIEW_REQUIRES_V4`, rather than reclassified. Historical `manifest` data stays canonical; only the separate result DTO is projected. New web clients opt in after capability discovery. Raw record endpoints retain their versioned codecs; clients must not strip unknown fields to downgrade records.
+
+Language policy is included only in explicit-language model-stage and reuse bases. Provider instructions preserve original text, IDs, units and authority constraints. English hypothesis-prose script checks flag unprotected Hangul without rewriting values or triggering a language-repair call; they do not certify English fluency or scientific correctness.
+
+
 ## Local model credential boundary
 
 | Method | Kind | Current contract |

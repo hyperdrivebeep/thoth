@@ -5,6 +5,10 @@ from __future__ import annotations
 from datetime import datetime
 
 from thoth.application.services.hypothesis_contract_v3 import CONTRACT_V3, base_tests, v3_details
+from thoth.application.services.hypothesis_v4_projection import (
+    hypothesis_details,
+    portfolio_details,
+)
 from thoth.application.services.hypothesis_verdict_link import running_verdict_link
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.hypothesis import (
@@ -14,10 +18,7 @@ from thoth.domain.hypothesis import (
     HypothesisV3,
 )
 from thoth.domain.hypothesis_full import HypothesisPortfolioRecord, HypothesisRecord
-from thoth.domain.research_projection import (
-    HypothesisGenerationDetails,
-    PortfolioGenerationDetails,
-)
+from thoth.domain.hypothesis_v4 import CONTRACT_V4, HypothesisPortfolioV4, HypothesisV4
 from thoth.domain.test_validity import hypothesis_semantic_digest
 
 
@@ -49,8 +50,10 @@ def hypothesis_view(record: HypothesisRecord) -> Hypothesis | None:
         "prediction_proposal": details.prediction_proposal,
         "semantic_review_ref": details.semantic_review_ref,
     }
-    if details.contract_version != CONTRACT_V3:
+    if details.contract_version is None:
         return Hypothesis.model_validate(fields)
+    if details.contract_version not in (CONTRACT_V3, CONTRACT_V4):
+        raise ValueError("HYPOTHESIS_CONTRACT_VERSION_UNSUPPORTED")
     # The generator was shown the v3 form: give back what it said beside the v2 content.
     rows = {item.test_id: item.rows for item in details.expected_results}
     tests = [
@@ -60,7 +63,9 @@ def hypothesis_view(record: HypothesisRecord) -> Hypothesis | None:
         }
         for test in details.discriminating_test_candidates
     ]
-    return HypothesisV3.model_validate(
+    return (
+        HypothesisV4 if details.contract_version == CONTRACT_V4 else HypothesisV3
+    ).model_validate(
         {
             **fields,
             "discriminating_tests": tests,
@@ -115,21 +120,24 @@ def full_hypothesis(
     intent = candidate.primary_intent
     if intent is None and current is not None:
         intent = current.primary_intent
-    details = HypothesisGenerationDetails(
-        primary_locus=candidate.primary_locus,
-        contributing_loci=candidate.contributing_loci,
-        causal_depth=candidate.causal_depth,
-        missing_evidence=candidate.missing_evidence,
-        assumptions=candidate.assumptions,
-        uncertainty=candidate.uncertainty,
-        predicted_observation_candidates=candidate.predicted_observations,
-        discriminating_test_candidates=base_tests(candidate),
-        candidate_status=candidate.status,
-        critical_review=candidate.critical_review,
-        execution_appraisal=candidate.execution_appraisal,
-        prediction_proposal=candidate.prediction_proposal,
-        semantic_review_ref=candidate.semantic_review_ref,
-        **v3_details(candidate),
+    details = hypothesis_details(
+        candidate,
+        dict(
+            primary_locus=candidate.primary_locus,
+            contributing_loci=candidate.contributing_loci,
+            causal_depth=candidate.causal_depth,
+            missing_evidence=candidate.missing_evidence,
+            assumptions=candidate.assumptions,
+            uncertainty=candidate.uncertainty,
+            predicted_observation_candidates=candidate.predicted_observations,
+            discriminating_test_candidates=base_tests(candidate),
+            candidate_status=candidate.status,
+            critical_review=candidate.critical_review,
+            execution_appraisal=candidate.execution_appraisal,
+            prediction_proposal=candidate.prediction_proposal,
+            semantic_review_ref=candidate.semantic_review_ref,
+            **({} if isinstance(candidate, HypothesisV4) else v3_details(candidate)),
+        ),
     )
     draft: dict[str, object] = {} if current is None else current.model_dump(mode="python")
     invalidated = (
@@ -200,7 +208,9 @@ def full_hypothesis(
             "supersedes_revision_digest": parent,
             "created_at": created_at,
             "receipt_ref": None,
-            "schema_version": "1.1.0",
+            "schema_version": "1.2.0"
+            if isinstance(candidate, (HypothesisV4, HypothesisPortfolioV4))
+            else "1.1.0",
             "revision_digest": "0" * 64,
         }
     )
@@ -279,20 +289,25 @@ def full_portfolio(
             else {"state": "NOT_ASSESSED"}
             if current is None
             else current.unknown_reserve,
-            "generation_details": PortfolioGenerationDetails(
-                candidate_status=candidate.status,
-                generated_from_head_set=candidate.generated_from_head_set,
-                alternatives_considered=candidate.alternatives_considered,
-                next_checks=candidate.next_checks,
-                uncertainty_reserve=candidate.uncertainty_reserve,
-                table_fill=candidate.table_fill
-                if isinstance(candidate, HypothesisPortfolioV3)
-                else None,
+            "generation_details": portfolio_details(
+                candidate,
+                dict(
+                    candidate_status=candidate.status,
+                    generated_from_head_set=candidate.generated_from_head_set,
+                    alternatives_considered=candidate.alternatives_considered,
+                    next_checks=candidate.next_checks,
+                    uncertainty_reserve=candidate.uncertainty_reserve,
+                    table_fill=candidate.table_fill
+                    if isinstance(candidate, HypothesisPortfolioV3)
+                    else None,
+                ),
             ),
             "supersedes_revision_digest": parent,
             "created_at": created_at,
             "receipt_ref": None,
-            "schema_version": "1.1.0",
+            "schema_version": "1.2.0"
+            if isinstance(candidate, (HypothesisV4, HypothesisPortfolioV4))
+            else "1.1.0",
             "revision_digest": "0" * 64,
         }
     )

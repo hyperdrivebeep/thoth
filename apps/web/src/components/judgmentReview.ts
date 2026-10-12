@@ -1,3 +1,5 @@
+import { message as formatMessage } from "../i18n/formatMessages";
+import { t } from "../i18n/locale";
 import { objectList, objectValue, stringValues, textValue } from "../api/presentation";
 
 export type ReviewRequest = {
@@ -14,12 +16,12 @@ export type ReviewControls = {
 };
 
 export const reviewReasons = [
-  { code: "EVIDENCE_INTERPRETATION", label: "근거 해석이 다름" },
-  { code: "MISSING_KEY_EVIDENCE", label: "중요한 근거가 빠짐" },
-  { code: "SOURCE_OR_TIME_INAPPROPRIATE", label: "출처·시점이 부적절함" },
-  { code: "WRONG_RELATION_TO_OTHER_HYPOTHESES", label: "다른 가설과의 관계가 잘못됨" },
-  { code: "INSUFFICIENT_EXPLANATION", label: "설명이 부족함" },
-  { code: "OTHER", label: "기타" },
+  { code: "EVIDENCE_INTERPRETATION", get label() { return t("review.interpretation"); } },
+  { code: "MISSING_KEY_EVIDENCE", get label() { return t("review.missing"); } },
+  { code: "SOURCE_OR_TIME_INAPPROPRIATE", get label() { return t("review.source"); } },
+  { code: "WRONG_RELATION_TO_OTHER_HYPOTHESES", get label() { return t("review.relationship"); } },
+  { code: "INSUFFICIENT_EXPLANATION", get label() { return t("review.explanation"); } },
+  { code: "OTHER", get label() { return t("hypothesisLink.other"); } },
 ] as const;
 
 export function parseRequests(value: unknown): ReviewRequest[] {
@@ -44,14 +46,14 @@ export const openRequest = (requests: ReviewRequest[], hypothesisId: string) =>
 export const resolvedRequest = (requests: ReviewRequest[], hypothesisId: string) =>
   newest(requests.filter(item => item.hypothesis_id === hypothesisId && item.status === "RESOLVED"));
 
-const outcomes: Record<string, string> = { UPHELD: "유지", CHANGED: "변경", HOLD: "보류" };
+const outcomes: Record<string, string> = { get UPHELD() { return t("review.keep"); }, get CHANGED() { return t("review.change"); }, get HOLD() { return t("state.hold"); } };
 export const outcomeLabel = (value: string) => outcomes[value] ?? value;
 
-const simple: Record<string, string> = { SUPPORT: "지지", COUNTER: "반박", UNASSESSED: "미평가", REMOVED: "이번 결과에 없음" };
+const simple: Record<string, string> = { get SUPPORT() { return t("hypotheses.support"); }, get COUNTER() { return t("hypotheses.refute"); }, get UNASSESSED() { return t("review.unassessed"); }, get REMOVED() { return t("review.absent"); } };
 /** Relation text as recorded ("SUPPORT" or "SUPPORT:3|COUNTER:0|APPRAISAL:x") in plain Korean. */
 export function relationText(value: string): string {
   if (simple[value]) return simple[value];
   const support = /SUPPORT:(\d+)/.exec(value)?.[1];
   const counter = /COUNTER:(\d+)/.exec(value)?.[1];
-  return support !== undefined && counter !== undefined ? `뒷받침 ${support} · 반박 ${counter}` : value;
+  return support !== undefined && counter !== undefined ? formatMessage("supportCounts", support, counter) : value;
 }

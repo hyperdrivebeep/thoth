@@ -1,9 +1,11 @@
+import { message as formatMessage } from "../i18n/formatMessages";
+import { t } from "../i18n/locale";
 import { Button, Callout, Classes, Dialog, Radio, RadioGroup } from "@blueprintjs/core";
 import { useState } from "react";
 import { applyTraceImport, previewTraceImport, type ImportApplied, type ImportMode, type ImportPreview } from "../api/trace";
 import { applyFailureText, issueText, lossText } from "./traceText";
 
-const kindName: Record<string, string> = { ITEM: "항목", LINK: "연결", RULE: "판정 규칙", RESULT: "결과" };
+const kindName: Record<string, string> = { get ITEM() { return t("traceImport.item"); }, get LINK() { return t("traceImport.link"); }, get RULE() { return t("traceImport.rule"); }, get RESULT() { return t("traceImport.result"); } };
 
 function readText(file: File): Promise<string> {
   if (typeof file.text === "function") return file.text();
@@ -17,7 +19,7 @@ function readText(file: File): Promise<string> {
 
 function ChangeList({ heading, items }: { heading: string; items: { kind: string; id: string; fields: string[] }[] }) {
   if (items.length === 0) return null;
-  return <div><strong>{heading} {items.length}개</strong>
+  return <div><strong>{formatMessage("itemCount", heading, items.length)}</strong>
     <ul className="trace-reasons">{items.map(item => <li key={item.kind + item.id}>{kindName[item.kind] ?? item.kind} {item.id}</li>)}</ul></div>;
 }
 
@@ -38,7 +40,7 @@ export function TraceImportDialog({ projectId, isOpen, hasTrace, onClose, onAppl
     if (csv === null) return;
     setBusy(true);
     try { setPreview(await previewTraceImport(projectId, nextMode, csv)); }
-    catch { setFailure({ message: "파일을 미리보기하지 못했습니다. 아무것도 저장되지 않았습니다.", next: "잠시 뒤 다시 시도하세요." }); }
+    catch { setFailure({ get message() { return t("traceImport.failed"); }, get next() { return t("trace.apply.retry"); } }); }
     finally { setBusy(false); }
   };
   const choose = async (file: File | undefined) => {
@@ -55,34 +57,33 @@ export function TraceImportDialog({ projectId, isOpen, hasTrace, onClose, onAppl
   };
   const changes = preview?.changes;
   const total = changes ? changes.added.length + changes.updated.length + changes.deleted.length : 0;
-  return <Dialog isOpen={isOpen} onClose={close} title="CSV 들여오기" className="trace-import-dialog">
+  return <Dialog isOpen={isOpen} onClose={close} title={t("tracePage.import")} className="trace-import-dialog">
     <div className={Classes.DIALOG_BODY}>
-      <RadioGroup label="들여오는 방식" selectedValue={mode} onChange={event => { const next = event.currentTarget.value as ImportMode; setMode(next); void look(next, text); }}>
-        <Radio value="CREATE" label="새로 만들기 (추적표가 없는 프로젝트)"/>
-        <Radio value="UPDATE" label="기존 표 고치기 (내보낸 파일을 고친 것)"/>
+      <RadioGroup label={t("traceImport.mode")} selectedValue={mode} onChange={event => { const next = event.currentTarget.value as ImportMode; setMode(next); void look(next, text); }}>
+        <Radio value="CREATE" label={t("traceImport.create")}/>
+        <Radio value="UPDATE" label={t("traceImport.update")}/>
       </RadioGroup>
-      <label className="trace-file-field">CSV 파일 선택
-        <input type="file" accept=".csv,text/csv" aria-label="CSV 파일 선택" onChange={event => void choose(event.currentTarget.files?.[0])}/></label>
-      {fileName && <p className="muted">선택한 파일: {fileName}</p>}
-      {busy && <p role="status">처리 중…</p>}
-      {failure && <Callout intent="danger" role="alert">{failure.message}<p><strong>다음 행동</strong>: {failure.next}</p></Callout>}
-      {preview && changes && <section aria-label="들여오기 미리보기" className="trace-preview">
-        <h3>미리보기 — 아직 저장하지 않았습니다</h3>
-        <p>추가 {changes.added.length}개 · 변경 {changes.updated.length}개 · 삭제 {changes.deleted.length}개 · 그대로 {changes.unchanged}개</p>
-        <ChangeList heading="추가" items={changes.added}/><ChangeList heading="변경" items={changes.updated}/><ChangeList heading="삭제" items={changes.deleted}/>
-        {preview.conflicts.length > 0 && <Callout intent="danger" title="반영할 수 없는 문제" role="alert">
+      <label className="trace-file-field">{t("traceImport.chooseFile")}<input type="file" accept=".csv,text/csv" aria-label={t("traceImport.chooseFile")} onChange={event => void choose(event.currentTarget.files?.[0])}/></label>
+      {fileName && <p className="muted">{t("labels.selectedFile")}{" "}{fileName}</p>}
+      {busy && <p role="status">{t("traceImport.working")}</p>}
+      {failure && <Callout intent="danger" role="alert">{failure.message}<p><strong>{t("delta.nextAction")}</strong>: {failure.next}</p></Callout>}
+      {preview && changes && <section aria-label={t("traceImport.preview")} className="trace-preview">
+        <h3>{t("traceImport.notSaved")}</h3>
+        <p>{formatMessage("importCounts", changes.added.length, changes.updated.length, changes.deleted.length, changes.unchanged)}</p>
+        <ChangeList heading={t("traceImport.added")} items={changes.added}/><ChangeList heading={t("history.change")} items={changes.updated}/><ChangeList heading={t("traceImport.deleted")} items={changes.deleted}/>
+        {preview.conflicts.length > 0 && <Callout intent="danger" title={t("traceImport.issues")} role="alert">
           <ul className="trace-reasons">{preview.conflicts.map((issue, index) => { const info = issueText(issue);
-            return <li key={index}>{info.message}<br/><strong>다음 행동</strong>: {info.next}
-              <details className="connection-tech"><summary>기술 정보</summary><small>{issue.code}{issue.detail ? ` · ${issue.detail}` : ""}</small></details></li>; })}</ul></Callout>}
-        {preview.losses.length > 0 && <details className="connection-tech"><summary>CSV에 담기지 않아 이 들여오기가 건드리지 않는 것</summary>
+            return <li key={index}>{info.message}<br/><strong>{t("delta.nextAction")}</strong>: {info.next}
+              <details className="connection-tech"><summary>{t("oauth.technical")}</summary><small>{issue.code}{issue.detail ? ` · ${issue.detail}` : ""}</small></details></li>; })}</ul></Callout>}
+        {preview.losses.length > 0 && <details className="connection-tech"><summary>{t("traceImport.untouched")}</summary>
           <ul className="trace-reasons">{preview.losses.map(line => <li key={line}>{lossText(line)}</li>)}</ul></details>}
-        {preview.applicable && total === 0 && <p>바뀌는 것이 없습니다.</p>}
-        {preview.applicable && total > 0 && <p className="muted">반영하면 바뀐 입력에 해당하는 판정이 같은 순간에 다시 계산됩니다. 이전 판정은 이력에 남습니다.</p>}
+        {preview.applicable && total === 0 && <p>{t("traceImport.noChange")}</p>}
+        {preview.applicable && total > 0 && <p className="muted">{t("traceImport.recompute")}</p>}
       </section>}
     </div>
     <div className={Classes.DIALOG_FOOTER}><div className={Classes.DIALOG_FOOTER_ACTIONS}>
-      <Button onClick={close}>닫기</Button>
-      <Button intent="primary" disabled={!preview || !preview.applicable || total === 0 || busy} onClick={() => void apply()}>이 내용으로 반영</Button>
+      <Button onClick={close}>{t("hold.close")}</Button>
+      <Button intent="primary" disabled={!preview || !preview.applicable || total === 0 || busy} onClick={() => void apply()}>{t("traceImport.apply")}</Button>
     </div></div>
   </Dialog>;
 }

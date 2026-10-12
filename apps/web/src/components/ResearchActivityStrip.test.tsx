@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import type { UserActivityEvent } from "../api/research";
 import { ResearchActivityStrip } from "./ResearchActivityStrip";
+import { setLocale } from "../i18n/locale";
 
 function event(seq: number, overrides: Partial<UserActivityEvent> = {}): UserActivityEvent {
   return {
@@ -23,6 +24,28 @@ function event(seq: number, overrides: Partial<UserActivityEvent> = {}): UserAct
 }
 
 describe("ResearchActivityStrip", () => {
+  it("translates the program-owned LOCAL READ tool name in English details", () => {
+    try {
+      setLocale("en");
+      const html = renderToStaticMarkup(<ResearchActivityStrip detailOpen events={[event(1, {
+        label_ko: "Read original record.",
+        tool: { display_name: "프로젝트 자료", family: "LOCAL", operation: "READ", sanitized_args: {}, raw_command_available: false, command_detail: "unavailable" },
+      })]} />);
+      expect(html).toContain("Project source");
+      expect(html).not.toContain("프로젝트 자료");
+    } finally { setLocale("ko"); }
+  });
+  it("translates the program model title but preserves the same words in a source title", () => {
+    try {
+      setLocale("en");
+      const html = renderToStaticMarkup(<ResearchActivityStrip events={[
+        event(1, { target: { kind: "model", title: "모델 검토기", access_state: "allowed" } }),
+        event(2, { target: { kind: "span", title: "모델 검토기", access_state: "allowed" } }),
+      ]} />);
+      expect(html).toContain("Model reviewer");
+      expect(html).toContain("모델 검토기");
+    } finally { setLocale("ko"); }
+  });
   it("shows only the five most recent default events in the compact view", () => {
     const html = renderToStaticMarkup(<ResearchActivityStrip events={Array.from({ length: 7 }, (_, index) => event(index + 1))} />);
     expect(html).not.toContain("자료 1 확인");

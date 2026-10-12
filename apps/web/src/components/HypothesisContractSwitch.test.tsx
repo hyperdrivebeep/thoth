@@ -31,7 +31,7 @@ it("shows the switch off, says in easy words what it does and that it is off unl
   expect(input().checked).toBe(false);
   expect(node.textContent).toContain("가설 만들 때 예상 결과와 기각 조건도 함께 받기");
   expect(node.textContent).toContain("기본은 꺼짐");
-  expect(node.textContent).toContain("모델을 더 부르지는 않습니다");
+  expect(node.textContent).toContain("추가 모델 호출이 생길 수 있습니다");
   expect(node.textContent).not.toMatch(/v3|hypothesis_portfolio|expected_by_hypothesis/);
 });
 

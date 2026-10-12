@@ -1,11 +1,17 @@
+import { UiError } from "../i18n/UiError";
+import { t } from "../i18n/locale";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { rpc } from "../api/rpcClient";
 import { readResearchStatus } from "../api/researchStatusRead";
+import { clearSubmission, hasSubmissionStore, readSubmission, submissionScopeId, writeSubmission } from "../api/submissionPersistence";
+import { readDraftLanguage, writeDraftLanguage } from "../api/draftLanguage";
+import type { ResponseLanguage } from "../api/localWorkspacePersistence";
+import type { WorkspaceReady } from "../api/research";
 import type { ResearchAdmission } from "../api/research";
 import type { ModelSelection } from "./ModelSettings";
 import { readDraft, writeDraft } from "../api/conversation";
-import { clearLocalPending, inspectLocalDraft, readLocalPending, submissionSignature, validWorkspaceId, writeLocalPending,
+import { inspectLocalDraft, submissionSignature, validWorkspaceId,
   type BrowserScope, type DraftWriteResult, type PendingOrigin, type PendingRead, type PendingSubmission } from "../api/localWorkspacePersistence";
 
 /** Draft ownership only. All execution/current-result states are server projections. */
@@ -14,6 +20,9 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   /** The trace row this question is about (set by "원인 조사"); it goes with the next request only, and is dropped when the question is emptied. */
   origin: PendingOrigin | null = null, onOriginDone?: () => void) {
   const client = useQueryClient();
+  const [selectedLanguage, setSelectedLanguage] = useState<ResponseLanguage | null | undefined>(() => readDraftLanguage(storageScope, projectId, threadId));
+  const ready = useQuery({ queryKey: ["workspace-ready"], enabled: false, queryFn: ({signal}) => rpc<WorkspaceReady>("workspace/ready", {}, "ws-ready", signal) });
+  const languageSupported = hasSubmissionStore(storageScope) && ready.data?.value.response_language_scope === "REQUEST" && ready.data.value.response_languages?.includes("en") === true;
   const [problem, updateProblem] = useState(() => readDraft(projectId, threadId, storageScope));
   const problemRef = useRef(problem);
   const [draftSaveState, setDraftSaveState] = useState<DraftWriteResult>(() =>
@@ -23,21 +32,23 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     const kind = inspectLocalDraft(storageScope.workspaceId, projectId, threadId).kind;
     return kind === "CORRUPT" || kind === "UNAVAILABLE" ? kind : null;
   });
-  const [pendingRead, setPendingRead] = useState<PendingRead>(() => storageScope.mode === "LOCAL"
-    ? readLocalPending(storageScope.workspaceId, projectId, threadId) : { kind: "NONE" });
+  const [pendingRead, setPendingRead] = useState<PendingRead>(() => readSubmission(storageScope, projectId, threadId));
   const [pendingStorageError, setPendingStorageError] = useState<string | null>(null);
   const [queuedNotice, setQueuedNotice] = useState(false);
   const setProblem = (text: string) => {
     if (origin && !text.trim()) onOriginDone?.();
+    let languageSaved = true;
+    if (text && !problemRef.current) { setSelectedLanguage(responseLanguage); languageSaved = writeDraftLanguage(storageScope, projectId, threadId, responseLanguage); }
     const saved = writeDraft(projectId, threadId, text, storageScope);
     if (storageScope.mode === "LOCAL") {
-      setDraftSaveState(saved);
+      setDraftSaveState(languageSaved ? saved : "UNAVAILABLE");
       if (saved === "SAVED") setDraftRestoreIssue(null);
     }
     problemRef.current = text;
     updateProblem(text);
   };
   useEffect(() => {
+    setSelectedLanguage(readDraftLanguage(storageScope, projectId, threadId));
     const stored = readDraft(projectId, threadId, storageScope);
     problemRef.current = stored;
     updateProblem(stored);
@@ -46,7 +57,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
       const kind = inspectLocalDraft(storageScope.workspaceId, projectId, threadId).kind;
       setDraftRestoreIssue(kind === "CORRUPT" || kind === "UNAVAILABLE" ? kind : null);
     } else setDraftRestoreIssue(null);
-    setPendingRead(storageScope.mode === "LOCAL" ? readLocalPending(storageScope.workspaceId, projectId, threadId) : { kind: "NONE" });
+    setPendingRead(readSubmission(storageScope, projectId, threadId));
     pendingSubmission.current = null;
     setPendingStorageError(null);
     setQueuedNotice(false);
@@ -54,8 +65,6 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   const [modelSelection, setModelSelection] = useState<ModelSelection | null>(null);
   const draftRevision = useRef(0);
   const pendingSubmission = useRef<{ signature: string; key: string; inFlight: boolean } | null>(null);
-  const currentSignature = submissionSignature(projectId, threadId, problem, modelSelection, origin);
-  const pendingBlocksNewInput = pendingRead.kind === "INVALID" || pendingRead.kind === "PENDING" && pendingRead.value.signature !== currentSignature;
   const chooseModel = (selection: ModelSelection) => { draftRevision.current += 1; setModelSelection(selection); };
   const clearModel = (revision: number, capturedEpoch = epoch.current) => {
     if (draftRevision.current === revision && capturedEpoch === epoch.current) { draftRevision.current += 1; setModelSelection(null); }
@@ -66,6 +75,15 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     queryFn: ({ signal }) => readResearchStatus(client, readKey, projectId, threadId, signal),
     refetchInterval: query => query.state.data?.value.operation_state === "RUNNING" ? 1200 : false,
   });
+  const responseLanguage = selectedLanguage !== undefined ? selectedLanguage : research.data?.value.request?.response_language ?? null;
+  const languageRef = useRef(responseLanguage);
+  languageRef.current = responseLanguage;
+  const chooseLanguage = (language: ResponseLanguage | null) => {
+    setSelectedLanguage(language);
+    if (!writeDraftLanguage(storageScope, projectId, threadId, language)) setDraftSaveState("UNAVAILABLE");
+  };
+  const currentSignature = submissionSignature(projectId, threadId, problem, modelSelection, origin, responseLanguage ?? undefined);
+  const pendingBlocksNewInput = pendingRead.kind === "INVALID" || pendingRead.kind === "PENDING" && pendingRead.value.signature !== currentSignature;
   const basis = research.data?.value.current_result?.basis_digest;
   const operationState = research.data?.value.operation_state;
   useEffect(() => {
@@ -82,9 +100,9 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     else if (sawRunning.current) setQueuedNotice(false);
   }, [queuedNotice, operationState]);
   const submit = useMutation({
-    mutationFn: async (captured: { projectId: string; threadId: string; problem: string; selection: ModelSelection | null; origin: PendingOrigin | null; revision: number; epoch: number; key: string; scope: BrowserScope }) => {
+    mutationFn: async (captured: { projectId: string; threadId: string; problem: string; selection: ModelSelection | null; origin: PendingOrigin | null; responseLanguage?: ResponseLanguage; revision: number; epoch: number; key: string; scope: BrowserScope }) => {
       const admission = await rpc<ResearchAdmission>(captured.threadId ? "thread/input" : "thread/start", {
-        project_id: captured.projectId, contract_version: 2, ...captured.selection, ...(captured.origin ? { origin: captured.origin } : {}),
+        project_id: captured.projectId, contract_version: 2, ...captured.selection, ...(captured.responseLanguage ? { response_language: captured.responseLanguage } : {}), ...(captured.origin ? { origin: captured.origin } : {}),
         ...(captured.threadId ? { thread_id: captured.threadId, instruction: captured.problem } : { problem: captured.problem }),
       }, captured.key);
       const value = admission.value;
@@ -101,7 +119,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
         (value.project_id !== undefined && value.project_id !== captured.projectId) ||
         !value.thread_id || (captured.threadId && value.thread_id !== captured.threadId) ||
         ((normal || queued) && value.project_id !== captured.projectId)) {
-        throw new Error("연구 요청의 접수를 확인하지 못했습니다. 초안을 보존했습니다.");
+        throw new UiError("submission.unconfirmed");
       }
       return value;
     },
@@ -109,10 +127,10 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
       // Parent invalidates this token synchronously on project selection; late admissions cannot replace another draft.
       if (captured.epoch !== epoch.current) return;
       pendingSubmission.current = null;
-      if (captured.scope.mode === "LOCAL") {
-        const removed = clearLocalPending(captured.scope.workspaceId, captured.projectId, captured.threadId);
+      if (hasSubmissionStore(captured.scope)) {
+        const removed = clearSubmission(captured.scope, captured.projectId, captured.threadId);
         if (removed) { setPendingRead({ kind: "NONE" }); setPendingStorageError(null); }
-        else setPendingStorageError("접수는 확인됐지만 브라우저의 요청 복구 표시를 지우지 못했습니다. 원 요청을 다시 확인하세요.");
+        else setPendingStorageError(t("submission.clearFailed"));
       }
       clearModel(captured.revision, captured.epoch);
       if (captured.origin) onOriginDone?.();
@@ -128,6 +146,9 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
       }
       problemRef.current = next;
       updateProblem(next);
+      const nextLanguage = languageRef.current !== (captured.responseLanguage ?? null) ? languageRef.current : captured.responseLanguage ?? null;
+      writeDraftLanguage(captured.scope, captured.projectId, admission.thread_id, nextLanguage);
+      if (!next) setSelectedLanguage(nextLanguage);
       onAdmitted(admission.thread_id);
       await Promise.all([
         client.invalidateQueries({ queryKey: ["threads"] }),
@@ -141,7 +162,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   // "이어서 조사": the user asked to continue the interrupted run. The server reuses only the stages whose input is unchanged.
   const resume = useMutation({
     mutationFn: async (operationId: string) => {
-      if (!canExecute || !threadId) throw new Error("지금은 이어서 조사를 시작할 수 없습니다.");
+      if (!canExecute || !threadId) throw new UiError("submission.resumeUnavailable");
       return rpc<ResearchAdmission>("thread/input", { project_id: projectId, thread_id: threadId, contract_version: 2, resume_from_operation_id: operationId }, crypto.randomUUID());
     },
     onSuccess: async () => {
@@ -153,49 +174,50 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     },
   });
   const retryPending = () => {
-    if (storageScope.mode !== "LOCAL" || !canExecute || pendingSubmission.current?.inFlight) return;
-    const stored = readLocalPending(storageScope.workspaceId, projectId, threadId);
+    if (!hasSubmissionStore(storageScope) || !canExecute || pendingSubmission.current?.inFlight) return;
+    const stored = readSubmission(storageScope, projectId, threadId);
     setPendingRead(stored);
     if (stored.kind !== "PENDING") return;
     const { value } = stored;
+    if (value.responseLanguage && !languageSupported) return;
     pendingSubmission.current = { signature: value.signature, key: value.key, inFlight: true };
     setPendingStorageError(null);
-    submit.mutate({ projectId, threadId, problem: value.problem, selection: value.selection, origin: value.origin ?? null,
+    submit.mutate({ projectId, threadId, problem: value.problem, selection: value.selection, origin: value.origin ?? null, responseLanguage: value.responseLanguage,
       revision: -1, epoch: epoch.current, key: value.key, scope: storageScope });
   };
   return { research, queuedNotice, problem, setProblem, draftSaveState, draftRestoreIssue, pendingRead, pendingBlocksNewInput, pendingStorageError,
-    retryPending, modelSelection, chooseModel, clearModel, draftRevision,
+    retryPending, modelSelection, chooseModel, clearModel, draftRevision, responseLanguage, chooseLanguage, languageSupported,
     renderedRevision: draftRevision.current, submit, resume,
     send: () => {
-      if (!canExecute || !problem.trim() || pendingSubmission.current?.inFlight || pendingBlocksNewInput) return;
-      if (storageScope.mode === "LOCAL") {
-        const stored = readLocalPending(storageScope.workspaceId, projectId, threadId);
+      if (!canExecute || responseLanguage !== null && !languageSupported || !problem.trim() || pendingSubmission.current?.inFlight || pendingBlocksNewInput) return;
+      if (hasSubmissionStore(storageScope)) {
+        const stored = readSubmission(storageScope, projectId, threadId);
         setPendingRead(stored);
         if (stored.kind === "INVALID" || stored.kind === "PENDING" && stored.value.signature !== currentSignature) return;
         const record: PendingSubmission = stored.kind === "PENDING" ? stored.value : {
-          version: 1, workspaceId: storageScope.workspaceId ?? "", projectId, threadId,
+          ...(responseLanguage ? { version: 2 as const, responseLanguage } : { version: 1 as const }), workspaceId: submissionScopeId(storageScope) ?? "", projectId, threadId,
           problem, selection: modelSelection, ...(origin ? { origin } : {}), signature: currentSignature, key: crypto.randomUUID(), createdAt: Date.now(),
         };
         if (stored.kind === "NONE") {
-          const saved = writeLocalPending(record);
+          const saved = writeSubmission(storageScope, record);
           if (saved !== "SAVED") {
-            setPendingStorageError(saved === "TOO_LARGE" ? "요청 복구 정보를 저장할 수 없을 만큼 초안이 큽니다. 입력을 줄인 뒤 다시 시도하세요."
-              : "요청 복구 정보를 저장하지 못했습니다. 중복 접수를 막기 위해 전송하지 않았습니다.");
+            setPendingStorageError(saved === "TOO_LARGE" ? t("submission.tooLarge")
+              : t("submission.storageFailed"));
             return;
           }
           setPendingRead({ kind: "PENDING", value: record });
         }
         pendingSubmission.current = { signature: record.signature, key: record.key, inFlight: true };
         setPendingStorageError(null);
-        submit.mutate({ projectId, threadId, problem: record.problem, selection: record.selection, origin: record.origin ?? null,
+        submit.mutate({ projectId, threadId, problem: record.problem, selection: record.selection, origin: record.origin ?? null, responseLanguage: record.responseLanguage,
           revision: draftRevision.current, epoch: epoch.current, key: record.key, scope: storageScope });
         return;
       }
-      const signature = JSON.stringify([projectId,threadId,problem,modelSelection,epoch.current,...(origin ? [origin] : [])]);
+      const signature = JSON.stringify([currentSignature, epoch.current]);
       if (pendingSubmission.current?.signature !== signature) pendingSubmission.current = {signature,key:crypto.randomUUID(),inFlight:false};
       const request = pendingSubmission.current;
       request.inFlight = true;
-      submit.mutate({ projectId, threadId, problem, selection: modelSelection, origin, revision: draftRevision.current, epoch: epoch.current, key:request.key, scope: storageScope });
+      submit.mutate({ projectId, threadId, problem, selection: modelSelection, origin, responseLanguage: responseLanguage ?? undefined, revision: draftRevision.current, epoch: epoch.current, key:request.key, scope: storageScope });
     },
   };
 }

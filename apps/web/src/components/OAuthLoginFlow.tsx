@@ -1,3 +1,5 @@
+import { message } from "../i18n/formatMessages";
+import { t, useTranslation, messageKey, uiText } from "../i18n/locale";
 import { Button, Callout, InputGroup } from "@blueprintjs/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -63,13 +65,13 @@ function readStatus(value: OAuthDto | undefined, provider: AccountProvider, meth
 
 function stateCopy(state: LoginState, accountConnected = false): string {
   switch (state) {
-    case "IDLE": return "이 로그인 시도를 더는 확인할 수 없습니다. 계정 상태를 다시 확인하세요.";
-    case "PENDING": return accountConnected ? "로그인이 확인됐습니다. 모델 목록을 받는 중입니다." : "브라우저에서 로그인을 마쳐 주세요. 끝나면 자동으로 확인합니다.";
-    case "CONNECTED": return "로그인됐습니다. 실제 모델 응답은 첫 연구에서 확인합니다.";
-    case "DENIED": return "로그인이 거부됐습니다. 새 로그인은 직접 선택할 때만 시작됩니다.";
-    case "EXPIRED": return "로그인 시도의 유효 시간이 끝났습니다.";
-    case "CANCELLED": return "이 로그인 시도를 취소했습니다. 기존 인증과 API 키는 유지됩니다.";
-    case "FAILED": return "로그인 시도에 실패했습니다. 계정 상태를 확인하세요.";
+    case "IDLE": return t("oauth.idle");
+    case "PENDING": return accountConnected ? t("oauth.catalogLoading") : t("oauth.browser");
+    case "CONNECTED": return t("oauth.connected");
+    case "DENIED": return t("oauth.denied");
+    case "EXPIRED": return t("oauth.expired");
+    case "CANCELLED": return t("oauth.cancelled");
+    case "FAILED": return t("oauth.failed");
   }
 }
 
@@ -77,6 +79,7 @@ export function OAuthLoginFlow({ projectId, workspaceId, provider, authMethod, m
   projectId: string; workspaceId?: string; provider: AccountProvider; authMethod: OAuthMethod;
   method: CredentialAuthMethod; account?: CredentialAccount;
 }) {
+  useTranslation();
   const client = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [now, setNow] = useState(() => Date.now() / 1000);
@@ -116,7 +119,7 @@ export function OAuthLoginFlow({ projectId, workspaceId, provider, authMethod, m
   const canStart = Boolean(workspaceId && canStartCredentialMethod(account, authMethod)
     && method.connected !== true && shownState !== "CONNECTED" && !busy && (!session || terminalStates.has(shownState!)));
   const label = provider === "openai" ? "ChatGPT" : "Claude";
-  const onInstalled = () => { setError(null); setErrorCode(null); setNotice("도구를 설치했습니다. 이제 로그인을 시작할 수 있습니다."); };
+  const onInstalled = () => { setError(null); setErrorCode(null); setNotice(messageKey("oauth.installed")); };
 
   const start = async () => {
     if (!canStart || inFlight.current) return;
@@ -130,11 +133,11 @@ export function OAuthLoginFlow({ projectId, workspaceId, provider, authMethod, m
         { project_id: projectId, provider, auth_method: authMethod }, crypto.randomUUID(), controller.signal);
       if (!active.current || ticket !== generation.current) return;
       const next = readSession(result.value, provider, authMethod);
-      if (!next) { setError("로그인 시작 응답의 시도 ID와 상태를 확인하지 못했습니다. 자동으로 다시 시작하지 않습니다."); return; }
+      if (!next) { setError(messageKey("oauth.invalidStart")); return; }
       setNow(Date.now() / 1000); setSession(next); setManualOpen(next.manualRequired);
     } catch (caught) { if (active.current && ticket === generation.current) {
       setErrorCode(reasonCode(caught));
-      setError(connectionErrorText(caught, "로그인 시작 결과를 확인하지 못했습니다. 새 시도는 직접 선택할 때만 시작됩니다."));
+      setError(connectionErrorText(caught, t("oauth.startUnknown")));
     } }
     finally { requests.current.delete(controller); inFlight.current = false;
       if (active.current && ticket === generation.current) setBusy(null); }
@@ -151,7 +154,7 @@ export function OAuthLoginFlow({ projectId, workspaceId, provider, authMethod, m
         { provider, auth_method: authMethod, login_id: session.id }, crypto.randomUUID(), controller.signal);
       if (!active.current || ticket !== generation.current) return;
       const next = readStatus(result.value, provider, authMethod, session.id);
-      if (!next) { setError("이 로그인 시도의 상태를 확인하지 못했습니다. 자동 조회를 멈췄습니다."); return; }
+      if (!next) { setError(messageKey("oauth.statusUnknown")); return; }
       if (terminalStates.has(next.state)) {
         if (manualInputRef.current) manualInputRef.current.value = "";
         setManualResponse(""); setManualOpen(false);
@@ -177,12 +180,12 @@ export function OAuthLoginFlow({ projectId, workspaceId, provider, authMethod, m
           client.invalidateQueries({ queryKey: ["workspace-ready"] }),
         ]);
         if (active.current && ticket === generation.current) {
-          if (modelListFailed) setError("로그인됐지만 모델 목록을 불러오지 못했습니다. 연결 상태를 확인한 뒤 다시 시도하세요.");
+          if (modelListFailed) setError(messageKey("oauth.noCatalog"));
           else if (reads.some(read => read.status === "rejected"))
-            setError("로그인 시도는 완료됐지만 계정·모델 목록을 다시 읽지 못했습니다. 연결 상태를 직접 확인하세요.");
+            setError(messageKey("oauth.refreshUnknown"));
         }
       }
-    } catch { if (active.current && ticket === generation.current) setError("상태 조회에 실패했습니다. 자동 조회를 멈췄으며 새 로그인은 시작하지 않았습니다."); }
+    } catch { if (active.current && ticket === generation.current) setError(messageKey("oauth.pollFailed")); }
     finally { requests.current.delete(controller); inFlight.current = false;
       if (active.current && ticket === generation.current) setBusy(null); }
   }, [session, workspaceId, expired, provider, authMethod, client, projectId]);
@@ -207,8 +210,8 @@ export function OAuthLoginFlow({ projectId, workspaceId, provider, authMethod, m
       if (!active.current || ticket !== generation.current) return;
       const next = readStatus(result.value, provider, authMethod, session.id);
       if (next?.state === "CANCELLED") setSession(current => current?.id === session.id ? { ...current, ...next, authorizationUrl: null } : current);
-      else setError("취소 결과를 확인하지 못했습니다. 같은 시도의 상태를 직접 확인하세요.");
-    } catch { if (active.current && ticket === generation.current) setError("취소 결과를 확인하지 못했습니다. 자동으로 다시 취소하지 않습니다."); }
+      else setError(messageKey("oauth.cancelUnknown"));
+    } catch { if (active.current && ticket === generation.current) setError(messageKey("oauth.cancelNotRetried")); }
     finally { requests.current.delete(controller); inFlight.current = false;
       if (active.current && ticket === generation.current) setBusy(null); }
   };
@@ -228,9 +231,9 @@ export function OAuthLoginFlow({ projectId, workspaceId, provider, authMethod, m
         { provider, auth_method: authMethod, login_id: session.id, response }, crypto.randomUUID(), controller.signal);
       if (!active.current || ticket !== generation.current) return;
       const next = readStatus(result.value, provider, authMethod, session.id);
-      if (!next) { setError("수동 응답의 접수 상태를 확인하지 못했습니다. 입력값은 화면에서 지웠습니다."); return; }
+      if (!next) { setError(messageKey("oauth.manualUnknown")); return; }
       setSession(current => current?.id === session.id ? { ...current, ...next } : current);
-    } catch { if (active.current && ticket === generation.current) setError("수동 응답 결과를 확인하지 못했습니다. 입력값은 화면에서 지웠습니다."); }
+    } catch { if (active.current && ticket === generation.current) setError(messageKey("oauth.manualFailed")); }
     finally { requests.current.delete(controller); inFlight.current = false;
       if (active.current && ticket === generation.current) setBusy(null); }
   };
@@ -238,37 +241,37 @@ export function OAuthLoginFlow({ projectId, workspaceId, provider, authMethod, m
   return <div className="oauth-login-flow">
     {method.capabilities?.start === true
       ? <Button intent={canStart ? "primary" : "none"} disabled={!canStart} loading={busy === "start"} onClick={() => void start()}>
-        {method.connected || shownState === "CONNECTED" ? `${label} 로그인됨` : `${label}로 로그인`}</Button>
-      : <p className="connection-note" role="status">{reasonText(method.reason_code) ?? "이 PC에서는 계정 로그인을 시작할 수 없습니다. API 키로 연결하세요."}</p>}
-    {!workspaceId && <small role="status">작업 공간을 확인한 뒤 로그인을 시작할 수 있습니다.</small>}
+        {method.connected || shownState === "CONNECTED" ? message("loginButton", label, true) : message("loginButton", label, false)}</Button>
+      : <p className="connection-note" role="status">{reasonText(method.reason_code) ?? t("oauth.unsupported")}</p>}
+    {!workspaceId && <small role="status">{t("oauth.workspaceNeeded")}</small>}
     {session && <Callout compact>
       <p role="status">{stateCopy(shownState!, accountConnected)}</p>
-      {session.authorizationUrl && waiting && <p><a href={session.authorizationUrl} target="_blank" rel="noopener noreferrer">로그인 페이지 열기</a></p>}
-      {waiting && <p className="connection-timer" aria-live="off">{session.expiryEstimated ? "남은 상태 확인 시간" : "남은 유효 시간"}: {Math.max(0, Math.ceil(session.expiresAt - now))}초</p>}
+      {session.authorizationUrl && waiting && <p><a href={session.authorizationUrl} target="_blank" rel="noopener noreferrer">{t("oauth.openPage")}</a></p>}
+      {waiting && <p className="connection-timer" aria-live="off">{message("expiry", Math.max(0, Math.ceil(session.expiresAt - now)), session.expiryEstimated)}</p>}
       {waiting && <div>
-        <Button small minimal disabled={busy !== null || !session.capabilities.status} onClick={() => void status()}>상태 직접 확인</Button>
-        <Button small minimal disabled={cancelAttempted || busy !== null || !session.capabilities.cancel} onClick={() => void cancel()}>이 로그인 취소</Button>
+        <Button small minimal disabled={busy !== null || !session.capabilities.status} onClick={() => void status()}>{t("oauth.checkManually")}</Button>
+        <Button small minimal disabled={cancelAttempted || busy !== null || !session.capabilities.cancel} onClick={() => void cancel()}>{t("oauth.cancel")}</Button>
       </div>}
       {provider === "anthropic" && shownState === "PENDING" && session.capabilities.manualComplete && <>
-        <Button small minimal disabled={busy !== null} onClick={() => { if (manualInputRef.current) manualInputRef.current.value = ""; setManualOpen(value => !value); setManualResponse(""); }}>코드·리디렉션 URL 직접 입력</Button>
+        <Button small minimal disabled={busy !== null} onClick={() => { if (manualInputRef.current) manualInputRef.current.value = ""; setManualOpen(value => !value); setManualResponse(""); }}>{t("oauth.manualInput")}</Button>
         {manualOpen && <div>
-          <InputGroup type="password" inputRef={manualInputRef} aria-label="Claude 인증 응답" autoComplete="off" maxLength={4096} value={manualResponse}
+          <InputGroup type="password" inputRef={manualInputRef} aria-label={t("oauth.claudeResponse")} autoComplete="off" maxLength={4096} value={manualResponse}
             onChange={event => setManualResponse(event.target.value)} />
-          <Button small disabled={!manualResponse.trim() || busy !== null} onClick={() => void complete()}>이 시도에 제출</Button>
+          <Button small disabled={!manualResponse.trim() || busy !== null} onClick={() => void complete()}>{t("oauth.submit")}</Button>
         </div>}
       </>}
     </Callout>}
-    {error && <Callout compact intent="warning" role="alert">{error}</Callout>}
-    {notice && <Callout compact intent="success" role="status">{notice}</Callout>}
+    {error && <Callout compact intent="warning" role="alert">{uiText(error)}</Callout>}
+    {notice && <Callout compact intent="success" role="status">{uiText(notice)}</Callout>}
     {isCodexToolReason(errorCode) && <CodexToolHelp onInstalled={onInstalled} />}
     {(isClaudeToolReason(errorCode) || method.capabilities?.start !== true && isClaudeToolReason(method.reason_code)) && <ClaudeCodeHelp onInstalled={onInstalled} />}
     {(session || errorCode || account?.guidance || method.capabilities?.start !== true) && <details className="connection-tech">
-      <summary>기술 정보</summary>
-      <p>{method.route} · 연결 {method.connection_state ?? "미조회"} · 모델 경로 {method.execution_eligible ? "시도 가능" : "준비 전"} · 실행 성공 {account?.execution_verified === true ? "확인됨" : "미검증"}</p>
-      {method.capabilities?.start !== true && <p>로그인 시작 불가{method.reason_code ? ` (${method.reason_code})` : ""}</p>}
-      {session && <p>로그인 시도: {shownState} · 저장 인증: {session.authState} · 모델 목록: {session.catalogState}</p>}
-      {errorCode && <p>오류 코드: {errorCode}</p>}
-      {account?.guidance && <p>서버 안내 원문: {account.guidance}</p>}
+      <summary>{t("oauth.technical")}</summary>
+      <p>{method.route}{" "}{t("labels.connection")}{" "}{method.connection_state ?? t("setup.notRead")}{" "}{t("labels.modelRoute")}{" "}{method.execution_eligible ? t("oauth.canAttempt") : t("oauth.notReady")}{" "}{t("labels.executionSuccess")}{" "}{account?.execution_verified === true ? t("oauth.verified") : t("oauth.unverified")}</p>
+      {method.capabilities?.start !== true && <p>{t("labels.loginUnavailable")}{method.reason_code ? ` (${method.reason_code})` : ""}</p>}
+      {session && <p>{t("labels.loginAttempt")}{" "}{shownState}{" "}{t("labels.storedAuth")}{" "}{session.authState}{" "}{t("labels.modelList")}{" "}{session.catalogState}</p>}
+      {errorCode && <p>{t("labels.errorCode")}{" "}{errorCode}</p>}
+      {account?.guidance && <p>{t("labels.serverGuidance")}{" "}{account.guidance}</p>}
     </details>}
   </div>;
 }

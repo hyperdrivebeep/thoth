@@ -1,3 +1,4 @@
+import { t } from "../i18n/locale";
 import { z } from "zod";
 import { rpc } from "./rpcClient";
 import { cutoffStates } from "./sourcePolicy";
@@ -31,10 +32,10 @@ export const sourceTimeMutationBasisSchema = z.object({
 });
 
 export function cutoffLabel(state: string) {
-  if (state === "ELIGIBLE") return "연결됨 · 기준시점에 적합";
-  if (state === "AFTER_CUTOFF") return "연결됨 · 기준시점보다 이후라 판단에는 사용하지 않음";
-  if (state === "UNKNOWN_TIME") return "연결됨 · 인용할 때 시점을 확인";
-  if (state === "PROHIBITED_CONTEXT") return "연결됨 · 사용 금지 상태";
+  if (state === "ELIGIBLE") return t("sourceTime.connectedEligible");
+  if (state === "AFTER_CUTOFF") return t("sourceTime.connectedAfter");
+  if (state === "UNKNOWN_TIME") return t("sourceTime.connectedUnknown");
+  if (state === "PROHIBITED_CONTEXT") return t("sourceTime.connectedProhibited");
   return state;
 }
 

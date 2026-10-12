@@ -1,3 +1,4 @@
+import { t } from "../i18n/locale";
 import type { CoverageMatrixRow } from "../api/researchFollowup";
 
 /**
@@ -9,7 +10,7 @@ export type EvidenceUse = "DIRECT" | "CONDITIONAL" | "UNUSABLE" | "INSUFFICIENT"
 
 export const evidenceUseOrder: EvidenceUse[] = ["DIRECT", "CONDITIONAL", "INSUFFICIENT", "UNUSABLE", "UNCLASSIFIED"];
 export const evidenceUseLabel: Record<EvidenceUse, string> = {
-  DIRECT: "직접 사용 가능", CONDITIONAL: "조건부·참고용", INSUFFICIENT: "자료 없음·부족", UNUSABLE: "직접 사용 불가", UNCLASSIFIED: "분류 안 됨",
+  get DIRECT() { return t("evidenceUse.direct"); }, get CONDITIONAL() { return t("evidenceUse.conditional"); }, get INSUFFICIENT() { return t("evidenceUse.missing"); }, get UNUSABLE() { return t("evidenceUse.unusable"); }, get UNCLASSIFIED() { return t("evidenceUse.unclassified"); },
 };
 
 export function classifyEvidenceUse(row: CoverageMatrixRow): EvidenceUse {

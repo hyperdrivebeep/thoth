@@ -7,6 +7,19 @@
       "title": "Contract Version",
       "type": "integer"
     },
+    "expected_result_contract": {
+      "anyOf": [
+        {
+          "const": "v4",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Result Contract"
+    },
     "include_selected_evidence": {
       "default": false,
       "title": "Include Selected Evidence",

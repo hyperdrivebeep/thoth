@@ -38,6 +38,7 @@ from thoth.domain.research_request import (
     CurrentResultManifestV21,
     ResearchAttempt,
     ThreadRequestRevision,
+    decode_thread_request,
 )
 from thoth.ports.governance import GovernanceStorePort
 from thoth.ports.ledger import LedgerPort
@@ -192,7 +193,7 @@ class ProjectReviewReader:
         )
         if current is None:
             return None
-        request = ThreadRequestRevision.model_validate(current[1])
+        request = decode_thread_request(current[1])
         result = _read_head(
             self.ledger,
             thread.project_id,

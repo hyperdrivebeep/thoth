@@ -2,7 +2,7 @@
 
 from thoth.domain.research_basis import ResearchResultBasis
 from thoth.domain.research_history import HistoryScopeLink
-from thoth.domain.research_request import ThreadRequestRevision
+from thoth.domain.research_request import decode_thread_request
 from thoth.ports.ledger import LedgerPort
 from thoth.ports.research_history import HistoryWatermark, ResearchHistoryReadPort
 from thoth.ports.resource_scope import ResourceAccessPort
@@ -42,7 +42,7 @@ def result_scope_links(
         )
         if request_snapshot is None:
             continue
-        request = ThreadRequestRevision.model_validate(request_snapshot.content)
+        request = decode_thread_request(request_snapshot.content)
         if request.operation_id != snapshot.content.get("operation_id"):
             continue
         producers = {ref.revision_digest for ref in basis.produced_refs}

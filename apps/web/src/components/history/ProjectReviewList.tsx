@@ -1,3 +1,4 @@
+import { t } from "../../i18n/locale";
 import { Button, Callout, Tag } from "@blueprintjs/core";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { readProjectReviewList, type ProjectReviewItem } from "../../api/researchFollowup";
@@ -7,9 +8,9 @@ import { nextActionLabel } from "../statusLabels";
 import { describeHistoryReasons } from "./historyReasonText";
 
 function priorityLabel(priority: ProjectReviewItem["priority"]) {
-  if (priority === "HIGH") return "높음";
-  if (priority === "MEDIUM") return "보통";
-  return "낮음";
+  if (priority === "HIGH") return t("state.high");
+  if (priority === "MEDIUM") return t("state.mediumTime");
+  return t("state.low");
 }
 
 function selectionOf(item: ProjectReviewItem): HistorySelection {
@@ -22,20 +23,20 @@ export function ProjectReviewList({ projectId, onSelect }: { projectId: string; 
     queryFn: ({ pageParam, signal }) => readProjectReviewList(projectId, pageParam, signal), getNextPageParam: page => page.next_cursor ?? undefined });
   const pages = query.data?.pages ?? [];
   const items = pages.flatMap(page => page.items);
-  if (query.error && pages.length === 0) return <Callout compact intent="warning" role="alert">검토 필요 목록을 읽지 못했습니다. 연구 이력은 계속 볼 수 있습니다.<Button small onClick={() => void query.refetch()}>다시 읽기</Button></Callout>;
-  return <section className="project-review-list" aria-label="검토 필요 답변">
-    <div className="section-title-row"><div><h2>검토 필요</h2><p>서버가 현재 기준 재확인이나 남은 확인 사항 검토가 필요하다고 표시한 답변입니다.</p></div><Button small minimal icon="refresh" onClick={() => void query.refetch()} loading={query.isRefetching}>새로 읽기</Button></div>
-    {query.isPending ? <p className="muted" role="status">검토 목록을 읽는 중…</p> : items.length === 0 ? <p className="muted">현재 프로젝트에 표시할 검토 필요 답변이 없습니다.</p>
+  if (query.error && pages.length === 0) return <Callout compact intent="warning" role="alert">{t("reviewList.failed")}<Button small onClick={() => void query.refetch()}>{t("workspace.reload")}</Button></Callout>;
+  return <section className="project-review-list" aria-label={t("reviewList.title")}>
+    <div className="section-title-row"><div><h2>{t("followup.reviewNeeded")}</h2><p>{t("reviewList.notice")}</p></div><Button small minimal icon="refresh" onClick={() => void query.refetch()} loading={query.isRefetching}>{t("historyWorkspace.reload")}</Button></div>
+    {query.isPending ? <p className="muted" role="status">{t("reviewList.loading")}</p> : items.length === 0 ? <p className="muted">{t("reviewList.empty")}</p>
       : <div className="review-items">{items.map(item => <article className="review-item" key={item.item_id}>
         <div><Tag minimal>{priorityLabel(item.priority)}</Tag><Tag minimal intent={currentnessTone(item.currentness)}>{currentnessLabel(item.currentness)}</Tag></div>
         <h3>{item.title}</h3>
         <p>{nextActionLabel(item.next_user_action)}</p>
         {item.reason_codes.length > 0 && <ul className="review-reasons">{describeHistoryReasons(item.reason_codes).slice(0, 3).map(line => <li key={line}><small>{line}</small></li>)}</ul>}
-        <details className="connection-tech"><summary>기술 정보</summary><small>{item.next_user_action.label}</small>{item.reason_codes.map(code => <small key={code}>{code}</small>)}</details>
-        <Button small icon="document-open" onClick={() => onSelect(selectionOf(item))}>해당 답변 열기</Button>
+        <details className="connection-tech"><summary>{t("oauth.technical")}</summary><small>{item.next_user_action.label}</small>{item.reason_codes.map(code => <small key={code}>{code}</small>)}</details>
+        <Button small icon="document-open" onClick={() => onSelect(selectionOf(item))}>{t("reviewList.open")}</Button>
       </article>)}</div>}
-    {query.error && pages.length > 0 && <Callout compact intent="warning">검토 목록의 다음 구간을 읽지 못했습니다.</Callout>}
-    {query.hasNextPage && <Button small onClick={() => void query.fetchNextPage()} loading={query.isFetchingNextPage}>다음 검토 항목 보기</Button>}
-    {pages[0] && (!pages[0].unread_supported || !pages[0].assignment_supported) && <p className="muted">읽지 않음, 배정, 댓글 알림은 이 목록의 계약에 포함되지 않습니다.</p>}
+    {query.error && pages.length > 0 && <Callout compact intent="warning">{t("reviewList.pageFailed")}</Callout>}
+    {query.hasNextPage && <Button small onClick={() => void query.fetchNextPage()} loading={query.isFetchingNextPage}>{t("reviewList.next")}</Button>}
+    {pages[0] && (!pages[0].unread_supported || !pages[0].assignment_supported) && <p className="muted">{t("reviewList.scope")}</p>}
   </section>;
 }

@@ -3,7 +3,7 @@
 from thoth.application.services.request_records import RequestRecords
 from thoth.domain.account_usage import AccountQuotaSnapshot
 from thoth.domain.enums import EntityType
-from thoth.domain.research_request import ThreadRequestRevision
+from thoth.domain.research_request import decode_thread_request
 from thoth.ports.provider_usage import ProviderUsagePort
 
 
@@ -40,7 +40,7 @@ class ProviderUsageService:
         record = self.records.read(project_id, EntityType.THREAD, f"request:{thread_id}")
         if record is None:
             return None
-        request = ThreadRequestRevision.model_validate(record[1])
+        request = decode_thread_request(record[1])
         if request.model_settings is None:
             return None
         return request.model_settings.provider

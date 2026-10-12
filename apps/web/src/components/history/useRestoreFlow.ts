@@ -1,3 +1,4 @@
+import { UiError } from "../../i18n/UiError";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { RpcError } from "../../api/rpcClient";
@@ -39,11 +40,11 @@ export function useRestoreFlow(scope: HistoryScope, selection: RestoreSelection,
   const run = async (mode: "apply" | "check") => {
     if (sending.current || !active.current) return;
     if (pending && pending.attempt.principalScope !== actorScope) {
-      setError(new Error("다른 로그인 또는 접근 범위의 요청은 다시 보내지 않습니다. 기록을 새로 읽어 주세요.")); return;
+      setError(new UiError("restore.scopeResendDenied")); return;
     }
     const currentPreview = preview.data;
     if (currentPreview && currentPreview.principalScope !== actorScope) {
-      setError(new Error("로그인 또는 접근 범위가 바뀌었습니다. 기록을 새로 읽어 주세요.")); return;
+      setError(new UiError("restore.scopeReload")); return;
     }
     if (mode === "apply" && (!currentPreview || pending || confirmed || error || preview.isFetching || preview.error)) return;
     if (mode === "check" && !pending && !confirmed) return;
@@ -51,7 +52,7 @@ export function useRestoreFlow(scope: HistoryScope, selection: RestoreSelection,
     let attempt = pending;
     try {
       if (!attempt && currentPreview && !confirmed) attempt = { version: 1, attempt: captureRestoreAttempt(currentPreview), operationId: null };
-    } catch (cause) { setError(cause instanceof Error ? cause : new Error("복원을 준비하지 못했습니다.")); return; }
+    } catch (cause) { setError(cause instanceof Error ? cause : new UiError("restore.prepareFailed")); return; }
     sending.current = true; setBusy(true); setError(null);
     try {
       if (confirmed) await confirmReadback(confirmed);
@@ -64,7 +65,7 @@ export function useRestoreFlow(scope: HistoryScope, selection: RestoreSelection,
       }
     } catch (cause) {
       if (!active.current) return;
-      setError(cause instanceof Error ? cause : new Error("요청 결과를 확인하지 못했습니다."));
+      setError(cause instanceof Error ? cause : new UiError("restore.resultUnknown"));
       // A definitive server refusal permits a new preview; transport/schema failures stay pending.
       if (cause instanceof RpcError && !confirmed && cause.details.original_operation_unchanged !== true
         && /^RESTORE_(HEAD_CHANGED|PREVIEW_STALE|SOURCE_UNAVAILABLE|SOURCE_DRIFT|SCHEMA_UNSUPPORTED|APPLY_NOT_READY|NOT_READY)$/.test(String(cause.details.reason_code))) {

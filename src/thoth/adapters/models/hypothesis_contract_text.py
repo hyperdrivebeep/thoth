@@ -79,11 +79,21 @@ _V3_OPENING = (
 
 def hypothesis_opening(prompt_version: str, default: str) -> str:
     """The generator's opening sentences: the v3 text for v3, the given text otherwise."""
-    return _V3_OPENING if prompt_version == V3_VERSION else default
+    return _V3_OPENING if prompt_version in (V3_VERSION, "hypothesis_portfolio.v4") else default
 
 
 def hypothesis_contract_addendum(prompt_version: str) -> str:
     """The extra text for this prompt version; empty for v2 and for every other version."""
+    if prompt_version == "hypothesis_portfolio.v4":
+        return _V3.replace("language of the question", "accepted response language").replace(
+            "for a Korean question", "when the response language is Korean"
+        ).replace("question language", "accepted response language").replace(
+            "CONTRACT_V3", "CONTRACT_V4"
+        ).replace("모름", "UNKNOWN with expected=null") + (
+            " Each row requires knowledge_state=PREDICTED with a nonempty expected string, or "
+            "knowledge_state=UNKNOWN with expected=null. Never encode uncertainty as a label. "
+            "A missing row means not provided, not UNKNOWN. Preserve supporting basis IDs."
+        )
     return _V3 if prompt_version == V3_VERSION else ""
 
 
@@ -127,5 +137,15 @@ _TABLE_FILLER = (
 )
 
 
-def table_filler_contract() -> str:
+def table_filler_contract(prompt_version: str = "") -> str:
+    if prompt_version == "hypothesis_table_filler.v5":
+        return _TABLE_FILLER.replace(
+            "language of the question", "accepted response language"
+        ).replace("for a Korean question", "when the response language is Korean").replace(
+            "모름", "UNKNOWN with expected=null"
+        ) + (
+            " Each answer requires knowledge_state=PREDICTED and a nonempty expected, or "
+            "knowledge_state=UNKNOWN and expected=null. Preserve basis refs. "
+            "A missing answer is NOT_ANSWERED, never an invented UNKNOWN answer."
+        )
     return _TABLE_FILLER

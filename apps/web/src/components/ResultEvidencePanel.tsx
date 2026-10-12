@@ -1,3 +1,5 @@
+import { message as formatMessage } from "../i18n/formatMessages";
+import { t } from "../i18n/locale";
 import { Button, Callout } from "@blueprintjs/core";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { readResultEvidence, resultContentKey, type ResultSelection, type EvidencePagePosition } from "../api/resultEvidence";
@@ -29,30 +31,29 @@ export function ResultEvidencePanel({ selection, result, focusSpanId, citations 
     // A cited source may sit on a later page: keep reading pages until it is found or the list ends.
     if (!focusLoaded && hasNextPage && !isFetching && !protection.blocked) void fetchNextPage();
   }, [focusLoaded, hasNextPage, isFetching, protection.blocked, fetchNextPage, loadedIds.length]);
-  if (query.isPending || (query.isFetching && !isFetchingNextPage)) return <p role="status">이 답변의 근거를 읽는 중…</p>;
-  if (protection.reason === "SCOPE_CHANGED") return <Callout intent="warning" role="alert">접근 범위 또는 기록 연결이 바뀌었습니다. 상세 화면을 닫고 근거를 다시 열어 주세요.</Callout>;
-  if (query.error || protection.blocked || !query.data || query.data.pages.length === 0) return <Callout intent="warning" role="alert">이 답변의 근거를 읽지 못했습니다. 근거가 없다는 뜻은 아닙니다.
-    <Button small onClick={() => void query.refetch()}>근거 다시 읽기</Button><Disclosure defaultOpen label="조회 진단"><p>{query.error?.message}</p></Disclosure></Callout>;
+  if (query.isPending || (query.isFetching && !isFetchingNextPage)) return <p role="status">{t("evidence.loading")}</p>;
+  if (protection.reason === "SCOPE_CHANGED") return <Callout intent="warning" role="alert">{t("evidence.scopeChanged")}</Callout>;
+  if (query.error || protection.blocked || !query.data || query.data.pages.length === 0) return <Callout intent="warning" role="alert">{t("evidence.failed")}<Button small onClick={() => void query.refetch()}>{t("evidence.reload")}</Button><Disclosure defaultOpen label={t("historyDetail.diagnostics")}><p>{query.error?.message}</p></Disclosure></Callout>;
   const pages = query.data.pages;
   const first = pages[0];
   if (!consistentEvidencePages(pages)) {
-    return <Callout intent="warning" role="alert">접근 범위 또는 기록 연결이 바뀌었습니다. 상세 화면을 닫고 근거를 다시 열어 주세요.</Callout>;
+    return <Callout intent="warning" role="alert">{t("evidence.scopeChanged")}</Callout>;
   }
   const items = pages.flatMap(page => page.items);
   const available = items.flatMap(item => item.span ? [item.span] : []);
   const unavailable = items.filter(item => item.availability !== "AVAILABLE");
-  return <section aria-label="답변에 선택된 근거">
-    <h3>이 답변에 선택된 근거 {first.selected_count}개</h3>
-    <p>연구에 선택된 원문 목록입니다. 답변 본문에서 직접 인용한 개수와 다를 수 있습니다.</p>
-    {first.selected_count === 0 ? <p>이 저장 버전에 선택된 근거가 없습니다.</p> : <>
-      <p className="muted">‘확인된 원문’은 지금까지 불러온 근거 중 원문을 보여 줄 수 있는 것의 수입니다. 한 번에 일부만 불러오므로 선택된 근거 전체보다 적을 수 있고, 나머지는 ‘다음 근거 보기’로 불러옵니다.</p>
-      {focusSpanId && !focusLoaded && !query.hasNextPage && <p className="result-notice" role="status">이 근거를 목록에서 찾지 못했습니다. 답변이 인용한 원문이 이 저장 버전의 선택 근거에 없습니다.</p>}
-      {focusSpanId && unavailable.some(item => item.span_id === focusSpanId) && <p className="result-notice" role="status">이 근거는 원문을 표시할 수 없습니다. 아래 안내를 확인하세요.</p>}
-      {available.length > 0 && <EvidenceRail evidence={available} heading={`확인된 원문 ${available.length}개`} focusSpanId={focusSpanId} citations={citations}/>}
-      {unavailable.map(item => <p className="result-notice" key={item.span_id}>{item.availability === "BASIS_MISMATCH" ? "저장 당시의 자료 버전이나 원문 해시와 일치하지 않아 표시하지 않습니다."
-        : item.availability === "UNKNOWN_BASIS" ? "저장 당시의 자료 기준을 확인할 수 없어 원문을 표시하지 않습니다." : "현재 읽을 수 없는 근거입니다."}<br/><small>{item.span_id}</small></p>)}
-      <p>전체 {first.selected_count}개 중 {items.length}개 확인 · 원문 표시 {available.length}개 · 원문 확인 불가 {unavailable.length}개</p>
-      {query.hasNextPage && <Button onClick={() => void query.fetchNextPage()}>다음 근거 보기</Button>}
+  return <section aria-label={t("evidence.selected")}>
+    <h3>{formatMessage("answerSelectedEvidence", first.selected_count)}</h3>
+    <p>{t("evidence.selectionNotice")}</p>
+    {first.selected_count === 0 ? <p>{t("evidence.empty")}</p> : <>
+      <p className="muted">{t("evidence.countNotice")}</p>
+      {focusSpanId && !focusLoaded && !query.hasNextPage && <p className="result-notice" role="status">{t("evidence.citationMissing")}</p>}
+      {focusSpanId && unavailable.some(item => item.span_id === focusSpanId) && <p className="result-notice" role="status">{t("evidence.unavailable")}</p>}
+      {available.length > 0 && <EvidenceRail evidence={available} heading={formatMessage("availableSources", available.length)} focusSpanId={focusSpanId} citations={citations}/>}
+      {unavailable.map(item => <p className="result-notice" key={item.span_id}>{item.availability === "BASIS_MISMATCH" ? t("evidence.mismatch")
+        : item.availability === "UNKNOWN_BASIS" ? t("evidence.unknownBasis") : t("evidence.unreadable")}<br/><small>{item.span_id}</small></p>)}
+      <p>{formatMessage("evidenceReadCounts", first.selected_count, items.length, available.length, unavailable.length)}</p>
+      {query.hasNextPage && <Button onClick={() => void query.fetchNextPage()}>{t("evidence.next")}</Button>}
     </>}
   </section>;
 }

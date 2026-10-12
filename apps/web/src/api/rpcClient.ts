@@ -1,3 +1,6 @@
+import { message as formatMessage } from "../i18n/formatMessages";
+import { UiError } from "../i18n/UiError";
+import { t } from "../i18n/locale";
 import { jsonRpcResponseSchema } from "./protocol";
 
 export type RpcResult<T> = {
@@ -55,6 +58,9 @@ function timeoutSignal(signal: AbortSignal | undefined, timeoutMs: number) {
   return { signal: controller.signal, dispose };
 }
 
+const typedResultMethods = new Set(["thread/read", "operation/result/read", "thread/result/read"]);
+let typedResultsSupported = false;
+
 export async function rpc<T>(
   method: string,
   input: Record<string, unknown>,
@@ -63,6 +69,8 @@ export async function rpc<T>(
   options: { timeoutMs?: number } = {},
 ): Promise<RpcResult<T>> {
   const bounded = timeoutSignal(signal, options.timeoutMs ?? 15000);
+  const readInput = typedResultsSupported && typedResultMethods.has(method) && !("expected_result_contract" in input)
+    ? { ...input, expected_result_contract: "v4" } : input;
   try {
     const response = await transportRead(() => fetch(readQueries.has(method) ? "/rpc/query" : "/rpc", {
       method: "POST",
@@ -73,7 +81,7 @@ export async function rpc<T>(
         jsonrpc: "2.0",
         id: crypto.randomUUID(),
         method,
-        params: { _meta: { idempotencyKey }, input },
+        params: { _meta: { idempotencyKey }, input: readInput },
       }),
     }), signal, bounded.signal);
     if (!response.ok) {
@@ -82,6 +90,10 @@ export async function rpc<T>(
     const envelope = jsonRpcResponseSchema.parse(await transportRead(() => response.json(), signal, bounded.signal));
     if (envelope.error) {
       throw new RpcError(envelope.error.message, envelope.error.code, envelope.error.data);
+    }
+    if (method === "workspace/ready") {
+      const value = envelope.result?.value;
+      typedResultsSupported = Boolean(value && typeof value === "object" && "response_language_scope" in value && value.response_language_scope === "REQUEST");
     }
     return envelope.result as RpcResult<T>;
   } finally {
@@ -117,12 +129,12 @@ export async function rpcAsync<T>(
     headers: { "content-type": "application/json" },
     body: JSON.stringify(request),
   });
-  if (!startedResponse.ok) throw new Error(`비동기 RPC 시작 실패 (${startedResponse.status})`);
+  if (!startedResponse.ok) throw new Error(formatMessage("rpcStartFailed", startedResponse.status));
   const started = jsonRpcResponseSchema.parse(await startedResponse.json());
   if (started.error) throw new Error(`${started.error.message} [${started.error.code}]`);
   const operationId = String(started.result?.operation_id ?? "");
   const projectId = String(input.project_id ?? "");
-  if (!operationId || !projectId) throw new Error("비동기 operation 식별자가 없습니다.");
+  if (!operationId || !projectId) throw new UiError("api.noOperation");
   options.onStarted?.(operationId);
   const interval = options.pollMs ?? 900;
   for (;;) {
@@ -131,16 +143,16 @@ export async function rpcAsync<T>(
       `/operations/${encodeURIComponent(operationId)}?project_id=${encodeURIComponent(projectId)}`,
       { credentials: "same-origin" },
     );
-    if (!statusResponse.ok) throw new Error(`operation 조회 실패 (${statusResponse.status})`);
+    if (!statusResponse.ok) throw new Error(formatMessage("operationReadFailed", statusResponse.status));
     const operation = (await statusResponse.json()) as OperationResult<T>;
     if (operation.state === "SUCCEEDED" && operation.result !== null) {
       return { operation_id: operationId, state: operation.state, value: operation.result };
     }
     if (operation.state === "FAILED") {
-      throw new Error(operation.error?.message ?? "분석 operation이 실패했습니다.");
+      throw new Error(operation.error?.message ?? t("api.analysisFailed"));
     }
     if (operation.state === "CANCELLED") {
-      throw new Error("사용자가 분석을 취소했습니다.");
+      throw new UiError("api.analysisCancelled");
     }
   }
 }
@@ -152,7 +164,7 @@ export async function cancelRpcOperation(projectId: string, operationId: string)
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ project_id: projectId }),
   });
-  if (!response.ok) throw new Error(`operation 취소 실패 (${response.status})`);
+  if (!response.ok) throw new Error(formatMessage("operationCancelFailed", response.status));
   const envelope = jsonRpcResponseSchema.parse(await response.json());
   if (envelope.error) throw new RpcError(envelope.error.message, envelope.error.code, envelope.error.data);
   return envelope;

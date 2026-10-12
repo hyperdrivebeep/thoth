@@ -3,6 +3,7 @@ from collections.abc import Callable
 
 from pydantic import JsonValue
 
+from thoth.application.services.browser_submission_scope import browser_submission_scope
 from thoth.domain.base import DomainModel
 from thoth.domain.deployment_mode import DeploymentMode, parse_deployment_mode
 from thoth.domain.workspace_setup import LocalWorkspaceReady, WorkspaceSetupState
@@ -133,6 +134,12 @@ class WorkspaceSetupHandlers:
         return payload
 
     async def ready(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
+        payload = await self._ready(value)
+        if self._mode is DeploymentMode.HOSTED_REVIEW and self._workspace_id is not None:
+            payload["browser_scope_id"] = browser_submission_scope(self._workspace_id)
+        return {**payload, "response_languages": ["ko", "en"], "response_language_scope": "REQUEST"}
+
+    async def _ready(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         del value
         try:
             setup = self._setup.read()

@@ -16,7 +16,7 @@ from thoth.domain.post_execution_learning import (
 )
 from thoth.domain.project import Project, WorkThread
 from thoth.domain.research_execution import ResearchFence, ResearchWork
-from thoth.domain.research_request import RevisionRef, ThreadRequestRevision
+from thoth.domain.research_request import RevisionRef, decode_thread_request
 
 
 class PostExecutionMemory:
@@ -44,7 +44,7 @@ class PostExecutionMemory:
         )
         if saved is None or saved[0] != work.request_ref:
             raise ResearchFence("POST_EXECUTION_REQUEST_STALE")
-        request = ThreadRequestRevision.model_validate(saved[1])
+        request = decode_thread_request(saved[1])
         basis = PostExecutionLearningBasis(
             project_id=project.project_id,
             thread_id=thread.thread_id,

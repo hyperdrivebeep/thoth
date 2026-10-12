@@ -1,3 +1,4 @@
+import { getLocale } from "./i18n/locale";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -21,7 +22,7 @@ createRoot(document.getElementById("root")!).render(
             <header>
               질문
               <time dateTime={TIMELINE_EXAMPLE_ASKED_AT}>
-                {new Date(TIMELINE_EXAMPLE_ASKED_AT).toLocaleString()}
+                {new Date(TIMELINE_EXAMPLE_ASKED_AT).toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")}
               </time>
             </header>
             <p>{timelineExampleStatus.request?.authored_text}</p>

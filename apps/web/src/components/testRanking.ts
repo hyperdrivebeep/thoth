@@ -1,3 +1,4 @@
+import { expectedUnknown } from "../api/expectedResultState";
 /**
  * The order of discriminating tests and action candidates for the hypotheses of one trace row. A pure rule, no score and no probability:
  * tests that leave the fewest cause candidates whichever way the result goes come first; ties go to the lower rule risk, then the lower
@@ -24,6 +25,7 @@ export type RankItem = {
    * result and "모름" is not known. When given it is used instead of `predictions`. A candidate with no entry means the split cannot be counted.
    */
   labels?: Record<string, string> | null;
+  knowledgeStates?: Record<string, "PREDICTED" | "UNKNOWN">;
 };
 export type RankHypothesis = { id: string; elimination: "SINGLE" | "REPEATED" | null };
 export type RankInput = { hypotheses: RankHypothesis[]; actions: { id: string; hypothesisIds: string[] }[]; items: RankItem[] };
@@ -48,7 +50,6 @@ const compareKeys = (a: number[], b: number[]) => {
   const at = a.findIndex((value, position) => value !== b[position]);
   return at === -1 ? 0 : a[at] - b[at];
 };
-const UNKNOWN_LABEL = "모름";
 const normalized = (label: string) => label.trim().replace(/\s+/g, " ").toLowerCase();
 
 /** The candidates left under each possible result of a test; null when the table does not cover every candidate. A hypothesis that does not know stays under every result. */
@@ -58,7 +59,7 @@ function outcomeClasses(item: RankItem, candidates: string[], tester: string | n
   if (item.labels) {
     const table = item.labels;
     if (!candidates.every(id => id in table)) return null;
-    const unknown = candidates.filter(id => normalized(table[id]) === normalized(UNKNOWN_LABEL));
+    const unknown = candidates.filter(id => expectedUnknown(table[id], item.knowledgeStates?.[id], "ranking"));
     const byLabel = new Map<string, string[]>();
     for (const id of candidates) if (!unknown.includes(id)) byLabel.set(normalized(table[id]), [...(byLabel.get(normalized(table[id])) ?? []), id]);
     return byLabel.size === 0 ? [unknown] : [...byLabel.values()].map(members => [...members, ...unknown]);

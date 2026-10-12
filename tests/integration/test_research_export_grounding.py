@@ -8,7 +8,10 @@ from tests.integration.test_research_request_v2 import ControlledResearchModel, 
 
 
 @pytest.mark.asyncio
-async def test_export_of_research_heads_binds_the_original_source_digest(tmp_path: Path) -> None:
+@pytest.mark.parametrize("language", [None, "en"])
+async def test_export_of_research_heads_binds_the_original_source_digest(
+    tmp_path: Path, language
+) -> None:
     runtime = await setup(tmp_path, ControlledResearchModel())
     try:
         value(
@@ -20,6 +23,7 @@ async def test_export_of_research_heads_binds_the_original_source_digest(tmp_pat
                         "project_id": "p",
                         "problem": "Summarize the connected record.",
                         "contract_version": 2,
+                        **({"response_language": language} if language else {}),
                     },
                 )
             )
@@ -76,9 +80,7 @@ async def test_export_of_research_heads_binds_the_original_source_digest(tmp_pat
         assert canonical["resources"], (
             "A valid envelope with zero source resources is not a grounded export."
         )
-        expected_digest = hashlib.sha256(
-            (tmp_path / "inbox/records.html").read_bytes()
-        ).hexdigest()
+        expected_digest = hashlib.sha256((tmp_path / "inbox/records.html").read_bytes()).hexdigest()
         assert [resource["digest"] for resource in canonical["resources"]] == [expected_digest]
         assert any(ref.startswith("THREAD:request:") for ref in canonical["head_set"])
         verified = value(

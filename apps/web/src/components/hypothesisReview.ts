@@ -1,10 +1,11 @@
+import { t } from "../i18n/locale";
 import { objectList, objectValue, stringValues, textValue } from "../api/presentation";
 
 /** The model's review of each hypothesis, as the result records it, and what the screen derives from it. */
 export type ReviewRelation = "SUPPORTED" | "QUALIFIED" | "UNSUPPORTED" | "INCONCLUSIVE";
 export type ReviewView = { relation: ReviewRelation; explanation: string; gaps: string[]; evidenceRefs: string[] };
 
-const RELATION_WORD: Record<ReviewRelation, string> = { SUPPORTED: "지지", QUALIFIED: "조건부 지지", UNSUPPORTED: "불지지", INCONCLUSIVE: "결론 불가" };
+const RELATION_WORD: Record<ReviewRelation, string> = { get SUPPORTED() { return t("hypotheses.support"); }, get QUALIFIED() { return t("review.qualified"); }, get UNSUPPORTED() { return t("review.unsupported"); }, get INCONCLUSIVE() { return t("review.inconclusive"); } };
 const isRelation = (value: string): value is ReviewRelation => Object.hasOwn(RELATION_WORD, value);
 export const reviewWord = (relation: ReviewRelation) => RELATION_WORD[relation];
 
@@ -30,8 +31,8 @@ export function causeUnconfirmed(result: Record<string, unknown>): boolean {
 }
 
 const STATUS_WORD: Record<string, string> = {
-  DRAFT: "초안", GROUNDED_CANDIDATE: "근거가 있는 후보", COUNTEREVIDENCE_CHECKED: "반대 근거를 확인함", PREDICTION_BOUND: "예상 관찰을 정함",
-  TESTABLE: "시험할 수 있음", EMPIRICALLY_UPDATED: "시험 결과를 반영함", INCONCLUSIVE: "결론을 내지 못함", ELIMINATED_WITHIN_SCOPE: "이 범위에서는 배제됨",
+  get DRAFT() { return t("review.draft"); }, get GROUNDED_CANDIDATE() { return t("review.grounded"); }, get COUNTEREVIDENCE_CHECKED() { return t("review.counterChecked"); }, get PREDICTION_BOUND() { return t("review.predictionBound"); },
+  get TESTABLE() { return t("review.testable"); }, get EMPIRICALLY_UPDATED() { return t("review.resultsApplied"); }, get INCONCLUSIVE() { return t("review.noConclusion"); }, get ELIMINATED_WITHIN_SCOPE() { return t("review.excluded"); },
 };
 /** Plain words for a hypothesis status; a status this screen does not know is not shown. */
 export const hypothesisStatusWord = (status: string): string | null => STATUS_WORD[status] ?? null;
