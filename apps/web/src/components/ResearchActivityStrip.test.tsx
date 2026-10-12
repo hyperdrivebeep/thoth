@@ -24,6 +24,19 @@ function event(seq: number, overrides: Partial<UserActivityEvent> = {}): UserAct
 }
 
 describe("ResearchActivityStrip", () => {
+  it("translates the redacted span placeholder but preserves an authored artifact title", () => {
+    try {
+      setLocale("en");
+      const html = renderToStaticMarkup(<ResearchActivityStrip events={[
+        event(1, { label_ko: "연결된 자료 line 1을 읽었습니다.", target: { kind: "span", title: "연결된 자료", display_ref: "line 1", access_state: "allowed" } }),
+        event(2, { label_ko: "Opened source", target: { kind: "artifact", title: "연결된 자료", access_state: "allowed" } }),
+      ]}/>);
+      expect(html).toContain("Read Connected source line 1.");
+      expect(html).toContain("Connected source · line 1");
+      expect(html).toContain("연결된 자료");
+    } finally { setLocale("ko"); }
+  });
+
   it("translates the program-owned LOCAL READ tool name in English details", () => {
     try {
       setLocale("en");

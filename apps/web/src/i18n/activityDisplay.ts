@@ -7,6 +7,7 @@ export function activityDisplay(text: string | null | undefined, fallback = t("a
   const known = uiText(text);
   if (known !== text || !/[가-힣]/.test(text)) return known;
   const patterns: [RegExp, (match: RegExpExecArray) => string][] = [
+    [/^연결된 자료(.*)을 읽었습니다\.$/, m => `Read ${t("activity.sourceFallback")}${m[1]}.`],
     [/^(.+)을 읽었습니다\.$/, m => `Read ${m[1]}.`],
     [/^가설 (\d+)개 중 (\d+)개를 검토했습니다\.$/, m => `Reviewed ${m[2]} of ${m[1]} hypotheses.`],
     [/^지지 관계가 기록된 근거 (\d+)곳을 확인했습니다\.$/, m => `Checked ${m[1]} evidence locations with recorded supporting relationships.`],

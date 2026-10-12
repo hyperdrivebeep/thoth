@@ -12,6 +12,8 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
 }) {
   useTranslation();
   const citation=useCitationGate(projectId);
+  const acceptedRequest = session.research.data?.value.request;
+  const acceptedLanguage = acceptedRequest?.response_language ?? null;
   const submit = async () => {
     if (!executionReady || readSuspended || session.pendingBlocksNewInput) return;
     const refs=[...session.problem.matchAll(/artifact:[A-Za-z0-9._:-]+/g)].map(item=>item[0]);
@@ -45,18 +47,18 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
       <label className="composer-label" htmlFor="live-problem">{t("composer.problem")}</label>
       <TextArea id="live-problem" fill rows={2} value={session.problem} onChange={event=>session.setProblem(event.target.value)}
         placeholder={threadId?t("composer.followupPlaceholder"):t("composer.startPlaceholder")}/>
-      <label className="reply-language-control">{t("language.reply")}{" "}<select aria-label={t("language.reply")} value={session.responseLanguage ?? "auto"}
+      {!session.languageSupported && <small className="language-help">{t("language.unsupported")}</small>}
+      <div className="composer-tools"><Button minimal icon="paperclip" aria-label={t("composer.attach")} title={t("composer.attach")} disabled={readSuspended} onClick={onAttach}>{t("composer.attachShort")}</Button>
+      <label className="reply-language-control" title={t("language.fixed")}>{t("language.replyShort")}{" "}<select aria-label={t("language.reply")} value={session.responseLanguage ?? "auto"}
         disabled={!session.languageSupported && session.responseLanguage === null} onChange={event => session.chooseLanguage(event.target.value === "auto" ? null : event.target.value as ResponseLanguage)}>
         <option value="auto">{t("language.automatic")}</option><option value="ko" disabled={!session.languageSupported}>한국어</option><option value="en" disabled={!session.languageSupported}>English</option>
       </select></label>
-      {session.research.data?.value.request && <small className="language-help">{t("language.accepted")}: {session.research.data.value.request.response_language === "en" ? "English" : session.research.data.value.request.response_language === "ko" ? "한국어" : t("language.automatic")}</small>}
-      <small className="language-help">{t(session.languageSupported ? "language.fixed" : "language.unsupported")}</small>
-      <small className="language-help">{t("language.cost")}</small>
-      <div className="composer-tools"><Button minimal icon="paperclip" disabled={readSuspended} onClick={onAttach}>{t("composer.attach")}</Button>
+      {acceptedRequest && acceptedLanguage !== session.responseLanguage && <small className="language-current" title={t("language.fixed")}>{t("language.acceptedShort")}: {acceptedLanguage === "en" ? "English" : acceptedLanguage === "ko" ? "한국어" : t("language.automatic")}</small>}
         {hosted || readSuspended ? null : <ModelSettings compact key={`${projectId}:${threadId||"new"}`} projectId={projectId} threadId={threadId||undefined}
           selection={session.modelSelection} onSelect={session.chooseModel} onSaved={()=>session.clearModel(session.renderedRevision,epoch)}/>}
-        <Button icon="arrow-up" intent="primary" type="submit" aria-label={threadId?t("composer.followup"):t("composer.start")} disabled={readSuspended || !executionReady || session.pendingBlocksNewInput || !session.problem.trim()} loading={session.submit.isPending}>
-          {session.pendingRead.kind === "PENDING" ? t("composer.checkOriginal") : threadId?t("composer.followup"):t("composer.start")}</Button>
+        {onOpenSettings && <Button minimal icon="settings" aria-label={t("workspace.settings")} title={t("workspace.settings")} onClick={()=>onOpenSettings()}/>}
+        <Button icon="arrow-up" intent="primary" type="submit" aria-label={threadId?t("composer.followup"):t("composer.start")} title={threadId?t("composer.followup"):t("composer.start")} disabled={readSuspended || !executionReady || session.pendingBlocksNewInput || !session.problem.trim()} loading={session.submit.isPending}>
+          {session.pendingRead.kind === "PENDING" ? t("composer.checkOriginal") : null}</Button>
       </div>
       {session.submit.error&&<Callout compact intent="danger" role="alert">{session.submit.error.message}</Callout>}
     </form>

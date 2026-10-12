@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-12T14:54:42.237179+00:00",
+  "created_at": "2026-10-12T15:37:44.253458+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -768,8 +768,8 @@
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspace.tsx",
-      "sha256": "e4df1c08e302cef1e7d16532ce1dd2e07835ea985c0118cce75b9c17cad9ba38",
-      "bytes": 42636
+      "sha256": "136dfb168af78bb70ff6a30fd7c6faead02823e8be4d8af1a27bb0ea662ee4f1",
+      "bytes": 42779
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspaceConsent.test.tsx",
@@ -803,13 +803,13 @@
     },
     {
       "path": "apps/web/src/components/ModelSettings.test.tsx",
-      "sha256": "da9d04a0670973eb67d99da7cf1b4a4c59ce824be5160dd59395ce1489219ce5",
-      "bytes": 23343
+      "sha256": "9e44d93aa874f504bc7ed2dc37d4c41767f44aeeb9cd7c0b78a1ee9770e5ea32",
+      "bytes": 23874
     },
     {
       "path": "apps/web/src/components/ModelSettings.tsx",
-      "sha256": "7c280d88d2524cfdbc3b1b8bc1f0ce3bc794cc5d1f824714ff00401e8253825f",
-      "bytes": 9273
+      "sha256": "bae7c274c7db338962bb5104c201418a55b78b76236ac5739f01365565329d10",
+      "bytes": 9377
     },
     {
       "path": "apps/web/src/components/OAuthLoginFlow.tsx",
@@ -873,13 +873,13 @@
     },
     {
       "path": "apps/web/src/components/ResearchActivityStrip.test.tsx",
-      "sha256": "c89e7af706b3b3abb23d5f4b02a8791ba071864dbd16ccb023f74ecd08d0ef44",
-      "bytes": 4372
+      "sha256": "2c0e55f727fbae8f1c8a33f192743ce0344af406a59069069b15e19ccf7829e8",
+      "bytes": 5115
     },
     {
       "path": "apps/web/src/components/ResearchActivityStrip.tsx",
-      "sha256": "6894910aef8d0b2eb08ac807b8fda4c637c1486d856229463a073c08af40ff0b",
-      "bytes": 9551
+      "sha256": "2b3076b927d14b4f81e5b92d18f717777dc189fcd223989f5397beee366397b6",
+      "bytes": 9744
     },
     {
       "path": "apps/web/src/components/ResearchCancelledPresentation.test.tsx",
@@ -888,8 +888,8 @@
     },
     {
       "path": "apps/web/src/components/ResearchComposer.tsx",
-      "sha256": "6002e3bacb5a68d27694d0b251083f9597a228996245d732089f573cf0fe2004",
-      "bytes": 6412
+      "sha256": "f5fdc357b4dd0f6ec87a5d1c87e4ab439c810daf78b9765a04abf2f9f876b450",
+      "bytes": 6730
     },
     {
       "path": "apps/web/src/components/ResearchDetailPane.tsx",
@@ -1468,8 +1468,8 @@
     },
     {
       "path": "apps/web/src/i18n/activityDisplay.ts",
-      "sha256": "faab5e696f3ddf9514e9dc93e389c62d1908d4969911fceaef50b91f4568dda9",
-      "bytes": 2334
+      "sha256": "acb7cd6b3abbe8b3f34c1c9feb092a2bd0efc49f6b9d0a1c9c4c67c89df99e22",
+      "bytes": 2440
     },
     {
       "path": "apps/web/src/i18n/activityMessages.ts",
@@ -1568,8 +1568,8 @@
     },
     {
       "path": "apps/web/src/i18n/messages.ts",
-      "sha256": "dfb0d1b2fc75d6ca2fe668d6825e9f0277bf5bdef50b66a4d26b4e229f9d8809",
-      "bytes": 8594
+      "sha256": "b6821bb5d61e9bd899b0a7da61271e8eb15871ed8bf95f7a29710096376c4d94",
+      "bytes": 8864
     },
     {
       "path": "apps/web/src/i18n/metricFormatMessages.ts",
@@ -1738,8 +1738,8 @@
     },
     {
       "path": "apps/web/src/workstation.css",
-      "sha256": "ad065ed48c75c6d7d5e64359d88f6d559d31f54a0fe0bcfad4fa0a16499c54db",
-      "bytes": 59542
+      "sha256": "6b5b8bfd96343cc5bdb32b5e09f09be59304923df6e371768e976cc33563af5d",
+      "bytes": 60405
     },
     {
       "path": "apps/web/timeline-preview.html",

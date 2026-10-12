@@ -28,6 +28,7 @@ vi.mock("../api/rpcClient", async (importOriginal) => ({ ...(await importOrigina
       model_options: [{provider: "test", model: "test", reasoning_efforts: ["low", "high"], default_effort: "low", ...fixture.optionExtra},
         ...(fixture.includeXaiModel ? [{provider: "xai-oauth", model: "grok-4.6", reasoning_efforts: ["low", "medium", "high", "xhigh"], default_effort: null}] : [])]};
     if (method === "project/source/list") value = {artifacts: []};
+    if (method === "model/credential/list") value = {accounts: []};
     if (method === "evidence/list") value = {evidence: []};
     if (method === "thread/list") value = {threads:["t","other"].map(thread_id=>({project_id:input.project_id,thread_id,problem:thread_id,execution_state:"IDLE",lifecycle:"OPEN"}))};
     if (method === "project/create") {
@@ -52,6 +53,14 @@ let container: HTMLDivElement;
 let client: QueryClient;
 const tick = () => new Promise(resolve => setTimeout(resolve, 25));
 async function flush() { await act(async () => {await tick();}); }
+async function openPage(label: string) {
+  await act(async () => {
+    const tab = Array.from(container.querySelectorAll<HTMLElement>('[role="tab"]')).find(item => item.textContent === label)!;
+    tab.click();
+  });
+  await flush(); await flush();
+}
+
 function effort() { return container.querySelector<HTMLSelectElement>('[aria-label="연구 추론강도"]')!; }
 async function select(value: string) { await act(async () => {effort().value = value; effort().dispatchEvent(new Event("change", {bubbles: true}));}); }
 async function submit() {
@@ -113,6 +122,7 @@ it("offers the explicit xai-oauth model without replacing an existing selection"
 
 it("keeps an unavailable saved model and effort visible until a user selects a new option", async () => {
   await mount(true);
+  await openPage("설정");
   expect(container.textContent).toContain("저장된 선택: retired / old-model · 추론강도 high");
   expect(container.textContent).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
   const model = container.querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
@@ -133,6 +143,7 @@ it("keeps an unavailable saved model and effort visible until a user selects a n
 
 it("does not silently replace an unsupported saved effort", async () => {
   await mount(true, { reason: "MODEL_REASONING_EFFORT_UNSUPPORTED", saved: { provider: "test", model: "test", reasoning_effort: "ultra" } });
+  await openPage("설정");
   expect(container.textContent).toContain("저장된 선택: test / test · 추론강도 ultra");
   const save = container.querySelector<HTMLButtonElement>("button.model-defaults")!;
   expect(save.disabled).toBe(true);
@@ -190,6 +201,7 @@ it("rechecks and hides cached parent details after project scope is revoked", as
     selector.value = "t"; selector.dispatchEvent(new Event("change", { bubbles: true }));
   });
   await flush(); await flush();
+  await openPage("설정");
   expect(container.textContent).toContain("상속한 프로젝트 선택: retired / old-model");
   fixture.projectSettingsDenied = true;
   await act(async () => { await client.invalidateQueries({ queryKey: ["model-settings", "p", "t"], exact: true }); });
@@ -225,6 +237,8 @@ it("a new draft survives a late admission", async () => {
 
 it("saved defaults survive reload and apply to successive requests", async () => {
   await mount(); await select("high");
+  expect(container.querySelector("button.model-defaults")).toBeNull();
+  await openPage("설정");
   await act(async () => {
     const save = Array.from(container.querySelectorAll<HTMLButtonElement>("fieldset button"))[0];
     save.click();
@@ -232,6 +246,7 @@ it("saved defaults survive reload and apply to successive requests", async () =>
   await flush();
   expect(fixture.effort).toBe("high");
   await act(async () => { await client.invalidateQueries({queryKey: ["model-settings"]}); });
+  await openPage("대화");
   await submit(); await submit();
   expect(effort().value).toBe("high");
   expect(fixture.calls.filter(c => c.method === "thread/start" || c.method === "thread/input").every(c =>

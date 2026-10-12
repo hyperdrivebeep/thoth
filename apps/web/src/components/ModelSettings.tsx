@@ -90,20 +90,20 @@ export function ModelSettings({ projectId, threadId, selection, onSelect, onSave
       : inherited.error ? <small role="alert">{t("model.parentFailed")}</small>
         : <small>{message("inheritedSelection", inheritedLabel ?? t("model.noProjectModel"))}</small>)}
     {inheritsProject && data?.availability !== "UNAVAILABLE" && <small>{t("model.inheritsProject")}</small>}
-    <label>{t("model.modelLabel")} <HTMLSelect key={`${scopeIdentity}:${query.dataUpdatedAt}`} aria-label={t("model.researchModel")} disabled={!data} value={option ? `${option.provider}/${option.model}` : ""}
+    <label><span className="model-control-label">{t("model.modelLabel")}</span> <HTMLSelect key={`${scopeIdentity}:${query.dataUpdatedAt}`} aria-label={t("model.researchModel")} disabled={!data} value={option ? `${option.provider}/${option.model}` : ""}
       onChange={event => {
         const next = data?.model_options.find(o => `${o.provider}/${o.model}` === event.target.value);
         if (next) choose({ provider: next.provider, model: next.model,
           ...(data?.availability !== "UNAVAILABLE" && next.default_effort ? { reasoning_effort: next.default_effort } : {}) });
       }}><option value="">{t("model.choose")}</option>{data?.model_options.map(o =>
         <option key={`${o.provider}/${o.model}`} value={`${o.provider}/${o.model}`}>{optionText(o, providerLabel(o.provider))}</option>)}</HTMLSelect></label>
-    <label>{t("model.effortLabel")} <HTMLSelect aria-label={t("model.reasoningEffort")} disabled={!option} value={current?.reasoning_effort ?? ""}
+    <label><span className="model-control-label">{t("model.effortLabel")}</span> <HTMLSelect aria-label={t("model.reasoningEffort")} disabled={!option} value={current?.reasoning_effort ?? ""}
       onChange={event => { if (current) choose({ ...current, reasoning_effort: event.target.value }); }}>
       <option value="">{t("model.default")}</option>{option?.reasoning_efforts.map(e => <option key={e} value={e}>{e}</option>)}</HTMLSelect></label>
-    <Button className="model-defaults" small minimal icon="floppy-disk" disabled={!current || !option || !validEffort || !explicitlyChosen || !data || save.isPending} loading={save.isPending} onClick={() => {
+    {!compact && <Button className="model-defaults" small minimal icon="floppy-disk" disabled={!current || !option || !validEffort || !explicitlyChosen || !data || save.isPending} loading={save.isPending} onClick={() => {
       if (current && option && validEffort && explicitlyChosen && data) save.mutate({scope, selection: current, digest: data.settings_digest, key, onSaved});
     }}>
-      {threadId ? t("model.saveThread") : t("model.saveProject")}</Button>
+      {threadId ? t("model.saveThread") : t("model.saveProject")}</Button>}
     {catalogRow && <small data-catalog-status>{catalogLine(catalogRow)}</small>}
     {catalogRow?.status === "STALE_LAST_GOOD" && <small role="status" className="result-notice">{staleCatalogNotice()}</small>}
     {excluded.length > 0 && <details className="model-excluded"><summary>{message("excludedModels", excluded.length)}</summary>

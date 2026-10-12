@@ -355,3 +355,14 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
   .language-settings + .conversation-workstation { height:calc(100dvh - 36px); min-height:0; }
   .language-settings + .conversation-workstation .navigation-rail { height:calc(100dvh - 36px); }
 }
+
+/* Keep the question primary; persistent defaults and explanations live in Settings. */
+.workstation .composer-dock .prompt-composer { padding:10px 12px; }
+.workstation .composer-dock .prompt-composer textarea { margin:0;width:100%;min-height:48px;line-height:1.5; }
+.composer-tools { gap:6px;margin-top:6px; }
+.composer-tools .reply-language-control { margin:0;gap:4px;flex-wrap:nowrap;font-size:11px; }
+.composer-tools .reply-language-control select { height:28px;max-width:155px;font-size:11px; }
+.language-current { font-size:10px;color:var(--muted);white-space:nowrap; }
+.model-settings.compact .model-control-label { position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%); }
+.model-settings.compact label:last-of-type select { min-width:68px;max-width:82px; }
+.composer-tools>.bp6-button:last-child { min-width:32px;min-height:32px; }

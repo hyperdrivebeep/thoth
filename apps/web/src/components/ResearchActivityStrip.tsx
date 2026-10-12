@@ -77,6 +77,8 @@ function targetLabel(event: UserActivityEvent) {
 
 function targetTitle(event: UserActivityEvent) {
   const target = event.target;
+  // The server redacts span titles to this fixed placeholder, not an authored title.
+  if (target?.kind === "span" && target.title === "연결된 자료") return t("activity.sourceFallback");
   return target?.kind === "model" && target.title === "모델 검토기" ? t("activity.modelReviewer") : target?.title;
 }
 
