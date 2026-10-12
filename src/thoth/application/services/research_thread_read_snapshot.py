@@ -30,6 +30,7 @@ from thoth.domain.research_request import (
     ResearchBudget,
     RevisionRef,
     ThreadRequestRevision,
+    decode_thread_request,
 )
 
 if TYPE_CHECKING:
@@ -58,11 +59,9 @@ def read_research_snapshot(
         current = host.records.read(project_id, EntityType.THREAD, f"request:{thread_id}")
         if current is None:
             return None
-        request = ThreadRequestRevision.model_validate(current[1])
+        request = decode_thread_request(current[1])
         attempt = host.records.journal_read(project_id, request.operation_id, ResearchAttempt)
-        result = host.records.read(
-            project_id, EntityType.DECISION_OBJECT, f"result:{thread_id}"
-        )
+        result = host.records.read(project_id, EntityType.DECISION_OBJECT, f"result:{thread_id}")
         manifest = None if result is None else decode_current_result_manifest(result[1])
         currentness = ResearchFreshnessService(
             host.records.ledger,
@@ -78,9 +77,7 @@ def read_research_snapshot(
             completion=None if manifest is None else manifest.completion,
         )
         fresh = manifest is not None and manifest.request_ref == current[0]
-        project, policy = host.projects.read(project_id), host.governance.read_policy(
-            project_id
-        )
+        project, policy = host.projects.read(project_id), host.governance.read_policy(project_id)
         fresh = (
             fresh
             and project is not None

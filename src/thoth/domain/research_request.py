@@ -1,6 +1,6 @@
 """Versioned request records. Current means a matching basis, never scientific truth."""
 
-from typing import Literal
+from typing import Literal, cast
 
 from pydantic import Field, model_validator
 
@@ -29,6 +29,22 @@ class ThreadRequestRevision(DomainModel):
     actor_ref: str
     operation_id: str
     model_settings: ResolvedModelSettings | None = None
+
+
+class ThreadRequestRevisionV21(ThreadRequestRevision):
+    """Explicit response language belongs to one immutable request revision."""
+
+    schema_version: Literal["2.1.0"] = "2.1.0"  # type: ignore[reportIncompatibleVariableOverride]
+    response_language: Literal["ko", "en"]
+
+
+def decode_thread_request(content: object) -> ThreadRequestRevision:
+    if (
+        isinstance(content, dict)
+        and cast(dict[str, object], content).get("schema_version") == "2.1.0"
+    ):
+        return ThreadRequestRevisionV21.model_validate(content)
+    return ThreadRequestRevision.model_validate(content)
 
 
 class AuthoredInputRevision(DomainModel):
@@ -158,6 +174,8 @@ REQUEST_CODECS = {
 
 
 def decode_request(content: dict[str, object]) -> DomainModel:
+    if content.get("record_kind") == "ThreadRequestRevision":
+        return decode_thread_request(content)
     if content.get("schema_version") != "2.0.0":
         raise ValueError("REQUEST_CODEC_VERSION_UNSUPPORTED")
     codec = REQUEST_CODECS.get(str(content.get("record_kind")))

@@ -1,3 +1,4 @@
+import { t } from "../i18n/locale";
 import { Button, Callout } from "@blueprintjs/core";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -26,8 +27,8 @@ export function TestActionDraft({ projectId, hypothesisId, testId, standing }: {
   return <div className="test-action-draft">
     <EffectDeclarationFields chosen={chosen} complete={complete} onChoose={choose} onComplete={setComplete}/>
     {against && <Callout compact intent="warning" role="note" className="standing-note">{against}</Callout>}
-    <Button small icon="send-to" loading={send.isPending} onClick={() => send.mutate()}>이 시험으로 행동 요청 준비</Button>
-    <small className="muted"> 요청을 준비할 뿐 승인이 아닙니다. 모델을 부르지 않습니다.</small>
+    <Button small icon="send-to" loading={send.isPending} onClick={() => send.mutate()}>{t("actionDraft.fromTest")}</Button>
+    <small className="muted">{" "}{t("actionDraft.noModel")}</small>
     {send.error && <Callout compact intent="warning" role="alert">{draftRefusal(send.error.message)}</Callout>}
     {send.data && <Callout compact intent="primary" role="status">{draftReadyLines(send.data.action).map((line, index) => <p key={index}>{line}</p>)}</Callout>}
   </div>;

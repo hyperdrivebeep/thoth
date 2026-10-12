@@ -1,0 +1,231 @@
+{
+  "$defs": {
+    "ResolvedModelSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "capability_source": {
+          "title": "Capability Source",
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Model"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "reasoning_effort": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reasoning Effort"
+        },
+        "settings_digest": {
+          "title": "Settings Digest",
+          "type": "string"
+        },
+        "source_by_field": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Source By Field",
+          "type": "object"
+        }
+      },
+      "required": [
+        "provider",
+        "model",
+        "reasoning_effort",
+        "source_by_field",
+        "capability_source",
+        "settings_digest"
+      ],
+      "title": "ResolvedModelSettings",
+      "type": "object"
+    },
+    "RevisionRef": {
+      "additionalProperties": false,
+      "properties": {
+        "entity_id": {
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "entity_type": {
+          "title": "Entity Type",
+          "type": "string"
+        },
+        "project_id": {
+          "title": "Project Id",
+          "type": "string"
+        },
+        "revision_digest": {
+          "title": "Revision Digest",
+          "type": "string"
+        },
+        "revision_id": {
+          "title": "Revision Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": "2.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_id",
+        "entity_type",
+        "entity_id",
+        "revision_id",
+        "revision_digest"
+      ],
+      "title": "RevisionRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Explicit response language belongs to one immutable request revision.",
+  "properties": {
+    "accepted_input_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Accepted Input Ids",
+      "type": "array"
+    },
+    "actor_ref": {
+      "title": "Actor Ref",
+      "type": "string"
+    },
+    "authored_text": {
+      "title": "Authored Text",
+      "type": "string"
+    },
+    "authored_text_ref": {
+      "$ref": "#/$defs/RevisionRef"
+    },
+    "cutoff_at": {
+      "title": "Cutoff At",
+      "type": "string"
+    },
+    "edit_kind": {
+      "enum": [
+        "APPEND",
+        "REPLACE",
+        "STEER"
+      ],
+      "title": "Edit Kind",
+      "type": "string"
+    },
+    "effective_question": {
+      "title": "Effective Question",
+      "type": "string"
+    },
+    "model_settings": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ResolvedModelSettings"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "operation_id": {
+      "title": "Operation Id",
+      "type": "string"
+    },
+    "parent_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RevisionRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "policy_digest": {
+      "title": "Policy Digest",
+      "type": "string"
+    },
+    "policy_ref": {
+      "title": "Policy Ref",
+      "type": "string"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "record_kind": {
+      "const": "ThreadRequestRevision",
+      "default": "ThreadRequestRevision",
+      "title": "Record Kind",
+      "type": "string"
+    },
+    "request_epoch": {
+      "minimum": 1,
+      "title": "Request Epoch",
+      "type": "integer"
+    },
+    "response_language": {
+      "enum": [
+        "ko",
+        "en"
+      ],
+      "title": "Response Language",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.1.0",
+      "default": "2.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Scope",
+      "type": "object"
+    },
+    "thread_id": {
+      "title": "Thread Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "thread_id",
+    "request_epoch",
+    "accepted_input_ids",
+    "edit_kind",
+    "authored_text",
+    "authored_text_ref",
+    "effective_question",
+    "scope",
+    "cutoff_at",
+    "policy_ref",
+    "policy_digest",
+    "actor_ref",
+    "operation_id",
+    "response_language"
+  ],
+  "title": "ThreadRequestRevisionV21",
+  "type": "object"
+}

@@ -1,3 +1,5 @@
+import { message as formatMessage } from "../i18n/formatMessages";
+import { t } from "../i18n/locale";
 import type { ReactNode } from "react";
 import { Callout } from "@blueprintjs/core";
 import type { CoverageMatrix } from "../api/researchFollowup";
@@ -15,13 +17,13 @@ export function AnswerHold({ status, coverage, facts, counter, next }: {
   const rows = coverage && coverage.availability !== "UNAVAILABLE" ? coverage.rows : [];
   const supported = rows.filter(row => row.status === "SATISFIED").length;
   const needsCheck = rows.filter(row => row.status === "UNRESOLVED" || row.status === "NOT_ASSESSED").length;
-  return <Callout compact className="answer-hold" intent={status === "PARTIAL_HOLD" ? "warning" : "none"} aria-label="결론 상태">
-    <p>결론 상태: <strong>{label}</strong></p>
+  return <Callout compact className="answer-hold" intent={status === "PARTIAL_HOLD" ? "warning" : "none"} aria-label={t("answerHold.title")}>
+    <p>{t("labels.conclusion")}{" "}<strong>{label}</strong></p>
     {facts}
     {rows.length > 0 && <EvidenceUseSummary rows={rows}/>}
-    <p>답할 수 있는 범위: {rows.length ? `답변 점검 항목 ${rows.length}개 중 충족 ${supported} · 확인 필요 ${needsCheck}` : "답변 점검 항목 정보를 아직 읽지 못했습니다"}</p>
+    <p>{t("labels.answerScope")}{" "}{rows.length ? formatMessage("answerCoverage", rows.length, supported, needsCheck) : t("answerHold.coverageMissing")}</p>
     {counter && <p>{counter}</p>}
-    {next && <p>다음 확보: {next}</p>}
+    {next && <p>{t("labels.nextEvidence")}{" "}{next}</p>}
   </Callout>;
 }
 

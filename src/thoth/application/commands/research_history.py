@@ -2,6 +2,7 @@
 
 from pydantic import JsonValue
 
+from thoth.application.services.expected_result_view import result_read_view
 from thoth.application.services.historical_result import HistoricalResultReader
 from thoth.application.services.research_history import ResearchHistoryService
 from thoth.domain.research_history import (
@@ -65,8 +66,9 @@ class ResearchHistoryHandlers:
 
     async def result_read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         try:
-            return self.results.read(HistoricalResultInput.model_validate(value)).model_dump(
-                mode="json"
+            request = HistoricalResultInput.model_validate(value)
+            return result_read_view(
+                self.results.read(request).model_dump(mode="json"), request.expected_result_contract
             )
         except RestoreError as exc:
             raise history_rpc_error(exc) from exc

@@ -12,7 +12,10 @@ from thoth.domain.enums import EntityType, OperationState, ProjectLifecycle, Thr
 from thoth.domain.model_settings import ModelSelection
 from thoth.domain.operation import OperationRecord
 from thoth.domain.research_queue import QueuedResearchInput
-from thoth.domain.research_request import ResearchAttempt, ThreadRequestRevision
+from thoth.domain.research_request import (
+    ResearchAttempt,
+    decode_thread_request,
+)
 from thoth.ports.model import ModelResolutionError
 from thoth.ports.research_queue import ResearchQueueStorePort
 from thoth.protocol.deferred import AcceptedRunning, PendingExecution
@@ -41,7 +44,9 @@ class ResearchInputQueue:
             dict[str, JsonValue],
             {
                 "contract_version": 2,
-                "status": "HOLD" if self_dependency else item.state
+                "status": "HOLD"
+                if self_dependency
+                else item.state
                 if item.state in {"HOLD", "SUPERSEDED"}
                 else "QUEUED_AFTER_CURRENT",
                 "project_id": item.project_id,
@@ -74,7 +79,7 @@ class ResearchInputQueue:
             prior = host.records.read(project_id, EntityType.THREAD, f"request:{thread_id}")
             if prior is None:
                 return None
-            current_request = ThreadRequestRevision.model_validate(prior[1])
+            current_request = decode_thread_request(prior[1])
             if current_request.operation_id == operation.operation_id:
                 attempt = host.records.journal_read(
                     project_id, operation.operation_id, ResearchAttempt
@@ -319,7 +324,7 @@ class ResearchInputQueue:
             if head[0].revision_digest != expected_digest:
                 held = self.hold(host, latest, "REQUEST_HEAD_CHANGED")
                 return PendingExecution(self.accepted_value(held))
-            current_request = ThreadRequestRevision.model_validate(head[1])
+            current_request = decode_thread_request(head[1])
             if (
                 latest.edit_kind == "REPLACE"
                 and latest.continuation.get("expected_request_epoch")

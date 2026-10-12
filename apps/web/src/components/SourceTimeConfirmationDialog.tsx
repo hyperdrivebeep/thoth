@@ -1,17 +1,18 @@
+import { t } from "../i18n/locale";
 import { Button, Callout, Dialog, DialogBody, DialogFooter } from "@blueprintjs/core";
 
 export function SourceTimeConfirmationDialog({open, fileLabel, cutoffAt, onConfirm, onAfter, onSkip}:{open:boolean; fileLabel:string; cutoffAt:string; onConfirm:()=>void; onAfter:()=>void; onSkip:()=>void;}) {
-  return <Dialog isOpen={open} onClose={onSkip} title="자료 시점 확인" aria-label="자료 시점 확인">
+  return <Dialog isOpen={open} onClose={onSkip} title={t("sourceTime.title")} aria-label={t("sourceTime.title")}>
     <DialogBody>
-      <Callout intent="warning">이 자료의 시점을 자동 확인하지 못했습니다.</Callout>
+      <Callout intent="warning">{t("sourceTime.automaticFailed")}</Callout>
       <p>{fileLabel}</p>
-      <p>판단 기준시점: {cutoffAt}</p>
-      <p>이 판은, 표시된 판단 기준시점까지 존재하던 자료입니까?</p>
+      <p>{t("labels.cutoff")}{" "}{cutoffAt}</p>
+      <p>{t("sourceTime.question")}</p>
     </DialogBody>
     <DialogFooter actions={<>
-      <Button intent="primary" onClick={onConfirm}>기준시점까지 존재</Button>
-      <Button onClick={onAfter}>기준시점보다 후</Button>
-      <Button minimal onClick={onSkip}>모르겠음 / 이번에는 쓰지 않음</Button>
+      <Button intent="primary" onClick={onConfirm}>{t("sourceTime.existed")}</Button>
+      <Button onClick={onAfter}>{t("sourceTime.later")}</Button>
+      <Button minimal onClick={onSkip}>{t("sourceTime.skip")}</Button>
     </>} />
   </Dialog>;
 }

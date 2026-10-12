@@ -146,30 +146,6 @@
       ],
       "policy": "existing Action RPC surface only; new responsibility goes to a new command/service module"
     },
-    "src/thoth/application/commands/executions_full.py": {
-      "baseline_lines": 617,
-      "top_level_symbols": [
-        "ProjectInput",
-        "ExecutionListInput",
-        "ExecutionReadInput",
-        "StepInput",
-        "AttemptListInput",
-        "AttemptReadInput",
-        "ReconciliationReadInput",
-        "StartInput",
-        "RevisionBoundInput",
-        "PauseInput",
-        "ResumeInput",
-        "CancelInput",
-        "RetryInput",
-        "ReconcileInput",
-        "ObservationLinkInput",
-        "CompensationInput",
-        "InvalidateInput",
-        "ExecutionHandlers"
-      ],
-      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
-    },
     "src/thoth/application/commands/hypotheses_full.py": {
       "baseline_lines": 822,
       "top_level_symbols": [
@@ -231,30 +207,8 @@
       ],
       "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     },
-    "src/thoth/application/commands/projects.py": {
-      "baseline_lines": 603,
-      "top_level_symbols": [
-        "ProjectCreateInput",
-        "ProjectReadInput",
-        "ProjectListInput",
-        "ProjectExpectedRevisionInput",
-        "ProjectMetadataUpdateInput",
-        "ProjectOverlayUpdateInput",
-        "ProjectPolicyUpdateInput",
-        "ProjectRoleAssignInput",
-        "ProjectRoleRevokeInput",
-        "ProjectReferenceImportInput",
-        "ProjectCutoffImpactInput",
-        "ProjectCutoffUpdateInput",
-        "ProjectCommandHandlers",
-        "_merge_policy_payload",
-        "_public_web_execution",
-        "_string_tuple"
-      ],
-      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
-    },
     "src/thoth/application/commands/research_threads.py": {
-      "baseline_lines": 856,
+      "baseline_lines": 855,
       "top_level_symbols": [
         "ResearchThreadHandlers"
       ],
@@ -293,7 +247,7 @@
       "policy": "existing Revision RPC surface only; new responsibility goes to a new command/service module"
     },
     "src/thoth/application/commands/thread_analysis.py": {
-      "baseline_lines": 709,
+      "baseline_lines": 708,
       "top_level_symbols": [
         "ThreadInputRequest",
         "_CycleExecution",
@@ -470,6 +424,52 @@
         "DispatchTicket",
         "PreClaimAuthorization",
         "CommandBus"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/commands/executions_full.py": {
+      "baseline_lines": 617,
+      "top_level_symbols": [
+        "ProjectInput",
+        "ExecutionListInput",
+        "ExecutionReadInput",
+        "StepInput",
+        "AttemptListInput",
+        "AttemptReadInput",
+        "ReconciliationReadInput",
+        "StartInput",
+        "RevisionBoundInput",
+        "PauseInput",
+        "ResumeInput",
+        "CancelInput",
+        "RetryInput",
+        "ReconcileInput",
+        "ObservationLinkInput",
+        "CompensationInput",
+        "InvalidateInput",
+        "ExecutionHandlers"
+      ],
+      "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "src/thoth/application/commands/projects.py": {
+      "baseline_lines": 603,
+      "top_level_symbols": [
+        "ProjectCreateInput",
+        "ProjectReadInput",
+        "ProjectListInput",
+        "ProjectExpectedRevisionInput",
+        "ProjectMetadataUpdateInput",
+        "ProjectOverlayUpdateInput",
+        "ProjectPolicyUpdateInput",
+        "ProjectRoleAssignInput",
+        "ProjectRoleRevokeInput",
+        "ProjectReferenceImportInput",
+        "ProjectCutoffImpactInput",
+        "ProjectCutoffUpdateInput",
+        "ProjectCommandHandlers",
+        "_merge_policy_payload",
+        "_public_web_execution",
+        "_string_tuple"
       ],
       "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     }

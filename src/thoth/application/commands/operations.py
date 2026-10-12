@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import Field, JsonValue, ValidationError
 
+from thoth.application.services.expected_result_view import result_read_view
 from thoth.application.services.historical_access_verification import (
     historical_verification_allowed,
     require_historical_operation_access,
@@ -21,6 +24,10 @@ from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 class OperationReadInput(DomainModel):
     project_id: str = Field(min_length=1, max_length=160)
     operation_id: str = Field(min_length=1, max_length=160)
+
+
+class OperationResultReadInput(OperationReadInput):
+    expected_result_contract: Literal["v4"] | None = None
 
 
 class OperationResumeInput(OperationReadInput):
@@ -50,6 +57,7 @@ class OperationCommandHandlers:
         if current_authenticated_actor() is None:
             return
         input_model: type[OperationReadInput] = {
+            "operation/result/read": OperationResultReadInput,
             "operation/pause": OperationPauseInput,
             "operation/resume": OperationResumeInput,
         }.get(method, OperationReadInput)
@@ -82,15 +90,18 @@ class OperationCommandHandlers:
         return payload
 
     async def result(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
-        request = OperationReadInput.model_validate(value)
+        request = OperationResultReadInput.model_validate(value)
         operation = self._read_query_scoped(request)
-        return {
-            "operation_id": operation.operation_id,
-            "state": operation.state.value,
-            "result": operation.result,
-            "error": operation.error,
-            "execution_observation": "UNKNOWN",
-        }
+        return result_read_view(
+            {
+                "operation_id": operation.operation_id,
+                "state": operation.state.value,
+                "result": operation.result,
+                "error": operation.error,
+                "execution_observation": "UNKNOWN",
+            },
+            request.expected_result_contract,
+        )
 
     async def checkpoint(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = OperationReadInput.model_validate(value)

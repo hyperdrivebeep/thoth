@@ -1,3 +1,5 @@
+import { message } from "../i18n/formatMessages";
+import { t } from "../i18n/locale";
 import { Button, Callout } from "@blueprintjs/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -37,7 +39,7 @@ export function ToolInstallHelp({ toolId, title, intro, command, onInstalled }: 
       onInstalled?.();
     } catch (caught) {
       if (active.current) setError({ code: reasonCode(caught),
-        text: connectionErrorText(caught, "자동 설치에 실패했습니다. 아래 명령을 직접 실행하세요.") });
+        text: connectionErrorText(caught, t("tools.installFailed")) });
     } finally {
       busy.current = false;
       if (active.current) setRunning(false);
@@ -51,11 +53,11 @@ export function ToolInstallHelp({ toolId, title, intro, command, onInstalled }: 
     <p><strong>{title}</strong></p>
     <p>{intro}</p>
     <Button small intent="primary" icon="download" loading={running} disabled={running} onClick={() => void install()}>
-      {running ? "설치 중…" : "자동 설치"}</Button>
-    {running && <p role="status">설치 중입니다. 최대 5분 걸릴 수 있습니다. 이 화면을 닫지 마세요.</p>}
-    {error && <Callout compact intent="warning" role="alert">{error.text}{error.code && <small> 오류 코드: {error.code}</small>}</Callout>}
-    <p>직접 설치하려면 PowerShell에서 아래 명령을 실행하세요.</p>
+      {running ? t("tools.installing") : t("tools.install")}</Button>
+    {running && <p role="status">{t("tools.wait")}</p>}
+    {error && <Callout compact intent="warning" role="alert">{error.text}{error.code && <small>{message("errorCode", error.code)}</small>}</Callout>}
+    <p>{t("tools.manual")}</p>
     <pre><code>{command}</code></pre>
-    <Button small icon="duplicate" onClick={() => void copy()}>{copied ? "복사됨" : "명령 복사"}</Button>
+    <Button small icon="duplicate" onClick={() => void copy()}>{copied ? t("tools.copied") : t("tools.copy")}</Button>
   </div>;
 }

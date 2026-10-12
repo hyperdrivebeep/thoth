@@ -10,13 +10,17 @@ from thoth.application.services.committed_learning_recovery import (
     require_committed_learning,
 )
 from thoth.application.services.post_execution_memory import PostExecutionMemory
+from thoth.application.services.request_language import apply_request_language
 from thoth.application.services.research_boundary import RequestBoundary
 from thoth.domain.enums import EntityType, OperationState, ThreadExecutionState
 from thoth.domain.operation import OperationRecord
 from thoth.domain.post_execution_learning import PostExecutionLearningResult
 from thoth.domain.research_execution import ResearchFence, ResearchWork, research_work
 from thoth.domain.research_lease import ResearchLeaseLost, ResearchPaused
-from thoth.domain.research_request import ResearchAttempt, ThreadRequestRevision
+from thoth.domain.research_request import (
+    ResearchAttempt,
+    decode_thread_request,
+)
 
 if TYPE_CHECKING:
     from thoth.application.commands.research_threads import ResearchThreadHandlers
@@ -61,7 +65,7 @@ async def resume_post_execution_learning(
     paused_states = {ThreadExecutionState.PAUSED, ThreadExecutionState.PAUSE_PENDING}
     if not resume_pause and thread.execution_state in paused_states:
         return result.model_copy(update={"state": "PENDING", "reason_code": "PAUSED"})
-    request = ThreadRequestRevision.model_validate(saved[1])
+    request = decode_thread_request(saved[1])
     boundary = RequestBoundary(
         host.records,
         host.projects,
@@ -76,6 +80,7 @@ async def resume_post_execution_learning(
     source = {s.span_id: s for s in host.analysis.evidence(operation.project_id)}
     work.evidence = tuple(source[key] for key in result.basis.source_refs if key in source)
     work.model_settings = request.model_settings
+    apply_request_language(work, request)
     boundary.validate_sources = lambda: host.analysis.require_current_sources(work.evidence, None)
     lease = host.leases.claim(attempt)
     if lease is None:

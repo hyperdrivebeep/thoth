@@ -5,6 +5,8 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from thoth.domain.hypothesis_v4 import HypothesisPortfolioV4, HypothesisTableFillV4
+from thoth.domain.language_validation import HypothesisLanguageCheck
 from thoth.domain.research_followup import (
     CoverageMatrix,
     DecisionDelta,
@@ -22,7 +24,11 @@ from thoth.domain.research_history import (
     HistoryPage,
     HistoryTimelineInput,
 )
-from thoth.domain.research_request import CurrentResultManifestV21
+from thoth.domain.research_request import (
+    CurrentResultManifestV21,
+    ThreadRequestRevision,
+    ThreadRequestRevisionV21,
+)
 from thoth.domain.restore import (
     RestoreApplyInput,
     RestoreApplyResult,
@@ -33,6 +39,11 @@ from thoth.domain.user_activity import UserActivityEvent
 from thoth.protocol.jsonrpc import JsonRpcError, JsonRpcRequest, JsonRpcResponse
 
 SCHEMA_MODELS: dict[str, type[BaseModel]] = {
+    "thread-request-v2.schema.json": ThreadRequestRevision,
+    "thread-request-v21.schema.json": ThreadRequestRevisionV21,
+    "hypothesis-portfolio-v4.schema.json": HypothesisPortfolioV4,
+    "hypothesis-table-fill-v4.schema.json": HypothesisTableFillV4,
+    "hypothesis-language-check.schema.json": HypothesisLanguageCheck,
     "jsonrpc-error.schema.json": JsonRpcError,
     "jsonrpc-request.schema.json": JsonRpcRequest,
     "jsonrpc-response.schema.json": JsonRpcResponse,

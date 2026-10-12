@@ -1,3 +1,6 @@
+import { t } from "../i18n/locale";
+import { message as formatMessage } from "../i18n/formatMessages";
+import { getLocale } from "../i18n/locale";
 import type { ResearchStatus } from "./research";
 import { sourceCardTitle } from "../sourceDisplay";
 import {
@@ -91,16 +94,16 @@ function extractConstraints(status?: ResearchStatus): string[] {
     found.push(table[0].replace(/\s+/g, " ").trim());
   }
   if (/표 숫자만/u.test(text)) {
-    found.push("표 숫자만 인용");
+    found.push(t("progress.tableOnly"));
   }
   if (/추측 금지/u.test(text)) {
-    found.push("추측 금지");
+    found.push(t("progress.noGuess"));
   }
   if (/원문 위치/u.test(text)) {
-    found.push("원문 위치와 함께 답");
+    found.push(t("progress.withLocator"));
   }
   if (/확인 안 되면|부족한지|HOLD/u.test(text)) {
-    found.push("확인 안 되면 부족 이유");
+    found.push(t("progress.explainMissing"));
   }
   const quotes = [...text.matchAll(/[“「"]([^”」"]{2,48})[”」"]/gu)].map((match) => match[1].trim());
   return unique([...found, ...quotes]);
@@ -203,9 +206,9 @@ function modelLine(status?: ResearchStatus): string | null {
     return null;
   }
   if (model && effort) {
-    return `${model} · 추론 ${effort}`;
+    return formatMessage("modelReasoning", model, effort);
   }
-  return model ?? `추론 ${effort}`;
+  return model ?? (effort ? formatMessage("reasoning", effort) : null);
 }
 
 function actionEvent(
@@ -287,7 +290,7 @@ function timelineFromPublished(status: ResearchStatus, sourceUris: string[], fac
             formatDuration(numberOrNull(payload.elapsed_ms)),
             formatBytes(numberOrNull(payload.context_bytes)),
             typeof payload.dispatch_count === "number" && payload.dispatch_count > 0
-              ? `모델 ${payload.dispatch_count}회`
+              ? formatMessage("modelCalls", payload.dispatch_count)
               : null,
           ]),
           live,
@@ -330,8 +333,8 @@ function timelineFromPublished(status: ResearchStatus, sourceUris: string[], fac
           `event-action-${event.seq ?? index}`,
           "model_call",
           waiting
-            ? compactPayload([elapsed ?? "경과 미확인", firstByte ? `첫 글자 ${firstByte}` : "첫 글자 아직 없음"])
-            : compactPayload([received != null ? `${received.toLocaleString()}B` : null, elapsed]),
+            ? compactPayload([elapsed ?? t("progress.elapsedUnknown"), firstByte ? formatMessage("firstByte", firstByte) : t("progress.noFirstByte")])
+            : compactPayload([received != null ? `${received.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")}B` : null, elapsed]),
           waiting,
         ),
       );
@@ -429,13 +432,13 @@ export function liveResearchProgress(
 
 export function composerActivity(status: ResearchStatus): string | null {
   if (status.execution_state === "PAUSE_PENDING") {
-    return "현재 단계를 마치고 멈추는 중입니다.";
+    return t("progress.pausing");
   }
   if (status.execution_state === "PAUSED") {
-    return "작업이 일시정지되어 있습니다.";
+    return t("progress.paused");
   }
   if (status.attempt?.remote_observation === "UNKNOWN" && status.attempt.external_effect_state === "DISPATCHING") {
-    return "외부 실행의 종료 여부를 아직 확인하지 못했습니다.";
+    return t("progress.externalUnknown");
   }
   if (status.operation_state !== "RUNNING") {
     return null;

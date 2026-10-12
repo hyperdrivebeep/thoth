@@ -7,6 +7,7 @@ import { ResearchResultCard } from "./ResearchResultCard";
 import { classifyEvidenceUse, groupEvidenceUse } from "./evidenceUse";
 import { nextActionLabel } from "./statusLabels";
 import { resultUsageLine } from "./resultUsage";
+import { setLocale } from "../i18n/locale";
 
 const digest = "a".repeat(64);
 type Row = CoverageMatrixRow;
@@ -153,6 +154,12 @@ it("says how many finished stages a resumed run reused and counts automatic retr
   expect(widened).toBe("이 조사: 토큰 15 · 걸린 시간 3분 · 그중 기억 검색어 넓히기 토큰 220 · 추정 비용 미확인");
   const unknown = resultUsageLine(status(entry({ by_purpose: { MEMORY_QUERY_EXPANSION: { label: "기억 검색어 넓히기", calls: 1, total_tokens: null } } })), "op");
   expect(unknown).toContain("그중 기억 검색어 넓히기 토큰 미확인");
+  try {
+    setLocale("en");
+    const english = resultUsageLine(status(entry({ by_purpose: { MEMORY_QUERY_EXPANSION: { label: "기억 검색어 넓히기", calls: 1, total_tokens: 220 } } })), "op");
+    expect(english).toContain("Including Memory query expansion: 220 tokens");
+    expect(english).not.toContain("기억 검색어 넓히기");
+  } finally { setLocale("ko"); }
 });
 
 

@@ -11,8 +11,9 @@ from thoth.application.services.full_project_memory import FullProjectMemoryServ
 from thoth.application.services.memory_query_expansion import ModelMemoryQueryExpander, widen_query
 from thoth.application.services.request_records import RequestRecords
 from thoth.application.services.requirement_compiler import compile_requirements
+from thoth.application.services.research_answer import answer_summary
 from thoth.application.services.research_context_assembler import assemble_context
-from thoth.application.services.research_coverage import answer_assessment_state, assess_coverage
+from thoth.application.services.research_coverage import assess_coverage
 from thoth.application.services.research_findings import adopt_confirmed_findings
 from thoth.application.services.research_gaps import gap_targets, validate_gaps
 from thoth.application.services.research_retrieval import pinned_first, work_candidates
@@ -270,9 +271,7 @@ class ResearchAnalysis:
                 project_id=project.project_id,
                 cutoff_at=project.cutoff_at,
                 model_policy_ref=project.policy_binding_ref,
-                head_set_digest=head_set_digest(
-                    self.records.ledger.read_heads(project.project_id)
-                ),
+                head_set_digest=head_set_digest(self.records.ledger.read_heads(project.project_id)),
             ),
             work=work,
             project_id=project.project_id,
@@ -456,11 +455,12 @@ class ResearchAnalysis:
                 )
             coverage = coverage.model_copy(update={"web_decision": str(discovery["state"])})
         work.context.update(
-            {"coverage": coverage.model_dump(mode="json"), "discovery": discovery, "answer": answer}
+            {
+                "coverage": coverage.model_dump(mode="json"),
+                "discovery": discovery,
+                **answer_summary(coverage, answer, work.response_language),
+            }
         )
-        work.context["answer_status"] = answer_assessment_state(coverage)
-        if work.context["answer_status"] == "PARTIAL_HOLD":
-            work.context["answer"] = "검증 보류 · 부분 초안: " + answer
         work.record_refs.append(
             self.stage_record(
                 work,

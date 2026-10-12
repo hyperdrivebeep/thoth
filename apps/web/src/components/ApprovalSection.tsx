@@ -1,3 +1,4 @@
+import { t } from "../i18n/locale";
 import { Callout } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -41,11 +42,11 @@ export function ApprovalSection({ projectId, planId, onReapprove, onDecline }: {
   const shown = (query.data?.approvals ?? []).filter(approval => !declined.includes(approval.id));
   if (!query.data || query.data.approvals.length === 0) return null;
   return <>
-    {reapprove.error && <Callout compact intent="danger" role="alert">승인 요청을 다시 만들지 못했습니다. {reapprove.error.message}</Callout>}
-    {requested && <Callout compact intent="primary" role="status">승인 요청을 만들었습니다. 승인자가 결정하기 전까지 아무것도 보내지 않습니다.</Callout>}
+    {reapprove.error && <Callout compact intent="danger" role="alert">{t("approval.recreateFailed")}{" "}{reapprove.error.message}</Callout>}
+    {requested && <Callout compact intent="primary" role="status">{t("approval.created")}</Callout>}
     {shown.map(approval => <ApprovalCard key={approval.id} approval={approval}
       onReapprove={() => { onReapprove?.(approval); if (!onReapprove) reapprove.mutate(approval); }}
       onDecline={() => { onDecline?.(approval); setDeclined(current => [...current, approval.id]); }}/>)}
-    {declined.length > 0 && <p className="muted">보내지 않기로 표시한 변경이 있습니다. 이 표시는 이 화면에만 적용되며, 승인 없이는 아무것도 전송되지 않습니다.</p>}
+    {declined.length > 0 && <p className="muted">{t("approval.notSentNotice")}</p>}
   </>;
 }

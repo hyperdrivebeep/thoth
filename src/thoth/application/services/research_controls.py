@@ -7,10 +7,14 @@ from typing import TYPE_CHECKING
 from pydantic import JsonValue
 
 from thoth.application.services.post_execution_resume import resume_post_execution_learning
+from thoth.application.services.request_language import resume_language
 from thoth.domain.enums import EntityType, OperationState, ThreadExecutionState
 from thoth.domain.operation import OperationRecord
 from thoth.domain.research_lease import ResearchLease
-from thoth.domain.research_request import ResearchAttempt, ThreadRequestRevision
+from thoth.domain.research_request import (
+    ResearchAttempt,
+    decode_thread_request,
+)
 from thoth.protocol.deferred import AcceptedRunning
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 
@@ -30,7 +34,8 @@ class ResearchControls:
         saved = self.host.records.read(project, EntityType.THREAD, f"request:{thread}")
         if saved is None:
             return None
-        request = ThreadRequestRevision.model_validate(saved[1])
+        request = decode_thread_request(saved[1])
+        resume_language(request, value)
         attempt = self.host.records.journal_read(project, request.operation_id, ResearchAttempt)
         operation = self.host.operations.read(request.operation_id)
         if attempt is None or operation is None:

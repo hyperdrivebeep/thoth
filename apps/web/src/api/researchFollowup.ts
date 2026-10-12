@@ -1,3 +1,4 @@
+import { UiError } from "../i18n/UiError";
 import { z } from "zod";
 import { rpc } from "./rpcClient";
 import { digestSchema } from "./historySchemas";
@@ -147,7 +148,7 @@ export type ProjectReviewItem = z.infer<typeof projectReviewItemSchema>;
 
 async function query(method: string, input: Record<string, unknown>, signal?: AbortSignal): Promise<unknown> {
   const response = await rpc<unknown>(method, input, crypto.randomUUID(), signal);
-  if (response.state !== "SUCCEEDED") throw new Error("검토 조회가 완료되지 않았습니다.");
+  if (response.state !== "SUCCEEDED") throw new UiError("followup.queryIncomplete");
   return response.value;
 }
 
@@ -158,7 +159,7 @@ export async function readDecisionDelta(projectId: string, threadId: string, bef
   if (value.project_id !== projectId || value.thread_id !== threadId ||
       value.before.request_revision_digest !== before.request_revision_digest || value.before.result_revision_digest !== before.result_revision_digest ||
       value.after.request_revision_digest !== after.request_revision_digest || value.after.result_revision_digest !== after.result_revision_digest) {
-    throw new Error("비교 대상 답변의 연결을 확인하지 못했습니다.");
+    throw new UiError("followup.binding");
   }
   return value;
 }
@@ -167,6 +168,6 @@ export async function readProjectReviewList(projectId: string, cursor: string | 
   const value = projectReviewListSchema.parse(await query("project/review/list", {
     project_id: projectId, cursor, limit: 20, contract_version: 2,
   }, signal));
-  if (value.project_id !== projectId) throw new Error("검토 목록의 프로젝트 연결을 확인하지 못했습니다.");
+  if (value.project_id !== projectId) throw new UiError("followup.projectBinding");
   return value;
 }

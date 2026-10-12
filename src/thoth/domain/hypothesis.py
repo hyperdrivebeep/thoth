@@ -221,6 +221,12 @@ def is_v3(portfolio: HypothesisPortfolio) -> bool:
     return isinstance(portfolio, HypothesisPortfolioV3)
 
 
-def portfolio_from_json(value: dict[str, Any], *, v3: bool) -> HypothesisPortfolio:
+def portfolio_from_json(
+    value: dict[str, Any], *, v3: bool, v4: bool = False
+) -> HypothesisPortfolio:
     """A portfolio from its JSON, in the form the caller says it has (v2 or v3)."""
+    if v4:
+        from thoth.domain.hypothesis_v4 import HypothesisPortfolioV4
+
+        return HypothesisPortfolioV4.model_validate(value)
     return (HypothesisPortfolioV3 if v3 else HypothesisPortfolio).model_validate(value)

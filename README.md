@@ -37,7 +37,7 @@ competing explanations and recorded results connected.** Inspect what supports a
 see what remains unresolved, and compare two saved results before deciding what comes next.
 
 > [!NOTE]
-> **Experimental source preview for personal/local use.** The interface is Korean-first.
+> **Experimental source preview for personal/local use.** The interface supports Korean and English; real-model English quality has not yet been verified.
 > Focused feature checks passed; the latest repository-wide verification is not passing. See the verification limits below.
 > **2026-09-29 update:** isolated model authentication and restart recovery are included. Real-provider analysis and a current-source FULL pass remain unverified. Claude sign-in goes through the official Claude Code executable and has not been checked with a real account.
 > **2026-10-11:** one real model investigation on the synthetic radar demo ran end to end ([screens](#see-it-work)). Answer quality has not been evaluated.
@@ -92,6 +92,11 @@ held judgment. Completion is not a claim that the evidence is sufficient.
 **Choose your own connection.** Configure a supported provider login or API key in your local
 workspace, then select the model and reasoning setting. Saved choices are preserved; unavailable
 routes are shown explicitly. Reading a saved result or comparison does not start a model call.
+
+**Choose the display and response languages separately.** Changing the display language makes
+no model call and preserves saved answers. Each submitted question keeps its response language
+through retries and recovery; the next question in the same conversation can use another language.
+Older requests retain their original language policy. New questions use model capacity.
 
 ## A research loop you can revisit
 

@@ -1,3 +1,4 @@
+import { t } from "../i18n/locale";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Callout } from "@blueprintjs/core";
@@ -43,8 +44,8 @@ export function HypothesisCompareLive({ result, projectId, threadId }: { result:
     onResend: item => send.mutate({ hypothesisId: item.hypothesis_id, evidenceRef: item.evidence_ref, reasons: item.reason_codes, note: item.note, digest: item.hypothesis_revision_digest }),
   };
   return <>
-    {list.error && <Callout compact intent="warning" role="status">재검토 요청 상태를 읽지 못했습니다.</Callout>}
-    {!target && send.error && <Callout compact intent="danger" role="alert">재검토 요청을 보내지 못했습니다. {send.error.message}</Callout>}
+    {list.error && <Callout compact intent="warning" role="status">{t("review.stateFailed")}</Callout>}
+    {!target && send.error && <Callout compact intent="danger" role="alert">{t("reviewDialog.failed")}{" "}{send.error.message}</Callout>}
     <HypothesisCompare result={result} review={controls} projectId={projectId} links={linked.links} distribution={linked.distribution} canDraft discrimination={discrimination.items} lessons={lessons.lessons} same={same.same}/>
     <ReviewDialog target={target} pending={send.isPending} error={target && send.error ? send.error.message : null} onClose={() => setTarget(null)}
       onSubmit={(reasons, note) => target && send.mutate({ hypothesisId: target.hypothesisId, evidenceRef: target.evidenceRef, reasons, note })}/>

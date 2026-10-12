@@ -10,10 +10,18 @@ from thoth.application.commands.thread_analysis import ThreadInputRequest
 from thoth.application.commands.threads import ThreadCommandHandlers
 from thoth.application.commands.trace_origin_admission import admit_trace_origin
 from thoth.application.services.connector_cleanup import cleanup_summary
+from thoth.application.services.expected_result_view import base_read_params, expected_result_view
 from thoth.application.services.model_call_settings import ModelCallSettingsService
 from thoth.application.services.model_settings import ModelSettingsService
 from thoth.application.services.post_execution_memory import PostExecutionMemory
 from thoth.application.services.provider_usage_service import ProviderUsageService
+from thoth.application.services.request_language import (
+    legacy_start_params,
+    research_start_params,
+    validate_request_language,
+    with_request_language,
+    with_result_language,
+)
 from thoth.application.services.request_records import RequestRecords
 from thoth.application.services.research_analysis import ResearchAnalysis
 from thoth.application.services.research_attempt_admission import (
@@ -44,6 +52,7 @@ from thoth.domain.research_request import (
     ResearchBudget,
     RevisionRef,
     ThreadRequestRevision,
+    decode_thread_request,
 )
 from thoth.domain.resource_scope import ResourceScopeError, current_resource_uses
 from thoth.domain.test_validity import TestValidityAssessment
@@ -56,7 +65,12 @@ from thoth.ports.provider_usage import ProviderUsagePort
 from thoth.ports.research_queue import ResearchQueueStorePort
 from thoth.ports.resource_scope import ResourceAccessPort
 from thoth.ports.thread import ThreadStorePort
-from thoth.protocol.deferred import AcceptedRunning, PendingExecution, current_operation
+from thoth.protocol.deferred import (
+    AcceptedRunning,
+    EphemeralCommandResult,
+    PendingExecution,
+    current_operation,
+)
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 from thoth.protocol.registry import CommandHandler
 
@@ -154,6 +168,7 @@ class ResearchThreadHandlers:
         return pending_attempt(self, attempt, status)
 
     async def start(self, value: dict[str, JsonValue]) -> dict[str, JsonValue] | AcceptedRunning:
+        validate_request_language(value)
         if value.get("contract_version") != 2:
             return await self.legacy.start(value)
         with self.records.ledger.transaction():
@@ -167,27 +182,13 @@ class ResearchThreadHandlers:
             if existing is not None:
                 return self.replay_attempt(existing, operation)
             value = admit_trace_origin(self, "thread/start", value)
-            data = {
-                k: v
-                for k, v in value.items()
-                if k not in {"contract_version", "provider", "model", "reasoning_effort", "origin"}
-            }
-            result = await self.legacy.start(data)
-            return self.submit(
-                {
-                    "project_id": value["project_id"],
-                    "thread_id": result["thread_id"],
-                    "instruction": value["problem"],
-                    "provider": value.get("provider", "default"),
-                    **{k: value.get(k) for k in ("model", "reasoning_effort")},
-                    **({"origin": value["origin"]} if "origin" in value else {}),
-                },
-                initial=True,
-            )
+            result = await self.legacy.start(legacy_start_params(value))
+            return self.submit(research_start_params(value, result["thread_id"]), initial=True)
 
     async def input(
         self, value: dict[str, JsonValue]
-    ) -> dict[str, JsonValue] | AcceptedRunning | PendingExecution:
+    ) -> dict[str, JsonValue] | AcceptedRunning | PendingExecution | EphemeralCommandResult:
+        validate_request_language(value)
         if value.get("contract_version") != 2:
             return await self.analyze_legacy(value)
         payload = {k: v for k, v in value.items() if k != "contract_version"}
@@ -209,6 +210,7 @@ class ResearchThreadHandlers:
         return self.submit(payload)
 
     async def steer(self, value: dict[str, JsonValue]) -> dict[str, JsonValue] | AcceptedRunning:
+        validate_request_language(value)
         if value.get("contract_version") != 2:
             return await self.legacy.steer(value)
         admit_trace_origin(self, "thread/steer", value)
@@ -275,7 +277,7 @@ class ResearchThreadHandlers:
                         RpcErrorCode.DOMAIN_REJECTED, "RETRY_POLICY_UNSUPPORTED"
                     )
             value = {**value, "provider": settings.provider, "model": settings.model}
-            previous = None if prior is None else ThreadRequestRevision.model_validate(prior[1])
+            previous = None if prior is None else decode_thread_request(prior[1])
             epoch = 0 if previous is None else previous.request_epoch
             edit_kind = str(value.get("edit_kind", "APPEND"))
             if edit_kind not in {"APPEND", "REPLACE", "STEER"}:
@@ -343,6 +345,7 @@ class ResearchThreadHandlers:
                 operation_id=operation.operation_id,
                 model_settings=settings,
             )
+            request = with_request_language(request, value)
             ref = self.records.save(project_id, EntityType.THREAD, f"request:{thread_id}", request)
             if previous is not None and edit_kind == "REPLACE":
                 for prior_input_id in previous.accepted_input_ids:
@@ -421,7 +424,7 @@ class ResearchThreadHandlers:
             raise RpcApplicationError(
                 RpcErrorCode.DOMAIN_REJECTED, "RESUBMIT_REQUIRED_REQUEST_MISSING"
             )
-        request = ThreadRequestRevision.model_validate(snapshot.content)
+        request = decode_thread_request(snapshot.content)
         return AcceptedRunning(
             self.accepted_value(attempt), lambda: self.run(attempt, request, operation)
         )
@@ -496,7 +499,7 @@ class ResearchThreadHandlers:
                 source_basis={
                     s.span_id: f"{s.source_version_id}:{s.text_sha256}" for s in work.evidence
                 },
-                result=result,
+                result=with_result_language(result, request),
                 gaps=gaps,
                 next_steps=gaps,
                 terminal_reason=terminal,
@@ -608,7 +611,7 @@ class ResearchThreadHandlers:
             snapshot = self.records.ledger.read_snapshot(revision.snapshot_id)
             if snapshot is None:
                 continue
-            request = ThreadRequestRevision.model_validate(snapshot.content)
+            request = decode_thread_request(snapshot.content)
             delivery = self.records.journal_read(
                 project, f"input:{request.accepted_input_ids[-1]}", InputDelivery
             )
@@ -636,13 +639,7 @@ class ResearchThreadHandlers:
     async def read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         if value.get("view", "SUMMARY") not in VIEWS:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "THREAD_READ_VIEW_UNKNOWN")
-        base = await self.legacy.read(
-            {
-                k: v
-                for k, v in value.items()
-                if k not in {"contract_version", "cursor", "refresh_account_quota", "view"}
-            }
-        )
+        base = await self.legacy.read(base_read_params(value))
         # A requested account-quota refresh is a provider call: it runs here, outside the read
         # transaction and its approval memo, and the read only receives its result.
         quota = (
@@ -650,7 +647,9 @@ class ResearchThreadHandlers:
             if value.get("refresh_account_quota") is True
             else None
         )
-        return self._read_current(value, base, quota)
+        return expected_result_view(
+            self._read_current(value, base, quota), value.get("expected_result_contract")
+        )
 
     def _read_current(
         self,
@@ -694,7 +693,9 @@ class ResearchThreadHandlers:
         result_ref, manifest = snapshot.result_ref, snapshot.manifest
         currentness, fresh, budget = snapshot.currentness, snapshot.fresh, snapshot.budget
         dispatches, activity_source_context, op = (
-            snapshot.dispatches, snapshot.activity_source_context, snapshot.operation
+            snapshot.dispatches,
+            snapshot.activity_source_context,
+            snapshot.operation,
         )
         usage = summarize_usage(
             tuple(dispatches),
@@ -819,7 +820,7 @@ class ResearchThreadHandlers:
                 for learning in PostExecutionMemory(self.records, self.analysis.memory).current(
                     project_id, thread_id
                 )
-            if learning.basis.request_ref == current_ref
+                if learning.basis.request_ref == current_ref
             ],
             "queued_inputs_v2": list(self.queue.summary(project_id, thread_id)),
         }
@@ -852,5 +853,3 @@ class ResearchThreadHandlers:
         if value.get("view") == "PROGRESS":
             return progress_thread_read(shown)
         return summarize_thread_read(shown)
-
-

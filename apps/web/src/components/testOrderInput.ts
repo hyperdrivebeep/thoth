@@ -2,7 +2,7 @@ import type { DiscriminationItem, TestResult } from "../api/judgmentRecords";
 import { objectList, stringValues, textValue } from "../api/presentation";
 import type { HypothesisRow } from "./hypothesisView";
 import type { RankInput, RankItem } from "./testRanking";
-import { EXCLUDED_TITLE, groupTitle } from "./testOrderText";
+import { excludedTitle, groupTitle } from "./testOrderText";
 import { rankItems } from "./testRanking";
 
 export type TestLabel = { statement: string; procedure: string; cost: number | null; recorded: TestResult | undefined };
@@ -28,7 +28,7 @@ export function testOrderInput(rows: HypothesisRow[], actions: Record<string, un
       const recorded = known?.results.find(item => item.test_id === textValue(test.test_id));
       labels.set(id, { statement: row.statement, procedure: textValue(test.procedure_candidate), cost: costOf(test.estimated_cost), recorded });
       items.push({ id, kind: "TEST", hypothesisId: row.id || null, riskTier: null, cost: costOf(test.estimated_cost), reversibility: textValue(test.reversibility) || null,
-        executable: test.executable !== false, resultRecorded: recorded !== undefined, predictions: null, labels: labelsOf(test) });
+        executable: test.executable !== false, resultRecorded: recorded !== undefined, predictions: null, labels: labelsOf(test), knowledgeStates: statesOf(test) });
     });
   }
   return { labels, input: {
@@ -51,15 +51,23 @@ export function orderedActions(actions: Record<string, unknown>[]): { action: Re
   const sections = ranked.groups.length + (ranked.excluded.length > 0 ? 1 : 0);
   const out: { action: Record<string, unknown>; heading: string | null; key: string }[] = [];
   for (const group of ranked.groups) group.items.forEach((entry, at) => out.push({ action: byId.get(entry.id)!, key: entry.id, heading: sections > 1 && at === 0 ? groupTitle(group.group, "ACTION") : null }));
-  ranked.excluded.forEach((id, at) => out.push({ action: byId.get(id)!, key: id, heading: at === 0 ? EXCLUDED_TITLE : null }));
+  ranked.excluded.forEach((id, at) => out.push({ action: byId.get(id)!, key: id, heading: at === 0 ? excludedTitle() : null }));
   return out;
 }
 /** The result each hypothesis is said to expect from a test (contract v3), by hypothesis id; null when the result carries no table. */
+function statesOf(test: Record<string, unknown>): Record<string, "PREDICTED" | "UNKNOWN"> {
+  const states: Record<string, "PREDICTED" | "UNKNOWN"> = {};
+  for (const row of objectList(test.expected_by_hypothesis)) {
+    const id = textValue(row.hypothesis_id);
+    if (id && !(id in states) && (row.knowledge_state === "PREDICTED" || row.knowledge_state === "UNKNOWN")) states[id] = row.knowledge_state;
+  }
+  return states;
+}
 function labelsOf(test: Record<string, unknown>): Record<string, string> | null {
   const table: Record<string, string> = {};
   for (const row of objectList(test.expected_by_hypothesis)) {
     const id = textValue(row.hypothesis_id), expected = textValue(row.expected);
-    if (id && expected && !(id in table)) table[id] = expected;
+    if (id && (expected || row.knowledge_state === "UNKNOWN") && !(id in table)) table[id] = expected;
   }
   return Object.keys(table).length > 0 ? table : null;
 }

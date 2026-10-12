@@ -1,3 +1,4 @@
+import { UiError } from "../i18n/UiError";
 import { z } from "zod";
 import { rpc } from "./rpcClient";
 import { digestSchema, historicalResultSchema } from "./historySchemas";
@@ -36,7 +37,7 @@ export function resultContentKey(value: unknown): string {
 function isShownPartOf(shown: Record<string, unknown>, stored: Record<string, unknown>): boolean {
   return Object.entries(shown).every(([key, value]) => Object.hasOwn(stored, key) && resultContentKey(value) === resultContentKey(stored[key]));
 }
-function mismatch(): never { throw new Error("선택한 답변과 근거의 연결을 확인하지 못했습니다. 답변을 다시 확인해 주세요."); }
+function mismatch(): never { throw new UiError("evidence.binding"); }
 
 function answerContent(value: Record<string, unknown>, thread: string, epoch: unknown, terminal: unknown) {
   // research_threads publication adds these four fields only to operation.result.
@@ -53,12 +54,12 @@ async function read(selection: ResultSelection, displayed: Record<string, unknow
     request_revision_digest: scope.requestDigest, ...(digest ? { result_revision_digest: digest } : {}), contract_version: 2,
     ...(expand ? { include_selected_evidence: true, selected_evidence_offset: offset, selected_evidence_limit: 50 } : {}),
   }, crypto.randomUUID(), signal);
-  if (response.state !== "SUCCEEDED") throw new Error("근거 조회가 완료되지 않았습니다.");
+  if (response.state !== "SUCCEEDED") throw new UiError("evidence.queryIncomplete");
   const value = responseSchema.parse(response.value);
   if (value.project_id !== scope.projectId || value.thread_id !== scope.threadId || value.request_revision_digest !== scope.requestDigest ||
       value.operation_id !== selection.operationId || (digest && value.result_revision_digest !== digest)) mismatch();
-  if (value.availability === "UNAVAILABLE") throw new Error("현재 권한으로 이 답변의 근거를 읽을 수 없습니다.");
-  if (!value.manifest || !value.result_revision_digest) throw new Error("이 답변의 저장 버전과 근거 목록을 확인하지 못했습니다.");
+  if (value.availability === "UNAVAILABLE") throw new UiError("evidence.accessDenied");
+  if (!value.manifest || !value.result_revision_digest) throw new UiError("evidence.versionUnknown");
   if (value.request.project_id !== scope.projectId || value.request.thread_id !== scope.threadId || value.request.operation_id !== selection.operationId || !value.result) mismatch();
   const manifest = manifestSchema.parse(value.manifest);
   const displayedContent = answerContent(displayed, scope.threadId, value.request.request_epoch, value.manifest.terminal_reason);
@@ -77,7 +78,7 @@ export async function readResultEvidence(selection: ResultSelection, displayed: 
   if (!digest) digest = (await read(selection, displayed, undefined, 0, false, signal)).value.result_revision_digest!;
   const { value, manifest } = await read(selection, displayed, digest, position.offset, true, signal);
   const page = value.selected_evidence;
-  if (!page) throw new Error("이 서버에서 답변별 근거 원문 조회를 확인하지 못했습니다.");
+  if (!page) throw new UiError("evidence.unsupported");
   const expected = manifest.source_refs.slice(position.offset, position.offset + 50);
   const next = position.offset + expected.length < manifest.source_refs.length ? position.offset + expected.length : null;
   if (page.result_revision_digest !== digest || page.offset !== position.offset || page.limit !== 50 ||

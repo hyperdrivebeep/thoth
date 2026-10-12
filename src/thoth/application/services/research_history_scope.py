@@ -3,7 +3,7 @@
 from thoth.domain.auth import current_authenticated_actor
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.research_history import HistoryScope
-from thoth.domain.research_request import ThreadRequestRevision
+from thoth.domain.research_request import ThreadRequestRevision, decode_thread_request
 from thoth.domain.restore import RestoreError
 from thoth.ports.ledger import LedgerPort
 from thoth.ports.project import ProjectStorePort
@@ -72,7 +72,7 @@ class HistoryScopeValidator:
         snapshot = None if revision is None else self.ledger.read_snapshot(revision.snapshot_id)
         if snapshot is None:
             raise RestoreError("HISTORY_REQUEST_UNAVAILABLE")
-        request = ThreadRequestRevision.model_validate(snapshot.content)
+        request = decode_thread_request(snapshot.content)
         if (
             request.project_id != project_id
             or revision is None

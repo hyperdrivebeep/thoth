@@ -1,3 +1,4 @@
+import { t } from "../i18n/locale";
 import { objectList, objectValue, stringValues, textValue } from "../api/presentation";
 
 export type WordPart = { op: "keep" | "add" | "del"; text: string };
@@ -51,8 +52,8 @@ export function compactWords(words: WordPart[], context = 2): Compact[] {
 }
 
 export const stateLabels: Record<string, string> = {
-  APPROVED: "승인됨 · 이 내용으로 유효", PENDING: "승인 대기", REJECTED: "거절됨", EXPIRED: "만료됨", CONSUMED: "사용됨",
-  STALE: "승인 무효 · 내용이 바뀜",
+  get APPROVED() { return t("approvalView.approved"); }, get PENDING() { return t("approvalView.pending"); }, get REJECTED() { return t("approvalView.rejected"); }, get EXPIRED() { return t("approvalView.expired"); }, get CONSUMED() { return t("approvalView.used"); },
+  get STALE() { return t("approvalView.invalid"); },
 };
 export const shortDigest = (digest: string | null) => digest ? digest.slice(0, 8) : "";
 export const listOf = (value: unknown) => stringValues(value);

@@ -171,7 +171,10 @@ it("shows the same sentence when the server refuses a correction whose basis cha
   await typeInto("고친 내용", "표본이 작으면 결론을 보류한다 다시");
   await typeInto("이유", "근거가 같습니다");
   await click(buttonByText(document.body, "수정 제안 보내기"));
-  expect(document.body.textContent).toContain("원래 근거가 바뀌었습니다");
+  await vi.waitFor(async () => {
+    await settle();
+    expect(document.body.textContent).toContain("원래 근거가 바뀌었습니다");
+  });
   expect(document.body.textContent).not.toContain("MEMORY_EDIT_TARGET_STALE");
 });
 

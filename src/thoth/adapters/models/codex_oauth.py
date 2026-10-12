@@ -14,6 +14,10 @@ from thoth.adapters.models.hypothesis_contract_text import (
     hypothesis_opening,
     table_filler_contract,
 )
+from thoth.adapters.models.language_contract_text import language_for
+from thoth.adapters.models.language_contract_text import (
+    user_visible_language_contract as user_visible_language_contract,
+)
 from thoth.adapters.models.reference_schema import (
     apply_hypothesis_review_contract,
     constrain_span_references,
@@ -457,7 +461,7 @@ def prompt_envelope(request: ModelRequest[BaseModel]) -> str:
         "Do not invent source IDs. "
         "Preserve uncertainty and explicit missing evidence. Keep narratives concise; "
         "use IDs instead of repeating source packets, metadata or paragraphs in every field. "
-        "Return only the schema object. " + user_visible_language_contract() + "\n\n"
+        "Return only the schema object. " + user_visible_language_contract(request) + "\n\n"
         "Each evidence span's source_index selects the exact source/version/authority/cutoff "
         "entry in the sources list. This is shared metadata, not missing information. "
         "Absent locator coordinates are unknown; do not invent them.\n\n"
@@ -468,13 +472,18 @@ def prompt_envelope(request: ModelRequest[BaseModel]) -> str:
         + "\n\nTASK\n"
         + request.role.value
         + "\nTASK_CONTRACT\n"
-        + role_contract(request.role.value, request.prompt_version)
+        + role_contract(request.role.value, request.prompt_version, language_for(request))
         + "\nPROMPT_VERSION\n"
         + request.prompt_version
+        + (
+            "\nREQUEST_LANGUAGE_OVERRIDE\n" + user_visible_language_contract(request)
+            if request.response_language is not None
+            else ""
+        )
     )
 
 
-def role_contract(role: str, prompt_version: str = "") -> str:
+def role_contract(role: str, prompt_version: str = "", response_language: str | None = None) -> str:
     if role == "RESEARCH_PLANNER":
         return (
             "Plan the evidence checks needed for the user's current question, not the final "
@@ -516,11 +525,14 @@ def role_contract(role: str, prompt_version: str = "") -> str:
             + hypothesis_contract_addendum(prompt_version)
             + _user_visible_language_fields(
                 "statement, uncertainty, counterevidence_queries, predicted_observations, "
-                "and discriminating_tests procedure/expected text"
+                "and discriminating_tests procedure/expected text",
+                response_language,
             )
         )
     if role == "HYPOTHESIS_TABLE_FILLER":
-        return table_filler_contract() + _user_visible_language_fields("expected labels")
+        return table_filler_contract(prompt_version) + _user_visible_language_fields(
+            "expected labels", response_language
+        )
     if role == "ACTION_PLANNER":
         return (
             "Create an ActionPlanDraft with at least three materially different action families. "
@@ -542,30 +554,31 @@ def role_contract(role: str, prompt_version: str = "") -> str:
             + effort_band_guidance()
             + _user_visible_language_fields(
                 "specification, expected_information_value, missing_evidence explanations, "
-                "and effort_estimates basis_text and assumptions"
+                "and effort_estimates basis_text and assumptions",
+                response_language,
             )
         )
     if role == "SEMANTIC_REVIEWER":
         return (
             "Perform the named bounded role using only supplied context and source identifiers."
-            + _user_visible_language_fields("answer and explanation prose")
+            + _user_visible_language_fields("answer and explanation prose", response_language)
         )
     return (
         "Perform the named bounded role using only supplied context and source identifiers."
-        + _user_visible_language_fields("any user-facing prose this role returns")
+        + _user_visible_language_fields(
+            "any user-facing prose this role returns", response_language
+        )
     )
 
 
-def user_visible_language_contract() -> str:
-    return (
-        "Write user-facing prose in the same language as context_pack.problem; "
-        "do not switch that prose to English when the question is not English. "
-        "Keep identifiers, GPU/model names, table numbers, units, "
-        "span IDs, file names, and quoted source text exactly as supplied. " + _PLAIN_WORDING
-    )
-
-
-def _user_visible_language_fields(fields: str) -> str:
+def _user_visible_language_fields(fields: str, response_language: str | None = None) -> str:
+    if response_language is not None:
+        return (
+            " User-facing fields ("
+            + fields
+            + ") follow the accepted response language. Keep identifiers, quoted evidence "
+            "and numeric citations unchanged."
+        )
     return (
         " User-facing fields ("
         + fields
@@ -577,12 +590,3 @@ def _user_visible_language_fields(fields: str) -> str:
 
 # The wording rule for everything the reader sees. It changes only how prose is written: the
 # structured fields, their names and values, and the source-linking rules stay as they are.
-_PLAIN_WORDING = (
-    "Write so the person who asked can read it at once, in short plain sentences. For a Korean "
-    "question write easy Korean. Keep the technical terms, units and standard abbreviations "
-    "that appear in the user's own material (for example SNR, RCS, CFAR, dB) exactly as they "
-    "are. Do not use program-internal codes, field names, variable names or made-up ids in "
-    "prose; say conditions in words (write '탐지율 0.90 이상', not 'detection_rate >= 0.90 "
-    "ratio') and use Korean words for internal terms such as sandbox-owner or gap. Write the "
-    "FACT/UNKNOWN labels as '사실' and '확인 불가'."
-)

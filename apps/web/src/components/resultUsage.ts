@@ -1,18 +1,21 @@
+import { t } from "../i18n/locale";
+import { message as formatMessage } from "../i18n/formatMessages";
+import { getLocale } from "../i18n/locale";
 import type { ResearchStatus } from "../api/research";
 
-const none = "이 결과의 사용량 기록 없음";
+const noUsage = () => t("usage.none");
 
 function minutes(ms: number): string {
-  return ms < 60_000 ? "1분 미만" : `${Math.round(ms / 60_000)}분`;
+  return ms < 60_000 ? t("usage.lessMinute") : formatMessage("minutes", Math.round(ms / 60_000));
 }
 
 /** Wall-clock time when the server recorded a start and an end; else the model time summed over this attempt's stages. */
 function timeText(status: ResearchStatus, operationId: string, wallMs: number | null | undefined): string {
-  if (typeof wallMs === "number" && wallMs >= 0) return `걸린 시간 ${minutes(wallMs)}`;
+  if (typeof wallMs === "number" && wallMs >= 0) return formatMessage("elapsedTime", minutes(wallMs));
   // Stage times belong to the attempt the status describes, so they only stand in for that operation.
   const stages = status.request?.operation_id === operationId
     ? (status.completed_stages ?? []).map(stage => stage.elapsed_ms).filter((value): value is number => typeof value === "number" && value >= 0) : [];
-  return stages.length ? `모델 처리 시간 합 ${minutes(stages.reduce((sum, value) => sum + value, 0))}` : "시간 미확인";
+  return stages.length ? formatMessage("modelTime", minutes(stages.reduce((sum, value) => sum + value, 0))) : t("usage.timeUnknown");
 }
 
 /**
@@ -21,15 +24,15 @@ function timeText(status: ResearchStatus, operationId: string, wallMs: number | 
  */
 export function resultUsageLine(status: ResearchStatus | undefined, operationId: string | undefined): string {
   const usage = operationId ? status?.result_usage?.[operationId] : undefined;
-  if (!status || !operationId || !usage) return none;
-  const tokens = usage.total_tokens == null ? "미확인" : usage.total_tokens.toLocaleString() + (usage.state === "PARTIAL" ? " (부분 관측)" : "");
+  if (!status || !operationId || !usage) return noUsage();
+  const tokens = usage.total_tokens == null ? t("state.unknown") : usage.total_tokens.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR") + (usage.state === "PARTIAL" ? t("workspace.partialUsage") : "");
   // The stage counts and the retry count describe what this run did; they are never shown for another result.
   const reuse = status.request?.operation_id === operationId ? status.stage_reuse : undefined;
-  const reused = reuse && reuse.reused > 0 ? ` · 완료된 ${reuse.reused}단계 재사용 · 새로 부른 단계 ${reuse.new}` : "";
-  const retried = usage.auto_retries ? ` · 자동 재시도 ${usage.auto_retries}회(연결 끊김)` : "";
+  const reused = reuse && reuse.reused > 0 ? formatMessage("reusedStages", reuse.reused, reuse.new) : "";
+  const retried = usage.auto_retries ? formatMessage("autoRetries", usage.auto_retries) : "";
   // The totals already include these calls; the share is shown so it is not a hidden cost.
-  const apart = Object.values(usage.by_purpose ?? {})
-    .map(part => ` · 그중 ${part.label} ${part.total_tokens == null ? "토큰 미확인" : `토큰 ${part.total_tokens.toLocaleString()}`}`).join("");
-  return `이 조사: 토큰 ${tokens} · ${timeText(status, operationId, usage.wall_ms)}${reused}${retried}${apart} · 추정 비용 미확인`;
+  const apart = Object.entries(usage.by_purpose ?? {})
+    .map(([purpose, part]) => formatMessage("usagePart", purpose === "MEMORY_QUERY_EXPANSION" ? t("usage.memoryExpansion") : part.label, part.total_tokens == null ? null : part.total_tokens.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR"))).join("");
+  return formatMessage("resultUsage", tokens, timeText(status, operationId, usage.wall_ms), reused, retried, apart);
 }
 

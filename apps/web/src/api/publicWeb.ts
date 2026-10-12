@@ -1,3 +1,4 @@
+import { t } from "../i18n/locale";
 import { z } from "zod";
 
 export const publicWebExecutionSchema = z.object({
@@ -50,11 +51,11 @@ export function parsePublicWebUpdate(input: unknown) {
 }
 
 export function executionLabel(state: string, reasons: string[] = []): string {
-  if (state === "READY") return "실행: 준비됨";
-  if (state === "OFF") return "실행: 꺼짐";
-  if (reasons.includes("PUBLIC_WEB_POLICY_INCONSISTENT")) return "실행: 권한 불일치";
-  if (reasons.includes("PUBLIC_WEB_GRANT_MISMATCH")) return "실행: grant 불일치";
-  if (reasons.includes("PUBLIC_WEB_CONNECTOR_UNAVAILABLE")) return "실행: 구현 없음";
-  if (reasons.includes("PUBLIC_WEB_CONSENT_REQUIRED")) return "실행: 워크스페이스 미허용";
-  return "실행: 제한됨";
+  if (state === "READY") return t("web.execution.ready");
+  if (state === "OFF") return t("web.execution.off");
+  if (reasons.includes("PUBLIC_WEB_POLICY_INCONSISTENT")) return t("web.execution.policy");
+  if (reasons.includes("PUBLIC_WEB_GRANT_MISMATCH")) return t("web.execution.grant");
+  if (reasons.includes("PUBLIC_WEB_CONNECTOR_UNAVAILABLE")) return t("web.execution.unavailable");
+  if (reasons.includes("PUBLIC_WEB_CONSENT_REQUIRED")) return t("web.execution.consent");
+  return t("web.execution.blocked");
 }

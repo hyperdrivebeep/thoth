@@ -1,0 +1,92 @@
+{
+  "$defs": {
+    "DroppedExpectation": {
+      "additionalProperties": false,
+      "description": "An item of the generator's output that was not kept, and why; the rest of the output stands.\n\nAn expected-result row names its test (`test_id`); a refutation condition has no test, so its\n`test_id` is empty and its original `text` is kept so the drop can be audited.",
+      "properties": {
+        "hypothesis_id": {
+          "title": "Hypothesis Id",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "test_id": {
+          "title": "Test Id",
+          "type": "string"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        }
+      },
+      "required": [
+        "test_id",
+        "hypothesis_id",
+        "reason"
+      ],
+      "title": "DroppedExpectation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "check": {
+      "const": "HANGUL_OUTSIDE_PROTECTED_TEXT",
+      "default": "HANGUL_OUTSIDE_PROTECTED_TEXT",
+      "title": "Check",
+      "type": "string"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/DroppedExpectation"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "flagged_items": {
+      "minimum": 0,
+      "title": "Flagged Items",
+      "type": "integer"
+    },
+    "hypotheses_checked": {
+      "minimum": 0,
+      "title": "Hypotheses Checked",
+      "type": "integer"
+    },
+    "response_language": {
+      "const": "en",
+      "default": "en",
+      "title": "Response Language",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "const": "GENERATED_HYPOTHESIS_PROSE",
+      "default": "GENERATED_HYPOTHESIS_PROSE",
+      "title": "Scope",
+      "type": "string"
+    }
+  },
+  "required": [
+    "flagged_items",
+    "hypotheses_checked",
+    "findings"
+  ],
+  "title": "HypothesisLanguageCheck",
+  "type": "object"
+}

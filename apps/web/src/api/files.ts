@@ -1,3 +1,4 @@
+import { message as formatMessage } from "../i18n/formatMessages";
 export type StagedFile = {
   relative_path: string;
   filename: string;
@@ -13,7 +14,7 @@ export async function stageFile(file: File, projectId: string): Promise<StagedFi
     headers: { "x-thoth-project-id": projectId } });
   if (!response.ok) {
     const detail = (await response.json().catch(() => null)) as { detail?: string } | null;
-    throw new Error(detail?.detail ?? `파일 준비 실패 (${response.status})`);
+    throw new Error(detail?.detail ?? formatMessage("filePrepareFailed", response.status));
   }
   return (await response.json()) as StagedFile;
 }

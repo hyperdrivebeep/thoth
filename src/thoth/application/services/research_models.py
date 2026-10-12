@@ -5,6 +5,7 @@ from dataclasses import replace
 from pydantic import BaseModel
 
 from thoth.application.services.model_wait import await_current_model
+from thoth.application.services.request_language import model_request_language
 from thoth.domain.model import ModelRequest, ModelResult
 from thoth.domain.model_dispatch import ModelCallContext
 from thoth.domain.research_execution import ResearchUsageObserver, model_call, research_work
@@ -19,7 +20,14 @@ class ResearchModel:
     async def structured[T: BaseModel](self, request: ModelRequest[T]) -> ModelResult[T]:
         work = research_work.get()
         if work is not None:
-            request = replace(request, model_settings=work.model_settings)
+            request = model_request_language(
+                replace(
+                    request,
+                    model_settings=work.model_settings,
+                    response_language=work.response_language,
+                ),
+                work.response_language,
+            )
             if isinstance(work.boundary, ResearchUsageObserver):
                 usage = work.boundary.usage_observation()
                 request = replace(

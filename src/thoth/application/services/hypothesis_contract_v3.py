@@ -12,6 +12,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TypedDict
 
+from thoth.application.services.english_prose import EnglishProseCheck, hypothesis_english_flags
 from thoth.application.services.text_script import (
     HAN,
     HANGUL,
@@ -32,6 +33,14 @@ from thoth.domain.hypothesis import (
     HypothesisPortfolioV3,
     HypothesisV3,
 )
+from thoth.domain.hypothesis_v4 import (
+    CONTRACT_V4,
+    ExpectedResultV4,
+    HypothesisPortfolioV4,
+    expected_is_unknown,
+)
+from thoth.domain.model import ContextPack
+from thoth.domain.research_execution import research_work
 from thoth.domain.research_projection import DroppedExpectation, ExpectedByTest
 
 CONTRACT_V2 = "hypothesis_portfolio.v2"
@@ -59,8 +68,20 @@ class GeneratorContract(TypedDict):
     prompt_version: str
 
 
-def generator_contract(v3: bool) -> GeneratorContract:
+def generator_contract_for_work() -> GeneratorContract:
+    from thoth.domain.research_execution import research_work
+
+    work = research_work.get()
+    return generator_contract(
+        work is not None and work.hypothesis_contract_v3,
+        None if work is None else work.response_language,
+    )
+
+
+def generator_contract(v3: bool, response_language: str | None = None) -> GeneratorContract:
     """The form and contract version for the generator call; v2 exactly as it always was."""
+    if v3 and response_language is not None:
+        return {"output_model": HypothesisPortfolioV4, "prompt_version": CONTRACT_V4}
     if v3:
         return {"output_model": HypothesisPortfolioV3, "prompt_version": CONTRACT_V3}
     return {"output_model": HypothesisPortfolio, "prompt_version": CONTRACT_V2}
@@ -191,6 +212,12 @@ def _visible_text(
     return updates, records
 
 
+def _mapped_row(row: ExpectedResult | ExpectedResultV4, change: Callable[[str], str]):
+    return (
+        row if row.expected is None else row.model_copy(update={"expected": change(row.expected)})
+    )
+
+
 def _map_texts(hypothesis: HypothesisV3, change: Callable[[str], str]) -> HypothesisV3:
     """The hypothesis with every readable text passed through change (ids and numbers untouched)."""
     tests = tuple(
@@ -200,8 +227,7 @@ def _map_texts(hypothesis: HypothesisV3, change: Callable[[str], str]) -> Hypoth
                 "expected_if_true": change(test.expected_if_true),
                 "expected_if_alternative": change(test.expected_if_alternative),
                 "expected_by_hypothesis": tuple(
-                    row.model_copy(update={"expected": change(row.expected)})
-                    for row in test.expected_by_hypothesis
+                    _mapped_row(row, change) for row in test.expected_by_hypothesis
                 ),
             }
         )
@@ -244,9 +270,11 @@ def _settle_one(
     known_spans: set[str],
     problem: str = "",
     quotes: Quotes | None = None,
+    english: EnglishProseCheck | None = None,
 ) -> _Settled:
     quotes = quotes or Quotes(problem, list)
-    hypothesis = _with_korean_dots(hypothesis, problem, quotes)
+    if english is None:
+        hypothesis = _with_korean_dots(hypothesis, problem, quotes)
     dropped: list[DroppedExpectation] = []
     tests: list[DiscriminatingTestV3] = []
     for test in hypothesis.discriminating_tests:
@@ -261,7 +289,11 @@ def _settle_one(
                 if not set(row.basis) <= known_spans
                 else None
             )
-            wrong_language = language_problem(row.expected, problem)
+            wrong_language = (
+                None
+                if english is not None or expected_is_unknown(row)
+                else language_problem(row.expected, problem)
+            )
             if reason is None and wrong_language is not None:
                 reason = f"EXPECTED_{wrong_language}_MISMATCH"
             if reason is None:
@@ -276,10 +308,13 @@ def _settle_one(
                     )
                 )
         tests.append(test.model_copy(update={"expected_by_hypothesis": tuple(kept)}))
-    conditions, language_drops = _refutation_language(hypothesis, problem)
-    dropped.extend(language_drops)
-    visible, visible_records = _visible_text(hypothesis, problem, quotes)
-    dropped.extend(visible_records)
+    conditions = hypothesis.refutation_conditions
+    visible: dict[str, tuple[str, ...]] = {}
+    if english is None:
+        conditions, language_drops = _refutation_language(hypothesis, problem)
+        dropped.extend(language_drops)
+        visible, visible_records = _visible_text(hypothesis, problem, quotes)
+        dropped.extend(visible_records)
     settled = hypothesis.model_copy(
         update={
             "discriminating_tests": tuple(tests),
@@ -287,11 +322,17 @@ def _settle_one(
             **visible,
         }
     )
+    if english is not None:
+        dropped.extend(hypothesis_english_flags(settled, english))
     return _Settled(settled, tuple(dropped))
 
 
 def settle_contract(
-    portfolio: HypothesisPortfolio, evidence: tuple[EvidenceSpan, ...], problem: str = ""
+    portfolio: HypothesisPortfolio,
+    evidence: tuple[EvidenceSpan, ...],
+    problem: str = "",
+    *,
+    context: ContextPack | None = None,
 ) -> HypothesisPortfolio:
     """Keep what a v3 output says correctly; v2 is untouched.
 
@@ -303,12 +344,33 @@ def settle_contract(
     """
     if not isinstance(portfolio, HypothesisPortfolioV3):
         return portfolio
+    from thoth.application.services.request_language import validation_problem
+
     known_hypotheses = {item.hypothesis_id for item in portfolio.hypotheses}
     known_spans = {span.span_id for span in evidence}
     quotes = Quotes(problem, lambda: (span.exact_text for span in evidence))
+    work = research_work.get()
+    identifiers = (
+        *known_hypotheses,
+        *known_spans,
+        portfolio.object_id,
+        *(
+            test.test_id
+            for hypothesis in portfolio.hypotheses
+            for test in hypothesis.discriminating_tests
+        ),
+    )
+    english = (
+        EnglishProseCheck.build(problem, evidence, identifiers, context)
+        if work is not None and work.response_language == "en"
+        else None
+    )
+    guard_problem = validation_problem(problem)
     settled: list[HypothesisV3] = []
     for hypothesis in portfolio.hypotheses:
-        found = _settle_one(hypothesis, known_hypotheses, known_spans, problem, quotes)
+        found = _settle_one(
+            hypothesis, known_hypotheses, known_spans, guard_problem, quotes, english
+        )
         found.hypothesis.note_dropped(found.dropped)
         settled.append(found.hypothesis)
     return portfolio.model_copy(update={"hypotheses": tuple(settled)})

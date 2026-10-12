@@ -1,3 +1,4 @@
+import { traceReasonText } from "../i18n/traceReasonResources";
 import type { TraceView, Verdict } from "../api/trace";
 
 /**
@@ -13,18 +14,7 @@ export type ReasonTagId =
 
 export type ReasonTag = { id: ReasonTagId; label: string; hint: string };
 
-export const REASON_TAG_TEXT: Record<ReasonTagId, { label: string; hint: string }> = {
-  UNTESTED: { label: "미시험", hint: "이 기준에 연결된 시험은 있지만 아직 결과가 없습니다." },
-  UNLINKED: { label: "미연결", hint: "이 기준에 연결된 시험이 없어 결과가 들어올 곳이 없습니다." },
-  UNIT: { label: "단위 오류", hint: "결과의 단위가 기준의 단위와 달라 비교하지 않았습니다." },
-  DENOMINATOR: { label: "분모 오류", hint: "결과의 분모가 0 이하이거나, 값이 분자·분모로 계산한 값과 달라 비교하지 않았습니다." },
-  VALUE: { label: "값 오류", hint: "결과의 값이 비었거나 숫자가 아니거나 너무 커서 비교하지 않았습니다." },
-  CONDITION_MISMATCH: { label: "조건 불일치", hint: "결과는 있지만 기준의 조건과 달라 쓰지 않았습니다." },
-  NO_RULE: { label: "규칙 없음", hint: "이 기준에는 판정 규칙이 없어 비교하지 않았습니다." },
-  VALID_MISS: { label: "유효한 미달", hint: "결과를 비교할 수 있었고 기준에 못 미쳤습니다." },
-  REQUIRED_INCOMPLETE: { label: "필수 기준 미완료", hint: "필수 기준이 없거나, 필수 기준 중 아직 충족이나 미달이 정해지지 않은 것이 있습니다." },
-  BASIS_CHANGED: { label: "근거 변경", hint: "이 판정이 기댄 규칙·결과·연결이 바뀌어 다시 계산해야 합니다." },
-};
+export const REASON_TAG_TEXT = traceReasonText;
 
 const ORDER: ReasonTagId[] = [
   "UNTESTED", "UNLINKED", "CONDITION_MISMATCH", "NO_RULE", "UNIT", "DENOMINATOR", "VALUE", "VALID_MISS", "REQUIRED_INCOMPLETE", "BASIS_CHANGED",

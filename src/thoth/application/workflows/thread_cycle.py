@@ -22,7 +22,7 @@ from thoth.application.services.full_project_memory import (
     FullMemoryPromotionResult,
     FullProjectMemoryService,
 )
-from thoth.application.services.hypothesis_contract_v3 import generator_contract
+from thoth.application.services.hypothesis_contract_v3 import generator_contract_for_work
 from thoth.application.services.hypothesis_table_filler import accepted_portfolio
 from thoth.application.services.memory_relation_resolver import MemoryRelationBudget
 from thoth.application.services.research_commit_scope import ReadScope, read_scope
@@ -210,7 +210,7 @@ class ThreadCycleService:
                 project_id=command.project_id,
                 cutoff_at=command.cutoff_at,
                 context_pack=context,
-                **generator_contract(work is not None and work.hypothesis_contract_v3),
+                **generator_contract_for_work(),
                 model_policy_ref=command.model_policy_ref,
                 max_output_tokens=4_000,
             )

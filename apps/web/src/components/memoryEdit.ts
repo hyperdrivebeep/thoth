@@ -1,3 +1,6 @@
+import { message as formatMessage } from "../i18n/formatMessages";
+import { messages } from "../i18n/messages";
+import { t } from "../i18n/locale";
 import { RpcError } from "../api/rpcClient";
 
 export type MemoryRevision = {
@@ -5,8 +8,8 @@ export type MemoryRevision = {
   summary: string; assertion: string | null; source_ref: string | null; evidence_count: number; evidence_refs: string[]; transition: string; support_status: string;
   authority_status: string; cutoff_valid: boolean; is_latest: boolean; not_recalled_because: string | null; created_at: string;
 };
-export const researchRunningNotice = "조사가 끝난 뒤 제안할 수 있습니다";
-export const staleBasisNotice = "원래 근거가 바뀌었습니다";
+export const researchRunningNotice = messages["memoryEdit.afterRun"].ko;
+export const staleBasisNotice = messages["memoryEdit.basisChanged"].ko;
 
 /** The record the memory stands on has changed, so a correction would rest on an outdated basis. */
 export const hasStaleBasis = (memory: MemoryRevision) =>
@@ -25,15 +28,15 @@ export type MemoryEditSubmission = { text: string; reason: string; evidenceRefs:
 
 /** What each review result means for the user, in one line. */
 export const memoryEditOutcomeLines: Record<string, string> = {
-  COMMIT: "다음 조사부터 원래 기억 대신 이 정정을 불러올 수 있습니다.",
-  REVISE: "내용이 짧거나 구체적이지 않습니다.",
-  HOLD: "관계가 불분명해 보류했습니다.",
-  QUARANTINE: "명령문이나 비밀값으로 보이는 내용이 있어 저장만 하고 쓰지 않습니다.",
+  get COMMIT() { return t("memoryEdit.applied"); },
+  get REVISE() { return t("memoryEdit.tooVague"); },
+  get HOLD() { return t("memoryEdit.ambiguous"); },
+  get QUARANTINE() { return t("memoryEdit.quarantined"); },
 };
 
 /** A held correction says which kind of hold it is: an unclear relation, or a different value for the same record. */
 export function memoryEditOutcomeLine(transition: string, supportStatus?: string): string {
-  if (transition === "HOLD" && supportStatus === "CONFLICTING") return "같은 기록의 값이 이미 반영된 기억과 달라 보류했습니다.";
+  if (transition === "HOLD" && supportStatus === "CONFLICTING") return t("memoryEdit.conflict");
   return memoryEditOutcomeLines[transition] ?? "";
 }
 
@@ -43,8 +46,8 @@ export const isUserCorrection = (memory: MemoryRevision) => memory.source_ref?.s
 export type EditFailure = { message: string; stale: boolean };
 export function describeEditFailure(error: unknown): EditFailure {
   const text = error instanceof RpcError ? error.message : "";
-  if (text.includes("MEMORY_EDIT_TARGET_STALE")) return { message: staleBasisNotice + ". 목록을 다시 읽었습니다.", stale: true };
-  if (text.includes("MEMORY_EDIT_TARGET_SUPERSEDED")) return { message: "이 기억은 이미 더 새로운 정정으로 대체되었습니다. 목록을 다시 읽었습니다.", stale: true };
-  if (text.includes("MEMORY_EDIT_TARGET_NOT_FOUND")) return { message: "이 기억을 찾지 못했습니다. 목록을 다시 읽었습니다.", stale: true };
-  return { message: "수정 제안을 보내지 못했습니다. 잠시 뒤 다시 시도해 주세요.", stale: false };
+  if (text.includes("MEMORY_EDIT_TARGET_STALE")) return { message: formatMessage("refreshedNotice", t("memoryEdit.basisChanged")), stale: true };
+  if (text.includes("MEMORY_EDIT_TARGET_SUPERSEDED")) return { get message() { return t("memoryEdit.superseded"); }, stale: true };
+  if (text.includes("MEMORY_EDIT_TARGET_NOT_FOUND")) return { get message() { return t("memoryEdit.missing"); }, stale: true };
+  return { get message() { return t("memoryEdit.failed"); }, stale: false };
 }

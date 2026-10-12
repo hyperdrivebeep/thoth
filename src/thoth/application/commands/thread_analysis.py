@@ -48,6 +48,7 @@ from thoth.domain.enums import (
 )
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.hypothesis import HypothesisPortfolio, is_v3, portfolio_from_json
+from thoth.domain.hypothesis_v4 import HypothesisPortfolioV4
 from thoth.domain.improvement import RecursiveImprovementResult
 from thoth.domain.memory_preparation import FullMemoryPromotionResult
 from thoth.domain.post_execution_learning import PostExecutionLearningResult
@@ -328,9 +329,7 @@ class ThreadAnalysisCommandHandlers:
         finally:
             self._finish_execution(request, running, work)
         payload = cycle_result_payload(outcome.result, work)
-        payload["selected_evidence_refs"] = [
-            span.span_id for span in outcome.selected_evidence
-        ]
+        payload["selected_evidence_refs"] = [span.span_id for span in outcome.selected_evidence]
         payload["selected_evidence_count"] = len(outcome.selected_evidence)
         payload["autonomous_acquisition"] = outcome.acquisition_projection
         payload["critical_counter_search"] = outcome.critical_counter_projection
@@ -393,9 +392,7 @@ class ThreadAnalysisCommandHandlers:
                 role="thread-cycle-runner",
                 project_id=request.project_id,
                 session_id=None if initiator is None else initiator.session_id,
-                role_assignment_ref=(
-                    None if initiator is None else initiator.role_assignment_id
-                ),
+                role_assignment_ref=(None if initiator is None else initiator.role_assignment_id),
             ),
             policy_version=project.policy_binding_ref,
             model_policy_ref=f"model-policy:{request.provider}-v1",
@@ -438,9 +435,7 @@ class ThreadAnalysisCommandHandlers:
                     evidence=refreshed_evidence,
                 ).selected
                 result = await cycle.execute(
-                    replace(
-                        cycle_command, evidence=selected_evidence, expected_head_overrides={}
-                    )
+                    replace(cycle_command, evidence=selected_evidence, expected_head_overrides={})
                 )
                 if result.commit.disposition == CommitDisposition.BRANCH:
                     return ThreadCycleBranchResult(
@@ -460,7 +455,13 @@ class ThreadAnalysisCommandHandlers:
             final = critical_counter.projection.get("portfolio")
             if isinstance(final, dict):
                 result = result.model_copy(
-                    update={"portfolio": portfolio_from_json(final, v3=is_v3(result.portfolio))}
+                    update={
+                        "portfolio": portfolio_from_json(
+                            final,
+                            v3=is_v3(result.portfolio),
+                            v4=isinstance(result.portfolio, HypothesisPortfolioV4),
+                        )
+                    }
                 )
         check_research_boundary()
         r2_execution = await self._execute_r2(
@@ -509,9 +510,7 @@ class ThreadAnalysisCommandHandlers:
         self._record_cycle_lineage(
             request, result, selected_evidence, r2_closed_loop_projection, work
         )
-        self._thread_runtime.mark_inputs_consumed(
-            tuple(item.input_id for item in pending_inputs)
-        )
+        self._thread_runtime.mark_inputs_consumed(tuple(item.input_id for item in pending_inputs))
         return _CycleExecution(
             result=result,
             selected_evidence=selected_evidence,

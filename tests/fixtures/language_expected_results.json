@@ -1,0 +1,12 @@
+[
+  {"name":"legacy_unknown","row":{"hypothesis_id":"h","expected":"모름","basis":[]},"server":true,"web":true,"annotation":true},
+  {"name":"legacy_whitespace","row":{"hypothesis_id":"h","expected":" \t모름\n ","basis":["span:1"]},"server":true,"web":true,"annotation":true},
+  {"name":"legacy_internal_space","row":{"hypothesis_id":"h","expected":"모  름","basis":[]},"server":false,"web":false,"annotation":false},
+  {"name":"legacy_english_upper","row":{"hypothesis_id":"h","expected":"UNKNOWN","basis":[]},"server":false,"web":false,"annotation":false},
+  {"name":"legacy_english_lower","row":{"hypothesis_id":"h","expected":"unknown","basis":[]},"server":false,"web":false,"annotation":false},
+  {"name":"legacy_na","row":{"hypothesis_id":"h","expected":"N/A","basis":[]},"server":false,"web":false,"annotation":false},
+  {"name":"legacy_other_korean","row":{"hypothesis_id":"h","expected":"미정","basis":[]},"server":false,"web":false,"annotation":false},
+  {"name":"legacy_bom_difference","row":{"hypothesis_id":"h","expected":"﻿모름","basis":[]},"server":false,"web":true,"annotation":true},
+  {"name":"typed_unknown_with_basis","row":{"hypothesis_id":"h","knowledge_state":"UNKNOWN","expected":null,"basis":["span:1"]},"server":true,"web":true,"annotation":true},
+  {"name":"typed_literal_prediction","row":{"hypothesis_id":"h","knowledge_state":"PREDICTED","expected":"모름","basis":[]},"server":false,"web":false,"annotation":false}
+]

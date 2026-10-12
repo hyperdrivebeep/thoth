@@ -3,6 +3,11 @@ from __future__ import annotations
 from pydantic import AwareDatetime, Field, model_validator
 
 from thoth.domain.base import DomainModel
+from thoth.domain.hypothesis_record_versions import validate_hypothesis_record_version
+from thoth.domain.hypothesis_v4_projection import (
+    HypothesisGenerationDetailsV4,
+    PortfolioGenerationDetailsV4,
+)
 from thoth.domain.ids import ProjectId, Sha256
 from thoth.domain.research_projection import HypothesisGenerationDetails, PortfolioGenerationDetails
 from thoth.domain.test_validity import Prespecification, ResearchMeasurementContract
@@ -40,10 +45,15 @@ class HypothesisRecord(DomainModel):
     supersedes_revision_digest: Sha256 | None = None
     receipt_ref: str | None = None
     created_at: AwareDatetime
-    generation_details: HypothesisGenerationDetails | None = None
+    generation_details: HypothesisGenerationDetailsV4 | HypothesisGenerationDetails | None = None
     # The trace verdict this hypothesis was investigated from; absent on any other hypothesis.
     verdict_link: VerdictLink | None = None
     schema_version: str = "1.0.0"
+
+    @model_validator(mode="before")
+    @classmethod
+    def select_codec(cls, value: object) -> object:
+        return validate_hypothesis_record_version(value)
 
     @model_validator(mode="after")
     def enforce_stage_and_appraisal_separation(self) -> HypothesisRecord:
@@ -76,8 +86,13 @@ class HypothesisPortfolioRecord(DomainModel):
     supersedes_revision_digest: Sha256 | None = None
     receipt_ref: str | None = None
     created_at: AwareDatetime
-    generation_details: PortfolioGenerationDetails | None = None
+    generation_details: PortfolioGenerationDetailsV4 | PortfolioGenerationDetails | None = None
     schema_version: str = "1.0.0"
+
+    @model_validator(mode="before")
+    @classmethod
+    def select_codec(cls, value: object) -> object:
+        return validate_hypothesis_record_version(value)
 
 
 class HypothesisRelationRecord(DomainModel):

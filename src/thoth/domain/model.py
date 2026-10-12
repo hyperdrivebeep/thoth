@@ -14,6 +14,7 @@ from thoth.domain.evidence import EvidenceSpan, InformationSufficiencyAssessment
 from thoth.domain.hypothesis import HypothesisPortfolio
 from thoth.domain.hypothesis_full import HypothesisPortfolioRecord, HypothesisRecord
 from thoth.domain.model_settings import ResolvedModelSettings
+from thoth.domain.response_language import ResponseLanguage
 from thoth.domain.test_validity import TestValidityAssessment
 
 
@@ -50,6 +51,7 @@ class ModelRequest[TModel: BaseModel]:
     model_policy_ref: str
     max_output_tokens: int
     model_settings: ResolvedModelSettings | None = None
+    response_language: ResponseLanguage | None = None
 
 
 @dataclass(frozen=True)

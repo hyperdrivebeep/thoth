@@ -8,7 +8,7 @@ from pydantic import JsonValue
 
 from thoth.application.services.request_records import RequestRecords
 from thoth.domain.enums import EntityType
-from thoth.domain.research_request import ThreadRequestRevision
+from thoth.domain.research_request import decode_thread_request
 from thoth.ports.resource_scope import ResourceAccessPort
 
 
@@ -38,7 +38,7 @@ def conversation_inputs(
         snapshot = records.ledger.read_snapshot(revision.snapshot_id)
         if snapshot is None:
             raise ValueError("CONVERSATION_REQUEST_SNAPSHOT_MISSING")
-        request = ThreadRequestRevision.model_validate(snapshot.content)
+        request = decode_thread_request(snapshot.content)
         if request.project_id != project or request.thread_id != thread:
             raise ValueError("CONVERSATION_REQUEST_SCOPE_MISMATCH")
         if request.parent_ref is not None and (

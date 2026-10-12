@@ -1,3 +1,4 @@
+import { message as formatMessage } from "../i18n/formatMessages";
 import { objectList, objectValue, stringValues, textValue } from "../api/presentation";
 import { reviewDecisions, type ReviewView } from "./hypothesisReview";
 
@@ -71,8 +72,8 @@ export function counterSearchLine(result: Record<string, unknown>): string | nul
   if (!rows.length) return null;
   const searched = rows.filter(row => row.counterTerminal);
   const total = rows.reduce((sum, row) => sum + row.counter.length, 0);
-  if (!searched.length) return `반대 근거 탐색: 안 함 · 반박 ${total > 0 ? total : "-"}`;
-  return `반대 근거 탐색: ${searched.length}/${rows.length}개 가설 · 반박 ${total}`;
+  if (!searched.length) return formatMessage("counterNotRun", total);
+  return formatMessage("counterCoverage", searched.length, rows.length, total);
 }
 
 /** A source the review cited for this hypothesis and judged "not supporting" is shown as not applicable; a source never looked at stays unevaluated. */

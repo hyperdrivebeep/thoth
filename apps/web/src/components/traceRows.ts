@@ -1,3 +1,5 @@
+import { t } from "../i18n/locale";
+import { message as formatMessage } from "../i18n/formatMessages";
 import type { TraceItem, TraceResult, TraceRule, TraceView, Verdict } from "../api/trace";
 
 export type CriterionRow = { item: TraceItem; rule: TraceRule | undefined; verdict: Verdict | undefined; chosen: TraceResult[] };
@@ -28,14 +30,14 @@ export function buildGroups(view: TraceView): RequirementGroup[] {
 export const titleOf = (view: TraceView) => (id: string) => view.items.find(item => item.item_id === id)?.title || id;
 
 export function ruleText(rule: TraceRule | undefined) {
-  if (!rule) return "판정 규칙 없음";
+  if (!rule) return t("trace.noRule");
   const unit = rule.unit ? ` (${rule.unit})` : "";
-  return `${rule.threshold} ${rule.comparator === ">=" ? "이상" : "이하"}${unit}${rule.required ? "" : " · 필수 아님"}`;
+  return formatMessage("ruleThreshold", String(rule.threshold), rule.comparator, unit, rule.required);
 }
 
 export function resultText(result: TraceResult) {
   const counts = result.numerator !== null && result.denominator !== null ? ` (${result.numerator}/${result.denominator})` : "";
-  const value = result.value ?? (result.raw_value ? `${result.raw_value}(숫자 아님)` : "값 없음");
+  const value = result.value ?? (result.raw_value ? formatMessage("notNumber", String(result.raw_value)) : t("trace.noValue"));
   return `${value}${result.unit ? ` ${result.unit}` : ""}${counts}`;
 }
 
