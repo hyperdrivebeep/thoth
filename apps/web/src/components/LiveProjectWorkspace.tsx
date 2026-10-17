@@ -30,6 +30,7 @@ import { ModelSettings } from "./ModelSettings";
 import { ProjectWebSetup } from "./ProjectWebSetup";
 import { RecordInspector } from "./RecordInspector";
 import { useResearchSession } from "./useResearchSession";
+import { useReadAccessProtection } from "./useReadAccessProtection";
 import { isHttpUrl, sourceCardHost, sourceCardTitle } from "../sourceDisplay";
 import { eyebrowLabel } from "./statusLabels";
 import { WorkspaceErrorBoundary } from "./WorkspaceErrorBoundary";
@@ -125,18 +126,24 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
   const clearConsentFocus = useCallback(() => setFocusConsent(false), []);
   const [catalogNamespace,setCatalogNamespace] = useState("all");
   const [detail,setDetail] = useState<ResearchDetail|null>(null);
+  const detailFromResearch = useRef(false);
+  useEffect(() => {
+    if (session.researchReadDenied && detailFromResearch.current) { detailFromResearch.current = false; setDetail(null); setPanelOpen(false); }
+  }, [session.researchReadDenied]);
   const [sideTab,setSideTab] = useState<SidePanelTab>("files");
   const [panelOpen,setPanelOpen] = useState(false);
   const [developerOpen,setDeveloperOpen] = useState(false);
   const [projectDetailsOpen,setProjectDetailsOpen] = useState(false);
   const [artifactDetailsId,setArtifactDetailsId] = useState("");
   const opener = useRef<HTMLElement|null>(null);
-  const openDetail = (value:ResearchDetail) => {opener.current=document.activeElement instanceof HTMLElement?document.activeElement:null;setDetail(value);setSideTab(value.kind==="actions"?"actions":value.kind==="hypotheses"?"hypotheses":value.kind==="history"||value.kind==="memory"?"history":value.kind==="evidence"?"evidence":sideTab);setPanelOpen(true);};
+  const openDetail = (value:ResearchDetail) => {detailFromResearch.current = value.result === session.research.data?.value.current_result?.result || value.result === session.research.data?.value.previous_result?.result;opener.current=document.activeElement instanceof HTMLElement?document.activeElement:null;setDetail(value);setSideTab(value.kind==="actions"?"actions":value.kind==="hypotheses"?"hypotheses":value.kind==="history"||value.kind==="memory"?"history":value.kind==="evidence"?"evidence":sideTab);setPanelOpen(true);};
   const closeDetail = () => {setDetail(null);setPanelOpen(false);opener.current?.focus();};
   const openResourcePanel = () => {opener.current=document.activeElement instanceof HTMLElement?document.activeElement:null;setDetail(null);setSideTab("files");setPanelOpen(true);};
   const capturedEpoch = epoch.current;
-  const citation=useCitationGate(project.project_id);
+  const citation=useCitationGate(project.project_id, session.isCurrentScope);
   const sources = useQuery({queryKey:["sources",project.project_id],queryFn:({signal})=>rpc<{artifacts:ConnectedArtifact[]; source_times?:Array<{artifact_id:string; source_version_id:string; byte_sha256:string; cutoff_state:string; revision:number; assessment_digest:string; metadata_digest?:string; reason_code:string; cutoff_at:string; mode:string}>; cutoff_basis?:{cutoff_at:string; project_revision:number}}>("project/source/list",{project_id:project.project_id},crypto.randomUUID(),signal)});
+  const sourcesDenied = useReadAccessProtection(["sources", project.project_id], sources.error);
+  const sourceData = sourcesDenied ? undefined : sources.data;
   const status = session.research.data?.value;
   const queryError = session.research.error ?? sources.error;
   if (readSuspended) return <section className="workspace-content conversation-page">
@@ -148,21 +155,21 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
     {page==="research" ? <div className={`conversation-layout ${panelOpen?"detail-open":""}`}><div className="conversation-center">
       <header className="conversation-heading"><h1>{status?.problem??(threadId?t("workspace.continue"):t("workspace.newQuestion"))}</h1></header>
       {import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Callout compact intent="warning" className="test-mode-banner">{t("workspace.testModeNotice")}</Callout>}
-      <div className="conversation-scroll"><ConversationTimeline projectId={project.project_id} threadId={threadId} status={status} sourceUris={(sources.data?.value.artifacts??[]).map(item=>item.source_uri)} onDetail={openDetail} queuedInstruction={session.queuedNotice} onContinue={()=>document.getElementById("live-problem")?.focus()} onRetry={question=>{session.setProblem(question);document.getElementById("live-problem")?.focus();}} onResume={operationId=>session.resume.mutate(operationId)} resuming={session.resume.isPending} onOpenHistory={()=>onPage("records")} onOpenTrace={onOpenTrace}/>
+      <div className="conversation-scroll"><ConversationTimeline projectId={project.project_id} threadId={threadId} status={status} sourceUris={(sourceData?.value.artifacts??[]).map(item=>item.source_uri)} onDetail={openDetail} queuedInstruction={session.queuedNotice} onContinue={()=>document.getElementById("live-problem")?.focus()} onRetry={question=>{session.setProblem(question);document.getElementById("live-problem")?.focus();}} onResume={operationId=>session.resume.mutate(operationId)} resuming={session.resume.isPending} onOpenHistory={()=>onPage("records")} onOpenTrace={onOpenTrace}/>
         {session.resume.error&&<Callout intent="danger" role="alert">{t("workspace.resumeFailed")} {session.resume.error.message}</Callout>}
-        {queryError&&<Callout intent="danger" role="alert">{queryError.message}<Button small onClick={()=>{void session.research.refetch();void sources.refetch();}}>{t("workspace.reload")}</Button></Callout>}
+        {(queryError || sourcesDenied || session.researchReadDenied)&&<Callout intent="danger" role="alert">{queryError?.message ?? t("workspace.accessFailed")}<Button small onClick={()=>{void session.research.refetch();void sources.refetch();}}>{t("workspace.reload")}</Button></Callout>}
       </div>
       <ResearchComposer session={session} projectId={project.project_id} threadId={threadId} epoch={capturedEpoch} onAttach={openResourcePanel}
         onOpenSettings={target=>{setFocusConsent(target==="consent");onPage("settings");}} hosted={hosted} executionReady={executionReady}
         consentMissing={!hosted && consent==="UNDECIDED"} modelConnected={modelConnected}/>
-    </div>{panelOpen&&<ResearchSidePanel tab={sideTab} onTab={setSideTab} detail={detail} onClose={closeDetail} sources={sources.data?.value.artifacts??[]} project={project} thread={{thread_id:threadId,problem:status?.problem??t("workspace.research"),current_object_ids:status?.current_object_ids??[]}} onOpenRecords={()=>onPage("records")} onManageResources={()=>{closeDetail();onPage("resources");}}/>}</div> :
+    </div>{panelOpen && !(session.researchReadDenied && detailFromResearch.current)&&<ResearchSidePanel tab={sideTab} onTab={setSideTab} detail={detail} onClose={closeDetail} sources={sourceData?.value.artifacts??[]} project={project} thread={{thread_id:threadId,problem:status?.problem??t("workspace.research"),current_object_ids:status?.current_object_ids??[]}} onOpenRecords={()=>onPage("records")} onManageResources={()=>{closeDetail();onPage("resources");}}/>}</div> :
     page==="capabilities" && !hosted ? <><Button minimal icon="arrow-left" onClick={()=>onPage("settings")}>{t("workspace.backSettings")}</Button><CapabilityWorkbench projectId={project.project_id} threadId={threadId} initialNamespace={catalogNamespace}/></> :
     page==="trace" ? <TracePage projectId={project.project_id} responseLanguage={session.responseLanguage} onInvestigate={onInvestigate} focusRow={traceFocus}/> : page==="records" ? <ResearchHistoryWorkspace key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId}
       onUseQuestion={session.problem.trim() ? undefined : question=>{session.setProblem(question);onPage("research");}}/> :
     page==="raw-records" && !hosted ? <><Button minimal icon="arrow-left" onClick={()=>onPage("settings")}>{t("workspace.backSettings")}</Button><DomainRecords key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId} operationId={status?.request?.operation_id} onOpenCatalog={namespace=>{setCatalogNamespace(namespace);onPage("capabilities");}}/></> :
     page==="resources" ? <><header className="workspace-heading"><div><h1>{t("workspace.resources")}</h1><p>{t("workspace.resourcesNotice")}</p></div><Button minimal icon="arrow-left" onClick={()=>onPage("research")}>{t("workspace.backConversation")}</Button></header><ProjectWebSetup projectId={project.project_id}/><FileConnectionPanel projectId={project.project_id} hosted={hosted}/><h2>{t("workspace.connectedSources")}</h2>
-      {citation.dialog}{citation.message&&<Callout compact>{citation.message}</Callout>}{(sources.data?.value.artifacts??[]).map(artifact=>{ const assessment=(sources.data?.value.source_times??[]).find(item=>item.artifact_id===artifact.artifact_id); const detailsOpen=artifactDetailsId===artifact.artifact_id; return <article className="detail-card" key={artifact.artifact_id}><h3>{isHttpUrl(artifact.source_uri)?<a href={artifact.source_uri} target="_blank" rel="noreferrer">{sourceCardTitle(artifact.source_uri)}</a>:sourceCardTitle(artifact.source_uri)}</h3>{sourceCardHost(artifact.source_uri)?<p>{sourceCardHost(artifact.source_uri)}</p>:null}<p>{artifact.media_type}</p><p>{cutoffLabel(assessment?.cutoff_state ?? artifact.cutoff_state ?? "UNKNOWN_TIME")}</p><Button small onClick={()=>void citation.ask(artifact.artifact_id)}>{t("workspace.cite")}</Button>{!hosted&&<SourceTimeAdvanced projectId={project.project_id} artifactId={artifact.artifact_id} assessment={assessment} cutoff={sources.data?.value.cutoff_basis}/>} {!hosted&&<><Button small minimal icon={detailsOpen?"chevron-up":"info-sign"} onClick={()=>setArtifactDetailsId(detailsOpen?"":artifact.artifact_id)} aria-expanded={detailsOpen}>{t("workspace.sourceDetails")}</Button><Collapse isOpen={detailsOpen}><RecordInspector value={artifact}/></Collapse></>}</article>})}
-      {sources.error&&<Callout intent="danger">{sources.error.message}</Callout>}
+      {citation.dialog}{citation.message&&<Callout compact>{citation.message}</Callout>}{(sourceData?.value.artifacts??[]).map(artifact=>{ const assessment=(sourceData?.value.source_times??[]).find(item=>item.artifact_id===artifact.artifact_id); const detailsOpen=artifactDetailsId===artifact.artifact_id; return <article className="detail-card" key={artifact.artifact_id}><h3>{isHttpUrl(artifact.source_uri)?<a href={artifact.source_uri} target="_blank" rel="noreferrer">{sourceCardTitle(artifact.source_uri)}</a>:sourceCardTitle(artifact.source_uri)}</h3>{sourceCardHost(artifact.source_uri)?<p>{sourceCardHost(artifact.source_uri)}</p>:null}<p>{artifact.media_type}</p><p>{cutoffLabel(assessment?.cutoff_state ?? artifact.cutoff_state ?? "UNKNOWN_TIME")}</p><Button small onClick={()=>void citation.ask(artifact.artifact_id)}>{t("workspace.cite")}</Button>{!hosted&&<SourceTimeAdvanced projectId={project.project_id} artifactId={artifact.artifact_id} assessment={assessment} cutoff={sourceData?.value.cutoff_basis}/>} {!hosted&&<><Button small minimal icon={detailsOpen?"chevron-up":"info-sign"} onClick={()=>setArtifactDetailsId(detailsOpen?"":artifact.artifact_id)} aria-expanded={detailsOpen}>{t("workspace.sourceDetails")}</Button><Collapse isOpen={detailsOpen}><RecordInspector value={artifact}/></Collapse></>}</article>})}
+      {(sources.error || sourcesDenied)&&<Callout intent="danger">{sources.error?.message ?? t("workspace.accessFailed")}</Callout>}
     </> : <><header className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel(hosted?"REVIEW WORKSPACE":"LOCAL WORKSPACE")}</p><h1>{hosted?t("workspace.operations"):t("workspace.settings")}</h1><p>{hosted?t("workspace.reviewInfo"):t("workspace.localToolsInfo")}</p></div></header>
       {hosted ? (
         <section className="detail-card"><h2>{t("workspace.reviewModel")}</h2><p>{t("workspace.operatorModel")}</p></section>

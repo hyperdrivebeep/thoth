@@ -1,0 +1,711 @@
+{
+  "ProjectInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "ProjectInput",
+    "type": "object"
+  },
+  "ListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "target_component": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Target Component"
+      },
+      "candidate_lifecycle": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Candidate Lifecycle"
+      },
+      "exposure_state": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Exposure State"
+      },
+      "promotion_state": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Promotion State"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "ListInput",
+    "type": "object"
+  },
+  "ImprovementReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "improvement_revision_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Improvement Revision Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      }
+    },
+    "required": [
+      "project_id",
+      "improvement_revision_id"
+    ],
+    "title": "ImprovementReadInput",
+    "type": "object"
+  },
+  "RecordReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "record_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Record Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "record_id"
+    ],
+    "title": "RecordReadInput",
+    "type": "object"
+  },
+  "ProposeInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "thread_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Thread Id"
+      },
+      "target_component": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Target Component",
+        "type": "string"
+      },
+      "scope_key": {
+        "maxLength": 500,
+        "minLength": 1,
+        "title": "Scope Key",
+        "type": "string"
+      },
+      "trigger_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Trigger Refs",
+        "type": "array"
+      },
+      "baseline_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Baseline Digest",
+        "type": "string"
+      },
+      "candidate_content": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Candidate Content",
+        "type": "object"
+      },
+      "improvement_hypothesis": {
+        "maxLength": 5000,
+        "minLength": 1,
+        "title": "Improvement Hypothesis",
+        "type": "string"
+      },
+      "evaluation_contract_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Evaluation Contract Ref",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "target_component",
+      "scope_key",
+      "trigger_refs",
+      "baseline_digest",
+      "candidate_content",
+      "improvement_hypothesis",
+      "evaluation_contract_ref"
+    ],
+    "title": "ProposeInput",
+    "type": "object"
+  },
+  "ReviseInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "improvement_revision_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Improvement Revision Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "patch": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Patch",
+        "type": "object"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "reason": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "improvement_revision_id",
+      "patch",
+      "evidence_refs",
+      "reason",
+      "expected_revision_digest"
+    ],
+    "title": "ReviseInput",
+    "type": "object"
+  },
+  "EvaluationPlanInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "improvement_revision_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Improvement Revision Id",
+        "type": "string"
+      },
+      "baseline_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Baseline Digest",
+        "type": "string"
+      },
+      "datasets": {
+        "items": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        "title": "Datasets",
+        "type": "array"
+      },
+      "evaluator_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evaluator Refs",
+        "type": "array"
+      },
+      "guardrails": {
+        "items": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        "title": "Guardrails",
+        "type": "array"
+      },
+      "exposure_policy_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Exposure Policy Ref",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "improvement_revision_id",
+      "baseline_digest",
+      "datasets",
+      "evaluator_refs",
+      "guardrails",
+      "exposure_policy_ref"
+    ],
+    "title": "EvaluationPlanInput",
+    "type": "object"
+  },
+  "EvaluationAssessInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "evaluation_plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Evaluation Plan Id",
+        "type": "string"
+      },
+      "result_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Result Refs",
+        "type": "array"
+      },
+      "evaluator_result_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evaluator Result Refs",
+        "type": "array"
+      },
+      "exposure_ledger_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Exposure Ledger Ref",
+        "type": "string"
+      },
+      "expected_evaluation_revision": {
+        "minimum": 1,
+        "title": "Expected Evaluation Revision",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "project_id",
+      "evaluation_plan_id",
+      "result_refs",
+      "evaluator_result_refs",
+      "exposure_ledger_ref",
+      "expected_evaluation_revision"
+    ],
+    "title": "EvaluationAssessInput",
+    "type": "object"
+  },
+  "ExposurePrepareInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "improvement_revision_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Improvement Revision Id",
+        "type": "string"
+      },
+      "requested_exposure_state": {
+        "pattern": "^(OFFLINE|SANDBOX|SHADOW|CANARY)$",
+        "title": "Requested Exposure State",
+        "type": "string"
+      },
+      "evaluation_plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Evaluation Plan Id",
+        "type": "string"
+      },
+      "scope": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "Scope",
+        "type": "object"
+      },
+      "duration_budget": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Duration Budget",
+        "type": "object"
+      },
+      "stop_rollback_contract": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Stop Rollback Contract",
+        "type": "object"
+      }
+    },
+    "required": [
+      "project_id",
+      "improvement_revision_id",
+      "requested_exposure_state",
+      "evaluation_plan_id",
+      "scope",
+      "duration_budget",
+      "stop_rollback_contract"
+    ],
+    "title": "ExposurePrepareInput",
+    "type": "object"
+  },
+  "PromotionPrepareInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "improvement_revision_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Improvement Revision Id",
+        "type": "string"
+      },
+      "assessment_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Assessment Refs",
+        "type": "array"
+      },
+      "candidate_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Candidate Digest",
+        "type": "string"
+      },
+      "baseline_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Baseline Digest",
+        "type": "string"
+      },
+      "target_scope": {
+        "maxLength": 500,
+        "minLength": 1,
+        "title": "Target Scope",
+        "type": "string"
+      },
+      "policy_version": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Policy Version",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "improvement_revision_id",
+      "assessment_refs",
+      "candidate_digest",
+      "baseline_digest",
+      "target_scope",
+      "policy_version"
+    ],
+    "title": "PromotionPrepareInput",
+    "type": "object"
+  },
+  "PromotionDecideInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "promotion_candidate_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Promotion Candidate Id",
+        "type": "string"
+      },
+      "decision": {
+        "pattern": "^(APPROVE|REJECT)$",
+        "title": "Decision",
+        "type": "string"
+      },
+      "actor_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Actor Ref",
+        "type": "string"
+      },
+      "role_assignment_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Role Assignment Ref",
+        "type": "string"
+      },
+      "approved_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Approved Digest",
+        "type": "string"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Reason"
+      }
+    },
+    "required": [
+      "project_id",
+      "promotion_candidate_id",
+      "decision",
+      "actor_ref",
+      "role_assignment_ref",
+      "approved_digest"
+    ],
+    "title": "PromotionDecideInput",
+    "type": "object"
+  },
+  "RollbackPrepareInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "promoted_revision_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Promoted Revision Ref",
+        "type": "string"
+      },
+      "guardrail_failure_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Guardrail Failure Refs",
+        "type": "array"
+      },
+      "rollback_target_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Rollback Target Digest",
+        "type": "string"
+      },
+      "target_scope": {
+        "maxLength": 500,
+        "minLength": 1,
+        "title": "Target Scope",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "promoted_revision_ref",
+      "guardrail_failure_refs",
+      "rollback_target_digest",
+      "target_scope"
+    ],
+    "title": "RollbackPrepareInput",
+    "type": "object"
+  },
+  "RetireInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "improvement_revision_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Improvement Revision Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "reason": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "improvement_revision_id",
+      "reason",
+      "evidence_refs",
+      "expected_revision_digest"
+    ],
+    "title": "RetireInput",
+    "type": "object"
+  }
+}

@@ -1,9 +1,11 @@
 import { message as formatMessage } from "../i18n/formatMessages";
 import { t } from "../i18n/locale";
 import { Button, Callout, Classes, Dialog, Radio, RadioGroup } from "@blueprintjs/core";
-import { useState } from "react";
-import { applyTraceImport, previewTraceImport, type ImportApplied, type ImportMode, type ImportPreview } from "../api/trace";
+import { useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { applyTraceImport, previewTraceImport, traceKey, type ImportApplied, type ImportMode, type ImportPreview } from "../api/trace";
 import { applyFailureText, issueText, lossText } from "./traceText";
+import { useDraftGeneration, type DraftTicket } from "./useDraftGeneration";
 
 const kindName: Record<string, string> = { get ITEM() { return t("traceImport.item"); }, get LINK() { return t("traceImport.link"); }, get RULE() { return t("traceImport.rule"); }, get RESULT() { return t("traceImport.result"); } };
 
@@ -27,39 +29,63 @@ function ChangeList({ heading, items }: { heading: string; items: { kind: string
 export function TraceImportDialog({ projectId, isOpen, hasTrace, onClose, onApplied }: {
   projectId: string; isOpen: boolean; hasTrace: boolean; onClose: () => void; onApplied: (result: ImportApplied) => void;
 }) {
+  const client = useQueryClient();
+  const ownership = useDraftGeneration(JSON.stringify([projectId, isOpen]));
   const [mode, setMode] = useState<ImportMode>(hasTrace ? "UPDATE" : "CREATE");
+  const modeRef = useRef(mode);
+  const previewVersion = useRef(0);
+  const readingFile = useRef(false);
   const [text, setText] = useState<string | null>(null);
   const [fileName, setFileName] = useState("");
   const [preview, setPreview] = useState<ImportPreview | null>(null);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<{ message: string; next: string } | null>(null);
-  const reset = () => { setText(null); setFileName(""); setPreview(null); setFailure(null); setBusy(false); };
+  const reset = () => { ownership.advance(); previewVersion.current += 1; readingFile.current = false; setText(null); setFileName(""); setPreview(null); setFailure(null); setBusy(false); };
   const close = () => { reset(); onClose(); };
-  const look = async (nextMode: ImportMode, csv: string | null) => {
+  const look = async (nextMode: ImportMode, csv: string | null, ticket: DraftTicket) => {
+    if (!ownership.isCurrent(ticket)) return;
+    const version = ++previewVersion.current;
+    const current = () => ownership.isCurrent(ticket) && previewVersion.current === version && modeRef.current === nextMode;
     setPreview(null); setFailure(null);
-    if (csv === null) return;
+    if (csv === null) { setBusy(readingFile.current); return; }
     setBusy(true);
-    try { setPreview(await previewTraceImport(projectId, nextMode, csv)); }
-    catch { setFailure({ get message() { return t("traceImport.failed"); }, get next() { return t("trace.apply.retry"); } }); }
-    finally { setBusy(false); }
+    try { const result = await previewTraceImport(projectId, nextMode, csv); if (current()) setPreview(result); }
+    catch { if (current()) setFailure({ get message() { return t("traceImport.failed"); }, get next() { return t("trace.apply.retry"); } }); }
+    finally { if (current()) setBusy(false); }
   };
   const choose = async (file: File | undefined) => {
     if (!file) return;
-    const csv = await readText(file);
-    setText(csv); setFileName(file.name);
-    await look(mode, csv);
+    ownership.advance();
+    previewVersion.current += 1;
+    const ticket = ownership.capture();
+    readingFile.current = true;
+    setText(null); setFileName(file.name); setPreview(null); setFailure(null); setBusy(true);
+    let csv: string;
+    try { csv = await readText(file); }
+    catch (error) { if (!ownership.isCurrent(ticket)) return; readingFile.current = false; setBusy(false); throw error; }
+    if (!ownership.isCurrent(ticket)) return;
+    readingFile.current = false;
+    setText(csv);
+    await look(modeRef.current, csv, ticket);
   };
   const apply = async () => {
     if (!preview || text === null) return;
+    const ticket = ownership.capture();
+    const version = previewVersion.current;
+    const current = () => ownership.isCurrent(ticket) && previewVersion.current === version;
     setBusy(true); setFailure(null);
-    try { const result = await applyTraceImport(projectId, mode, text, preview); reset(); onApplied(result); }
-    catch (error) { setFailure(applyFailureText(error)); setBusy(false); }
+    try {
+      const result = await applyTraceImport(projectId, mode, text, preview);
+      if (current()) { reset(); onApplied(result); }
+      else await client.invalidateQueries({ queryKey: traceKey(projectId) });
+    }
+    catch (error) { if (current()) { setFailure(applyFailureText(error)); setBusy(false); } }
   };
   const changes = preview?.changes;
   const total = changes ? changes.added.length + changes.updated.length + changes.deleted.length : 0;
   return <Dialog isOpen={isOpen} onClose={close} title={t("tracePage.import")} className="trace-import-dialog">
     <div className={Classes.DIALOG_BODY}>
-      <RadioGroup label={t("traceImport.mode")} selectedValue={mode} onChange={event => { const next = event.currentTarget.value as ImportMode; setMode(next); void look(next, text); }}>
+      <RadioGroup label={t("traceImport.mode")} selectedValue={mode} onChange={event => { const next = event.currentTarget.value as ImportMode; modeRef.current = next; setMode(next); void look(next, text, ownership.capture()); }}>
         <Radio value="CREATE" label={t("traceImport.create")}/>
         <Radio value="UPDATE" label={t("traceImport.update")}/>
       </RadioGroup>

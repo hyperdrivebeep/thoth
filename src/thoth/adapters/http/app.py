@@ -7,68 +7,44 @@ import time
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from hashlib import sha256
-from os import replace
 from pathlib import Path
 from typing import cast
-from uuid import uuid4
 
 import orjson
 from fastapi import FastAPI, File, HTTPException, Request, Response, UploadFile
 from pydantic import ValidationError
 
 from thoth import __version__
+from thoth.adapters.http.async_routes import (
+    cancel_async_operation,
+    mount_async_rpc_route,
+    mount_operation_routes,
+)
+from thoth.adapters.http.file_staging import stage_file_upload
 from thoth.adapters.http.hosted_review import (
     hosted_dispatch_gate_enabled,
-    hosted_internal_authorized,
     hosted_mode,
     hosted_request_session,
     hosted_transport_authorized,
     is_hosted_credential_method,
 )
-from thoth.apps.hosted_review_dispatch import SNAPSHOT_UNCOMMITTED, hosted_dispatch
-from thoth.apps.hosted_review_quota import (
-    HostedReviewLimits,
-    inbox_nbytes,
-    reject_if_upload_exceeds,
-)
+from thoth.adapters.http.internal_routes import mount_internal_routes
+from thoth.apps.hosted_review_dispatch import hosted_dispatch
 from thoth.apps.hosted_review_snapshot import (
-    export_workspace_archive,
     mark_workspace_live,
-    restore_workspace_archive,
-    snapshot_file_count,
-    sqlite_has_running,
-    sqlite_path,
-    workspace_is_live,
 )
 from thoth.apps.runtime import AppRuntime, create_runtime
 from thoth.domain.auth import AuthenticatedActorContext, authenticated_actor_scope
-from thoth.domain.upload_scope import project_upload_prefix
 from thoth.ports.auth import HttpAuthenticationPort
 from thoth.protocol.bus import CommandBus, DispatchTicket
 from thoth.protocol.jsonrpc import (
     JsonRpcError,
     JsonRpcRequest,
     JsonRpcResponse,
-    RpcApplicationError,
     RpcErrorCode,
 )
 from thoth.protocol.stdio import encode_response, handle_json_line
 
-MAX_UPLOAD_BYTES = 64 * 1024 * 1024
-MEDIA_TYPES = {
-    ".html": "text/html",
-    ".htm": "text/html",
-    ".csv": "text/csv",
-    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ".hwpx": "application/vnd.hancom.hwpx+zip",
-    ".json": "application/json",
-    ".md": "text/markdown",
-    ".pdf": "application/pdf",
-    ".txt": "text/plain",
-    ".yaml": "text/plain",
-    ".yml": "text/plain",
-    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-}
 LOCAL_ACTOR_ID = "human:local-user"
 _LOCAL_ACTOR_FIELDS = frozenset({"actor_id", "actor_or_agent_ref", "actor_ref"})
 _READ_ONLY_METHOD_MARKERS = ("/read", "/list", "/status", "/audit", "/history")
@@ -310,46 +286,14 @@ def create_app(
 
     _mount_async_rpc_route(application, auth, local_actor_id)
 
-    async def read_async_operation(
-        operation_id: str, project_id: str, bus: CommandBus
-    ) -> dict[str, object]:
-        # This route is installed below with a request-aware wrapper in hosted mode.
-        if auth is not None:
-            raise HTTPException(
-                status_code=403,
-                detail="authenticated operation read requires RPC operation/read",
-            )
-        operation = bus.read_operation(operation_id)
-        if operation is None or operation.project_id != project_id:
-            raise HTTPException(status_code=404, detail="operation was not found")
-        return operation.model_dump(mode="json")
-
-    async def read_async_operation_endpoint(
-        operation_id: str, project_id: str, request: Request
-    ) -> Response:
-        blocked = _hosted_transport_block(request)
-        if blocked is not None:
-            return blocked
-        active_bus = _resolve_bus_for_request(application, request)
-        payload = await read_async_operation(operation_id, project_id, active_bus)
-        return Response(content=orjson.dumps(payload), media_type="application/json")
-
-    application.add_api_route(
-        "/operations/{operation_id}",
-        read_async_operation_endpoint,
-        methods=["GET"],
-    )
-
-    async def cancel_async_operation(operation_id: str, request: Request) -> Response:
-        blocked = _hosted_transport_block(request)
-        if blocked is not None:
-            return blocked
-        return await _cancel_async_operation(application, auth, operation_id, request)
-
-    application.add_api_route(
-        "/operations/{operation_id}/cancel",
-        cancel_async_operation,
-        methods=["POST"],
+    mount_operation_routes(
+        application,
+        auth,
+        _hosted_transport_block=lambda request: _hosted_transport_block(request),
+        _resolve_bus_for_request=lambda app, request: _resolve_bus_for_request(app, request),
+        _cancel_async_operation=lambda app, auth, identifier, request: _cancel_async_operation(
+            app, auth, identifier, request
+        ),
     )
 
     async def stage_file(request: Request, file: UploadFile = File(...)) -> dict[str, object]:
@@ -368,168 +312,29 @@ def create_app(
 def _mount_async_rpc_route(
     application: FastAPI, auth: HttpAuthenticationPort | None, local_actor_id: str
 ) -> None:
-    async def rpc_async_endpoint(request: Request) -> Response:
-        try:
-            rpc_request = JsonRpcRequest.model_validate(orjson.loads(await request.body()))
-        except (orjson.JSONDecodeError, ValidationError) as exc:
-            raise HTTPException(status_code=400, detail="invalid JSON-RPC request") from exc
-        blocked = _hosted_credential_rpc_block_request(rpc_request)
-        if blocked is not None:
-            return blocked
-        if not hosted_transport_authorized(request):
-            blocked = _hosted_transport_denial(rpc_request.id)
-            assert blocked is not None
-            return blocked
-        active_bus = _resolve_bus_for_request(application, request)
-        authenticated: AuthenticatedActorContext | None
-        if auth is None:
-            authenticated = None
-            claimed = _claim_local_rpc(
-                rpc_request,
-                active_bus,
-                local_actor_id=local_actor_id,
-            )
-        else:
-            authentication = await _authenticate_rpc(auth, request, rpc_request)
-            if isinstance(authentication, Response):
-                return authentication
-            authenticated = authentication
-            with authenticated_actor_scope(authenticated):
-                claimed = active_bus.claim(rpc_request)
-        if isinstance(claimed, JsonRpcResponse):
-            return Response(content=encode_response(claimed), media_type="application/json")
-        assert isinstance(claimed, DispatchTicket)
-        if authenticated is None:
-            task = asyncio.create_task(active_bus.execute(claimed))
-        else:
-            with authenticated_actor_scope(authenticated):
-                task = asyncio.create_task(active_bus.execute(claimed))
-        tasks: dict[str, asyncio.Task[JsonRpcResponse]] = application.state.background_tasks
-        tasks[claimed.operation.operation_id] = task
+    def claim_local(
+        request: JsonRpcRequest, bus: CommandBus, *, local_actor_id: str
+    ) -> JsonRpcResponse | DispatchTicket:
+        return _claim_local_rpc(request, bus, local_actor_id=local_actor_id)
 
-        def forget(_task: asyncio.Task[JsonRpcResponse]) -> None:
-            tasks.pop(claimed.operation.operation_id, None)
-
-        task.add_done_callback(forget)
-        response = JsonRpcResponse(
-            id=rpc_request.id,
-            result={
-                "operation_id": claimed.operation.operation_id,
-                "state": "RUNNING",
-                "value": None,
-            },
-        )
-        return Response(content=encode_response(response), media_type="application/json")
-
-    application.add_api_route("/rpc/async", rpc_async_endpoint, methods=["POST"])
+    mount_async_rpc_route(
+        application,
+        auth,
+        local_actor_id,
+        _resolve_bus_for_request=lambda app, request: _resolve_bus_for_request(app, request),
+        _claim_local_rpc=claim_local,
+        _authenticate_rpc=lambda auth, request, rpc: _authenticate_rpc(auth, request, rpc),
+        _hosted_credential_rpc_block_request=lambda rpc: _hosted_credential_rpc_block_request(rpc),
+        _hosted_transport_denial=lambda request_id: _hosted_transport_denial(request_id),
+    )
 
 
 def _mount_internal_routes(application: FastAPI) -> None:
-    async def export_workspace(request: Request) -> Response:
-        if not hosted_internal_authorized(request):
-            raise HTTPException(status_code=404, detail="not found")
-        workspace = _workspace_path()
-        payload = export_workspace_archive(workspace)
-        running = sqlite_has_running(sqlite_path(workspace))
-        return Response(
-            content=payload,
-            media_type="application/gzip",
-            headers={
-                "x-thoth-research-running": "1" if running else "0",
-                "x-thoth-file-count": str(snapshot_file_count(workspace)),
-            },
-        )
-
-    async def restore_workspace(request: Request) -> Response:
-        if not hosted_internal_authorized(request):
-            raise HTTPException(status_code=404, detail="not found")
-        workspace = _workspace_path()
-        tasks: dict[str, asyncio.Task[JsonRpcResponse]] = application.state.background_tasks
-        if tasks or workspace_is_live(workspace):
-            return Response(
-                content=orjson.dumps({"skipped": True, "reason": "live-runtime"}),
-                media_type="application/json",
-            )
-        runtime: AppRuntime | None = application.state.runtime
-        if runtime is not None:
-            runtime.close()
-            application.state.runtime = None
-            application.state.bus = None
-        try:
-            restored = restore_workspace_archive(workspace, await request.body())
-        except ValueError as exc:
-            raise HTTPException(status_code=503, detail=str(exc)) from exc
-        mark_workspace_live(workspace)
-        return Response(content=orjson.dumps(restored), media_type="application/json")
-
-    async def release_dispatch(request: Request) -> Response:
-        if not hosted_internal_authorized(request):
-            raise HTTPException(status_code=404, detail="not found")
-        try:
-            payload: object = orjson.loads(await request.body())
-        except orjson.JSONDecodeError as exc:
-            raise HTTPException(status_code=400, detail="invalid JSON") from exc
-        operation_id = (
-            cast(dict[str, object], payload).get("operation_id")
-            if isinstance(payload, dict)
-            else None
-        )
-        if not isinstance(operation_id, str) or not operation_id.strip():
-            raise HTTPException(status_code=400, detail="operation_id is required")
-        hosted_dispatch.release(operation_id)
-        return Response(
-            content=orjson.dumps({"released": operation_id.strip()}),
-            media_type="application/json",
-        )
-
-    async def abort_dispatch(request: Request) -> Response:
-        if not hosted_internal_authorized(request):
-            raise HTTPException(status_code=404, detail="not found")
-        if (
-            not os.environ.get("THOTH_REVIEW_SESSION_ID", "").strip()
-            and not hosted_request_session(request)
-        ):
-            raise HTTPException(status_code=400, detail="x-thoth-review-session is required")
-        try:
-            payload: object = orjson.loads(await request.body())
-        except orjson.JSONDecodeError as exc:
-            raise HTTPException(status_code=400, detail="invalid JSON") from exc
-        operation_id = (
-            cast(dict[str, object], payload).get("operation_id")
-            if isinstance(payload, dict)
-            else None
-        )
-        if not isinstance(operation_id, str) or not operation_id.strip():
-            raise HTTPException(status_code=400, detail="operation_id is required")
-        identifier = operation_id.strip()
-        hosted_dispatch.abort(identifier)
-        bus = _resolve_bus_for_request(application, request)
-        failed = bus.fail_if_running(
-            identifier,
-            {
-                "code": int(RpcErrorCode.DOMAIN_REJECTED),
-                "message": SNAPSHOT_UNCOMMITTED,
-                "data": {
-                    "reason_code": SNAPSHOT_UNCOMMITTED,
-                    "remote_observation": "NOT_SENT",
-                    "pre_io": True,
-                },
-            },
-        )
-        return Response(
-            content=orjson.dumps(
-                {
-                    "aborted": identifier,
-                    "state": None if failed is None else failed.state.value,
-                }
-            ),
-            media_type="application/json",
-        )
-
-    application.add_api_route("/internal/workspace-export", export_workspace, methods=["GET"])
-    application.add_api_route("/internal/workspace-restore", restore_workspace, methods=["POST"])
-    application.add_api_route("/internal/dispatch-release", release_dispatch, methods=["POST"])
-    application.add_api_route("/internal/dispatch-abort", abort_dispatch, methods=["POST"])
+    mount_internal_routes(
+        application,
+        _workspace_path=lambda: _workspace_path(),
+        _resolve_bus_for_request=lambda app, request: _resolve_bus_for_request(app, request),
+    )
 
 def web_ui_dist() -> Path | None:
     raw = os.environ.get("THOTH_WEB_DIST")
@@ -558,56 +363,14 @@ async def _cancel_async_operation(
     operation_id: str,
     request: Request,
 ) -> Response:
-    body = cast(object, await request.json())
-    mapping = cast(dict[object, object], body) if isinstance(body, dict) else {}
-    project_id = mapping.get("project_id")
-    if not isinstance(project_id, str) or not project_id:
-        raise HTTPException(status_code=400, detail="project_id is required")
-    authenticated: AuthenticatedActorContext | None = None
-    if auth is not None:
-        try:
-            authenticated = await auth.authenticate_http(
-                authorization=request.headers.get("authorization"),
-                project_id=project_id,
-                method="operation/cancel",
-                requested_scope={},
-            )
-        except PermissionError as exc:
-            return _auth_denied(None, str(exc))
-    cancel_request = JsonRpcRequest.model_validate(
-        {
-            "id": f"cancel:{operation_id}",
-            "method": "operation/cancel",
-            "params": {
-                "_meta": {"idempotencyKey": f"cancel:{operation_id}"},
-                "input": {"project_id": project_id, "operation_id": operation_id},
-            },
-        }
+    return await cancel_async_operation(
+        application,
+        auth,
+        operation_id,
+        request,
+        _resolve_bus_for_request=lambda app, request: _resolve_bus_for_request(app, request),
+        _auth_denied=lambda request_id, reason: _auth_denied(request_id, reason),
     )
-    active_bus = _resolve_bus_for_request(application, request)
-    operation = active_bus.read_operation(operation_id)
-    tasks: dict[str, asyncio.Task[JsonRpcResponse]] = application.state.background_tasks
-    if (
-        authenticated is not None
-        and operation is not None
-        and (
-            operation.owner_actor_id != authenticated.actor_id
-            or operation.owner_session_id != authenticated.session_id
-            or operation.owner_role_assignment_id != authenticated.role_assignment_id
-            or operation.owner_data_scopes != tuple(sorted(authenticated.data_scopes))
-        )
-    ):
-        return _auth_denied(None, "AUTH_OPERATION_OWNER_DENIED")
-    if authenticated is None:
-        response = await active_bus.dispatch(cancel_request)
-    else:
-        with authenticated_actor_scope(authenticated):
-            response = await active_bus.dispatch(cancel_request)
-    if response.error is None and operation is not None and operation.project_id == project_id:
-        task = tasks.get(operation_id)
-        if task is not None:
-            task.cancel()
-    return Response(content=encode_response(response), media_type="application/json")
 
 
 async def _stage_file(
@@ -615,70 +378,12 @@ async def _stage_file(
     request: Request,
     file: UploadFile,
 ) -> dict[str, object]:
-    workspace = _workspace_path_for_request(request)
-    authenticated_project_id = request.headers.get("x-thoth-project-id", "")
-    if not authenticated_project_id:
-        raise HTTPException(status_code=400, detail="x-thoth-project-id is required")
-    if auth is not None:
-        try:
-            authenticated = await auth.authenticate_http(
-                authorization=request.headers.get("authorization"),
-                project_id=authenticated_project_id,
-                method="project/source/connect",
-                requested_scope={},
-            )
-        except PermissionError as exc:
-            raise HTTPException(status_code=403, detail=str(exc)) from exc
-        authenticated_project_id = authenticated.project_id
-    filename = Path(file.filename or "upload.bin").name
-    suffix = Path(filename).suffix.lower()
-    media_type = MEDIA_TYPES.get(suffix)
-    if media_type is None:
-        raise HTTPException(status_code=415, detail="unsupported research file type")
-    payload = await file.read(MAX_UPLOAD_BYTES + 1)
-    if not payload:
-        raise HTTPException(status_code=400, detail="empty research file")
-    if len(payload) > MAX_UPLOAD_BYTES:
-        raise HTTPException(status_code=413, detail="research file exceeds 64 MiB")
-    if hosted_mode():
-        try:
-            reject_if_upload_exceeds(
-                existing_bytes=inbox_nbytes(workspace),
-                incoming_bytes=len(payload),
-                limits=HostedReviewLimits(),
-            )
-        except RpcApplicationError as exc:
-            raise HTTPException(status_code=413, detail=exc.message) from exc
-    safe_name = re.sub(r"[^0-9A-Za-z가-힣._-]+", "-", filename).strip(".-")
-    if not safe_name:
-        safe_name = f"source{suffix}"
-    safe_stem = Path(safe_name).stem[:48] or "source"
-    safe_name = f"{safe_stem}{suffix}"
-    digest = sha256(payload).hexdigest()
-    relative_inbox = project_upload_prefix(authenticated_project_id)
-    inbox = workspace / "inbox" / relative_inbox
-    inbox.mkdir(parents=True, exist_ok=True)
-    destination = inbox / f"{digest[:16]}-{safe_name}"
-    if destination.exists():
-        if sha256(destination.read_bytes()).hexdigest() != digest:
-            raise HTTPException(status_code=409, detail="staged digest collision")
-    else:
-        temporary = inbox / f".{digest[:16]}-{uuid4().hex}.tmp"
-        try:
-            temporary.write_bytes(payload)
-            if sha256(temporary.read_bytes()).hexdigest() != digest:
-                raise HTTPException(status_code=500, detail="staged file verification failed")
-            replace(temporary, destination)
-        finally:
-            temporary.unlink(missing_ok=True)
-    relative = destination.relative_to(workspace / "inbox")
-    return {
-        "relative_path": relative.as_posix(),
-        "filename": filename,
-        "media_type": media_type,
-        "byte_sha256": digest,
-        "bytes": len(payload),
-    }
+    return await stage_file_upload(
+        auth,
+        request,
+        file,
+        _workspace_path_for_request=lambda request: _workspace_path_for_request(request),
+    )
 
 
 def _resolve_bus_for_request(application: FastAPI, request: Request) -> CommandBus:

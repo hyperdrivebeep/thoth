@@ -1,0 +1,810 @@
+{
+  "o1": {
+    "id_clock_trace": [
+      [
+        "id",
+        "operation",
+        129
+      ],
+      [
+        "clock",
+        136
+      ],
+      [
+        "id",
+        "event",
+        130
+      ],
+      [
+        "clock",
+        137
+      ],
+      [
+        "id",
+        "semantic-merge",
+        131
+      ],
+      [
+        "id",
+        "snapshot",
+        132
+      ],
+      [
+        "clock",
+        138
+      ],
+      [
+        "id",
+        "revision",
+        133
+      ],
+      [
+        "clock",
+        139
+      ],
+      [
+        "clock",
+        140
+      ],
+      [
+        "id",
+        "resource-scope",
+        134
+      ],
+      [
+        "id",
+        "resource-scope-receipt",
+        135
+      ],
+      [
+        "clock",
+        141
+      ],
+      [
+        "id",
+        "receipt",
+        136
+      ],
+      [
+        "clock",
+        142
+      ],
+      [
+        "id",
+        "resource-scope",
+        137
+      ],
+      [
+        "id",
+        "resource-scope-receipt",
+        138
+      ],
+      [
+        "clock",
+        143
+      ],
+      [
+        "id",
+        "revision-merge_proposal",
+        139
+      ],
+      [
+        "id",
+        "control-revision",
+        140
+      ],
+      [
+        "clock",
+        144
+      ],
+      [
+        "clock",
+        145
+      ],
+      [
+        "id",
+        "resource-scope",
+        141
+      ],
+      [
+        "id",
+        "resource-scope-receipt",
+        142
+      ],
+      [
+        "clock",
+        146
+      ],
+      [
+        "clock",
+        147
+      ],
+      [
+        "id",
+        "semantic-merge-receipt",
+        143
+      ],
+      [
+        "clock",
+        148
+      ],
+      [
+        "id",
+        "control-revision",
+        144
+      ],
+      [
+        "clock",
+        149
+      ],
+      [
+        "clock",
+        150
+      ],
+      [
+        "id",
+        "resource-scope",
+        145
+      ],
+      [
+        "id",
+        "resource-scope-receipt",
+        146
+      ],
+      [
+        "clock",
+        151
+      ],
+      [
+        "clock",
+        152
+      ],
+      [
+        "id",
+        "checkpoint",
+        147
+      ],
+      [
+        "clock",
+        153
+      ],
+      [
+        "id",
+        "event",
+        148
+      ],
+      [
+        "clock",
+        154
+      ],
+      [
+        "id",
+        "event",
+        149
+      ],
+      [
+        "clock",
+        155
+      ]
+    ],
+    "value": {
+      "conflict": null,
+      "head_mutated": true,
+      "merge_proposal": {
+        "canonical_truth": false,
+        "control_revision_id": "control-revision:00000140",
+        "created_at": "2026-10-15T00:00:00.144000Z",
+        "namespace": "REVISION",
+        "payload": {
+          "aggregate_id": "object:00000010",
+          "candidate_content": null,
+          "common_ancestor_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+          "conflicts": [],
+          "evidence_refs": [],
+          "head_mutated": true,
+          "merge_policy_ref": "merge:three-way-v1",
+          "parent_revision_digests": [
+            "0583e9fdc124ef34da2c0d2ffc7c5ddb7338e4b0e318d51334d14d79e89b12bf",
+            "f11a9470b4bd9a338f75db676e1463d6841793d79f9af2d18a050617fa9c999f"
+          ],
+          "reason": "O1 independently changed fields",
+          "semantic_merge": {
+            "common_ancestor_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+            "conflict_paths": [],
+            "entity_id": "object:00000010",
+            "entity_type": "DECISION_OBJECT",
+            "gates": {
+              "authority": true,
+              "common_ancestor": true,
+              "current_head": true,
+              "cutoff": true,
+              "dependency": true,
+              "domain": true,
+              "policy": true,
+              "schema_compatible": true
+            },
+            "head_mutated": true,
+            "last_write_wins": false,
+            "left_changed_paths": [
+              "/purpose_statement"
+            ],
+            "left_revision_digest": "0583e9fdc124ef34da2c0d2ffc7c5ddb7338e4b0e318d51334d14d79e89b12bf",
+            "merge_id": "semantic-merge:00000131",
+            "merged_revision_digest": "20c7bf3cedd0698a3c37dd11707b979d2a42b996aac7dca3e7c017412b3d3198",
+            "project_id": "project:102-v",
+            "reason_codes": [],
+            "receipt_ref": "receipt:00000136",
+            "right_changed_paths": [
+              "/problem_frame"
+            ],
+            "right_revision_digest": "f11a9470b4bd9a338f75db676e1463d6841793d79f9af2d18a050617fa9c999f",
+            "semantic_truth_certified": false,
+            "state": "AUTO_MERGED"
+          }
+        },
+        "project_id": "project:102-v",
+        "record_digest": "79535ff8e1bb1cfa96291c693bd64767517b1cd54bdcfb36afc3d0f3649c99aa",
+        "record_id": "revision-merge_proposal:00000139",
+        "record_type": "MERGE_PROPOSAL",
+        "schema_version": "1.0.0",
+        "state": "AUTO_MERGED",
+        "supersedes_digest": null,
+        "version": 1
+      },
+      "receipt": {
+        "authorization": "SEPARATE",
+        "common_ancestor_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+        "conflict_paths": [],
+        "gates": {
+          "authority": true,
+          "common_ancestor": true,
+          "current_head": true,
+          "cutoff": true,
+          "dependency": true,
+          "domain": true,
+          "policy": true,
+          "schema_compatible": true
+        },
+        "integrity": "VALID",
+        "merge_id": "semantic-merge:00000131",
+        "parent_revision_digests": [
+          "0583e9fdc124ef34da2c0d2ffc7c5ddb7338e4b0e318d51334d14d79e89b12bf",
+          "f11a9470b4bd9a338f75db676e1463d6841793d79f9af2d18a050617fa9c999f"
+        ],
+        "project_id": "project:102-v",
+        "provenance": "CANONICAL_REVISION_DAG",
+        "receipt_digest": "e60436e348a2ae5e4ddfd7dd40601e94a1c868112f1f915bbf34a0ddd33686bb",
+        "receipt_id": "semantic-merge-receipt:00000143",
+        "recorded_at": "2026-10-15T00:00:00.148000Z",
+        "semantic_truth": "NOT_CERTIFIED",
+        "state": "AUTO_MERGED"
+      },
+      "semantic_merge": {
+        "common_ancestor_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+        "conflict_paths": [],
+        "entity_id": "object:00000010",
+        "entity_type": "DECISION_OBJECT",
+        "gates": {
+          "authority": true,
+          "common_ancestor": true,
+          "current_head": true,
+          "cutoff": true,
+          "dependency": true,
+          "domain": true,
+          "policy": true,
+          "schema_compatible": true
+        },
+        "head_mutated": true,
+        "last_write_wins": false,
+        "left_changed_paths": [
+          "/purpose_statement"
+        ],
+        "left_revision_digest": "0583e9fdc124ef34da2c0d2ffc7c5ddb7338e4b0e318d51334d14d79e89b12bf",
+        "merge_id": "semantic-merge:00000131",
+        "merged_revision_digest": "20c7bf3cedd0698a3c37dd11707b979d2a42b996aac7dca3e7c017412b3d3198",
+        "project_id": "project:102-v",
+        "reason_codes": [],
+        "receipt_ref": "receipt:00000136",
+        "right_changed_paths": [
+          "/problem_frame"
+        ],
+        "right_revision_digest": "f11a9470b4bd9a338f75db676e1463d6841793d79f9af2d18a050617fa9c999f",
+        "semantic_truth_certified": false,
+        "state": "AUTO_MERGED"
+      }
+    }
+  },
+  "o2": {
+    "id_clock_trace": [
+      [
+        "id",
+        "operation",
+        148
+      ],
+      [
+        "clock",
+        154
+      ],
+      [
+        "id",
+        "event",
+        149
+      ],
+      [
+        "clock",
+        155
+      ],
+      [
+        "id",
+        "revision-proposal",
+        150
+      ],
+      [
+        "id",
+        "control-revision",
+        151
+      ],
+      [
+        "clock",
+        156
+      ],
+      [
+        "clock",
+        157
+      ],
+      [
+        "id",
+        "resource-scope",
+        152
+      ],
+      [
+        "id",
+        "resource-scope-receipt",
+        153
+      ],
+      [
+        "clock",
+        158
+      ],
+      [
+        "id",
+        "revision-change_set",
+        154
+      ],
+      [
+        "id",
+        "control-revision",
+        155
+      ],
+      [
+        "clock",
+        159
+      ],
+      [
+        "clock",
+        160
+      ],
+      [
+        "id",
+        "resource-scope",
+        156
+      ],
+      [
+        "id",
+        "resource-scope-receipt",
+        157
+      ],
+      [
+        "clock",
+        161
+      ],
+      [
+        "id",
+        "control-revision",
+        158
+      ],
+      [
+        "clock",
+        162
+      ],
+      [
+        "clock",
+        163
+      ],
+      [
+        "id",
+        "resource-scope",
+        159
+      ],
+      [
+        "id",
+        "resource-scope-receipt",
+        160
+      ],
+      [
+        "clock",
+        164
+      ],
+      [
+        "clock",
+        165
+      ],
+      [
+        "id",
+        "checkpoint",
+        161
+      ],
+      [
+        "clock",
+        166
+      ],
+      [
+        "id",
+        "event",
+        162
+      ],
+      [
+        "clock",
+        167
+      ],
+      [
+        "id",
+        "event",
+        163
+      ],
+      [
+        "clock",
+        168
+      ],
+      [
+        "id",
+        "event",
+        164
+      ],
+      [
+        "clock",
+        169
+      ]
+    ],
+    "value": {
+      "candidate_revision": {
+        "canonical_truth": false,
+        "control_revision_id": "control-revision:00000151",
+        "created_at": "2026-10-15T00:00:00.156000Z",
+        "namespace": "REVISION",
+        "payload": {
+          "actor_or_agent_ref": "agent:102-v",
+          "aggregate_id": "object:00000010",
+          "aggregate_type": "DECISION_OBJECT",
+          "authenticated_role": null,
+          "authenticated_role_assignment_ref": null,
+          "authenticated_session_id": null,
+          "candidate_content": {
+            "active_work_mode": "FRAMING",
+            "actor_or_agent_ref": "agent:thread-materializer",
+            "applicability": "PROJECT_SCOPED",
+            "attention": "NONE",
+            "blockers": [],
+            "created_at": "2026-10-15T00:00:00.017Z",
+            "cutoff_ref": null,
+            "disposition": "NONE",
+            "entry_criteria": {
+              "candidate_ref": "object-candidate:00000012",
+              "status": "PASS"
+            },
+            "exit_criteria": {
+              "reason": "work remains open",
+              "status": "NOT_SATISFIED"
+            },
+            "facets": [],
+            "focus_refs": [
+              "workstream:revision"
+            ],
+            "freshness": "CURRENT",
+            "lifecycle": "ACTIVE",
+            "materialization_trigger": "EXPLICIT_USER_REQUEST",
+            "object_id": "object:00000010",
+            "object_revision_id": "object-revision:00000015",
+            "parent_object_id": null,
+            "problem_frame": "Revision storage fixture",
+            "profile_refs": [
+              "GENERAL_RND_DECISION"
+            ],
+            "profile_state": "MATCHED",
+            "project_id": "project:102-v",
+            "protected_boundary_context": {},
+            "purpose_statement": "O2 chosen resolution",
+            "receipt_ref": null,
+            "relation_refs": [],
+            "requirement_refs": [],
+            "resolution": "OPEN",
+            "revision_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+            "schema_version": "1.0.0",
+            "security_scope": "PROJECT_POLICY",
+            "supersedes_revision_digest": null,
+            "thread_id": "thread:102-v",
+            "trigger_evidence_refs": [],
+            "verification": "NOT_ASSESSED",
+            "workstream_refs": [
+              "revision"
+            ]
+          },
+          "content_digest": "132362983679d7ddd8119ec3b9c70c604084994414cf3787d1dde5dcee09e8f3",
+          "evidence_refs": [],
+          "expected_head_digest": "c6ac7e99246217d0c93640c6ff9225a3aef37b68c30605d0bfe09276bfd721ea",
+          "parent_revision_digests": [
+            "c6ac7e99246217d0c93640c6ff9225a3aef37b68c30605d0bfe09276bfd721ea",
+            "2bbfeed599395621225cae3a062baa328ab84d210b4f9762cb0439ba56c6d9c6"
+          ],
+          "reason": "resolved merge proposal",
+          "resolution_map": {
+            "purpose_statement": "O2 chosen resolution"
+          },
+          "restores_revision_digest": null
+        },
+        "project_id": "project:102-v",
+        "record_digest": "e157d10267a44c3a0d50a776332e02d535a234f93591444f24c1270ea62a42e7",
+        "record_id": "revision-proposal:00000150",
+        "record_type": "PROPOSAL",
+        "schema_version": "1.0.0",
+        "state": "DRAFT",
+        "supersedes_digest": null,
+        "version": 1
+      },
+      "change_set": {
+        "canonical_truth": false,
+        "control_revision_id": "control-revision:00000155",
+        "created_at": "2026-10-15T00:00:00.159000Z",
+        "namespace": "REVISION",
+        "payload": {
+          "candidate_revision_digests": [
+            "e157d10267a44c3a0d50a776332e02d535a234f93591444f24c1270ea62a42e7"
+          ],
+          "conflict_state": "RESOLVED",
+          "expected_head_set": {
+            "DECISION_OBJECT:object:00000010": "c6ac7e99246217d0c93640c6ff9225a3aef37b68c30605d0bfe09276bfd721ea"
+          },
+          "expected_head_set_digest": "f03dd59ce217346d05d3d197dcaf3238403e51492255ec394ee52e843e6bd88b",
+          "impact_policy_ref": "merge:default",
+          "missing_dependencies": [],
+          "transition_reason": "resolved merge"
+        },
+        "project_id": "project:102-v",
+        "record_digest": "52544020f9d10a5664afca45cc99d0d5ffc164373848d6cb8eec663dfb854734",
+        "record_id": "revision-change_set:00000154",
+        "record_type": "CHANGE_SET",
+        "schema_version": "1.0.0",
+        "state": "STAGED",
+        "supersedes_digest": null,
+        "version": 1
+      },
+      "head_mutated": false,
+      "merge_proposal": {
+        "canonical_truth": false,
+        "control_revision_id": "control-revision:00000158",
+        "created_at": "2026-10-15T00:00:00.162000Z",
+        "namespace": "REVISION",
+        "payload": {
+          "aggregate_id": "object:00000010",
+          "candidate_content": null,
+          "common_ancestor_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+          "conflicts": [
+            "/purpose_statement"
+          ],
+          "evidence_refs": [],
+          "head_mutated": false,
+          "merge_policy_ref": "merge:three-way-v1",
+          "parent_revision_digests": [
+            "c6ac7e99246217d0c93640c6ff9225a3aef37b68c30605d0bfe09276bfd721ea",
+            "2bbfeed599395621225cae3a062baa328ab84d210b4f9762cb0439ba56c6d9c6"
+          ],
+          "reason": "O2 conflicting purpose edits",
+          "resolution_revision": "e157d10267a44c3a0d50a776332e02d535a234f93591444f24c1270ea62a42e7",
+          "semantic_merge": {
+            "common_ancestor_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+            "conflict_paths": [
+              "/purpose_statement"
+            ],
+            "entity_id": "object:00000010",
+            "entity_type": "DECISION_OBJECT",
+            "gates": {
+              "authority": true,
+              "common_ancestor": true,
+              "current_head": true,
+              "cutoff": true,
+              "dependency": true,
+              "domain": true,
+              "policy": true,
+              "schema_compatible": true
+            },
+            "head_mutated": false,
+            "last_write_wins": false,
+            "left_changed_paths": [
+              "/purpose_statement"
+            ],
+            "left_revision_digest": "c6ac7e99246217d0c93640c6ff9225a3aef37b68c30605d0bfe09276bfd721ea",
+            "merge_id": "semantic-merge:00000131",
+            "merged_revision_digest": null,
+            "project_id": "project:102-v",
+            "reason_codes": [
+              "OVERLAPPING_FIELD_CHANGE"
+            ],
+            "receipt_ref": null,
+            "right_changed_paths": [
+              "/purpose_statement"
+            ],
+            "right_revision_digest": "2bbfeed599395621225cae3a062baa328ab84d210b4f9762cb0439ba56c6d9c6",
+            "semantic_truth_certified": false,
+            "state": "OPEN_CONFLICT"
+          }
+        },
+        "project_id": "project:102-v",
+        "record_digest": "3396197dbde21a33dcafd536fa297e483e0939a2be247a1a3ae90e1d65cdeea5",
+        "record_id": "revision-merge_proposal:00000132",
+        "record_type": "MERGE_PROPOSAL",
+        "schema_version": "1.0.0",
+        "state": "RESOLVED",
+        "supersedes_digest": "81862fb13bc0f2c85bdc3c548a8ab11575ad22f9bf6ddcdc94e1a03586c1aa27",
+        "version": 2
+      }
+    }
+  },
+  "o3": {
+    "id_clock_trace": [
+      [
+        "id",
+        "operation",
+        91
+      ],
+      [
+        "clock",
+        98
+      ],
+      [
+        "id",
+        "event",
+        92
+      ],
+      [
+        "clock",
+        99
+      ],
+      [
+        "id",
+        "control-revision",
+        93
+      ],
+      [
+        "clock",
+        100
+      ],
+      [
+        "clock",
+        101
+      ],
+      [
+        "id",
+        "resource-scope",
+        94
+      ],
+      [
+        "id",
+        "resource-scope-receipt",
+        95
+      ],
+      [
+        "clock",
+        102
+      ],
+      [
+        "id",
+        "revision-baseline",
+        96
+      ],
+      [
+        "id",
+        "control-revision",
+        97
+      ],
+      [
+        "clock",
+        103
+      ],
+      [
+        "clock",
+        104
+      ],
+      [
+        "id",
+        "resource-scope",
+        98
+      ],
+      [
+        "id",
+        "resource-scope-receipt",
+        99
+      ],
+      [
+        "clock",
+        105
+      ],
+      [
+        "clock",
+        106
+      ],
+      [
+        "id",
+        "checkpoint",
+        100
+      ],
+      [
+        "clock",
+        107
+      ],
+      [
+        "id",
+        "event",
+        101
+      ],
+      [
+        "clock",
+        108
+      ],
+      [
+        "id",
+        "event",
+        102
+      ],
+      [
+        "clock",
+        109
+      ],
+      [
+        "id",
+        "event",
+        103
+      ],
+      [
+        "clock",
+        110
+      ]
+    ],
+    "value": {
+      "baseline": {
+        "canonical_truth": false,
+        "control_revision_id": "control-revision:00000097",
+        "created_at": "2026-10-15T00:00:00.103000Z",
+        "namespace": "REVISION",
+        "payload": {
+          "authority": {
+            "actor_ref": "human:o3-owner",
+            "role_assignment_ref": "role-assignment:00000047"
+          },
+          "candidate_digest": "89b6197c0cf8dc071a4225ee2ed56f029802e8cd674d3f751e69888b4fe49eba",
+          "evidence_refs": [],
+          "manifest_digest": "64e6fc5e555df732958fd6b9c3d690d219bd07ff7422837d205e4324e47a2a17",
+          "policy_version": "baseline:o3",
+          "protected_authority": true,
+          "purpose": "O3 legacy new",
+          "required_roles": [
+            "baseline-owner"
+          ],
+          "scoped_head_map": {
+            "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+          }
+        },
+        "project_id": "project:102-v",
+        "record_digest": "5a3622eca8d9ec321107e0889aef04eac1134f775e063a4bd2441b923c59c850",
+        "record_id": "revision-baseline:00000096",
+        "record_type": "BASELINE",
+        "schema_version": "1.0.0",
+        "state": "CURRENT",
+        "supersedes_digest": null,
+        "version": 1
+      },
+      "immutable_manifest": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+      }
+    }
+  }
+}

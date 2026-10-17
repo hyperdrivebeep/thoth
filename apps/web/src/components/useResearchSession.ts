@@ -1,9 +1,9 @@
 import { UiError } from "../i18n/UiError";
-import { t } from "../i18n/locale";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { rpc } from "../api/rpcClient";
 import { readResearchStatus } from "../api/researchStatusRead";
+import { useReadAccessProtection } from "./useReadAccessProtection";
 import { clearSubmission, hasSubmissionStore, readSubmission, submissionScopeId, writeSubmission } from "../api/submissionPersistence";
 import { readDraftLanguage, writeDraftLanguage } from "../api/draftLanguage";
 import type { ResponseLanguage } from "../api/localWorkspacePersistence";
@@ -20,6 +20,13 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   /** The trace row this question is about (set by "원인 조사"); it goes with the next request only, and is dropped when the question is emptied. */
   origin: PendingOrigin | null = null, onOriginDone?: () => void) {
   const client = useQueryClient();
+  const scopeEpoch = epoch.current;
+  const scopeIdentity = JSON.stringify([storageScope.mode, submissionScopeId(storageScope), projectId, threadId]);
+  const currentScope = useRef(scopeIdentity);
+  currentScope.current = scopeIdentity;
+  const active = useRef(true);
+  useLayoutEffect(() => { active.current = true; return () => { active.current = false; }; }, []);
+  const isCurrentScope = () => active.current && currentScope.current === scopeIdentity && epoch.current === scopeEpoch;
   const [selectedLanguage, setSelectedLanguage] = useState<ResponseLanguage | null | undefined>(() => readDraftLanguage(storageScope, projectId, threadId));
   const ready = useQuery({ queryKey: ["workspace-ready"], enabled: false, queryFn: ({signal}) => rpc<WorkspaceReady>("workspace/ready", {}, "ws-ready", signal) });
   const languageSupported = hasSubmissionStore(storageScope) && ready.data?.value.response_language_scope === "REQUEST" && ready.data.value.response_languages?.includes("en") === true;
@@ -33,7 +40,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     return kind === "CORRUPT" || kind === "UNAVAILABLE" ? kind : null;
   });
   const [pendingRead, setPendingRead] = useState<PendingRead>(() => readSubmission(storageScope, projectId, threadId));
-  const [pendingStorageError, setPendingStorageError] = useState<string | null>(null);
+  const [pendingStorageError, setPendingStorageError] = useState<"submission.clearFailed" | "submission.tooLarge" | "submission.storageFailed" | null>(null);
   const [queuedNotice, setQueuedNotice] = useState(false);
   const setProblem = (text: string) => {
     if (origin && !text.trim()) onOriginDone?.();
@@ -70,12 +77,18 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     if (draftRevision.current === revision && capturedEpoch === epoch.current) { draftRevision.current += 1; setModelSelection(null); }
   };
   const readKey = ["research", projectId, threadId];
-  const research = useQuery({
+  const researchQuery = useQuery({
     queryKey: readKey, enabled: Boolean(projectId && threadId),
     queryFn: ({ signal }) => readResearchStatus(client, readKey, projectId, threadId, signal),
     refetchInterval: query => query.state.data?.value.operation_state === "RUNNING" ? 1200 : false,
   });
-  const responseLanguage = selectedLanguage !== undefined ? selectedLanguage : research.data?.value.request?.response_language ?? null;
+  const researchReadDenied = useReadAccessProtection(readKey, researchQuery.error);
+  const research = researchReadDenied ? { ...researchQuery, data: undefined } : researchQuery;
+  // Keep an already observed language preference without retaining denied research content.
+  const inheritedLanguage = useRef<{ scope: string; value: ResponseLanguage | null }>({ scope: scopeIdentity, value: null });
+  if (inheritedLanguage.current.scope !== scopeIdentity) inheritedLanguage.current = { scope: scopeIdentity, value: null };
+  if (!researchReadDenied) inheritedLanguage.current.value = researchQuery.data?.value.request?.response_language ?? null;
+  const responseLanguage = selectedLanguage !== undefined ? selectedLanguage : inheritedLanguage.current.value;
   const languageRef = useRef(responseLanguage);
   languageRef.current = responseLanguage;
   const chooseLanguage = (language: ResponseLanguage | null) => {
@@ -95,10 +108,11 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   // A queued instruction waits for the running investigation; the notice ends when that run leaves RUNNING.
   const sawRunning = useRef(false);
   useEffect(() => {
+    if (researchReadDenied) return;
     if (!queuedNotice) { sawRunning.current = false; return; }
     if (operationState === "RUNNING") sawRunning.current = true;
     else if (sawRunning.current) setQueuedNotice(false);
-  }, [queuedNotice, operationState]);
+  }, [queuedNotice, operationState, researchReadDenied]);
   const submit = useMutation({
     mutationFn: async (captured: { projectId: string; threadId: string; problem: string; selection: ModelSelection | null; origin: PendingOrigin | null; responseLanguage?: ResponseLanguage; revision: number; epoch: number; key: string; scope: BrowserScope }) => {
       const admission = await rpc<ResearchAdmission>(captured.threadId ? "thread/input" : "thread/start", {
@@ -130,7 +144,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
       if (hasSubmissionStore(captured.scope)) {
         const removed = clearSubmission(captured.scope, captured.projectId, captured.threadId);
         if (removed) { setPendingRead({ kind: "NONE" }); setPendingStorageError(null); }
-        else setPendingStorageError(t("submission.clearFailed"));
+        else setPendingStorageError("submission.clearFailed");
       }
       clearModel(captured.revision, captured.epoch);
       if (captured.origin) onOriginDone?.();
@@ -174,7 +188,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     },
   });
   const retryPending = () => {
-    if (!hasSubmissionStore(storageScope) || !canExecute || pendingSubmission.current?.inFlight) return;
+    if (!isCurrentScope() || !hasSubmissionStore(storageScope) || !canExecute || pendingSubmission.current?.inFlight) return;
     const stored = readSubmission(storageScope, projectId, threadId);
     setPendingRead(stored);
     if (stored.kind !== "PENDING") return;
@@ -183,13 +197,13 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     pendingSubmission.current = { signature: value.signature, key: value.key, inFlight: true };
     setPendingStorageError(null);
     submit.mutate({ projectId, threadId, problem: value.problem, selection: value.selection, origin: value.origin ?? null, responseLanguage: value.responseLanguage,
-      revision: -1, epoch: epoch.current, key: value.key, scope: storageScope });
+      revision: -1, epoch: scopeEpoch, key: value.key, scope: storageScope });
   };
-  return { research, queuedNotice, problem, setProblem, draftSaveState, draftRestoreIssue, pendingRead, pendingBlocksNewInput, pendingStorageError,
+  return { research, researchReadDenied, queuedNotice, problem, setProblem, draftSaveState, draftRestoreIssue, pendingRead, pendingBlocksNewInput, pendingStorageError,
     retryPending, modelSelection, chooseModel, clearModel, draftRevision, responseLanguage, chooseLanguage, languageSupported,
-    renderedRevision: draftRevision.current, submit, resume,
+    renderedRevision: draftRevision.current, submit, resume, isCurrentScope,
     send: () => {
-      if (!canExecute || responseLanguage !== null && !languageSupported || !problem.trim() || pendingSubmission.current?.inFlight || pendingBlocksNewInput) return;
+      if (!isCurrentScope() || !canExecute || responseLanguage !== null && !languageSupported || !problem.trim() || pendingSubmission.current?.inFlight || pendingBlocksNewInput) return;
       if (hasSubmissionStore(storageScope)) {
         const stored = readSubmission(storageScope, projectId, threadId);
         setPendingRead(stored);
@@ -201,8 +215,8 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
         if (stored.kind === "NONE") {
           const saved = writeSubmission(storageScope, record);
           if (saved !== "SAVED") {
-            setPendingStorageError(saved === "TOO_LARGE" ? t("submission.tooLarge")
-              : t("submission.storageFailed"));
+            setPendingStorageError(saved === "TOO_LARGE" ? "submission.tooLarge"
+              : "submission.storageFailed");
             return;
           }
           setPendingRead({ kind: "PENDING", value: record });
@@ -210,14 +224,14 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
         pendingSubmission.current = { signature: record.signature, key: record.key, inFlight: true };
         setPendingStorageError(null);
         submit.mutate({ projectId, threadId, problem: record.problem, selection: record.selection, origin: record.origin ?? null, responseLanguage: record.responseLanguage,
-          revision: draftRevision.current, epoch: epoch.current, key: record.key, scope: storageScope });
+          revision: draftRevision.current, epoch: scopeEpoch, key: record.key, scope: storageScope });
         return;
       }
-      const signature = JSON.stringify([currentSignature, epoch.current]);
+      const signature = JSON.stringify([currentSignature, scopeEpoch]);
       if (pendingSubmission.current?.signature !== signature) pendingSubmission.current = {signature,key:crypto.randomUUID(),inFlight:false};
       const request = pendingSubmission.current;
       request.inFlight = true;
-      submit.mutate({ projectId, threadId, problem, selection: modelSelection, origin, responseLanguage: responseLanguage ?? undefined, revision: draftRevision.current, epoch: epoch.current, key:request.key, scope: storageScope });
+      submit.mutate({ projectId, threadId, problem, selection: modelSelection, origin, responseLanguage: responseLanguage ?? undefined, revision: draftRevision.current, epoch: scopeEpoch, key:request.key, scope: storageScope });
     },
   };
 }

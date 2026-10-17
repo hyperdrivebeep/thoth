@@ -28,10 +28,21 @@ from thoth.application.commands.object_inputs import (
     SplitProposeInput,
     WorkReplanInput,
 )
+from thoth.application.commands.object_proposal_projection import (
+    object_merge_proposal_data,
+    object_merge_proposal_result,
+    object_split_proposal_data,
+    object_split_proposal_result,
+)
+from thoth.application.commands.object_read_projection import (
+    object_impact_view,
+    object_matches,
+    object_revision_result,
+    object_summary,
+)
 from thoth.application.services.decision_object_service import DecisionObjectService
 from thoth.application.services.revision_service import CommitResult
 from thoth.domain.auth import authenticated_data_scope_allows
-from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.decision_object_full import DecisionObjectRecord
 from thoth.ports.decision_object import DecisionObjectStorePort
 from thoth.ports.dependency import DependencyGraphPort
@@ -74,15 +85,7 @@ class DecisionObjectHandlers:
         items = tuple(
             item
             for item in self._store.list_objects(request.project_id)
-            if (request.thread_id is None or item.thread_id == request.thread_id)
-            and (request.lifecycle is None or item.lifecycle == request.lifecycle)
-            and (
-                request.active_work_mode is None
-                or item.active_work_mode == request.active_work_mode
-            )
-            and (request.profile_ref is None or request.profile_ref in item.profile_refs)
-            and (request.attention is None or item.attention == request.attention)
-            and (request.blocker is None or request.blocker in item.blockers)
+            if object_matches(item, request)
         )
         return {"objects": [self._summary(item) for item in items], "next_cursor": None}
 
@@ -166,23 +169,8 @@ class DecisionObjectHandlers:
         source_ref = f"OBJECT:{item.object_id}"
         downstream = self._dependencies.downstream(request.project_id, source_ref)
         states = self._dependencies.read_states(request.project_id)
-        return {
-            "impact": {
-                "source_ref": source_ref,
-                "direct_relation_targets": [
-                    relation.target_ref
-                    for relation in self._store.list_relations(
-                        request.project_id, request.object_id
-                    )
-                    if relation.active
-                ],
-                "transitive_affected_refs": list(downstream),
-                "dependency_states": {
-                    key: state.value for key, state in states.items() if key in downstream
-                },
-                "recalculation_plan": [key for key in downstream if states.get(key) is not None],
-            }
-        }
+        relations = self._store.list_relations(request.project_id, request.object_id)
+        return object_impact_view(source_ref, relations, downstream, states)
 
     async def attention_list(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = AttentionListInput.model_validate(value)
@@ -450,23 +438,9 @@ class DecisionObjectHandlers:
     async def split_propose(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = SplitProposeInput.model_validate(value)
         current = self._read_expected(request)
-        payload: dict[str, JsonValue] = {
-            "project_id": request.project_id,
-            "object_id": request.object_id,
-            "partitions": [dict(item) for item in request.partitions],
-            "evidence_refs": list(request.evidence_refs),
-            "rationale": request.rationale,
-            "expected_revision_digest": request.expected_revision_digest,
-            "applied": False,
-            "owner_namespace": "REVISION",
-        }
-        digest = domain_digest("OBJECT_SPLIT_PROPOSAL", "1.0.0", canonical_payload(payload))
+        payload, digest = object_split_proposal_data(request)
         self._service.audit(current, "object/splitProposed", {**payload, "digest": digest})
-        return {
-            "split_proposal": {**payload, "digest": digest},
-            "lineage_preview": [f"PART_OF:{request.object_id}"],
-            "impact_preview": ["dependent projections become stale after application"],
-        }
+        return object_split_proposal_result(request, payload, digest)
 
     async def merge_propose(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = MergeProposeInput.model_validate(value)
@@ -484,34 +458,10 @@ class DecisionObjectHandlers:
         actual = tuple(item.revision_digest for item in objects if item is not None)
         if actual != request.expected_revision_digests:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "merge revision mismatch")
-        conflicts = sorted(
-            {
-                "problem_frame"
-                for item in objects[1:]
-                if item is not None
-                and objects[0] is not None
-                and item.problem_frame != objects[0].problem_frame
-            }
-        )
-        payload: dict[str, JsonValue] = {
-            "project_id": request.project_id,
-            "object_ids": list(request.object_ids),
-            "field_mapping": request.field_mapping,
-            "evidence_refs": list(request.evidence_refs),
-            "rationale": request.rationale,
-            "expected_revision_digests": list(request.expected_revision_digests),
-            "applied": False,
-            "owner_namespace": "REVISION",
-            "conflicts": cast(JsonValue, conflicts),
-        }
-        digest = domain_digest("OBJECT_MERGE_PROPOSAL", "1.0.0", canonical_payload(payload))
+        payload, digest = object_merge_proposal_data(request, objects)
         first = cast(DecisionObjectRecord, objects[0])
         self._service.audit(first, "object/mergeProposed", {**payload, "digest": digest})
-        return {
-            "merge_proposal": {**payload, "digest": digest},
-            "lineage_preview": [f"SUPERSEDES:{item}" for item in request.object_ids],
-            "impact_preview": ["application belongs to Revision namespace"],
-        }
+        return object_merge_proposal_result(request, payload, digest)
 
     async def attention_acknowledge(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = AttentionAcknowledgeInput.model_validate(value)
@@ -536,57 +486,60 @@ class DecisionObjectHandlers:
         }
 
     async def followup_create(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
-        request = FollowupCreateInput.model_validate(value)
-        current = self._read_expected(request)
-        try:
-            candidate, child, commit = self._service.materialize(
-                project_id=request.project_id,
-                thread_id=current.thread_id,
-                purpose_statement=request.purpose_statement,
-                problem_frame=request.purpose_statement,
-                focus_refs=(f"OBJECT:{current.object_id}",),
-                trigger_evidence_refs=request.trigger_refs,
-                profile_refs=current.profile_refs,
+        with self._service.atomic():
+            request = FollowupCreateInput.model_validate(value)
+            current = self._read_expected(request)
+            try:
+                candidate, child, commit = self._service.materialize(
+                    project_id=request.project_id,
+                    thread_id=current.thread_id,
+                    purpose_statement=request.purpose_statement,
+                    problem_frame=request.purpose_statement,
+                    focus_refs=(f"OBJECT:{current.object_id}",),
+                    trigger_evidence_refs=request.trigger_refs,
+                    profile_refs=current.profile_refs,
+                    actor_ref="agent:followup-materializer",
+                    parent_object_id=current.object_id,
+                    trigger_type="FOLLOWUP",
+                    workstream_refs=current.workstream_refs if request.inherit_scope else (),
+                    requirement_refs=current.requirement_refs if request.inherit_scope else (),
+                )
+            except ValueError as exc:
+                raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
+            if child is None or commit is None:
+                return {
+                    "candidate": candidate.model_dump(mode="json"),
+                    "object": None,
+                    "commit": None,
+                }
+            relation, child_revised, relation_commit = self._service.add_relation(
+                child,
+                relation_type="FOLLOWUP_OF",
+                target_ref=f"OBJECT:{current.object_id}",
+                semantic_role="explicit follow-up lineage",
+                evidence_refs=request.trigger_refs,
+                authority_state="OFFICIAL",
                 actor_ref="agent:followup-materializer",
-                parent_object_id=current.object_id,
-                trigger_type="FOLLOWUP",
-                workstream_refs=current.workstream_refs if request.inherit_scope else (),
-                requirement_refs=current.requirement_refs if request.inherit_scope else (),
             )
-        except ValueError as exc:
-            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
-        if child is None or commit is None:
-            return {
-                "candidate": candidate.model_dump(mode="json"),
-                "object": None,
-                "commit": None,
-            }
-        relation, child_revised, relation_commit = self._service.add_relation(
-            child,
-            relation_type="FOLLOWUP_OF",
-            target_ref=f"OBJECT:{current.object_id}",
-            semantic_role="explicit follow-up lineage",
-            evidence_refs=request.trigger_refs,
-            authority_state="OFFICIAL",
-            actor_ref="agent:followup-materializer",
-        )
-        thread = self._threads.read(current.thread_id)
-        if thread is not None and child.object_id not in thread.current_object_ids:
-            self._threads.update(
-                thread.model_copy(
+            thread = self._threads.read(current.thread_id)
+            if thread is not None and child.object_id not in thread.current_object_ids:
+                updated = thread.model_copy(
                     update={
                         "current_object_ids": (*thread.current_object_ids, child.object_id),
                         "revision": thread.revision + 1,
                     }
-                ),
-                expected_revision=thread.revision,
-            )
-        return {
-            "candidate": candidate.model_dump(mode="json"),
-            "object": child_revised.model_dump(mode="json"),
-            "lineage": relation.model_dump(mode="json"),
-            "commit": relation_commit.model_dump(mode="json"),
-        }
+                )
+                if not self._threads.update(updated, expected_revision=thread.revision):
+                    raise RpcApplicationError(
+                        RpcErrorCode.DOMAIN_REJECTED,
+                        "thread revision changed while attaching Object",
+                    )
+            return {
+                "candidate": candidate.model_dump(mode="json"),
+                "object": child_revised.model_dump(mode="json"),
+                "lineage": relation.model_dump(mode="json"),
+                "commit": relation_commit.model_dump(mode="json"),
+            }
 
     def _read(self, request: ObjectReadInput) -> DecisionObjectRecord:
         item = self._store.read_object(
@@ -634,60 +587,6 @@ class DecisionObjectHandlers:
             )
         )
 
-    @staticmethod
-    def _summary(item: DecisionObjectRecord) -> dict[str, JsonValue]:
-        return {
-            "object_id": item.object_id,
-            "project_id": item.project_id,
-            "thread_id": item.thread_id,
-            "purpose_statement": item.purpose_statement,
-            "lifecycle": item.lifecycle,
-            "active_work_mode": item.active_work_mode,
-            "profile_refs": list(item.profile_refs),
-            "profile_state": item.profile_state,
-            "attention": item.attention,
-            "blockers": list(item.blockers),
-            "resolution": item.resolution,
-            "verification": item.verification,
-            "disposition": item.disposition,
-            "freshness": item.freshness,
-            "working_head_digest": item.revision_digest,
-        }
+    _summary = staticmethod(object_summary)
 
-    @staticmethod
-    def _revision_result(
-        before: DecisionObjectRecord, after: DecisionObjectRecord, commit: CommitResult
-    ) -> dict[str, JsonValue]:
-        before_data = before.model_dump(mode="json")
-        after_data = after.model_dump(mode="json")
-        diff: list[JsonValue] = [
-            cast(
-                JsonValue,
-                {
-                    "path": key,
-                    "before": before_data.get(key),
-                    "after": after_data.get(key),
-                },
-            )
-            for key in sorted(set(before_data) | set(after_data))
-            if before_data.get(key) != after_data.get(key)
-        ]
-        commit_value = cast(JsonValue, commit.model_dump(mode="json"))
-        return cast(
-            dict[str, JsonValue],
-            {
-                "object": after.model_dump(mode="json"),
-                "semantic_diff": diff,
-                "affected_relations": list(after.relation_refs),
-                "invalidations": [],
-                "status_axes": {
-                    "lifecycle": after.lifecycle,
-                    "resolution": after.resolution,
-                    "verification": after.verification,
-                    "disposition": after.disposition,
-                    "freshness": after.freshness,
-                    "attention": after.attention,
-                },
-                "commit": commit_value,
-            },
-        )
+    _revision_result = staticmethod(object_revision_result)

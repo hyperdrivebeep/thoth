@@ -1,0 +1,65 @@
+{
+  "prior": {
+    "operation_id": "operation:read",
+    "state": "SUCCEEDED",
+    "value": {
+      "project_id": "p",
+      "thread_id": "t",
+      "problem": "Synthetic question",
+      "operation_state": "RUNNING",
+      "current_result": {
+        "operation_id": "operation:old",
+        "result": {
+          "answer": "SYNTHETIC_OLD_RESULT"
+        }
+      },
+      "coverage_matrix": {
+        "rows": [
+          {
+            "id": "synthetic"
+          }
+        ]
+      },
+      "usage": {
+        "total_tokens": 1
+      },
+      "request": {
+        "operation_id": "operation:old",
+        "response_language": "en"
+      }
+    }
+  },
+  "light": {
+    "operation_id": "operation:read",
+    "state": "SUCCEEDED",
+    "value": {
+      "project_id": "p",
+      "thread_id": "t",
+      "operation_state": "RUNNING",
+      "usage": {
+        "total_tokens": 9
+      }
+    }
+  },
+  "ready": {
+    "value": {
+      "response_language_scope": "REQUEST",
+      "response_languages": [
+        "ko",
+        "en"
+      ]
+    }
+  },
+  "expectedJson": "{\"operation_id\":\"operation:read\",\"state\":\"SUCCEEDED\",\"value\":{\"project_id\":\"p\",\"thread_id\":\"t\",\"problem\":\"Synthetic question\",\"operation_state\":\"RUNNING\",\"current_result\":{\"operation_id\":\"operation:old\",\"result\":{\"answer\":\"SYNTHETIC_OLD_RESULT\"}},\"coverage_matrix\":{\"rows\":[{\"id\":\"synthetic\"}]},\"usage\":{\"total_tokens\":9},\"request\":{\"operation_id\":\"operation:old\",\"response_language\":\"en\"}}}",
+  "expectedCalls": [
+    {
+      "method": "thread/read",
+      "input": {
+        "project_id": "p",
+        "thread_id": "t",
+        "expected_result_contract": "v4",
+        "view": "PROGRESS"
+      }
+    }
+  ]
+}

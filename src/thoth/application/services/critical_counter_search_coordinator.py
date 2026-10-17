@@ -1,17 +1,27 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal
-from typing import cast
+from typing import Unpack, cast
 
 from pydantic import JsonValue
 
 from thoth.application.services.connector_service import ConnectorService
-from thoth.application.services.counter_search_calculations import (
-    aggregate_gate_inputs,
-    budget_snapshot,
-    resolve_loop_terminal,
+from thoth.application.services.counter_search_preflight import (
+    CounterSearchBlock,
+    CounterSearchBlocks,
+    classify_counter_route,
 )
+from thoth.application.services.counter_search_preparation import (
+    multi_wave_connector_request,
+    multi_wave_investigation_spec,
+)
+from thoth.application.services.counter_search_publication import (
+    CounterEvidenceArguments,
+    build_counter_search_intent,
+    publish_counter_evidence,
+)
+from thoth.application.services.counter_search_usage import CounterSearchUsage
+from thoth.application.services.counter_wave_evaluation import CounterWaveEvaluator
 from thoth.application.services.critical_counter_search import (
     CounterevidenceChallenger,
     CounterSearchBasis,
@@ -22,12 +32,13 @@ from thoth.application.services.critical_counter_search import (
 from thoth.application.services.critical_counter_search_finalization import (
     CounterSearchFinalizationService,
     IndependentConfirmationTracker,
+    conclude_counter_loop,
 )
 from thoth.application.services.evidence_graph_service import EvidenceGraphService
 from thoth.application.services.investigation_service import InvestigationService
 from thoth.application.services.research_identity_service import ResearchIdentityService
-from thoth.domain.acquisition import AcquisitionLead, SearchIntent
-from thoth.domain.canonical import canonical_payload, domain_digest, head_set_digest
+from thoth.domain.acquisition import SearchIntent
+from thoth.domain.canonical import head_set_digest
 from thoth.domain.connectors import ConnectorAccessRequest, ConnectorFailure
 from thoth.domain.counterevidence import (
     CounterLoopTerminal,
@@ -85,6 +96,16 @@ class CriticalCounterSearchCoordinator:
         self._research = research
         self._clock = clock
         self._ids = ids
+
+        def commit_evidence_candidate(**arguments: Unpack[CounterEvidenceArguments]) -> None:
+            self._commit_evidence_candidate(**arguments)
+
+        self._wave_evaluator = CounterWaveEvaluator(
+            governance=governance,
+            investigations=investigations,
+            clock=clock,
+            commit_evidence_candidate=commit_evidence_candidate,
+        )
         self._challenger = CounterevidenceChallenger(clock=clock, ids=ids)
         self._reviewer = IndependentGateReviewer(clock=clock, ids=ids)
         revisions = CounterSearchRevisionService(
@@ -349,50 +370,16 @@ class CriticalCounterSearchCoordinator:
         limits = policy.counter_search_limits
         ordered = tuple(sorted(routes, key=lambda item: (-item.priority, item.route_id)))
         investigation = self._investigations.start(
-            thread=thread,
-            trigger="HIGH_RISK_MULTI_WAVE_COUNTER_SEARCH",
-            question=f"Run bounded multi-wave challenge for {hypothesis.hypothesis_id}",
-            target_object_id=hypothesis.object_id,
-            target_hypothesis_id=hypothesis.hypothesis_id,
-            mode="CRITICAL",
-            scope={
-                **thread.scope,
-                "cutoff": project.cutoff_at.isoformat(),
-                "access": "PROJECT_POLICY_BOUND",
-                "egress": "PROJECT_POLICY_BOUND",
-                "security": policy.max_source_security_class.value,
-                "max_depth": str(limits.max_depth),
-            },
-            required_evidence_groups=(f"counterevidence:{hypothesis.hypothesis_id}",),
-            query_families=tuple(
-                dict.fromkeys(family for route in ordered for family in route.query_families)
-            ),
-            budget=limits.max_waves,
-            stop_conditions=(
-                "INDEPENDENT_CONFIRMATION_CONVERGED",
-                "SEARCH_SATURATED",
-                "BUDGET_EXHAUSTED",
-                "POLICY_BLOCKED",
-                "AUTHORITY_REQUIRED",
-                "ABSTAINED",
-            ),
+            **multi_wave_investigation_spec(project, thread, hypothesis, policy, ordered, limits)
         )
         primary_sources = self._primary_sources(
             project.project_id,
             hypothesis.support_evidence_refs,
         )
-        started_at = self._clock.now()
-        used_waves = 0
-        used_results = 0
-        used_documents = 0
-        used_bytes = 0
-        used_tool_calls = 0
-        used_cost = 0
+        usage = CounterSearchUsage(started_at=self._clock.now())
         decision_rank = 0
         low_voi_streak = 0
-        policy_blocks = 0
-        authority_blocks = 0
-        abstention_blocks = 0
+        blocks = CounterSearchBlocks()
         seen_content_digests: set[str] = set()
         confirmations = IndependentConfirmationTracker()
         counter_refs: list[str] = []
@@ -405,16 +392,8 @@ class CriticalCounterSearchCoordinator:
         loop_terminal: CounterLoopTerminal | None = None
 
         for route in ordered:
-            elapsed = max(0, int((self._clock.now() - started_at).total_seconds()))
-            if (
-                used_waves >= limits.max_waves
-                or used_documents >= limits.max_documents
-                or used_results >= limits.max_results
-                or used_bytes >= limits.max_bytes
-                or used_tool_calls + 2 > limits.max_tool_calls
-                or used_cost + route.estimated_cost_microunits > limits.max_cost_microunits
-                or elapsed >= limits.max_time_seconds
-            ):
+            now = self._clock.now()
+            if usage.exhausted(limits, route.estimated_cost_microunits, now):
                 budget_exhausted = True
                 break
             plan = self._challenger.challenge(
@@ -433,58 +412,24 @@ class CriticalCounterSearchCoordinator:
                 "investigation/counterSearchPlanned",
                 {"plan": plan.model_dump(mode="json"), "role": "COUNTEREVIDENCE_CHALLENGER"},
             )
-            if route.depth > limits.max_depth:
-                abstention_blocks += 1
+            block = classify_counter_route(route, plan, policy, primary_sources, self._reviewer)
+            if block is not None:
+                blocks.record(block)
                 continue
-            gate = self._reviewer.preflight(plan=plan, primary_sources=primary_sources)
-            if gate.terminal == CounterReviewTerminal.UNRESOLVED_AUTHORITY:
-                authority_blocks += 1
-                continue
-            if gate.terminal in {
-                CounterReviewTerminal.UNRESOLVED_PROHIBITED_CONTEXT,
-                CounterReviewTerminal.UNRESOLVED_TEMPORAL,
-                CounterReviewTerminal.UNRESOLVED_INDEPENDENCE,
-            }:
-                abstention_blocks += 1
-                continue
-            if plan.connector_id not in policy.connector_allowlist:
-                policy_blocks += 1
-                continue
-            remaining_bytes = limits.max_bytes - used_bytes
-            remaining_results = limits.max_results - used_results
-            if remaining_bytes <= 0 or remaining_results <= 0:
+            remaining_bytes, remaining_results, depleted = usage.remaining(limits)
+            if depleted:
                 budget_exhausted = True
                 break
             try:
                 acquisition = await self._connectors.acquire_one(
-                    ConnectorAccessRequest(
-                        actor_id="agent:critical-counter-search-coordinator",
-                        project_id=project.project_id,
-                        connector_id=plan.connector_id,
-                        selector=plan.selector,
-                        authority=AuthorityState(plan.source_authority),
-                        cutoff_state=CutoffState(plan.temporal_state),
-                        security_class=SecurityClass.INTERNAL,
-                        cutoff_at=project.cutoff_at,
-                        max_bytes=remaining_bytes,
-                        policy_id=policy.policy_id,
-                        policy_revision=policy.policy_revision,
-                        policy_digest=policy.policy_digest,
-                    )
+                    multi_wave_connector_request(project, plan, policy, remaining_bytes)
                 )
             except ConnectorFailure as exc:
-                if exc.policy_denial is not None:
-                    policy_blocks += 1
-                else:
-                    abstention_blocks += 1
+                blocks.record_failure(exc)
                 continue
-            used_waves += 1
-            used_documents += 1
-            used_tool_calls += 2
-            used_cost += plan.estimated_cost_microunits
-            used_bytes += acquisition.receipt.byte_size
-            acquired_spans = acquisition.ingestion.evidence_candidates[:remaining_results]
-            used_results += len(acquired_spans)
+            acquired_spans = usage.record_success(
+                acquisition, plan.estimated_cost_microunits, remaining_results
+            )
             last_connector_run = cast(dict[str, JsonValue], acquisition.run.model_dump(mode="json"))
             gate = self._reviewer.review_results(
                 plan=plan,
@@ -498,113 +443,32 @@ class CriticalCounterSearchCoordinator:
                 acquisition.binding.binding_id,
             ):
                 loop_terminal = CounterLoopTerminal.ABSTAINED
-                abstention_blocks += 1
+                blocks.record(CounterSearchBlock.ABSTENTION)
                 break
-            content_digest = acquisition.ingestion.object_digest
-            deduplicated = content_digest in seen_content_digests
-            if not deduplicated:
-                seen_content_digests.add(content_digest)
-            contributes_confirmation = confirmations.can_contribute(
-                plan,
-                acquisition.source,
-                content_duplicate=deduplicated,
+            outcome = self._wave_evaluator.evaluate(
+                project_id=project.project_id,
+                thread=thread,
+                plan=plan,
+                intent=intent,
+                acquisition=acquisition,
+                acquired_spans=acquired_spans,
+                gate=gate,
+                investigation=investigation,
+                hypothesis_id=hypothesis.hypothesis_id,
+                limits=limits,
+                wave_index=usage.used_waves,
+                seen_content_digests=seen_content_digests,
+                confirmations=confirmations,
+                counter_refs=counter_refs,
+                support_refs=support_refs,
+                executed_track_ids=executed_track_ids,
+                decision_rank=decision_rank,
+                low_voi_streak=low_voi_streak,
             )
-            rank_before = decision_rank
-            accepted = tuple(
-                span for span in acquired_spans if span.span_id in gate.accepted_evidence_refs
-            )
-            relevant = gate.terminal in {
-                CounterReviewTerminal.SUPPORTED,
-                CounterReviewTerminal.ELIMINATED_WITHIN_SCOPE,
-            }
-            computed_voi = (
-                Decimal(plan.priority) / Decimal(100) / Decimal(1 + plan.estimated_cost_microunits)
-                if relevant and contributes_confirmation
-                else Decimal(0)
-            )
-            if relevant and not deduplicated:
-                try:
-                    self._commit_evidence_candidate(
-                        project_id=project.project_id,
-                        thread=thread,
-                        plan=plan,
-                        intent=intent,
-                        source=acquisition.source,
-                        spans=accepted,
-                        terminal=gate.terminal,
-                    )
-                    if gate.terminal == CounterReviewTerminal.ELIMINATED_WITHIN_SCOPE:
-                        counter_refs.extend(gate.accepted_evidence_refs)
-                        if contributes_confirmation:
-                            decision_rank -= 1
-                    else:
-                        support_refs.extend(gate.accepted_evidence_refs)
-                        if contributes_confirmation:
-                            decision_rank += 1
-                    if contributes_confirmation:
-                        confirmations.record(plan, acquisition.source, gate.terminal)
-                    executed_track_ids.extend(gate.executed_track_ids)
-                except Exception:
-                    relevant = False
-                    computed_voi = Decimal(0)
-            if not relevant or deduplicated:
-                self._governance.set_source_binding_state(
-                    project.project_id,
-                    acquisition.binding.binding_id,
-                    state="DETACHED",
-                    updated_at=self._clock.now().isoformat(),
-                )
-            low_voi_streak = (
-                low_voi_streak + 1 if computed_voi <= limits.saturation_voi_threshold else 0
-            )
-            investigation = self._investigations.record_wave(
-                investigation,
-                observation_count=(1 if relevant and not deduplicated else 0),
-                lead_count=(1 if relevant and not deduplicated else 0),
-                claim_candidate_count=(1 if relevant and not deduplicated else 0),
-                remaining_target_gaps=(
-                    ()
-                    if confirmations.maximum >= limits.min_independent_confirmations
-                    else (f"counterevidence:{hypothesis.hypothesis_id}",)
-                ),
-            )
-            checkpoint_digest = investigation.checkpoint_digest
-            if plan.checkpoint_after:
-                paused = self._investigations.pause(investigation)
-                checkpoint_digest = paused.checkpoint_digest
-                if checkpoint_digest is None:
-                    raise ValueError("counter-search checkpoint digest is missing")
-                investigation = self._investigations.resume(
-                    paused,
-                    expected_checkpoint_digest=checkpoint_digest,
-                )
-            confirmation_after = confirmations.maximum
-            confirmation_before = confirmation_after - (
-                1 if relevant and contributes_confirmation else 0
-            )
-            wave = CounterWaveRecord(
-                wave_index=used_waves,
-                route_id=plan.route_id,
-                connector_id=plan.connector_id,
-                priority=plan.priority,
-                depth=plan.depth,
-                excursion=plan.excursion,
-                result_count=len(acquired_spans),
-                document_count=1,
-                byte_count=acquisition.receipt.byte_size,
-                tool_calls=2,
-                cost_microunits=plan.estimated_cost_microunits,
-                deduplicated=deduplicated,
-                computed_voi=computed_voi,
-                sufficiency_before=f"confirmations:{confirmation_before}",
-                sufficiency_after=f"confirmations:{confirmation_after}",
-                decision_rank_before=rank_before,
-                decision_rank_after=decision_rank,
-                gate_terminal=gate.terminal,
-                accepted_evidence_refs=(() if deduplicated else gate.accepted_evidence_refs),
-                executed_track_ids=gate.executed_track_ids,
-                checkpoint_digest=checkpoint_digest,
-            )
+            investigation = outcome.investigation
+            decision_rank = outcome.decision_rank
+            low_voi_streak = outcome.low_voi_streak
+            wave = outcome.wave
             waves.append(wave)
             self._investigations.audit(
                 investigation,
@@ -620,57 +484,31 @@ class CriticalCounterSearchCoordinator:
             if low_voi_streak >= 2:
                 loop_terminal = CounterLoopTerminal.SEARCH_SATURATED
                 break
-        loop_terminal = resolve_loop_terminal(
+        conclusion = conclude_counter_loop(
             loop_terminal=loop_terminal,
             budget_exhausted=budget_exhausted,
             counter_refs=counter_refs,
             support_refs=support_refs,
-            policy_blocks=policy_blocks,
-            authority_blocks=authority_blocks,
-            abstention_blocks=abstention_blocks,
+            blocks=blocks,
             waves=waves,
+            plans=plans,
+            confirmations=confirmations,
+            executed_track_ids=executed_track_ids,
+            investigation=investigation,
+            reviewer=self._reviewer,
+            investigations=self._investigations,
         )
-        if not plans:
-            raise ValueError("multi-wave counter-search produced no challenger plan")
-        gate_terminal, accepted_refs = aggregate_gate_inputs(
-            loop_terminal, counter_refs, support_refs
-        )
-        gate = self._reviewer.aggregate(
-            plans[0],
-            terminal=gate_terminal,
-            reasons=(
-                f"multi-wave terminal: {loop_terminal.value}",
-                f"counter confirmations: {len(confirmations.counter_groups)}",
-                f"support confirmations: {len(confirmations.support_groups)}",
-            ),
-            accepted_evidence_refs=accepted_refs,
-            executed_track_ids=tuple(dict.fromkeys(executed_track_ids)),
-        )
-        stopped = self._investigations.stop(
-            investigation,
-            reason=self._loop_stop_reason(loop_terminal),
-        )
-        elapsed = max(0, int((self._clock.now() - started_at).total_seconds()))
-        budget = budget_snapshot(
-            limits=limits,
-            used_waves=used_waves,
-            used_results=used_results,
-            used_documents=used_documents,
-            used_bytes=used_bytes,
-            used_tool_calls=used_tool_calls,
-            used_cost=used_cost,
-            elapsed=elapsed,
-        )
+        budget = usage.snapshot(limits, self._clock.now())
         return CriticalCounterSearchExecution(
             projection=self._finalizer.multi(
                 project=project,
                 thread=thread,
                 portfolio=portfolio,
                 hypothesis=hypothesis,
-                investigation=stopped,
+                investigation=conclusion.investigation,
                 plans=plans,
-                gate=gate,
-                loop_terminal=loop_terminal,
+                gate=conclusion.gate,
+                loop_terminal=conclusion.terminal,
                 basis=basis,
                 waves=waves,
                 budget=budget,
@@ -710,94 +548,16 @@ class CriticalCounterSearchCoordinator:
         return tuple(sources[key] for key in sorted(sources))
 
     def _intent(self, plan: CounterSearchPlan) -> SearchIntent:
-        draft: dict[str, object] = {
-            "search_intent_id": self._ids.new("search-intent"),
-            "project_id": plan.project_id,
-            "thread_id": plan.thread_id,
-            "investigation_id": plan.investigation_id,
-            "evidence_group": f"counterevidence:{plan.hypothesis_id}",
-            "query_families": plan.query_families,
-            "connector_id": plan.connector_id,
-            "selector": plan.selector,
-            "max_waves": plan.max_waves,
-            "max_results": plan.max_results,
-            "stop_conditions": (
-                "INDEPENDENT_GATE_TERMINAL",
-                "SEARCH_SATURATED",
-                "POLICY_BLOCKED",
-                "BUDGET_EXHAUSTED",
-            ),
-            "policy_id": plan.policy_id,
-            "policy_revision": plan.policy_revision,
-            "policy_digest": plan.policy_digest,
-            "state": "READY",
-            "created_at": self._clock.now(),
-        }
-        return SearchIntent.model_validate(
-            {
-                **draft,
-                "intent_digest": domain_digest(
-                    "COUNTER_SEARCH_INTENT", "1.0.0", canonical_payload(draft)
-                ),
-            }
-        )
+        return build_counter_search_intent(plan, clock=self._clock, ids=self._ids)
 
-    def _commit_evidence_candidate(
-        self,
-        *,
-        project_id: str,
-        thread: WorkThread,
-        plan: CounterSearchPlan,
-        intent: SearchIntent,
-        source: EvidenceSourceRecord,
-        spans: tuple[EvidenceSpan, ...],
-        terminal: CounterReviewTerminal,
-    ) -> None:
-        if not spans:
-            raise ValueError("gate accepted no evidence spans")
-        span = spans[0]
-        lead_draft: dict[str, object] = {
-            "lead_id": self._ids.new("counterevidence-lead"),
-            "project_id": project_id,
-            "investigation_id": plan.investigation_id,
-            "search_intent_id": intent.search_intent_id,
-            "source_id": source.source_id,
-            "span_id": span.span_id,
-            "evidence_group": f"counterevidence:{plan.hypothesis_id}",
-            "state": "CLAIM_CANDIDATE",
-            "information_value": "CRITICAL_COUNTEREVIDENCE",
-            "authority_basis": "independent deterministic gate pass",
-            "created_at": self._clock.now(),
-        }
-        lead = AcquisitionLead.model_validate(
-            {
-                **lead_draft,
-                "lead_digest": domain_digest(
-                    "COUNTEREVIDENCE_LEAD", "1.0.0", canonical_payload(lead_draft)
-                ),
-            }
+    def _commit_evidence_candidate(self, **arguments: Unpack[CounterEvidenceArguments]) -> None:
+        publish_counter_evidence(
+            **arguments,
+            evidence_graph=self._evidence_graph,
+            evidence_unit_of_work=self._evidence_unit_of_work,
+            clock=self._clock,
+            ids=self._ids,
         )
-        staged = self._evidence_graph.stage_link(
-            project_id=project_id,
-            target_type="HYPOTHESIS",
-            target_id=plan.hypothesis_id,
-            relation=(
-                "CONTRADICTS"
-                if terminal == CounterReviewTerminal.ELIMINATED_WITHIN_SCOPE
-                else "SUPPORTS"
-            ),
-            span_ids=tuple(item.span_id for item in spans),
-            observed_statement="\n".join(item.exact_text for item in spans),
-            thread_id=thread.thread_id,
-            conditions={
-                "source_territory": plan.source_territory,
-                "alternative_explanation": plan.alternative_explanation_track,
-            },
-            applicability="INDEPENDENT_CRITICAL_REVIEW_CANDIDATE",
-            independence_group=plan.independence_group,
-            lead=lead,
-        )
-        self._evidence_unit_of_work.commit(staged)
 
     @staticmethod
     def _stop_reason(terminal: CounterReviewTerminal) -> str:
@@ -815,21 +575,4 @@ class CriticalCounterSearchCoordinator:
             return "PERMISSION_BLOCKED"
         if terminal == CounterReviewTerminal.UNRESOLVED_FAILED:
             return "CONNECTOR_FAILED"
-        return "HIGH_RISK_CONFLICT"
-
-    @staticmethod
-    def _loop_stop_reason(terminal: CounterLoopTerminal) -> str:
-        if terminal in {
-            CounterLoopTerminal.SUPPORTED,
-            CounterLoopTerminal.ELIMINATED_WITHIN_SCOPE,
-        }:
-            return "SUFFICIENT"
-        if terminal == CounterLoopTerminal.SEARCH_SATURATED:
-            return "SEARCH_SATURATED"
-        if terminal == CounterLoopTerminal.BUDGET_EXHAUSTED:
-            return "BUDGET_EXHAUSTED"
-        if terminal == CounterLoopTerminal.POLICY_BLOCKED:
-            return "PERMISSION_BLOCKED"
-        if terminal == CounterLoopTerminal.AUTHORITY_REQUIRED:
-            return "PERMISSION_BLOCKED"
         return "HIGH_RISK_CONFLICT"

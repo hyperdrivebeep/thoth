@@ -3,14 +3,29 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import cast
 
-from pydantic import AwareDatetime, Field, JsonValue
+from pydantic import AwareDatetime, JsonValue
 
+from thoth.application.commands.project_inputs import ProjectCreateInput as ProjectCreateInput
+from thoth.application.commands.project_inputs import (
+    ProjectCutoffImpactInput,
+    ProjectCutoffUpdateInput,
+    ProjectListInput,
+    ProjectMetadataUpdateInput,
+    ProjectOverlayUpdateInput,
+    ProjectPolicyUpdateInput,
+    ProjectReadInput,
+    ProjectReferenceImportInput,
+    ProjectRoleAssignInput,
+    ProjectRoleRevokeInput,
+)
+from thoth.application.commands.project_inputs import (
+    ProjectExpectedRevisionInput as ProjectExpectedRevisionInput,
+)
 from thoth.application.services.public_web_policy import (
     normalize_public_web_update,
     reconcile_managed_web_permissions,
 )
 from thoth.domain.auth import current_authenticated_actor
-from thoth.domain.base import DomainModel
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.enums import ProjectLifecycle
 from thoth.domain.governance import ProjectPolicy, ProjectReference, RoleAssignment
@@ -28,69 +43,6 @@ from thoth.ports.ledger import LedgerPort
 from thoth.ports.project import ProjectAlreadyExistsError, ProjectStorePort
 from thoth.ports.runtime import ClockPort, IdGeneratorPort
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
-
-
-class ProjectCreateInput(DomainModel):
-    project_id: str = Field(min_length=1, max_length=160)
-    name: str = Field(min_length=1, max_length=500)
-    description: str = Field(default="", max_length=10_000)
-    cutoff_at: AwareDatetime
-    overlay: str = Field(default="default", min_length=1, max_length=160)
-    policy_binding_ref: str = Field(default="policy:default", min_length=1, max_length=160)
-
-
-class ProjectReadInput(DomainModel):
-    project_id: str = Field(min_length=1, max_length=160)
-
-
-class ProjectListInput(DomainModel):
-    project_id: str = Field(default="system:projects", min_length=1, max_length=160)
-    include_archived: bool = False
-
-
-class ProjectExpectedRevisionInput(ProjectReadInput):
-    expected_revision: int = Field(ge=0)
-
-
-class ProjectMetadataUpdateInput(ProjectExpectedRevisionInput):
-    name: str | None = Field(default=None, min_length=1, max_length=500)
-    description: str | None = Field(default=None, max_length=10_000)
-
-
-class ProjectOverlayUpdateInput(ProjectExpectedRevisionInput):
-    overlay: str = Field(min_length=1, max_length=160)
-
-
-class ProjectPolicyUpdateInput(ProjectExpectedRevisionInput):
-    payload: dict[str, JsonValue]
-
-
-class ProjectRoleAssignInput(ProjectExpectedRevisionInput):
-    actor_id: str = Field(min_length=1, max_length=160)
-    organization_id: str | None = Field(default=None, max_length=160)
-    role: str = Field(min_length=1, max_length=160)
-    scope: str = Field(default="PROJECT", min_length=1, max_length=260)
-    authority_tags: tuple[str, ...] = ()
-
-
-class ProjectRoleRevokeInput(ProjectExpectedRevisionInput):
-    role_assignment_id: str = Field(min_length=1, max_length=160)
-
-
-class ProjectReferenceImportInput(ProjectExpectedRevisionInput):
-    origin_project_id: str = Field(min_length=1, max_length=160)
-    origin_revision: str = Field(min_length=1, max_length=160)
-    rights_status: str = Field(min_length=1, max_length=80)
-    scope: str = Field(min_length=1, max_length=260)
-
-
-class ProjectCutoffImpactInput(ProjectReadInput):
-    proposed_cutoff_at: AwareDatetime
-
-
-class ProjectCutoffUpdateInput(ProjectExpectedRevisionInput):
-    cutoff_at: AwareDatetime
-    expected_impact_digest: str = Field(min_length=64, max_length=64)
 
 
 class ProjectCommandHandlers:

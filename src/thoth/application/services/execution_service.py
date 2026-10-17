@@ -1,25 +1,37 @@
 from __future__ import annotations
 
-from typing import cast
-
 from thoth.application.services.action_currentness import find_plan_step, require_plan_current
 from thoth.application.services.action_service import ActionService
 from thoth.application.services.authorization_currentness import approved_authorization
+from thoth.application.services.execution_attempt_drafts import (
+    attempt_record,
+    revised_attempt_record,
+)
 from thoth.application.services.execution_frontier import execution_frontier
 from thoth.application.services.execution_persistence import (
     append_execution_audit,
     persist_execution,
 )
 from thoth.application.services.execution_preparation import (
-    execution_checkpoint,
     execution_digest,
-    execution_resume_token,
     prepare_execution_record,
     sandbox_attempt_updates,
 )
+from thoth.application.services.execution_record_drafts import (
+    RECONCILIATION_ATTEMPT_STATES,
+    RECONCILIATION_FINDINGS,
+    advance_state,
+    compensation_specification,
+    effect_record,
+    reconciliation_record,
+    revised_execution_record,
+    sandbox_failed_updates,
+    sandbox_not_admitted_updates,
+    sandbox_succeeded_updates,
+)
 from thoth.application.services.revision_service import CommitResult, RevisionCommitService
 from thoth.domain.action_full import ActionPlanRecord, AuthorizationEnvelopeRecord
-from thoth.domain.canonical import canonical_payload, domain_digest, head_set_digest
+from thoth.domain.canonical import head_set_digest
 from thoth.domain.enums import CutoffState
 from thoth.domain.execution_full import (
     ExecutionAuditRecord,
@@ -115,31 +127,7 @@ class ExecutionService:
     ) -> tuple[PlanExecutionRecord, CommitResult]:
         with self._ledger.transaction():
             self._assert_current(current)
-            draft = current.model_dump(mode="python")
-            draft.update(updates)
-            draft.update(
-                {
-                    "execution_revision_id": self._ids.new("execution-revision"),
-                    "revision": current.revision + 1,
-                    "supersedes_revision_digest": current.revision_digest,
-                    "updated_at": self._clock.now(),
-                }
-            )
-            draft.pop("revision_digest", None)
-            checkpoint = execution_checkpoint(
-                current.plan_execution_id,
-                current.plan_revision_digest,
-                current.revision + 1,
-                tuple(cast(tuple[str, ...], draft.get("executable_steps", ()))),
-                cast(dict[str, str], draft.get("blocked_steps", {})),
-                tuple(cast(tuple[str, ...], draft.get("protected_steps", ()))),
-                current.selected_step_ids,
-            )
-            draft["checkpoint_digest"] = checkpoint
-            draft["resume_token"] = execution_resume_token(checkpoint, current.plan_execution_id)
-            revised = PlanExecutionRecord.model_validate(
-                {**draft, "revision_digest": self._digest("PLAN_EXECUTION", draft)}
-            )
+            revised = revised_execution_record(current, updates, ids=self._ids, clock=self._clock)
             return self._persist_execution(revised, event_type)
 
     def pause(
@@ -287,41 +275,10 @@ class ExecutionService:
         with self._ledger.transaction():
             self._assert_current(current)
             self._validate_evidence(current.project_id, evidence_refs)
-            findings = {
-                "TARGET_CHECK_CONFIRMED_NOT_APPLIED": (
-                    "CONFIRMED_NOT_APPLIED",
-                    "NONE",
-                    True,
-                    "RETRY_ALLOWED",
-                ),
-                "TARGET_CHECK_CONFIRMED_APPLIED": (
-                    "CONFIRMED_APPLIED",
-                    "CONFIRMED",
-                    False,
-                    "LINK_OBSERVATION",
-                ),
-                "TARGET_CHECK_PARTIAL": (
-                    "PARTIAL",
-                    "PARTIAL",
-                    False,
-                    "COMPENSATION_OR_NEW_REVISION",
-                ),
-                "TARGET_CHECK_STILL_UNKNOWN": (
-                    "STILL_UNKNOWN",
-                    "EFFECT_MAY_CONTINUE",
-                    False,
-                    "RECONCILE_AGAIN",
-                ),
-            }
-            if method not in findings:
+            if method not in RECONCILIATION_FINDINGS:
                 raise ValueError("unsupported reconciliation method")
-            finding, effect_state, retry, next_action = findings[method]
-            state = {
-                "CONFIRMED_NOT_APPLIED": "FAILED",
-                "CONFIRMED_APPLIED": "SUCCEEDED",
-                "PARTIAL": "PARTIAL",
-                "STILL_UNKNOWN": "UNKNOWN_COMPLETION",
-            }[finding]
+            finding, effect_state, retry, next_action = RECONCILIATION_FINDINGS[method]
+            state = RECONCILIATION_ATTEMPT_STATES[finding]
             revised_attempt = self._revise_attempt(
                 attempt,
                 updates={
@@ -339,44 +296,26 @@ class ExecutionService:
                     ),
                 },
             )
-            reconciliation_draft: dict[str, object] = {
-                "reconciliation_id": self._ids.new("reconciliation"),
-                "project_id": current.project_id,
-                "plan_execution_id": current.plan_execution_id,
-                "attempt_id": attempt.attempt_id,
-                "method": method,
-                "target_state_evidence_refs": evidence_refs,
-                "finding": finding,
-                "duplicate_risk": (
-                    "NONE_CONFIRMED" if finding == "CONFIRMED_NOT_APPLIED" else "POSSIBLE"
-                ),
-                "retry_permitted": retry,
-                "next_permitted_action": next_action,
-                "created_at": self._clock.now(),
-            }
-            reconciliation = ReconciliationRecord.model_validate(
-                {
-                    **reconciliation_draft,
-                    "reconciliation_digest": self._digest(
-                        "EXECUTION_RECONCILIATION", reconciliation_draft
-                    ),
-                }
+            reconciliation = reconciliation_record(
+                current,
+                attempt,
+                method=method,
+                evidence_refs=evidence_refs,
+                finding=finding,
+                retry=retry,
+                next_action=next_action,
+                ids=self._ids,
+                clock=self._clock,
             )
             self._store.add_reconciliation(reconciliation)
-            effect_draft: dict[str, object] = {
-                "effect_id": self._ids.new("execution-effect"),
-                "project_id": current.project_id,
-                "attempt_id": attempt.attempt_id,
-                "effect_state": effect_state,
-                "effect_refs": evidence_refs,
-                "target_reconciliation_required": finding == "STILL_UNKNOWN",
-                "created_at": self._clock.now(),
-            }
-            effect = ExecutionEffectRecord.model_validate(
-                {
-                    **effect_draft,
-                    "effect_digest": self._digest("EXECUTION_EFFECT", effect_draft),
-                }
+            effect = effect_record(
+                current,
+                attempt,
+                effect_state=effect_state,
+                evidence_refs=evidence_refs,
+                finding=finding,
+                ids=self._ids,
+                clock=self._clock,
             )
             self._store.add_effect(effect)
             completed = (
@@ -477,45 +416,24 @@ class ExecutionService:
             if not observation_admitted:
                 execution, commit = self.revise_execution(
                     current,
-                    updates={
-                        "state": "PARTIAL",
-                        "blocked_steps": {
-                            **current.blocked_steps,
-                            attempt.step_id: admission_reason,
-                        },
-                        "observation_refs": tuple(
-                            dict.fromkeys((*current.observation_refs, *observation_refs))
-                        ),
-                    },
+                    updates=sandbox_not_admitted_updates(
+                        current, attempt.step_id, observation_refs, admission_reason
+                    ),
                     event_type="execution/resultNotAdmitted",
                 )
                 return revised_attempt, execution, (), commit
             if revised_attempt.state != "SUCCEEDED":
                 execution, commit = self.revise_execution(
                     current,
-                    updates={
-                        "state": "PARTIAL",
-                        "blocked_steps": {
-                            **current.blocked_steps,
-                            attempt.step_id: result.state.value,
-                        },
-                    },
+                    updates=sandbox_failed_updates(current, attempt.step_id, result.state.value),
                     event_type="execution/sandboxAttemptFailed",
                 )
                 return revised_attempt, execution, (), commit
             base, commit = self.revise_execution(
                 current,
-                updates={
-                    "completed_steps": tuple(
-                        dict.fromkeys((*current.completed_steps, attempt.step_id))
-                    ),
-                    "effect_refs": tuple(
-                        dict.fromkeys((*current.effect_refs, receipt.receipt_digest))
-                    ),
-                    "observation_refs": tuple(
-                        dict.fromkeys((*current.observation_refs, *observation_refs))
-                    ),
-                },
+                updates=sandbox_succeeded_updates(
+                    current, attempt.step_id, receipt.receipt_digest, observation_refs
+                ),
                 event_type="execution/sandboxAttemptSucceeded",
             )
             advanced, attempts, advance_commit = self._advance(
@@ -571,18 +489,7 @@ class ExecutionService:
             plan = self._actions.read_plan(current.project_id, current.plan_id, None)
             if plan is None:
                 raise ValueError("ActionPlan was not found for compensation")
-            specification: dict[str, object] = {
-                "description": reason,
-                "caused_by_execution_attempt_ref": attempt.attempt_id,
-                "observed_effect_refs": effect_refs,
-                "expected_observation_or_change": {
-                    "description": "residual effect is reduced and remains observable"
-                },
-                "effect_completeness_confirmed": False,
-                "effect_vector": {"effect_completeness_confirmed": False},
-                "stop_conditions": ("residual effect boundary reached",),
-                "observability": "effect and residual evidence required",
-            }
+            specification = compensation_specification(reason, attempt, effect_refs)
             action, _duplicates, commit = self._action_service.create(
                 project_id=current.project_id,
                 object_id=current.object_id,
@@ -633,25 +540,13 @@ class ExecutionService:
                 for attempt in self._store.list_attempts(
                     current.project_id, current.plan_execution_id
                 )
-                if attempt.state not in {"FAILED", "INVALIDATED", "CANCELLED_CONFIRMED"}
+                if attempt.state not in {"INVALIDATED", "CANCELLED_CONFIRMED"}
             }
             dispatch = tuple(step for step in executable if step not in attempted_steps)
             attempts = tuple(self._create_attempt(current, plan, step_id) for step_id in dispatch)
             for attempt in attempts:
                 self._store.add_attempt(attempt)
-            all_steps = set(current.selected_step_ids) or {
-                str(step["step_id"]) for step in plan.steps
-            }
-            completed = set(current.completed_steps)
-            state = (
-                "COMPLETED"
-                if completed == all_steps
-                else "RUNNING"
-                if executable
-                else "PAUSED_PROTECTED_BOUNDARY"
-                if protected
-                else "PARTIAL"
-            )
+            state = advance_state(plan, current, executable, protected)
             execution, commit = self.revise_execution(
                 current,
                 updates={
@@ -700,88 +595,22 @@ class ExecutionService:
             authorization = self._action_service.consume_authorization(
                 authorization, exact_scope_digest=authorization.exact_scope_digest
             )
-        input_values = self._strings(step.get("input_digests", step.get("inputs", ())))
-        input_digests = tuple(
-            value
-            if len(value) == 64
-            else domain_digest("EXECUTION_INPUT", "1.0.0", canonical_payload({"value": value}))
-            for value in input_values
-        )
-        target_values = self._strings(step.get("target_digests", ()))
-        target_digests = tuple(
-            value
-            if len(value) == 64
-            else domain_digest("EXECUTION_TARGET", "1.0.0", canonical_payload({"value": value}))
-            for value in target_values
-        )
-        environment = {
-            "execution_profile_ref": execution.execution_profile_ref,
-            "risk_tier": risk,
-            "sandbox": risk == "R2",
-        }
-        environment_digest = domain_digest(
-            "EXECUTION_ENVIRONMENT", "1.0.0", canonical_payload(environment)
-        )
-        invocation = {
-            "plan_revision_digest": plan.revision_digest,
-            "step_id": step_id,
-            "input_digests": input_digests,
-            "target_digests": target_digests,
-            "environment_digest": environment_digest,
-            "authorization_digest": (
-                None if authorization is None else authorization.exact_scope_digest
-            ),
-            "attempt_number": attempt_number,
-        }
-        draft: dict[str, object] = {
-            "attempt_revision_id": self._ids.new("attempt-revision"),
-            "attempt_id": self._ids.new("execution-attempt"),
-            "project_id": execution.project_id,
-            "plan_execution_id": execution.plan_execution_id,
-            "plan_id": plan.plan_id,
-            "plan_revision_digest": plan.revision_digest,
-            "step_id": step_id,
-            "attempt_number": attempt_number,
-            "state": "DISPATCHED",
-            "exact_invocation_digest": domain_digest(
-                "EXECUTION_INVOCATION", "1.0.0", canonical_payload(invocation)
-            ),
-            "input_digests": input_digests,
-            "target_digests": target_digests,
-            "environment_digest": environment_digest,
-            "authorization_digest": (
-                None if authorization is None else authorization.exact_scope_digest
-            ),
-            "idempotency_key": f"{execution.plan_execution_id}:{step_id}:{attempt_number}",
-            "delivery_guarantee": (
-                "IDEMPOTENT_RETRYABLE" if risk in {"R0", "R1", "R2"} else "REQUIRES_RECONCILIATION"
-            ),
-            "effect_state": "POSSIBLE" if risk == "R3" else "NONE",
-            "observation_completeness": "MISSING",
-            "heartbeat_at": self._clock.now(),
-            "started_at": self._clock.now(),
-            "created_at": self._clock.now(),
-        }
-        return StepExecutionAttemptRecord.model_validate(
-            {**draft, "revision_digest": self._digest("STEP_EXECUTION_ATTEMPT", draft)}
+        return attempt_record(
+            execution,
+            plan,
+            step_id,
+            step=step,
+            risk=risk,
+            authorization=authorization,
+            attempt_number=attempt_number,
+            ids=self._ids,
+            clock=self._clock,
         )
 
     def _revise_attempt(
         self, current: StepExecutionAttemptRecord, *, updates: dict[str, object]
     ) -> StepExecutionAttemptRecord:
-        draft = current.model_dump(mode="python")
-        draft.update(updates)
-        draft.update(
-            {
-                "attempt_revision_id": self._ids.new("attempt-revision"),
-                "supersedes_revision_digest": current.revision_digest,
-                "created_at": self._clock.now(),
-            }
-        )
-        draft.pop("revision_digest", None)
-        revised = StepExecutionAttemptRecord.model_validate(
-            {**draft, "revision_digest": self._digest("STEP_EXECUTION_ATTEMPT", draft)}
-        )
+        revised = revised_attempt_record(current, updates, ids=self._ids, clock=self._clock)
         self._store.add_attempt(revised)
         return revised
 
@@ -816,13 +645,3 @@ class ExecutionService:
     @staticmethod
     def _step(plan: ActionPlanRecord, step_id: str) -> dict[str, object]:
         return find_plan_step(plan, step_id)
-
-    @staticmethod
-    def _strings(value: object) -> tuple[str, ...]:
-        if not isinstance(value, tuple | list):
-            return ()
-        return tuple(str(item) for item in cast(tuple[object, ...] | list[object], value))
-
-    @staticmethod
-    def _digest(kind: str, value: dict[str, object]) -> str:
-        return domain_digest(kind, "1.0.0", canonical_payload(value))

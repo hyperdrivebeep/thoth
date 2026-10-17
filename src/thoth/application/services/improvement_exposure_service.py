@@ -5,6 +5,7 @@ from typing import Literal, cast
 
 from pydantic import JsonValue
 
+from thoth.application.services import improvement_exposure_records as records
 from thoth.application.services.behavior_candidate_service import BehaviorCandidateService
 from thoth.application.services.control_record_service import ControlRecordService
 from thoth.application.services.improvement_thread_scope import ImprovementThreadScope
@@ -20,7 +21,6 @@ from thoth.domain.behavior_execution import (
     BehaviorExecutionRecord,
     BehaviorExposureRecord,
     BehaviorExposureSpec,
-    BehaviorStageEvidence,
     select_behavior_baseline,
 )
 from thoth.domain.behavior_policy import BehaviorPolicyError
@@ -79,31 +79,12 @@ class ImprovementExposureService:
                 record_type="CANARY_RUN" if record.spec.stage == "CANARY" else "SHADOW_RUN",
                 record_id=record.spec.exposure_id,
                 state=record.state,
-                payload={
-                    "improvement_revision_id": record.spec.improvement_ref,
-                    "evaluation_plan_id": record.spec.evaluation_plan_ref,
-                    "requested_exposure_state": record.spec.stage,
-                    "runtime_record_digest": record.record_digest,
-                    "runtime_spec": record.spec.model_dump(mode="python"),
-                    "approval_target_digest": record.spec.spec_digest,
-                    "authorization_required": record.spec.stage == "CANARY",
-                    "stage_evidence": record.stage_evidence,
-                    "actual_execution_observed": bool(record.observations),
-                    "decision_exposure_observed": any(
-                        item.decision_exposed for item in record.observations
-                    ),
-                    "output_authoritative": False,
-                },
+                payload=records.exposure_projection(record),
             )
         return record
 
     def transition(self, old: BehaviorExposureRecord, **changes: object) -> BehaviorExposureRecord:
-        payload = old.model_dump(mode="python", exclude={"record_digest"})
-        payload.update(changes)
-        payload["revision"] = old.revision + 1
-        record = BehaviorExposureRecord.model_validate(
-            sealed_payload("BEHAVIOR_EXPOSURE_RECORD", "record_digest", payload)
-        )
+        record = records.transition_record(old, changes)
         return self._write(record, old.revision)
 
     def read(self, project: str, identifier: str) -> BehaviorExposureRecord:
@@ -201,36 +182,20 @@ class ImprovementExposureService:
                     "spec_digest",
                     {
                         "exposure_id": self._ids.new("behavior-exposure"),
-                        "project_id": project,
-                        "component": component,
-                        "environment": self._environment,
-                        "evaluation_contract_ref": pair.spec.binding_id,
-                        "scope_digest": domain_digest(
-                            "BEHAVIOR_OVERLAP_SCOPE",
-                            "1.0.0",
-                            canonical_payload(
-                                {
-                                    "project_id": project,
-                                    "component": component,
-                                    "environment": self._environment,
-                                    "evaluation_contract_ref": pair.spec.binding_id,
-                                }
-                            ),
+                        **records.exposure_spec_fields(
+                            project,
+                            component,
+                            self._environment,
+                            pair,
+                            pair.result.result_digest,
+                            stage,
+                            proposal,
+                            plan,
+                            artifact,
+                            target,
+                            workstream,
+                            governance.policy_digest,
                         ),
-                        "stage": stage,
-                        "improvement_ref": proposal.record_id,
-                        "improvement_digest": proposal.record_digest,
-                        "evaluation_plan_ref": plan.record_id,
-                        "pair_id": pair.spec.pair_id,
-                        "pair_result_digest": pair.result.result_digest,
-                        "baseline_artifact_ref": pair.spec.baseline_ref,
-                        "baseline_digest": pair.spec.baseline_digest,
-                        "candidate_artifact_ref": artifact.artifact_id,
-                        "candidate_digest": artifact.content_digest,
-                        "candidate_revision_digest": pair.spec.candidate_digest,
-                        "target_thread_id": target,
-                        "target_workstream": workstream,
-                        "policy_digest": governance.policy_digest,
                         "duration_seconds": self._budget(budget, "duration_seconds"),
                         "max_requests": self._budget(budget, "max_requests"),
                         "max_model_calls": self._budget(budget, "max_model_calls"),
@@ -246,55 +211,7 @@ class ImprovementExposureService:
 
     @staticmethod
     def _prepared(spec: BehaviorExposureSpec, pair: PairedRunRecord) -> BehaviorExposureRecord:
-        assert pair.result is not None
-        evidence = (
-            BehaviorStageEvidence(
-                stage="OFFLINE",
-                status="EXECUTED",
-                execution_refs=(
-                    pair.result.baseline.execution_id,
-                    pair.result.candidate.execution_id,
-                ),
-                receipt_refs=(pair.result.result_digest,),
-            ),
-            BehaviorStageEvidence(
-                stage="SANDBOX",
-                status="SKIPPED",
-                reason_code="TRUSTED_DECLARATIVE_POLICY_NO_UNTRUSTED_CODE",
-            ),
-            *(
-                (
-                    BehaviorStageEvidence(
-                        stage="SHADOW",
-                        status="SKIPPED",
-                        reason_code="POLICY_ONLY_COMPARISON_NO_MODEL_QUALITY_CLAIM",
-                    ),
-                )
-                if spec.stage == "CANARY"
-                else ()
-            ),
-            BehaviorStageEvidence(stage=spec.stage, status="PENDING"),
-        )
-        return BehaviorExposureRecord.model_validate(
-            sealed_payload(
-                "BEHAVIOR_EXPOSURE_RECORD",
-                "record_digest",
-                {
-                    "spec": spec,
-                    "revision": 1,
-                    "state": "PREPARED",
-                    "approval": None,
-                    "started_at": None,
-                    "expires_at": None,
-                    "request_count": 0,
-                    "model_call_count": 0,
-                    "reserved_cost_microunits": 0,
-                    "observations": (),
-                    "stage_evidence": evidence,
-                    "reason_code": None,
-                },
-            )
-        )
+        return records.prepared_record(spec, pair)
 
     def _role_covers(self, role_scope: str, spec: BehaviorExposureSpec) -> bool:
         if role_scope == "PROJECT":
@@ -545,20 +462,7 @@ class ImprovementExposureService:
                 record_type="EVALUATION_PLAN",
                 record_id=plan.record_id,
                 state="EVALUATED",
-                payload={
-                    **plan.payload,
-                    "evaluation_revision": plan.version + 1,
-                    "promotion_eligible": True,
-                    "runtime_exposure_ref": completed.spec.exposure_id,
-                    "runtime_exposure_digest": completed.record_digest,
-                    "runtime_observation_refs": tuple(
-                        item.execution_ref for item in completed.observations
-                    ),
-                    "runtime_observation_digests": tuple(
-                        item.execution_digest for item in completed.observations
-                    ),
-                    "exposure_state": "CANARY",
-                },
+                payload=records.completion_payload(plan, completed),
             )
         return completed
 
@@ -588,19 +492,7 @@ class ImprovementExposureService:
 
     def _restore_published_baseline(self, record: BehaviorExposureRecord, actor: str) -> None:
         spec = record.spec
-        scope_digest = domain_digest(
-            "BEHAVIOR_BASELINE_SCOPE",
-            "1.0.0",
-            canonical_payload(
-                {
-                    "project_id": spec.project_id,
-                    "component": spec.component,
-                    "environment": spec.environment,
-                    "target_thread_id": spec.target_thread_id,
-                    "target_workstream": spec.target_workstream,
-                }
-            ),
-        )
+        scope_digest = records.baseline_scope_digest(spec)
         current = self._store.baseline(
             spec.project_id, spec.component, spec.environment, scope_digest
         )
@@ -626,20 +518,7 @@ class ImprovementExposureService:
                 "BEHAVIOR_BASELINE_REVISION",
                 "receipt_digest",
                 {
-                    "project_id": spec.project_id,
-                    "component": spec.component,
-                    "environment": spec.environment,
-                    "scope_digest": scope_digest,
-                    "target_thread_id": spec.target_thread_id,
-                    "target_workstream": spec.target_workstream,
-                    "revision": current.revision + 1,
-                    "change_kind": "ROLLED_BACK",
-                    "artifact_ref": spec.baseline_artifact_ref,
-                    "content_digest": spec.baseline_digest,
-                    "previous_digest": current.content_digest,
-                    "exposure_ref": spec.exposure_id,
-                    "approval_ref": "exposure-spec:" + spec.spec_digest,
-                    "actor_ref": actor,
+                    **records.rollback_baseline_fields(spec, scope_digest, current, actor),
                     "created_at": self._clock.now(),
                 },
             )
@@ -672,13 +551,7 @@ class ImprovementExposureService:
         ):
             raise BehaviorPolicyError("BEHAVIOR_CANARY_EVIDENCE_REQUIRED")
         self.verify_observations(record)
-        return {
-            "runtime_exposure_ref": identifier,
-            "runtime_exposure_digest": record.record_digest,
-            "runtime_scope": record.spec.model_dump(mode="python"),
-            "baseline_kind": "BEHAVIOR",
-            "scientific_baseline_change": False,
-        }
+        return records.promotion_evidence_projection(identifier, record)
 
     def prepare_promotion(
         self, project: str, promotion_id: str, approved_digest: str
@@ -737,19 +610,7 @@ class ImprovementExposureService:
         )
         if current is not None and current.content_digest != spec.baseline_digest:
             raise BehaviorPolicyError("BEHAVIOR_BASELINE_CHANGED")
-        scope_digest = domain_digest(
-            "BEHAVIOR_BASELINE_SCOPE",
-            "1.0.0",
-            canonical_payload(
-                {
-                    "project_id": spec.project_id,
-                    "component": spec.component,
-                    "environment": spec.environment,
-                    "target_thread_id": spec.target_thread_id,
-                    "target_workstream": spec.target_workstream,
-                }
-            ),
-        )
+        scope_digest = records.baseline_scope_digest(spec)
         exact = self._store.baseline(
             spec.project_id, spec.component, spec.environment, scope_digest
         )
@@ -759,20 +620,9 @@ class ImprovementExposureService:
                 "BEHAVIOR_BASELINE_REVISION",
                 "receipt_digest",
                 {
-                    "project_id": spec.project_id,
-                    "component": spec.component,
-                    "environment": spec.environment,
-                    "scope_digest": scope_digest,
-                    "target_thread_id": spec.target_thread_id,
-                    "target_workstream": spec.target_workstream,
-                    "revision": revision,
-                    "change_kind": "PROMOTED",
-                    "artifact_ref": spec.candidate_artifact_ref,
-                    "content_digest": spec.candidate_digest,
-                    "previous_digest": spec.baseline_digest,
-                    "exposure_ref": spec.exposure_id,
-                    "approval_ref": promotion.control_revision_id,
-                    "actor_ref": actor,
+                    **records.promoted_baseline_fields(
+                        spec, scope_digest, revision, promotion, actor
+                    ),
                     "created_at": self._clock.now(),
                 },
             )

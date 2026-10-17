@@ -1,0 +1,6602 @@
+{
+ "actor_mismatch": {
+  "notifications": [],
+  "outputs": [
+   [
+    "RevisionFullHandlers.propose",
+    {
+     "error": "RpcApplicationError",
+     "message": "authenticated actor does not match revision proposer"
+    }
+   ]
+  ],
+  "trace": [
+   [
+    "RevisionFullHandlers.propose",
+    [
+     "a16ac5aedd51cf596cf52125139077efc030d0c63a215ff361845dbfb401e40c"
+    ],
+    {}
+   ],
+   [
+    "injected_actor_mismatch"
+   ],
+   [
+    "raise",
+    "RevisionFullHandlers.propose",
+    "RpcApplicationError"
+   ]
+  ]
+ },
+ "branch_preserved": {
+  "notifications": [
+   [
+    "READY_TO_COMMIT",
+    [
+     "revision/validated"
+    ]
+   ],
+   [
+    "READY_TO_COMMIT",
+    [
+     "revision/validated"
+    ]
+   ]
+  ],
+  "outputs": [
+   [
+    "RevisionFullHandlers.propose",
+    {
+     "impact_preview": [],
+     "proposal": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000044",
+      "created_at": "2026-10-15T00:00:00.046000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "actor_or_agent_ref": "agent:102-v",
+       "aggregate_id": "object:00000010",
+       "aggregate_type": "DECISION_OBJECT",
+       "authenticated_role": null,
+       "authenticated_role_assignment_ref": null,
+       "authenticated_session_id": null,
+       "candidate_content": {
+        "active_work_mode": "FRAMING",
+        "actor_or_agent_ref": "agent:thread-materializer",
+        "applicability": "PROJECT_SCOPED",
+        "attention": "NONE",
+        "blockers": [],
+        "created_at": "2026-10-15T00:00:00.017Z",
+        "cutoff_ref": null,
+        "disposition": "NONE",
+        "entry_criteria": {
+         "candidate_ref": "object-candidate:00000012",
+         "status": "PASS"
+        },
+        "exit_criteria": {
+         "reason": "work remains open",
+         "status": "NOT_SATISFIED"
+        },
+        "facets": [],
+        "focus_refs": [
+         "workstream:revision"
+        ],
+        "freshness": "CURRENT",
+        "lifecycle": "ACTIVE",
+        "materialization_trigger": "EXPLICIT_USER_REQUEST",
+        "object_id": "object:00000010",
+        "object_revision_id": "object-revision:00000015",
+        "parent_object_id": null,
+        "problem_frame": "Revision storage fixture",
+        "profile_refs": [
+         "GENERAL_RND_DECISION"
+        ],
+        "profile_state": "MATCHED",
+        "project_id": "project:102-v",
+        "protected_boundary_context": {},
+        "purpose_statement": "target",
+        "receipt_ref": null,
+        "relation_refs": [],
+        "requirement_refs": [],
+        "resolution": "OPEN",
+        "revision_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+        "schema_version": "1.0.0",
+        "security_scope": "PROJECT_POLICY",
+        "supersedes_revision_digest": null,
+        "thread_id": "thread:102-v",
+        "trigger_evidence_refs": [],
+        "verification": "NOT_ASSESSED",
+        "workstream_refs": [
+         "revision"
+        ]
+       },
+       "candidate_schema_version": "1.0.0",
+       "content_digest": "edf5c53a6fd22388fc06c900ac16d8b2ec2f785f17f1753ca6c29d3374748380",
+       "evidence_refs": [],
+       "expected_head_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+       "parent_revision_digests": [
+        "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       ],
+       "reason": "target",
+       "validation_state": "DRAFT"
+      },
+      "project_id": "project:102-v",
+      "record_digest": "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb",
+      "record_id": "revision-proposal:00000043",
+      "record_type": "PROPOSAL",
+      "schema_version": "1.0.0",
+      "state": "DRAFT",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "staged_snapshot": {
+      "canonical": false,
+      "content_digest": "edf5c53a6fd22388fc06c900ac16d8b2ec2f785f17f1753ca6c29d3374748380"
+     },
+     "validation_state": "DRAFT"
+    }
+   ],
+   [
+    "RevisionFullHandlers.propose",
+    {
+     "impact_preview": [],
+     "proposal": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000053",
+      "created_at": "2026-10-15T00:00:00.055000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "actor_or_agent_ref": "agent:102-v",
+       "aggregate_id": "object:00000010",
+       "aggregate_type": "DECISION_OBJECT",
+       "authenticated_role": null,
+       "authenticated_role_assignment_ref": null,
+       "authenticated_session_id": null,
+       "candidate_content": {
+        "active_work_mode": "FRAMING",
+        "actor_or_agent_ref": "agent:thread-materializer",
+        "applicability": "PROJECT_SCOPED",
+        "attention": "NONE",
+        "blockers": [],
+        "created_at": "2026-10-15T00:00:00.017Z",
+        "cutoff_ref": null,
+        "disposition": "NONE",
+        "entry_criteria": {
+         "candidate_ref": "object-candidate:00000012",
+         "status": "PASS"
+        },
+        "exit_criteria": {
+         "reason": "work remains open",
+         "status": "NOT_SATISFIED"
+        },
+        "facets": [],
+        "focus_refs": [
+         "workstream:revision"
+        ],
+        "freshness": "CURRENT",
+        "lifecycle": "ACTIVE",
+        "materialization_trigger": "EXPLICIT_USER_REQUEST",
+        "object_id": "object:00000010",
+        "object_revision_id": "object-revision:00000015",
+        "parent_object_id": null,
+        "problem_frame": "Revision storage fixture",
+        "profile_refs": [
+         "GENERAL_RND_DECISION"
+        ],
+        "profile_state": "MATCHED",
+        "project_id": "project:102-v",
+        "protected_boundary_context": {},
+        "purpose_statement": "rival",
+        "receipt_ref": null,
+        "relation_refs": [],
+        "requirement_refs": [],
+        "resolution": "OPEN",
+        "revision_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+        "schema_version": "1.0.0",
+        "security_scope": "PROJECT_POLICY",
+        "supersedes_revision_digest": null,
+        "thread_id": "thread:102-v",
+        "trigger_evidence_refs": [],
+        "verification": "NOT_ASSESSED",
+        "workstream_refs": [
+         "revision"
+        ]
+       },
+       "candidate_schema_version": "1.0.0",
+       "content_digest": "eb279e957b20029050c193aa271417a37eed5cda71efb76d61d6e49966a86690",
+       "evidence_refs": [],
+       "expected_head_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+       "parent_revision_digests": [
+        "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       ],
+       "reason": "rival",
+       "validation_state": "DRAFT"
+      },
+      "project_id": "project:102-v",
+      "record_digest": "44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf",
+      "record_id": "revision-proposal:00000052",
+      "record_type": "PROPOSAL",
+      "schema_version": "1.0.0",
+      "state": "DRAFT",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "staged_snapshot": {
+      "canonical": false,
+      "content_digest": "eb279e957b20029050c193aa271417a37eed5cda71efb76d61d6e49966a86690"
+     },
+     "validation_state": "DRAFT"
+    }
+   ],
+   [
+    "RevisionFullHandlers.change_set_create",
+    {
+     "change_set": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000062",
+      "created_at": "2026-10-15T00:00:00.064000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "candidate_revision_digests": [
+        "44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf"
+       ],
+       "commit_result": null,
+       "conflict_state": "NONE",
+       "expected_head_set": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       },
+       "expected_head_set_digest": "64e6fc5e555df732958fd6b9c3d690d219bd07ff7422837d205e4324e47a2a17",
+       "impact_policy_ref": "102-v",
+       "missing_dependencies": [],
+       "transition_reason": "rival-change",
+       "validation_bundle": null
+      },
+      "project_id": "project:102-v",
+      "record_digest": "0efd17c5bcdea5b9c13417cff1a209adc9221af0f99f4bf2a9f664fd2e5474f8",
+      "record_id": "revision-change_set:00000061",
+      "record_type": "CHANGE_SET",
+      "schema_version": "1.0.0",
+      "state": "STAGED",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "conflict_state": "NONE",
+     "missing_dependencies": []
+    }
+   ],
+   [
+    "RestoreProposalHandlers.validate",
+    {
+     "change_set": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000070",
+      "created_at": "2026-10-15T00:00:00.073000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "candidate_revision_digests": [
+        "44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf"
+       ],
+       "commit_result": null,
+       "conflict_state": "NONE",
+       "expected_head_set": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       },
+       "expected_head_set_digest": "64e6fc5e555df732958fd6b9c3d690d219bd07ff7422837d205e4324e47a2a17",
+       "impact_policy_ref": "102-v",
+       "missing_dependencies": [],
+       "transition_reason": "rival-change",
+       "validation_bundle": {
+        "checks": {
+         "authority": true,
+         "branch_preservation": false,
+         "cutoff": true,
+         "dependency": true,
+         "optimistic": true,
+         "policy": true,
+         "schema": true,
+         "source": true
+        },
+        "impact_propagation_plan": {
+         "invalidated_refs": [],
+         "recalculate_refs": [],
+         "stale_refs": []
+        }
+       },
+       "validation_bundle_digest": "65378a749cb3eca44813720882aa62f6bb7bd64d93cdca5cc163e40e8115ed2b"
+      },
+      "project_id": "project:102-v",
+      "record_digest": "ce5527f588b887f8a665b65756d4483884fa936dbfdec6be1ff0862ece533766",
+      "record_id": "revision-change_set:00000061",
+      "record_type": "CHANGE_SET",
+      "schema_version": "1.0.0",
+      "state": "READY_TO_COMMIT",
+      "supersedes_digest": "0efd17c5bcdea5b9c13417cff1a209adc9221af0f99f4bf2a9f664fd2e5474f8",
+      "version": 2
+     },
+     "checks": {
+      "authority": true,
+      "branch_preservation": false,
+      "cutoff": true,
+      "dependency": true,
+      "optimistic": true,
+      "policy": true,
+      "schema": true,
+      "source": true
+     },
+     "impact_propagation_plan": {
+      "invalidated_refs": [],
+      "recalculate_refs": [],
+      "stale_refs": []
+     },
+     "state": "READY_TO_COMMIT",
+     "validation_bundle_digest": "65378a749cb3eca44813720882aa62f6bb7bd64d93cdca5cc163e40e8115ed2b"
+    }
+   ],
+   [
+    "RevisionFullHandlers.change_set_create",
+    {
+     "change_set": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000097",
+      "created_at": "2026-10-15T00:00:00.101000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "candidate_revision_digests": [
+        "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+       ],
+       "commit_result": null,
+       "conflict_state": "NONE",
+       "expected_head_set": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       },
+       "expected_head_set_digest": "64e6fc5e555df732958fd6b9c3d690d219bd07ff7422837d205e4324e47a2a17",
+       "impact_policy_ref": "102-v",
+       "missing_dependencies": [],
+       "transition_reason": "target-change",
+       "validation_bundle": null
+      },
+      "project_id": "project:102-v",
+      "record_digest": "717519d9ef5fa17605c4be555c4edf0e9bb2369e29a9ec52439b9a4e29aec0f2",
+      "record_id": "revision-change_set:00000096",
+      "record_type": "CHANGE_SET",
+      "schema_version": "1.0.0",
+      "state": "STAGED",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "conflict_state": "NONE",
+     "missing_dependencies": []
+    }
+   ],
+   [
+    "RestoreProposalHandlers.validate",
+    {
+     "change_set": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000105",
+      "created_at": "2026-10-15T00:00:00.110000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "candidate_revision_digests": [
+        "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+       ],
+       "commit_result": null,
+       "conflict_state": "NONE",
+       "expected_head_set": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       },
+       "expected_head_set_digest": "64e6fc5e555df732958fd6b9c3d690d219bd07ff7422837d205e4324e47a2a17",
+       "impact_policy_ref": "102-v",
+       "missing_dependencies": [],
+       "transition_reason": "target-change",
+       "validation_bundle": {
+        "checks": {
+         "authority": true,
+         "branch_preservation": true,
+         "cutoff": true,
+         "dependency": true,
+         "optimistic": false,
+         "policy": true,
+         "schema": true,
+         "source": true
+        },
+        "impact_propagation_plan": {
+         "invalidated_refs": [],
+         "recalculate_refs": [],
+         "stale_refs": []
+        }
+       },
+       "validation_bundle_digest": "d98fa0c9db997c054b5bb6ca36b0f524e717617cded48750237517d97e8edcad"
+      },
+      "project_id": "project:102-v",
+      "record_digest": "54adfc3f325e03b00c28847597e826eed7530710a08e002a78fbd6bf5e2ab9fd",
+      "record_id": "revision-change_set:00000096",
+      "record_type": "CHANGE_SET",
+      "schema_version": "1.0.0",
+      "state": "READY_TO_COMMIT",
+      "supersedes_digest": "717519d9ef5fa17605c4be555c4edf0e9bb2369e29a9ec52439b9a4e29aec0f2",
+      "version": 2
+     },
+     "checks": {
+      "authority": true,
+      "branch_preservation": true,
+      "cutoff": true,
+      "dependency": true,
+      "optimistic": false,
+      "policy": true,
+      "schema": true,
+      "source": true
+     },
+     "impact_propagation_plan": {
+      "invalidated_refs": [],
+      "recalculate_refs": [],
+      "stale_refs": []
+     },
+     "state": "READY_TO_COMMIT",
+     "validation_bundle_digest": "d98fa0c9db997c054b5bb6ca36b0f524e717617cded48750237517d97e8edcad"
+    }
+   ]
+  ],
+  "trace": [
+   [
+    "RevisionFullHandlers.propose",
+    [
+     "3a47899fc9ecfa9c1f4f4a2b4469beae0ac99bf608f8008579196648992aed59"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "current_authenticated_actor",
+    []
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "_authenticated_revision_provenance",
+    []
+   ],
+   [
+    "auth",
+    "current_authenticated_actor",
+    []
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "2547e103f67276b37a1b4e51da4f390f46241126cf6b8b74524e8272078ffa7f",
+     "project_id": "project:102-v",
+     "record_type": "PROPOSAL",
+     "state": "DRAFT"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "2547e103f67276b37a1b4e51da4f390f46241126cf6b8b74524e8272078ffa7f",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "PROPOSAL",
+     "state": "DRAFT"
+    }
+   ],
+   [
+    "id",
+    "revision-proposal"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-proposal:00000043"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-proposal:00000043"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "f52670e5eb3eeb65c4d3b8f0975a715eed63d00ced8941d5448a0ea748f366fe"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "c8df9079c6d365e8d6fddb2e7486c5107e7dc26fe828104f71004ce7184ebc36"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "f52670e5eb3eeb65c4d3b8f0975a715eed63d00ced8941d5448a0ea748f366fe"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb",
+     "753f049df50d37ce123215b3bc3f2c088ad4b080991f09121f284e39feb014e8"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.propose",
+    "879a0a7fc623a269ecc741803f9e565eb4bf2650da0eddb2775a68b8042d303c"
+   ],
+   [
+    "RevisionFullHandlers.propose",
+    [
+     "83eaaf79a8b53352dd14a0f713697c04698249f8206f58b6bb8748444ca55d48"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "current_authenticated_actor",
+    []
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "_authenticated_revision_provenance",
+    []
+   ],
+   [
+    "auth",
+    "current_authenticated_actor",
+    []
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "e0de1cbaafa40ac1fdc822dae34372bf665b0b897081fd8f4c0ca379b691fb49",
+     "project_id": "project:102-v",
+     "record_type": "PROPOSAL",
+     "state": "DRAFT"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "e0de1cbaafa40ac1fdc822dae34372bf665b0b897081fd8f4c0ca379b691fb49",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "PROPOSAL",
+     "state": "DRAFT"
+    }
+   ],
+   [
+    "id",
+    "revision-proposal"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-proposal:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-proposal:00000052"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "cd29df292faa725872e8779a086d667ee30ed0a3bcc42633ce2c4703e2b3e79a"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "c8df9079c6d365e8d6fddb2e7486c5107e7dc26fe828104f71004ce7184ebc36"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "cd29df292faa725872e8779a086d667ee30ed0a3bcc42633ce2c4703e2b3e79a"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf",
+     "753f049df50d37ce123215b3bc3f2c088ad4b080991f09121f284e39feb014e8"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.propose",
+    "b01c930047526a4d5dbc56b665fd7a00603ffeaf5c7335456d23d53fd2c37ac2"
+   ],
+   [
+    "RevisionFullHandlers.change_set_create",
+    [
+     "69627bdbcbe777ba2f441e958177c389f3cc23577b6b4982a3cf2a582f250706"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "8383e442348d9476c7fb0af0aa0d9026bbb0f582e6d55ea19ada9483650ed589"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "b6398f4d52e01b3a80cb181a2a462c4cbd8aeacdfba57c1718f3479040c839f8",
+     "project_id": "project:102-v",
+     "record_type": "CHANGE_SET",
+     "state": "STAGED"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "b6398f4d52e01b3a80cb181a2a462c4cbd8aeacdfba57c1718f3479040c839f8",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "CHANGE_SET",
+     "state": "STAGED"
+    }
+   ],
+   [
+    "id",
+    "revision-change_set"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000061"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000061"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "c32a98d957859859ea844bbc2267868cecb25c900edb9a2f474ff7d703a33035"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "c32a98d957859859ea844bbc2267868cecb25c900edb9a2f474ff7d703a33035"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "0efd17c5bcdea5b9c13417cff1a209adc9221af0f99f4bf2a9f664fd2e5474f8",
+     "8383e442348d9476c7fb0af0aa0d9026bbb0f582e6d55ea19ada9483650ed589"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.change_set_create",
+    "d955402801303639c19918b72953dccf01e970e7ae2aaeba679c66b6f567d6e2"
+   ],
+   [
+    "RestoreProposalHandlers.validate",
+    [
+     "0aad5efa046e31a6a869c07634621ac355268f16f62864d5d370fe75c2101b3f"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000061"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000061"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0efd17c5bcdea5b9c13417cff1a209adc9221af0f99f4bf2a9f664fd2e5474f8"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "741e33ca0a260c6a2eae10f1cceb96df3f51847c2dd5cd7c75ddccff1c07bd34"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "8383e442348d9476c7fb0af0aa0d9026bbb0f582e6d55ea19ada9483650ed589"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "RevisionFullHandlers.change_set_validate",
+    [
+     "0aad5efa046e31a6a869c07634621ac355268f16f62864d5d370fe75c2101b3f"
+    ],
+    {}
+   ],
+   [
+    "RevisionFullHandlers._record",
+    [
+     "0aad5efa046e31a6a869c07634621ac355268f16f62864d5d370fe75c2101b3f",
+     "CHANGE_SET"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000061"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000061"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0efd17c5bcdea5b9c13417cff1a209adc9221af0f99f4bf2a9f664fd2e5474f8"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "741e33ca0a260c6a2eae10f1cceb96df3f51847c2dd5cd7c75ddccff1c07bd34"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:44640dc0318ad7edd4827c0ef78c810c825cbf12c0400443299adef3cbd232bf"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "8383e442348d9476c7fb0af0aa0d9026bbb0f582e6d55ea19ada9483650ed589"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "RevisionFullHandlers._branch_preservation_allowed",
+    [],
+    {
+     "actual": "1c5bb473656520d8dbd27381efd961896af37b7330d41997940270cfed39108f",
+     "expected": "1c5bb473656520d8dbd27381efd961896af37b7330d41997940270cfed39108f",
+     "proposals": "686ee94afd63f2dcb1182f7b3e7cf431275e7d1a718225c36bd11ac0cf9a8114"
+    }
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "f53363acf271dfe3ce2d018031e9886d57ec82d8ec9daa61305446201d2e8395",
+     "project_id": "project:102-v",
+     "record_id": "revision-change_set:00000061",
+     "record_type": "CHANGE_SET",
+     "state": "READY_TO_COMMIT"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "f53363acf271dfe3ce2d018031e9886d57ec82d8ec9daa61305446201d2e8395",
+     "project_id": "project:102-v",
+     "record_id": "revision-change_set:00000061",
+     "record_type": "CHANGE_SET",
+     "state": "READY_TO_COMMIT"
+    }
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000061"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000061"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0efd17c5bcdea5b9c13417cff1a209adc9221af0f99f4bf2a9f664fd2e5474f8"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "741e33ca0a260c6a2eae10f1cceb96df3f51847c2dd5cd7c75ddccff1c07bd34"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "1989a1be1d707599cc127198710d8fa6cd221df335a9353fe41d266ea1f9bb3f"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "741e33ca0a260c6a2eae10f1cceb96df3f51847c2dd5cd7c75ddccff1c07bd34"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "1989a1be1d707599cc127198710d8fa6cd221df335a9353fe41d266ea1f9bb3f"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "ce5527f588b887f8a665b65756d4483884fa936dbfdec6be1ff0862ece533766",
+     "a436bffd145569026b174213bdd31ba04f891eb7526c6746f95fa8ef5bcadb88"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.change_set_validate",
+    "3613e4f57993b7eac0767e3971f312ca104ca782129b4fb7a3fba9e15b8d0478"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RestoreProposalHandlers.validate",
+    "3613e4f57993b7eac0767e3971f312ca104ca782129b4fb7a3fba9e15b8d0478"
+   ],
+   [
+    "RevisionFullHandlers.change_set_create",
+    [
+     "41add4bb74faf50309f48bddb38affbf61221ea195ea16f8199394b57604bc0c"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "37e72cbd1b9906986050cb1a99d856f4ab70e9cf3086446d40ff6a87bcf33b92",
+     "project_id": "project:102-v",
+     "record_type": "CHANGE_SET",
+     "state": "STAGED"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "37e72cbd1b9906986050cb1a99d856f4ab70e9cf3086446d40ff6a87bcf33b92",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "CHANGE_SET",
+     "state": "STAGED"
+    }
+   ],
+   [
+    "id",
+    "revision-change_set"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000096"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000096"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "5f64f280e15c657f22a0e62480c8a1ebda61de2e63baa913f4a9ea5101e15327"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "5f64f280e15c657f22a0e62480c8a1ebda61de2e63baa913f4a9ea5101e15327"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "717519d9ef5fa17605c4be555c4edf0e9bb2369e29a9ec52439b9a4e29aec0f2",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.change_set_create",
+    "fb6144795f31e87e2d34c39e0eeccc04cb0b962f8b323881085b55e8a3532b46"
+   ],
+   [
+    "RestoreProposalHandlers.validate",
+    [
+     "0648345febbb81bbe1b07a9c1b1906e32ffd49b91fbaaf9e01438646226dd7c9"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000096"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000096"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:717519d9ef5fa17605c4be555c4edf0e9bb2369e29a9ec52439b9a4e29aec0f2"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "ed332ecf0f53f003afe4acb55bc92ccd5d0f937b3c164ef14baa88cebc22d282"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "RevisionFullHandlers.change_set_validate",
+    [
+     "0648345febbb81bbe1b07a9c1b1906e32ffd49b91fbaaf9e01438646226dd7c9"
+    ],
+    {}
+   ],
+   [
+    "RevisionFullHandlers._record",
+    [
+     "0648345febbb81bbe1b07a9c1b1906e32ffd49b91fbaaf9e01438646226dd7c9",
+     "CHANGE_SET"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000096"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000096"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:717519d9ef5fa17605c4be555c4edf0e9bb2369e29a9ec52439b9a4e29aec0f2"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "ed332ecf0f53f003afe4acb55bc92ccd5d0f937b3c164ef14baa88cebc22d282"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "RevisionFullHandlers._branch_preservation_allowed",
+    [],
+    {
+     "actual": "7c254a6f1e5a87fcca7837a1e3691800464186ae24ad2b69e85fcaa0e6fc7be7",
+     "expected": "1c5bb473656520d8dbd27381efd961896af37b7330d41997940270cfed39108f",
+     "proposals": "ec7e02523cddbbac311961cec0d8a29984e696d584d4927befce9cf8a5928496"
+    }
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "6e28a0d6362b3b09c6ad96fa923462cccc0da6ed3d73ae3114084adbe62de5a9",
+     "project_id": "project:102-v",
+     "record_id": "revision-change_set:00000096",
+     "record_type": "CHANGE_SET",
+     "state": "READY_TO_COMMIT"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "6e28a0d6362b3b09c6ad96fa923462cccc0da6ed3d73ae3114084adbe62de5a9",
+     "project_id": "project:102-v",
+     "record_id": "revision-change_set:00000096",
+     "record_type": "CHANGE_SET",
+     "state": "READY_TO_COMMIT"
+    }
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000096"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000096"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:717519d9ef5fa17605c4be555c4edf0e9bb2369e29a9ec52439b9a4e29aec0f2"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "ed332ecf0f53f003afe4acb55bc92ccd5d0f937b3c164ef14baa88cebc22d282"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "1661425226aa7371a5109dc6f1b03e0545d3f2911b9a145fcc3b311de1e0f491"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "ed332ecf0f53f003afe4acb55bc92ccd5d0f937b3c164ef14baa88cebc22d282"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "1661425226aa7371a5109dc6f1b03e0545d3f2911b9a145fcc3b311de1e0f491"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "54adfc3f325e03b00c28847597e826eed7530710a08e002a78fbd6bf5e2ab9fd",
+     "6039d86a857009d557f3963862bdc3a05e1db2ff48e6a753732d456b4135b280"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.change_set_validate",
+    "226a4466aa2fd515cbc3e671282609c59f5460dc566a4d9898fcfb82d3a19334"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RestoreProposalHandlers.validate",
+    "226a4466aa2fd515cbc3e671282609c59f5460dc566a4d9898fcfb82d3a19334"
+   ]
+  ]
+ },
+ "draft_flow": {
+  "notifications": [
+   [
+    "READY_TO_COMMIT",
+    [
+     "revision/validated"
+    ]
+   ]
+  ],
+  "outputs": [
+   [
+    "RevisionFullHandlers.propose",
+    {
+     "impact_preview": [],
+     "proposal": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000044",
+      "created_at": "2026-10-15T00:00:00.046000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "actor_or_agent_ref": "agent:102-v",
+       "aggregate_id": "object:00000010",
+       "aggregate_type": "DECISION_OBJECT",
+       "authenticated_role": null,
+       "authenticated_role_assignment_ref": null,
+       "authenticated_session_id": null,
+       "candidate_content": {
+        "active_work_mode": "FRAMING",
+        "actor_or_agent_ref": "agent:thread-materializer",
+        "applicability": "PROJECT_SCOPED",
+        "attention": "NONE",
+        "blockers": [],
+        "created_at": "2026-10-15T00:00:00.017Z",
+        "cutoff_ref": null,
+        "disposition": "NONE",
+        "entry_criteria": {
+         "candidate_ref": "object-candidate:00000012",
+         "status": "PASS"
+        },
+        "exit_criteria": {
+         "reason": "work remains open",
+         "status": "NOT_SATISFIED"
+        },
+        "facets": [],
+        "focus_refs": [
+         "workstream:revision"
+        ],
+        "freshness": "CURRENT",
+        "lifecycle": "ACTIVE",
+        "materialization_trigger": "EXPLICIT_USER_REQUEST",
+        "object_id": "object:00000010",
+        "object_revision_id": "object-revision:00000015",
+        "parent_object_id": null,
+        "problem_frame": "Revision storage fixture",
+        "profile_refs": [
+         "GENERAL_RND_DECISION"
+        ],
+        "profile_state": "MATCHED",
+        "project_id": "project:102-v",
+        "protected_boundary_context": {},
+        "purpose_statement": "target",
+        "receipt_ref": null,
+        "relation_refs": [],
+        "requirement_refs": [],
+        "resolution": "OPEN",
+        "revision_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+        "schema_version": "1.0.0",
+        "security_scope": "PROJECT_POLICY",
+        "supersedes_revision_digest": null,
+        "thread_id": "thread:102-v",
+        "trigger_evidence_refs": [],
+        "verification": "NOT_ASSESSED",
+        "workstream_refs": [
+         "revision"
+        ]
+       },
+       "candidate_schema_version": "1.0.0",
+       "content_digest": "edf5c53a6fd22388fc06c900ac16d8b2ec2f785f17f1753ca6c29d3374748380",
+       "evidence_refs": [],
+       "expected_head_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+       "parent_revision_digests": [
+        "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       ],
+       "reason": "target",
+       "validation_state": "DRAFT"
+      },
+      "project_id": "project:102-v",
+      "record_digest": "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb",
+      "record_id": "revision-proposal:00000043",
+      "record_type": "PROPOSAL",
+      "schema_version": "1.0.0",
+      "state": "DRAFT",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "staged_snapshot": {
+      "canonical": false,
+      "content_digest": "edf5c53a6fd22388fc06c900ac16d8b2ec2f785f17f1753ca6c29d3374748380"
+     },
+     "validation_state": "DRAFT"
+    }
+   ],
+   [
+    "RevisionFullHandlers.change_set_create",
+    {
+     "change_set": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000053",
+      "created_at": "2026-10-15T00:00:00.055000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "candidate_revision_digests": [
+        "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+       ],
+       "commit_result": null,
+       "conflict_state": "NONE",
+       "expected_head_set": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       },
+       "expected_head_set_digest": "64e6fc5e555df732958fd6b9c3d690d219bd07ff7422837d205e4324e47a2a17",
+       "impact_policy_ref": "102-v",
+       "missing_dependencies": [],
+       "transition_reason": "target-change",
+       "validation_bundle": null
+      },
+      "project_id": "project:102-v",
+      "record_digest": "75adac598fdff8b08320e4286668f23f4530736037ac72c61508cbde7c838a9c",
+      "record_id": "revision-change_set:00000052",
+      "record_type": "CHANGE_SET",
+      "schema_version": "1.0.0",
+      "state": "STAGED",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "conflict_state": "NONE",
+     "missing_dependencies": []
+    }
+   ],
+   [
+    "RestoreProposalHandlers.validate",
+    {
+     "change_set": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000061",
+      "created_at": "2026-10-15T00:00:00.064000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "candidate_revision_digests": [
+        "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+       ],
+       "commit_result": null,
+       "conflict_state": "NONE",
+       "expected_head_set": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       },
+       "expected_head_set_digest": "64e6fc5e555df732958fd6b9c3d690d219bd07ff7422837d205e4324e47a2a17",
+       "impact_policy_ref": "102-v",
+       "missing_dependencies": [],
+       "transition_reason": "target-change",
+       "validation_bundle": {
+        "checks": {
+         "authority": true,
+         "branch_preservation": false,
+         "cutoff": true,
+         "dependency": true,
+         "optimistic": true,
+         "policy": true,
+         "schema": true,
+         "source": true
+        },
+        "impact_propagation_plan": {
+         "invalidated_refs": [],
+         "recalculate_refs": [],
+         "stale_refs": []
+        }
+       },
+       "validation_bundle_digest": "65378a749cb3eca44813720882aa62f6bb7bd64d93cdca5cc163e40e8115ed2b"
+      },
+      "project_id": "project:102-v",
+      "record_digest": "f5b8922961983e117c18fc60392e8725db23a89b2018962f2ca0b784956eb407",
+      "record_id": "revision-change_set:00000052",
+      "record_type": "CHANGE_SET",
+      "schema_version": "1.0.0",
+      "state": "READY_TO_COMMIT",
+      "supersedes_digest": "75adac598fdff8b08320e4286668f23f4530736037ac72c61508cbde7c838a9c",
+      "version": 2
+     },
+     "checks": {
+      "authority": true,
+      "branch_preservation": false,
+      "cutoff": true,
+      "dependency": true,
+      "optimistic": true,
+      "policy": true,
+      "schema": true,
+      "source": true
+     },
+     "impact_propagation_plan": {
+      "invalidated_refs": [],
+      "recalculate_refs": [],
+      "stale_refs": []
+     },
+     "state": "READY_TO_COMMIT",
+     "validation_bundle_digest": "65378a749cb3eca44813720882aa62f6bb7bd64d93cdca5cc163e40e8115ed2b"
+    }
+   ],
+   [
+    "RevisionFullHandlers.branch_create",
+    {
+     "branch": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000070",
+      "created_at": "2026-10-15T00:00:00.073000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "actor_or_agent_ref": "agent:102-v",
+       "aggregate_id": "object:00000010",
+       "canonical_head_unchanged": true,
+       "from_revision_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+       "purpose": "branch metadata"
+      },
+      "project_id": "project:102-v",
+      "record_digest": "c2216a314ad83872d5d1df28dd5a110eedd9a03b835a59fe4e75f58da150c241",
+      "record_id": "revision-branch:00000069",
+      "record_type": "BRANCH",
+      "schema_version": "1.0.0",
+      "state": "OPEN",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "content_mutated": false
+    }
+   ],
+   [
+    "RevisionFullHandlers.recompute_request",
+    {
+     "recompute_task": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000079",
+      "created_at": "2026-10-15T00:00:00.082000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "change_set_id": "revision-change_set:00000052",
+       "checkpoint": "e4899b62cfe99e3aaedcf004f52d5aa46c523403a403bb8e19e93a00dc5ec5a5",
+       "cycles": [],
+       "dependency_order": [
+        "a",
+        "z"
+       ],
+       "projection_refs": [
+        "z",
+        "a"
+       ],
+       "recompute_policy_ref": "policy"
+      },
+      "project_id": "project:102-v",
+      "record_digest": "0f5468bbdf7411db5316cf18802902fc582d067b5bf7d66346e6c0ccbe83e574",
+      "record_id": "revision-recompute_task:00000078",
+      "record_type": "RECOMPUTE_TASK",
+      "schema_version": "1.0.0",
+      "state": "READY",
+      "supersedes_digest": null,
+      "version": 1
+     }
+    }
+   ],
+   [
+    "RevisionFullHandlers.baseline_prepare",
+    {
+     "baseline_candidate": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000088",
+      "created_at": "2026-10-15T00:00:00.091000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "evidence_refs": [],
+       "manifest_digest": "64e6fc5e555df732958fd6b9c3d690d219bd07ff7422837d205e4324e47a2a17",
+       "policy_version": "v1",
+       "protected_authority": true,
+       "purpose": "baseline candidate only",
+       "required_roles": [
+        "baseline-owner"
+       ],
+       "scoped_head_map": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       }
+      },
+      "project_id": "project:102-v",
+      "record_digest": "d7959d2ba6d9dbde5b9345cfef20d04c277d5022a46663890cdfc3e0bf6862e0",
+      "record_id": "revision-baseline_candidate:00000087",
+      "record_type": "BASELINE_CANDIDATE",
+      "schema_version": "1.0.0",
+      "state": "PENDING",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "impact": [
+      "DECISION_OBJECT:object:00000010"
+     ],
+     "protected_authority_package": {
+      "approved_digest": "d7959d2ba6d9dbde5b9345cfef20d04c277d5022a46663890cdfc3e0bf6862e0",
+      "required_roles": [
+       "baseline-owner"
+      ]
+     }
+    }
+   ]
+  ],
+  "trace": [
+   [
+    "RevisionFullHandlers.propose",
+    [
+     "3a47899fc9ecfa9c1f4f4a2b4469beae0ac99bf608f8008579196648992aed59"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "current_authenticated_actor",
+    []
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "_authenticated_revision_provenance",
+    []
+   ],
+   [
+    "auth",
+    "current_authenticated_actor",
+    []
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "2547e103f67276b37a1b4e51da4f390f46241126cf6b8b74524e8272078ffa7f",
+     "project_id": "project:102-v",
+     "record_type": "PROPOSAL",
+     "state": "DRAFT"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "2547e103f67276b37a1b4e51da4f390f46241126cf6b8b74524e8272078ffa7f",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "PROPOSAL",
+     "state": "DRAFT"
+    }
+   ],
+   [
+    "id",
+    "revision-proposal"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-proposal:00000043"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-proposal:00000043"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "f52670e5eb3eeb65c4d3b8f0975a715eed63d00ced8941d5448a0ea748f366fe"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "c8df9079c6d365e8d6fddb2e7486c5107e7dc26fe828104f71004ce7184ebc36"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "f52670e5eb3eeb65c4d3b8f0975a715eed63d00ced8941d5448a0ea748f366fe"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb",
+     "753f049df50d37ce123215b3bc3f2c088ad4b080991f09121f284e39feb014e8"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.propose",
+    "879a0a7fc623a269ecc741803f9e565eb4bf2650da0eddb2775a68b8042d303c"
+   ],
+   [
+    "RevisionFullHandlers.change_set_create",
+    [
+     "41add4bb74faf50309f48bddb38affbf61221ea195ea16f8199394b57604bc0c"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "37e72cbd1b9906986050cb1a99d856f4ab70e9cf3086446d40ff6a87bcf33b92",
+     "project_id": "project:102-v",
+     "record_type": "CHANGE_SET",
+     "state": "STAGED"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "37e72cbd1b9906986050cb1a99d856f4ab70e9cf3086446d40ff6a87bcf33b92",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "CHANGE_SET",
+     "state": "STAGED"
+    }
+   ],
+   [
+    "id",
+    "revision-change_set"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "3660e6c78ed496966c95ee1db7cef9ad4312c795d9bdd9aa77ba3651721e5b3c"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "3660e6c78ed496966c95ee1db7cef9ad4312c795d9bdd9aa77ba3651721e5b3c"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "75adac598fdff8b08320e4286668f23f4530736037ac72c61508cbde7c838a9c",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.change_set_create",
+    "66811ec0023cb8e99ab9d7434ae9f8274bc46776b8674018b1df1f8105b77ee9"
+   ],
+   [
+    "RestoreProposalHandlers.validate",
+    [
+     "d69d678915f128a56397ac32c396c7bca9b2f4b281dd15b40cdeec0c2258f90d"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:75adac598fdff8b08320e4286668f23f4530736037ac72c61508cbde7c838a9c"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4174c66b0964acaa6a388e53ce193c953a6fc10e1eb157c21b288a27d97b20e9"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "RevisionFullHandlers.change_set_validate",
+    [
+     "d69d678915f128a56397ac32c396c7bca9b2f4b281dd15b40cdeec0c2258f90d"
+    ],
+    {}
+   ],
+   [
+    "RevisionFullHandlers._record",
+    [
+     "d69d678915f128a56397ac32c396c7bca9b2f4b281dd15b40cdeec0c2258f90d",
+     "CHANGE_SET"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:75adac598fdff8b08320e4286668f23f4530736037ac72c61508cbde7c838a9c"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4174c66b0964acaa6a388e53ce193c953a6fc10e1eb157c21b288a27d97b20e9"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "RevisionFullHandlers._branch_preservation_allowed",
+    [],
+    {
+     "actual": "1c5bb473656520d8dbd27381efd961896af37b7330d41997940270cfed39108f",
+     "expected": "1c5bb473656520d8dbd27381efd961896af37b7330d41997940270cfed39108f",
+     "proposals": "ec7e02523cddbbac311961cec0d8a29984e696d584d4927befce9cf8a5928496"
+    }
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "c7d633edf96ba193dd223f940251b3fc3b969dd53a0c26b21fb5590342d913c7",
+     "project_id": "project:102-v",
+     "record_id": "revision-change_set:00000052",
+     "record_type": "CHANGE_SET",
+     "state": "READY_TO_COMMIT"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "c7d633edf96ba193dd223f940251b3fc3b969dd53a0c26b21fb5590342d913c7",
+     "project_id": "project:102-v",
+     "record_id": "revision-change_set:00000052",
+     "record_type": "CHANGE_SET",
+     "state": "READY_TO_COMMIT"
+    }
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:75adac598fdff8b08320e4286668f23f4530736037ac72c61508cbde7c838a9c"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4174c66b0964acaa6a388e53ce193c953a6fc10e1eb157c21b288a27d97b20e9"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "a7a9e22097e388d508bee544bd42bee16bc3c51034e4a161cb5164db0e614e84"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4174c66b0964acaa6a388e53ce193c953a6fc10e1eb157c21b288a27d97b20e9"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "a7a9e22097e388d508bee544bd42bee16bc3c51034e4a161cb5164db0e614e84"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "f5b8922961983e117c18fc60392e8725db23a89b2018962f2ca0b784956eb407",
+     "e32dee82686b8db4bf709faf39e9320d2547c1fae190d2dc7c79e5664d8010d5"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.change_set_validate",
+    "e9ad7ea3043b5d4e1590318d62c577377ab92005cf3ea41aeadcfcfe23bfc50d"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RestoreProposalHandlers.validate",
+    "e9ad7ea3043b5d4e1590318d62c577377ab92005cf3ea41aeadcfcfe23bfc50d"
+   ],
+   [
+    "RevisionFullHandlers.branch_create",
+    [
+     "9d5f8f92934fa02d326ae7e8f54c527c4078f303d5f75ea21343019fc9abe490"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "bind_authenticated_actor",
+    [
+     "project:102-v",
+     "agent:102-v"
+    ]
+   ],
+   [
+    "SqliteLedger.read_revision_by_digest",
+    [
+     "project:102-v",
+     "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "revision:4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "c8df9079c6d365e8d6fddb2e7486c5107e7dc26fe828104f71004ce7184ebc36"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "222cf29fef2cc5352b6c42e863ce7329b7cd52f791d4140354e6b0813599db39",
+     "project_id": "project:102-v",
+     "record_type": "BRANCH",
+     "state": "OPEN"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "222cf29fef2cc5352b6c42e863ce7329b7cd52f791d4140354e6b0813599db39",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "BRANCH",
+     "state": "OPEN"
+    }
+   ],
+   [
+    "id",
+    "revision-branch"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-branch:00000069"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-branch:00000069"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "668fcacbf320dc3e20065add8c5c8e7c0ea31d2e55de7c782a2445f04acc96f0"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "668fcacbf320dc3e20065add8c5c8e7c0ea31d2e55de7c782a2445f04acc96f0"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "c2216a314ad83872d5d1df28dd5a110eedd9a03b835a59fe4e75f58da150c241",
+     "c8df9079c6d365e8d6fddb2e7486c5107e7dc26fe828104f71004ce7184ebc36"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.branch_create",
+    "4bcc080f6297d039b2aa1e0c20c13f6c6a7174e027edce7d88ee355199e582b2"
+   ],
+   [
+    "RevisionFullHandlers.recompute_request",
+    [
+     "1bd07e5fccf39c40182cbc51bbc475bc2914e64fd9952161a02b00a3b24a321d"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:f5b8922961983e117c18fc60392e8725db23a89b2018962f2ca0b784956eb407"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "633292b62254f9447f9144c21bca3acd1bad0b76a7820d2329ea63f683e76b75"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "622ce50a21d4c0f83d68bde7835ca81971e7bfa4364a4dcf51d3a537bbdd9777",
+     "project_id": "project:102-v",
+     "record_type": "RECOMPUTE_TASK",
+     "state": "READY"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "622ce50a21d4c0f83d68bde7835ca81971e7bfa4364a4dcf51d3a537bbdd9777",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "RECOMPUTE_TASK",
+     "state": "READY"
+    }
+   ],
+   [
+    "id",
+    "revision-recompute_task"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-recompute_task:00000078"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-recompute_task:00000078"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "7a2dfccf810201e901a74ed1708add4d4967d9c5d1a10d4f0c2a38bb8772a176"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "7a2dfccf810201e901a74ed1708add4d4967d9c5d1a10d4f0c2a38bb8772a176"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "0f5468bbdf7411db5316cf18802902fc582d067b5bf7d66346e6c0ccbe83e574",
+     "633292b62254f9447f9144c21bca3acd1bad0b76a7820d2329ea63f683e76b75"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.recompute_request",
+    "a8198a480813cdea291edf73d4ff3469d06d7578da4be031473325b55e7f2143"
+   ],
+   [
+    "RevisionFullHandlers.baseline_prepare",
+    [
+     "fedbb2e15408d2ecdfb9d01b18d05842eeab51cdb121c74d0be299291c397868"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "5351e469589b714bff73302529ac3f43d2abccf1b0d500dcd01c8f2af9dd8c55",
+     "project_id": "project:102-v",
+     "record_type": "BASELINE_CANDIDATE",
+     "state": "PENDING"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "5351e469589b714bff73302529ac3f43d2abccf1b0d500dcd01c8f2af9dd8c55",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "BASELINE_CANDIDATE",
+     "state": "PENDING"
+    }
+   ],
+   [
+    "id",
+    "revision-baseline_candidate"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-baseline_candidate:00000087"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-baseline_candidate:00000087"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "9152a67379a4f75ee3f56c1b4aeaac57a73ba3dfd90f97e61c90d061f65b582b"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "9152a67379a4f75ee3f56c1b4aeaac57a73ba3dfd90f97e61c90d061f65b582b"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "d7959d2ba6d9dbde5b9345cfef20d04c277d5022a46663890cdfc3e0bf6862e0",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.baseline_prepare",
+    "064d794435656a1cf217e5f1c4e1933585409f62a9d5654f7161c3febdd458bb"
+   ]
+  ]
+ },
+ "head_mismatch": {
+  "notifications": [],
+  "outputs": [
+   [
+    "RevisionFullHandlers.propose",
+    {
+     "error": "RpcApplicationError",
+     "message": "expected aggregate head does not match"
+    }
+   ]
+  ],
+  "trace": [
+   [
+    "RevisionFullHandlers.propose",
+    [
+     "25db04b55c43faee5fed145ed225c0a412950ac0a4a024156b195c6b8927d9ab"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "current_authenticated_actor",
+    []
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "raise",
+    "RevisionFullHandlers.propose",
+    "RpcApplicationError"
+   ]
+  ]
+ },
+ "held_validation": {
+  "notifications": [
+   [
+    "HELD",
+    [
+     "revision/held"
+    ]
+   ]
+  ],
+  "outputs": [
+   [
+    "RevisionFullHandlers.propose",
+    {
+     "impact_preview": [],
+     "proposal": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000044",
+      "created_at": "2026-10-15T00:00:00.046000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "actor_or_agent_ref": "agent:102-v",
+       "aggregate_id": "object:00000010",
+       "aggregate_type": "DECISION_OBJECT",
+       "authenticated_role": null,
+       "authenticated_role_assignment_ref": null,
+       "authenticated_session_id": null,
+       "candidate_content": {
+        "active_work_mode": "FRAMING",
+        "actor_or_agent_ref": "agent:thread-materializer",
+        "applicability": "PROJECT_SCOPED",
+        "attention": "NONE",
+        "blockers": [],
+        "created_at": "2026-10-15T00:00:00.017Z",
+        "cutoff_ref": null,
+        "disposition": "NONE",
+        "entry_criteria": {
+         "candidate_ref": "object-candidate:00000012",
+         "status": "PASS"
+        },
+        "exit_criteria": {
+         "reason": "work remains open",
+         "status": "NOT_SATISFIED"
+        },
+        "facets": [],
+        "focus_refs": [
+         "workstream:revision"
+        ],
+        "freshness": "CURRENT",
+        "lifecycle": "ACTIVE",
+        "materialization_trigger": "EXPLICIT_USER_REQUEST",
+        "object_id": "object:00000010",
+        "object_revision_id": "object-revision:00000015",
+        "parent_object_id": null,
+        "problem_frame": "Revision storage fixture",
+        "profile_refs": [
+         "GENERAL_RND_DECISION"
+        ],
+        "profile_state": "MATCHED",
+        "project_id": "project:102-v",
+        "protected_boundary_context": {},
+        "purpose_statement": "target",
+        "receipt_ref": null,
+        "relation_refs": [],
+        "requirement_refs": [],
+        "resolution": "OPEN",
+        "revision_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+        "schema_version": "1.0.0",
+        "security_scope": "PROJECT_POLICY",
+        "supersedes_revision_digest": null,
+        "thread_id": "thread:102-v",
+        "trigger_evidence_refs": [],
+        "verification": "NOT_ASSESSED",
+        "workstream_refs": [
+         "revision"
+        ]
+       },
+       "candidate_schema_version": "1.0.0",
+       "content_digest": "edf5c53a6fd22388fc06c900ac16d8b2ec2f785f17f1753ca6c29d3374748380",
+       "evidence_refs": [],
+       "expected_head_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+       "parent_revision_digests": [
+        "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       ],
+       "reason": "target",
+       "validation_state": "DRAFT"
+      },
+      "project_id": "project:102-v",
+      "record_digest": "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb",
+      "record_id": "revision-proposal:00000043",
+      "record_type": "PROPOSAL",
+      "schema_version": "1.0.0",
+      "state": "DRAFT",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "staged_snapshot": {
+      "canonical": false,
+      "content_digest": "edf5c53a6fd22388fc06c900ac16d8b2ec2f785f17f1753ca6c29d3374748380"
+     },
+     "validation_state": "DRAFT"
+    }
+   ],
+   [
+    "RevisionFullHandlers.change_set_create",
+    {
+     "change_set": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000053",
+      "created_at": "2026-10-15T00:00:00.055000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "candidate_revision_digests": [
+        "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+       ],
+       "commit_result": null,
+       "conflict_state": "NONE",
+       "expected_head_set": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+        "DECISION_OBJECT:unrelated": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+       },
+       "expected_head_set_digest": "a07574406b190954f6c98ea025eaaa8624b8d2de39ba31a192662dfb43cd6469",
+       "impact_policy_ref": "102-v",
+       "missing_dependencies": [],
+       "transition_reason": "target-change",
+       "validation_bundle": null
+      },
+      "project_id": "project:102-v",
+      "record_digest": "89e085b4af53ac5bae81d27ebad8f8415e9198ab0fbd27409db84dcf8ed17693",
+      "record_id": "revision-change_set:00000052",
+      "record_type": "CHANGE_SET",
+      "schema_version": "1.0.0",
+      "state": "STAGED",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "conflict_state": "NONE",
+     "missing_dependencies": []
+    }
+   ],
+   [
+    "RestoreProposalHandlers.validate",
+    {
+     "change_set": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000061",
+      "created_at": "2026-10-15T00:00:00.064000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "candidate_revision_digests": [
+        "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+       ],
+       "commit_result": null,
+       "conflict_state": "NONE",
+       "expected_head_set": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+        "DECISION_OBJECT:unrelated": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+       },
+       "expected_head_set_digest": "a07574406b190954f6c98ea025eaaa8624b8d2de39ba31a192662dfb43cd6469",
+       "impact_policy_ref": "102-v",
+       "missing_dependencies": [],
+       "transition_reason": "target-change",
+       "validation_bundle": {
+        "checks": {
+         "authority": true,
+         "branch_preservation": false,
+         "cutoff": true,
+         "dependency": true,
+         "optimistic": false,
+         "policy": true,
+         "schema": true,
+         "source": true
+        },
+        "impact_propagation_plan": {
+         "invalidated_refs": [],
+         "recalculate_refs": [],
+         "stale_refs": []
+        }
+       },
+       "validation_bundle_digest": "62887bbd13344e9f206c505fd93e65328f7ecbe4f59fb3f20a5dd5e2778887de"
+      },
+      "project_id": "project:102-v",
+      "record_digest": "ec0ea432be22d915f93726517aca83d8d8e56d121b2bdb0e28d0bf7568cd8e65",
+      "record_id": "revision-change_set:00000052",
+      "record_type": "CHANGE_SET",
+      "schema_version": "1.0.0",
+      "state": "HELD",
+      "supersedes_digest": "89e085b4af53ac5bae81d27ebad8f8415e9198ab0fbd27409db84dcf8ed17693",
+      "version": 2
+     },
+     "checks": {
+      "authority": true,
+      "branch_preservation": false,
+      "cutoff": true,
+      "dependency": true,
+      "optimistic": false,
+      "policy": true,
+      "schema": true,
+      "source": true
+     },
+     "impact_propagation_plan": {
+      "invalidated_refs": [],
+      "recalculate_refs": [],
+      "stale_refs": []
+     },
+     "state": "HELD",
+     "validation_bundle_digest": "62887bbd13344e9f206c505fd93e65328f7ecbe4f59fb3f20a5dd5e2778887de"
+    }
+   ]
+  ],
+  "trace": [
+   [
+    "RevisionFullHandlers.propose",
+    [
+     "3a47899fc9ecfa9c1f4f4a2b4469beae0ac99bf608f8008579196648992aed59"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "current_authenticated_actor",
+    []
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "_authenticated_revision_provenance",
+    []
+   ],
+   [
+    "auth",
+    "current_authenticated_actor",
+    []
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "2547e103f67276b37a1b4e51da4f390f46241126cf6b8b74524e8272078ffa7f",
+     "project_id": "project:102-v",
+     "record_type": "PROPOSAL",
+     "state": "DRAFT"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "2547e103f67276b37a1b4e51da4f390f46241126cf6b8b74524e8272078ffa7f",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "PROPOSAL",
+     "state": "DRAFT"
+    }
+   ],
+   [
+    "id",
+    "revision-proposal"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-proposal:00000043"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-proposal:00000043"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "f52670e5eb3eeb65c4d3b8f0975a715eed63d00ced8941d5448a0ea748f366fe"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "c8df9079c6d365e8d6fddb2e7486c5107e7dc26fe828104f71004ce7184ebc36"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "f52670e5eb3eeb65c4d3b8f0975a715eed63d00ced8941d5448a0ea748f366fe"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb",
+     "753f049df50d37ce123215b3bc3f2c088ad4b080991f09121f284e39feb014e8"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.propose",
+    "879a0a7fc623a269ecc741803f9e565eb4bf2650da0eddb2775a68b8042d303c"
+   ],
+   [
+    "RevisionFullHandlers.change_set_create",
+    [
+     "db8f95d4cea7d82d07d70e24ec53c9de01ed2b6aef1a2e3f47088f6558281872"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "eeb7991042f6654cf7bac1613d47cc0b62023edc0bf1d0dc602b3be508bb6fe0",
+     "project_id": "project:102-v",
+     "record_type": "CHANGE_SET",
+     "state": "STAGED"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "eeb7991042f6654cf7bac1613d47cc0b62023edc0bf1d0dc602b3be508bb6fe0",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "CHANGE_SET",
+     "state": "STAGED"
+    }
+   ],
+   [
+    "id",
+    "revision-change_set"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "a4733d309be8f26db11e6af07d8459c43da340b97aa48cb8053f912732423c00"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "a4733d309be8f26db11e6af07d8459c43da340b97aa48cb8053f912732423c00"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "89e085b4af53ac5bae81d27ebad8f8415e9198ab0fbd27409db84dcf8ed17693",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.change_set_create",
+    "4fed75082cb9f8f9ed1253f62e0ffa9c11ea60c8e3e99f74e217fd453e044639"
+   ],
+   [
+    "RestoreProposalHandlers.validate",
+    [
+     "d69d678915f128a56397ac32c396c7bca9b2f4b281dd15b40cdeec0c2258f90d"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:89e085b4af53ac5bae81d27ebad8f8415e9198ab0fbd27409db84dcf8ed17693"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "101f8af99e859638214564408aa848a2895d0d6b8691d7bb4d5cbc213b47581a"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "RevisionFullHandlers.change_set_validate",
+    [
+     "d69d678915f128a56397ac32c396c7bca9b2f4b281dd15b40cdeec0c2258f90d"
+    ],
+    {}
+   ],
+   [
+    "RevisionFullHandlers._record",
+    [
+     "d69d678915f128a56397ac32c396c7bca9b2f4b281dd15b40cdeec0c2258f90d",
+     "CHANGE_SET"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:89e085b4af53ac5bae81d27ebad8f8415e9198ab0fbd27409db84dcf8ed17693"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "101f8af99e859638214564408aa848a2895d0d6b8691d7bb4d5cbc213b47581a"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "RevisionFullHandlers._branch_preservation_allowed",
+    [],
+    {
+     "actual": "1c5bb473656520d8dbd27381efd961896af37b7330d41997940270cfed39108f",
+     "expected": "b00773b1c6bab905b05e3b6d6a02afccf1772a27429b9057137dd84222618eaa",
+     "proposals": "ec7e02523cddbbac311961cec0d8a29984e696d584d4927befce9cf8a5928496"
+    }
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "e6ac45394005cb452d740baa8d14f5fc966c752fa820e8b2b487f3f900c819af",
+     "project_id": "project:102-v",
+     "record_id": "revision-change_set:00000052",
+     "record_type": "CHANGE_SET",
+     "state": "HELD"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "e6ac45394005cb452d740baa8d14f5fc966c752fa820e8b2b487f3f900c819af",
+     "project_id": "project:102-v",
+     "record_id": "revision-change_set:00000052",
+     "record_type": "CHANGE_SET",
+     "state": "HELD"
+    }
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:89e085b4af53ac5bae81d27ebad8f8415e9198ab0fbd27409db84dcf8ed17693"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "101f8af99e859638214564408aa848a2895d0d6b8691d7bb4d5cbc213b47581a"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "f72ade628258d06ca3303fbe3742e3e2c80a84673e11ad1aacf5d9dde80747e4"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "101f8af99e859638214564408aa848a2895d0d6b8691d7bb4d5cbc213b47581a"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "f72ade628258d06ca3303fbe3742e3e2c80a84673e11ad1aacf5d9dde80747e4"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "ec0ea432be22d915f93726517aca83d8d8e56d121b2bdb0e28d0bf7568cd8e65",
+     "a5a77c14965f6f349f1ba0e1470f94f8fa1d13ea2dede9eceed54d575649e748"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "44b618a808b74d05f2159d6e3d58a2bb45fd42e2d94c97802cec5b76876acdec",
+     "project_id": "project:102-v",
+     "record_type": "CONFLICT",
+     "state": "OPEN_CONFLICT"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "44b618a808b74d05f2159d6e3d58a2bb45fd42e2d94c97802cec5b76876acdec",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "CONFLICT",
+     "state": "OPEN_CONFLICT"
+    }
+   ],
+   [
+    "id",
+    "revision-conflict"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-conflict:00000064"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-conflict:00000064"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "2b195c2f32043a1c9613909a873a9acf29dcbc3e1c71eecb96c9a08a2ae450be"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "2b195c2f32043a1c9613909a873a9acf29dcbc3e1c71eecb96c9a08a2ae450be"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "91a253151d420e70c451f8baa8d6f57e1c29b595f6e7156c61dab210ab86dbb7",
+     "78f8952a2b461e650c3a8f4abd98de1cd297f1b281f5ad672b1156a61b2baf18"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.change_set_validate",
+    "ed482d48e5bc88168b238f38356cc9bd99e6f36cd71e50e8a88d3834c259176e"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RestoreProposalHandlers.validate",
+    "ed482d48e5bc88168b238f38356cc9bd99e6f36cd71e50e8a88d3834c259176e"
+   ]
+  ]
+ },
+ "missing_dependencies": {
+  "notifications": [],
+  "outputs": [
+   [
+    "RevisionFullHandlers.change_set_create",
+    {
+     "change_set": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000044",
+      "created_at": "2026-10-15T00:00:00.046000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "candidate_revision_digests": [
+        "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+       ],
+       "commit_result": null,
+       "conflict_state": "OPEN_CONFLICT",
+       "expected_head_set": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       },
+       "expected_head_set_digest": "64e6fc5e555df732958fd6b9c3d690d219bd07ff7422837d205e4324e47a2a17",
+       "impact_policy_ref": "102-v",
+       "missing_dependencies": [
+        "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+       ],
+       "transition_reason": "missing-change",
+       "validation_bundle": null
+      },
+      "project_id": "project:102-v",
+      "record_digest": "8066a78fb6a4f05dc2dfef018cd2dc23671ce25463fb910e91f34c312354e101",
+      "record_id": "revision-change_set:00000043",
+      "record_type": "CHANGE_SET",
+      "schema_version": "1.0.0",
+      "state": "HELD",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "conflict_state": "OPEN_CONFLICT",
+     "missing_dependencies": [
+      "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+     ]
+    }
+   ]
+  ],
+  "trace": [
+   [
+    "RevisionFullHandlers.change_set_create",
+    [
+     "8a88af17da38bc99df92aa1e455c19836099c3777e6abe07ec24029be0ee9917"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    ],
+    {}
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "d83bdb60b03141df4f2ab32b6f89f18ecda21bca687d614dc7cef079f6007bc4",
+     "project_id": "project:102-v",
+     "record_type": "CHANGE_SET",
+     "state": "HELD"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "d83bdb60b03141df4f2ab32b6f89f18ecda21bca687d614dc7cef079f6007bc4",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "CHANGE_SET",
+     "state": "HELD"
+    }
+   ],
+   [
+    "id",
+    "revision-change_set"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000043"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000043"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "53957e4f278f7e722b72d8467627325751e43ef505ffd248ff353728c21de65b"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "53957e4f278f7e722b72d8467627325751e43ef505ffd248ff353728c21de65b"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "8066a78fb6a4f05dc2dfef018cd2dc23671ce25463fb910e91f34c312354e101",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.change_set_create",
+    "48b7e94c3f2f2f6b2a07a89750985e7f2fd9fae7c7f88f853271e7c25573e9c1"
+   ]
+  ]
+ },
+ "missing_records": {
+  "notifications": [],
+  "outputs": [
+   [
+    "RestoreProposalHandlers.validate",
+    {
+     "error": "RpcApplicationError",
+     "message": "RESTORE_PROPOSAL_UNAVAILABLE"
+    }
+   ],
+   [
+    "RevisionFullHandlers.recompute_request",
+    {
+     "error": "RpcApplicationError",
+     "message": "ChangeSet not found"
+    }
+   ],
+   [
+    "RevisionFullHandlers.branch_create",
+    {
+     "error": "RpcApplicationError",
+     "message": "branch origin invalid"
+    }
+   ],
+   [
+    "RevisionFullHandlers.baseline_prepare",
+    {
+     "error": "RpcApplicationError",
+     "message": "baseline scoped heads are not current"
+    }
+   ]
+  ],
+  "trace": [
+   [
+    "RestoreProposalHandlers.validate",
+    [
+     "5af9ca9845a42d08349c4ae4335ea23e627560eca92e30771882243f57fadf4f"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "missing"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "missing"
+    ],
+    {}
+   ],
+   [
+    "atomic_uow",
+    "rollback",
+    "RestoreError"
+   ],
+   [
+    "ledger",
+    "rollback",
+    "RestoreError"
+   ],
+   [
+    "raise",
+    "RestoreProposalHandlers.validate",
+    "RpcApplicationError"
+   ],
+   [
+    "RevisionFullHandlers.recompute_request",
+    [
+     "6228d27efe71dc744f43037e28df791becd55c31b2c4631147da570af49e4839"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "missing"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "missing"
+    ],
+    {}
+   ],
+   [
+    "raise",
+    "RevisionFullHandlers.recompute_request",
+    "RpcApplicationError"
+   ],
+   [
+    "RevisionFullHandlers.branch_create",
+    [
+     "80bc73231ebf2e95dd632063b4d312b4e66d63b8ff9028c209d7d8de02e71baa"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "bind_authenticated_actor",
+    [
+     "project:102-v",
+     "agent:102-v"
+    ]
+   ],
+   [
+    "SqliteLedger.read_revision_by_digest",
+    [
+     "project:102-v",
+     "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    ],
+    {}
+   ],
+   [
+    "raise",
+    "RevisionFullHandlers.branch_create",
+    "RpcApplicationError"
+   ],
+   [
+    "RevisionFullHandlers.baseline_prepare",
+    [
+     "e87a84ee7f53f4139bee00e42674f194720b040d9a8b1ae5da64d00651a279b1"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "raise",
+    "RevisionFullHandlers.baseline_prepare",
+    "RpcApplicationError"
+   ]
+  ]
+ },
+ "stale_validation": {
+  "notifications": [
+   [
+    "READY_TO_COMMIT",
+    [
+     "revision/validated"
+    ]
+   ]
+  ],
+  "outputs": [
+   [
+    "RevisionFullHandlers.propose",
+    {
+     "impact_preview": [],
+     "proposal": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000044",
+      "created_at": "2026-10-15T00:00:00.046000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "actor_or_agent_ref": "agent:102-v",
+       "aggregate_id": "object:00000010",
+       "aggregate_type": "DECISION_OBJECT",
+       "authenticated_role": null,
+       "authenticated_role_assignment_ref": null,
+       "authenticated_session_id": null,
+       "candidate_content": {
+        "active_work_mode": "FRAMING",
+        "actor_or_agent_ref": "agent:thread-materializer",
+        "applicability": "PROJECT_SCOPED",
+        "attention": "NONE",
+        "blockers": [],
+        "created_at": "2026-10-15T00:00:00.017Z",
+        "cutoff_ref": null,
+        "disposition": "NONE",
+        "entry_criteria": {
+         "candidate_ref": "object-candidate:00000012",
+         "status": "PASS"
+        },
+        "exit_criteria": {
+         "reason": "work remains open",
+         "status": "NOT_SATISFIED"
+        },
+        "facets": [],
+        "focus_refs": [
+         "workstream:revision"
+        ],
+        "freshness": "CURRENT",
+        "lifecycle": "ACTIVE",
+        "materialization_trigger": "EXPLICIT_USER_REQUEST",
+        "object_id": "object:00000010",
+        "object_revision_id": "object-revision:00000015",
+        "parent_object_id": null,
+        "problem_frame": "Revision storage fixture",
+        "profile_refs": [
+         "GENERAL_RND_DECISION"
+        ],
+        "profile_state": "MATCHED",
+        "project_id": "project:102-v",
+        "protected_boundary_context": {},
+        "purpose_statement": "target",
+        "receipt_ref": null,
+        "relation_refs": [],
+        "requirement_refs": [],
+        "resolution": "OPEN",
+        "revision_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+        "schema_version": "1.0.0",
+        "security_scope": "PROJECT_POLICY",
+        "supersedes_revision_digest": null,
+        "thread_id": "thread:102-v",
+        "trigger_evidence_refs": [],
+        "verification": "NOT_ASSESSED",
+        "workstream_refs": [
+         "revision"
+        ]
+       },
+       "candidate_schema_version": "1.0.0",
+       "content_digest": "edf5c53a6fd22388fc06c900ac16d8b2ec2f785f17f1753ca6c29d3374748380",
+       "evidence_refs": [],
+       "expected_head_digest": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb",
+       "parent_revision_digests": [
+        "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       ],
+       "reason": "target",
+       "validation_state": "DRAFT"
+      },
+      "project_id": "project:102-v",
+      "record_digest": "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb",
+      "record_id": "revision-proposal:00000043",
+      "record_type": "PROPOSAL",
+      "schema_version": "1.0.0",
+      "state": "DRAFT",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "staged_snapshot": {
+      "canonical": false,
+      "content_digest": "edf5c53a6fd22388fc06c900ac16d8b2ec2f785f17f1753ca6c29d3374748380"
+     },
+     "validation_state": "DRAFT"
+    }
+   ],
+   [
+    "RevisionFullHandlers.change_set_create",
+    {
+     "change_set": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000053",
+      "created_at": "2026-10-15T00:00:00.055000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "candidate_revision_digests": [
+        "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+       ],
+       "commit_result": null,
+       "conflict_state": "NONE",
+       "expected_head_set": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       },
+       "expected_head_set_digest": "64e6fc5e555df732958fd6b9c3d690d219bd07ff7422837d205e4324e47a2a17",
+       "impact_policy_ref": "102-v",
+       "missing_dependencies": [],
+       "transition_reason": "target-change",
+       "validation_bundle": null
+      },
+      "project_id": "project:102-v",
+      "record_digest": "75adac598fdff8b08320e4286668f23f4530736037ac72c61508cbde7c838a9c",
+      "record_id": "revision-change_set:00000052",
+      "record_type": "CHANGE_SET",
+      "schema_version": "1.0.0",
+      "state": "STAGED",
+      "supersedes_digest": null,
+      "version": 1
+     },
+     "conflict_state": "NONE",
+     "missing_dependencies": []
+    }
+   ],
+   [
+    "RestoreProposalHandlers.validate",
+    {
+     "change_set": {
+      "canonical_truth": false,
+      "control_revision_id": "control-revision:00000061",
+      "created_at": "2026-10-15T00:00:00.064000Z",
+      "namespace": "REVISION",
+      "payload": {
+       "candidate_revision_digests": [
+        "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+       ],
+       "commit_result": null,
+       "conflict_state": "NONE",
+       "expected_head_set": {
+        "DECISION_OBJECT:object:00000010": "4b6a1d3262dacab520469502ac2e8aba95b7fb092dc05ec595b14225530abedb"
+       },
+       "expected_head_set_digest": "64e6fc5e555df732958fd6b9c3d690d219bd07ff7422837d205e4324e47a2a17",
+       "impact_policy_ref": "102-v",
+       "missing_dependencies": [],
+       "transition_reason": "target-change",
+       "validation_bundle": {
+        "checks": {
+         "authority": true,
+         "branch_preservation": false,
+         "cutoff": true,
+         "dependency": true,
+         "optimistic": true,
+         "policy": true,
+         "schema": true,
+         "source": true
+        },
+        "impact_propagation_plan": {
+         "invalidated_refs": [],
+         "recalculate_refs": [],
+         "stale_refs": []
+        }
+       },
+       "validation_bundle_digest": "65378a749cb3eca44813720882aa62f6bb7bd64d93cdca5cc163e40e8115ed2b"
+      },
+      "project_id": "project:102-v",
+      "record_digest": "f5b8922961983e117c18fc60392e8725db23a89b2018962f2ca0b784956eb407",
+      "record_id": "revision-change_set:00000052",
+      "record_type": "CHANGE_SET",
+      "schema_version": "1.0.0",
+      "state": "READY_TO_COMMIT",
+      "supersedes_digest": "75adac598fdff8b08320e4286668f23f4530736037ac72c61508cbde7c838a9c",
+      "version": 2
+     },
+     "checks": {
+      "authority": true,
+      "branch_preservation": false,
+      "cutoff": true,
+      "dependency": true,
+      "optimistic": true,
+      "policy": true,
+      "schema": true,
+      "source": true
+     },
+     "impact_propagation_plan": {
+      "invalidated_refs": [],
+      "recalculate_refs": [],
+      "stale_refs": []
+     },
+     "state": "READY_TO_COMMIT",
+     "validation_bundle_digest": "65378a749cb3eca44813720882aa62f6bb7bd64d93cdca5cc163e40e8115ed2b"
+    }
+   ],
+   [
+    "RestoreProposalHandlers.validate",
+    {
+     "error": "RpcApplicationError",
+     "message": "ChangeSet revision changed"
+    }
+   ]
+  ],
+  "trace": [
+   [
+    "RevisionFullHandlers.propose",
+    [
+     "3a47899fc9ecfa9c1f4f4a2b4469beae0ac99bf608f8008579196648992aed59"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "current_authenticated_actor",
+    []
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "auth",
+    "_authenticated_revision_provenance",
+    []
+   ],
+   [
+    "auth",
+    "current_authenticated_actor",
+    []
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "2547e103f67276b37a1b4e51da4f390f46241126cf6b8b74524e8272078ffa7f",
+     "project_id": "project:102-v",
+     "record_type": "PROPOSAL",
+     "state": "DRAFT"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "2547e103f67276b37a1b4e51da4f390f46241126cf6b8b74524e8272078ffa7f",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "PROPOSAL",
+     "state": "DRAFT"
+    }
+   ],
+   [
+    "id",
+    "revision-proposal"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-proposal:00000043"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-proposal:00000043"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "f52670e5eb3eeb65c4d3b8f0975a715eed63d00ced8941d5448a0ea748f366fe"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "c8df9079c6d365e8d6fddb2e7486c5107e7dc26fe828104f71004ce7184ebc36"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "f52670e5eb3eeb65c4d3b8f0975a715eed63d00ced8941d5448a0ea748f366fe"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb",
+     "753f049df50d37ce123215b3bc3f2c088ad4b080991f09121f284e39feb014e8"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.propose",
+    "879a0a7fc623a269ecc741803f9e565eb4bf2650da0eddb2775a68b8042d303c"
+   ],
+   [
+    "RevisionFullHandlers.change_set_create",
+    [
+     "41add4bb74faf50309f48bddb38affbf61221ea195ea16f8199394b57604bc0c"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "37e72cbd1b9906986050cb1a99d856f4ab70e9cf3086446d40ff6a87bcf33b92",
+     "project_id": "project:102-v",
+     "record_type": "CHANGE_SET",
+     "state": "STAGED"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "37e72cbd1b9906986050cb1a99d856f4ab70e9cf3086446d40ff6a87bcf33b92",
+     "project_id": "project:102-v",
+     "record_id": null,
+     "record_type": "CHANGE_SET",
+     "state": "STAGED"
+    }
+   ],
+   [
+    "id",
+    "revision-change_set"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "3660e6c78ed496966c95ee1db7cef9ad4312c795d9bdd9aa77ba3651721e5b3c"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "3660e6c78ed496966c95ee1db7cef9ad4312c795d9bdd9aa77ba3651721e5b3c"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "75adac598fdff8b08320e4286668f23f4530736037ac72c61508cbde7c838a9c",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.change_set_create",
+    "66811ec0023cb8e99ab9d7434ae9f8274bc46776b8674018b1df1f8105b77ee9"
+   ],
+   [
+    "RestoreProposalHandlers.validate",
+    [
+     "d69d678915f128a56397ac32c396c7bca9b2f4b281dd15b40cdeec0c2258f90d"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:75adac598fdff8b08320e4286668f23f4530736037ac72c61508cbde7c838a9c"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4174c66b0964acaa6a388e53ce193c953a6fc10e1eb157c21b288a27d97b20e9"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "RevisionFullHandlers.change_set_validate",
+    [
+     "d69d678915f128a56397ac32c396c7bca9b2f4b281dd15b40cdeec0c2258f90d"
+    ],
+    {}
+   ],
+   [
+    "RevisionFullHandlers._record",
+    [
+     "d69d678915f128a56397ac32c396c7bca9b2f4b281dd15b40cdeec0c2258f90d",
+     "CHANGE_SET"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:75adac598fdff8b08320e4286668f23f4530736037ac72c61508cbde7c838a9c"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4174c66b0964acaa6a388e53ce193c953a6fc10e1eb157c21b288a27d97b20e9"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteLedger.read_heads",
+    [
+     "project:102-v"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "RevisionFullHandlers._branch_preservation_allowed",
+    [],
+    {
+     "actual": "1c5bb473656520d8dbd27381efd961896af37b7330d41997940270cfed39108f",
+     "expected": "1c5bb473656520d8dbd27381efd961896af37b7330d41997940270cfed39108f",
+     "proposals": "ec7e02523cddbbac311961cec0d8a29984e696d584d4927befce9cf8a5928496"
+    }
+   ],
+   [
+    "ControlRecordService.create",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "c7d633edf96ba193dd223f940251b3fc3b969dd53a0c26b21fb5590342d913c7",
+     "project_id": "project:102-v",
+     "record_id": "revision-change_set:00000052",
+     "record_type": "CHANGE_SET",
+     "state": "READY_TO_COMMIT"
+    }
+   ],
+   [
+    "ControlRecordService.stage",
+    [],
+    {
+     "namespace": "REVISION",
+     "payload": "c7d633edf96ba193dd223f940251b3fc3b969dd53a0c26b21fb5590342d913c7",
+     "project_id": "project:102-v",
+     "record_id": "revision-change_set:00000052",
+     "record_type": "CHANGE_SET",
+     "state": "READY_TO_COMMIT"
+    }
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:75adac598fdff8b08320e4286668f23f4530736037ac72c61508cbde7c838a9c"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4174c66b0964acaa6a388e53ce193c953a6fc10e1eb157c21b288a27d97b20e9"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "id",
+    "control-revision"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "ScopedRevisionControls.append",
+    [
+     "a7a9e22097e388d508bee544bd42bee16bc3c51034e4a161cb5164db0e614e84"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "4174c66b0964acaa6a388e53ce193c953a6fc10e1eb157c21b288a27d97b20e9"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "SqliteControlRecordStore.append",
+    [
+     "a7a9e22097e388d508bee544bd42bee16bc3c51034e4a161cb5164db0e614e84"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.record_control_lineage",
+    [
+     "project:102-v",
+     "f5b8922961983e117c18fc60392e8725db23a89b2018962f2ca0b784956eb407",
+     "e32dee82686b8db4bf709faf39e9320d2547c1fae190d2dc7c79e5664d8010d5"
+    ],
+    {}
+   ],
+   [
+    "clock"
+   ],
+   [
+    "id",
+    "resource-scope"
+   ],
+   [
+    "id",
+    "resource-scope-receipt"
+   ],
+   [
+    "clock"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RevisionFullHandlers.change_set_validate",
+    "e9ad7ea3043b5d4e1590318d62c577377ab92005cf3ea41aeadcfcfe23bfc50d"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "return",
+    "RestoreProposalHandlers.validate",
+    "e9ad7ea3043b5d4e1590318d62c577377ab92005cf3ea41aeadcfcfe23bfc50d"
+   ],
+   [
+    "RestoreProposalHandlers.validate",
+    [
+     "d69d678915f128a56397ac32c396c7bca9b2f4b281dd15b40cdeec0c2258f90d"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:f5b8922961983e117c18fc60392e8725db23a89b2018962f2ca0b784956eb407"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "633292b62254f9447f9144c21bca3acd1bad0b76a7820d2329ea63f683e76b75"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "ScopedRevisionControls.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read_digest",
+    [
+     "project:102-v",
+     "0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:0ba7f5a0816c356e74df56d04add7a9f29258ae9b61bf71ad01e8607190cc7eb"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "e998b29fdedf03379559f2007e3e2b5365ba92ae389e24a7003e3e13f12536d3"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "RevisionFullHandlers.change_set_validate",
+    [
+     "d69d678915f128a56397ac32c396c7bca9b2f4b281dd15b40cdeec0c2258f90d"
+    ],
+    {}
+   ],
+   [
+    "RevisionFullHandlers._record",
+    [
+     "d69d678915f128a56397ac32c396c7bca9b2f4b281dd15b40cdeec0c2258f90d",
+     "CHANGE_SET"
+    ],
+    {}
+   ],
+   [
+    "ScopedRevisionControls.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "SqliteControlRecordStore.read",
+    [
+     "project:102-v",
+     "REVISION",
+     "revision-change_set:00000052"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_read",
+    [
+     "project:102-v",
+     "control:f5b8922961983e117c18fc60392e8725db23a89b2018962f2ca0b784956eb407"
+    ],
+    {}
+   ],
+   [
+    "ResourceScopeService.require_reads",
+    [
+     "project:102-v",
+     "633292b62254f9447f9144c21bca3acd1bad0b76a7820d2329ea63f683e76b75"
+    ],
+    {}
+   ],
+   [
+    "ledger",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "enter"
+   ],
+   [
+    "atomic_uow",
+    "exit"
+   ],
+   [
+    "ledger",
+    "exit"
+   ],
+   [
+    "raise",
+    "RevisionFullHandlers.change_set_validate",
+    "RpcApplicationError"
+   ],
+   [
+    "atomic_uow",
+    "rollback",
+    "RpcApplicationError"
+   ],
+   [
+    "ledger",
+    "rollback",
+    "RpcApplicationError"
+   ],
+   [
+    "raise",
+    "RestoreProposalHandlers.validate",
+    "RpcApplicationError"
+   ]
+  ]
+ }
+}

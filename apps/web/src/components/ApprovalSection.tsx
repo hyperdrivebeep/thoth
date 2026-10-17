@@ -6,6 +6,7 @@ import { objectList, objectValue, textValue } from "../api/presentation";
 import { rpc } from "../api/rpcClient";
 import { ApprovalCard } from "./ApprovalCard";
 import { parseApproval, type Approval } from "./approvalView";
+import { useReadAccessProtection } from "./useReadAccessProtection";
 
 /**
  * The plan's protected-step approvals, newest per step. Shows nothing when they cannot be read.
@@ -38,9 +39,10 @@ export function ApprovalSection({ projectId, planId, onReapprove, onDecline }: {
       policy_version: approval.policyVersion }, crypto.randomUUID()),
     onSuccess: () => client.invalidateQueries({ queryKey: key }),
   });
+  const blocked = useReadAccessProtection(key, query.error);
   const requested = reapprove.isSuccess;
   const shown = (query.data?.approvals ?? []).filter(approval => !declined.includes(approval.id));
-  if (!query.data || query.data.approvals.length === 0) return null;
+  if (blocked || !query.data || query.data.approvals.length === 0) return null;
   return <>
     {reapprove.error && <Callout compact intent="danger" role="alert">{t("approval.recreateFailed")}{" "}{reapprove.error.message}</Callout>}
     {requested && <Callout compact intent="primary" role="status">{t("approval.created")}</Callout>}

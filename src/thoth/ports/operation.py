@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import datetime
 from typing import Protocol, runtime_checkable
 
 from pydantic import JsonValue
 
+from thoth.domain.event import EventRecord
 from thoth.domain.operation import (
     InternalFailureDiagnostic,
     InternalFailureStateSnapshot,
@@ -25,7 +27,14 @@ class OperationReentryAuthorizer(Protocol):
 
 
 class OperationStorePort(Protocol):
-    def claim(self, candidate: OperationRecord) -> tuple[OperationRecord, bool]: ...
+    def claim(
+        self,
+        candidate: OperationRecord,
+        *,
+        started_event: Callable[[], EventRecord] | None = None,
+    ) -> tuple[OperationRecord, bool]:
+        """Atomically claim and persist the lazy, I/O-free event only for a new operation."""
+        ...
 
     def complete(
         self, operation_id: str, result: dict[str, JsonValue], *, completed_at: datetime

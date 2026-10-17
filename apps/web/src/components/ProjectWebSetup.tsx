@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { rpc } from "../api/rpcClient";
 import { executionLabel, normalizePreferredHosts, publicWebExecutionSchema } from "../api/publicWeb";
+import { useReadAccessProtection } from "./useReadAccessProtection";
 
 type ProjectRead = {
   revision: number;
@@ -34,6 +35,8 @@ export function ProjectWebSetup({ projectId }: { projectId: string }) {
       ),
   });
   const web = project.data?.value.policy?.payload?.public_web;
+  const projectBlocked = useReadAccessProtection(["project-web", projectId], project.error);
+  const grantBlocked = useReadAccessProtection(["workspace-setup"], grant.error);
   const hosts = web?.preferred_hosts ?? [];
   const enabled = Boolean(web?.enabled);
   const execution = publicWebExecutionSchema.safeParse(project.data?.value.public_web_execution);
@@ -60,6 +63,7 @@ export function ProjectWebSetup({ projectId }: { projectId: string }) {
     },
   });
   const consent = grant.data?.value.internet_consent;
+  if (projectBlocked || grantBlocked) return <Callout compact intent="warning" role="alert">{t("workspace.accessFailed")}</Callout>;
   return (
     <section className="project-web-setup">
       <h2>{t("web.permittedSources")}</h2>

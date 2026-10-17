@@ -11,6 +11,7 @@ import { Disclosure } from "../Disclosure";
 import { eyebrowLabel } from "../statusLabels";
 import { ProjectReviewList } from "./ProjectReviewList";
 import { DecisionDeltaComparison } from "./DecisionDeltaComparison";
+import { useReadAccessProtection } from "../useReadAccessProtection";
 
 function ScopedHistory({ scope, initialSelection, onUseQuestion, kinds }: {
   scope: HistoryScope; initialSelection?: HistorySelection; onUseQuestion?: (question: string) => void; kinds?: HistoryKind[];
@@ -26,7 +27,8 @@ function ScopedHistory({ scope, initialSelection, onUseQuestion, kinds }: {
   const queryKey = ["research-history", scope.projectId, scope.threadId ?? null, scope.requestDigest ?? null, kinds?.join(",") ?? "all"];
   const query = useInfiniteQuery({ queryKey, initialPageParam: null as string | null, retry: false, gcTime: 0,
     queryFn: ({ pageParam, signal }) => readHistoryPage(scope, pageParam, signal, kinds), getNextPageParam: page => page.nextCursor ?? undefined });
-  const pages = query.data?.pages ?? [];
+  const blocked = useReadAccessProtection(queryKey, query.error);
+  const pages = blocked ? [] : query.data?.pages ?? [];
   const actorScope = pages[0]?.actorScope ?? null;
   const contextChanged = pages.some(page => page.actorScope !== actorScope);
   const historyError = Boolean(query.error);
@@ -48,7 +50,7 @@ function ScopedHistory({ scope, initialSelection, onUseQuestion, kinds }: {
   };
   return <>
     <div className="history-toolbar"><p>{t("historyWorkspace.intro")}</p><div className="history-toolbar-actions"><Switch label={t("historyWorkspace.checkpoints")} checked={showCheckpoints} onChange={event=>setShowCheckpoints(event.currentTarget.checked)}/><Button minimal icon="refresh" onClick={refresh} loading={query.isRefetching}>{t("historyWorkspace.reload")}</Button></div></div>
-    {query.error && <Callout intent="warning" role="alert">{invalidCursor ? t("historyWorkspace.cursorExpired") : t("historyWorkspace.failed")}<Button small onClick={refresh}>{t("workspace.reload")}</Button><Disclosure defaultOpen label={t("historyDetail.diagnostics")}><p>{query.error.message}</p></Disclosure></Callout>}
+    {(query.error || blocked) && <Callout intent="warning" role="alert">{invalidCursor ? t("historyWorkspace.cursorExpired") : t("historyWorkspace.failed")}<Button small onClick={refresh}>{t("workspace.reload")}</Button><Disclosure defaultOpen label={t("historyDetail.diagnostics")}><p>{query.error?.message}</p></Disclosure></Callout>}
     {contextChanged && <Callout intent="warning" role="alert">{t("historyWorkspace.scopeChanged")}<Button small onClick={refresh}>{t("historyWorkspace.reload")}</Button></Callout>}
     {!initialSelection && !kinds && <ProjectReviewList projectId={scope.projectId} onSelect={next => { setSelection(next); setBefore(null); setAfter(null); }} />}
     {!contextChanged && !query.error && pages.length > 0 && <section className="history-decision-comparison" aria-label={t("historyWorkspace.selection")}>
@@ -58,7 +60,7 @@ function ScopedHistory({ scope, initialSelection, onUseQuestion, kinds }: {
       {comparisonActorScope === actorScope && before && after && <DecisionDeltaComparison key={JSON.stringify([actorScope, selectionKey(before), selectionKey(after)])}
         before={before} after={after} actorScope={actorScope} historyCheckEpoch={historyCheckEpoch} suspended={query.isRefetching} />}
     </section>}
-    {!contextChanged && <div className="history-layout">
+    {!contextChanged && !blocked && <div className="history-layout">
       {query.isPending ? <section className="history-timeline"><p role="status">{t("historyWorkspace.loading")}</p></section>
         : query.error && pages.length === 0 ? <section className="history-timeline"><p>{t("historyWorkspace.unknownRecords")}</p></section> : <HistoryTimeline pages={pages} selected={selection}
         showCheckpoints={showCheckpoints} loadingMore={query.isFetchingNextPage} onMore={() => void query.fetchNextPage()} onSelect={row => { setSelection(row.selection); setBefore(null); setAfter(null); }}

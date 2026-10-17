@@ -1,20 +1,23 @@
-import { t } from "../i18n/locale";
+import type { MessageKey } from "../i18n/messages";
+import { t, useTranslation } from "../i18n/locale";
 import { Button, Callout, Checkbox, Classes, Dialog, TextArea } from "@blueprintjs/core";
 import { useState } from "react";
 import { reviewReasons, type ReviewTarget } from "./judgmentReview";
 
 /** Collects the reasons and an optional memo for one review request. Sending is the caller's job. */
-export function ReviewDialog({ target, pending, error, onClose, onSubmit }: {
+export function ReviewDialog({ target, pending, error, onClose, onSubmit, onDraftChange }: {
   target: ReviewTarget | null; pending: boolean; error: string | null;
   onClose: () => void; onSubmit: (reasons: string[], note: string) => void;
+  onDraftChange?: () => void;
 }) {
+  useTranslation();
   const [reasons, setReasons] = useState<string[]>([]);
   const [note, setNote] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<MessageKey | "">("");
   const close = () => { setReasons([]); setNote(""); setMessage(""); onClose(); };
-  const toggle = (code: string) => setReasons(current => current.includes(code) ? current.filter(item => item !== code) : [...current, code]);
+  const toggle = (code: string) => { onDraftChange?.(); setReasons(current => current.includes(code) ? current.filter(item => item !== code) : [...current, code]); };
   const submit = () => {
-    if (reasons.length === 0) { setMessage(t("reviewDialog.required")); return; }
+    if (reasons.length === 0) { setMessage("reviewDialog.required"); return; }
     setMessage("");
     onSubmit(reasons, note.trim());
   };
@@ -28,8 +31,8 @@ export function ReviewDialog({ target, pending, error, onClose, onSubmit }: {
       <fieldset className="review-reasons"><legend>{t("traceHistory.reason")}</legend>
         {reviewReasons.map(reason => <Checkbox key={reason.code} label={reason.label} checked={reasons.includes(reason.code)} onChange={() => toggle(reason.code)}/>)}
       </fieldset>
-      <label className="review-note">{t("recheck.optionalNote")}<TextArea fill rows={3} aria-label={t("recheck.note")} value={note} maxLength={2000} onChange={event => setNote(event.target.value)}/></label>
-      {message && <Callout compact intent="warning" role="alert">{message}</Callout>}
+      <label className="review-note">{t("recheck.optionalNote")}<TextArea fill rows={3} aria-label={t("recheck.note")} value={note} maxLength={2000} onChange={event => { onDraftChange?.(); setNote(event.target.value); }}/></label>
+      {message && <Callout compact intent="warning" role="alert">{t(message)}</Callout>}
       {error && <Callout compact intent="danger" role="alert">{t("reviewDialog.failed")}{" "}{error}</Callout>}
     </div>
     <div className={Classes.DIALOG_FOOTER}><div className={Classes.DIALOG_FOOTER_ACTIONS}>

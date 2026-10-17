@@ -1,0 +1,419 @@
+{
+  "ProjectCreateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "name": {
+        "maxLength": 500,
+        "minLength": 1,
+        "title": "Name",
+        "type": "string"
+      },
+      "description": {
+        "default": "",
+        "maxLength": 10000,
+        "title": "Description",
+        "type": "string"
+      },
+      "cutoff_at": {
+        "format": "date-time",
+        "title": "Cutoff At",
+        "type": "string"
+      },
+      "overlay": {
+        "default": "default",
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Overlay",
+        "type": "string"
+      },
+      "policy_binding_ref": {
+        "default": "policy:default",
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Policy Binding Ref",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "name",
+      "cutoff_at"
+    ],
+    "title": "ProjectCreateInput",
+    "type": "object"
+  },
+  "ProjectReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "ProjectReadInput",
+    "type": "object"
+  },
+  "ProjectListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "default": "system:projects",
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "include_archived": {
+        "default": false,
+        "title": "Include Archived",
+        "type": "boolean"
+      }
+    },
+    "title": "ProjectListInput",
+    "type": "object"
+  },
+  "ProjectExpectedRevisionInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "expected_revision": {
+        "minimum": 0,
+        "title": "Expected Revision",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "project_id",
+      "expected_revision"
+    ],
+    "title": "ProjectExpectedRevisionInput",
+    "type": "object"
+  },
+  "ProjectMetadataUpdateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "expected_revision": {
+        "minimum": 0,
+        "title": "Expected Revision",
+        "type": "integer"
+      },
+      "name": {
+        "anyOf": [
+          {
+            "maxLength": 500,
+            "minLength": 1,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Name"
+      },
+      "description": {
+        "anyOf": [
+          {
+            "maxLength": 10000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Description"
+      }
+    },
+    "required": [
+      "project_id",
+      "expected_revision"
+    ],
+    "title": "ProjectMetadataUpdateInput",
+    "type": "object"
+  },
+  "ProjectOverlayUpdateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "expected_revision": {
+        "minimum": 0,
+        "title": "Expected Revision",
+        "type": "integer"
+      },
+      "overlay": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Overlay",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "expected_revision",
+      "overlay"
+    ],
+    "title": "ProjectOverlayUpdateInput",
+    "type": "object"
+  },
+  "ProjectPolicyUpdateInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "expected_revision": {
+        "minimum": 0,
+        "title": "Expected Revision",
+        "type": "integer"
+      },
+      "payload": {
+        "additionalProperties": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "title": "Payload",
+        "type": "object"
+      }
+    },
+    "required": [
+      "project_id",
+      "expected_revision",
+      "payload"
+    ],
+    "title": "ProjectPolicyUpdateInput",
+    "type": "object"
+  },
+  "ProjectRoleAssignInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "expected_revision": {
+        "minimum": 0,
+        "title": "Expected Revision",
+        "type": "integer"
+      },
+      "actor_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Actor Id",
+        "type": "string"
+      },
+      "organization_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Organization Id"
+      },
+      "role": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Role",
+        "type": "string"
+      },
+      "scope": {
+        "default": "PROJECT",
+        "maxLength": 260,
+        "minLength": 1,
+        "title": "Scope",
+        "type": "string"
+      },
+      "authority_tags": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "title": "Authority Tags",
+        "type": "array"
+      }
+    },
+    "required": [
+      "project_id",
+      "expected_revision",
+      "actor_id",
+      "role"
+    ],
+    "title": "ProjectRoleAssignInput",
+    "type": "object"
+  },
+  "ProjectRoleRevokeInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "expected_revision": {
+        "minimum": 0,
+        "title": "Expected Revision",
+        "type": "integer"
+      },
+      "role_assignment_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Role Assignment Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "expected_revision",
+      "role_assignment_id"
+    ],
+    "title": "ProjectRoleRevokeInput",
+    "type": "object"
+  },
+  "ProjectReferenceImportInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "expected_revision": {
+        "minimum": 0,
+        "title": "Expected Revision",
+        "type": "integer"
+      },
+      "origin_project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Origin Project Id",
+        "type": "string"
+      },
+      "origin_revision": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Origin Revision",
+        "type": "string"
+      },
+      "rights_status": {
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Rights Status",
+        "type": "string"
+      },
+      "scope": {
+        "maxLength": 260,
+        "minLength": 1,
+        "title": "Scope",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "expected_revision",
+      "origin_project_id",
+      "origin_revision",
+      "rights_status",
+      "scope"
+    ],
+    "title": "ProjectReferenceImportInput",
+    "type": "object"
+  },
+  "ProjectCutoffImpactInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "proposed_cutoff_at": {
+        "format": "date-time",
+        "title": "Proposed Cutoff At",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "proposed_cutoff_at"
+    ],
+    "title": "ProjectCutoffImpactInput",
+    "type": "object"
+  },
+  "ProjectCutoffUpdateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "expected_revision": {
+        "minimum": 0,
+        "title": "Expected Revision",
+        "type": "integer"
+      },
+      "cutoff_at": {
+        "format": "date-time",
+        "title": "Cutoff At",
+        "type": "string"
+      },
+      "expected_impact_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Impact Digest",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "expected_revision",
+      "cutoff_at",
+      "expected_impact_digest"
+    ],
+    "title": "ProjectCutoffUpdateInput",
+    "type": "object"
+  }
+}

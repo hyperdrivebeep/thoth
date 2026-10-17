@@ -16,6 +16,7 @@ import typer
 from rich.console import Console
 
 from thoth import __version__
+from thoth.adapters.cli.auth_presentation import present_auth_connect, present_auth_status
 from thoth.adapters.cli.diagnostics import register_diagnostic_commands
 from thoth.adapters.cli.sources import register_source_commands
 from thoth.adapters.connectors import load_connector_registry
@@ -256,24 +257,7 @@ def auth_status(
         raise typer.Exit(code=1) from exc
     finally:
         close_workspace_broker(workspace)
-    if json_output:
-        safe = {
-            key: payload.get(key)
-            for key in (
-                "provider",
-                "connected",
-                "connection_state",
-                "profile_mode",
-                "reason_code",
-                "execution_eligible",
-                "execution_verified",
-            )
-            if key in payload
-        }
-        console.print_json(json.dumps(safe))
-    else:
-        state = str(payload.get("connection_state") or "UNKNOWN")
-        console.print(f"Codex account: {state}")
+    present_auth_status(console, payload, json_output)
     if not payload["connected"]:
         raise typer.Exit(code=1)
 
@@ -294,20 +278,7 @@ def auth_connect(
         raise typer.Exit(code=1) from exc
     finally:
         close_workspace_broker(workspace)
-    safe = {
-        key: result.get(key)
-        for key in (
-            "started",
-            "connected",
-            "connection_state",
-            "reason_code",
-            "execution_eligible",
-            "execution_verified",
-            "guidance",
-        )
-        if key in result
-    }
-    console.print_json(json.dumps(safe))
+    present_auth_connect(console, result)
     if result.get("connected") is not True:
         raise typer.Exit(code=1)
 

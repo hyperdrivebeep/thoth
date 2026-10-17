@@ -1,5 +1,9 @@
 """Compose analysis and post-execution learning against the same owned stores."""
 
+from dataclasses import dataclass
+
+from thoth.application.commands.investigation import InvestigationQueryHandlers
+from thoth.application.commands.projections import ProjectionQueryHandlers
 from thoth.application.commands.thread_analysis import ThreadAnalysisCommandHandlers
 from thoth.application.services import (
     AcquisitionCoordinator,
@@ -12,14 +16,19 @@ from thoth.application.services import (
     RecursiveImprovementCoordinator,
     SourceGroundedCriterionProfileRouter,
 )
+from thoth.application.services.investigation_service import InvestigationService
 from thoth.application.services.research_identity_service import ResearchIdentityService
 from thoth.apps.memory_composition import create_post_execution_memory
+from thoth.ports.acquisition import AcquisitionTraceStorePort
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
 from thoth.ports.criterion_contract import CriterionContractStorePort
+from thoth.ports.investigation import InvestigationStorePort
+from thoth.ports.ledger import LedgerPort
 from thoth.ports.memory import MemoryStorePort
 from thoth.ports.model import ModelResolverPort
 from thoth.ports.runtime import ClockPort, IdGeneratorPort
 from thoth.ports.store_bundle import StoreBundlePort
+from thoth.ports.thread import ThreadStorePort
 
 
 def create_thread_analysis(
@@ -67,4 +76,39 @@ def create_thread_analysis(
         baselines=baselines,
         research=research,
         post_execution_memory=create_post_execution_memory(stores, full_memory, clock, ids),
+    )
+
+
+@dataclass(frozen=True)
+class ResearchQueries:
+    projection_handlers: ProjectionQueryHandlers
+    investigation_handlers: InvestigationQueryHandlers
+
+
+def create_research_queries(
+    *,
+    acquisition_trace_store: AcquisitionTraceStorePort,
+    artifact_ledger: ArtifactLedgerPort,
+    clock: ClockPort,
+    investigation_service: InvestigationService,
+    investigation_store: InvestigationStorePort,
+    ledger: LedgerPort,
+    research_identity: ResearchIdentityService,
+    thread_store: ThreadStorePort,
+) -> ResearchQueries:
+    projection_handlers = ProjectionQueryHandlers(
+        ledger=ledger,
+        artifacts=artifact_ledger,
+        clock=clock,
+        research=research_identity,
+    )
+    investigation_handlers = InvestigationQueryHandlers(
+        store=investigation_store,
+        service=investigation_service,
+        threads=thread_store,
+        acquisition=acquisition_trace_store,
+    )
+    return ResearchQueries(
+        projection_handlers=projection_handlers,
+        investigation_handlers=investigation_handlers,
     )

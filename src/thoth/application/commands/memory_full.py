@@ -1,180 +1,54 @@
 from __future__ import annotations
 
-import re
 from typing import cast
 
-from pydantic import AwareDatetime, Field, JsonValue
+from pydantic import JsonValue
 
+from thoth.application.commands.memory_control_drafts import (
+    candidate_payload,
+    classified_payload,
+    context_pack_payload,
+    gate_draft,
+    gate_plan,
+    memory_entry_payload,
+    projection_checkpoint,
+    retention_candidates,
+)
+from thoth.application.commands.memory_control_profiles import POLICIES
+from thoth.application.commands.memory_inputs import (
+    CandidateClassifyInput,
+    CandidateCreateInput,
+    CandidateListInput,
+    CandidateReadInput,
+    ChangeSetProposeInput,
+    ConflictListInput,
+    ContextBuildInput,
+    ContextReadInput,
+    GateReadInput,
+    MemoryListInput,
+    MemoryReadInput,
+    PolicyListInput,
+    PolicyReadInput,
+    ProjectInput,
+    ProjectionRebuildInput,
+    RecallAuditInput,
+    RetentionEvaluateInput,
+    RetireProposeInput,
+    RevalidateInput,
+    ValidateInput,
+)
+from thoth.application.commands.memory_read_projection import (
+    find_policy,
+    projection_status_view,
+    select_policies,
+)
 from thoth.application.services.control_record_service import ControlRecordService
 from thoth.application.services.memory_router import build_recall_context
-from thoth.domain.base import DomainModel
-from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.control_record import ControlRecord
 from thoth.ports.control_record import ControlRecordStorePort
 from thoth.ports.ledger import LedgerPort
 from thoth.ports.memory import FullMemoryStorePort, MemoryStorePort
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
-
-POLICIES = (
-    {
-        "profile_ref": "memory:domain-reference:1",
-        "version": 1,
-        "payload_mode": "DOMAIN_REFERENCE",
-        "recall_classes": (
-            "FACT",
-            "FAILURE",
-            "REFERENCE",
-            "HYPOTHESIS",
-            "DECISION",
-            "PERSON",
-            "ACTION",
-        ),
-        "owner": "DOMAIN_NAMESPACE",
-        "promotion": "EXACT_OWNER_REVISION_REQUIRED",
-        "expiry": "OWNER_OR_POLICY_BOUND",
-        "retention": "AUDIT_PRESERVE",
-        "team_roles": ("FACTS", "CONTRARIAN", "RISK", "GATE_REVIEWER"),
-        "enabled": True,
-    },
-    {
-        "profile_ref": "memory:assertion:1",
-        "version": 1,
-        "payload_mode": "MEMORY_ASSERTION",
-        "recall_classes": ("LESSON", "PRACTICE"),
-        "owner": "MEMORY_NAMESPACE",
-        "promotion": "SOURCE_LINEAGE_AND_TEAM_GATE",
-        "expiry": "TIME_AND_SUPPORT_BOUND",
-        "retention": "SUPERSEDE_OR_RETIRE_NO_DELETE",
-        "team_roles": ("REFLECTION", "CONTRARIAN", "RISK", "GATE_REVIEWER"),
-        "enabled": True,
-    },
-)
-
-INJECTION = re.compile(
-    r"ignore\s+(all|previous)|system\s+prompt|developer\s+message|이전\s*명령.*무시",
-    re.IGNORECASE,
-)
-SECRET = re.compile(r"(?:api[_-]?key|secret|password|token)\s*[:=]\s*[^\s]{8,}", re.IGNORECASE)
-
-
-class ProjectInput(DomainModel):
-    project_id: str = Field(min_length=1, max_length=160)
-
-
-class MemoryListInput(ProjectInput):
-    recall_class: str | None = Field(default=None, max_length=80)
-    payload_mode: str | None = Field(default=None, max_length=80)
-    pipeline_status: str | None = Field(default=None, max_length=80)
-    lifecycle_status: str | None = Field(default=None, max_length=80)
-    recall_eligibility: str | None = Field(default=None, max_length=80)
-
-
-class MemoryReadInput(ProjectInput):
-    memory_entry_id: str = Field(min_length=1, max_length=160)
-    revision_digest: str | None = Field(default=None, min_length=64, max_length=64)
-
-
-class CandidateListInput(ProjectInput):
-    producer_role: str | None = Field(default=None, max_length=80)
-    classification_status: str | None = Field(default=None, max_length=80)
-    risk_tag: str | None = Field(default=None, max_length=80)
-
-
-class CandidateReadInput(ProjectInput):
-    candidate_id: str = Field(min_length=1, max_length=160)
-
-
-class ContextReadInput(ProjectInput):
-    context_pack_id: str | None = Field(default=None, max_length=160)
-    character_budget: int = Field(default=20_000, ge=0, le=2_000_000)
-
-
-class PolicyListInput(ProjectInput):
-    recall_class: str | None = Field(default=None, max_length=80)
-    payload_mode: str | None = Field(default=None, max_length=80)
-    enabled_only: bool = True
-
-
-class PolicyReadInput(ProjectInput):
-    profile_ref: str = Field(min_length=1, max_length=160)
-    version: int | None = Field(default=None, ge=1)
-
-
-class GateReadInput(ProjectInput):
-    candidate_id: str | None = Field(default=None, max_length=160)
-    memory_entry_id: str | None = Field(default=None, max_length=160)
-    transition_receipt_ref: str | None = Field(default=None, max_length=160)
-
-
-class ConflictListInput(ProjectInput):
-    recall_class: str | None = Field(default=None, max_length=80)
-    lifecycle_status: str | None = Field(default=None, max_length=80)
-
-
-class RecallAuditInput(ProjectInput):
-    context_pack_id: str | None = Field(default=None, max_length=160)
-    thread_id: str | None = Field(default=None, max_length=160)
-    time_range: dict[str, str] | None = None
-
-
-class CandidateCreateInput(ProjectInput):
-    producer_role: str = Field(min_length=1, max_length=80)
-    payload_mode: str = Field(pattern=r"^(DOMAIN_REFERENCE|MEMORY_ASSERTION)$")
-    recall_class: str = Field(min_length=1, max_length=80)
-    domain_revision_ref: str | None = Field(default=None, max_length=160)
-    assertion_candidate: str | None = Field(default=None, max_length=20_000)
-    parent_refs: tuple[str, ...] = ()
-    scope: dict[str, str]
-    evidence_refs: tuple[str, ...]
-    risk_tags: tuple[str, ...] = ()
-
-
-class CandidateClassifyInput(CandidateReadInput):
-    classifier_profile_ref: str = Field(min_length=1, max_length=160)
-    expected_candidate_revision: int = Field(ge=1)
-
-
-class ValidateInput(CandidateReadInput):
-    transition_intent: str = Field(min_length=1, max_length=80)
-    policy_version: str = Field(min_length=1, max_length=160)
-
-
-class ChangeSetProposeInput(CandidateReadInput):
-    transition_intent: str = Field(min_length=1, max_length=80)
-    validated_gate_digest: str = Field(min_length=64, max_length=64)
-    expected_memory_head_digest: str | None = Field(default=None, min_length=64, max_length=64)
-
-
-class RevalidateInput(MemoryReadInput):
-    trigger_refs: tuple[str, ...]
-
-
-class RetireProposeInput(MemoryReadInput):
-    reason: str = Field(min_length=1, max_length=2_000)
-    evidence_refs: tuple[str, ...]
-    expected_revision_digest: str = Field(min_length=64, max_length=64)
-
-
-class ContextBuildInput(ProjectInput):
-    thread_id: str = Field(min_length=1, max_length=160)
-    query: str = Field(min_length=1, max_length=10_000)
-    target_use: str = Field(min_length=1, max_length=80)
-    scope: dict[str, str]
-    token_budget: int = Field(ge=0, le=2_000_000)
-    selection_policy_version: str = Field(min_length=1, max_length=160)
-    cutoff: AwareDatetime | None = None
-
-
-class ProjectionRebuildInput(ProjectInput):
-    projection_types: tuple[str, ...]
-    from_checkpoint: str | None = Field(default=None, max_length=160)
-    model_or_index_version: str | None = Field(default=None, max_length=160)
-
-
-class RetentionEvaluateInput(ProjectInput):
-    scope: dict[str, str] | None = None
-    policy_version: str = Field(min_length=1, max_length=160)
-    evaluation_time: AwareDatetime
 
 
 class MemoryFullHandlers:
@@ -293,23 +167,12 @@ class MemoryFullHandlers:
 
     async def policy_list(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = PolicyListInput.model_validate(value)
-        policies = tuple(
-            policy
-            for policy in POLICIES
-            if (request.payload_mode is None or policy["payload_mode"] == request.payload_mode)
-            and (
-                request.recall_class is None
-                or request.recall_class in cast(tuple[str, ...], policy["recall_classes"])
-            )
-            and (not request.enabled_only or policy["enabled"] is True)
-        )
+        policies = select_policies(POLICIES, request)
         return {"policies": [cast(JsonValue, policy) for policy in policies]}
 
     async def policy_read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = PolicyReadInput.model_validate(value)
-        policy = next(
-            (item for item in POLICIES if item["profile_ref"] == request.profile_ref), None
-        )
+        policy = find_policy(POLICIES, request.profile_ref)
         if policy is None:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "policy not found")
         return {"policy": cast(JsonValue, policy)}
@@ -353,21 +216,8 @@ class MemoryFullHandlers:
     async def projection_status(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ProjectInput.model_validate(value)
         tasks = self._records.list(request.project_id, "MEMORY", "PROJECTION_TASK")
-        return cast(
-            dict[str, JsonValue],
-            {
-                "canonical_reference_health": "PASS",
-                "index_freshness": "CURRENT" if not tasks else tasks[-1].state,
-                "vector_freshness": "DERIVED_ONLY",
-                "summary_freshness": "DERIVED_ONLY",
-                "rebuild_checkpoints": [item.payload.get("checkpoint") for item in tasks],
-                "leakage_checks": "PROJECT_FILTER_BEFORE_RERANK",
-                "full_projection_types": [
-                    item.projection_type for item in self._full.list_projections(request.project_id)
-                ],
-                "derived_projection_canonical_truth": False,
-            },
-        )
+        projections = self._full.list_projections(request.project_id)
+        return projection_status_view(tasks, projections)
 
     async def full_list(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ProjectInput.model_validate(value)
@@ -407,32 +257,7 @@ class MemoryFullHandlers:
 
     async def candidate_create(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = CandidateCreateInput.model_validate(value)
-        raw = request.assertion_candidate or ""
-        unsafe = bool(INJECTION.search(raw) or SECRET.search(raw))
-        missing: list[str] = []
-        if request.payload_mode == "DOMAIN_REFERENCE" and not request.domain_revision_ref:
-            missing.append("domain_revision_ref")
-        if request.payload_mode == "MEMORY_ASSERTION" and not raw:
-            missing.append("assertion_candidate")
-        risk_tags = (*request.risk_tags, "UNSAFE_CONTENT") if unsafe else request.risk_tags
-        payload: dict[str, object] = {
-            "producer_role": request.producer_role,
-            "payload_mode": request.payload_mode,
-            "recall_class": request.recall_class,
-            "domain_revision_ref": request.domain_revision_ref,
-            "assertion_candidate": "[REDACTED_TOMBSTONE]"
-            if unsafe
-            else request.assertion_candidate,
-            "raw_payload_retained": not unsafe,
-            "parent_refs": request.parent_refs,
-            "scope": request.scope,
-            "evidence_refs": request.evidence_refs,
-            "risk_tags": tuple(dict.fromkeys(risk_tags)),
-            "classification_status": "AMBIGUOUS" if missing else "CLEAR",
-            "deterministic_precheck": "QUARANTINE" if unsafe else "PASS" if not missing else "HOLD",
-            "missing_gates": tuple(missing),
-            "allowed_use": "AUDIT_ONLY" if unsafe else "EVIDENCE_SEARCH_ONLY",
-        }
+        payload, unsafe, missing = candidate_payload(request)
         candidate = self._controls.create(
             project_id=request.project_id,
             namespace="MEMORY",
@@ -445,7 +270,7 @@ class MemoryFullHandlers:
             {
                 "candidate": candidate.model_dump(mode="json"),
                 "precheck": payload["deterministic_precheck"],
-                "gate_plan": self._gate_plan(payload),
+                "gate_plan": gate_plan(payload),
                 "allowed_use": payload["allowed_use"],
             },
         )
@@ -455,23 +280,7 @@ class MemoryFullHandlers:
         current = self._candidate(request)
         if current.version != request.expected_candidate_revision:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "candidate revision changed")
-        recall_class = str(current.payload.get("recall_class"))
-        alternatives = ()
-        status = "CLEAR"
-        if recall_class not in {
-            str(item)
-            for policy in POLICIES
-            for item in cast(tuple[str, ...], policy["recall_classes"])
-        }:
-            status = "AMBIGUOUS"
-            alternatives = ("REFERENCE", "LESSON")
-        payload = {
-            **current.payload,
-            "classification_status": status,
-            "alternative_classes": alternatives,
-            "classifier_profile_ref": request.classifier_profile_ref,
-            "required_role_union": self._gate_plan(current.payload)["required_roles"],
-        }
+        recall_class, alternatives, status, payload = classified_payload(current, request)
         revised = self._controls.create(
             project_id=request.project_id,
             namespace="MEMORY",
@@ -495,25 +304,7 @@ class MemoryFullHandlers:
     async def validate(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ValidateInput.model_validate(value)
         current = self._candidate(request)
-        plan = self._gate_plan(current.payload)
-        unsafe = current.state == "QUARANTINED"
-        ambiguous = current.payload.get("classification_status") == "AMBIGUOUS"
-        reducer = "QUARANTINED" if unsafe else "HELD" if ambiguous else "VALIDATED"
-        verdicts = {
-            role: "REJECT" if unsafe else "HOLD" if ambiguous else "PASS"
-            for role in cast(tuple[str, ...], plan["required_roles"])
-        }
-        gate_payload: dict[str, object] = {
-            "subject_id": current.record_id,
-            "transition_intent": request.transition_intent,
-            "policy_version": request.policy_version,
-            "required_roles": plan["required_roles"],
-            "actual_roles": tuple(verdicts),
-            "verdicts": verdicts,
-            "deterministic_precheck": current.payload.get("deterministic_precheck"),
-            "reducer_outcome": reducer,
-        }
-        gate_digest = domain_digest("MEMORY_GATE", "1.0.0", canonical_payload(gate_payload))
+        plan, reducer, verdicts, gate_payload, gate_digest = gate_draft(request, current)
         gate = self._controls.create(
             project_id=request.project_id,
             namespace="MEMORY",
@@ -551,22 +342,7 @@ class MemoryFullHandlers:
             raise RpcApplicationError(
                 RpcErrorCode.DOMAIN_REJECTED, "candidate gate is not validated"
             )
-        entry_payload: dict[str, object] = {
-            "candidate_id": candidate.record_id,
-            "payload_mode": candidate.payload.get("payload_mode"),
-            "recall_class": candidate.payload.get("recall_class"),
-            "domain_revision_ref": candidate.payload.get("domain_revision_ref"),
-            "assertion": candidate.payload.get("assertion_candidate"),
-            "parent_refs": candidate.payload.get("parent_refs", ()),
-            "scope": candidate.payload.get("scope", {}),
-            "evidence_refs": candidate.payload.get("evidence_refs", ()),
-            "pipeline_status": "CANDIDATE",
-            "support_status": "UNRESOLVED",
-            "authority_status": "UNKNOWN",
-            "lifecycle_status": "ACTIVE",
-            "recall_eligibility": "EVIDENCE_SEARCH_ONLY",
-            "classification_status": candidate.payload.get("classification_status"),
-        }
+        entry_payload = memory_entry_payload(candidate)
         memory_candidate = self._controls.create(
             project_id=request.project_id,
             namespace="MEMORY",
@@ -661,65 +437,7 @@ class MemoryFullHandlers:
         request = ContextBuildInput.model_validate(value)
         heads = set(self._ledger.read_heads(request.project_id).values())
         entries = self._records.list(request.project_id, "MEMORY", "MEMORY_ENTRY")
-        included: list[dict[str, object]] = []
-        excluded: list[dict[str, object]] = []
-        used = 0
-        for item in entries:
-            payload = item.payload
-            reason = None
-            owner = str(payload.get("domain_revision_ref") or "")
-            if owner and owner not in heads:
-                reason = "OWNER_REVISION_NOT_CURRENT"
-            elif payload.get("lifecycle_status") != "ACTIVE":
-                reason = "NOT_ACTIVE"
-            elif payload.get("recall_eligibility") not in {"WORKING_CONTEXT", "ACTION_CONTEXT"}:
-                reason = "NOT_ELIGIBLE_FOR_TARGET_USE"
-            elif payload.get("scope") and not self._scope_matches(
-                payload.get("scope"), request.scope
-            ):
-                reason = "SCOPE_MISMATCH"
-            size = len(str(payload.get("assertion") or payload.get("domain_revision_ref") or ""))
-            if reason is None and used + size > request.token_budget * 4:
-                reason = "TOKEN_BUDGET"
-            if reason is None:
-                included.append(
-                    {
-                        "memory_entry_id": item.record_id,
-                        "revision_digest": item.record_digest,
-                        "reason": "DETERMINISTIC_FILTER_AND_RELEVANCE",
-                    }
-                )
-                used += size
-            else:
-                excluded.append({"memory_entry_id": item.record_id, "reason": reason})
-        pack_payload: dict[str, object] = {
-            "thread_id": request.thread_id,
-            "query": request.query,
-            "target_use": request.target_use,
-            "scope": request.scope,
-            "cutoff": request.cutoff,
-            "selection_policy_version": request.selection_policy_version,
-            "included": tuple(included),
-            "excluded": tuple(excluded),
-            "conflict_refs": tuple(
-                item.record_id
-                for item in entries
-                if item.payload.get("support_status") == "CONFLICTING"
-            ),
-            "token_budget": request.token_budget,
-            "approximate_characters": used,
-            "query_policy_digest": domain_digest(
-                "MEMORY_QUERY_POLICY",
-                "1.0.0",
-                canonical_payload(
-                    {
-                        "query": request.query,
-                        "scope": request.scope,
-                        "policy": request.selection_policy_version,
-                    }
-                ),
-            ),
-        }
+        included, pack_payload = context_pack_payload(request, entries, heads)
         pack = self._controls.create(
             project_id=request.project_id,
             namespace="MEMORY",
@@ -738,17 +456,7 @@ class MemoryFullHandlers:
             item.record_digest
             for item in self._records.list(request.project_id, "MEMORY", "MEMORY_ENTRY")
         )
-        checkpoint = domain_digest(
-            "MEMORY_PROJECTION_CHECKPOINT",
-            "1.0.0",
-            canonical_payload(
-                {
-                    "sources": source_set,
-                    "types": request.projection_types,
-                    "version": request.model_or_index_version,
-                }
-            ),
-        )
+        checkpoint = projection_checkpoint(request, source_set)
         task = self._controls.create(
             project_id=request.project_id,
             namespace="MEMORY",
@@ -769,16 +477,7 @@ class MemoryFullHandlers:
     async def retention_evaluate(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = RetentionEvaluateInput.model_validate(value)
         entries = self._records.list(request.project_id, "MEMORY", "MEMORY_ENTRY")
-        candidates = tuple(
-            {
-                "memory_entry_id": item.record_id,
-                "transition": "RETIRE_CANDIDATE"
-                if item.payload.get("lifecycle_status") == "EXPIRED"
-                else "RETAIN",
-                "silent_delete": False,
-            }
-            for item in entries
-        )
+        candidates = retention_candidates(entries)
         evaluation = self._controls.create(
             project_id=request.project_id,
             namespace="MEMORY",
@@ -814,27 +513,7 @@ class MemoryFullHandlers:
         return item
 
     @staticmethod
-    def _gate_plan(payload: dict[str, object]) -> dict[str, object]:
-        mode = payload.get("payload_mode")
-        roles = (
-            ("FACTS", "CONTRARIAN", "RISK", "GATE_REVIEWER")
-            if mode == "DOMAIN_REFERENCE"
-            else ("REFLECTION", "CONTRARIAN", "RISK", "GATE_REVIEWER")
-        )
-        return {"required_roles": roles, "majority_vote": False}
-
-    @staticmethod
     def _strings(value: object) -> tuple[str, ...]:
         if not isinstance(value, tuple | list):
             return ()
         return tuple(str(item) for item in cast(tuple[object, ...] | list[object], value))
-
-    @staticmethod
-    def _scope_matches(left: object, right: dict[str, str]) -> bool:
-        if not isinstance(left, dict):
-            return False
-        return all(
-            right.get(str(key)) == str(value)
-            for key, value in cast(dict[object, object], left).items()
-            if key != "workstream"
-        )

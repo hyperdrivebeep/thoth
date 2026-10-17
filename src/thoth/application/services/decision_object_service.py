@@ -2,6 +2,15 @@ from __future__ import annotations
 
 from contextlib import AbstractContextManager
 
+from thoth.application.services.object_record_drafts import (
+    acknowledged_object_attention_draft,
+    ended_object_relation_draft,
+    materialized_object_draft,
+    object_attention_draft,
+    object_candidate_draft,
+    object_relation_draft,
+    revised_object_draft,
+)
 from thoth.application.services.revision_service import CommitResult, RevisionCommitService
 from thoth.domain.actor import ActorRef
 from thoth.domain.auth import current_authenticated_actor
@@ -188,23 +197,22 @@ class DecisionObjectService:
                 if entry_validation == "PASS"
                 else "HOLD_ENTRY_INVALID"
             )
-            candidate_draft: dict[str, object] = {
-                "candidate_id": self._ids.new("object-candidate"),
-                "project_id": project_id,
-                "thread_id": thread_id,
-                "purpose_statement": purpose_statement,
-                "problem_frame": problem_frame,
-                "focus_refs": focus_refs,
-                "trigger_type": trigger_type,
-                "trigger_evidence_refs": trigger_evidence_refs,
-                "profile_candidates": selected_refs,
-                "profile_state": profile_state,
-                "duplicate_object_refs": duplicates,
-                "entry_validation": entry_validation,
-                "permitted_transition": transition,
-                "candidate_state": "PROPOSED",
-                "created_at": self._clock.now(),
-            }
+            candidate_draft = object_candidate_draft(
+                project_id=project_id,
+                thread_id=thread_id,
+                purpose_statement=purpose_statement,
+                problem_frame=problem_frame,
+                focus_refs=focus_refs,
+                trigger_type=trigger_type,
+                trigger_evidence_refs=trigger_evidence_refs,
+                selected_refs=selected_refs,
+                profile_state=profile_state,
+                duplicates=duplicates,
+                entry_validation=entry_validation,
+                transition=transition,
+                ids=self._ids,
+                clock=self._clock,
+            )
             candidate = ObjectCandidateRecord.model_validate(
                 {
                     **candidate_draft,
@@ -216,37 +224,25 @@ class DecisionObjectService:
             self._store.add_candidate(candidate)
             if transition != "MATERIALIZE_ROUTINE":
                 return candidate, None, None
-            object_draft: dict[str, object] = {
-                "object_revision_id": self._ids.new("object-revision"),
-                "object_id": object_id or self._ids.new("object"),
-                "project_id": project_id,
-                "thread_id": thread_id,
-                "parent_object_id": parent_object_id,
-                "purpose_statement": purpose_statement,
-                "problem_frame": problem_frame,
-                "focus_refs": focus_refs,
-                "workstream_refs": workstream_refs,
-                "requirement_refs": requirement_refs,
-                "profile_refs": selected_refs,
-                "profile_state": profile_state,
-                "facets": (),
-                "materialization_trigger": trigger_type,
-                "trigger_evidence_refs": trigger_evidence_refs,
-                "entry_criteria": {"status": "PASS", "candidate_ref": candidate.candidate_id},
-                "exit_criteria": {"status": "NOT_SATISFIED", "reason": "work remains open"},
-                "active_work_mode": "FRAMING",
-                "lifecycle": "ACTIVE",
-                "resolution": "OPEN",
-                "verification": "NOT_ASSESSED",
-                "disposition": "NONE",
-                "freshness": "CURRENT",
-                "attention": "NONE",
-                "blockers": (),
-                "relation_refs": (),
-                "actor_or_agent_ref": actor_ref,
-                "protected_boundary_context": {},
-                "created_at": self._clock.now(),
-            }
+            object_draft = materialized_object_draft(
+                project_id=project_id,
+                thread_id=thread_id,
+                parent_object_id=parent_object_id,
+                purpose_statement=purpose_statement,
+                problem_frame=problem_frame,
+                focus_refs=focus_refs,
+                workstream_refs=workstream_refs,
+                requirement_refs=requirement_refs,
+                selected_refs=selected_refs,
+                profile_state=profile_state,
+                trigger_type=trigger_type,
+                trigger_evidence_refs=trigger_evidence_refs,
+                actor_ref=actor_ref,
+                object_id=object_id,
+                candidate=candidate,
+                ids=self._ids,
+                clock=self._clock,
+            )
             record = DecisionObjectRecord.model_validate(
                 {**object_draft, "revision_digest": self._digest(object_draft)}
             )
@@ -271,17 +267,7 @@ class DecisionObjectService:
     ) -> tuple[DecisionObjectRecord, CommitResult]:
         with self._ledger.transaction():
             self._validate_evidence(current.project_id, evidence_refs)
-            draft = current.model_dump(mode="python")
-            draft.update(updates)
-            draft.update(
-                {
-                    "object_revision_id": self._ids.new("object-revision"),
-                    "supersedes_revision_digest": current.revision_digest,
-                    "created_at": self._clock.now(),
-                }
-            )
-            draft.pop("revision_digest", None)
-            draft.pop("receipt_ref", None)
+            draft = revised_object_draft(current, updates, ids=self._ids, clock=self._clock)
             revised = DecisionObjectRecord.model_validate(
                 {**draft, "revision_digest": self._digest(draft)}
             )
@@ -350,21 +336,17 @@ class DecisionObjectService:
             if relation_type not in allowed:
                 raise ValueError("relation type is not allowed by the active ObjectProfile")
             now = self._clock.now()
-            relation_draft: dict[str, object] = {
-                "relation_revision_id": self._ids.new("object-relation-revision"),
-                "relation_id": self._ids.new("object-relation"),
-                "project_id": current.project_id,
-                "source_object_id": current.object_id,
-                "relation_type": relation_type,
-                "target_ref": target_ref,
-                "semantic_role": semantic_role,
-                "evidence_refs": evidence_refs,
-                "actor_or_agent_ref": actor_ref,
-                "valid_from": now,
-                "authority_state": authority_state,
-                "active": True,
-                "created_at": now,
-            }
+            relation_draft = object_relation_draft(
+                current,
+                relation_type=relation_type,
+                target_ref=target_ref,
+                semantic_role=semantic_role,
+                evidence_refs=evidence_refs,
+                authority_state=authority_state,
+                actor_ref=actor_ref,
+                now=now,
+                ids=self._ids,
+            )
             relation = ObjectRelationRecord.model_validate(
                 {**relation_draft, "revision_digest": self._relation_digest(relation_draft)}
             )
@@ -402,17 +384,7 @@ class DecisionObjectService:
         with self._ledger.transaction():
             if not relation.active:
                 raise ValueError("relation is already inactive")
-            draft = relation.model_dump(mode="python")
-            draft.update(
-                {
-                    "relation_revision_id": self._ids.new("object-relation-revision"),
-                    "valid_to": self._clock.now(),
-                    "active": False,
-                    "supersedes_revision_digest": relation.revision_digest,
-                    "created_at": self._clock.now(),
-                }
-            )
-            draft.pop("revision_digest", None)
+            draft = ended_object_relation_draft(relation, ids=self._ids, clock=self._clock)
             ended = ObjectRelationRecord.model_validate(
                 {**draft, "revision_digest": self._relation_digest(draft)}
             )
@@ -446,18 +418,15 @@ class DecisionObjectService:
             )
             if existing is not None:
                 return existing
-            draft: dict[str, object] = {
-                "attention_revision_id": self._ids.new("object-attention-revision"),
-                "attention_id": self._ids.new("object-attention"),
-                "project_id": current.project_id,
-                "object_id": current.object_id,
-                "attention_type": attention_type,
-                "risk": risk,
-                "reason": reason,
-                "condition_ref": condition_ref,
-                "state": "OPEN",
-                "created_at": self._clock.now(),
-            }
+            draft = object_attention_draft(
+                current,
+                attention_type=attention_type,
+                risk=risk,
+                reason=reason,
+                condition_ref=condition_ref,
+                ids=self._ids,
+                clock=self._clock,
+            )
             record = ObjectAttentionRecord.model_validate(
                 {**draft, "revision_digest": self._attention_digest(draft)}
             )
@@ -475,18 +444,14 @@ class DecisionObjectService:
     ) -> tuple[ObjectAttentionRecord, DecisionObjectRecord, CommitResult]:
         with self._ledger.transaction():
             resolved = attention.condition_ref not in current.blockers
-            draft = attention.model_dump(mode="python")
-            draft.update(
-                {
-                    "attention_revision_id": self._ids.new("object-attention-revision"),
-                    "state": "CLEARED" if resolved else "ACKNOWLEDGED",
-                    "acknowledged_by": actor_ref,
-                    "acknowledgement_note": note,
-                    "supersedes_revision_digest": attention.revision_digest,
-                    "created_at": self._clock.now(),
-                }
+            draft = acknowledged_object_attention_draft(
+                attention,
+                resolved=resolved,
+                actor_ref=actor_ref,
+                note=note,
+                ids=self._ids,
+                clock=self._clock,
             )
-            draft.pop("revision_digest", None)
             revised_attention = ObjectAttentionRecord.model_validate(
                 {**draft, "revision_digest": self._attention_digest(draft)}
             )

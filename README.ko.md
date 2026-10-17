@@ -188,7 +188,7 @@ API는 로컬 루프백 주소에 바인딩되고, Vite는 API 요청을 8765 �
 
 이 검증으로 실제 모델의 답변 품질, 여러 runtime을 사용하는 Hosted 운영 준비, 폭넓은 플랫폼 호환성, 실제 협업자의 시간 절감 효과가 입증된 것은 아닙니다.
 
-[검증 기록](docs/VERIFICATION.md) · [미해결 테스트 목록](docs/KNOWN_TEST_FAILURES.json) · [공개 파일 범위](docs/PACKAGING.md)
+[검증 기록](docs/VERIFICATION.md) · [미해결 테스트 목록](docs/KNOWN_TEST_FAILURES.json) · [알려진 한계](docs/KNOWN_LIMITATIONS.ko.md) · [공개 파일 범위](docs/PACKAGING.md)
 
 ## 내부를 살펴보기
 

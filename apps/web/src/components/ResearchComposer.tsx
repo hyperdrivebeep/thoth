@@ -11,17 +11,17 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
   hosted?:boolean;executionReady?:boolean;readSuspended?:boolean;consentMissing?:boolean;modelConnected?:boolean;
 }) {
   useTranslation();
-  const citation=useCitationGate(projectId);
+  const citation=useCitationGate(projectId, session.isCurrentScope);
   const acceptedRequest = session.research.data?.value.request;
   const acceptedLanguage = acceptedRequest?.response_language ?? null;
   const submit = async () => {
-    if (!executionReady || readSuspended || session.pendingBlocksNewInput) return;
+    if (!session.isCurrentScope() || !executionReady || readSuspended || session.pendingBlocksNewInput) return;
     const refs=[...session.problem.matchAll(/artifact:[A-Za-z0-9._:-]+/g)].map(item=>item[0]);
     for (const artifactId of refs) {
       const result=await citation.ask(artifactId);
-      if(result.status!=="ELIGIBLE") return;
+      if(!session.isCurrentScope() || !result || result.status!=="ELIGIBLE") return;
     }
-    session.send();
+    if (session.isCurrentScope()) session.send();
   };
   return <div className="composer-dock">
     {!readSuspended && session.research.data?.value && <ResearchProgress status={session.research.data.value}/>}
@@ -30,7 +30,7 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
       : t("composer.uncertain")}
       {!session.submit.isPending && <Button small minimal disabled={!executionReady || readSuspended || !session.languageSupported && session.pendingRead.kind === "PENDING" && session.pendingRead.value.version === 2} onClick={session.retryPending}>{t("composer.retryOriginal")}</Button>}</Callout>}
     {session.pendingRead.kind === "INVALID" && <Callout compact intent="danger" role="alert">{t("composer.invalidPending")}</Callout>}
-    {session.pendingStorageError && <Callout compact intent="warning" role="alert">{session.pendingStorageError}</Callout>}
+    {session.pendingStorageError && <Callout compact intent="warning" role="alert">{t(session.pendingStorageError)}</Callout>}
     {readSuspended && <Callout compact intent="warning" role="status">{t("composer.accessChecking")}</Callout>}
     {!readSuspended && !hosted && !executionReady && <Callout compact intent="warning" role="status">{t("composer.savedResearch")} {blockedReason(consentMissing,modelConnected)}
       {onOpenSettings && (consentMissing && modelConnected!==false

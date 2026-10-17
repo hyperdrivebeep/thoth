@@ -1,20 +1,42 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import cast
 
 from pydantic import JsonValue
 
+from thoth.application.services.r2_execution_projections import (
+    admission_policy_projection,
+    completed_projection,
+    failure_projection,
+    hold_projection,
+    hold_reason_code,
+    prepare_blocked_projection,
+    sandbox_failure_projection,
+    stale_head_projection,
+    template_required_projection,
+)
 from thoth.application.services.r2_outcome_projection import (
     ProcessOutcomeProjection,
     build_process_outcome,
+)
+from thoth.application.services.r2_recovery_records import (
+    assessed_outcome,
+    closed_loop_actor,
+    failure_class_of,
+    r2_action,
+    reconciliation_record,
+    recovery_actor,
+    recovery_attempt,
+    recovery_candidate,
+    repair_basis_text,
+    stage_revision,
+    terminal_state,
 )
 from thoth.application.services.r2_sandbox_compiler import (
     R2SandboxSpecCompiler,
     SandboxTemplateRequired,
 )
 from thoth.application.services.r2_test_lifecycle import (
-    PendingResultHold,
     PreparedResearchExecution,
     R2TestLifecycle,
     ResearchTestCompletion,
@@ -31,11 +53,9 @@ from thoth.application.services.revision_service import (
 from thoth.application.services.sandbox_service import SandboxExecutionBundle, SandboxService
 from thoth.domain.action import ActionCandidate, ActionPlan
 from thoth.domain.actor import ActorRef
-from thoth.domain.canonical import canonical_payload, domain_digest, head_set_digest
+from thoth.domain.canonical import canonical_payload, head_set_digest
 from thoth.domain.enums import (
-    ActorKind,
     EntityType,
-    RiskTier,
 )
 from thoth.domain.hypothesis import HypothesisPortfolio
 from thoth.domain.outcome import OutcomeRecord
@@ -44,14 +64,11 @@ from thoth.domain.post_execution_learning import CommittedExecutionBasis
 from thoth.domain.project import Project, WorkThread
 from thoth.domain.recovery import (
     ExecutionFailureClass,
-    ReconciliationRecord,
     RecoveryAttempt,
-    RecoveryCandidateRevision,
 )
 from thoth.domain.research_execution import check_research_boundary, research_work
 from thoth.domain.research_request import RevisionRef
 from thoth.domain.revision import (
-    EntitySnapshot,
     ImpactPropagationPlan,
     RevisionChangeSet,
     SemanticRevision,
@@ -59,7 +76,6 @@ from thoth.domain.revision import (
 )
 from thoth.domain.sandbox import (
     SandboxErrorCode,
-    SandboxExecutionState,
     SandboxFailure,
     SandboxRunSpec,
 )
@@ -107,15 +123,7 @@ class R2ClosedLoopCoordinator:
         portfolio: HypothesisPortfolio,
         action_plan: ActionPlan,
     ) -> R2ClosedLoopExecution | None:
-        by_id = {item.action_id: item for item in action_plan.alternatives}
-        action = next(
-            (
-                by_id[action_id]
-                for action_id in action_plan.frontier
-                if action_id in by_id and by_id[action_id].risk_tier == RiskTier.R2
-            ),
-            None,
-        )
+        action = r2_action(action_plan)
         if action is None:
             return None
         spec, compile_hold = self._compile_or_hold(project, action_plan, action)
@@ -152,7 +160,7 @@ class R2ClosedLoopCoordinator:
                     action.action_id,
                     bundle,
                 )
-            failure_class = self._failure_class(bundle, recovery_policy)
+            failure_class = failure_class_of(bundle, recovery_policy)
             assessments, assessment_hold = self._measurement_assessments(prepared_test, bundle)
             if assessment_hold is not None:
                 return assessment_hold
@@ -168,16 +176,7 @@ class R2ClosedLoopCoordinator:
                     return self._admission_hold(
                         project.project_id, portfolio, action_plan, action.action_id, bundle, exc
                     )
-            attempts.append(
-                RecoveryAttempt(
-                    attempt_id=spec.attempt_id,
-                    input_context_digest=cast(str, spec.input_context_digest),
-                    result_state=bundle.result.state.value,
-                    failure_class=failure_class,
-                    failure_detail=bundle.result.failure_detail,
-                    retry_ordinal=retry_ordinal,
-                )
-            )
+            attempts.append(recovery_attempt(spec, bundle, failure_class, retry_ordinal))
             if failure_class is None:
                 break
             if (
@@ -231,29 +230,17 @@ class R2ClosedLoopCoordinator:
         )
         outcome = process.outcome
         if prepared_test is not None:
-            outcome = outcome.model_copy(
-                update={
-                    "test_validity_assessment_refs": tuple(
-                        item.assessment_id for item in assessments
-                    ),
-                    "interpretation": "process observation links to scoped test assessments",
-                    "limitations": (
-                        "official criterion attainment and causal attribution remain NOT_ASSESSED",
-                    ),
-                }
-            )
-        actor = ActorRef(
-            actor_id="agent:r2-closed-loop-coordinator",
-            kind=ActorKind.AGENT,
-            role="trusted-r2-closed-loop-coordinator",
-        )
+            outcome = assessed_outcome(outcome, assessments)
+        actor = closed_loop_actor()
         research_batch = self._research.stage_cycle(
             process.portfolio, process.plan, actor=actor, context=research
         )
         staged = (
             research_batch.hypotheses.staged[0],
             research_batch.actions.staged[0],
-            self._stage(
+            stage_revision(
+                self._ids,
+                self._clock,
                 project.project_id,
                 EntityType.OUTCOME,
                 outcome.outcome_id,
@@ -315,35 +302,9 @@ class R2ClosedLoopCoordinator:
         assessments: tuple[TestValidityAssessment, ...],
     ) -> R2ClosedLoopExecution:
         return R2ClosedLoopExecution(
-            projection={
-                **(
-                    {}
-                    if test_completion is None
-                    else {"test_lifecycle": test_completion.projection}
-                ),
-                "terminal_state": "COMPLETED",
-                "compiled_spec": cast(JsonValue, spec.model_dump(mode="json")),
-                "sandbox_result": cast(JsonValue, bundle.result.model_dump(mode="json")),
-                "sandbox_receipt": cast(JsonValue, bundle.receipt.model_dump(mode="json")),
-                "observation_refs": list(process.observation_refs),
-                "outcome": cast(JsonValue, outcome.model_dump(mode="json")),
-                "outcome_validity": cast(JsonValue, process.validity.model_dump(mode="json")),
-                "hypothesis_appraisal": cast(JsonValue, process.appraisal.model_dump(mode="json")),
-                "next_action_order": list(process.next_order),
-                "non_truth_receipt": cast(JsonValue, commit.receipt.model_dump(mode="json")),
-                "scientific_truth_state": "NOT_CERTIFIED",
-                "recovery": {
-                    "attempts": [item.model_dump(mode="json") for item in attempts],
-                    "retry_count": retry_ordinal,
-                    "baseline_head_before": spec.current_head_set_digest,
-                    "baseline_head_after": commit.after_head_set_digest,
-                    "candidate_branch_revision_ids": [],
-                    "repair_basis": None,
-                    "reconciliation": None,
-                    "retry_budget_exhausted": False,
-                    "failure_receipt": commit.receipt.model_dump(mode="json"),
-                },
-            },
+            projection=completed_projection(
+                test_completion, spec, bundle, process, outcome, commit, attempts, retry_ordinal
+            ),
             portfolio=process.portfolio,
             action_plan=process.plan,
             committed_basis=CommittedExecutionBasis(
@@ -396,18 +357,7 @@ class R2ClosedLoopCoordinator:
         try:
             return self._test_lifecycle.prepare(project, portfolio, action, spec), None
         except SandboxFailure as exc:
-            return None, R2ClosedLoopExecution(
-                projection={
-                    "terminal_state": "POLICY_BLOCKED" if exc.policy_denial is not None else "HOLD",
-                    "reason_code": exc.code.value,
-                    "stage": "PRE_IO",
-                    "runtime_io_completed": False,
-                    "policy_denial": None
-                    if exc.policy_denial is None
-                    else cast(JsonValue, exc.policy_denial.model_dump(mode="json")),
-                    "scientific_truth_state": "NOT_CERTIFIED",
-                }
-            )
+            return None, R2ClosedLoopExecution(projection=prepare_blocked_projection(exc))
         except ValueError as exc:
             return None, self._test_hold(exc)
 
@@ -438,33 +388,8 @@ class R2ClosedLoopCoordinator:
     def _test_hold(
         error: ValueError, *, bundle: SandboxExecutionBundle | None = None
     ) -> R2ClosedLoopExecution:
-        reason = str(error)
-        code = (
-            reason
-            if reason
-            and len(reason) <= 160
-            and all(
-                character.isupper() or character.isdigit() or character == "_"
-                for character in reason
-            )
-            else "RESEARCH_TEST_INPUT_INVALID"
-        )
-        return R2ClosedLoopExecution(
-            projection={
-                "terminal_state": "HOLD",
-                "reason_code": code,
-                "runtime_io_completed": bundle is not None,
-                "scientific_truth_state": "NOT_CERTIFIED",
-                "sandbox_receipt": None
-                if bundle is None
-                else cast(JsonValue, bundle.receipt.model_dump(mode="json")),
-                **(
-                    {"pending_result": cast(JsonValue, error.detail)}
-                    if isinstance(error, PendingResultHold)
-                    else {}
-                ),
-            }
-        )
+        code = hold_reason_code(error)
+        return R2ClosedLoopExecution(projection=hold_projection(code, error, bundle))
 
     def _compile_or_hold(
         self,
@@ -476,28 +401,12 @@ class R2ClosedLoopCoordinator:
             return self._compiler.compile(project=project, plan=plan, action=action), None
         except SandboxTemplateRequired:
             return None, R2ClosedLoopExecution(
-                projection={
-                    "terminal_state": "HOLD",
-                    "reason_code": "SANDBOX_TEMPLATE_REQUIRED",
-                    "action_id": action.action_id,
-                    "scientific_truth_state": "NOT_CERTIFIED",
-                }
+                projection=template_required_projection(action.action_id)
             )
 
         except SandboxFailure as exc:
             return None, R2ClosedLoopExecution(
-                projection={
-                    "terminal_state": (
-                        "POLICY_BLOCKED" if exc.policy_denial is not None else "HOLD"
-                    ),
-                    "action_id": action.action_id,
-                    "policy_denial": (
-                        None
-                        if exc.policy_denial is None
-                        else cast(JsonValue, exc.policy_denial.model_dump(mode="json"))
-                    ),
-                    "scientific_truth_state": "NOT_CERTIFIED",
-                }
+                projection=sandbox_failure_projection(exc, action.action_id)
             )
 
     def _commit_outcome(
@@ -564,16 +473,7 @@ class R2ClosedLoopCoordinator:
     ) -> R2ClosedLoopExecution:
         if failure.policy_denial is not None:
             return R2ClosedLoopExecution(
-                projection={
-                    "terminal_state": "POLICY_BLOCKED",
-                    "reason_code": "SANDBOX_ADMISSION_POLICY_CHANGED",
-                    "stage": "POST_IO_ADMISSION",
-                    "runtime_io_completed": True,
-                    "action_id": action_id,
-                    "scientific_truth_state": "NOT_CERTIFIED",
-                    "policy_denial": cast(JsonValue, failure.policy_denial.model_dump(mode="json")),
-                    "sandbox_result": cast(JsonValue, bundle.result.model_dump(mode="json")),
-                }
+                projection=admission_policy_projection(action_id, failure.policy_denial, bundle)
             )
         return self._stale_head_execution(
             project_id,
@@ -605,14 +505,7 @@ class R2ClosedLoopCoordinator:
         current_portfolio = self._current_portfolio(project_id, portfolio)
         current_plan = self._current_action_plan(project_id, action_plan)
         return R2ClosedLoopExecution(
-            projection={
-                "terminal_state": "HOLD",
-                "reason_code": "SANDBOX_HEAD_STALE_AFTER_IO",
-                "action_id": action_id,
-                "sandbox_result": cast(JsonValue, bundle.result.model_dump(mode="json")),
-                "sandbox_receipt": cast(JsonValue, bundle.receipt.model_dump(mode="json")),
-                "scientific_truth_state": "NOT_CERTIFIED",
-            },
+            projection=stale_head_projection(action_id, bundle),
             portfolio=current_portfolio,
             action_plan=current_plan,
         )
@@ -636,18 +529,7 @@ class R2ClosedLoopCoordinator:
             return bundle, None
         except SandboxFailure as exc:
             return None, R2ClosedLoopExecution(
-                projection={
-                    "terminal_state": (
-                        "POLICY_BLOCKED" if exc.policy_denial is not None else "HOLD"
-                    ),
-                    "action_id": action_id,
-                    "policy_denial": (
-                        None
-                        if exc.policy_denial is None
-                        else cast(JsonValue, exc.policy_denial.model_dump(mode="json"))
-                    ),
-                    "scientific_truth_state": "NOT_CERTIFIED",
-                }
+                projection=sandbox_failure_projection(exc, action_id)
             )
 
     def _current_portfolio(
@@ -663,22 +545,6 @@ class R2ClosedLoopCoordinator:
         fallback: ActionPlan,
     ) -> ActionPlan:
         return self._research.read_action_plan(project_id, fallback.plan_id)
-
-    def _failure_class(
-        self,
-        bundle: SandboxExecutionBundle,
-        policy: R2RecoveryPolicy,
-    ) -> ExecutionFailureClass | None:
-        if bundle.result.state == SandboxExecutionState.SUCCEEDED:
-            return None
-        return self._classify_failure(
-            bundle.result.state.value,
-            bundle.result.failure_detail,
-            policy.transient_markers,
-            policy.semantic_markers,
-            policy.code_markers,
-            policy.ambiguous_markers,
-        )
 
     def _failure_execution(
         self,
@@ -699,62 +565,22 @@ class R2ClosedLoopCoordinator:
             expected_head_set_digest = head_set_digest(expected_heads)
         baseline_heads = dict(expected_heads)
         baseline_digest = head_set_digest(baseline_heads)
-        repair_basis = (
-            f"create a new candidate after {failure_class.value}: "
-            f"{attempts[-1].failure_detail or 'unspecified failure'}"
-        )
-        original_specification = next(
-            item.specification for item in action_plan.alternatives if item.action_id == action_id
-        )
-        candidate_draft: dict[str, object] = {
-            "candidate_id": self._ids.new("recovery-candidate"),
-            "action_id": action_id,
-            "plan_id": action_plan.plan_id,
-            "baseline_head_digest": baseline_digest,
-            "failure_class": failure_class,
-            "revised_specification": (
-                f"{original_specification} [candidate revision: {failure_class.value}]"
-            ),
-            "repair_basis": repair_basis,
-            "attempt_ids": tuple(item.attempt_id for item in attempts),
-        }
-        candidate = RecoveryCandidateRevision.model_validate(
-            {
-                **candidate_draft,
-                "candidate_digest": domain_digest(
-                    "R2_RECOVERY_CANDIDATE",
-                    "1.0.0",
-                    canonical_payload(candidate_draft),
-                ),
-            }
+        repair_basis = repair_basis_text(failure_class, attempts)
+        candidate = recovery_candidate(
+            self._ids,
+            action_plan,
+            action_id,
+            baseline_digest,
+            failure_class,
+            repair_basis,
+            attempts,
         )
         reconciliation = None
         if failure_class == ExecutionFailureClass.AMBIGUOUS_EXTERNAL:
-            reconciliation_draft: dict[str, object] = {
-                "reconciliation_id": self._ids.new("reconciliation"),
-                "action_id": action_id,
-                "attempt_id": attempts[-1].attempt_id,
-                "state": "REQUIRED",
-                "automatic_retry_allowed": False,
-                "reason": attempts[-1].failure_detail or "ambiguous external result",
-            }
-            reconciliation = ReconciliationRecord.model_validate(
-                {
-                    **reconciliation_draft,
-                    "reconciliation_digest": domain_digest(
-                        "R2_RECONCILIATION",
-                        "1.0.0",
-                        canonical_payload(reconciliation_draft),
-                    ),
-                }
-            )
+            reconciliation = reconciliation_record(self._ids, action_id, attempts)
         revised_plan = action_plan.model_copy(update={"recovery_candidate": candidate})
         action_head_key = f"ACTION:{action_plan.plan_id}"
-        actor = ActorRef(
-            actor_id="agent:r2-recovery-coordinator",
-            kind=ActorKind.AGENT,
-            role="bounded-r2-recovery-coordinator",
-        )
+        actor = recovery_actor()
         research = self._research.context(project.project_id, action_plan.object_id, baseline_heads)
         batch = self._research.stage_actions(
             revised_plan, actor=actor, context=research, hypotheses=research.hypotheses
@@ -779,103 +605,18 @@ class R2ClosedLoopCoordinator:
             )
         )
         baseline_after = head_set_digest(self._ledger.read_heads(project.project_id))
-        terminal = (
-            "RECONCILIATION_REQUIRED"
-            if failure_class == ExecutionFailureClass.AMBIGUOUS_EXTERNAL
-            else "RETRY_BUDGET_EXHAUSTED"
-            if retry_budget_exhausted
-            else "CANDIDATE_REVISION_CREATED"
-            if failure_class in {ExecutionFailureClass.SEMANTIC, ExecutionFailureClass.CODE}
-            else "FAILED"
-        )
+        terminal = terminal_state(failure_class, retry_budget_exhausted)
         return R2ClosedLoopExecution(
-            projection={
-                "terminal_state": terminal,
-                **(
-                    {}
-                    if test_completion is None
-                    else {"test_lifecycle": test_completion.projection}
-                ),
-                "action_id": action_id,
-                "scientific_truth_state": "NOT_CERTIFIED",
-                "recovery": {
-                    "attempts": [item.model_dump(mode="json") for item in attempts],
-                    "retry_count": max(0, len(attempts) - 1),
-                    "baseline_head_before": baseline_digest,
-                    "baseline_head_after": baseline_after,
-                    "candidate_branch_revision_ids": list(commit.branch_revision_ids),
-                    "repair_basis": repair_basis,
-                    "reconciliation": (
-                        None if reconciliation is None else reconciliation.model_dump(mode="json")
-                    ),
-                    "retry_budget_exhausted": retry_budget_exhausted,
-                    "failure_receipt": commit.receipt.model_dump(mode="json"),
-                },
-            }
+            projection=failure_projection(
+                terminal,
+                test_completion,
+                action_id,
+                attempts,
+                baseline_digest,
+                baseline_after,
+                commit,
+                repair_basis,
+                reconciliation,
+                retry_budget_exhausted,
+            )
         )
-
-    @staticmethod
-    def _classify_failure(
-        state: str,
-        detail: str | None,
-        transient_markers: tuple[str, ...],
-        semantic_markers: tuple[str, ...],
-        code_markers: tuple[str, ...],
-        ambiguous_markers: tuple[str, ...],
-    ) -> ExecutionFailureClass:
-        corpus = f"{state} {detail or ''}".upper()
-        if any(marker.upper() in corpus for marker in ambiguous_markers):
-            return ExecutionFailureClass.AMBIGUOUS_EXTERNAL
-        if any(marker.upper() in corpus for marker in semantic_markers):
-            return ExecutionFailureClass.SEMANTIC
-        if any(marker.upper() in corpus for marker in code_markers):
-            return ExecutionFailureClass.CODE
-        if any(marker.upper() in corpus for marker in transient_markers):
-            return ExecutionFailureClass.TRANSIENT_INFRA
-        return ExecutionFailureClass.PERMANENT_INFRA
-
-    def _stage(
-        self,
-        project_id: str,
-        entity_type: EntityType,
-        entity_id: str,
-        content: dict[str, object],
-        heads: dict[str, str],
-    ) -> StagedRevision:
-        snapshot = EntitySnapshot(
-            snapshot_id=self._ids.new("snapshot"),
-            project_id=project_id,
-            entity_type=entity_type,
-            entity_id=entity_id,
-            schema_version="1.0.0",
-            content=content,
-            content_digest=domain_digest("SNAPSHOT", "1.0.0", canonical_payload(content)),
-        )
-        parent = heads.get(f"{entity_type.value}:{entity_id}")
-        revision_draft: dict[str, object] = {
-            "revision_id": self._ids.new("revision"),
-            "project_id": project_id,
-            "entity_type": entity_type,
-            "entity_id": entity_id,
-            "snapshot_id": snapshot.snapshot_id,
-            "parent_revision_digests": () if parent is None else (parent,),
-            "actor": ActorRef(
-                actor_id="agent:r2-closed-loop-coordinator",
-                kind=ActorKind.AGENT,
-                role="trusted-r2-closed-loop-coordinator",
-            ),
-            "reason": "R2 sandbox observation integration",
-            "evidence_refs": (),
-            "affected_refs": (),
-            "created_at": self._clock.now(),
-            "schema_version": "1.0.0",
-        }
-        revision = SemanticRevision.model_validate(
-            {
-                **revision_draft,
-                "revision_digest": domain_digest(
-                    "SEMANTIC_REVISION", "1.0.0", canonical_payload(revision_draft)
-                ),
-            }
-        )
-        return StagedRevision(snapshot=snapshot, revision=revision)

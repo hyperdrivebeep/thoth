@@ -127,7 +127,8 @@ evaluation/currentness and other display/contract mismatches. Some causes remain
 Assertions, selectors and time budgets were not relaxed to portray a passing full suite.
 
 Canonical-owner atomicity debt remains open. Focused transaction evidence does not establish
-complete atomicity for all owners or execution paths.
+complete atomicity for all owners or execution paths. The gaps found so far, written for users,
+are in [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md).
 
 ## Candidate checks
 

@@ -8,6 +8,20 @@ from typing import Literal
 from pydantic import AwareDatetime
 
 from thoth.application.services.memory_admission import MemoryAdmissionService
+from thoth.application.services.memory_context_drafts import (
+    context_pack,
+    projection_checkpoint,
+    projection_set,
+    selection_record,
+)
+from thoth.application.services.memory_promotion_drafts import (
+    build_content_excerpt,
+    candidate_is_unsafe,
+    candidate_set_digest,
+    memory_words_text,
+    promotion_result,
+    reduce_reviews,
+)
 from thoth.application.services.memory_recall import (
     AUTO_MEMORY_NO_EVIDENCE,
     OMITTED_BY_BUDGET,
@@ -29,7 +43,6 @@ from thoth.application.services.memory_revision_seal import (
     seal_revision,
     support_status,
 )
-from thoth.application.services.memory_safety import REDACTED_MEMORY, memory_text_is_unsafe
 from thoth.application.services.memory_shape import memory_body
 from thoth.application.services.memory_summary import memory_is_container
 from thoth.application.services.memory_supersession import superseded_memory_digests
@@ -38,8 +51,6 @@ from thoth.application.services.scoped_memory import MemoryResourceAccess
 from thoth.domain.actor import ActorRef
 from thoth.domain.auth import current_authenticated_actor
 from thoth.domain.canonical import (
-    canonical_payload,
-    domain_digest,
     head_set_digest,
     same_stored_instant,
 )
@@ -81,7 +92,6 @@ from thoth.ports.memory import (
 from thoth.ports.runtime import ClockPort, IdGeneratorPort
 
 _TOKEN = re.compile(r"[0-9A-Za-z가-힣_]{3,}")
-_UNKNOWN_SHAPE_CHARS = 640
 
 
 def _hold_for_missing_evidence(
@@ -161,20 +171,7 @@ class FullProjectMemoryService:
             memory_revision_set=tuple(
                 sorted(item.revision_digest for item in self._store.list_revisions(project_id))
             ),
-            candidate_set_digest=domain_digest(
-                "MEMORY_CANDIDATE_SET",
-                "1.0.0",
-                canonical_payload(
-                    {
-                        "records": tuple(
-                            sorted(
-                                (item.memory_id, item.revision_digest)
-                                for item in self._candidates.list(project_id)
-                            )
-                        )
-                    }
-                ),
-            ),
+            candidate_set_digest=candidate_set_digest(self._candidates.list(project_id)),
             authority=None
             if self._admission is None
             else self._admission.capture(
@@ -357,7 +354,7 @@ class FullProjectMemoryService:
                 if owner is None
                 else self._ledger.read_snapshot(owner.snapshot_id)
             )
-            content_excerpt = self._content_excerpt(
+            content_excerpt = build_content_excerpt(
                 candidate.source_ref,
                 candidate.assertion,
                 snapshot,
@@ -367,14 +364,9 @@ class FullProjectMemoryService:
                 None if candidate.assertion is not None or content is None else memory_body(content)
             )
             # A free-text memory is judged by its own words, never by ids in its source reference.
-            if candidate.assertion is not None:
-                words_text = candidate.assertion
-            else:
-                words_text = content_excerpt if body is None else body[1]
+            words_text = memory_words_text(candidate, content_excerpt, body)
             query_terms = tuple(sorted(self._tokens(words_text)))
-            unsafe = (
-                memory_text_is_unsafe(content_excerpt) or candidate.assertion == REDACTED_MEMORY
-            )
+            unsafe = candidate_is_unsafe(candidate, content_excerpt)
             owner_valid = owner is not None and owner.project_id == project_id
             content_reusable = len(words(words_text)) >= 2
             verdict = await self._relations.resolve_candidate(
@@ -421,7 +413,7 @@ class FullProjectMemoryService:
                 # No source span is behind this automatic memory: it is held, not remembered.
                 reviews = _hold_for_missing_evidence(reviews)
                 support = "NO_EVIDENCE"
-            transition = self._reduce(reviews)
+            transition = reduce_reviews(reviews)
             now = self._clock.now()
             revision = seal_revision(
                 revision_id=self._ids.new("memory-revision"),
@@ -457,7 +449,7 @@ class FullProjectMemoryService:
             basis=basis,
             staged_revisions=staged_revisions,
         )
-        result = self._promotion_result(revisions, receipts, projections, judgments)
+        result = promotion_result(revisions, receipts, projections, judgments)
 
         return PreparedMemoryPromotion(
             basis=basis,
@@ -466,38 +458,6 @@ class FullProjectMemoryService:
             receipts=tuple(receipts),
             projections=projections,
             result=result,
-        )
-
-    @staticmethod
-    def _promotion_result(
-        revisions: list[FullMemoryRevision],
-        receipts: list[MemoryTransitionReceipt],
-        projections: tuple[MemoryProjection, ...],
-        judgments: list[MemoryRelationJudgment],
-    ) -> FullMemoryPromotionResult:
-        """Project reviewed revisions into the public promotion result."""
-        checkpoint = (
-            projections[0].rebuild_checkpoint
-            if projections
-            else domain_digest(
-                "MEMORY_PROJECTION_CHECKPOINT",
-                "1.0.0",
-                canonical_payload({"source_revision_digests": ()}),
-            )
-        )
-        return FullMemoryPromotionResult(
-            committed=tuple(
-                item for item in revisions if item.transition == MemoryTransition.COMMIT
-            ),
-            revised=tuple(item for item in revisions if item.transition == MemoryTransition.REVISE),
-            held=tuple(item for item in revisions if item.transition == MemoryTransition.HOLD),
-            quarantined=tuple(
-                item for item in revisions if item.transition == MemoryTransition.QUARANTINE
-            ),
-            receipts=tuple(receipts),
-            projection_checkpoint=checkpoint,
-            projection_state="BUILT" if projections else "DEFERRED_SCOPE",
-            relation_judgments=tuple(judgments),
         )
 
     def commit_prepared(
@@ -639,29 +599,8 @@ class FullProjectMemoryService:
             expansion_only=narrowing.expansion_only,
         )
         excluded[OMITTED_BY_BUDGET] = [item.memory_revision_id for item in plan.omitted]
-        selection = MemorySelectionRecord(
-            limits=self._limits.as_dict(),
-            eligible=tuple(item.memory_revision_id for item in eligible),
-            retrieved=tuple(item.memory_revision_id for item in plan.retrieved),
-            selected=tuple(item.memory_revision_id for item in plan.selected),
-            context_included=tuple(item.memory_revision_id for item in plan.included),
-            excluded={reason: tuple(ids) for reason, ids in sorted(excluded.items()) if ids},
-            omitted_by_limit=dict(sorted(plan.omitted_by_limit.items())),
-            truncated=tuple(plan.truncated),
-            estimated_tokens=plan.tokens,
-            common_terms=tuple(sorted(narrowing.common_terms)),
-            follow_up=bool(narrowing.follow_up_markers),
-            follow_up_markers=narrowing.follow_up_markers,
-            matches={
-                item.memory_revision_id: narrowing.matches[item.memory_revision_id]
-                for item in plan.retrieved
-                if item.memory_revision_id in narrowing.matches
-            },
-            expansion=None
-            if expansion is None
-            else expansion.record.model_copy(
-                update={"added_words": tuple(word.run for word in added)}
-            ),
+        selection = selection_record(
+            self._limits, eligible, plan, narrowing, excluded, expansion, added
         )
         return self._save_context(
             project_id,
@@ -687,38 +626,19 @@ class FullProjectMemoryService:
         excluded: Mapping[str, list[str]],
         selection: MemorySelectionRecord | None,
     ) -> FullMemoryContextPack:
-        counts = {reason: len(ids) for reason, ids in sorted(excluded.items()) if ids}
-        if selection is None:
-            selection = MemorySelectionRecord(
-                injection_enabled=False,
-                limits=self._limits.as_dict(),
-                excluded={reason: tuple(ids) for reason, ids in sorted(excluded.items()) if ids},
-            )
-        query_draft = {
-            "project_id": project_id,
-            "thread_id": thread_id,
-            "query": query,
-            "target_use": target_use,
-            "scope": scope,
-            "cutoff_at": cutoff_at,
-            "included": tuple(item.revision_digest for item in included),
-            "excluded": counts,
-        }
-        context = FullMemoryContextPack(
-            context_pack_id=self._ids.new("memory-context"),
-            project_id=project_id,
-            thread_id=thread_id,
-            query=query,
-            target_use=target_use,
-            cutoff_at=cutoff_at,
-            included=included,
-            excluded_reason_counts=counts,
-            query_digest=domain_digest(
-                "FULL_MEMORY_QUERY", "1.0.0", canonical_payload(query_draft)
-            ),
-            injected_into_thread=bool(included),
-            created_at=self._clock.now(),
-            selection=selection,
+        context = context_pack(
+            project_id,
+            thread_id,
+            query,
+            target_use,
+            scope,
+            cutoff_at,
+            included,
+            excluded,
+            selection,
+            self._limits,
+            self._ids,
+            self._clock,
         )
         self._store.put_context(context)
         return context
@@ -774,56 +694,12 @@ class FullProjectMemoryService:
                 )
             )
         )
-        checkpoint = domain_digest(
-            "MEMORY_PROJECTION_CHECKPOINT",
-            "1.0.0",
-            canonical_payload({"source_revision_digests": source_digests}),
-        )
+        checkpoint = projection_checkpoint(source_digests)
         now = self._clock.now()
-        projections = tuple(
-            MemoryProjection(
-                projection_id=f"memory-projection:{project_id}:{kind.lower()}",
-                project_id=project_id,
-                projection_type=kind,
-                source_revision_digests=source_digests,
-                payload_digest=domain_digest(
-                    f"MEMORY_{kind}_PROJECTION",
-                    "1.0.0",
-                    canonical_payload(
-                        {
-                            "source_revision_digests": source_digests,
-                            "derived": True,
-                            "semantic_payload": (
-                                vectors
-                                if kind == "VECTOR"
-                                else relations
-                                if kind == "GRAPH"
-                                else (),
-                            ),
-                        }
-                    ),
-                ),
-                rebuild_checkpoint=checkpoint,
-                created_at=now,
-            )
-            for kind in ("KEYWORD", "VECTOR", "GRAPH", "SUMMARY")
+        projections = projection_set(
+            project_id, source_digests, vectors, relations, checkpoint, now
         )
         return projections
-
-    @staticmethod
-    def _content_excerpt(source_ref: str | None, assertion: str | None, snapshot: object) -> str:
-        """The stored text: the source, then one short line (a lesson's words, or the record's)."""
-
-        parts = [source_ref or "", assertion or ""]
-        if assertion is None and snapshot is not None:
-            content = getattr(snapshot, "content", {})
-            body = memory_body(content)
-            if body is not None:
-                parts.append(body[0])
-            else:
-                # An unfamiliar record: keep the start of it, within one recalled item's share.
-                parts.append(canonical_payload(content).decode()[:_UNKNOWN_SHAPE_CHARS])
-        return "\n".join(part for part in parts if part)[:8_000]
 
     @staticmethod
     def _tokens(value: str) -> frozenset[str]:
@@ -833,14 +709,3 @@ class FullProjectMemoryService:
     def _scope_matches(left: dict[str, str], right: dict[str, str]) -> bool:
         # Origin workstream is provenance under B; scientific applicability stays scoped.
         return all(right.get(key) == value for key, value in left.items() if key != "workstream")
-
-    @staticmethod
-    def _reduce(reviews: tuple[MemoryRoleReview, ...]) -> MemoryTransition:
-        verdicts = {review.verdict for review in reviews}
-        if MemoryReviewVerdict.QUARANTINE in verdicts:
-            return MemoryTransition.QUARANTINE
-        if MemoryReviewVerdict.HOLD in verdicts:
-            return MemoryTransition.HOLD
-        if MemoryReviewVerdict.REVISE in verdicts:
-            return MemoryTransition.REVISE
-        return MemoryTransition.COMMIT

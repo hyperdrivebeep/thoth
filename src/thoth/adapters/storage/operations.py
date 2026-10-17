@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import sqlite3
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 from typing import cast
@@ -11,6 +12,7 @@ from pydantic import JsonValue
 from sqlalchemy import Connection, Engine, Table, func, insert, select, update
 from sqlalchemy.exc import OperationalError
 
+from thoth.adapters.storage.events import insert_event_on_connection
 from thoth.adapters.storage.resource_scope_schema import operation_resource_bindings
 from thoth.adapters.storage.schema import (
     idempotency_keys,
@@ -26,6 +28,7 @@ from thoth.adapters.storage.schema import (
 from thoth.adapters.storage.transaction import read_connection, write_connection
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.enums import OperationState
+from thoth.domain.event import EventRecord
 from thoth.domain.operation import (
     InternalFailureDiagnostic,
     InternalFailureStateSnapshot,
@@ -122,9 +125,14 @@ class SqliteOperationStore(OperationStorePort):
         ).scalar_one()
         return int(value)
 
-    def claim(self, candidate: OperationRecord) -> tuple[OperationRecord, bool]:
+    def claim(
+        self,
+        candidate: OperationRecord,
+        *,
+        started_event: Callable[[], EventRecord] | None = None,
+    ) -> tuple[OperationRecord, bool]:
         try:
-            return self._claim(candidate)
+            return self._claim(candidate, started_event=started_event)
         except OperationalError as exc:
             code = getattr(exc.orig, "sqlite_errorcode", None)
             if isinstance(code, int) and code & 0xFF in {
@@ -136,7 +144,12 @@ class SqliteOperationStore(OperationStorePort):
                 raise OperationClaimBusy("OPERATION_CLAIM_BUSY") from exc
             raise
 
-    def _claim(self, candidate: OperationRecord) -> tuple[OperationRecord, bool]:
+    def _claim(
+        self,
+        candidate: OperationRecord,
+        *,
+        started_event: Callable[[], EventRecord] | None = None,
+    ) -> tuple[OperationRecord, bool]:
         # Logical operation bookkeeping owns its transaction; it must not borrow a
         # domain transaction that could later commit a partially failed claim.
         with self._engine.begin() as connection:
@@ -190,6 +203,8 @@ class SqliteOperationStore(OperationStorePort):
                     operation_id=candidate.operation_id,
                 )
             )
+            if started_event is not None:
+                insert_event_on_connection(connection, started_event())
             return candidate, False
 
     def complete(

@@ -4,15 +4,31 @@ from collections.abc import Iterable
 from contextlib import AbstractContextManager
 from datetime import datetime
 
+from thoth.application.services.hypothesis_auxiliary_drafts import (
+    appraisal_draft,
+    assumption_draft,
+    ended_relation_draft,
+    prediction_draft,
+    relation_draft,
+    test_binding_draft,
+)
+from thoth.application.services.hypothesis_portfolio_drafts import (
+    portfolio_creation_draft,
+    portfolio_revision_draft,
+)
+from thoth.application.services.hypothesis_record_drafts import (
+    creation_draft,
+    revision_draft,
+)
+from thoth.application.services.hypothesis_revision_drafts import hypothesis_revision_records
 from thoth.application.services.hypothesis_test_lifecycle import (
     HypothesisTestLifecycle,
     PreparedPredictionBasis,
 )
 from thoth.application.services.revision_service import CommitResult, RevisionCommitService
-from thoth.domain.actor import ActorRef
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.decision_object_full import DecisionObjectRecord
-from thoth.domain.enums import ActorKind, CutoffState, EntityType
+from thoth.domain.enums import CutoffState
 from thoth.domain.hypothesis_full import (
     AuxiliaryAssumptionRecord,
     HypothesisAppraisalRecord,
@@ -24,10 +40,8 @@ from thoth.domain.hypothesis_full import (
     PredictionRecord,
 )
 from thoth.domain.revision import (
-    EntitySnapshot,
     ImpactPropagationPlan,
     RevisionChangeSet,
-    SemanticRevision,
     StagedRevision,
 )
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
@@ -118,54 +132,23 @@ class HypothesisService:
                 and item.freshness != "INVALIDATED"
                 and item.statement.casefold() == statement.casefold()
             )
-            grounded = bool(evidence_refs and evidence_basis.strip() and scope)
-            gateway = {
-                "atomic_statement": "PASS" if statement.strip() else "FAIL",
-                "observed_problem_scope": "PASS" if scope else "FAIL",
-                "intent_profile": "PASS",
-                "source_cutoff_provenance": "PASS" if evidence_refs else "INCOMPLETE",
-                "causal_blocker_separation": "PASS",
-                "evidence_basis_label": "PASS" if evidence_basis else "FAIL",
-                "expected_outcome_model": "PENDING",
-                "observable_test_route": "PENDING",
-                "future_oracle_leakage": "PASS",
-            }
-            quality = {
-                axis: (
-                    "MIXED"
-                    if axis in {"clarity_atomicity", "problem_scope_alignment", "evidence_basis"}
-                    and grounded
-                    else "NOT_ASSESSED"
-                )
-                for axis in QUALITY_AXES
-            }
-            draft: dict[str, object] = {
-                "hypothesis_revision_id": self._ids.new("hypothesis-revision"),
-                "hypothesis_id": self._ids.new("hypothesis"),
-                "project_id": project_id,
-                "object_id": object_id,
-                "portfolio_id": portfolio_id,
-                "statement": statement,
-                "observed_problem": object_record.problem_frame,
-                "primary_intent": primary_intent,
-                "secondary_intents": secondary_intents,
-                "intent_profile_refs": (f"intent-profile:{primary_intent.lower()}:1",),
-                "evidence_basis": evidence_basis,
-                "scope": scope,
-                "evidence_refs": evidence_refs,
-                "causal_profile": (
-                    {"applicability": "REQUIRED", "primary_locus": "UNCLASSIFIED"}
-                    if primary_intent in CAUSAL_INTENTS
-                    else {"applicability": "NOT_APPLICABLE"}
-                ),
-                "development_stage": "GROUNDED_CANDIDATE" if grounded else "DRAFT",
-                "empirical_appraisal": "UNASSESSED",
-                "freshness": "CURRENT",
-                "prespecification_state": prespecification_state,
-                "quality_profile": quality,
-                "gateway_results": gateway,
-                "created_at": self._clock.now(),
-            }
+            draft = creation_draft(
+                project_id=project_id,
+                object_id=object_id,
+                portfolio_id=portfolio_id,
+                statement=statement,
+                primary_intent=primary_intent,
+                secondary_intents=secondary_intents,
+                evidence_basis=evidence_basis,
+                scope=scope,
+                evidence_refs=evidence_refs,
+                prespecification_state=prespecification_state,
+                object_record=object_record,
+                quality_axes=QUALITY_AXES,
+                causal_intents=CAUSAL_INTENTS,
+                ids=self._ids,
+                clock=self._clock,
+            )
             record = HypothesisRecord.model_validate(
                 {**draft, "revision_digest": self._digest(draft)}
             )
@@ -182,38 +165,13 @@ class HypothesisService:
         invalidate_derived: bool = False,
     ) -> tuple[HypothesisRecord, CommitResult]:
         self._validate_evidence(current.project_id, evidence_refs)
-        draft = current.model_dump(mode="python")
-        invalidated = current.invalidated_refs
-        if invalidate_derived:
-            invalidated = tuple(
-                dict.fromkeys(
-                    (*invalidated, *current.prediction_refs, *current.test_refs, "APPRAISALS")
-                )
-            )
-            updates = {
-                **updates,
-                "prediction_refs": (),
-                "test_refs": (),
-                "invalidated_refs": invalidated,
-                "empirical_appraisal": "UNASSESSED",
-                "freshness": "CURRENT",
-                "development_stage": (
-                    "GROUNDED_CANDIDATE"
-                    if current.evidence_refs
-                    and updates.get("primary_intent", current.primary_intent) is not None
-                    else "DRAFT"
-                ),
-            }
-        draft.update(updates)
-        draft.update(
-            {
-                "hypothesis_revision_id": self._ids.new("hypothesis-revision"),
-                "supersedes_revision_digest": current.revision_digest,
-                "created_at": self._clock.now(),
-            }
+        draft = revision_draft(
+            current,
+            updates=updates,
+            invalidate_derived=invalidate_derived,
+            ids=self._ids,
+            clock=self._clock,
         )
-        draft.pop("revision_digest", None)
-        draft.pop("receipt_ref", None)
         revised = HypothesisRecord.model_validate({**draft, "revision_digest": self._digest(draft)})
         return self._persist_hypothesis(revised, event_type, evidence_refs=evidence_refs)
 
@@ -241,61 +199,17 @@ class HypothesisService:
                 raise ValueError("portfolio requires an explicit unknown reserve")
             effective_id = portfolio_id or self._ids.new("hypothesis-portfolio")
             current = self._store.read_portfolio(project_id, effective_id, None)
-            statements = {item.statement.casefold() for item in hypotheses}
-            quality_gaps = tuple(
-                gap
-                for gap, present in (
-                    (
-                        "semantic diversity",
-                        len(hypotheses) > 1 and len(statements) == len(hypotheses),
-                    ),
-                    (
-                        "counterevidence route",
-                        bool(hypotheses)
-                        and all(item.counterevidence_queries for item in hypotheses),
-                    ),
-                    (
-                        "prediction coverage",
-                        bool(hypotheses) and all(item.prediction_refs for item in hypotheses),
-                    ),
-                )
-                if not present
+            draft = portfolio_creation_draft(
+                project_id=project_id,
+                object_id=object_id,
+                effective_id=effective_id,
+                hypothesis_ids=hypothesis_ids,
+                unknown_reserve=unknown_reserve,
+                hypotheses=hypotheses,
+                current=current,
+                ids=self._ids,
+                clock=self._clock,
             )
-            draft: dict[str, object] = {
-                "portfolio_revision_id": self._ids.new("portfolio-revision"),
-                "portfolio_id": effective_id,
-                "project_id": project_id,
-                "object_id": object_id,
-                "hypothesis_refs": hypothesis_ids,
-                "relation_refs": (() if current is None else current.relation_refs),
-                "unknown_reserve": unknown_reserve,
-                "coverage_state": "NOT_ASSESSED"
-                if not hypotheses
-                else "PARTIAL"
-                if quality_gaps
-                else "COVERED",
-                "diversity_state": (
-                    "NOT_ASSESSED"
-                    if len(hypotheses) < 2
-                    else "DIVERSE"
-                    if len(statements) == len(hypotheses)
-                    else "PARAPHRASE_RISK"
-                ),
-                "discrimination_state": (
-                    "NOT_ASSESSED"
-                    if not hypotheses
-                    else "CANDIDATE"
-                    if all(item.prediction_refs for item in hypotheses)
-                    else "MISSING"
-                ),
-                "abstention_state": "AVAILABLE",
-                "quality_gaps": quality_gaps,
-                "discrimination_matrix": (),
-                "supersedes_revision_digest": (
-                    None if current is None else current.revision_digest
-                ),
-                "created_at": self._clock.now(),
-            }
             record = HypothesisPortfolioRecord.model_validate(
                 {**draft, "revision_digest": self._portfolio_digest(draft)}
             )
@@ -341,20 +255,16 @@ class HypothesisService:
             raise ValueError("unsupported hypothesis relation type")
         self._hypotheses(current.project_id, (source_hypothesis_id, target_hypothesis_id))
         self._validate_evidence(current.project_id, evidence_refs)
-        draft: dict[str, object] = {
-            "relation_revision_id": self._ids.new("hypothesis-relation-revision"),
-            "relation_id": self._ids.new("hypothesis-relation"),
-            "project_id": current.project_id,
-            "portfolio_id": current.portfolio_id,
-            "source_hypothesis_id": source_hypothesis_id,
-            "relation_type": relation_type,
-            "target_hypothesis_id": target_hypothesis_id,
-            "evidence_refs": evidence_refs,
-            "semantic_role": semantic_role,
-            "authority_state": "UNCLASSIFIED",
-            "active": True,
-            "created_at": self._clock.now(),
-        }
+        draft = relation_draft(
+            current,
+            source_hypothesis_id=source_hypothesis_id,
+            relation_type=relation_type,
+            target_hypothesis_id=target_hypothesis_id,
+            evidence_refs=evidence_refs,
+            semantic_role=semantic_role,
+            ids=self._ids,
+            clock=self._clock,
+        )
         relation = HypothesisRelationRecord.model_validate(
             {**draft, "revision_digest": self._relation_digest(draft)}
         )
@@ -378,16 +288,11 @@ class HypothesisService:
         self._validate_evidence(current.project_id, evidence_refs)
         if not relation.active:
             raise ValueError("hypothesis relation is already inactive")
-        draft = relation.model_dump(mode="python")
-        draft.update(
-            {
-                "relation_revision_id": self._ids.new("hypothesis-relation-revision"),
-                "active": False,
-                "supersedes_revision_digest": relation.revision_digest,
-                "created_at": self._clock.now(),
-            }
+        draft = ended_relation_draft(
+            relation,
+            ids=self._ids,
+            clock=self._clock,
         )
-        draft.pop("revision_digest", None)
         ended = HypothesisRelationRecord.model_validate(
             {**draft, "revision_digest": self._relation_digest(draft)}
         )
@@ -416,18 +321,15 @@ class HypothesisService:
         validation_route: str | None,
     ) -> tuple[AuxiliaryAssumptionRecord, HypothesisRecord, CommitResult]:
         self._validate_evidence(current.project_id, evidence_refs)
-        draft: dict[str, object] = {
-            "assumption_id": self._ids.new("hypothesis-assumption"),
-            "project_id": current.project_id,
-            "hypothesis_id": current.hypothesis_id,
-            "statement": statement,
-            "role": role,
-            "evidence_refs": evidence_refs,
-            "validation_route": validation_route,
-            "status": "UNVALIDATED",
-            "testability": "TESTABLE" if validation_route else "NOT_ASSESSED",
-            "created_at": self._clock.now(),
-        }
+        draft = assumption_draft(
+            current,
+            statement=statement,
+            role=role,
+            evidence_refs=evidence_refs,
+            validation_route=validation_route,
+            ids=self._ids,
+            clock=self._clock,
+        )
         assumption = AuxiliaryAssumptionRecord.model_validate(
             {**draft, "assumption_digest": self._aux_digest("ASSUMPTION", draft)}
         )
@@ -466,32 +368,19 @@ class HypothesisService:
             conditions=conditions,
             expected_outcome=expected_outcome,
         )
-        draft: dict[str, object] = {
-            "prediction_id": self._ids.new("prediction"),
-            "project_id": current.project_id,
-            "hypothesis_id": current.hypothesis_id,
-            "hypothesis_revision_digest": current.revision_digest,
-            "knowledge_cutoff": knowledge_cutoff,
-            "prespecification_state": prespecification_state,
-            "conditions": conditions,
-            "population_or_object": conditions.get("population", current.object_id),
-            "time_window": conditions.get("time_window", "BOUND_EXECUTION_INTERVAL"),
-            "measurement_contract_ref": measurement_contract_ref,
-            "assumption_refs": assumption_refs,
-            "expected_outcome": expected_outcome,
-            "discrimination_map": discrimination_map,
-            "observation_bound": False,
-            "prediction_fit": "NOT_OBSERVED",
-            "created_at": self._clock.now(),
-            "object_id": current.object_id,
-            "measurement_contract": basis.contract,
-            "measurement_contract_digest": basis.contract_digest,
-            "hypothesis_semantic_digest": basis.semantic_digest,
-            "unbound_assumption_candidates": ()
-            if current.generation_details is None
-            else current.generation_details.assumptions,
-            "schema_version": "1.1.0",
-        }
+        draft = prediction_draft(
+            current,
+            knowledge_cutoff=knowledge_cutoff,
+            prespecification_state=prespecification_state,
+            conditions=conditions,
+            measurement_contract_ref=measurement_contract_ref,
+            assumption_refs=assumption_refs,
+            expected_outcome=expected_outcome,
+            discrimination_map=discrimination_map,
+            basis=basis,
+            ids=self._ids,
+            clock=self._clock,
+        )
         prediction = PredictionRecord.model_validate({**draft, "prediction_digest": "0" * 64})
         prediction = prediction.model_copy(
             update={
@@ -544,20 +433,17 @@ class HypothesisService:
                 if previous.assessment_digest != assessment.assessment_digest:
                     raise ValueError("TEST_BINDING_IDEMPOTENCY_CONFLICT")
                 return previous
-        draft: dict[str, object] = {
-            "test_binding_id": self._ids.new("hypothesis-test-binding"),
-            "project_id": prediction.project_id,
-            "prediction_id": prediction.prediction_id,
-            "execution_ref": execution_ref,
-            "observation_refs": observation_refs,
-            "test_validity_assessment_ref": test_validity_assessment_ref,
-            "test_validity": test_validity,
-            "prediction_fit": prediction_fit,
-            "appraisal_mutation_allowed": assessment.substantive_update_allowed,
-            "assessment_digest": assessment.assessment_digest,
-            "prediction_digest": prediction.prediction_digest,
-            "created_at": self._clock.now(),
-        }
+        draft = test_binding_draft(
+            prediction,
+            execution_ref=execution_ref,
+            observation_refs=observation_refs,
+            test_validity_assessment_ref=test_validity_assessment_ref,
+            test_validity=test_validity,
+            prediction_fit=prediction_fit,
+            assessment=assessment,
+            ids=self._ids,
+            clock=self._clock,
+        )
         binding = HypothesisTestBinding.model_validate(
             {**draft, "binding_digest": self._aux_digest("TEST_BINDING", draft)}
         )
@@ -604,24 +490,17 @@ class HypothesisService:
             if not valid
             else "Scoped appraisal derived from sealed prediction-fit assessments"
         )
-        draft: dict[str, object] = {
-            "appraisal_id": self._ids.new("hypothesis-appraisal"),
-            "project_id": current.project_id,
-            "hypothesis_id": current.hypothesis_id,
-            "hypothesis_revision_digest": current.revision_digest,
-            "evidence_refs": evidence_refs,
-            "test_assessment_refs": test_assessment_refs,
-            "appraisal_scope": appraisal_scope,
-            "appraisal": appraisal,
-            "rationale": rationale,
-            "boundaries": tuple(f"{key}={value}" for key, value in appraisal_scope.items()),
-            "calibration": {
-                "prespecification_state": current.prespecification_state,
-                "prediction_count": len(current.prediction_refs),
-            },
-            "substantive_update_applied": valid,
-            "created_at": self._clock.now(),
-        }
+        draft = appraisal_draft(
+            current,
+            evidence_refs=evidence_refs,
+            test_assessment_refs=test_assessment_refs,
+            appraisal_scope=appraisal_scope,
+            appraisal=appraisal,
+            rationale=rationale,
+            valid=valid,
+            ids=self._ids,
+            clock=self._clock,
+        )
         record = HypothesisAppraisalRecord.model_validate(
             {**draft, "appraisal_digest": self._aux_digest("APPRAISAL", draft)}
         )
@@ -723,17 +602,12 @@ class HypothesisService:
         updates: dict[str, object],
         event_type: str,
     ) -> tuple[HypothesisPortfolioRecord, CommitResult]:
-        draft = current.model_dump(mode="python")
-        draft.update(updates)
-        draft.update(
-            {
-                "portfolio_revision_id": self._ids.new("portfolio-revision"),
-                "supersedes_revision_digest": current.revision_digest,
-                "created_at": self._clock.now(),
-            }
+        draft = portfolio_revision_draft(
+            current,
+            updates=updates,
+            ids=self._ids,
+            clock=self._clock,
         )
-        draft.pop("revision_digest", None)
-        draft.pop("receipt_ref", None)
         revised = HypothesisPortfolioRecord.model_validate(
             {**draft, "revision_digest": self._portfolio_digest(draft)}
         )
@@ -752,34 +626,15 @@ class HypothesisService:
     ) -> CommitResult:
         if self._ledger.read_heads(record.project_id).get(f"HYPOTHESIS:{entity_id}") != supersedes:
             raise ValueError("HYPOTHESIS_REVISION_CONFLICT")
-        content = record.model_dump(mode="python")
-        snapshot = EntitySnapshot(
-            snapshot_id=self._ids.new("snapshot"),
-            project_id=record.project_id,
-            entity_type=EntityType.HYPOTHESIS,
+        snapshot, actor, revision = hypothesis_revision_records(
+            record,
             entity_id=entity_id,
-            schema_version="1.0.0",
-            content=content,
-            content_digest=domain_digest("ENTITY_SNAPSHOT", "1.0.0", canonical_payload(content)),
-        )
-        actor = ActorRef(
-            actor_id="agent:hypothesis-service",
-            kind=ActorKind.AGENT,
-            role="hypothesis-editor",
-        )
-        revision = SemanticRevision(
             revision_id=revision_id,
-            project_id=record.project_id,
-            entity_type=EntityType.HYPOTHESIS,
-            entity_id=entity_id,
-            snapshot_id=snapshot.snapshot_id,
-            parent_revision_digests=() if supersedes is None else (supersedes,),
-            actor=actor,
-            reason=event_type,
-            evidence_refs=evidence_refs,
-            affected_refs=(),
             revision_digest=revision_digest,
-            created_at=record.created_at,
+            supersedes=supersedes,
+            event_type=event_type,
+            evidence_refs=evidence_refs,
+            ids=self._ids,
         )
         expected = {} if supersedes is None else {f"HYPOTHESIS:{entity_id}": supersedes}
         commit = self._commits.commit(

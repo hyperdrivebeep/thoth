@@ -4,8 +4,10 @@ from collections.abc import Awaitable, Callable, Iterable
 from time import perf_counter_ns
 from typing import cast
 
-from pydantic import BaseModel, JsonValue, ValidationError
+from pydantic import BaseModel, ValidationError
 
+from thoth.application.services import research_review_context as review_contexts
+from thoth.application.services import research_source_queries as source_queries
 from thoth.application.services.connector_service import ConnectorService
 from thoth.application.services.full_project_memory import FullProjectMemoryService
 from thoth.application.services.memory_query_expansion import ModelMemoryQueryExpander, widen_query
@@ -14,6 +16,7 @@ from thoth.application.services.requirement_compiler import compile_requirements
 from thoth.application.services.research_answer import answer_summary
 from thoth.application.services.research_context_assembler import assemble_context
 from thoth.application.services.research_coverage import assess_coverage
+from thoth.application.services.research_discovery import discover_sources
 from thoth.application.services.research_findings import adopt_confirmed_findings
 from thoth.application.services.research_gaps import gap_targets, validate_gaps
 from thoth.application.services.research_retrieval import pinned_first, work_candidates
@@ -22,8 +25,7 @@ from thoth.application.services.research_role_context import bundle_view, role_c
 from thoth.application.services.research_stage_reuse import reuse_stage_if_exact
 from thoth.application.services.research_stages import persist_stage, read_stage
 from thoth.domain.canonical import canonical_payload, domain_digest, head_set_digest
-from thoth.domain.connectors import ConnectorAccessRequest, ConnectorFailure, ConnectorOperation
-from thoth.domain.enums import CutoffState, EntityType, ModelRole, SecurityClass
+from thoth.domain.enums import CutoffState, EntityType, ModelRole
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.evidence_bundle import ContextAssembly
 from thoth.domain.evidence_requirements import (
@@ -31,17 +33,14 @@ from thoth.domain.evidence_requirements import (
     EvidenceRanking,
     RequirementProposal,
     RequirementSetRevision,
-    ResearchSourcePlan,
     ReviewAdjudication,
     ReviewProposal,
 )
 from thoth.domain.memory_expansion import MemoryExpansionOutcome
 from thoth.domain.model import ContextPack, ModelRequest
 from thoth.domain.project import Project, WorkThread
-from thoth.domain.public_web_access import PROJECT_PUBLIC_WEB_CONNECTOR_ID
 from thoth.domain.research_execution import ResearchFence, ResearchWork, research_work
 from thoth.domain.research_request import ResolvedRequestRevision, RevisionRef
-from thoth.domain.resource_scope import ResourceScopeError
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
 from thoth.ports.criterion_contract import CriterionContractStorePort
 from thoth.ports.evidence_graph import EvidenceGraphStorePort
@@ -137,109 +136,39 @@ class ResearchAnalysis:
         return ref
 
     def evidence(self, project: str) -> tuple[EvidenceSpan, ...]:
-        active = {
-            b.artifact_id
-            for b in self.governance.list_source_bindings(project)
-            if b.state == "ACTIVE"
-        }
-        return tuple(s for s in self.artifacts.list_evidence(project) if s.artifact_id in active)
+        return source_queries.evidence(self.artifacts, self.governance, project)
 
     def evidence_by_ids(self, project: str, span_ids: Iterable[str]) -> tuple[EvidenceSpan, ...]:
         """The visible spans among span_ids: the rule of evidence(), without loading every span."""
-        active = {
-            b.artifact_id
-            for b in self.governance.list_source_bindings(project)
-            if b.state == "ACTIVE"
-        }
-        found: list[EvidenceSpan] = []
-        for span_id in dict.fromkeys(span_ids):
-            try:
-                span = self.artifacts.read_evidence(span_id)
-            except ResourceScopeError:
-                continue
-            if span is not None and span.project_id == project and span.artifact_id in active:
-                found.append(span)
-        return tuple(found)
+        return source_queries.evidence_by_ids(self.artifacts, self.governance, project, span_ids)
 
     def source_overview(self, project_id: str) -> list[dict[str, object]]:
-        active = {
-            b.artifact_id
-            for b in self.governance.list_source_bindings(project_id)
-            if b.state == "ACTIVE"
-        }
-        result: list[dict[str, object]] = []
-        for artifact in self.artifacts.list_artifacts(project_id):
-            if artifact.artifact_id not in active:
-                continue
-            for version in self.artifacts.list_source_versions(project_id, artifact.artifact_id):
-                document = self.artifacts.read_structure(project_id, artifact.artifact_id, version)
-                result.append(
-                    {
-                        "artifact_id": artifact.artifact_id,
-                        "source_version_id": version,
-                        "parser_name": artifact.parser_name,
-                        "parser_version": artifact.parser_version,
-                        "authority": artifact.authority.value,
-                        "cutoff": artifact.cutoff_state.value,
-                        "observation": None
-                        if document is None or document.capability_observation is None
-                        else document.capability_observation.model_dump(mode="json"),
-                    }
-                )
-        return result
+        return source_queries.source_overview(self.artifacts, self.governance, project_id)
 
     def source_packet(
         self, evidence: tuple[EvidenceSpan, ...], *, include_structure: bool = True
     ) -> dict[str, object]:
-        packet: dict[str, object] = {
-            "artifacts": [
-                a.model_dump(mode="json")
-                for identifier in sorted({s.artifact_id for s in evidence})
-                if (a := self.artifacts.read_artifact(identifier)) is not None
-            ],
-            "corrections": [
-                c.model_dump(mode="json")
-                for s in sorted(evidence, key=lambda s: s.span_id)
-                for c in self.evidence_graph.list_span_corrections(s.project_id, s.span_id)
-            ],
-            "originals_are_canonical": True,
-            "source_text_is_untrusted_data": True,
-        }
-        if include_structure:
-            packet["structures"] = self.source_structures(evidence)
-        return packet
+        return source_queries.source_packet(
+            self.artifacts,
+            self.evidence_graph,
+            evidence,
+            include_structure=include_structure,
+            source_structures=lambda spans: self.source_structures(spans),
+        )
 
     def source_structures(self, evidence: tuple[EvidenceSpan, ...]) -> list[dict[str, object]]:
         """Assembly consumes original structures; corrections belong to the selected packet."""
-        return [
-            {"artifact_id": a, "source_version_id": v, **self._structure_summary(p, a, v)}
-            for p, a, v in sorted(
-                {(s.project_id, s.artifact_id, s.source_version_id) for s in evidence}
-            )
-        ]
+        return source_queries.source_structures(
+            evidence,
+            structure_summary=lambda project, artifact, version: self._structure_summary(
+                project, artifact, version
+            ),
+        )
 
     def _structure_summary(self, project: str, artifact: str, version: str) -> dict[str, object]:
-        metadata = self.artifacts.read_structure_metadata_digest(project, artifact, version)
-        key = None if metadata is None else (project, artifact, version, metadata)
-        if key is not None and key in self._structure_summaries:
-            observation, digest = self._structure_summaries[key]
-            return {"observation": observation, "nodes_digest": digest}
-        document = self.artifacts.read_structure(project, artifact, version)
-        if document is None:
-            return {"observation": None, "nodes_digest": None}
-        observation = (
-            None
-            if document.capability_observation is None
-            else document.capability_observation.model_dump(mode="json")
+        return source_queries.structure_summary(
+            self.artifacts, self._structure_summaries, project, artifact, version
         )
-        digest = domain_digest(
-            "SOURCE_STRUCTURE", "1.0.0", canonical_payload({"nodes": document.nodes})
-        )
-        if key is not None:
-            if len(self._structure_summaries) >= 128:
-                self._structure_summaries.clear()
-            self._structure_summaries[key] = (observation, digest)
-        return {"observation": observation, "nodes_digest": digest}
 
     def source_digest(self, evidence: tuple[EvidenceSpan, ...], *, version: str = "2.1.0") -> str:
         return domain_digest(
@@ -488,21 +417,7 @@ class ResearchAnalysis:
         ranked, _ = await self.ask(
             model,
             project,
-            context.model_copy(
-                update={
-                    "evidence": candidates,
-                    "research_context": {
-                        **work.context,
-                        "context_bundle": None,
-                        "requirement_set_ref": ref.model_dump(mode="json"),
-                        "task": "Rank relevance; preserve exact IDs, Korean "
-                        "terms, abbreviations and units. Relevance does not imply support. "
-                        "Return unselected "
-                        "required information as explicit gaps. JSON-pointer table indexes are "
-                        "not printed table numbers. Structure is expanded after your ranking.",
-                    },
-                }
-            ),
+            review_contexts.ranking_context(context, work, ref, candidates),
             ModelRole.EVIDENCE_RERANKER,
             EvidenceRanking,
         )
@@ -534,27 +449,7 @@ class ResearchAnalysis:
                 "EVIDENCE_FOCUS",
                 {"evidence_focus": evidence_focus_payload(work.evidence)},
             )
-        review_context = context.model_copy(
-            update={
-                "evidence": work.evidence,
-                "research_context": {
-                    **work.context,
-                    "task": "Review each exact requirement against "
-                    "conflicts using scoped_conflicts with exact requirement_ids and span IDs; "
-                    "leave legacy conflicts empty. Distinguish current targets "
-                    "from optional checks. "
-                    "target, conditions, time, contrary evidence and adjacent original context. "
-                    "Use only supplied span IDs in evidence_refs and applicability_basis; "
-                    "put prose in explanation. For record-summary requests, assess what the record "
-                    "states rather than treating the statement as independently proven "
-                    "world truth. "
-                    "Official "
-                    "authority or a citation alone is not support. Do not invent support edges. "
-                    "BOUND exemptions require governing authority, never model discretion.",
-                    "omitted_required_information": ranked.omitted_required_information,
-                },
-            }
-        )
+        review_context = review_contexts.semantic_review_context(context, work, ranked)
         candidate, _ = await self.ask(
             model, project, review_context, ModelRole.SEMANTIC_REVIEWER, ReviewProposal
         )
@@ -568,23 +463,7 @@ class ResearchAnalysis:
         adjudication, run = await self.ask(
             model,
             project,
-            review_context.model_copy(
-                update={
-                    "research_context": {
-                        **review_context.research_context,
-                        "candidate": candidate.model_dump(mode="json"),
-                        "requirement_set_ref": ref.model_dump(mode="json"),
-                        "task": "Separately adjudicate this candidate and the completeness "
-                        "including each scoped conflict's relevance and resolution. Bind each "
-                        "conflict decision to requirement_set_ref.revision_digest and supplied "
-                        "evidence basis_refs. Unproven scope/resolution is INCONCLUSIVE. "
-                        "of question decomposition. Check exact evidence and conditions. "
-                        "N/A research checks need request-bound source basis. "
-                        "You have no authority to waive a BOUND rule. "
-                        "Missing or uncertain means INCONCLUSIVE.",
-                    }
-                }
-            ),
+            review_contexts.adjudication_context(review_context, candidate, ref),
             ModelRole.REVIEW_ADJUDICATOR,
             ReviewAdjudication,
         )
@@ -632,143 +511,17 @@ class ResearchAnalysis:
         work: ResearchWork,
         coverage: CoverageAssessment,
     ) -> dict[str, object]:
-        try:
-            catalog = self.connectors.research_catalog(project.project_id)
-            expectation = self.connectors.current_policy_expectation(project.project_id)
-        except ConnectorFailure as exc:
-            return {"state": "BLOCKED_ACCESS", "reason": exc.code.value, "acquired_count": 0}
-        if not catalog:
-            return {
-                "state": "BLOCKED_CAPABILITY",
-                "reason": "NO_ALLOWED_DISCOVERY_ROUTE",
-                "acquired_count": 0,
-            }
-        plan, _ = await self.ask(
+        return await discover_sources(
             model,
             project,
-            context.model_copy(
-                update={
-                    "evidence": work.evidence,
-                    "research_context": {
-                        **work.context,
-                        "catalog": catalog,
-                        "gaps": coverage.allowed_next_steps,
-                        "task": "Propose bounded discovery selectors "
-                        "using only allowed registered catalog contracts. "
-                        "Each selector object contains connector_id and selector. "
-                        "Do not invent paths, source contents, credentials, SQL or permissions. "
-                        "Empty selectors means no supported route; not sufficient evidence.",
-                    },
-                }
-            ),
-            ModelRole.SOURCE_PLANNER,
-            ResearchSourcePlan,
+            context,
+            work,
+            coverage,
+            connectors=self.connectors,
+            artifacts=self.artifacts,
+            ask=self.ask,
+            evidence=lambda project: self.evidence(project),
         )
-        allowed = {str(c["connector_id"]) for c in catalog}
-        security_order = {value: index for index, value in enumerate(SecurityClass)}
-        source_classes = [SecurityClass.INTERNAL]
-        for span in work.evidence:
-            artifact = self.artifacts.read_artifact(span.artifact_id)
-            if artifact is not None:
-                source_classes.append(artifact.security_class)
-        query_class = max(source_classes, key=security_order.__getitem__)
-        acquired: list[str] = []
-        failures: list[str] = []
-        failure_details: list[dict[str, object]] = []
-        discovered = 0
-        for item in plan.selectors[:4]:
-            connector_id, selector = item.connector_id, item.values()
-            if connector_id not in allowed:
-                failures.append("SELECTOR_NOT_AUTHORIZED")
-                failure_details.append(
-                    {
-                        "stage": "select",
-                        "connector_id": str(connector_id),
-                        "error_code": "SELECTOR_NOT_AUTHORIZED",
-                        "reason_code": "SELECTOR_NOT_AUTHORIZED",
-                    }
-                )
-                continue
-            try:
-                query_security = (
-                    None
-                    if connector_id == PROJECT_PUBLIC_WEB_CONNECTOR_ID
-                    and selector.get("mode") != "SEARCH"
-                    and "query" not in selector
-                    else query_class
-                )
-                request = ConnectorAccessRequest(
-                    actor_id="agent:research-discovery",
-                    project_id=project.project_id,
-                    connector_id=str(connector_id),
-                    operation=ConnectorOperation.DISCOVER,
-                    selector=cast(dict[str, JsonValue], selector),
-                    security_class=SecurityClass.PUBLIC,
-                    query_security_class=query_security,
-                    cutoff_at=project.cutoff_at,
-                    max_bytes=2_000_000,
-                    **expectation.model_dump(),
-                )
-                refs = await self.connectors.discover_candidates(request)
-                discovered += len(refs)
-                for source in refs[:2]:
-                    # A discover snippet is never evidence. Re-enter the authorized reader.
-                    result = await self.connectors.acquire_one(
-                        request.model_copy(
-                            update={
-                                "operation": ConnectorOperation.READ,
-                                "selector": source.locator or request.selector,
-                            }
-                        )
-                    )
-                    acquired.append(result.source.source_id)
-            except ConnectorFailure as exc:
-                failures.append(exc.code.value)
-                failure_details.append(
-                    {
-                        "stage": "discover",
-                        "connector_id": str(connector_id),
-                        "error_code": exc.code.value,
-                        "reason_code": str(exc),
-                    }
-                )
-        return {
-            "state": (
-                "SEARCHED_BOUNDED"
-                if acquired
-                else "BLOCKED_ACCESS"
-                if failures
-                and all(
-                    code
-                    in {
-                        "SCOPE_DENIED",
-                        "EGRESS_DENIED",
-                        "AUTH_REQUIRED",
-                        "AUTH_EXPIRED",
-                        "SELECTOR_NOT_AUTHORIZED",
-                    }
-                    for code in failures
-                )
-                else "ACQUISITION_FAILED"
-                if failures
-                else "SEARCHED_NO_RESULTS"
-                if plan.selectors
-                else "BLOCKED_CAPABILITY"
-            ),
-            "acquired_count": len(acquired),
-            "discovered_count": discovered,
-            "eligible_evidence_count": sum(
-                1
-                for span in self.evidence(project.project_id)
-                if span.cutoff_state == CutoffState.ELIGIBLE
-            ),
-            "discovery_kind": "REGISTERED_SITE_ENUMERATION",
-            "source_refs": acquired,
-            "failures": failures,
-            "failure_details": failure_details,
-            "reason": plan.reason,
-            "entire_internet_searched": False,
-        }
 
     async def ask[T: BaseModel](
         self,

@@ -2,9 +2,26 @@ from __future__ import annotations
 
 from typing import cast
 
-from pydantic import Field, JsonValue
+from pydantic import JsonValue
 
+from thoth.application.commands import improvement_control_drafts as drafts
+from thoth.application.commands import improvement_control_views as views
 from thoth.application.commands.behavior_execution import BehaviorExposureCommands
+from thoth.application.commands.improvement_inputs import (
+    EvaluationAssessInput,
+    EvaluationPlanInput,
+    ExposurePrepareInput,
+    ImprovementReadInput,
+    ListInput,
+    PromotionDecideInput,
+    PromotionPrepareInput,
+    ProposeInput,
+    RecordReadInput,
+    RetireInput,
+    ReviseInput,
+    RollbackPrepareInput,
+)
+from thoth.application.commands.improvement_inputs import ProjectInput as ProjectInput
 from thoth.application.services.control_record_service import ControlRecordService
 from thoth.application.services.improvement_evidence import (
     assessments_match,
@@ -14,7 +31,6 @@ from thoth.application.services.improvement_exposure_service import ImprovementE
 from thoth.application.services.improvement_thread_scope import ImprovementThreadScope
 from thoth.application.services.paired_evaluation_service import PairedEvaluationService
 from thoth.domain.auth import require_authenticated_authority
-from thoth.domain.base import DomainModel
 from thoth.domain.behavior_policy import BehaviorPolicyError
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.control_record import ControlRecord
@@ -40,101 +56,6 @@ PROHIBITED_TARGETS = {
     "WAIVER",
     "GO_OR_STOP_DECISION",
 }
-
-
-class ProjectInput(DomainModel):
-    project_id: str = Field(min_length=1, max_length=160)
-
-
-class ListInput(ProjectInput):
-    target_component: str | None = Field(default=None, max_length=160)
-    candidate_lifecycle: str | None = Field(default=None, max_length=80)
-    exposure_state: str | None = Field(default=None, max_length=80)
-    promotion_state: str | None = Field(default=None, max_length=80)
-
-
-class ImprovementReadInput(ProjectInput):
-    improvement_revision_id: str = Field(min_length=1, max_length=160)
-    revision_digest: str | None = Field(default=None, min_length=64, max_length=64)
-
-
-class RecordReadInput(ProjectInput):
-    record_id: str = Field(min_length=1, max_length=160)
-
-
-class ProposeInput(ProjectInput):
-    thread_id: str | None = Field(default=None, min_length=1, max_length=160)
-    target_component: str = Field(min_length=1, max_length=160)
-    scope_key: str = Field(min_length=1, max_length=500)
-    trigger_refs: tuple[str, ...]
-    baseline_digest: str = Field(min_length=64, max_length=64)
-    candidate_content: dict[str, JsonValue]
-    improvement_hypothesis: str = Field(min_length=1, max_length=5_000)
-    evaluation_contract_ref: str = Field(min_length=1, max_length=160)
-
-
-class ReviseInput(ImprovementReadInput):
-    patch: dict[str, JsonValue]
-    evidence_refs: tuple[str, ...]
-    reason: str = Field(min_length=1, max_length=2_000)
-    expected_revision_digest: str = Field(min_length=64, max_length=64)
-
-
-class EvaluationPlanInput(ProjectInput):
-    improvement_revision_id: str = Field(min_length=1, max_length=160)
-    baseline_digest: str = Field(min_length=64, max_length=64)
-    datasets: tuple[dict[str, JsonValue], ...]
-    evaluator_refs: tuple[str, ...]
-    guardrails: tuple[dict[str, JsonValue], ...]
-    exposure_policy_ref: str = Field(min_length=1, max_length=160)
-
-
-class EvaluationAssessInput(ProjectInput):
-    evaluation_plan_id: str = Field(min_length=1, max_length=160)
-    result_refs: tuple[str, ...]
-    evaluator_result_refs: tuple[str, ...]
-    exposure_ledger_ref: str = Field(min_length=1, max_length=160)
-    expected_evaluation_revision: int = Field(ge=1)
-
-
-class ExposurePrepareInput(ProjectInput):
-    improvement_revision_id: str = Field(min_length=1, max_length=160)
-    requested_exposure_state: str = Field(pattern=r"^(OFFLINE|SANDBOX|SHADOW|CANARY)$")
-    evaluation_plan_id: str = Field(min_length=1, max_length=160)
-    scope: dict[str, str]
-    duration_budget: dict[str, JsonValue]
-    stop_rollback_contract: dict[str, JsonValue]
-
-
-class PromotionPrepareInput(ProjectInput):
-    improvement_revision_id: str = Field(min_length=1, max_length=160)
-    assessment_refs: tuple[str, ...]
-    candidate_digest: str = Field(min_length=64, max_length=64)
-    baseline_digest: str = Field(min_length=64, max_length=64)
-    target_scope: str = Field(min_length=1, max_length=500)
-    policy_version: str = Field(min_length=1, max_length=160)
-
-
-class PromotionDecideInput(ProjectInput):
-    promotion_candidate_id: str = Field(min_length=1, max_length=160)
-    decision: str = Field(pattern=r"^(APPROVE|REJECT)$")
-    actor_ref: str = Field(min_length=1, max_length=160)
-    role_assignment_ref: str = Field(min_length=1, max_length=160)
-    approved_digest: str = Field(min_length=64, max_length=64)
-    reason: str | None = Field(default=None, max_length=2_000)
-
-
-class RollbackPrepareInput(ProjectInput):
-    promoted_revision_ref: str = Field(min_length=1, max_length=160)
-    guardrail_failure_refs: tuple[str, ...]
-    rollback_target_digest: str = Field(min_length=64, max_length=64)
-    target_scope: str = Field(min_length=1, max_length=500)
-
-
-class RetireInput(ImprovementReadInput):
-    reason: str = Field(min_length=1, max_length=2_000)
-    evidence_refs: tuple[str, ...]
-    expected_revision_digest: str = Field(min_length=64, max_length=64)
 
 
 class ImprovementHandlers:
@@ -258,20 +179,7 @@ class ImprovementHandlers:
                 else "PROPOSED"
             )
             payload: dict[str, object] = {
-                "thread_id": request.thread_id,
-                "target_component": request.target_component,
-                "scope_key": request.scope_key,
-                "trigger_refs": request.trigger_refs,
-                "baseline_digest": request.baseline_digest,
-                "candidate_content": cast(dict[str, object], request.candidate_content),
-                "candidate_digest": candidate_digest,
-                "improvement_hypothesis": request.improvement_hypothesis,
-                "evaluation_contract_ref": request.evaluation_contract_ref,
-                "candidate_lifecycle": "PROPOSED",
-                "evaluation_validity": "NOT_ASSESSED",
-                "performance_verdict": "INCONCLUSIVE",
-                "exposure_state": "NONE",
-                "promotion_state": "NOT_ELIGIBLE",
+                **drafts.proposal_fields(request, candidate_digest),
                 "overlap_lock": tuple(
                     item.record_id for item in active if self._thread_scope.may_read(item)
                 ),
@@ -283,11 +191,7 @@ class ImprovementHandlers:
                 state=state,
                 payload=payload,
             )
-            return {
-                "improvement": record.model_dump(mode="json"),
-                "overlap_lock_check": not active,
-                "prohibited_target_check": True,
-            }
+            return views.proposal_response(record, active)
 
     async def revise(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         with self._ledger.transaction():
@@ -307,22 +211,7 @@ class ImprovementHandlers:
                     RpcErrorCode.DOMAIN_REJECTED,
                     f"noncanonical Improvement patch: {', '.join(rejected)}",
                 )
-            payload = {
-                **current.payload,
-                **cast(dict[str, object], request.patch),
-                "evaluation_validity": "NOT_ASSESSED",
-                "performance_verdict": "INCONCLUSIVE",
-                "promotion_state": "NOT_ELIGIBLE",
-                "evidence_refs": request.evidence_refs,
-                "revision_reason": request.reason,
-            }
-            if "candidate_content" in request.patch:
-                content = cast(dict[str, object], request.patch["candidate_content"])
-                payload["candidate_digest"] = domain_digest(
-                    "IMPROVEMENT_CANDIDATE",
-                    "1.0.0",
-                    canonical_payload(content),
-                )
+            payload = drafts.revised_payload(current, request)
             revised = self._controls.create(
                 project_id=request.project_id,
                 namespace="IMPROVEMENT",
@@ -331,10 +220,7 @@ class ImprovementHandlers:
                 state="PROPOSED",
                 payload=payload,
             )
-            return {
-                "improvement": revised.model_dump(mode="json"),
-                "old_evaluation_invalidated": True,
-            }
+            return views.revision_response(revised)
 
     async def evaluation_plan(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         with self._ledger.transaction():
@@ -345,47 +231,19 @@ class ImprovementHandlers:
                     improvement_revision_id=request.improvement_revision_id,
                 )
             )
-            hidden_exposure = any(
-                item.get("contains_expected_values") is True for item in request.datasets
-            )
-            self_evaluation = improvement.payload.get(
-                "target_component"
-            ) == "EVALUATOR_CODE" and any(
-                ref == improvement.payload.get("candidate_digest") for ref in request.evaluator_refs
-            )
-            state = (
-                "HELD"
-                if hidden_exposure
-                or self_evaluation
-                or request.baseline_digest != improvement.payload.get("baseline_digest")
-                else "PLANNED"
+            hidden_exposure, self_evaluation, state = drafts.evaluation_plan_state(
+                request, improvement
             )
             plan = self._controls.create(
                 project_id=request.project_id,
                 namespace="IMPROVEMENT",
                 record_type="EVALUATION_PLAN",
                 state=state,
-                payload={
-                    "improvement_revision_id": improvement.record_id,
-                    "improvement_record_digest": improvement.record_digest,
-                    "baseline_digest": request.baseline_digest,
-                    "candidate_digest": improvement.payload.get("candidate_digest"),
-                    "datasets": request.datasets,
-                    "evaluator_refs": request.evaluator_refs,
-                    "guardrails": request.guardrails,
-                    "exposure_policy_ref": request.exposure_policy_ref,
-                    "evaluator_isolation": not self_evaluation,
-                    "hidden_expected_value_access": hidden_exposure,
-                    "evaluation_revision": 1,
-                    "results": (),
-                },
+                payload=drafts.evaluation_plan_payload(
+                    request, improvement, self_evaluation, hidden_exposure
+                ),
             )
-            return {
-                "evaluation_plan": plan.model_dump(mode="json"),
-                "evaluator_isolation": not self_evaluation,
-                "holdout_access_check": not hidden_exposure,
-                "action_plan_candidates": [],
-            }
+            return views.evaluation_plan_response(plan, self_evaluation, hidden_exposure)
 
     async def evaluation_assess(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = EvaluationAssessInput.model_validate(value)
@@ -413,34 +271,8 @@ class ImprovementHandlers:
             )
             if measured is not None and self._paired is not None:
                 self._paired.require_current(measured)
-            pair = None if measured is None else measured.result
-            bound = (
-                pair is not None
-                and improvement is not None
-                and plan_matches_improvement(plan, improvement)
-            )
-            if bound and measured is not None:
-                bound = (
-                    measured.spec.plan_id == plan.record_id
-                    and measured.spec.plan_digest == plan.record_digest
-                    and measured.spec.baseline_digest == plan.payload.get("baseline_digest")
-                    and measured.spec.candidate_digest == plan.payload.get("candidate_digest")
-                )
-            validity = (
-                "INVALID"
-                if plan.state == "HELD"
-                else pair.validity
-                if bound and pair is not None
-                else "INCONCLUSIVE"
-            )
-            verdict = (
-                "INCONCLUSIVE"
-                if validity != "VALID"
-                else "WORSE"
-                if critical_failure
-                else pair.performance_verdict
-                if pair is not None
-                else "INCONCLUSIVE"
+            validity, verdict = drafts.assessment_state(
+                plan, improvement, measured, critical_failure
             )
             # Offline comparison is evidence, never actual canary or baseline approval.
             eligible = False
@@ -450,30 +282,12 @@ class ImprovementHandlers:
                 record_type="EVALUATION_PLAN",
                 record_id=plan.record_id,
                 state="EVALUATED",
-                payload={
-                    **plan.payload,
-                    "evaluation_revision": plan.version + 1,
-                    "result_refs": request.result_refs,
-                    "evaluator_result_refs": request.evaluator_result_refs,
-                    "exposure_ledger_ref": request.exposure_ledger_ref,
-                    "evaluation_validity": validity,
-                    "performance_verdict": verdict,
-                    "guardrail_vector": guardrails,
-                    "critical_guardrail_failure": critical_failure,
-                    "promotion_eligible": eligible,
-                },
+                payload=drafts.assessment_payload(
+                    plan, request, validity, verdict, guardrails, critical_failure, eligible
+                ),
             )
 
-            return cast(
-                dict[str, JsonValue],
-                {
-                    "evaluation": assessed.model_dump(mode="json"),
-                    "evaluation_validity": validity,
-                    "performance_verdict": verdict,
-                    "guardrail_vector": list(guardrails),
-                    "promotion_eligibility": eligible,
-                },
-            )
+            return views.assessment_response(assessed, validity, verdict, guardrails, eligible)
 
     def _measured_result(self, request: EvaluationAssessInput) -> PairedRunRecord | None:
         if self._paired is None or len(request.result_refs) != 1:
@@ -525,15 +339,7 @@ class ImprovementHandlers:
                     request.project_id, "IMPROVEMENT", runtime.spec.exposure_id
                 )
                 assert projection is not None
-                return {
-                    "exposure": projection.model_dump(mode="json"),
-                    "runtime_exposure": runtime.model_dump(mode="json"),
-                    "approval_target_digest": runtime.spec.spec_digest,
-                    "policy_authorization_requirements": "PROTECTED_R3"
-                    if runtime.spec.stage == "CANARY"
-                    else "R0_R2_BOUNDED",
-                    "actual_execution_observed": False,
-                }
+                return views.runtime_exposure_response(projection, runtime)
         with self._ledger.transaction():
             request = ExposurePrepareInput.model_validate(value)
             improvement = self._improvement(
@@ -561,28 +367,11 @@ class ImprovementHandlers:
                 namespace="IMPROVEMENT",
                 record_type=record_type,
                 state="PREPARED",
-                payload={
-                    "improvement_revision_id": improvement.record_id,
-                    "evaluation_plan_id": evaluation.record_id,
-                    "requested_exposure_state": request.requested_exposure_state,
-                    "scope": request.scope,
-                    "duration_budget": request.duration_budget,
-                    "stop_rollback_contract": request.stop_rollback_contract,
-                    "output_authoritative": False,
-                    "policy_requirements": (
-                        "PROTECTED_R3" if requires_authority else "R0_R2_BOUNDED"
-                    ),
-                    "authorization_required": requires_authority,
-                },
+                payload=drafts.exposure_payload(
+                    request, improvement, evaluation, requires_authority
+                ),
             )
-            return cast(
-                dict[str, JsonValue],
-                {
-                    "exposure": exposure.model_dump(mode="json"),
-                    "action_plan_candidate": {"owner": "ACTION", "automatic_execution": False},
-                    "policy_authorization_requirements": exposure.payload["policy_requirements"],
-                },
-            )
+            return views.exposure_response(exposure)
 
     async def promotion_prepare(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         with self._ledger.transaction():
@@ -616,35 +405,11 @@ class ImprovementHandlers:
                 namespace="IMPROVEMENT",
                 record_type="PROMOTION",
                 state=state,
-                payload={
-                    "improvement_revision_id": improvement.record_id,
-                    "improvement_record_digest": improvement.record_digest,
-                    "assessment_refs": request.assessment_refs,
-                    "assessment_digests": {
-                        item.record_id: item.record_digest
-                        for item in assessments
-                        if item is not None
-                    },
-                    "candidate_digest": request.candidate_digest,
-                    "baseline_digest": request.baseline_digest,
-                    "target_scope": request.target_scope,
-                    "policy_version": request.policy_version,
-                    "required_roles": ("improvement-owner",),
-                    **runtime_payload,
-                    "exact_impact": {
-                        "target_component": improvement.payload.get("target_component"),
-                        "scope_key": improvement.payload.get("scope_key"),
-                    },
-                },
+                payload=drafts.promotion_payload(
+                    request, improvement, assessments, runtime_payload
+                ),
             )
-            return cast(
-                dict[str, JsonValue],
-                {
-                    "promotion": promotion.model_dump(mode="json"),
-                    "eligibility": state,
-                    "exact_impact": promotion.payload["exact_impact"],
-                },
-            )
+            return views.promotion_response(promotion, state)
 
     async def promotion_decide(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = PromotionDecideInput.model_validate(value)
@@ -719,13 +484,7 @@ class ImprovementHandlers:
                 record_type="PROMOTION",
                 record_id=promotion.record_id,
                 state="APPROVED" if request.decision == "APPROVE" else "REJECTED",
-                payload={
-                    **promotion.payload,
-                    "decision": request.decision,
-                    "actor_ref": request.actor_ref,
-                    "role_assignment_ref": request.role_assignment_ref,
-                    "reason": request.reason,
-                },
+                payload=drafts.promotion_decision_payload(promotion, request),
             )
             applied = None
             if self._exposures is not None and request.decision == "APPROVE":
@@ -740,24 +499,9 @@ class ImprovementHandlers:
                 namespace="IMPROVEMENT",
                 record_type="REVISION_CHANGE_SET_PROPOSAL",
                 state="PROPOSED_NOT_APPLIED" if applied is None else "APPLIED_BEHAVIOR_BASELINE",
-                payload={
-                    "promotion_id": decided.record_id,
-                    "baseline_change": request.decision == "APPROVE",
-                    "current_state_mutated": applied is not None,
-                    "baseline_kind": None if applied is None else "BEHAVIOR",
-                    "behavior_baseline_receipt": None
-                    if applied is None
-                    else applied.receipt_digest,
-                },
+                payload=drafts.baseline_change_payload(decided, request, applied),
             )
-            return {
-                "promotion": decided.model_dump(mode="json"),
-                "revision_baseline_change_set_proposal": change_set.model_dump(mode="json"),
-                "current_state_mutated": applied is not None,
-                "behavior_baseline_revision": None
-                if applied is None
-                else applied.model_dump(mode="json"),
-            }
+            return views.promotion_decision_response(decided, change_set, applied)
 
     async def rollback_prepare(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         with self._ledger.transaction():
@@ -767,27 +511,9 @@ class ImprovementHandlers:
                 namespace="IMPROVEMENT",
                 record_type="ROLLBACK",
                 state="PREPARED",
-                payload={
-                    "promoted_revision_ref": request.promoted_revision_ref,
-                    "guardrail_failure_refs": request.guardrail_failure_refs,
-                    "rollback_target_digest": request.rollback_target_digest,
-                    "target_scope": request.target_scope,
-                    "authority": (
-                        "PREAUTHORIZED" if request.guardrail_failure_refs else "PROTECTED_R3"
-                    ),
-                    "exact_rollback_claimed": False,
-                    "residual_state": "REQUIRES_REASSESSMENT",
-                    "current_state_mutated": False,
-                },
+                payload=drafts.rollback_payload(request),
             )
-            return cast(
-                dict[str, JsonValue],
-                {
-                    "rollback": rollback.model_dump(mode="json"),
-                    "action_revision_change_set": {"automatic_execution": False},
-                    "residual_state": rollback.payload["residual_state"],
-                },
-            )
+            return views.rollback_response(rollback)
 
     async def retire_propose(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         with self._ledger.transaction():
@@ -800,13 +526,7 @@ class ImprovementHandlers:
                 namespace="IMPROVEMENT",
                 record_type="RETIRE_CANDIDATE",
                 state="PROPOSED_NOT_APPLIED",
-                payload={
-                    "improvement_revision_id": current.record_id,
-                    "reason": request.reason,
-                    "evidence_refs": request.evidence_refs,
-                    "exposure_cleanup": "REQUIRED",
-                    "retention_impact": "PRESERVE_EVALUATION_HISTORY",
-                },
+                payload=drafts.retirement_payload(current, request),
             )
             return {"retirement": retirement.model_dump(mode="json"), "history_preserved": True}
 

@@ -4,13 +4,23 @@ import asyncio
 import hashlib
 from collections.abc import Callable
 from contextlib import suppress
-from dataclasses import dataclass
 from typing import cast
 
 from pydantic import JsonValue
 
+from thoth.application.services.connector_catalog import (
+    connector_web_ready,
+    project_connector_catalog,
+)
+from thoth.application.services.connector_catalog import (
+    public_web_search_attempts as public_web_search_attempts,
+)
 from thoth.application.services.connector_cleanup import connector_cleanup
+from thoth.application.services.connector_contracts import (
+    ConnectorAcquisition as ConnectorAcquisition,
+)
 from thoth.application.services.connector_io import connector_io
+from thoth.application.services.connector_receipt import build_connector_receipt
 from thoth.application.services.control_record_service import ControlRecordService
 from thoth.application.services.evidence_graph_service import EvidenceGraphService
 from thoth.application.services.ingestion_service import IngestArtifactCommand, IngestionService
@@ -30,7 +40,6 @@ from thoth.domain.connectors import (
 )
 from thoth.domain.enums import SecurityClass
 from thoth.domain.errors import ParserFailure
-from thoth.domain.evidence_graph import EvidenceSourceRecord
 from thoth.domain.governance import SourceBinding
 from thoth.domain.ingestion import IngestionResult
 from thoth.domain.policy import (
@@ -39,7 +48,6 @@ from thoth.domain.policy import (
     PolicyExpectation,
 )
 from thoth.domain.public_web_access import PROJECT_PUBLIC_WEB_CONNECTOR_ID
-from thoth.domain.registered_site_entrypoints import registered_entrypoints
 from thoth.domain.research_execution import check_research_boundary
 from thoth.domain.workspace_setup import WorkspaceSetupState
 from thoth.ports.acquisition import AcquisitionConflictError, AcquisitionUnitOfWorkPort
@@ -47,40 +55,12 @@ from thoth.ports.connectors import ConnectorPort, ConnectorRegistryPort
 from thoth.ports.project import ProjectStorePort
 from thoth.ports.runtime import ClockPort, IdGeneratorPort
 
-
-def public_web_search_attempts(
-    request: ConnectorAccessRequest,
-    policy: AuthoritativeExecutionPolicy,
-) -> tuple[ConnectorAccessRequest, ...]:
-    if request.selector.get("mode") != "SEARCH":
-        return (request,)
-    if not policy.public_web_enabled or not policy.preferred_hosts:
-        return (request,)
-    query = request.selector.get("query")
-    if not isinstance(query, str) or not query.strip():
-        return (request,)
-    sites = " OR ".join(f"site:{host}" for host in policy.preferred_hosts)
-    scoped_selector = dict(request.selector)
-    scoped_selector["query"] = f"({query}) ({sites})"
-    scoped = request.model_copy(update={"selector": scoped_selector})
-    return (scoped, request)
-
-
 _SECURITY_ORDER = {
     SecurityClass.PUBLIC: 0,
     SecurityClass.INTERNAL: 1,
     SecurityClass.CONFIDENTIAL: 2,
     SecurityClass.RESTRICTED: 3,
 }
-
-
-@dataclass(frozen=True)
-class ConnectorAcquisition:
-    ingestion: IngestionResult
-    run: ConnectorRunRecord
-    receipt: ConnectorReceipt
-    binding: SourceBinding
-    source: EvidenceSourceRecord
 
 
 class ConnectorService:
@@ -126,33 +106,8 @@ class ConnectorService:
     def research_catalog(self, project_id: str) -> tuple[dict[str, JsonValue], ...]:
         policy = self._authorize(project_id, expectation=None)
         setup = self._workspace_setup()
-        grant_ok = (
-            setup.internet_consent == "ALLOWED"
-            and bool(setup.internet_grant_id)
-            and setup.internet_grant_id == policy.workspace_internet_grant_id
-        )
-        web_ready = (
-            policy.public_web_enabled
-            and bool(policy.preferred_hosts)
-            and grant_ok
-            and PROJECT_PUBLIC_WEB_CONNECTOR_ID in policy.connector_allowlist
-            and "ALLOWLISTED_EXTERNAL" in policy.connector_allowed_egress_classes
-        )
-        return tuple(
-            cast(
-                dict[str, JsonValue],
-                {
-                    **item,
-                    "index_freshness": "UNKNOWN",
-                    "unvisited_scope": "NOT_ENUMERATED",
-                    "configured_selectors": _catalog_selectors(item["connector_id"], policy),
-                },
-            )
-            for item in self.capabilities()
-            if item["connector_id"] in policy.connector_allowlist
-            and item["egress_class"] in policy.connector_allowed_egress_classes
-            and (item["connector_id"] != PROJECT_PUBLIC_WEB_CONNECTOR_ID or web_ready)
-        )
+        web_ready = connector_web_ready(policy, setup)
+        return project_connector_catalog(self.capabilities(), policy, web_ready)
 
     async def discover_candidates(self, request: ConnectorAccessRequest):
         policy = self._authorize(
@@ -322,10 +277,10 @@ class ConnectorService:
                     "revision": project.revision + 1,
                 }
             )
+            closed = True  # The cleanup helper now owns this close attempt.
             await connector_cleanup(
                 request, run_id, lambda: connector.close(run_id), self._controls
             )
-            closed = True
             self._unit_of_work.commit(
                 AcquisitionCommit(
                     ingestion=ingestion,
@@ -622,28 +577,12 @@ class ConnectorService:
         run_id: str,
         fetched: ConnectorFetchResult,
     ) -> ConnectorReceipt:
-        draft: dict[str, object] = {
-            "connector_run_id": run_id,
-            "project_id": request.project_id,
-            "connector_id": request.connector_id,
-            "driver_version": capability.driver_version,
-            "policy_digest": request.policy_digest,
-            "source_uri": fetched.ref.source_uri,
-            "native_version": fetched.ref.native_version.model_dump(mode="json"),
-            "content_sha256": fetched.content_sha256,
-            "byte_size": len(fetched.raw),
-            "recorded_at": self._clock.now(),
-            "semantic_truth_certified": False,
-        }
-        return ConnectorReceipt.model_validate(
-            {
-                **draft,
-                "receipt_digest": domain_digest(
-                    "CONNECTOR_RECEIPT",
-                    "1.0.0",
-                    canonical_payload(draft),
-                ),
-            }
+        return build_connector_receipt(
+            request=request,
+            capability=capability,
+            run_id=run_id,
+            fetched=fetched,
+            clock=self._clock,
         )
 
     async def _close_after_failure(
@@ -653,16 +592,3 @@ class ConnectorService:
             await connector_cleanup(
                 request, run_id, lambda: connector.close(run_id), self._controls
             )
-
-
-def _catalog_selectors(
-    connector_id: JsonValue,
-    policy: AuthoritativeExecutionPolicy,
-) -> list[JsonValue]:
-    if connector_id == PROJECT_PUBLIC_WEB_CONNECTOR_ID:
-        return cast(list[JsonValue], list(registered_entrypoints(policy.preferred_hosts)))
-    return [
-        cast(JsonValue, route.selector)
-        for route in (*policy.acquisition_routes, *policy.counter_search_routes)
-        if route.connector_id == connector_id
-    ]

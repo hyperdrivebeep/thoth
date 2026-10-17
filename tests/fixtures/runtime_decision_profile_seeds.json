@@ -1,0 +1,246 @@
+{
+  "object_profiles": [
+    {
+      "profile_ref": "EXPERIMENT_DIAGNOSIS",
+      "version": 1,
+      "name": "Experiment diagnosis case",
+      "domain_hint": "experimental-rnd",
+      "namespace_owner": "THOTH.OBJECT",
+      "required_fields": [
+        "purpose_statement",
+        "problem_frame",
+        "focus_refs"
+      ],
+      "conditional_fields": [
+        "requirement_refs",
+        "cutoff_ref",
+        "protected_boundary_context"
+      ],
+      "allowed_facets": [
+        "TECHNICAL",
+        "EVIDENCE",
+        "DATA",
+        "MODEL",
+        "SAFETY"
+      ],
+      "allowed_relation_types": [
+        "PART_OF",
+        "DEPENDS_ON",
+        "BLOCKED_BY",
+        "VERIFIES",
+        "QUALIFIES",
+        "CONTRADICTS",
+        "FOLLOWUP_OF",
+        "SUPERSEDES"
+      ],
+      "entry_policy": {
+        "evidence": "EVIDENCE_OR_TYPED_USER_ASSERTION",
+        "scope": "PROJECT_AND_THREAD_REQUIRED",
+        "trigger": "DECISION_SENSITIVE_OR_EXPLICIT_USER_REQUEST"
+      },
+      "exit_policy": {
+        "conflict": "NO_CLOSURE_BLOCKER",
+        "resolution": "EXPLICIT",
+        "verification": "PROFILE_ACCEPTABLE"
+      },
+      "enabled": true,
+      "migration_state": "CURRENT",
+      "profile_digest": "2943ed5a454418e509343ffc32699fa0fb7b11e8a9d465ec361a3f28046483b2",
+      "schema_version": "1.0.0"
+    },
+    {
+      "profile_ref": "GENERAL_RND_DECISION",
+      "version": 1,
+      "name": "General R&D decision",
+      "domain_hint": "general-rnd",
+      "namespace_owner": "THOTH.OBJECT",
+      "required_fields": [
+        "purpose_statement",
+        "problem_frame",
+        "focus_refs"
+      ],
+      "conditional_fields": [
+        "requirement_refs",
+        "cutoff_ref",
+        "protected_boundary_context"
+      ],
+      "allowed_facets": [
+        "TECHNICAL",
+        "EVIDENCE",
+        "COST",
+        "SCHEDULE",
+        "SAFETY",
+        "INTERFACE",
+        "DATA",
+        "MODEL"
+      ],
+      "allowed_relation_types": [
+        "PART_OF",
+        "DEPENDS_ON",
+        "BLOCKED_BY",
+        "VERIFIES",
+        "QUALIFIES",
+        "CONTRADICTS",
+        "FOLLOWUP_OF",
+        "SUPERSEDES"
+      ],
+      "entry_policy": {
+        "evidence": "EVIDENCE_OR_TYPED_USER_ASSERTION",
+        "scope": "PROJECT_AND_THREAD_REQUIRED",
+        "trigger": "DECISION_SENSITIVE_OR_EXPLICIT_USER_REQUEST"
+      },
+      "exit_policy": {
+        "conflict": "NO_CLOSURE_BLOCKER",
+        "resolution": "EXPLICIT",
+        "verification": "PROFILE_ACCEPTABLE"
+      },
+      "enabled": true,
+      "migration_state": "CURRENT",
+      "profile_digest": "af6e4ccfb8384e86a9a62ef4b9db3c34479ab504b53499b8d2dad4afd6563cfa",
+      "schema_version": "1.0.0"
+    },
+    {
+      "profile_ref": "SYSTEMS_INTEGRATION",
+      "version": 1,
+      "name": "Systems integration case",
+      "domain_hint": "systems-engineering",
+      "namespace_owner": "THOTH.OBJECT",
+      "required_fields": [
+        "purpose_statement",
+        "problem_frame",
+        "focus_refs",
+        "workstream_refs"
+      ],
+      "conditional_fields": [
+        "requirement_refs",
+        "cutoff_ref",
+        "protected_boundary_context"
+      ],
+      "allowed_facets": [
+        "TECHNICAL",
+        "EVIDENCE",
+        "INTERFACE",
+        "SAFETY",
+        "SCHEDULE"
+      ],
+      "allowed_relation_types": [
+        "PART_OF",
+        "DEPENDS_ON",
+        "BLOCKED_BY",
+        "VERIFIES",
+        "QUALIFIES",
+        "CONTRADICTS",
+        "FOLLOWUP_OF",
+        "SUPERSEDES"
+      ],
+      "entry_policy": {
+        "evidence": "EVIDENCE_OR_TYPED_USER_ASSERTION",
+        "scope": "PROJECT_AND_THREAD_REQUIRED",
+        "trigger": "DECISION_SENSITIVE_OR_EXPLICIT_USER_REQUEST"
+      },
+      "exit_policy": {
+        "conflict": "NO_CLOSURE_BLOCKER",
+        "resolution": "EXPLICIT",
+        "verification": "PROFILE_ACCEPTABLE"
+      },
+      "enabled": true,
+      "migration_state": "CURRENT",
+      "profile_digest": "9fc39973d4c108cc77f643b164d01fd180c43cb3b61afc744aefe92728bb5328",
+      "schema_version": "1.0.0"
+    }
+  ],
+  "outcome_profiles": [
+    {
+      "profile_ref": "DELIVERY_ACKNOWLEDGEMENT_OUTCOME",
+      "version": 1,
+      "name": "Delivery acknowledgement outcome",
+      "action_purposes": [
+        "COMMUNICATION_SUBMISSION"
+      ],
+      "required_evidence": [
+        "delivery_receipt"
+      ],
+      "comparator_contract": "EXACT_BASELINE_SET_DIGEST_REQUIRED",
+      "window_contract": "PHASE_AND_TIME_WINDOW_REQUIRED",
+      "evaluator_contract": "SOURCE_BOUND_DETERMINISTIC_OR_EXPLICIT_ABSTENTION",
+      "effect_dimensions": [
+        "delivery_acknowledgement"
+      ],
+      "attribution_standard": "NOT_APPLICABLE",
+      "closure_criteria": {
+        "objective": "EXPLICITLY_ASSESSED",
+        "residual_effect": "HANDLED_OR_ACCEPTED",
+        "validity": "VALID_OR_PROFILE_ACCEPTED_LIMITED"
+      },
+      "enabled": true,
+      "authority_owner": "OUTCOME_EVALUATION_OWNER",
+      "profile_digest": "3c1aea4e31ed0ca9d442c34a06e4d2240e025215b4357fa0fdf95fa32bd6f752",
+      "schema_version": "1.0.0"
+    },
+    {
+      "profile_ref": "EXPERIMENT_LEARNING_OUTCOME",
+      "version": 1,
+      "name": "Experiment learning outcome",
+      "action_purposes": [
+        "HYPOTHESIS_DISCRIMINATION",
+        "ANALYSIS_COMPUTATION",
+        "SIMULATION"
+      ],
+      "required_evidence": [
+        "observation",
+        "comparator",
+        "test_validity"
+      ],
+      "comparator_contract": "EXACT_BASELINE_SET_DIGEST_REQUIRED",
+      "window_contract": "PHASE_AND_TIME_WINDOW_REQUIRED",
+      "evaluator_contract": "SOURCE_BOUND_DETERMINISTIC_OR_EXPLICIT_ABSTENTION",
+      "effect_dimensions": [
+        "hypothesis_discrimination",
+        "information_gain",
+        "unexpected_effect"
+      ],
+      "attribution_standard": "ASSOCIATION_BY_DEFAULT",
+      "closure_criteria": {
+        "objective": "EXPLICITLY_ASSESSED",
+        "residual_effect": "HANDLED_OR_ACCEPTED",
+        "validity": "VALID_OR_PROFILE_ACCEPTED_LIMITED"
+      },
+      "enabled": true,
+      "authority_owner": "OUTCOME_EVALUATION_OWNER",
+      "profile_digest": "3ae887e2c26eed9dcdfdb0bb033abf6b79c83b552c4f415848518fd726308dfc",
+      "schema_version": "1.0.0"
+    },
+    {
+      "profile_ref": "REQUIREMENT_VERIFICATION_OUTCOME",
+      "version": 1,
+      "name": "Requirement verification outcome",
+      "action_purposes": [
+        "REQUIREMENT_VERIFICATION",
+        "EXPERIMENT_TEST"
+      ],
+      "required_evidence": [
+        "observation",
+        "comparator",
+        "criterion"
+      ],
+      "comparator_contract": "EXACT_BASELINE_SET_DIGEST_REQUIRED",
+      "window_contract": "PHASE_AND_TIME_WINDOW_REQUIRED",
+      "evaluator_contract": "SOURCE_BOUND_DETERMINISTIC_OR_EXPLICIT_ABSTENTION",
+      "effect_dimensions": [
+        "requirement_result",
+        "effect_direction",
+        "residual_risk"
+      ],
+      "attribution_standard": "CONTRIBUTION_ONLY_WITHOUT_CAUSAL_DESIGN",
+      "closure_criteria": {
+        "objective": "EXPLICITLY_ASSESSED",
+        "residual_effect": "HANDLED_OR_ACCEPTED",
+        "validity": "VALID_OR_PROFILE_ACCEPTED_LIMITED"
+      },
+      "enabled": true,
+      "authority_owner": "OUTCOME_EVALUATION_OWNER",
+      "profile_digest": "49ee6c86a08e4fa3d40d7bc53f1132b5f377c722d6fef0565642d1c72edfbe71",
+      "schema_version": "1.0.0"
+    }
+  ]
+}

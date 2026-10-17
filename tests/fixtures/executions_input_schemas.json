@@ -1,0 +1,690 @@
+{
+  "ProjectInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "ProjectInput",
+    "type": "object"
+  },
+  "ExecutionListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "object_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Object Id"
+      },
+      "plan_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Plan Id"
+      },
+      "plan_state": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Plan State"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "ExecutionListInput",
+    "type": "object"
+  },
+  "ExecutionReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_execution_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Execution Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_execution_id"
+    ],
+    "title": "ExecutionReadInput",
+    "type": "object"
+  },
+  "StepInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_execution_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Execution Id",
+        "type": "string"
+      },
+      "step_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Step Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_execution_id",
+      "step_id"
+    ],
+    "title": "StepInput",
+    "type": "object"
+  },
+  "AttemptListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_execution_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Execution Id",
+        "type": "string"
+      },
+      "step_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Step Id"
+      },
+      "attempt_state": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Attempt State"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_execution_id"
+    ],
+    "title": "AttemptListInput",
+    "type": "object"
+  },
+  "AttemptReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "attempt_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Attempt Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "attempt_id"
+    ],
+    "title": "AttemptReadInput",
+    "type": "object"
+  },
+  "ReconciliationReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "reconciliation_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Reconciliation Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "reconciliation_id"
+    ],
+    "title": "ReconciliationReadInput",
+    "type": "object"
+  },
+  "StartInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Id",
+        "type": "string"
+      },
+      "plan_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Plan Revision Digest",
+        "type": "string"
+      },
+      "execution_profile_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Execution Profile Ref",
+        "type": "string"
+      },
+      "expected_working_head_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Working Head Digest",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_id",
+      "plan_revision_digest",
+      "execution_profile_ref",
+      "expected_working_head_digest"
+    ],
+    "title": "StartInput",
+    "type": "object"
+  },
+  "RevisionBoundInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_execution_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Execution Id",
+        "type": "string"
+      },
+      "expected_execution_revision": {
+        "minimum": 0,
+        "title": "Expected Execution Revision",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_execution_id",
+      "expected_execution_revision"
+    ],
+    "title": "RevisionBoundInput",
+    "type": "object"
+  },
+  "PauseInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_execution_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Execution Id",
+        "type": "string"
+      },
+      "expected_execution_revision": {
+        "minimum": 0,
+        "title": "Expected Execution Revision",
+        "type": "integer"
+      },
+      "reason": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_execution_id",
+      "expected_execution_revision",
+      "reason"
+    ],
+    "title": "PauseInput",
+    "type": "object"
+  },
+  "ResumeInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_execution_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Execution Id",
+        "type": "string"
+      },
+      "expected_execution_revision": {
+        "minimum": 0,
+        "title": "Expected Execution Revision",
+        "type": "integer"
+      },
+      "checkpoint_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Checkpoint Digest",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_execution_id",
+      "expected_execution_revision",
+      "checkpoint_digest"
+    ],
+    "title": "ResumeInput",
+    "type": "object"
+  },
+  "CancelInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_execution_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Execution Id",
+        "type": "string"
+      },
+      "expected_execution_revision": {
+        "minimum": 0,
+        "title": "Expected Execution Revision",
+        "type": "integer"
+      },
+      "scope": {
+        "maxLength": 260,
+        "minLength": 1,
+        "title": "Scope",
+        "type": "string"
+      },
+      "reason": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_execution_id",
+      "expected_execution_revision",
+      "scope",
+      "reason"
+    ],
+    "title": "CancelInput",
+    "type": "object"
+  },
+  "RetryInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_execution_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Execution Id",
+        "type": "string"
+      },
+      "expected_execution_revision": {
+        "minimum": 0,
+        "title": "Expected Execution Revision",
+        "type": "integer"
+      },
+      "step_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Step Id",
+        "type": "string"
+      },
+      "failed_attempt_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Failed Attempt Id",
+        "type": "string"
+      },
+      "retry_reason": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Retry Reason",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_execution_id",
+      "expected_execution_revision",
+      "step_id",
+      "failed_attempt_id",
+      "retry_reason"
+    ],
+    "title": "RetryInput",
+    "type": "object"
+  },
+  "ReconcileInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_execution_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Execution Id",
+        "type": "string"
+      },
+      "attempt_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Attempt Id",
+        "type": "string"
+      },
+      "target_state_evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Target State Evidence Refs",
+        "type": "array"
+      },
+      "reconciliation_method": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Reconciliation Method",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_execution_id",
+      "attempt_id",
+      "target_state_evidence_refs",
+      "reconciliation_method"
+    ],
+    "title": "ReconcileInput",
+    "type": "object"
+  },
+  "ObservationLinkInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "attempt_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Attempt Id",
+        "type": "string"
+      },
+      "observation_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Observation Refs",
+        "type": "array"
+      },
+      "completeness": {
+        "pattern": "^(COMPLETE|PARTIAL|MISSING|CORRUPT|NOT_APPLICABLE)$",
+        "title": "Completeness",
+        "type": "string"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "expected_execution_revision": {
+        "minimum": 0,
+        "title": "Expected Execution Revision",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "project_id",
+      "attempt_id",
+      "observation_refs",
+      "completeness",
+      "evidence_refs",
+      "expected_execution_revision"
+    ],
+    "title": "ObservationLinkInput",
+    "type": "object"
+  },
+  "CompensationInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "attempt_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Attempt Id",
+        "type": "string"
+      },
+      "effect_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Effect Refs",
+        "type": "array"
+      },
+      "reason": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "attempt_id",
+      "effect_refs",
+      "reason"
+    ],
+    "title": "CompensationInput",
+    "type": "object"
+  },
+  "InvalidateInput": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "plan_execution_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Plan Execution Id",
+        "type": "string"
+      },
+      "cause_revision_ref": {
+        "maxLength": 260,
+        "minLength": 1,
+        "title": "Cause Revision Ref",
+        "type": "string"
+      },
+      "impact_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Impact Refs",
+        "type": "array"
+      },
+      "clear_pending_attempt_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "minLength": 1,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Clear Pending Attempt Id"
+      },
+      "expected_execution_revision": {
+        "anyOf": [
+          {
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Expected Execution Revision"
+      },
+      "reason": {
+        "anyOf": [
+          {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Reason"
+      },
+      "input_difference": {
+        "anyOf": [
+          {
+            "additionalProperties": {
+              "$ref": "#/$defs/JsonValue"
+            },
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Input Difference"
+      }
+    },
+    "required": [
+      "project_id",
+      "plan_execution_id",
+      "cause_revision_ref",
+      "impact_refs"
+    ],
+    "title": "InvalidateInput",
+    "type": "object"
+  }
+}

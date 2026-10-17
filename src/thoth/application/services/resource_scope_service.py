@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+from thoth.application.services import resource_scope_records as scope_records
 from thoth.application.services.resource_scope_context import current_resource_intake
 from thoth.application.services.resource_scope_read_context import (
     ScopeReadContext,
     scope_read_context,
 )
 from thoth.domain.auth import AuthenticatedActorContext, current_authenticated_actor
-from thoth.domain.canonical import canonical_payload, domain_digest, model_digest
+from thoth.domain.canonical import model_digest
 from thoth.domain.governance import ProjectPolicy
 from thoth.domain.operation import OperationRecord
 from thoth.domain.resource_scope import (
@@ -18,14 +19,12 @@ from thoth.domain.resource_scope import (
     ResourceScopeBody,
     ResourceScopeError,
     ResourceScopePolicy,
-    ResourceScopeReceiptBody,
     ResourceScopeRecord,
     ResourceScopeTemplate,
     StagedResourceScope,
     record_resource_use,
     resource_intake_basis_digest,
     seal_resource_scope,
-    seal_resource_scope_receipt,
 )
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
 from thoth.ports.auth import AuthSessionStorePort
@@ -107,11 +106,7 @@ class ResourceScopeService:
         policy = self._governance.read_policy(project_id)
         if project is None or policy is None or project.policy_binding_ref != policy.policy_id:
             raise ResourceScopeError("RESOURCE_POLICY_UNAVAILABLE")
-        expected = domain_digest(
-            "PROJECT_POLICY",
-            "1.0.0",
-            canonical_payload({"project_id": project_id, "policy": policy.payload}),
-        )
+        expected = scope_records.policy_content_digest(project_id, policy)
         if expected != policy.policy_digest:
             raise ResourceScopeError("RESOURCE_POLICY_DIGEST_MISMATCH")
         return policy
@@ -176,11 +171,7 @@ class ResourceScopeService:
         project = self._projects.read(project_id)
         assert project is not None
         return ResourceIntakeBasis(
-            project_id=project_id,
-            project_revision=project.revision,
-            policy_id=policy.policy_id,
-            policy_digest=policy.policy_digest,
-            template=template,
+            **scope_records.intake_identity_fields(project_id, project, policy, template),
             parent_digests={ref: parent_records[ref].record_digest for ref in template.parent_refs},
             actor_ref="local:operator" if actor is None else actor.actor_id,
             principal_digest=self._principal_digest(actor),
@@ -215,16 +206,7 @@ class ResourceScopeService:
             access_basis="DERIVED_PARENTS" if derived else "SOURCE_OWNER",
             **basis.template.model_dump(mode="python"),
             scope_id=self._ids.new("resource-scope"),
-            project_id=basis.project_id,
-            resource_ref=resource_ref,
-            revision=1,
-            grants=(),
-            event_kind="ASSIGNED",
-            actor_ref=basis.actor_ref,
-            session_ref=basis.session_ref,
-            role_assignment_ref=basis.role_assignment_ref,
-            basis_digest=resource_intake_basis_digest(basis),
-            reason="apply the explicit ingestion ownership scope",
+            **scope_records.initial_scope_fields(resource_ref, basis),
             receipt_ref=self._ids.new("resource-scope-receipt"),
             created_at=self._clock.now(),
         )
@@ -259,19 +241,7 @@ class ResourceScopeService:
 
     @staticmethod
     def _receipt(record: ResourceScopeRecord):
-        return seal_resource_scope_receipt(
-            ResourceScopeReceiptBody(
-                receipt_id=record.receipt_ref,
-                project_id=record.project_id,
-                resource_ref=record.resource_ref,
-                before_digest=record.previous_digest,
-                after_digest=record.record_digest,
-                event_kind=record.event_kind,
-                actor_ref=record.actor_ref,
-                session_ref=record.session_ref,
-                created_at=record.created_at,
-            )
-        )
+        return scope_records.scope_receipt(record)
 
     def _artifact_ref(self, project_id: str, resource_ref: str) -> str:
         artifact = self._artifacts.read_artifact(resource_ref)
@@ -367,11 +337,7 @@ class ResourceScopeService:
             parent_refs=parents,
         )
         return ResourceIntakeBasis(
-            project_id=project_id,
-            project_revision=project.revision,
-            policy_id=policy.policy_id,
-            policy_digest=policy.policy_digest,
-            template=template,
+            **scope_records.intake_identity_fields(project_id, project, policy, template),
             parent_digests={ref: parent_records[ref].record_digest for ref in parents},
             actor_ref="local:operator" if actor is None else actor.actor_id,
             principal_digest=self._principal_digest(actor),
@@ -473,14 +439,7 @@ class ResourceScopeService:
         basis = self._derived_basis(project_id, tuple(retained), allow_empty=True)
         staged = self.stage(reference, basis, derived=True)
         if not retained:
-            body = ResourceScopeBody.model_validate(
-                {
-                    **staged.record.model_dump(exclude={"record_digest"}),
-                    "access_basis": "PENDING_SOURCES",
-                    "reason": "retain a source-free input draft without granting shared access",
-                }
-            )
-            record = seal_resource_scope(body)
+            record = scope_records.pending_source_record(staged.record)
             self._store.append(record, self._receipt(record), expected_revision=0)
         else:
             self.admit(staged)
@@ -704,13 +663,7 @@ class ResourceScopeService:
             self._known_owner(project_id, template)
             basis = self.prepare_intake(project_id, template)
             staged = self.stage(resource_ref, basis)
-            body = ResourceScopeBody.model_validate(
-                {
-                    **staged.record.model_dump(exclude={"record_digest"}),
-                    "reason": reason,
-                }
-            )
-            record = seal_resource_scope(body)
+            record = scope_records.assigned_scope_record(staged.record, reason)
             staged = StagedResourceScope(basis=basis, record=record, receipt=self._receipt(record))
             self.admit(staged)
             return record
@@ -838,26 +791,9 @@ class ResourceScopeService:
         payload = current.model_dump(mode="python", exclude={"record_digest"})
         payload.update(
             {
-                "revision": current.revision + 1,
-                "previous_digest": current.record_digest,
-                "event_kind": event_kind,
-                "grants": grants,
-                "visibility": "EXPLICIT_GRANT"
-                if current.visibility == "WORKSTREAM" and event_kind == "GRANTED"
-                else current.visibility,
-                "actor_ref": "local:operator" if actor is None else actor.actor_id,
-                "session_ref": None if actor is None else actor.session_id,
-                "role_assignment_ref": None if actor is None else actor.role_assignment_id,
-                "basis_digest": domain_digest(
-                    "RESOURCE_SCOPE_CHANGE_BASIS",
-                    "1.0.0",
-                    canonical_payload(
-                        {
-                            "policy_digest": policy.policy_digest,
-                            "principal_digest": self._principal_digest(actor),
-                            "before_digest": current.record_digest,
-                        }
-                    ),
+                **scope_records.change_fields(current, actor, event_kind, grants),
+                "basis_digest": scope_records.change_basis_digest(
+                    policy.policy_digest, self._principal_digest(actor), current.record_digest
                 ),
                 "receipt_ref": self._ids.new("resource-scope-receipt"),
                 "created_at": self._clock.now(),

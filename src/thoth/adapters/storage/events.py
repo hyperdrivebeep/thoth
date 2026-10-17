@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import cast
 
 import orjson
-from sqlalchemy import Engine, insert, select
+from sqlalchemy import Connection, Engine, insert, select
 
 from thoth.adapters.storage.schema import checkpoints, events
 from thoth.adapters.storage.transaction import read_connection, write_connection
@@ -20,24 +20,29 @@ def _object(value: str) -> dict[str, object]:
     return {str(key): child for key, child in mapping.items()}
 
 
+def insert_event_on_connection(connection: Connection, event: EventRecord) -> None:
+    """Write the unchanged event representation inside its caller's transaction."""
+    connection.execute(
+        insert(events).values(
+            event_id=event.event_id,
+            project_id=event.project_id,
+            operation_id=event.operation_id,
+            event_type=event.event_type,
+            payload_json=orjson.dumps(event.payload, option=orjson.OPT_SORT_KEYS).decode(),
+            previous_event_digest=event.previous_event_digest,
+            event_digest=event.event_digest,
+            created_at=event.created_at.isoformat(),
+        )
+    )
+
+
 class SqliteEventStore(EventStorePort):
     def __init__(self, engine: Engine) -> None:
         self._engine = engine
 
     def insert_event(self, event: EventRecord) -> None:
         with write_connection(self._engine) as connection:
-            connection.execute(
-                insert(events).values(
-                    event_id=event.event_id,
-                    project_id=event.project_id,
-                    operation_id=event.operation_id,
-                    event_type=event.event_type,
-                    payload_json=orjson.dumps(event.payload, option=orjson.OPT_SORT_KEYS).decode(),
-                    previous_event_digest=event.previous_event_digest,
-                    event_digest=event.event_digest,
-                    created_at=event.created_at.isoformat(),
-                )
-            )
+            insert_event_on_connection(connection, event)
 
     def list_events(self, operation_id: str) -> tuple[EventRecord, ...]:
         with read_connection(self._engine) as connection:
