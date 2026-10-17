@@ -1,41 +1,44 @@
 """Reference inquiry transitions reuse the Criterion owner and its existing UoW."""
 
 import hashlib
-import re
 from dataclasses import dataclass
-from decimal import Decimal
-from typing import Literal, cast
 
 from thoth.application.services.criterion_contract_service import CriterionContractService
+from thoth.application.services.reference_grounding import (
+    check_measurement_grounding,
+    eligible,
+    formula_inputs,
+)
+from thoth.application.services.reference_inquiry_drafts import (
+    answered_inquiry,
+    calculator_request,
+    inquiry_values,
+    operator_actor,
+    prior_request,
+    question_set,
+    scenario_deltas,
+    scenario_variant,
+    selected_calculator,
+    source_basis_digest,
+)
 from thoth.application.services.revision_service import CommitResult
-from thoth.domain.actor import ActorRef
-from thoth.domain.artifact import ArtifactEnvelope
 from thoth.domain.auth import current_authenticated_actor
-from thoth.domain.canonical import canonical_payload, domain_digest, head_set_digest
+from thoth.domain.canonical import head_set_digest
 from thoth.domain.criterion_contract import CriterionContractRecord
 from thoth.domain.enums import (
-    ActorKind,
-    AuthorityState,
-    CutoffState,
-    SupportState,
     ThreadExecutionState,
     ThreadLifecycle,
-    VerificationState,
 )
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.reference import (
     CONTEXT_FIELDS,
-    ReferenceAnswer,
     ReferenceAnswerRequest,
-    ReferenceContext,
     ReferenceError,
     ReferenceInquiry,
     ReferenceMappingTrace,
-    ReferenceQuestion,
     ReferenceRequest,
     ReferenceScenarioResult,
     criterion_reference_basis,
-    evaluate_reference_formula,
     seal_inquiry,
 )
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
@@ -118,7 +121,7 @@ class ReferenceService:
         )
         self.mapping_sources(project, refs)
         if isinstance(request, ReferenceRequest) and request.lane == "RECALCULATED_VALUE":
-            self._formula_inputs(current, request.target, request.evaluator_binding_digest)
+            formula_inputs(current, request.target, request.evaluator_binding_digest)
 
     def begin(
         self,
@@ -166,42 +169,19 @@ class ReferenceService:
             actor = current_authenticated_actor()
             now = self._clock.now()
             inquiry_id = request.inquiry_id or self._ids.new("reference-inquiry")
-            values: dict[str, object] = {
-                "inquiry_id": inquiry_id,
-                "project_id": project,
-                "thread_id": thread,
-                "criterion_id": current.criterion_id,
-                "criterion_basis_digest": criterion_reference_basis(
-                    current.model_dump(mode="python")
-                ),
-                "original_revision_digest": current.revision_digest
-                if not request.inquiry_id or prior is None
-                else prior.original_revision_digest,
-                "lane": request.lane,
-                "revision": 1 if not request.inquiry_id or prior is None else prior.revision + 1,
-                "state": "HOLD",
-                "source_refs": tuple(dict.fromkeys(request.source_refs)),
-                "source_digests": self.source_digests(project, request.source_refs),
-                "questions": () if not request.inquiry_id or prior is None else prior.questions,
-                "question_order": tuple(f for f in question_order if f in CONTEXT_FIELDS),
-                "mapping_traces": self._traces(
-                    prior if request.inquiry_id else None, mapping_trace
-                ),
-                "calculator_id": request.calculator_id,
-                "calculator_version": request.calculator_version,
-                "evaluator_binding_digest": request.evaluator_binding_digest,
-                "target": request.target,
-                "measurements": request.measurements or (),
-                "scenarios": request.scenarios,
-                "answers": () if not request.inquiry_id or prior is None else prior.answers,
-                "actor_ref": "local:operator" if actor is None else actor.actor_id,
-                "session_ref": None if actor is None else actor.session_id,
-                "created_at": now if not request.inquiry_id or prior is None else prior.created_at,
-                "updated_at": now,
-                "assumptions": (
-                    "Declared target context; source mapping remains an auditable candidate.",
-                ),
-            }
+            values = inquiry_values(
+                project,
+                thread,
+                request,
+                current,
+                prior,
+                inquiry_id,
+                now,
+                self.source_digests(project, request.source_refs),
+                actor,
+                mapping_trace,
+                question_order,
+            )
             inquiry = self._evaluate(seal_inquiry(values))
             return self._persist(current, inquiry)
 
@@ -241,47 +221,14 @@ class ReferenceService:
             if request.expected_answer_revision != revision:
                 raise ReferenceError("REFERENCE_ANSWER_REVISION_CONFLICT")
             actor = current_authenticated_actor()
-            answer = ReferenceAnswer(
-                question_id=question.question_id,
-                field=question.field,
-                revision=revision + 1,
-                value=request.value,
-                actor_ref="local:operator" if actor is None else actor.actor_id,
-                session_ref=None if actor is None else actor.session_id,
-                answered_at=self._clock.now(),
-            )
-            target = ReferenceContext.model_validate(
-                {**inquiry.target.model_dump(), question.field: request.value}
-            )
-            updated = seal_inquiry(
-                {
-                    **inquiry.model_dump(mode="python", exclude={"inquiry_digest"}),
-                    "revision": inquiry.revision + 1,
-                    "target": target,
-                    "answers": (*inquiry.answers, answer),
-                    "state": "HOLD",
-                    "calculation": None,
-                    "updated_at": self._clock.now(),
-                    "mapping_traces": self._traces(inquiry, mapping_trace),
-                }
+            updated = answered_inquiry(
+                inquiry, question, request, revision, actor, self._clock, mapping_trace
             )
             return self._persist(current, self._evaluate(updated))
 
     def _evaluate(self, inquiry: ReferenceInquiry) -> ReferenceInquiry:
         missing = inquiry.target.missing()
-        existing = {q.field: q for q in inquiry.questions}
-        questions = tuple(
-            existing.get(field)
-            or ReferenceQuestion(
-                question_id=self._ids.new("reference-question"),
-                field=field,
-                basis_revision_digest=inquiry.original_revision_digest,
-                prompt=f"Provide the target {field}; no value will be inferred without it.",
-            )
-            for field in dict.fromkeys(
-                (*existing, *(f for f in inquiry.question_order if f in missing), *missing)
-            )
-        )
+        questions = question_set(inquiry, missing, self._ids)
         payload = inquiry.model_dump(mode="python", exclude={"inquiry_digest"})
         payload.update(questions=questions, calculation=None, scenario_results=(), reason_codes=())
         if missing:
@@ -302,7 +249,7 @@ class ReferenceService:
                     )
                     if current is None:
                         raise ReferenceError("REFERENCE_SCOPE_NOT_FOUND")
-                    inputs = self._formula_inputs(
+                    inputs = formula_inputs(
                         current, inquiry.target, inquiry.evaluator_binding_digest
                     )
                 self._grounded(inquiry, calculator.minimum_independent_sources)
@@ -324,39 +271,10 @@ class ReferenceService:
             try:
                 if {m.span_id for m in measurements} != selected:
                     raise ReferenceError("REFERENCE_SCENARIO_SOURCE_NOT_BOUND")
-                variant = seal_inquiry(
-                    {
-                        **inquiry.model_dump(mode="python", exclude={"inquiry_digest"}),
-                        "measurements": measurements,
-                        "scenarios": (),
-                        "scenario_results": (),
-                        "state": "HOLD",
-                        "calculation": None,
-                    }
-                )
+                variant = scenario_variant(inquiry, measurements)
                 self._grounded(variant, calculator.minimum_independent_sources)
                 calculated = calculator.calculate(variant)
-                lower = upper = None
-                if calculated.lower is not None and base.lower is not None:
-                    lower = str(
-                        evaluate_reference_formula(
-                            "a-b",
-                            {
-                                "a": Decimal(calculated.lower),
-                                "b": Decimal(base.lower),
-                            },
-                        )
-                    )
-                if calculated.upper is not None and base.upper is not None:
-                    upper = str(
-                        evaluate_reference_formula(
-                            "a-b",
-                            {
-                                "a": Decimal(calculated.upper),
-                                "b": Decimal(base.upper),
-                            },
-                        )
-                    )
+                lower, upper = scenario_deltas(calculated, base)
                 results.append(
                     ReferenceScenarioResult(
                         scenario=scenario,
@@ -376,59 +294,6 @@ class ReferenceService:
                 )
         return tuple(results)
 
-    @staticmethod
-    def _formula_inputs(
-        current: CriterionContractRecord, target: ReferenceContext, binding: str | None
-    ) -> dict[str, str]:
-        computation = current.computation_spec or {}
-        if (
-            current.usage_authorization != "AUTHORIZED_EVALUATOR_INPUT"
-            or computation.get("type") != "FORMULA"
-        ):
-            raise ReferenceError("REFERENCE_FORMULA_NOT_AUTHORIZED")
-        if binding is None or binding != computation.get("evaluator_binding_digest"):
-            raise ReferenceError("REFERENCE_FORMULA_BINDING_MISMATCH")
-        if target.formula != computation.get("expression") or target.unit != computation.get(
-            "unit"
-        ):
-            raise ReferenceError("REFERENCE_FORMULA_TARGET_MISMATCH")
-        units = computation.get("input_units")
-        if not isinstance(units, dict) or not units:
-            raise ReferenceError("REFERENCE_FORMULA_INPUT_CONTRACT_MISSING")
-        values = cast(dict[object, object], units)
-        if any(
-            not isinstance(k, str) or not isinstance(v, str) or not k or not v
-            for k, v in values.items()
-        ):
-            raise ReferenceError("REFERENCE_FORMULA_INPUT_CONTRACT_MISSING")
-        return {str(k): str(v) for k, v in values.items()}
-
-    @staticmethod
-    def _eligible(span: EvidenceSpan, artifact: ArtifactEnvelope) -> None:
-        if (
-            span.cutoff_state != CutoffState.ELIGIBLE
-            or artifact.cutoff_state != CutoffState.ELIGIBLE
-        ):
-            raise ReferenceError("REFERENCE_SOURCE_CUTOFF_INELIGIBLE")
-        if span.authority_state not in {
-            AuthorityState.INFORMAL,
-            AuthorityState.OFFICIAL,
-            AuthorityState.APPROVED,
-        }:
-            raise ReferenceError("REFERENCE_SOURCE_AUTHORITY_UNRESOLVED")
-        if span.support_state not in {
-            SupportState.EXTRACTED,
-            SupportState.SUPPORTED_CANDIDATE,
-            SupportState.SUPPORTED,
-        }:
-            raise ReferenceError("REFERENCE_SOURCE_SUPPORT_UNRESOLVED")
-        if span.verification_state not in {
-            VerificationState.SCHEMA_VALID,
-            VerificationState.PROVENANCE_VALID,
-            VerificationState.DETERMINISTICALLY_VERIFIED,
-        }:
-            raise ReferenceError("REFERENCE_SOURCE_PROVENANCE_UNRESOLVED")
-
     def _grounded(self, inquiry: ReferenceInquiry, minimum_sources: int) -> None:
         spans = self.sources(inquiry.project_id, inquiry.source_refs)
         uris: set[str] = set()
@@ -443,44 +308,7 @@ class ReferenceService:
                 raise ReferenceError("REFERENCE_SOURCE_SCOPE_MISMATCH")
             # Extracted values may form a non-authoritative range after grounding checks;
             # this never promotes the source or a scientific claim to SUPPORTED.
-            self._eligible(span, artifact)
-            fields = measurement.context.model_dump()
-            for field in CONTEXT_FIELDS:
-                text = fields[field]
-                quote = measurement.quotes.get(field)
-                field_span = spans.get(measurement.field_span_ids.get(field, measurement.span_id))
-                if (
-                    field_span is None
-                    or field_span.artifact_id != span.artifact_id
-                    or not text
-                    or not quote
-                    or quote not in field_span.exact_text
-                    or text not in quote
-                ):
-                    raise ReferenceError("REFERENCE_FIELD_GROUNDING_MISSING")
-                self._eligible(field_span, artifact)
-                if (
-                    field != "unit"
-                    and text.strip().casefold() != str(target[field]).strip().casefold()
-                ):
-                    raise ReferenceError("REFERENCE_CONTEXT_INCOMPATIBLE")
-            if measurement.value_quote not in span.exact_text:
-                raise ReferenceError("REFERENCE_VALUE_GROUNDING_MISSING")
-            numbers = re.findall(
-                r"(?<![\w.])[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?(?![\w.])",
-                measurement.value_quote,
-            )
-            if {Decimal(n) for n in numbers} != {measurement.value}:
-                raise ReferenceError("REFERENCE_VALUE_GROUNDING_MISSING")
-            if inquiry.lane == "RECALCULATED_VALUE" and (
-                measurement.variable is None
-                or re.search(
-                    r"(?<!\w)" + re.escape(measurement.variable) + r"(?!\w)",
-                    measurement.value_quote,
-                )
-                is None
-            ):
-                raise ReferenceError("REFERENCE_VARIABLE_GROUNDING_MISSING")
+            check_measurement_grounding(inquiry, measurement, span, artifact, spans, target)
             uris.add(artifact.source_uri)
             hashes.add(artifact.byte_sha256)
         if len(uris) < minimum_sources or len(hashes) < minimum_sources:
@@ -493,7 +321,7 @@ class ReferenceService:
         actor = current_authenticated_actor()
         updates: dict[str, object] = {"reference_inquiry": inquiry, "schema_version": "1.1.0"}
         if inquiry.lane == "RECALCULATED_VALUE" and inquiry.calculation is not None:
-            self._formula_inputs(current, inquiry.target, inquiry.evaluator_binding_digest)
+            formula_inputs(current, inquiry.target, inquiry.evaluator_binding_digest)
             updates["result_and_uncertainty"] = {
                 "value": inquiry.calculation.value,
                 "variables": inquiry.calculation.variables,
@@ -506,14 +334,7 @@ class ReferenceService:
             current,
             updates=updates,
             event_type="criteria/referenceInquiryUpdated",
-            actor=ActorRef(
-                actor_id="local:operator" if actor is None else actor.actor_id,
-                kind=ActorKind.HUMAN,
-                role="local-operator" if actor is None else actor.role,
-                project_id=current.project_id,
-                session_id=None if actor is None else actor.session_id,
-                role_assignment_ref=None if actor is None else actor.role_assignment_id,
-            ),
+            actor=operator_actor(current, actor),
         )
         thread = self._threads.read(inquiry.thread_id)
         if thread is None or not self._threads.update(
@@ -538,7 +359,7 @@ class ReferenceService:
             artifact = self._artifacts.read_artifact(span.artifact_id)
             if artifact is None or artifact.project_id != project_id:
                 raise ReferenceError("REFERENCE_SOURCE_SCOPE_MISMATCH")
-            self._eligible(span, artifact)
+            eligible(span, artifact)
         return tuple(spans.values())
 
     def source_digests(self, project: str, refs: tuple[str, ...]) -> dict[str, str]:
@@ -547,24 +368,8 @@ class ReferenceService:
             artifact = self._artifacts.read_artifact(span.artifact_id)
             if artifact is None:
                 raise ReferenceError("REFERENCE_SOURCE_SCOPE_MISMATCH")
-            result[span.span_id] = domain_digest(
-                "REFERENCE_SOURCE_BASIS",
-                "1.0.0",
-                canonical_payload(
-                    {
-                        "span": span,
-                        "artifact": artifact,
-                    }
-                ),
-            )
+            result[span.span_id] = source_basis_digest(span, artifact)
         return result
-
-    @staticmethod
-    def _traces(
-        inquiry: ReferenceInquiry | None, trace: ReferenceMappingTrace | None
-    ) -> tuple[ReferenceMappingTrace, ...]:
-        prior = () if inquiry is None else inquiry.mapping_traces
-        return prior if trace is None or trace in prior else (*prior, trace)
 
     def automatic_request(self, project_id: str, thread_id: str) -> ReferenceRequest | None:
         thread = self._threads.read(thread_id)
@@ -594,35 +399,7 @@ class ReferenceService:
                 criterion.model_dump(mode="python")
             ):
                 raise ReferenceError("REFERENCE_INQUIRY_BASIS_STALE")
-            return ReferenceRequest(
-                criterion_id=criterion.criterion_id,
-                expected_revision_digest=criterion.revision_digest,
-                lane=prior.lane,
-                source_refs=prior.source_refs,
-                calculator_id=prior.calculator_id,
-                calculator_version=prior.calculator_version,
-                target=prior.target,
-                inquiry_id=prior.inquiry_id,
-                evaluator_binding_digest=prior.evaluator_binding_digest,
-                scenarios=prior.scenarios,
-            )
-        selected = thread.scope.get("reference_calculator", "")
-        calculator, separator, version = selected.partition("@")
-        if not separator or not calculator or not version:
-            raise ReferenceError("REFERENCE_CALCULATOR_SELECTION_REQUIRED")
-        lane = thread.scope.get("reference_lane", "REFERENCE_RANGE_CANDIDATE")
-        if lane not in {"REFERENCE_RANGE_CANDIDATE", "RECALCULATED_VALUE"}:
-            raise ReferenceError("REFERENCE_LANE_INVALID")
+            return prior_request(criterion, prior)
+        calculator, version, lane = selected_calculator(thread)
         binding = (criterion.computation_spec or {}).get("evaluator_binding_digest")
-        return ReferenceRequest(
-            criterion_id=criterion.criterion_id,
-            expected_revision_digest=criterion.revision_digest,
-            lane=cast(Literal["REFERENCE_RANGE_CANDIDATE", "RECALCULATED_VALUE"], lane),
-            source_refs=criterion.required_evidence,
-            calculator_id=calculator,
-            calculator_version=version,
-            target=ReferenceContext.model_validate(
-                {k: v for k, v in criterion.context_spec.items() if k in CONTEXT_FIELDS}
-            ),
-            evaluator_binding_digest=binding if isinstance(binding, str) else None,
-        )
+        return calculator_request(criterion, lane, calculator, version, binding)

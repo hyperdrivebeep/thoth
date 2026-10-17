@@ -1,5 +1,5 @@
 import { t } from "../i18n/locale";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { rpc } from "../api/rpcClient";
 import { confirmSourceTime, refreshSourceTimeViews } from "../api/sourceTime";
@@ -20,13 +20,23 @@ export async function requestCitationUse(projectId: string, artifactId: string) 
   return {status: assessment.cutoff_state, assessment, cutoff, artifact, listed};
 }
 
-export function useCitationGate(projectId: string) {
+export function useCitationGate(projectId: string, scopeCurrent?: () => boolean) {
   const client = useQueryClient();
+  const active = useRef(true);
+  const currentProject = useRef(projectId);
+  currentProject.current = projectId;
+  useLayoutEffect(() => { active.current = true; return () => { active.current = false; }; }, []);
+  const isCurrent = () => active.current && currentProject.current === projectId && (scopeCurrent?.() ?? true);
   const [pending, setPending] = useState<null | {artifactId:string; fileLabel:string; cutoffAt:string; assessment: NonNullable<SourceList["source_times"]>[number]; cutoff: NonNullable<SourceList["cutoff_basis"]>}>(null);
   const [message, setMessage] = useState("");
   const ask = async (artifactId: string) => {
-    const result = await requestCitationUse(projectId, artifactId);
+    if (!isCurrent()) return null;
+    let result: Awaited<ReturnType<typeof requestCitationUse>>;
+    try { result = await requestCitationUse(projectId, artifactId); }
+    catch (error) { if (!isCurrent()) return null; throw error; }
+    if (!isCurrent()) return null;
     await client.cancelQueries({queryKey:["sources",projectId]});
+    if (!isCurrent()) return null;
     client.setQueryData(["sources",projectId], result.listed);
     if (result.status === "ELIGIBLE") { setMessage(t("citation.ready")); return result; }
     if (result.status === "AFTER_CUTOFF") { setMessage(t("citation.afterCutoff")); return result; }

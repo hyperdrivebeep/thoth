@@ -4,7 +4,7 @@ from dataclasses import dataclass, replace
 
 from pydantic import Field, JsonValue, ValidationError
 
-from thoth.application.reducers import SufficiencySignals
+from thoth.application.commands.thread_analysis_preparation import build_cycle_command
 from thoth.application.services import (
     AcquisitionCoordinator,
     BaselineService,
@@ -25,27 +25,26 @@ from thoth.application.services.criterion_projection import (
 from thoth.application.services.memory_query_expansion import ModelMemoryQueryExpander, widen_query
 from thoth.application.services.post_execution_memory import PostExecutionMemory
 from thoth.application.services.r2_closed_loop import R2ClosedLoopExecution
+from thoth.application.services.r2_context_preflight import (
+    r2_authority_hold,
+    r2_project_context_hold,
+)
 from thoth.application.services.research_basis_capture import (
     cycle_result_payload,
     render_analysis_memory,
 )
 from thoth.application.services.research_identity_service import ResearchIdentityService
 from thoth.application.services.revision_service import CommitDisposition
-from thoth.application.workflows import ThreadCycleCommand, ThreadCycleService
+from thoth.application.services.thread_cycle_lineage import cycle_lineage_values
+from thoth.application.workflows import ThreadCycleService
 from thoth.application.workflows.thread_cycle import ThreadCycleBranchResult, ThreadCycleResult
-from thoth.domain.action import ActionCompilationPolicy, ActionPlan
-from thoth.domain.actor import ActorRef
+from thoth.domain.action import ActionPlan
 from thoth.domain.auth import authenticated_data_scope_allows, current_authenticated_actor
 from thoth.domain.base import DomainModel
 from thoth.domain.baseline import MultiBaselineProjection
-from thoth.domain.canonical import head_set_digest, same_stored_instant
+from thoth.domain.canonical import head_set_digest
 from thoth.domain.criterion import CriterionCandidate
-from thoth.domain.enums import (
-    ActorKind,
-    ProjectLifecycle,
-    RiskTier,
-    ThreadExecutionState,
-)
+from thoth.domain.enums import RiskTier, ThreadExecutionState
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.hypothesis import HypothesisPortfolio, is_v3, portfolio_from_json
 from thoth.domain.hypothesis_v4 import HypothesisPortfolioV4
@@ -53,7 +52,6 @@ from thoth.domain.improvement import RecursiveImprovementResult
 from thoth.domain.memory_preparation import FullMemoryPromotionResult
 from thoth.domain.post_execution_learning import PostExecutionLearningResult
 from thoth.domain.project import Project, WorkThread
-from thoth.domain.receipt_dag import ReceiptNodeKind
 from thoth.domain.reference import ReferenceAnswerRequest, ReferenceRequest
 from thoth.domain.research_execution import ResearchWork, check_research_boundary, research_work
 from thoth.domain.thread_runtime import ThreadInputRecord
@@ -375,29 +373,8 @@ class ThreadAnalysisCommandHandlers:
         learning: PostExecutionLearningResult | None = None
         initiator = current_authenticated_actor()
         cycle = self._create_cycle(model, project)
-        cycle_command = ThreadCycleCommand(
-            case_id=f"case:{thread.thread_id}",
-            project_id=request.project_id,
-            thread_id=thread.thread_id,
-            object_id=thread.current_object_ids[0],
-            problem=analysis_problem,
-            cutoff_at=project.cutoff_at,
-            criteria=criteria,
-            evidence=selected_evidence,
-            sufficiency_signals=SufficiencySignals(),
-            action_policy=_default_action_policy(),
-            actor=ActorRef(
-                actor_id=f"agent:{request.provider}",
-                kind=ActorKind.AGENT,
-                role="thread-cycle-runner",
-                project_id=request.project_id,
-                session_id=None if initiator is None else initiator.session_id,
-                role_assignment_ref=(None if initiator is None else initiator.role_assignment_id),
-            ),
-            policy_version=project.policy_binding_ref,
-            model_policy_ref=f"model-policy:{request.provider}-v1",
-            expected_head_overrides=request.expected_head_overrides,
-            memory_scope=thread.scope,
+        cycle_command = build_cycle_command(
+            request, project, thread, analysis_problem, criteria, selected_evidence, initiator
         )
         result = await cycle.execute(cycle_command)
         if result.commit.disposition == CommitDisposition.BRANCH:
@@ -555,41 +532,9 @@ class ThreadAnalysisCommandHandlers:
         r2_closed_loop_projection: dict[str, JsonValue] | None,
         work: ResearchWork | None,
     ) -> None:
-        full_memory = result.full_memory
-        assert full_memory is not None
-        dag_values: dict[ReceiptNodeKind, tuple[str, ...]] = {
-            ReceiptNodeKind.EVIDENCE: tuple(span.span_id for span in selected_evidence),
-            ReceiptNodeKind.MODEL: result.model_ids,
-            ReceiptNodeKind.ACTION: (result.action_plan.plan_id,),
-            ReceiptNodeKind.REVISION: (result.commit.receipt.receipt_id,),
-            ReceiptNodeKind.MEMORY: tuple(
-                item.memory_revision_id
-                for item in (
-                    *full_memory.committed,
-                    *full_memory.revised,
-                    *full_memory.held,
-                    *full_memory.quarantined,
-                )
-            ),
-        }
-        if work is not None:
-            dag_values[ReceiptNodeKind.REVISION] = (
-                *dag_values[ReceiptNodeKind.REVISION],
-                work.request_ref.revision_digest,
-                *(ref.revision_digest for ref in work.record_refs),
-            )
-        if result.outcome is not None:
-            dag_values[ReceiptNodeKind.OUTCOME] = (result.outcome.outcome_id,)
-        if r2_closed_loop_projection is not None:
-            compiled = r2_closed_loop_projection.get("compiled_spec")
-            sandbox_receipt = r2_closed_loop_projection.get("sandbox_receipt")
-            outcome_value = r2_closed_loop_projection.get("outcome")
-            if isinstance(compiled, dict):
-                dag_values[ReceiptNodeKind.EXECUTION] = (str(compiled.get("attempt_id")),)
-            if isinstance(sandbox_receipt, dict):
-                dag_values[ReceiptNodeKind.SANDBOX] = (str(sandbox_receipt.get("receipt_digest")),)
-            if isinstance(outcome_value, dict):
-                dag_values[ReceiptNodeKind.OUTCOME] = (str(outcome_value.get("outcome_id")),)
+        dag_values = cycle_lineage_values(
+            result, selected_evidence, r2_closed_loop_projection, work
+        )
         self._receipt_dag.record_cycle(request.project_id, dag_values, result.commit.receipt)
 
     def _create_cycle(self, model: ModelPort, project: Project) -> ThreadCycleService:
@@ -625,46 +570,14 @@ class ThreadAnalysisCommandHandlers:
         ):
             return None
         current = self._projects.read(project.project_id)
-        if (
-            current is None
-            or not same_stored_instant(current.cutoff_at, project.cutoff_at)
-            or current.policy_binding_ref != project.policy_binding_ref
-            or current.overlay != project.overlay
-            or current.lifecycle in {ProjectLifecycle.CLOSING, ProjectLifecycle.ARCHIVED_READ_ONLY}
-        ):
-            return R2ClosedLoopExecution(
-                projection={
-                    "terminal_state": "HOLD",
-                    "reason_code": "R2_PROJECT_CONTEXT_CHANGED",
-                    "scientific_truth_state": "NOT_CERTIFIED",
-                    "pre_io": True,
-                }
-            )
+        current = r2_project_context_hold(project, current)
+        if isinstance(current, R2ClosedLoopExecution):
+            return current
         authenticated = current_authenticated_actor()
         if authenticated is not None:
-            role = next(
-                (
-                    item
-                    for item in self._governance.list_roles(project.project_id)
-                    if item.role_assignment_id == authenticated.role_assignment_id
-                ),
-                None,
-            )
-            if (
-                role is None
-                or role.state != "ACTIVE"
-                or role.actor_id != authenticated.actor_id
-                or role.role != authenticated.role
-                or role.scope not in authenticated.data_scopes
-            ):
-                return R2ClosedLoopExecution(
-                    projection={
-                        "terminal_state": "AUTHORITY_REQUIRED",
-                        "reason_code": "R2_AUTHORITY_CHANGED",
-                        "scientific_truth_state": "NOT_CERTIFIED",
-                        "pre_io": True,
-                    }
-                )
+            held = r2_authority_hold(authenticated, self._governance.list_roles(project.project_id))
+            if held is not None:
+                return held
         return await self._r2_closed_loop.execute_if_required(
             project=current,
             thread=thread,
@@ -684,25 +597,3 @@ class ThreadAnalysisCommandHandlers:
         )
         self._thread_runtime.enqueue_input(record)
         return record
-
-
-def _default_action_policy() -> ActionCompilationPolicy:
-    return ActionCompilationPolicy(
-        minimum_tier_by_family={
-            "EVIDENCE_REQUEST": RiskTier.R0,
-            "READ_ONLY_ANALYSIS": RiskTier.R0,
-            "SANDBOX_REPLAY": RiskTier.R2,
-            "CONFIGURATION_CHANGE": RiskTier.R3,
-            "CONTROLLED_RERUN": RiskTier.R3,
-            "OFFICIAL_CRITERION_CHANGE": RiskTier.R4,
-        },
-        approver_role_by_family={
-            "EVIDENCE_REQUEST": "project-owner",
-            "READ_ONLY_ANALYSIS": "project-owner",
-            "SANDBOX_REPLAY": "sandbox-owner",
-            "CONFIGURATION_CHANGE": "configuration-owner",
-            "CONTROLLED_RERUN": "test-owner",
-            "OFFICIAL_CRITERION_CHANGE": "criterion-owner",
-        },
-        unknown_family_tier=RiskTier.R3,
-    )

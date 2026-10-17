@@ -243,7 +243,7 @@ async def test_hypothesis_prediction_validity_appraisal_and_portfolio(tmp_path: 
             )
         )
         first = cast(dict[str, JsonValue], counter_result["hypothesis"])
-        assert first["development_stage"] == "COUNTEREVIDENCE_CHECKED"
+        assert first["development_stage"] == causal_result["stage"]
 
         assumption_result = value(
             await runtime.bus.dispatch(

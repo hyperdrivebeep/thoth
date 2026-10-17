@@ -206,7 +206,7 @@ Real-provider answer quality, hosted multi-runtime readiness, broad platform por
 actual collaborator time savings have not been established by these checks.
 
 [Verification record](docs/VERIFICATION.md) · [Exact known failures](docs/KNOWN_TEST_FAILURES.json) ·
-[Package boundary](docs/PACKAGING.md)
+[Known limitations](docs/KNOWN_LIMITATIONS.md) · [Package boundary](docs/PACKAGING.md)
 
 ## Built to be inspected
 

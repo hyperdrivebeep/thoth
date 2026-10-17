@@ -1,9 +1,10 @@
 import { message as formatMessage } from "../i18n/formatMessages";
-import { t } from "../i18n/locale";
+import type { MessageKey } from "../i18n/messages";
+import { t, useTranslation } from "../i18n/locale";
 import { Button, Callout, Tag } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Fragment, useEffect, useState } from "react";
-import { confirmTraceVerdict, exportTrace, readTrace, traceKey, type ImportApplied, type TraceView, type Verdict } from "../api/trace";
+import { confirmTraceVerdict, exportTrace, readTrace, traceKey, type ImportApplied, type TraceView, type Verdict, type VerdictChange } from "../api/trace";
 import { reasonTags } from "./traceReasonTags";
 import { investigationFor, type RowInvestigation } from "./traceInvestigation";
 import { hypothesisLinksKey } from "../api/hypothesisLink";
@@ -19,6 +20,16 @@ import { TraceHistory } from "./TraceHistory";
 import { TraceImportDialog } from "./TraceImportDialog";
 import { buildGroups, isSyntheticTrace, resultText, ruleText, titleOf, type CriterionRow } from "./traceRows";
 import { actorLabel, changeSentence, describeConditionText, lossText, nextStep, reasonSentence, timeText, verdictChangeSentence, verdictLook, type ChangeLookup } from "./traceText";
+import { useDraftGeneration, type DraftTicket } from "./useDraftGeneration";
+
+type TraceNotice = { kind: "confirmed" } | { kind: "export"; losses: string[] }
+  | { kind: "import"; applied: boolean; lines: { change: VerdictChange; title: string }[] };
+function noticeLines(notice: TraceNotice): string[] {
+  if (notice.kind === "confirmed") return [t("tracePage.confirmed")];
+  if (notice.kind === "export") return [formatMessage("csvDownloaded", notice.losses.map(lossText).join(" / "))];
+  const lines = notice.lines.map(({ change, title }) => verdictChangeSentence(change, () => title));
+  return [notice.applied ? t("tracePage.applied") : t("tracePage.unchanged"), ...(lines.length ? [t("labels.changedVerdicts"), ...lines] : [])];
+}
 
 const SYNTHETIC_NOTICE = "SYNTHETIC DEMO DATA - NOT MEASURED - NOT APPROVED - NOT FOR ENGINEERING USE";
 
@@ -68,6 +79,7 @@ function groupSummary(rows: CriterionRow[]) {
 export function TracePage({ projectId, onInvestigate, focusRow = null, responseLanguage }: {
   responseLanguage?: "ko" | "en" | null; projectId: string; onInvestigate?: (item: RowInvestigation) => void; focusRow?: { kind: string; id: string } | null;
 }) {
+  useTranslation();
   const client = useQueryClient();
   const query = useQuery({ queryKey: traceKey(projectId), queryFn: ({ signal }) => readTrace(projectId, signal) });
   const [open, setOpen] = useState<Set<string>>(new Set());
@@ -75,13 +87,17 @@ export function TracePage({ projectId, onInvestigate, focusRow = null, responseL
   const [closing, setClosing] = useState<Verdict | null>(null);
   const [evidence, setEvidence] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
-  const [notice, setNotice] = useState<string[] | null>(null);
-  const [problem, setProblem] = useState<string | null>(null);
+  const [notice, setNotice] = useState<TraceNotice | null>(null);
+  const [problem, setProblem] = useState<MessageKey | null>(null);
+  const ownership = useDraftGeneration(projectId);
   const linked = useHypothesisLinks(projectId, Boolean(onInvestigate));
   const closures = useTraceClosures(projectId);
   const confirm = useMutation({
-    mutationFn: (rationale: string) => confirmTraceVerdict(projectId, confirming!.revision_digest, rationale, query.data?.record_digest ?? null),
-    onSuccess: view => { client.setQueryData(traceKey(projectId), view); setConfirming(null); setNotice([t("tracePage.confirmed")]); },
+    mutationFn: (input: { rationale: string; revision: string; expectedDigest: string | null; ticket: DraftTicket }) => confirmTraceVerdict(projectId, input.revision, input.rationale, input.expectedDigest),
+    onSuccess: (view, input) => {
+      if (ownership.isCurrent(input.ticket)) { ownership.advance(); client.setQueryData(traceKey(projectId), view); setConfirming(null); setNotice({ kind: "confirmed" }); }
+      else void client.invalidateQueries({ queryKey: traceKey(projectId) });
+    },
     onError: () => void client.invalidateQueries({ queryKey: traceKey(projectId) }),
   });
   const loaded = Boolean(query.data);
@@ -101,18 +117,18 @@ export function TracePage({ projectId, onInvestigate, focusRow = null, responseL
     try {
       const file = await exportTrace(projectId);
       download(file.filename, file.csv_text);
-      setNotice([formatMessage("csvDownloaded", file.loss_manifest.map(lossText).join(" / "))]);
-    } catch { setProblem(t("tracePage.exportFailed")); }
+      setNotice({ kind: "export", losses: file.loss_manifest });
+    } catch { setProblem("tracePage.exportFailed"); }
   };
   const applied = (result: ImportApplied) => {
     setImporting(false);
     if (result.trace) client.setQueryData(traceKey(projectId), result.trace); else void client.invalidateQueries({ queryKey: traceKey(projectId) });
     void client.invalidateQueries({ queryKey: hypothesisLinksKey(projectId) });
-    const lines = result.applied ? result.verdict_changes.map(change => verdictChangeSentence(change, result.trace ? titleOf(result.trace) : name)) : [];
-    setNotice([result.applied ? t("tracePage.applied") : t("tracePage.unchanged"), ...(lines.length > 0 ? [t("labels.changedVerdicts"), ...lines] : [])]);
+    const title = result.trace ? titleOf(result.trace) : name;
+    setNotice({ kind: "import", applied: result.applied, lines: result.applied ? result.verdict_changes.map(change => ({ change, title: title(change.subject_id) })) : [] });
   };
   const cells = (kind: string, verdict: Verdict | undefined, label: string) =>
-    <VerdictCells lookup={view} view={view} kind={kind} verdict={verdict} label={label} titleOf={name} onConfirm={setConfirming} onEvidence={setEvidence}
+    <VerdictCells lookup={view} view={view} kind={kind} verdict={verdict} label={label} titleOf={name} onConfirm={next => { ownership.advance(); confirm.reset(); setConfirming(next); }} onEvidence={setEvidence}
       investigation={onInvestigate && verdict ? investigationFor(projectId, kind, verdict, view, responseLanguage) : null} onInvestigate={onInvestigate}
       staleHypotheses={verdict ? staleCount(linked.links, kind, verdict.subject_id) : 0}
       closure={verdict ? closures.closures?.find(item => item.subject_kind === kind && item.subject_id === verdict.subject_id) : undefined} onClose={setClosing}/>;
@@ -131,8 +147,8 @@ export function TracePage({ projectId, onInvestigate, focusRow = null, responseL
       <p>{t("tracePage.explanation")}</p></div>
       <div className="trace-actions"><Button icon="export" onClick={() => void exportCsv()}>{t("tracePage.export")}</Button>
         <Button icon="import" onClick={() => setImporting(true)}>{t("tracePage.import")}</Button></div></header>
-    {problem && <Callout intent="danger" role="alert">{problem}</Callout>}
-    {notice && <Callout intent="success" role="status" className="trace-notice">{notice.map(line => <p key={line}>{line}</p>)}</Callout>}
+    {problem && <Callout intent="danger" role="alert">{t(problem)}</Callout>}
+    {notice && <Callout intent="success" role="status" className="trace-notice">{noticeLines(notice).map(line => <p key={line}>{line}</p>)}</Callout>}
     {groups.length === 0 ? <Callout role="status">{t("tracePage.empty")}</Callout> :
       <table className="bp6-html-table trace-table">
         <caption className="trace-sr-only">{t("tracePage.tableLabel")}</caption>
@@ -166,7 +182,8 @@ export function TracePage({ projectId, onInvestigate, focusRow = null, responseL
     </div>
     <TraceImportDialog key={String(groups.length > 0)} projectId={projectId} isOpen={importing} hasTrace={groups.length > 0} onClose={() => setImporting(false)} onApplied={applied}/>
     <TraceConfirmDialog verdict={confirming} title={confirming ? name(confirming.subject_id) : ""} pending={confirm.isPending}
-      error={confirm.error ? t("tracePage.confirmFailed") : null} onClose={() => { confirm.reset(); setConfirming(null); }} onSubmit={rationale => confirm.mutate(rationale)}/>
+      error={confirm.error && ownership.isCurrent(confirm.variables?.ticket) ? t("tracePage.confirmFailed") : null} onClose={() => { ownership.advance(); confirm.reset(); setConfirming(null); }} onDraftChange={ownership.advance}
+      onSubmit={rationale => confirming && confirm.mutate({ rationale, revision: confirming.revision_digest, expectedDigest: query.data?.record_digest ?? null, ticket: ownership.capture() })}/>
     <TraceEvidenceDialog projectId={projectId} spanRef={evidence} onClose={() => setEvidence(null)}/>
     <ClosureRecorder projectId={projectId} verdict={closing} title={closing ? name(closing.subject_id) : ""} onClose={() => setClosing(null)}/>
   </section>;

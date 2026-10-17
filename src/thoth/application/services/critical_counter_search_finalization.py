@@ -5,6 +5,11 @@ from typing import cast
 
 from pydantic import JsonValue
 
+from thoth.application.services.counter_search_calculations import (
+    aggregate_gate_inputs,
+    resolve_loop_terminal,
+)
+from thoth.application.services.counter_search_preflight import CounterSearchBlocks
 from thoth.application.services.critical_counter_search import (
     CounterSearchBasis,
     CounterSearchRevisionService,
@@ -232,3 +237,73 @@ class CounterSearchFinalizationService:
     @staticmethod
     def _hypothesis(portfolio: HypothesisPortfolio, hypothesis_id: str) -> Hypothesis:
         return next(item for item in portfolio.hypotheses if item.hypothesis_id == hypothesis_id)
+
+
+@dataclass(frozen=True)
+class CounterLoopConclusion:
+    terminal: CounterLoopTerminal
+    gate: IndependentGateReview
+    investigation: InvestigationRecord
+
+
+def conclude_counter_loop(
+    *,
+    loop_terminal: CounterLoopTerminal | None,
+    budget_exhausted: bool,
+    counter_refs: list[str],
+    support_refs: list[str],
+    blocks: CounterSearchBlocks,
+    waves: list[CounterWaveRecord],
+    plans: list[CounterSearchPlan],
+    confirmations: IndependentConfirmationTracker,
+    executed_track_ids: list[str],
+    investigation: InvestigationRecord,
+    reviewer: IndependentGateReviewer,
+    investigations: InvestigationService,
+) -> CounterLoopConclusion:
+    loop_terminal = resolve_loop_terminal(
+        loop_terminal=loop_terminal,
+        budget_exhausted=budget_exhausted,
+        counter_refs=counter_refs,
+        support_refs=support_refs,
+        policy_blocks=blocks.policy,
+        authority_blocks=blocks.authority,
+        abstention_blocks=blocks.abstention,
+        waves=waves,
+    )
+    if not plans:
+        raise ValueError("multi-wave counter-search produced no challenger plan")
+    gate_terminal, accepted_refs = aggregate_gate_inputs(loop_terminal, counter_refs, support_refs)
+    gate = reviewer.aggregate(
+        plans[0],
+        terminal=gate_terminal,
+        reasons=(
+            f"multi-wave terminal: {loop_terminal.value}",
+            f"counter confirmations: {len(confirmations.counter_groups)}",
+            f"support confirmations: {len(confirmations.support_groups)}",
+        ),
+        accepted_evidence_refs=accepted_refs,
+        executed_track_ids=tuple(dict.fromkeys(executed_track_ids)),
+    )
+    stopped = investigations.stop(
+        investigation,
+        reason=counter_loop_stop_reason(loop_terminal),
+    )
+    return CounterLoopConclusion(loop_terminal, gate, stopped)
+
+
+def counter_loop_stop_reason(terminal: CounterLoopTerminal) -> str:
+    if terminal in {
+        CounterLoopTerminal.SUPPORTED,
+        CounterLoopTerminal.ELIMINATED_WITHIN_SCOPE,
+    }:
+        return "SUFFICIENT"
+    if terminal == CounterLoopTerminal.SEARCH_SATURATED:
+        return "SEARCH_SATURATED"
+    if terminal == CounterLoopTerminal.BUDGET_EXHAUSTED:
+        return "BUDGET_EXHAUSTED"
+    if terminal == CounterLoopTerminal.POLICY_BLOCKED:
+        return "PERMISSION_BLOCKED"
+    if terminal == CounterLoopTerminal.AUTHORITY_REQUIRED:
+        return "PERMISSION_BLOCKED"
+    return "HIGH_RISK_CONFLICT"

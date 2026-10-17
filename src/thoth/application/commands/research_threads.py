@@ -20,7 +20,6 @@ from thoth.application.services.request_language import (
     research_start_params,
     validate_request_language,
     with_request_language,
-    with_result_language,
 )
 from thoth.application.services.request_records import RequestRecords
 from thoth.application.services.research_analysis import ResearchAnalysis
@@ -30,21 +29,18 @@ from thoth.application.services.research_attempt_admission import (
 )
 from thoth.application.services.research_attempt_runner import run_research_attempt
 from thoth.application.services.research_controls import ResearchControls
+from thoth.application.services.research_conversation_activity import read_conversation_activity
 from thoth.application.services.research_input_queue import ResearchInputQueue
 from thoth.application.services.research_leases import ResearchLeases
 from thoth.application.services.research_operation_access import ResearchOperationAccess
-from thoth.application.services.research_read_summary import (
-    VIEWS,
-    progress_thread_read,
-    summarize_thread_read,
-)
+from thoth.application.services.research_read_summary import VIEWS
+from thoth.application.services.research_result_publication import publish_research_result
 from thoth.domain.account_usage import AccountQuotaSnapshot
 from thoth.domain.auth import current_authenticated_actor
-from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.enums import EntityType, OperationState, ThreadLifecycle
 from thoth.domain.model_settings import ModelSelection
 from thoth.domain.operation import OperationRecord
-from thoth.domain.research_execution import ResearchFence, ResearchWork
+from thoth.domain.research_execution import ResearchWork
 from thoth.domain.research_request import (
     AuthoredInputRevision,
     InputDelivery,
@@ -54,7 +50,7 @@ from thoth.domain.research_request import (
     ThreadRequestRevision,
     decode_thread_request,
 )
-from thoth.domain.resource_scope import ResourceScopeError, current_resource_uses
+from thoth.domain.resource_scope import ResourceScopeError
 from thoth.domain.test_validity import TestValidityAssessment
 from thoth.ports.command_authorization import CommandAuthorizerPort
 from thoth.ports.governance import GovernanceStorePort
@@ -445,196 +441,28 @@ class ResearchThreadHandlers:
         terminal: str | None = None,
         check: bool = True,
     ) -> RevisionRef:
-        with self.records.ledger.transaction():
-            if check:
-                work.boundary.check()
-            if not work.boundary.owns_attempt():
-                from thoth.domain.research_lease import ResearchLeaseLost
-
-                raise ResearchLeaseLost("ATTEMPT_LEASE_FENCED")
-            # Recheck request even on budget/transport HOLD; stale work cannot become current.
-            head = self.records.read(
-                request.project_id, EntityType.THREAD, f"request:{request.thread_id}"
-            )
-            if head is None or head[0] != attempt.request_ref:
-                raise ResearchFence("STALE_PUBLICATION")
-            uses = current_resource_uses() or ()
-            operation = self.operations.read(attempt.operation_id)
-            if operation is None:
-                raise ResearchFence("OPERATION_MISSING")
-            self.access.require_operation(operation.model_copy(update={"resource_uses": uses}))
-            staged = tuple(work.pending_revisions)
-            self.records.commit_staged(staged)
-            from thoth.application.services.research_basis_capture import capture_record_producers
-
-            capture_record_producers(work, self.records.ledger)
-            from thoth.application.services.research_basis_capture import result_basis
-            from thoth.domain.research_request import CurrentResultManifestV21
-
-            manifest = CurrentResultManifestV21(
-                research_basis=result_basis(work, request, self.records.ledger),
-                request_ref=attempt.request_ref,
-                operation_id=attempt.operation_id,
-                attempt_epoch=attempt.attempt_epoch,
-                basis_digest=domain_digest(
-                    "RESEARCH_BASIS",
-                    "2.0.0",
-                    canonical_payload(
-                        {
-                            "request": attempt.request_ref,
-                            "refs": work.record_refs,
-                            "evidence": work.evidence,
-                            "uses": uses,
-                        }
-                    ),
-                ),
-                phase=phase,
-                completion="TERMINAL" if terminal else "CHECKPOINT",
-                input_ids=request.accepted_input_ids,
-                record_refs=tuple(work.record_refs),
-                source_refs=tuple(s.span_id for s in work.evidence),
-                resource_uses=tuple(u.model_dump(mode="python") for u in uses),
-                source_context_digest=self.analysis.source_digest(work.evidence),
-                source_context_version="2.1.0",
-                source_basis={
-                    s.span_id: f"{s.source_version_id}:{s.text_sha256}" for s in work.evidence
-                },
-                result=with_result_language(result, request),
-                gaps=gaps,
-                next_steps=gaps,
-                terminal_reason=terminal,
-            )
-            ref = self.records.save(
-                request.project_id,
-                EntityType.DECISION_OBJECT,
-                f"result:{request.thread_id}",
-                manifest,
-                evidence_refs=manifest.source_refs,
-            )
-            self.records.journal(
-                request.project_id,
-                attempt.operation_id,
-                (
-                    self.records.journal_read(
-                        request.project_id, attempt.operation_id, ResearchAttempt
-                    )
-                    or attempt
-                ).model_copy(
-                    update={
-                        "phase": phase,
-                        "checkpoint_ref": ref,
-                        "status": "SUCCEEDED" if terminal else "RUNNING",
-                    }
-                ),
-            )
-            # Input is APPLIED only after an analysis result, not its acceptance checkpoint.
-            if phase != "CONNECTED_SOURCES" and "requirements" in work.context:
-                for input_id in request.accepted_input_ids:
-                    delivery = self.records.journal_read(
-                        request.project_id, f"input:{input_id}", InputDelivery
-                    )
-                    if delivery is not None and delivery.first_result_ref is None:
-                        self.records.journal(
-                            request.project_id,
-                            f"input:{input_id}",
-                            delivery.model_copy(
-                                update={"state": "APPLIED", "first_result_ref": ref}
-                            ),
-                            "APPLIED",
-                        )
-            event_cursor = None
-            if self.records.events is not None:
-                self.records.events.checkpoint(
-                    operation_id=attempt.operation_id,
-                    payload={
-                        "result_ref": ref.model_dump(mode="json"),
-                        "phase": phase,
-                        "request_epoch": request.request_epoch,
-                        "completion": manifest.completion,
-                    },
-                )
-                event = self.records.events.append(
-                    project_id=request.project_id,
-                    operation_id=attempt.operation_id,
-                    event_type="research.terminal" if terminal else "research.progress",
-                    payload={
-                        "result_ref": ref.model_dump(mode="json"),
-                        "phase": phase,
-                        "terminal_reason": terminal,
-                    },
-                )
-                event_cursor = event.event_id
-            if event_cursor is not None:
-                latest = (
-                    self.records.journal_read(
-                        request.project_id, attempt.operation_id, ResearchAttempt
-                    )
-                    or attempt
-                )
-                self.records.journal(
-                    request.project_id,
-                    attempt.operation_id,
-                    latest.model_copy(update={"event_cursor": event_cursor}),
-                )
-            if terminal is not None:
-                self.operations.complete(
-                    attempt.operation_id,
-                    cast(
-                        dict[str, JsonValue],
-                        {
-                            **result,
-                            "contract_version": 2,
-                            "thread_id": request.thread_id,
-                            "request_epoch": request.request_epoch,
-                            "terminal_reason": terminal,
-                        },
-                    ),
-                    completed_at=self.records.clock.now(),
-                )
-        del work.pending_revisions[: len(staged)]
-        return ref
+        return publish_research_result(
+            attempt,
+            request,
+            work,
+            phase,
+            result,
+            gaps,
+            terminal,
+            check,
+            records=self.records,
+            operations=self.operations,
+            access=self.access,
+            source_digest=lambda spans: self.analysis.source_digest(spans),
+        )
 
     async def activity_list(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
-        from thoth.application.services.conversation_inputs import conversation_inputs
-
-        before = value.get("conversation_before_epoch")
-        if before is not None and (type(before) is not int or before < 1):
-            raise RpcApplicationError(RpcErrorCode.INVALID_PARAMS, "invalid conversation cursor")
-        base = await self.legacy.activity_list(
-            {k: v for k, v in value.items() if k != "conversation_before_epoch"}
+        return await read_conversation_activity(
+            value,
+            records=self.records,
+            access=self.access,
+            legacy_activity_list=lambda params: self.legacy.activity_list(params),
         )
-        project, thread = str(value["project_id"]), str(value["thread_id"])
-        activities = cast(list[JsonValue], base["activities"])
-        for revision in self.records.ledger.read_revisions(project, "THREAD", f"request:{thread}"):
-            if not self.access.may_read_revision(project, revision.revision_digest):
-                continue
-            snapshot = self.records.ledger.read_snapshot(revision.snapshot_id)
-            if snapshot is None:
-                continue
-            request = decode_thread_request(snapshot.content)
-            delivery = self.records.journal_read(
-                project, f"input:{request.accepted_input_ids[-1]}", InputDelivery
-            )
-            activities.append(
-                {
-                    "activity_id": revision.revision_id,
-                    "event_type": "research/inputAccepted",
-                    "created_at": revision.created_at.isoformat(),
-                    "actor_id": request.actor_ref,
-                    "payload": {
-                        "request_epoch": request.request_epoch,
-                        "authored_text_ref": request.authored_text_ref.model_dump(mode="json"),
-                        "input_state": None if delivery is None else delivery.state,
-                    },
-                }
-            )
-        return {
-            "conversation": conversation_inputs(self.records, self.access, project, thread, before),
-            "activities": sorted(
-                activities,
-                key=lambda item: str(item.get("created_at", "") if isinstance(item, dict) else ""),
-            ),
-        }
 
     async def read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         if value.get("view", "SUMMARY") not in VIEWS:
@@ -673,59 +501,30 @@ class ResearchThreadHandlers:
         quota: AccountQuotaSnapshot | None,
     ) -> dict[str, JsonValue]:
         project_id, thread_id = str(value["project_id"]), str(value["thread_id"])
-        from thoth.application.services.research_model_hold import model_call_hold_failure
+        from thoth.application.services.research_read_payload import (
+            model_dispatch_fields,
+            snapshot_fields,
+        )
         from thoth.application.services.research_thread_read_snapshot import (
             read_research_snapshot,
         )
-        from thoth.application.services.research_usage import (
-            operation_wall_ms,
-            summarize_operation_usage,
-            summarize_usage,
-        )
-        from thoth.application.services.user_activity_projection import (
-            project_user_activity_events,
-        )
+        from thoth.application.services.research_usage_read import read_thread_usage
 
         snapshot = read_research_snapshot(self, project_id, thread_id)
         if snapshot is None:
             return base
         current_ref, request, attempt = snapshot.current_ref, snapshot.request, snapshot.attempt
-        result_ref, manifest = snapshot.result_ref, snapshot.manifest
-        currentness, fresh, budget = snapshot.currentness, snapshot.fresh, snapshot.budget
-        dispatches, activity_source_context, op = (
-            snapshot.dispatches,
-            snapshot.activity_source_context,
-            snapshot.operation,
+        manifest = snapshot.manifest
+        fresh, budget = snapshot.fresh, snapshot.budget
+        dispatches, op = snapshot.dispatches, snapshot.operation
+        usage, result_usage = read_thread_usage(
+            project_id=project_id,
+            thread_id=thread_id,
+            snapshot=snapshot,
+            quota=quota,
+            provider_usage=self.provider_usage,
+            operations=self.operations,
         )
-        usage = summarize_usage(
-            tuple(dispatches),
-            thread_id,
-            0 if budget is None else budget.calls,
-            account_quota=(
-                quota
-                if quota is not None
-                else self.provider_usage.read_snapshot(project_id, thread_id)
-            ).model_dump(mode="json"),
-        )
-        # Per-result usage, computed from this read's dispatches: the result's own operation and the
-        # one currently requested. A result without recorded calls simply has no entry.
-        result_usage: dict[str, JsonValue] = {}
-        for usage_op in dict.fromkeys(
-            op_id
-            for op_id in (None if manifest is None else manifest.operation_id, request.operation_id)
-            if op_id
-        ):
-            usage_record = self.operations.read(usage_op)
-            entry = summarize_operation_usage(
-                dispatches,
-                thread_id,
-                usage_op,
-                wall_ms=None
-                if usage_record is None
-                else operation_wall_ms(usage_record.created_at, usage_record.completed_at),
-            )
-            if entry is not None:
-                result_usage[usage_op] = entry
         from thoth.domain.research_failure import ResearchCleanupFailure, ResearchFailureRecord
 
         failure = (
@@ -748,7 +547,6 @@ class ResearchThreadHandlers:
         )
         effective = "UNKNOWN" if op is None else op.state.value
         from thoth.application.services.research_completion_view import completion_view
-        from thoth.application.services.research_progress_view import project_activity_events
 
         completion = completion_view(
             self.records,
@@ -760,39 +558,8 @@ class ResearchThreadHandlers:
             str(base.get("execution_state", "UNKNOWN")),
             budget,
         )
-        inconsistent = (
-            attempt is not None
-            and effective in {"FAILED", "CANCELLED"}
-            and attempt.status != effective
-        )
         payload = {
-            **base,
-            **completion,
-            "contract_version": 2,
-            "request_ref": current_ref.model_dump(mode="json"),
-            "request_epoch": request.request_epoch,
-            "operation_state": "UNKNOWN" if op is None else op.state.value,
-            "operation_error": None if op is None else op.error,
-            "failure": model_call_hold_failure(manifest if fresh else None, attempt)
-            if failure is None
-            else failure.model_dump(mode="json"),
-            "cleanup_failure": None
-            if cleanup_failure is None
-            else cleanup_failure.model_dump(mode="json"),
-            "execution_summary": {
-                "effective_execution_state": effective,
-                "state_inconsistent": inconsistent,
-                "last_checkpoint_only": effective in {"FAILED", "CANCELLED"}
-                and manifest is not None,
-                "automatic_retry": False,
-            },
-            "request": request.model_dump(mode="json"),
-            "attempt": None if attempt is None else attempt.model_dump(mode="json"),
-            "current_result": manifest.model_dump(mode="json") if fresh and manifest else None,
-            "previous_result": manifest.model_dump(mode="json") if manifest and not fresh else None,
-            "freshness": "CURRENT" if fresh else "STALE_OR_PENDING_CURRENT_REQUEST",
-            "basis_currentness": currentness.model_dump(mode="json"),
-            "cursor": None if attempt is None else attempt.event_cursor,
+            **snapshot_fields(snapshot, base, completion, failure, cleanup_failure),
             "inputs": [
                 d.model_dump(mode="json")
                 for i in request.accepted_input_ids
@@ -802,18 +569,7 @@ class ResearchThreadHandlers:
             "budget": None if budget is None else budget.model_dump(mode="json"),
             "usage": usage,
             "result_usage": result_usage,
-            "model_dispatches": [
-                {
-                    "dispatch_id": dispatch.dispatch_id,
-                    "state": dispatch.state,
-                    "received_bytes": dispatch.received_bytes,
-                    "remote_stop": dispatch.remote_stop,
-                    "transport_observation": None
-                    if dispatch.transport_observation is None
-                    else dispatch.transport_observation.model_dump(mode="json"),
-                }
-                for dispatch in dispatches
-            ],
+            "model_dispatches": model_dispatch_fields(dispatches),
             "cleanup": cleanup_summary(self.records.controls, project_id, request.operation_id),
             "post_execution_learning_current": [
                 learning.model_dump(mode="json")
@@ -824,32 +580,13 @@ class ResearchThreadHandlers:
             ],
             "queued_inputs_v2": list(self.queue.summary(project_id, thread_id)),
         }
-        from thoth.application.services.research_followup_projection import (
-            project_thread_followup,
-        )
+        from thoth.application.services.research_read_view import project_thread_read_view
 
-        if value.get("view") != "PROGRESS":
-            progress_summary, coverage_matrix, next_user_action = project_thread_followup(
-                ledger=self.records.ledger,
-                access=self.access,
-                request_ref=current_ref,
-                request=request,
-                result_ref=result_ref,
-                manifest=manifest,
-                attempt=attempt,
-                operation_state=effective,
-                currentness_state=currentness.model_dump(mode="json"),
-            )
-            payload["user_progress_summary"] = progress_summary.model_dump(mode="json")
-            payload["coverage_matrix"] = coverage_matrix.model_dump(mode="json")
-            payload["next_user_action"] = next_user_action.model_dump(mode="json")
-        payload["activity_events"] = project_activity_events(cast(dict[str, JsonValue], payload))
-        payload["user_activity_events"] = project_user_activity_events(
-            cast(dict[str, object], payload), source_context=activity_source_context
+        return project_thread_read_view(
+            value=value,
+            payload=payload,
+            snapshot=snapshot,
+            effective=effective,
+            ledger=self.records.ledger,
+            access=self.access,
         )
-        shown = cast(dict[str, JsonValue], payload)
-        if value.get("view", "SUMMARY") == "FULL":
-            return {**shown, "view": "FULL"}
-        if value.get("view") == "PROGRESS":
-            return progress_thread_read(shown)
-        return summarize_thread_read(shown)

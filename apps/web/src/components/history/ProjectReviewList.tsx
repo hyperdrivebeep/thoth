@@ -6,6 +6,7 @@ import type { HistorySelection } from "../../api/historyModels";
 import { currentnessLabel, currentnessTone } from "./historyPresentation";
 import { nextActionLabel } from "../statusLabels";
 import { describeHistoryReasons } from "./historyReasonText";
+import { useReadAccessProtection } from "../useReadAccessProtection";
 
 function priorityLabel(priority: ProjectReviewItem["priority"]) {
   if (priority === "HIGH") return t("state.high");
@@ -21,9 +22,10 @@ function selectionOf(item: ProjectReviewItem): HistorySelection {
 export function ProjectReviewList({ projectId, onSelect }: { projectId: string; onSelect: (selection: HistorySelection) => void }) {
   const query = useInfiniteQuery({ queryKey: ["project-review-list", projectId], initialPageParam: null as string | null, retry: false, gcTime: 0,
     queryFn: ({ pageParam, signal }) => readProjectReviewList(projectId, pageParam, signal), getNextPageParam: page => page.next_cursor ?? undefined });
-  const pages = query.data?.pages ?? [];
+  const blocked = useReadAccessProtection(["project-review-list", projectId], query.error);
+  const pages = blocked ? [] : query.data?.pages ?? [];
   const items = pages.flatMap(page => page.items);
-  if (query.error && pages.length === 0) return <Callout compact intent="warning" role="alert">{t("reviewList.failed")}<Button small onClick={() => void query.refetch()}>{t("workspace.reload")}</Button></Callout>;
+  if ((query.error || blocked) && pages.length === 0) return <Callout compact intent="warning" role="alert">{t("reviewList.failed")}<Button small onClick={() => void query.refetch()}>{t("workspace.reload")}</Button></Callout>;
   return <section className="project-review-list" aria-label={t("reviewList.title")}>
     <div className="section-title-row"><div><h2>{t("followup.reviewNeeded")}</h2><p>{t("reviewList.notice")}</p></div><Button small minimal icon="refresh" onClick={() => void query.refetch()} loading={query.isRefetching}>{t("historyWorkspace.reload")}</Button></div>
     {query.isPending ? <p className="muted" role="status">{t("reviewList.loading")}</p> : items.length === 0 ? <p className="muted">{t("reviewList.empty")}</p>

@@ -1,0 +1,190 @@
+{
+  "ResearchContext": {
+    "signature": "(project_id: 'str', object_id: 'str', heads: 'Mapping[str, str]', hypotheses: 'tuple[HypothesisRecord, ...]' = (), portfolio: 'HypothesisPortfolioRecord | None' = None, portfolio_view: 'HypothesisPortfolio | None' = None, actions: 'tuple[ActionRecord, ...]' = (), action_plan: 'ActionPlanRecord | None' = None, action_plan_view: 'ActionPlan | None' = None, action_portfolio: 'ActionPortfolioRecord | None' = None, action_portfolio_id: 'str | None' = None, unrepresented_refs: 'tuple[str, ...]' = (), portfolio_id: 'str | None' = None, test_assessments: 'tuple[TestValidityAssessment, ...]' = (), currentness: 'Mapping[str, BasisCurrentness]' = <factory>) -> None",
+    "fields": [
+      {
+        "name": "project_id",
+        "type": "str",
+        "required": true,
+        "default": null,
+        "factory": null
+      },
+      {
+        "name": "object_id",
+        "type": "str",
+        "required": true,
+        "default": null,
+        "factory": null
+      },
+      {
+        "name": "heads",
+        "type": "Mapping[str, str]",
+        "required": true,
+        "default": null,
+        "factory": null
+      },
+      {
+        "name": "hypotheses",
+        "type": "tuple[HypothesisRecord, ...]",
+        "required": false,
+        "default": "()",
+        "factory": null
+      },
+      {
+        "name": "portfolio",
+        "type": "HypothesisPortfolioRecord | None",
+        "required": false,
+        "default": "None",
+        "factory": null
+      },
+      {
+        "name": "portfolio_view",
+        "type": "HypothesisPortfolio | None",
+        "required": false,
+        "default": "None",
+        "factory": null
+      },
+      {
+        "name": "actions",
+        "type": "tuple[ActionRecord, ...]",
+        "required": false,
+        "default": "()",
+        "factory": null
+      },
+      {
+        "name": "action_plan",
+        "type": "ActionPlanRecord | None",
+        "required": false,
+        "default": "None",
+        "factory": null
+      },
+      {
+        "name": "action_plan_view",
+        "type": "ActionPlan | None",
+        "required": false,
+        "default": "None",
+        "factory": null
+      },
+      {
+        "name": "action_portfolio",
+        "type": "ActionPortfolioRecord | None",
+        "required": false,
+        "default": "None",
+        "factory": null
+      },
+      {
+        "name": "action_portfolio_id",
+        "type": "str | None",
+        "required": false,
+        "default": "None",
+        "factory": null
+      },
+      {
+        "name": "unrepresented_refs",
+        "type": "tuple[str, ...]",
+        "required": false,
+        "default": "()",
+        "factory": null
+      },
+      {
+        "name": "portfolio_id",
+        "type": "str | None",
+        "required": false,
+        "default": "None",
+        "factory": null
+      },
+      {
+        "name": "test_assessments",
+        "type": "tuple[TestValidityAssessment, ...]",
+        "required": false,
+        "default": "()",
+        "factory": null
+      },
+      {
+        "name": "currentness",
+        "type": "Mapping[str, BasisCurrentness]",
+        "required": false,
+        "default": null,
+        "factory": "dict[str, thoth.domain.research_basis.BasisCurrentness]"
+      }
+    ]
+  },
+  "HypothesisOwnershipBatch": {
+    "signature": "(hypotheses: 'tuple[HypothesisRecord, ...]', portfolio: 'HypothesisPortfolioRecord', staged: 'tuple[StagedRevision, ...]') -> None",
+    "fields": [
+      {
+        "name": "hypotheses",
+        "type": "tuple[HypothesisRecord, ...]",
+        "required": true,
+        "default": null,
+        "factory": null
+      },
+      {
+        "name": "portfolio",
+        "type": "HypothesisPortfolioRecord",
+        "required": true,
+        "default": null,
+        "factory": null
+      },
+      {
+        "name": "staged",
+        "type": "tuple[StagedRevision, ...]",
+        "required": true,
+        "default": null,
+        "factory": null
+      }
+    ]
+  },
+  "ActionOwnershipBatch": {
+    "signature": "(actions: 'tuple[ActionRecord, ...]', portfolio: 'ActionPortfolioRecord', plan: 'ActionPlanRecord', staged: 'tuple[StagedRevision, ...]') -> None",
+    "fields": [
+      {
+        "name": "actions",
+        "type": "tuple[ActionRecord, ...]",
+        "required": true,
+        "default": null,
+        "factory": null
+      },
+      {
+        "name": "portfolio",
+        "type": "ActionPortfolioRecord",
+        "required": true,
+        "default": null,
+        "factory": null
+      },
+      {
+        "name": "plan",
+        "type": "ActionPlanRecord",
+        "required": true,
+        "default": null,
+        "factory": null
+      },
+      {
+        "name": "staged",
+        "type": "tuple[StagedRevision, ...]",
+        "required": true,
+        "default": null,
+        "factory": null
+      }
+    ]
+  },
+  "ResearchOwnershipBatch": {
+    "signature": "(hypotheses: 'HypothesisOwnershipBatch', actions: 'ActionOwnershipBatch') -> None",
+    "fields": [
+      {
+        "name": "hypotheses",
+        "type": "HypothesisOwnershipBatch",
+        "required": true,
+        "default": null,
+        "factory": null
+      },
+      {
+        "name": "actions",
+        "type": "ActionOwnershipBatch",
+        "required": true,
+        "default": null,
+        "factory": null
+      }
+    ]
+  }
+}

@@ -6,94 +6,159 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING, Unpack, overload
 
-from thoth.adapters.connectors import ConnectorRegistry, GitReadConnector, LocalFileConnector
-from thoth.adapters.connectors.project_public_web import ProjectPublicWebConnector
+from thoth.adapters.connectors import ConnectorRegistry
+from thoth.adapters.connectors import GitReadConnector as GitReadConnector
+from thoth.adapters.connectors import LocalFileConnector as LocalFileConnector
+from thoth.adapters.connectors.project_public_web import (
+    ProjectPublicWebConnector as ProjectPublicWebConnector,
+)
 from thoth.adapters.evaluators import default_evaluator_registry
-from thoth.adapters.projectpacks import FilesystemProjectPackLoader
+from thoth.adapters.projectpacks import FilesystemProjectPackLoader as FilesystemProjectPackLoader
 from thoth.adapters.runtime import SystemClock, UuidIdGenerator
-from thoth.adapters.sandbox import DisabledSandboxAdapter
-from thoth.adapters.storage.workspace_setup import read_setup
+from thoth.adapters.sandbox import DisabledSandboxAdapter as DisabledSandboxAdapter
+from thoth.adapters.storage.workspace_setup import read_setup as read_setup
 from thoth.application.commands import (
-    ActionHandlers,
-    CriterionFullHandlers,
-    DecisionObjectHandlers,
-    EvidenceCommandHandlers,
-    ExecutionHandlers,
-    FieldMeasurementHandlers,
-    HypothesisHandlers,
-    InvestigationQueryHandlers,
-    OutcomeHandlers,
-    ProjectCommandHandlers,
-    ProjectionQueryHandlers,
-    ProjectPackCommandHandlers,
-    ThreadCommandHandlers,
+    ActionHandlers as ActionHandlers,
 )
-from thoth.application.commands.research_operations import register_research_operations
+from thoth.application.commands import (
+    CriterionFullHandlers as CriterionFullHandlers,
+)
+from thoth.application.commands import (
+    DecisionObjectHandlers as DecisionObjectHandlers,
+)
+from thoth.application.commands import (
+    EvidenceCommandHandlers as EvidenceCommandHandlers,
+)
+from thoth.application.commands import (
+    ExecutionHandlers as ExecutionHandlers,
+)
+from thoth.application.commands import FieldMeasurementHandlers, ThreadCommandHandlers
+from thoth.application.commands import (
+    HypothesisHandlers as HypothesisHandlers,
+)
+from thoth.application.commands import InvestigationQueryHandlers as InvestigationQueryHandlers
+from thoth.application.commands import (
+    OutcomeHandlers as OutcomeHandlers,
+)
+from thoth.application.commands import (
+    ProjectCommandHandlers as ProjectCommandHandlers,
+)
+from thoth.application.commands import ProjectionQueryHandlers as ProjectionQueryHandlers
+from thoth.application.commands import ProjectPackCommandHandlers as ProjectPackCommandHandlers
+from thoth.application.commands.research_operations import (
+    register_research_operations as register_research_operations,
+)
 from thoth.application.services import (
-    AcquisitionCoordinator,
-    ConnectorService,
-    ControlRecordService,
-    CriticalCounterSearchCoordinator,
-    DecisionObjectService,
-    InvestigationService,
-    OutcomeService,
-    PolicyGate,
-    RegisteredSandboxRouter,
-    RevisionCommitService,
-    SandboxService,
+    AcquisitionCoordinator as AcquisitionCoordinator,
 )
+from thoth.application.services import (
+    ConnectorService as ConnectorService,
+)
+from thoth.application.services import (
+    ControlRecordService,
+    InvestigationService,
+)
+from thoth.application.services import (
+    CriticalCounterSearchCoordinator as CriticalCounterSearchCoordinator,
+)
+from thoth.application.services import (
+    DecisionObjectService as DecisionObjectService,
+)
+from thoth.application.services import (
+    OutcomeService as OutcomeService,
+)
+from thoth.application.services import (
+    PolicyGate as PolicyGate,
+)
+from thoth.application.services import (
+    RegisteredSandboxRouter as RegisteredSandboxRouter,
+)
+from thoth.application.services import (
+    RevisionCommitService as RevisionCommitService,
+)
+from thoth.application.services import (
+    SandboxService as SandboxService,
+)
+from thoth.apps.acquisition_composition import create_acquisition_components
 from thoth.apps.behavior_composition import create_behavior_runtime
 from thoth.apps.criteria_composition import create_criterion_service
-from thoth.apps.criterion_object_routes import register_criterion_and_object_methods
-from thoth.apps.decision_chain_routes import register_decision_chain_methods
+from thoth.apps.criterion_object_routes import (
+    register_criterion_and_object_methods as register_criterion_and_object_methods,
+)
+from thoth.apps.decision_chain_routes import (
+    register_decision_chain_methods as register_decision_chain_methods,
+)
+from thoth.apps.decision_command_composition import create_decision_command_components
 from thoth.apps.evidence_composition import create_evidence_components
-from thoth.apps.export_composition import create_export_handlers, create_lifecycle_handlers
+from thoth.apps.export_composition import create_export_handlers
+from thoth.apps.export_composition import create_lifecycle_handlers as create_lifecycle_handlers
+from thoth.apps.history_command_composition import create_history_commands
+from thoth.apps.improvement_composition import create_improvement_components
 from thoth.apps.improvement_composition import (
-    create_improvement_components,
-    register_improvement_handlers,
+    register_improvement_handlers as register_improvement_handlers,
 )
-from thoth.apps.judgment_review_composition import install_judgment_review
-from thoth.apps.lifecycle_routes import register_closure_and_export_methods
+from thoth.apps.judgment_review_composition import (
+    install_judgment_review as install_judgment_review,
+)
+from thoth.apps.lifecycle_routes import (
+    register_closure_and_export_methods as register_closure_and_export_methods,
+)
 from thoth.apps.management_routes import (
-    register_investigation_methods,
-    register_project_methods,
-    register_thread_methods,
+    register_investigation_methods as register_investigation_methods,
 )
-from thoth.apps.memory_composition import (
-    create_memory_components,
-    create_memory_handlers,
-    register_memory_handlers,
-)
+from thoth.apps.management_routes import register_project_methods as register_project_methods
+from thoth.apps.management_routes import register_thread_methods as register_thread_methods
+from thoth.apps.memory_composition import create_memory_components, create_memory_handlers
+from thoth.apps.memory_composition import register_memory_handlers as register_memory_handlers
 from thoth.apps.model_composition import create_models, wrap_research_models
-from thoth.apps.outcome_receipt_routes import register_outcome_and_receipt_methods
-from thoth.apps.projectpack_execution import ProjectPackExecutionFactory
-from thoth.apps.reference_composition import reference_thread_entry
-from thoth.apps.research_entry_composition import create_research_entry
+from thoth.apps.outcome_receipt_routes import (
+    register_outcome_and_receipt_methods as register_outcome_and_receipt_methods,
+)
+from thoth.apps.projectpack_execution import (
+    ProjectPackExecutionFactory as ProjectPackExecutionFactory,
+)
+from thoth.apps.reference_composition import reference_thread_entry as reference_thread_entry
+from thoth.apps.research_entry_composition import create_research_entry as create_research_entry
 from thoth.apps.research_runtime import create_research_components
 from thoth.apps.resource_scope_composition import (
     create_evidence_access,
     create_execution_access,
     create_memory_access,
     create_resources,
-    register_resource_handlers,
-    scope_bus,
-    source_policy_defaults,
 )
-from thoth.apps.revision_composition import create_revision_handlers, register_revision_methods
+from thoth.apps.resource_scope_composition import (
+    register_resource_handlers as register_resource_handlers,
+)
+from thoth.apps.resource_scope_composition import (
+    scope_bus as scope_bus,
+)
+from thoth.apps.resource_scope_composition import (
+    source_policy_defaults as source_policy_defaults,
+)
+from thoth.apps.revision_composition import create_revision_handlers as create_revision_handlers
+from thoth.apps.revision_composition import register_revision_methods as register_revision_methods
+from thoth.apps.runtime_entry import assemble_runtime_entry
+from thoth.apps.runtime_registration import register_runtime_methods
 from thoth.apps.runtime_types import AppRuntime, RuntimeOptions, RuntimeWithLedger
+from thoth.apps.sandbox_composition import create_sandbox_components
+from thoth.apps.source_command_composition import create_source_commands
 from thoth.apps.source_composition import (
     create_ingestion_service,
-    create_source_handlers,
     create_source_time_service,
 )
-from thoth.apps.source_evidence_routes import register_source_and_evidence_methods
+from thoth.apps.source_composition import create_source_handlers as create_source_handlers
+from thoth.apps.source_evidence_routes import (
+    register_source_and_evidence_methods as register_source_and_evidence_methods,
+)
 from thoth.apps.storage_composition import create_shared_storage_services, open_stores
-from thoth.apps.test_runtime import create_execution_components
-from thoth.apps.thread_analysis_composition import create_thread_analysis
+from thoth.apps.test_runtime import create_execution_components as create_execution_components
+from thoth.apps.thread_analysis_composition import create_research_queries, create_thread_analysis
 from thoth.domain.deployment_mode import DeploymentMode, parse_deployment_mode
 from thoth.domain.environment import EnvironmentProfile
-from thoth.domain.policy import preferred_hosts_from_payload
-from thoth.domain.public_web_access import PROJECT_PUBLIC_WEB_CONNECTOR_ID
+from thoth.domain.policy import preferred_hosts_from_payload as preferred_hosts_from_payload
+from thoth.domain.public_web_access import (
+    PROJECT_PUBLIC_WEB_CONNECTOR_ID as PROJECT_PUBLIC_WEB_CONNECTOR_ID,
+)
 from thoth.domain.resource_scope import ResourceScopePolicy
 from thoth.ports.evaluation_runner import EvaluationCatalogPort
 from thoth.ports.improvement import ImprovementEvaluatorPort
@@ -105,7 +170,7 @@ from thoth.ports.parser import ParserRegistryPort
 from thoth.ports.sandbox import SandboxPort
 from thoth.ports.store_bundle import StoreFactoryPort
 from thoth.ports.task_profile import TaskProfileCatalogPort
-from thoth.protocol.registry import MethodRegistry
+from thoth.protocol.registry import MethodRegistry as MethodRegistry
 
 if TYPE_CHECKING:
 
@@ -265,192 +330,78 @@ def create_runtime(
             )
         )
 
-        def hosts_for(project_id: str) -> tuple[str, ...]:
-            stored = governance.read_policy(project_id)
-            if stored is None:
-                return ()
-            return preferred_hosts_from_payload(stored.payload)
-
-        managed_web = ProjectPublicWebConnector(hosts_for)
-        if connector_registry is None:
-            effective_connectors = ConnectorRegistry(
-                (
-                    LocalFileConnector(workspace / "inbox"),
-                    GitReadConnector(workspace),
-                    managed_web,
-                )
-            )
-        else:
-            effective_connectors = connector_registry
-
-        def workspace_setup():
-            return read_setup(workspace)
-
-        connector_service = ConnectorService(
-            registry=effective_connectors,
-            ingestion=ingestion_service,
-            evidence_graph=evidence_graph_service,
-            projects=projects,
-            policies=PolicyGate(policies=governance, clock=clock),
-            unit_of_work=stores.acquisition_uow(
-                fault_injector=acquisition_fault_injector,
-                resource_scopes=artifact_ledger.scopes,
-            ),
-            controls=control_service,
-            clock=clock,
-            ids=ids,
-            workspace_setup=workspace_setup,
-        )
-        acquisition_coordinator = AcquisitionCoordinator(
-            connectors=connector_service,
-            evidence_graph=evidence_graph_service,
-            evidence_unit_of_work=evidence_unit_of_work,
-            investigations=investigation_service,
-            traces=acquisition_trace_store,
-            policies=governance,
-            clock=clock,
-            ids=ids,
-        )
-        critical_counter_search = CriticalCounterSearchCoordinator(
-            research=research_identity,
-            connectors=connector_service,
-            evidence_graph=evidence_graph_service,
-            evidence_unit_of_work=evidence_unit_of_work,
-            evidence_store=evidence_graph_store,
-            artifacts=artifact_ledger,
-            investigations=investigation_service,
-            traces=acquisition_trace_store,
+        acquisition = create_acquisition_components(
+            workspace=workspace,
+            connector_registry=connector_registry,
+            stores=stores,
             governance=governance,
-            policies=governance,
-            ledger=ledger,
+            projects=projects,
+            ingestion_service=ingestion_service,
+            evidence_graph_service=evidence_graph_service,
+            acquisition_fault_injector=acquisition_fault_injector,
+            artifact_ledger=artifact_ledger,
+            control_service=control_service,
             clock=clock,
             ids=ids,
+            evidence_unit_of_work=evidence_unit_of_work,
+            investigation_service=investigation_service,
+            acquisition_trace_store=acquisition_trace_store,
+            research_identity=research_identity,
+            evidence_graph_store=evidence_graph_store,
+            ledger=ledger,
         )
+        connector_service = acquisition.connector_service
         effective_models = wrap_research_models(
             behavior_runtime, create_models(model_resolver, artifact_ledger.scopes, workspace)
         )
-        effective_sandbox = sandbox_adapter or DisabledSandboxAdapter()
-        sandbox_router = RegisteredSandboxRouter()
-        sandbox_capability = effective_sandbox.capability
-        sandbox_router.register(
-            sandbox_capability.runtime_profile,
-            effective_sandbox,
-            available=sandbox_capability.available,
-            version=sandbox_capability.runtime_version,
-            security_tier=sandbox_capability.security_tier,
-            network_modes=sandbox_capability.network_modes,
-        )
-        sandbox_service = SandboxService(
-            router=sandbox_router,
-            artifacts=artifact_ledger,
-            objects=object_store,
-            controls=control_service,
-            ingestion=ingestion_service,
+        sandbox = create_sandbox_components(
+            sandbox_adapter=sandbox_adapter,
+            artifact_ledger=artifact_ledger,
+            object_store=object_store,
+            control_service=control_service,
+            ingestion_service=ingestion_service,
             projects=projects,
-            policies=PolicyGate(policies=governance, clock=clock),
-            ledger=ledger,
-            clock=clock,
-            ids=ids,
-        )
-        execution_service, r2_closed_loop = create_execution_components(
-            stores=stores,
-            research=research_components,
-            actions=action_store,
-            action_service=action_service,
-            executions=execution_store,
-            artifacts=artifact_ledger,
-            sandbox=sandbox_service,
-            ledger=ledger,
-            policies=governance,
-            clock=clock,
-            ids=ids,
-        )
-        decision_object_service = DecisionObjectService(
-            store=decision_object_store,
-            artifacts=artifact_ledger,
-            dependencies=dependency_graph,
-            ledger=ledger,
-            commits=RevisionCommitService(
-                ledger,
-                clock,
-                ids,
-                policy_version="decision-object:2.0.0",
-            ),
-            clock=clock,
-            ids=ids,
-        )
-        decision_object_service.seed_profiles()
-        outcome_service = OutcomeService(
-            store=outcome_store,
-            objects=decision_object_store,
-            actions=action_store,
-            executions=execution_store,
-            artifacts=artifact_ledger,
-            ledger=ledger,
-            commits=RevisionCommitService(
-                ledger,
-                clock,
-                ids,
-                policy_version="outcome:2.0.0",
-            ),
-            clock=clock,
-            ids=ids,
-            baselines=baseline_service,
-        )
-        outcome_service.seed_profiles()
-        project_handlers = ProjectCommandHandlers(
-            store=projects,
             governance=governance,
-            artifacts=artifact_ledger,
             ledger=ledger,
             clock=clock,
             ids=ids,
-            default_policy_payload=source_policy_defaults(
-                effective_connectors, environment_profile, sandbox_adapter, resource_scope_policy
-            ),
-            workspace_setup=workspace_setup,
-            public_web_registered=lambda: any(
-                item.connector_id == PROJECT_PUBLIC_WEB_CONNECTOR_ID
-                for item in effective_connectors.capabilities()
-            ),
+            stores=stores,
+            research_components=research_components,
+            action_store=action_store,
+            action_service=action_service,
+            execution_store=execution_store,
         )
-        evidence_handlers = EvidenceCommandHandlers(
-            store=evidence_graph_store,
-            service=evidence_graph_service,
-            artifacts=artifact_ledger,
-        )
-        criterion_handlers = CriterionFullHandlers(
-            store=criterion_store,
-            service=criterion_service,
-        )
-        object_handlers = DecisionObjectHandlers(
-            store=decision_object_store,
-            service=decision_object_service,
-            dependencies=dependency_graph,
-            threads=thread_store,
-        )
-        hypothesis_handlers = HypothesisHandlers(
-            store=hypothesis_store,
-            service=hypothesis_service,
-            objects=decision_object_store,
-            artifacts=artifact_ledger,
-            threads=thread_store,
-            investigations=investigation_service,
-        )
-        action_handlers = ActionHandlers(
-            store=action_store,
-            service=action_service,
-            objects=decision_object_store,
-            operations=operations,
-        )
-        execution_handlers = ExecutionHandlers(
-            store=execution_store,
-            actions=action_store,
-            service=execution_service,
-            sandbox=sandbox_service,
+        decision_commands = create_decision_command_components(
+            action_service=action_service,
+            action_store=action_store,
+            artifact_ledger=artifact_ledger,
+            baseline_service=baseline_service,
+            clock=clock,
+            criterion_service=criterion_service,
+            criterion_store=criterion_store,
+            decision_object_store=decision_object_store,
+            dependency_graph=dependency_graph,
+            effective_connectors=acquisition.effective_connectors,
+            environment_profile=environment_profile,
+            evidence_graph_service=evidence_graph_service,
+            evidence_graph_store=evidence_graph_store,
+            execution_service=sandbox.execution_service,
+            execution_store=execution_store,
+            governance=governance,
+            hypothesis_service=hypothesis_service,
+            hypothesis_store=hypothesis_store,
+            ids=ids,
+            investigation_service=investigation_service,
             ledger=ledger,
+            operations=operations,
+            outcome_store=outcome_store,
+            projects=projects,
+            resource_scope_policy=resource_scope_policy,
+            sandbox_adapter=sandbox_adapter,
+            sandbox_service=sandbox.sandbox_service,
+            thread_store=thread_store,
+            workspace_setup=acquisition.workspace_setup,
         )
-        outcome_handlers = OutcomeHandlers(store=outcome_store, service=outcome_service)
         export_handlers = create_export_handlers(
             stores=stores,
             workspace=workspace,
@@ -470,27 +421,22 @@ def create_runtime(
             ids=ids,
             investigation_service=investigation_service,
             investigations=investigation_store,
-            decision_objects=decision_object_service,
+            decision_objects=decision_commands.decision_object_service,
         )
-        projectpack_handlers = ProjectPackCommandHandlers(
-            loader=FilesystemProjectPackLoader(projectpack_root or Path("examples/projectpacks")),
-            executions=ProjectPackExecutionFactory(
-                storage_factory=storage_factory,
-                workspace=workspace,
-                models=effective_models,
-            ),
-        )
-        source_handlers = create_source_handlers(
+        source_commands = create_source_commands(
+            artifact_ledger=artifact_ledger,
+            clock=clock,
+            connector_service=connector_service,
+            effective_models=effective_models,
+            evidence_graph_service=evidence_graph_service,
+            ids=ids,
+            ingestion_service=ingestion_service,
+            ledger=ledger,
+            projectpack_root=projectpack_root,
+            source_time_service=source_time_service,
+            storage_factory=storage_factory,
             stores=stores,
             workspace=workspace,
-            ledger=ledger,
-            ingestion=ingestion_service,
-            clock=clock,
-            evidence_graph=evidence_graph_service,
-            ids=ids,
-            connectors=connector_service,
-            artifacts=artifact_ledger,
-            source_time=source_time_service,
         )
         thread_analysis_handlers = create_thread_analysis(
             stores,
@@ -499,9 +445,9 @@ def create_runtime(
             criterion_store,
             criterion_service,
             effective_models,
-            acquisition_coordinator,
-            critical_counter_search,
-            r2_closed_loop,
+            acquisition.acquisition_coordinator,
+            acquisition.critical_counter_search,
+            sandbox.r2_closed_loop,
             receipt_dag_service,
             full_memory_service,
             recursive_improvement,
@@ -510,44 +456,32 @@ def create_runtime(
             clock,
             ids,
         )
-        revision_handlers, revision_full_handlers = create_revision_handlers(
-            ledger,
-            stores,
-            control_store,
-            control_service,
-            dependency_graph,
-            governance,
-            clock,
-            ids,
-            baseline_service,
-            artifact_ledger.scopes,
-        )
-        receipt_handlers, lifecycle_handlers, closure_handlers = create_lifecycle_handlers(
-            stores=stores,
-            ledger=ledger,
-            records=control_store,
-            controls=control_service,
-            artifacts=artifact_ledger,
+        history_commands = create_history_commands(
+            action_store=action_store,
+            artifact_ledger=artifact_ledger,
+            baseline_service=baseline_service,
             clock=clock,
+            control_service=control_service,
+            control_store=control_store,
+            dependency_graph=dependency_graph,
+            execution_store=execution_store,
+            governance=governance,
             ids=ids,
-            dag=receipt_dag_service,
-            dag_store=receipt_dag_store,
-            actions=action_store,
-            executions=execution_store,
-            outcomes=outcome_store,
-            baselines=baseline_service,
-        )
-        projection_handlers = ProjectionQueryHandlers(
             ledger=ledger,
-            artifacts=artifact_ledger,
-            clock=clock,
-            research=research_identity,
+            outcome_store=outcome_store,
+            receipt_dag_service=receipt_dag_service,
+            receipt_dag_store=receipt_dag_store,
+            stores=stores,
         )
-        investigation_handlers = InvestigationQueryHandlers(
-            store=investigation_store,
-            service=investigation_service,
-            threads=thread_store,
-            acquisition=acquisition_trace_store,
+        queries = create_research_queries(
+            acquisition_trace_store=acquisition_trace_store,
+            artifact_ledger=artifact_ledger,
+            clock=clock,
+            investigation_service=investigation_service,
+            investigation_store=investigation_store,
+            ledger=ledger,
+            research_identity=research_identity,
+            thread_store=thread_store,
         )
         memory_full_handlers = create_memory_handlers(
             stores,
@@ -560,110 +494,54 @@ def create_runtime(
             full_memory_service,
         )
         field_measurement_handlers = FieldMeasurementHandlers(field_measurement_service)
-        registry = MethodRegistry()
-        register_resource_handlers(registry, artifact_ledger.scopes)
-        registry.register("field/protocol/seal", field_measurement_handlers.protocol_seal)
-        registry.register("field/session/start", field_measurement_handlers.session_start)
-        registry.register("field/event/record", field_measurement_handlers.event_record)
-        registry.register("field/session/end", field_measurement_handlers.session_end)
-        registry.register("field/score/record", field_measurement_handlers.score_record)
-        registry.register("field/export/build", field_measurement_handlers.export_build)
-        registry.register("projectpack/list", projectpack_handlers.list)
-        registry.register("projectpack/run", projectpack_handlers.run)
-        register_project_methods(registry, project_handlers, stores)
-        register_closure_and_export_methods(
-            registry, lifecycle_handlers, closure_handlers, export_handlers
+        registration = register_runtime_methods(
+            artifact_ledger=artifact_ledger,
+            baseline_service=baseline_service,
+            behavior_runtime=behavior_runtime,
+            clock=clock,
+            control_service=control_service,
+            criterion_service=criterion_service,
+            criterion_store=criterion_store,
+            decision_commands=decision_commands,
+            effective_models=effective_models,
+            evaluation_handlers=evaluation_handlers,
+            export_handlers=export_handlers,
+            field_measurement_handlers=field_measurement_handlers,
+            history_commands=history_commands,
+            hypothesis_store=hypothesis_store,
+            ids=ids,
+            improvement_handlers=improvement_handlers,
+            ledger=ledger,
+            memory_full_handlers=memory_full_handlers,
+            projects=projects,
+            research_queries=queries,
+            source_commands=source_commands,
+            stores=stores,
+            thread_analysis_handlers=thread_analysis_handlers,
+            thread_handlers=thread_handlers,
+            thread_store=thread_store,
         )
-        register_source_and_evidence_methods(registry, source_handlers, evidence_handlers)
-        register_thread_methods(registry, thread_handlers)
-        behavior_runtime.register_thread(
-            registry,
-            reference_thread_entry(
-                thread_analysis_handlers,
-                criteria=criterion_store,
-                service=criterion_service,
-                artifacts=artifact_ledger,
-                ledger=ledger,
-                threads=thread_store,
-                clock=clock,
-                ids=ids,
-                models=effective_models,
-                projects=projects,
-            ),
-        )
-        register_revision_methods(
-            registry,
-            revision_handlers,
-            revision_full_handlers,
-            stores,
-            artifact_ledger.scopes,
-            baseline_service,
-            clock,
-            ids,
-        )
-        register_decision_chain_methods(
-            registry, hypothesis_handlers, action_handlers, execution_handlers, projection_handlers
-        )
-        judgment_review = install_judgment_review(
-            registry, stores, control_service, hypothesis_store, clock, ids
-        )
-        register_criterion_and_object_methods(registry, criterion_handlers, object_handlers)
-        register_memory_handlers(registry, memory_full_handlers)
-        register_improvement_handlers(registry, improvement_handlers, evaluation_handlers)
-        register_outcome_and_receipt_methods(registry, outcome_handlers, receipt_handlers)
-        register_investigation_methods(registry, investigation_handlers)
-        research_component = create_research_entry(
-            registry,
-            stores,
-            thread_handlers,
-            artifact_ledger,
-            criterion_store,
-            connector_service,
-            full_memory_service,
-            evidence_graph_store,
-            effective_models,
-            clock,
-            ids,
-            task_profiles,
-            model_catalog,
-            model_resolver is None,
-            research_components.tests,
+        return assemble_runtime_entry(
+            registration=registration,
+            artifact_ledger=artifact_ledger,
+            clock=clock,
+            connector_service=connector_service,
+            criterion_store=criterion_store,
+            effective_models=effective_models,
+            evidence_graph_store=evidence_graph_store,
+            field_measurement_service=field_measurement_service,
+            full_memory_service=full_memory_service,
+            ids=ids,
+            ledger=ledger,
+            mode=mode,
+            model_catalog=model_catalog,
+            model_resolver=model_resolver,
+            operations=operations,
+            research_components=research_components,
+            stores=stores,
+            task_profiles=task_profiles,
+            thread_handlers=thread_handlers,
             workspace=workspace,
-            deployment_mode=mode,
-        )
-        before_continue = None
-        if mode is DeploymentMode.HOSTED_REVIEW:
-            from thoth.apps.hosted_review_dispatch import wait_for_hosted_dispatch
-
-            before_continue = wait_for_hosted_dispatch
-        bus = scope_bus(
-            registry,
-            ledger,
-            operations,
-            clock,
-            ids,
-            stores.events,
-            field_measurement_service,
-            artifact_ledger.scopes,
-            seal_abandoned_running=mode is DeploymentMode.HOSTED_REVIEW,
-            before_continue=before_continue,
-            queued_admission=research_component.entry.queued_admission,
-        )
-        judgment_review.connect(bus, research_component.entry)
-        from thoth.application.commands.research_queue_cancel import QueueAwareOperationCancel
-
-        registry.decorate(
-            "operation/cancel",
-            lambda original: (
-                QueueAwareOperationCancel(
-                    original, research_component.entry.records, research_component.entry.queue
-                ).cancel
-            ),
-        )
-
-        register_research_operations(registry, research_component.entry)
-        return RuntimeWithLedger(
-            bus=bus, ledger=ledger, close_storage=research_component.close_storage
         )
     except BaseException:
         stores.close()

@@ -74,6 +74,7 @@ async def connector_cleanup(
         return await action()
 
     task = asyncio.create_task(invoke())
+    caller_cancelled: asyncio.CancelledError | None = None
     try:
         done, _ = await asyncio.wait({task}, timeout=2.0)
         if done:
@@ -82,9 +83,12 @@ async def connector_cleanup(
         else:
             task.cancel()
             state = "CANCEL_REQUESTED"
-    except asyncio.CancelledError:
+    except asyncio.CancelledError as exc:
         task.cancel()
         state = "CANCEL_REQUESTED"
+        caller = asyncio.current_task()
+        if caller is not None and caller.cancelling():
+            caller_cancelled = exc
     except Exception:
         state = "FAILED"
     if not task.done():
@@ -105,4 +109,6 @@ async def connector_cleanup(
         usage = usage.model_copy(update={"observation_persisted": False})
     if work is not None:
         work.cleanup_usage[key] = usage
+    if caller_cancelled is not None:
+        raise caller_cancelled
     return usage

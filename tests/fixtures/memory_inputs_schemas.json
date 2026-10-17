@@ -1,0 +1,975 @@
+{
+  "ProjectInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "ProjectInput",
+    "type": "object"
+  },
+  "MemoryListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "recall_class": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Recall Class"
+      },
+      "payload_mode": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Payload Mode"
+      },
+      "pipeline_status": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Pipeline Status"
+      },
+      "lifecycle_status": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Lifecycle Status"
+      },
+      "recall_eligibility": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Recall Eligibility"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "MemoryListInput",
+    "type": "object"
+  },
+  "MemoryReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "memory_entry_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Memory Entry Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      }
+    },
+    "required": [
+      "project_id",
+      "memory_entry_id"
+    ],
+    "title": "MemoryReadInput",
+    "type": "object"
+  },
+  "CandidateListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "producer_role": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Producer Role"
+      },
+      "classification_status": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Classification Status"
+      },
+      "risk_tag": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Risk Tag"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "CandidateListInput",
+    "type": "object"
+  },
+  "CandidateReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "candidate_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Candidate Id",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "candidate_id"
+    ],
+    "title": "CandidateReadInput",
+    "type": "object"
+  },
+  "ContextReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "context_pack_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Context Pack Id"
+      },
+      "character_budget": {
+        "default": 20000,
+        "maximum": 2000000,
+        "minimum": 0,
+        "title": "Character Budget",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "ContextReadInput",
+    "type": "object"
+  },
+  "PolicyListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "recall_class": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Recall Class"
+      },
+      "payload_mode": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Payload Mode"
+      },
+      "enabled_only": {
+        "default": true,
+        "title": "Enabled Only",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "PolicyListInput",
+    "type": "object"
+  },
+  "PolicyReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "profile_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Profile Ref",
+        "type": "string"
+      },
+      "version": {
+        "anyOf": [
+          {
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Version"
+      }
+    },
+    "required": [
+      "project_id",
+      "profile_ref"
+    ],
+    "title": "PolicyReadInput",
+    "type": "object"
+  },
+  "GateReadInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "candidate_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Candidate Id"
+      },
+      "memory_entry_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Memory Entry Id"
+      },
+      "transition_receipt_ref": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Transition Receipt Ref"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "GateReadInput",
+    "type": "object"
+  },
+  "ConflictListInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "recall_class": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Recall Class"
+      },
+      "lifecycle_status": {
+        "anyOf": [
+          {
+            "maxLength": 80,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Lifecycle Status"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "ConflictListInput",
+    "type": "object"
+  },
+  "RecallAuditInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "context_pack_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Context Pack Id"
+      },
+      "thread_id": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Thread Id"
+      },
+      "time_range": {
+        "anyOf": [
+          {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Time Range"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "RecallAuditInput",
+    "type": "object"
+  },
+  "CandidateCreateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "producer_role": {
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Producer Role",
+        "type": "string"
+      },
+      "payload_mode": {
+        "pattern": "^(DOMAIN_REFERENCE|MEMORY_ASSERTION)$",
+        "title": "Payload Mode",
+        "type": "string"
+      },
+      "recall_class": {
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Recall Class",
+        "type": "string"
+      },
+      "domain_revision_ref": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Domain Revision Ref"
+      },
+      "assertion_candidate": {
+        "anyOf": [
+          {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Assertion Candidate"
+      },
+      "parent_refs": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "title": "Parent Refs",
+        "type": "array"
+      },
+      "scope": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "Scope",
+        "type": "object"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "risk_tags": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "title": "Risk Tags",
+        "type": "array"
+      }
+    },
+    "required": [
+      "project_id",
+      "producer_role",
+      "payload_mode",
+      "recall_class",
+      "scope",
+      "evidence_refs"
+    ],
+    "title": "CandidateCreateInput",
+    "type": "object"
+  },
+  "CandidateClassifyInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "candidate_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Candidate Id",
+        "type": "string"
+      },
+      "classifier_profile_ref": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Classifier Profile Ref",
+        "type": "string"
+      },
+      "expected_candidate_revision": {
+        "minimum": 1,
+        "title": "Expected Candidate Revision",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "project_id",
+      "candidate_id",
+      "classifier_profile_ref",
+      "expected_candidate_revision"
+    ],
+    "title": "CandidateClassifyInput",
+    "type": "object"
+  },
+  "ValidateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "candidate_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Candidate Id",
+        "type": "string"
+      },
+      "transition_intent": {
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Transition Intent",
+        "type": "string"
+      },
+      "policy_version": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Policy Version",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "candidate_id",
+      "transition_intent",
+      "policy_version"
+    ],
+    "title": "ValidateInput",
+    "type": "object"
+  },
+  "ChangeSetProposeInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "candidate_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Candidate Id",
+        "type": "string"
+      },
+      "transition_intent": {
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Transition Intent",
+        "type": "string"
+      },
+      "validated_gate_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Validated Gate Digest",
+        "type": "string"
+      },
+      "expected_memory_head_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Expected Memory Head Digest"
+      }
+    },
+    "required": [
+      "project_id",
+      "candidate_id",
+      "transition_intent",
+      "validated_gate_digest"
+    ],
+    "title": "ChangeSetProposeInput",
+    "type": "object"
+  },
+  "RevalidateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "memory_entry_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Memory Entry Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "trigger_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Trigger Refs",
+        "type": "array"
+      }
+    },
+    "required": [
+      "project_id",
+      "memory_entry_id",
+      "trigger_refs"
+    ],
+    "title": "RevalidateInput",
+    "type": "object"
+  },
+  "RetireProposeInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "memory_entry_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Memory Entry Id",
+        "type": "string"
+      },
+      "revision_digest": {
+        "anyOf": [
+          {
+            "maxLength": 64,
+            "minLength": 64,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Revision Digest"
+      },
+      "reason": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "title": "Reason",
+        "type": "string"
+      },
+      "evidence_refs": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Evidence Refs",
+        "type": "array"
+      },
+      "expected_revision_digest": {
+        "maxLength": 64,
+        "minLength": 64,
+        "title": "Expected Revision Digest",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "memory_entry_id",
+      "reason",
+      "evidence_refs",
+      "expected_revision_digest"
+    ],
+    "title": "RetireProposeInput",
+    "type": "object"
+  },
+  "ContextBuildInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "thread_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Thread Id",
+        "type": "string"
+      },
+      "query": {
+        "maxLength": 10000,
+        "minLength": 1,
+        "title": "Query",
+        "type": "string"
+      },
+      "target_use": {
+        "maxLength": 80,
+        "minLength": 1,
+        "title": "Target Use",
+        "type": "string"
+      },
+      "scope": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "title": "Scope",
+        "type": "object"
+      },
+      "token_budget": {
+        "maximum": 2000000,
+        "minimum": 0,
+        "title": "Token Budget",
+        "type": "integer"
+      },
+      "selection_policy_version": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Selection Policy Version",
+        "type": "string"
+      },
+      "cutoff": {
+        "anyOf": [
+          {
+            "format": "date-time",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Cutoff"
+      }
+    },
+    "required": [
+      "project_id",
+      "thread_id",
+      "query",
+      "target_use",
+      "scope",
+      "token_budget",
+      "selection_policy_version"
+    ],
+    "title": "ContextBuildInput",
+    "type": "object"
+  },
+  "ProjectionRebuildInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "projection_types": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Projection Types",
+        "type": "array"
+      },
+      "from_checkpoint": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "From Checkpoint"
+      },
+      "model_or_index_version": {
+        "anyOf": [
+          {
+            "maxLength": 160,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Model Or Index Version"
+      }
+    },
+    "required": [
+      "project_id",
+      "projection_types"
+    ],
+    "title": "ProjectionRebuildInput",
+    "type": "object"
+  },
+  "RetentionEvaluateInput": {
+    "additionalProperties": false,
+    "properties": {
+      "project_id": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Project Id",
+        "type": "string"
+      },
+      "scope": {
+        "anyOf": [
+          {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Scope"
+      },
+      "policy_version": {
+        "maxLength": 160,
+        "minLength": 1,
+        "title": "Policy Version",
+        "type": "string"
+      },
+      "evaluation_time": {
+        "format": "date-time",
+        "title": "Evaluation Time",
+        "type": "string"
+      }
+    },
+    "required": [
+      "project_id",
+      "policy_version",
+      "evaluation_time"
+    ],
+    "title": "RetentionEvaluateInput",
+    "type": "object"
+  }
+}

@@ -1,0 +1,2812 @@
+{
+  "contract": {
+    "heads": [
+      "3b06e4f87d92"
+    ],
+    "schema_rows": [
+      [
+        "index",
+        "ix_acquisition_search_intents_investigation_id",
+        "acquisition_search_intents",
+        "CREATE INDEX ix_acquisition_search_intents_investigation_id ON acquisition_search_intents (investigation_id)"
+      ],
+      [
+        "index",
+        "ix_acquisition_search_intents_project_id",
+        "acquisition_search_intents",
+        "CREATE INDEX ix_acquisition_search_intents_project_id ON acquisition_search_intents (project_id)"
+      ],
+      [
+        "index",
+        "ix_action_audit_project_id",
+        "action_audit",
+        "CREATE INDEX ix_action_audit_project_id ON action_audit (project_id)"
+      ],
+      [
+        "index",
+        "ix_action_audit_subject_id",
+        "action_audit",
+        "CREATE INDEX ix_action_audit_subject_id ON action_audit (subject_id)"
+      ],
+      [
+        "index",
+        "ix_action_authorizations_authorization_id",
+        "action_authorizations",
+        "CREATE INDEX ix_action_authorizations_authorization_id ON action_authorizations (authorization_id)"
+      ],
+      [
+        "index",
+        "ix_action_authorizations_plan_id",
+        "action_authorizations",
+        "CREATE INDEX ix_action_authorizations_plan_id ON action_authorizations (plan_id)"
+      ],
+      [
+        "index",
+        "ix_action_authorizations_project_id",
+        "action_authorizations",
+        "CREATE INDEX ix_action_authorizations_project_id ON action_authorizations (project_id)"
+      ],
+      [
+        "index",
+        "ix_action_authorizations_step_id",
+        "action_authorizations",
+        "CREATE INDEX ix_action_authorizations_step_id ON action_authorizations (step_id)"
+      ],
+      [
+        "index",
+        "ix_action_plans_object_id",
+        "action_plans",
+        "CREATE INDEX ix_action_plans_object_id ON action_plans (object_id)"
+      ],
+      [
+        "index",
+        "ix_action_plans_plan_id",
+        "action_plans",
+        "CREATE INDEX ix_action_plans_plan_id ON action_plans (plan_id)"
+      ],
+      [
+        "index",
+        "ix_action_plans_project_id",
+        "action_plans",
+        "CREATE INDEX ix_action_plans_project_id ON action_plans (project_id)"
+      ],
+      [
+        "index",
+        "ix_action_portfolios_object_id",
+        "action_portfolios",
+        "CREATE INDEX ix_action_portfolios_object_id ON action_portfolios (object_id)"
+      ],
+      [
+        "index",
+        "ix_action_portfolios_portfolio_id",
+        "action_portfolios",
+        "CREATE INDEX ix_action_portfolios_portfolio_id ON action_portfolios (portfolio_id)"
+      ],
+      [
+        "index",
+        "ix_action_portfolios_project_id",
+        "action_portfolios",
+        "CREATE INDEX ix_action_portfolios_project_id ON action_portfolios (project_id)"
+      ],
+      [
+        "index",
+        "ix_action_records_action_id",
+        "action_records",
+        "CREATE INDEX ix_action_records_action_id ON action_records (action_id)"
+      ],
+      [
+        "index",
+        "ix_action_records_object_id",
+        "action_records",
+        "CREATE INDEX ix_action_records_object_id ON action_records (object_id)"
+      ],
+      [
+        "index",
+        "ix_action_records_portfolio_id",
+        "action_records",
+        "CREATE INDEX ix_action_records_portfolio_id ON action_records (portfolio_id)"
+      ],
+      [
+        "index",
+        "ix_action_records_project_id",
+        "action_records",
+        "CREATE INDEX ix_action_records_project_id ON action_records (project_id)"
+      ],
+      [
+        "index",
+        "ix_artifacts_project_id",
+        "artifacts",
+        "CREATE INDEX ix_artifacts_project_id ON artifacts (project_id)"
+      ],
+      [
+        "index",
+        "ix_auth_sessions_actor_id",
+        "auth_sessions",
+        "CREATE INDEX ix_auth_sessions_actor_id ON auth_sessions (actor_id)"
+      ],
+      [
+        "index",
+        "ix_auth_sessions_project_id",
+        "auth_sessions",
+        "CREATE INDEX ix_auth_sessions_project_id ON auth_sessions (project_id)"
+      ],
+      [
+        "index",
+        "ix_baseline_candidates_project_id",
+        "baseline_candidates",
+        "CREATE INDEX ix_baseline_candidates_project_id ON baseline_candidates (project_id)"
+      ],
+      [
+        "index",
+        "ix_baseline_decisions_project_id",
+        "baseline_decisions",
+        "CREATE INDEX ix_baseline_decisions_project_id ON baseline_decisions (project_id)"
+      ],
+      [
+        "index",
+        "ix_baseline_sets_project_id",
+        "baseline_sets",
+        "CREATE INDEX ix_baseline_sets_project_id ON baseline_sets (project_id)"
+      ],
+      [
+        "index",
+        "ix_behavior_artifacts_project_id",
+        "behavior_artifacts",
+        "CREATE INDEX ix_behavior_artifacts_project_id ON behavior_artifacts (project_id)"
+      ],
+      [
+        "index",
+        "ix_control_records_namespace",
+        "control_records",
+        "CREATE INDEX ix_control_records_namespace ON control_records (namespace)"
+      ],
+      [
+        "index",
+        "ix_control_records_project_id",
+        "control_records",
+        "CREATE INDEX ix_control_records_project_id ON control_records (project_id)"
+      ],
+      [
+        "index",
+        "ix_control_records_record_id",
+        "control_records",
+        "CREATE INDEX ix_control_records_record_id ON control_records (record_id)"
+      ],
+      [
+        "index",
+        "ix_control_records_record_type",
+        "control_records",
+        "CREATE INDEX ix_control_records_record_type ON control_records (record_type)"
+      ],
+      [
+        "index",
+        "ix_control_records_state",
+        "control_records",
+        "CREATE INDEX ix_control_records_state ON control_records (state)"
+      ],
+      [
+        "index",
+        "ix_criterion_audit_criterion_id",
+        "criterion_audit",
+        "CREATE INDEX ix_criterion_audit_criterion_id ON criterion_audit (criterion_id)"
+      ],
+      [
+        "index",
+        "ix_criterion_audit_project_id",
+        "criterion_audit",
+        "CREATE INDEX ix_criterion_audit_project_id ON criterion_audit (project_id)"
+      ],
+      [
+        "index",
+        "ix_criterion_conflicts_criterion_id",
+        "criterion_conflicts",
+        "CREATE INDEX ix_criterion_conflicts_criterion_id ON criterion_conflicts (criterion_id)"
+      ],
+      [
+        "index",
+        "ix_criterion_conflicts_project_id",
+        "criterion_conflicts",
+        "CREATE INDEX ix_criterion_conflicts_project_id ON criterion_conflicts (project_id)"
+      ],
+      [
+        "index",
+        "ix_criterion_contracts_criterion_id",
+        "criterion_contracts",
+        "CREATE INDEX ix_criterion_contracts_criterion_id ON criterion_contracts (criterion_id)"
+      ],
+      [
+        "index",
+        "ix_criterion_contracts_project_id",
+        "criterion_contracts",
+        "CREATE INDEX ix_criterion_contracts_project_id ON criterion_contracts (project_id)"
+      ],
+      [
+        "index",
+        "ix_criterion_references_criterion_id",
+        "criterion_references",
+        "CREATE INDEX ix_criterion_references_criterion_id ON criterion_references (criterion_id)"
+      ],
+      [
+        "index",
+        "ix_criterion_references_project_id",
+        "criterion_references",
+        "CREATE INDEX ix_criterion_references_project_id ON criterion_references (project_id)"
+      ],
+      [
+        "index",
+        "ix_decision_objects_object_id",
+        "decision_objects",
+        "CREATE INDEX ix_decision_objects_object_id ON decision_objects (object_id)"
+      ],
+      [
+        "index",
+        "ix_decision_objects_project_id",
+        "decision_objects",
+        "CREATE INDEX ix_decision_objects_project_id ON decision_objects (project_id)"
+      ],
+      [
+        "index",
+        "ix_decision_objects_thread_id",
+        "decision_objects",
+        "CREATE INDEX ix_decision_objects_thread_id ON decision_objects (thread_id)"
+      ],
+      [
+        "index",
+        "ix_entity_snapshots_entity_id",
+        "entity_snapshots",
+        "CREATE INDEX ix_entity_snapshots_entity_id ON entity_snapshots (entity_id)"
+      ],
+      [
+        "index",
+        "ix_entity_snapshots_entity_type",
+        "entity_snapshots",
+        "CREATE INDEX ix_entity_snapshots_entity_type ON entity_snapshots (entity_type)"
+      ],
+      [
+        "index",
+        "ix_entity_snapshots_project_id",
+        "entity_snapshots",
+        "CREATE INDEX ix_entity_snapshots_project_id ON entity_snapshots (project_id)"
+      ],
+      [
+        "index",
+        "ix_events_project_id",
+        "events",
+        "CREATE INDEX ix_events_project_id ON events (project_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_audit_evidence_ref",
+        "evidence_audit",
+        "CREATE INDEX ix_evidence_audit_evidence_ref ON evidence_audit (evidence_ref)"
+      ],
+      [
+        "index",
+        "ix_evidence_audit_project_id",
+        "evidence_audit",
+        "CREATE INDEX ix_evidence_audit_project_id ON evidence_audit (project_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_conflicts_project_id",
+        "evidence_conflicts",
+        "CREATE INDEX ix_evidence_conflicts_project_id ON evidence_conflicts (project_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_leads_investigation_id",
+        "evidence_leads",
+        "CREATE INDEX ix_evidence_leads_investigation_id ON evidence_leads (investigation_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_leads_project_id",
+        "evidence_leads",
+        "CREATE INDEX ix_evidence_leads_project_id ON evidence_leads (project_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_leads_search_intent_id",
+        "evidence_leads",
+        "CREATE INDEX ix_evidence_leads_search_intent_id ON evidence_leads (search_intent_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_leads_source_id",
+        "evidence_leads",
+        "CREATE INDEX ix_evidence_leads_source_id ON evidence_leads (source_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_leads_span_id",
+        "evidence_leads",
+        "CREATE INDEX ix_evidence_leads_span_id ON evidence_leads (span_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_leads_state",
+        "evidence_leads",
+        "CREATE INDEX ix_evidence_leads_state ON evidence_leads (state)"
+      ],
+      [
+        "index",
+        "ix_evidence_links_project_id",
+        "evidence_links",
+        "CREATE INDEX ix_evidence_links_project_id ON evidence_links (project_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_links_target_id",
+        "evidence_links",
+        "CREATE INDEX ix_evidence_links_target_id ON evidence_links (target_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_observations_project_id",
+        "evidence_observations",
+        "CREATE INDEX ix_evidence_observations_project_id ON evidence_observations (project_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_sources_artifact_id",
+        "evidence_sources",
+        "CREATE INDEX ix_evidence_sources_artifact_id ON evidence_sources (artifact_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_sources_project_id",
+        "evidence_sources",
+        "CREATE INDEX ix_evidence_sources_project_id ON evidence_sources (project_id)"
+      ],
+      [
+        "index",
+        "ix_evidence_spans_project_id",
+        "evidence_spans",
+        "CREATE INDEX ix_evidence_spans_project_id ON evidence_spans (project_id)"
+      ],
+      [
+        "index",
+        "ix_execution_audit_plan_execution_id",
+        "execution_audit",
+        "CREATE INDEX ix_execution_audit_plan_execution_id ON execution_audit (plan_execution_id)"
+      ],
+      [
+        "index",
+        "ix_execution_audit_project_id",
+        "execution_audit",
+        "CREATE INDEX ix_execution_audit_project_id ON execution_audit (project_id)"
+      ],
+      [
+        "index",
+        "ix_execution_effects_attempt_id",
+        "execution_effects",
+        "CREATE INDEX ix_execution_effects_attempt_id ON execution_effects (attempt_id)"
+      ],
+      [
+        "index",
+        "ix_execution_effects_project_id",
+        "execution_effects",
+        "CREATE INDEX ix_execution_effects_project_id ON execution_effects (project_id)"
+      ],
+      [
+        "index",
+        "ix_execution_reconciliations_attempt_id",
+        "execution_reconciliations",
+        "CREATE INDEX ix_execution_reconciliations_attempt_id ON execution_reconciliations (attempt_id)"
+      ],
+      [
+        "index",
+        "ix_execution_reconciliations_plan_execution_id",
+        "execution_reconciliations",
+        "CREATE INDEX ix_execution_reconciliations_plan_execution_id ON execution_reconciliations (plan_execution_id)"
+      ],
+      [
+        "index",
+        "ix_execution_reconciliations_project_id",
+        "execution_reconciliations",
+        "CREATE INDEX ix_execution_reconciliations_project_id ON execution_reconciliations (project_id)"
+      ],
+      [
+        "index",
+        "ix_field_events_project_id",
+        "field_events",
+        "CREATE INDEX ix_field_events_project_id ON field_events (project_id)"
+      ],
+      [
+        "index",
+        "ix_field_events_session_id",
+        "field_events",
+        "CREATE INDEX ix_field_events_session_id ON field_events (session_id)"
+      ],
+      [
+        "index",
+        "ix_field_exports_project_id",
+        "field_exports",
+        "CREATE INDEX ix_field_exports_project_id ON field_exports (project_id)"
+      ],
+      [
+        "index",
+        "ix_field_protocol_seals_project_id",
+        "field_protocol_seals",
+        "CREATE INDEX ix_field_protocol_seals_project_id ON field_protocol_seals (project_id)"
+      ],
+      [
+        "index",
+        "ix_field_scores_project_id",
+        "field_scores",
+        "CREATE INDEX ix_field_scores_project_id ON field_scores (project_id)"
+      ],
+      [
+        "index",
+        "ix_field_scores_session_id",
+        "field_scores",
+        "CREATE INDEX ix_field_scores_session_id ON field_scores (session_id)"
+      ],
+      [
+        "index",
+        "ix_field_session_metrics_project_id",
+        "field_session_metrics",
+        "CREATE INDEX ix_field_session_metrics_project_id ON field_session_metrics (project_id)"
+      ],
+      [
+        "index",
+        "ix_field_sessions_project_id",
+        "field_sessions",
+        "CREATE INDEX ix_field_sessions_project_id ON field_sessions (project_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_appraisals_hypothesis_id",
+        "hypothesis_appraisals",
+        "CREATE INDEX ix_hypothesis_appraisals_hypothesis_id ON hypothesis_appraisals (hypothesis_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_appraisals_project_id",
+        "hypothesis_appraisals",
+        "CREATE INDEX ix_hypothesis_appraisals_project_id ON hypothesis_appraisals (project_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_assumptions_hypothesis_id",
+        "hypothesis_assumptions",
+        "CREATE INDEX ix_hypothesis_assumptions_hypothesis_id ON hypothesis_assumptions (hypothesis_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_assumptions_project_id",
+        "hypothesis_assumptions",
+        "CREATE INDEX ix_hypothesis_assumptions_project_id ON hypothesis_assumptions (project_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_audit_hypothesis_id",
+        "hypothesis_audit",
+        "CREATE INDEX ix_hypothesis_audit_hypothesis_id ON hypothesis_audit (hypothesis_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_audit_project_id",
+        "hypothesis_audit",
+        "CREATE INDEX ix_hypothesis_audit_project_id ON hypothesis_audit (project_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_portfolios_object_id",
+        "hypothesis_portfolios",
+        "CREATE INDEX ix_hypothesis_portfolios_object_id ON hypothesis_portfolios (object_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_portfolios_portfolio_id",
+        "hypothesis_portfolios",
+        "CREATE INDEX ix_hypothesis_portfolios_portfolio_id ON hypothesis_portfolios (portfolio_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_portfolios_project_id",
+        "hypothesis_portfolios",
+        "CREATE INDEX ix_hypothesis_portfolios_project_id ON hypothesis_portfolios (project_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_predictions_hypothesis_id",
+        "hypothesis_predictions",
+        "CREATE INDEX ix_hypothesis_predictions_hypothesis_id ON hypothesis_predictions (hypothesis_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_predictions_project_id",
+        "hypothesis_predictions",
+        "CREATE INDEX ix_hypothesis_predictions_project_id ON hypothesis_predictions (project_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_records_hypothesis_id",
+        "hypothesis_records",
+        "CREATE INDEX ix_hypothesis_records_hypothesis_id ON hypothesis_records (hypothesis_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_records_object_id",
+        "hypothesis_records",
+        "CREATE INDEX ix_hypothesis_records_object_id ON hypothesis_records (object_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_records_portfolio_id",
+        "hypothesis_records",
+        "CREATE INDEX ix_hypothesis_records_portfolio_id ON hypothesis_records (portfolio_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_records_project_id",
+        "hypothesis_records",
+        "CREATE INDEX ix_hypothesis_records_project_id ON hypothesis_records (project_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_relations_portfolio_id",
+        "hypothesis_relations",
+        "CREATE INDEX ix_hypothesis_relations_portfolio_id ON hypothesis_relations (portfolio_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_relations_project_id",
+        "hypothesis_relations",
+        "CREATE INDEX ix_hypothesis_relations_project_id ON hypothesis_relations (project_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_relations_relation_id",
+        "hypothesis_relations",
+        "CREATE INDEX ix_hypothesis_relations_relation_id ON hypothesis_relations (relation_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_test_bindings_prediction_id",
+        "hypothesis_test_bindings",
+        "CREATE INDEX ix_hypothesis_test_bindings_prediction_id ON hypothesis_test_bindings (prediction_id)"
+      ],
+      [
+        "index",
+        "ix_hypothesis_test_bindings_project_id",
+        "hypothesis_test_bindings",
+        "CREATE INDEX ix_hypothesis_test_bindings_project_id ON hypothesis_test_bindings (project_id)"
+      ],
+      [
+        "index",
+        "ix_investigation_audit_investigation_id",
+        "investigation_audit",
+        "CREATE INDEX ix_investigation_audit_investigation_id ON investigation_audit (investigation_id)"
+      ],
+      [
+        "index",
+        "ix_investigation_audit_project_id",
+        "investigation_audit",
+        "CREATE INDEX ix_investigation_audit_project_id ON investigation_audit (project_id)"
+      ],
+      [
+        "index",
+        "ix_investigations_project_id",
+        "investigations",
+        "CREATE INDEX ix_investigations_project_id ON investigations (project_id)"
+      ],
+      [
+        "index",
+        "ix_investigations_thread_id",
+        "investigations",
+        "CREATE INDEX ix_investigations_thread_id ON investigations (thread_id)"
+      ],
+      [
+        "index",
+        "ix_memory_context_packs_project_id",
+        "memory_context_packs",
+        "CREATE INDEX ix_memory_context_packs_project_id ON memory_context_packs (project_id)"
+      ],
+      [
+        "index",
+        "ix_memory_projections_project_id",
+        "memory_projections",
+        "CREATE INDEX ix_memory_projections_project_id ON memory_projections (project_id)"
+      ],
+      [
+        "index",
+        "ix_memory_records_project_id",
+        "memory_records",
+        "CREATE INDEX ix_memory_records_project_id ON memory_records (project_id)"
+      ],
+      [
+        "index",
+        "ix_memory_revision_ledger_project_id",
+        "memory_revision_ledger",
+        "CREATE INDEX ix_memory_revision_ledger_project_id ON memory_revision_ledger (project_id)"
+      ],
+      [
+        "index",
+        "ix_memory_transition_receipts_project_id",
+        "memory_transition_receipts",
+        "CREATE INDEX ix_memory_transition_receipts_project_id ON memory_transition_receipts (project_id)"
+      ],
+      [
+        "index",
+        "ix_object_attention_attention_id",
+        "object_attention",
+        "CREATE INDEX ix_object_attention_attention_id ON object_attention (attention_id)"
+      ],
+      [
+        "index",
+        "ix_object_attention_object_id",
+        "object_attention",
+        "CREATE INDEX ix_object_attention_object_id ON object_attention (object_id)"
+      ],
+      [
+        "index",
+        "ix_object_attention_project_id",
+        "object_attention",
+        "CREATE INDEX ix_object_attention_project_id ON object_attention (project_id)"
+      ],
+      [
+        "index",
+        "ix_object_audit_object_id",
+        "object_audit",
+        "CREATE INDEX ix_object_audit_object_id ON object_audit (object_id)"
+      ],
+      [
+        "index",
+        "ix_object_audit_project_id",
+        "object_audit",
+        "CREATE INDEX ix_object_audit_project_id ON object_audit (project_id)"
+      ],
+      [
+        "index",
+        "ix_object_candidates_project_id",
+        "object_candidates",
+        "CREATE INDEX ix_object_candidates_project_id ON object_candidates (project_id)"
+      ],
+      [
+        "index",
+        "ix_object_candidates_thread_id",
+        "object_candidates",
+        "CREATE INDEX ix_object_candidates_thread_id ON object_candidates (thread_id)"
+      ],
+      [
+        "index",
+        "ix_object_relations_project_id",
+        "object_relations",
+        "CREATE INDEX ix_object_relations_project_id ON object_relations (project_id)"
+      ],
+      [
+        "index",
+        "ix_object_relations_relation_id",
+        "object_relations",
+        "CREATE INDEX ix_object_relations_relation_id ON object_relations (relation_id)"
+      ],
+      [
+        "index",
+        "ix_object_relations_source_object_id",
+        "object_relations",
+        "CREATE INDEX ix_object_relations_source_object_id ON object_relations (source_object_id)"
+      ],
+      [
+        "index",
+        "ix_operations_project_id",
+        "operations",
+        "CREATE INDEX ix_operations_project_id ON operations (project_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_assessments_object_id",
+        "outcome_assessments",
+        "CREATE INDEX ix_outcome_assessments_object_id ON outcome_assessments (object_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_assessments_outcome_assessment_id",
+        "outcome_assessments",
+        "CREATE INDEX ix_outcome_assessments_outcome_assessment_id ON outcome_assessments (outcome_assessment_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_assessments_outcome_series_id",
+        "outcome_assessments",
+        "CREATE INDEX ix_outcome_assessments_outcome_series_id ON outcome_assessments (outcome_series_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_assessments_project_id",
+        "outcome_assessments",
+        "CREATE INDEX ix_outcome_assessments_project_id ON outcome_assessments (project_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_attributions_outcome_assessment_id",
+        "outcome_attributions",
+        "CREATE INDEX ix_outcome_attributions_outcome_assessment_id ON outcome_attributions (outcome_assessment_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_attributions_project_id",
+        "outcome_attributions",
+        "CREATE INDEX ix_outcome_attributions_project_id ON outcome_attributions (project_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_audit_project_id",
+        "outcome_audit",
+        "CREATE INDEX ix_outcome_audit_project_id ON outcome_audit (project_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_audit_subject_id",
+        "outcome_audit",
+        "CREATE INDEX ix_outcome_audit_subject_id ON outcome_audit (subject_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_change_sets_outcome_assessment_id",
+        "outcome_change_sets",
+        "CREATE INDEX ix_outcome_change_sets_outcome_assessment_id ON outcome_change_sets (outcome_assessment_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_change_sets_project_id",
+        "outcome_change_sets",
+        "CREATE INDEX ix_outcome_change_sets_project_id ON outcome_change_sets (project_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_impacts_outcome_series_id",
+        "outcome_impacts",
+        "CREATE INDEX ix_outcome_impacts_outcome_series_id ON outcome_impacts (outcome_series_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_impacts_project_id",
+        "outcome_impacts",
+        "CREATE INDEX ix_outcome_impacts_project_id ON outcome_impacts (project_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_series_object_id",
+        "outcome_series",
+        "CREATE INDEX ix_outcome_series_object_id ON outcome_series (object_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_series_outcome_series_id",
+        "outcome_series",
+        "CREATE INDEX ix_outcome_series_outcome_series_id ON outcome_series (outcome_series_id)"
+      ],
+      [
+        "index",
+        "ix_outcome_series_project_id",
+        "outcome_series",
+        "CREATE INDEX ix_outcome_series_project_id ON outcome_series (project_id)"
+      ],
+      [
+        "index",
+        "ix_plan_executions_object_id",
+        "plan_executions",
+        "CREATE INDEX ix_plan_executions_object_id ON plan_executions (object_id)"
+      ],
+      [
+        "index",
+        "ix_plan_executions_plan_execution_id",
+        "plan_executions",
+        "CREATE INDEX ix_plan_executions_plan_execution_id ON plan_executions (plan_execution_id)"
+      ],
+      [
+        "index",
+        "ix_plan_executions_plan_id",
+        "plan_executions",
+        "CREATE INDEX ix_plan_executions_plan_id ON plan_executions (plan_id)"
+      ],
+      [
+        "index",
+        "ix_plan_executions_project_id",
+        "plan_executions",
+        "CREATE INDEX ix_plan_executions_project_id ON plan_executions (project_id)"
+      ],
+      [
+        "index",
+        "ix_project_policies_project_id",
+        "project_policies",
+        "CREATE INDEX ix_project_policies_project_id ON project_policies (project_id)"
+      ],
+      [
+        "index",
+        "ix_project_references_project_id",
+        "project_references",
+        "CREATE INDEX ix_project_references_project_id ON project_references (project_id)"
+      ],
+      [
+        "index",
+        "ix_project_roles_actor_id",
+        "project_roles",
+        "CREATE INDEX ix_project_roles_actor_id ON project_roles (actor_id)"
+      ],
+      [
+        "index",
+        "ix_project_roles_project_id",
+        "project_roles",
+        "CREATE INDEX ix_project_roles_project_id ON project_roles (project_id)"
+      ],
+      [
+        "index",
+        "ix_receipt_dag_bundles_project_id",
+        "receipt_dag_bundles",
+        "CREATE INDEX ix_receipt_dag_bundles_project_id ON receipt_dag_bundles (project_id)"
+      ],
+      [
+        "index",
+        "ix_receipt_dag_edges_project_id",
+        "receipt_dag_edges",
+        "CREATE INDEX ix_receipt_dag_edges_project_id ON receipt_dag_edges (project_id)"
+      ],
+      [
+        "index",
+        "ix_receipt_dag_manifests_project_id",
+        "receipt_dag_manifests",
+        "CREATE INDEX ix_receipt_dag_manifests_project_id ON receipt_dag_manifests (project_id)"
+      ],
+      [
+        "index",
+        "ix_receipt_dag_nodes_project_id",
+        "receipt_dag_nodes",
+        "CREATE INDEX ix_receipt_dag_nodes_project_id ON receipt_dag_nodes (project_id)"
+      ],
+      [
+        "index",
+        "ix_receipt_dag_verifications_project_id",
+        "receipt_dag_verifications",
+        "CREATE INDEX ix_receipt_dag_verifications_project_id ON receipt_dag_verifications (project_id)"
+      ],
+      [
+        "index",
+        "ix_receipts_project_id",
+        "receipts",
+        "CREATE INDEX ix_receipts_project_id ON receipts (project_id)"
+      ],
+      [
+        "index",
+        "ix_relations_project_id",
+        "relations",
+        "CREATE INDEX ix_relations_project_id ON relations (project_id)"
+      ],
+      [
+        "index",
+        "ix_relations_source_ref",
+        "relations",
+        "CREATE INDEX ix_relations_source_ref ON relations (source_ref)"
+      ],
+      [
+        "index",
+        "ix_research_identity_entity",
+        "research_identities",
+        "CREATE INDEX ix_research_identity_entity ON research_identities (entity_id, aggregate_kind)"
+      ],
+      [
+        "index",
+        "ix_semantic_revisions_entity_id",
+        "semantic_revisions",
+        "CREATE INDEX ix_semantic_revisions_entity_id ON semantic_revisions (entity_id)"
+      ],
+      [
+        "index",
+        "ix_semantic_revisions_entity_type",
+        "semantic_revisions",
+        "CREATE INDEX ix_semantic_revisions_entity_type ON semantic_revisions (entity_type)"
+      ],
+      [
+        "index",
+        "ix_semantic_revisions_project_id",
+        "semantic_revisions",
+        "CREATE INDEX ix_semantic_revisions_project_id ON semantic_revisions (project_id)"
+      ],
+      [
+        "index",
+        "ix_source_bindings_artifact_id",
+        "source_bindings",
+        "CREATE INDEX ix_source_bindings_artifact_id ON source_bindings (artifact_id)"
+      ],
+      [
+        "index",
+        "ix_source_bindings_project_id",
+        "source_bindings",
+        "CREATE INDEX ix_source_bindings_project_id ON source_bindings (project_id)"
+      ],
+      [
+        "index",
+        "ix_span_corrections_project_id",
+        "span_corrections",
+        "CREATE INDEX ix_span_corrections_project_id ON span_corrections (project_id)"
+      ],
+      [
+        "index",
+        "ix_span_corrections_span_id",
+        "span_corrections",
+        "CREATE INDEX ix_span_corrections_span_id ON span_corrections (span_id)"
+      ],
+      [
+        "index",
+        "ix_step_execution_attempts_attempt_id",
+        "step_execution_attempts",
+        "CREATE INDEX ix_step_execution_attempts_attempt_id ON step_execution_attempts (attempt_id)"
+      ],
+      [
+        "index",
+        "ix_step_execution_attempts_plan_execution_id",
+        "step_execution_attempts",
+        "CREATE INDEX ix_step_execution_attempts_plan_execution_id ON step_execution_attempts (plan_execution_id)"
+      ],
+      [
+        "index",
+        "ix_step_execution_attempts_project_id",
+        "step_execution_attempts",
+        "CREATE INDEX ix_step_execution_attempts_project_id ON step_execution_attempts (project_id)"
+      ],
+      [
+        "index",
+        "ix_step_execution_attempts_step_id",
+        "step_execution_attempts",
+        "CREATE INDEX ix_step_execution_attempts_step_id ON step_execution_attempts (step_id)"
+      ],
+      [
+        "index",
+        "ix_structural_nodes_artifact_id",
+        "structural_nodes",
+        "CREATE INDEX ix_structural_nodes_artifact_id ON structural_nodes (artifact_id)"
+      ],
+      [
+        "index",
+        "ix_structural_nodes_project_id",
+        "structural_nodes",
+        "CREATE INDEX ix_structural_nodes_project_id ON structural_nodes (project_id)"
+      ],
+      [
+        "index",
+        "ix_structural_nodes_source_version_id",
+        "structural_nodes",
+        "CREATE INDEX ix_structural_nodes_source_version_id ON structural_nodes (source_version_id)"
+      ],
+      [
+        "index",
+        "ix_thread_activities_project_id",
+        "thread_activities",
+        "CREATE INDEX ix_thread_activities_project_id ON thread_activities (project_id)"
+      ],
+      [
+        "index",
+        "ix_thread_activities_thread_id",
+        "thread_activities",
+        "CREATE INDEX ix_thread_activities_thread_id ON thread_activities (thread_id)"
+      ],
+      [
+        "index",
+        "ix_thread_checkpoints_project_id",
+        "thread_checkpoints",
+        "CREATE INDEX ix_thread_checkpoints_project_id ON thread_checkpoints (project_id)"
+      ],
+      [
+        "index",
+        "ix_thread_checkpoints_thread_id",
+        "thread_checkpoints",
+        "CREATE INDEX ix_thread_checkpoints_thread_id ON thread_checkpoints (thread_id)"
+      ],
+      [
+        "index",
+        "ix_thread_inputs_project_id",
+        "thread_inputs",
+        "CREATE INDEX ix_thread_inputs_project_id ON thread_inputs (project_id)"
+      ],
+      [
+        "index",
+        "ix_thread_inputs_thread_id",
+        "thread_inputs",
+        "CREATE INDEX ix_thread_inputs_thread_id ON thread_inputs (thread_id)"
+      ],
+      [
+        "index",
+        "ix_threads_project_id",
+        "threads",
+        "CREATE INDEX ix_threads_project_id ON threads (project_id)"
+      ],
+      [
+        "index",
+        "ix_workstreams_project_id",
+        "workstreams",
+        "CREATE INDEX ix_workstreams_project_id ON workstreams (project_id)"
+      ],
+      [
+        "index",
+        "sqlite_autoindex_acquisition_search_intents_1",
+        "acquisition_search_intents",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_acquisition_search_intents_2",
+        "acquisition_search_intents",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_action_audit_1",
+        "action_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_action_audit_2",
+        "action_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_action_authorizations_1",
+        "action_authorizations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_action_authorizations_2",
+        "action_authorizations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_action_plans_1",
+        "action_plans",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_action_plans_2",
+        "action_plans",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_action_portfolios_1",
+        "action_portfolios",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_action_portfolios_2",
+        "action_portfolios",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_action_records_1",
+        "action_records",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_action_records_2",
+        "action_records",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_alembic_version_1",
+        "alembic_version",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_artifact_versions_1",
+        "artifact_versions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_artifacts_1",
+        "artifacts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_auth_sessions_1",
+        "auth_sessions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_auth_sessions_2",
+        "auth_sessions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_baseline_candidates_1",
+        "baseline_candidates",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_baseline_candidates_2",
+        "baseline_candidates",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_baseline_decisions_1",
+        "baseline_decisions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_baseline_decisions_2",
+        "baseline_decisions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_baseline_sets_1",
+        "baseline_sets",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_baseline_sets_2",
+        "baseline_sets",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_behavior_artifacts_1",
+        "behavior_artifacts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_behavior_artifacts_2",
+        "behavior_artifacts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_behavior_baseline_history_1",
+        "behavior_baseline_history",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_behavior_exposure_history_1",
+        "behavior_exposure_history",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_behavior_registry_1",
+        "behavior_registry",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_checkpoints_1",
+        "checkpoints",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_checkpoints_2",
+        "checkpoints",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_control_records_1",
+        "control_records",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_control_records_2",
+        "control_records",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_criterion_audit_1",
+        "criterion_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_criterion_audit_2",
+        "criterion_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_criterion_conflicts_1",
+        "criterion_conflicts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_criterion_conflicts_2",
+        "criterion_conflicts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_criterion_contracts_1",
+        "criterion_contracts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_criterion_contracts_2",
+        "criterion_contracts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_criterion_profiles_1",
+        "criterion_profiles",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_criterion_profiles_2",
+        "criterion_profiles",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_criterion_references_1",
+        "criterion_references",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_criterion_references_2",
+        "criterion_references",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_decision_objects_1",
+        "decision_objects",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_dependency_states_1",
+        "dependency_states",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_entity_snapshots_1",
+        "entity_snapshots",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evaluation_runs_1",
+        "evaluation_runs",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evaluation_runs_2",
+        "evaluation_runs",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_events_1",
+        "events",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_events_2",
+        "events",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_audit_1",
+        "evidence_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_audit_2",
+        "evidence_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_conflicts_1",
+        "evidence_conflicts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_conflicts_2",
+        "evidence_conflicts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_leads_1",
+        "evidence_leads",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_leads_2",
+        "evidence_leads",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_links_1",
+        "evidence_links",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_links_2",
+        "evidence_links",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_observations_1",
+        "evidence_observations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_observations_2",
+        "evidence_observations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_sources_1",
+        "evidence_sources",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_sources_2",
+        "evidence_sources",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_evidence_spans_1",
+        "evidence_spans",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_execution_audit_1",
+        "execution_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_execution_audit_2",
+        "execution_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_execution_effects_1",
+        "execution_effects",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_execution_effects_2",
+        "execution_effects",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_execution_reconciliations_1",
+        "execution_reconciliations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_execution_reconciliations_2",
+        "execution_reconciliations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_field_events_1",
+        "field_events",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_field_exports_1",
+        "field_exports",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_field_exports_2",
+        "field_exports",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_field_protocol_seals_1",
+        "field_protocol_seals",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_field_protocol_seals_2",
+        "field_protocol_seals",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_field_scores_1",
+        "field_scores",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_field_session_metrics_1",
+        "field_session_metrics",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_field_sessions_1",
+        "field_sessions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_governance_heads_1",
+        "governance_heads",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_governance_revisions_1",
+        "governance_revisions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_governance_revisions_2",
+        "governance_revisions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_governance_revisions_3",
+        "governance_revisions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_appraisals_1",
+        "hypothesis_appraisals",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_appraisals_2",
+        "hypothesis_appraisals",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_assumptions_1",
+        "hypothesis_assumptions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_assumptions_2",
+        "hypothesis_assumptions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_audit_1",
+        "hypothesis_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_audit_2",
+        "hypothesis_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_portfolios_1",
+        "hypothesis_portfolios",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_portfolios_2",
+        "hypothesis_portfolios",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_predictions_1",
+        "hypothesis_predictions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_predictions_2",
+        "hypothesis_predictions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_records_1",
+        "hypothesis_records",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_records_2",
+        "hypothesis_records",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_relations_1",
+        "hypothesis_relations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_relations_2",
+        "hypothesis_relations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_test_bindings_1",
+        "hypothesis_test_bindings",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_hypothesis_test_bindings_2",
+        "hypothesis_test_bindings",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_idempotency_keys_1",
+        "idempotency_keys",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_investigation_audit_1",
+        "investigation_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_investigation_audit_2",
+        "investigation_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_investigations_1",
+        "investigations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_investigations_2",
+        "investigations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_memory_context_packs_1",
+        "memory_context_packs",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_memory_projections_1",
+        "memory_projections",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_memory_projections_2",
+        "memory_projections",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_memory_records_1",
+        "memory_records",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_memory_revision_ledger_1",
+        "memory_revision_ledger",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_memory_revision_ledger_2",
+        "memory_revision_ledger",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_memory_revision_ledger_3",
+        "memory_revision_ledger",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_memory_transition_receipts_1",
+        "memory_transition_receipts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_memory_transition_receipts_2",
+        "memory_transition_receipts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_memory_transition_receipts_3",
+        "memory_transition_receipts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_object_attention_1",
+        "object_attention",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_object_audit_1",
+        "object_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_object_audit_2",
+        "object_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_object_candidates_1",
+        "object_candidates",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_object_profiles_1",
+        "object_profiles",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_object_profiles_2",
+        "object_profiles",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_object_relations_1",
+        "object_relations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_operation_resource_bindings_1",
+        "operation_resource_bindings",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_operations_1",
+        "operations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_operations_2",
+        "operations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_organizations_1",
+        "organizations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_assessments_1",
+        "outcome_assessments",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_assessments_2",
+        "outcome_assessments",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_attributions_1",
+        "outcome_attributions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_attributions_2",
+        "outcome_attributions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_audit_1",
+        "outcome_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_audit_2",
+        "outcome_audit",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_change_sets_1",
+        "outcome_change_sets",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_change_sets_2",
+        "outcome_change_sets",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_impacts_1",
+        "outcome_impacts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_impacts_2",
+        "outcome_impacts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_profiles_1",
+        "outcome_profiles",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_profiles_2",
+        "outcome_profiles",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_series_1",
+        "outcome_series",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_outcome_series_2",
+        "outcome_series",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_plan_executions_1",
+        "plan_executions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_plan_executions_2",
+        "plan_executions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_project_head_sets_1",
+        "project_head_sets",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_project_policies_1",
+        "project_policies",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_project_policies_2",
+        "project_policies",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_project_references_1",
+        "project_references",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_project_roles_1",
+        "project_roles",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_projects_1",
+        "projects",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_receipt_dag_bundles_1",
+        "receipt_dag_bundles",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_receipt_dag_bundles_2",
+        "receipt_dag_bundles",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_receipt_dag_edges_1",
+        "receipt_dag_edges",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_receipt_dag_edges_2",
+        "receipt_dag_edges",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_receipt_dag_manifests_1",
+        "receipt_dag_manifests",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_receipt_dag_manifests_2",
+        "receipt_dag_manifests",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_receipt_dag_nodes_1",
+        "receipt_dag_nodes",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_receipt_dag_nodes_2",
+        "receipt_dag_nodes",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_receipt_dag_verifications_1",
+        "receipt_dag_verifications",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_receipt_dag_verifications_2",
+        "receipt_dag_verifications",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_receipts_1",
+        "receipts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_receipts_2",
+        "receipts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_relations_1",
+        "relations",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_research_identities_1",
+        "research_identities",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_research_test_assessments_1",
+        "research_test_assessments",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_resource_scope_heads_1",
+        "resource_scope_heads",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_resource_scope_history_1",
+        "resource_scope_history",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_resource_scope_receipts_1",
+        "resource_scope_receipts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_revision_parents_1",
+        "revision_parents",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_semantic_revisions_1",
+        "semantic_revisions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_semantic_revisions_2",
+        "semantic_revisions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_source_bindings_1",
+        "source_bindings",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_source_bindings_2",
+        "source_bindings",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_span_corrections_1",
+        "span_corrections",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_span_corrections_2",
+        "span_corrections",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_step_execution_attempts_1",
+        "step_execution_attempts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_step_execution_attempts_2",
+        "step_execution_attempts",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_structural_nodes_1",
+        "structural_nodes",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_thread_activities_1",
+        "thread_activities",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_thread_activities_2",
+        "thread_activities",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_thread_checkpoints_1",
+        "thread_checkpoints",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_thread_checkpoints_2",
+        "thread_checkpoints",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_thread_inputs_1",
+        "thread_inputs",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_thread_inputs_2",
+        "thread_inputs",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_threads_1",
+        "threads",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_tui_sessions_1",
+        "tui_sessions",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_working_heads_1",
+        "working_heads",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_workstreams_1",
+        "workstreams",
+        null
+      ],
+      [
+        "index",
+        "uq_research_test_prediction_attempt",
+        "research_test_assessments",
+        "CREATE UNIQUE INDEX uq_research_test_prediction_attempt ON research_test_assessments (project_id, prediction_id, attempt_ref)"
+      ],
+      [
+        "table",
+        "acquisition_search_intents",
+        "acquisition_search_intents",
+        "CREATE TABLE acquisition_search_intents (\n\tsearch_intent_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tinvestigation_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tintent_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (search_intent_id), \n\tUNIQUE (intent_digest)\n)"
+      ],
+      [
+        "table",
+        "action_audit",
+        "action_audit",
+        "CREATE TABLE action_audit (\n\taudit_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tsubject_id VARCHAR(160) NOT NULL, \n\tevent_type VARCHAR(120) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tevent_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (audit_id), \n\tUNIQUE (event_digest)\n)"
+      ],
+      [
+        "table",
+        "action_authorizations",
+        "action_authorizations",
+        "CREATE TABLE action_authorizations (\n\tauthorization_revision_id VARCHAR(160) NOT NULL, \n\tauthorization_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tstep_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (authorization_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "action_plans",
+        "action_plans",
+        "CREATE TABLE action_plans (\n\tplan_revision_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (plan_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "action_portfolios",
+        "action_portfolios",
+        "CREATE TABLE action_portfolios (\n\tportfolio_revision_id VARCHAR(160) NOT NULL, \n\tportfolio_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (portfolio_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "action_records",
+        "action_records",
+        "CREATE TABLE action_records (\n\taction_revision_id VARCHAR(160) NOT NULL, \n\taction_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tportfolio_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (action_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "alembic_version",
+        "alembic_version",
+        "CREATE TABLE alembic_version (\n\tversion_num VARCHAR(32) NOT NULL, \n\tCONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)\n)"
+      ],
+      [
+        "table",
+        "artifact_versions",
+        "artifact_versions",
+        "CREATE TABLE artifact_versions (\n\tsource_version_id VARCHAR(160) NOT NULL, \n\tartifact_id VARCHAR(160) NOT NULL, \n\tversion_label VARCHAR(260), \n\tbyte_sha256 VARCHAR(64) NOT NULL, \n\tretrieved_at VARCHAR(32) NOT NULL, structure_metadata_json TEXT, \n\tPRIMARY KEY (source_version_id), \n\tFOREIGN KEY(artifact_id) REFERENCES artifacts (artifact_id)\n)"
+      ],
+      [
+        "table",
+        "artifacts",
+        "artifacts",
+        "CREATE TABLE artifacts (\n\tartifact_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tsource_uri TEXT NOT NULL, \n\tmedia_type VARCHAR(260) NOT NULL, \n\tbyte_sha256 VARCHAR(64) NOT NULL, \n\tauthority VARCHAR(60) NOT NULL, \n\tcutoff_state VARCHAR(60) NOT NULL, \n\tsecurity_class VARCHAR(60) NOT NULL, \n\tparser_name VARCHAR(160) NOT NULL, \n\tparser_version VARCHAR(80) NOT NULL, \n\tretrieved_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (artifact_id)\n)"
+      ],
+      [
+        "table",
+        "auth_sessions",
+        "auth_sessions",
+        "CREATE TABLE auth_sessions (\n\tsession_id VARCHAR(200) NOT NULL, \n\tactor_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\trole_assignment_id VARCHAR(160) NOT NULL, \n\ttoken_digest VARCHAR(64) NOT NULL, \n\tstate VARCHAR(40) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\texpires_at VARCHAR(40) NOT NULL, \n\tPRIMARY KEY (session_id), \n\tUNIQUE (token_digest)\n)"
+      ],
+      [
+        "table",
+        "baseline_candidates",
+        "baseline_candidates",
+        "CREATE TABLE baseline_candidates (\n\tcandidate_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tscope VARCHAR(80) NOT NULL, \n\tstate VARCHAR(60) NOT NULL, \n\tcandidate_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (candidate_id), \n\tUNIQUE (candidate_digest)\n)"
+      ],
+      [
+        "table",
+        "baseline_decisions",
+        "baseline_decisions",
+        "CREATE TABLE baseline_decisions (\n\tdecision_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tcandidate_id VARCHAR(200) NOT NULL, \n\tdecision VARCHAR(20) NOT NULL, \n\tdecision_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (decision_id), \n\tUNIQUE (decision_digest)\n)"
+      ],
+      [
+        "table",
+        "baseline_sets",
+        "baseline_sets",
+        "CREATE TABLE baseline_sets (\n\tbaseline_set_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tscope VARCHAR(80) NOT NULL, \n\tlifecycle VARCHAR(40) NOT NULL, \n\tbaseline_set_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (baseline_set_id), \n\tUNIQUE (baseline_set_digest)\n)"
+      ],
+      [
+        "table",
+        "behavior_artifacts",
+        "behavior_artifacts",
+        "CREATE TABLE behavior_artifacts (\n\tartifact_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tkind VARCHAR(80) NOT NULL, \n\tstate VARCHAR(40) NOT NULL, \n\tcontent_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (artifact_id), \n\tCONSTRAINT uq_behavior_artifact_content UNIQUE (project_id, kind, content_digest)\n)"
+      ],
+      [
+        "table",
+        "behavior_baseline_history",
+        "behavior_baseline_history",
+        "CREATE TABLE behavior_baseline_history (\n\tproject_id VARCHAR(160) NOT NULL, \n\tscope_digest VARCHAR(64) NOT NULL, \n\tcomponent VARCHAR(64) NOT NULL, \n\tenvironment VARCHAR(160) NOT NULL, \n\trevision INTEGER NOT NULL, \n\tcontent_digest VARCHAR(64) NOT NULL, \n\treceipt_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id, scope_digest, component, environment, revision)\n)"
+      ],
+      [
+        "table",
+        "behavior_exposure_history",
+        "behavior_exposure_history",
+        "CREATE TABLE behavior_exposure_history (\n\tproject_id VARCHAR(160) NOT NULL, \n\texposure_id VARCHAR(200) NOT NULL, \n\trevision INTEGER NOT NULL, \n\tscope_digest VARCHAR(64) NOT NULL, \n\tstage VARCHAR(32) NOT NULL, \n\tstate VARCHAR(32) NOT NULL, \n\trecord_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id, exposure_id, revision)\n)"
+      ],
+      [
+        "table",
+        "behavior_registry",
+        "behavior_registry",
+        "CREATE TABLE behavior_registry (\n\tproject_id VARCHAR(160) NOT NULL, \n\tkind VARCHAR(80) NOT NULL, \n\tactive_digest VARCHAR(64) NOT NULL, \n\trevision INTEGER NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id, kind)\n)"
+      ],
+      [
+        "table",
+        "checkpoints",
+        "checkpoints",
+        "CREATE TABLE checkpoints (\n\tcheckpoint_id VARCHAR(160) NOT NULL, \n\toperation_id VARCHAR(160) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tcheckpoint_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (checkpoint_id), \n\tFOREIGN KEY(operation_id) REFERENCES operations (operation_id), \n\tUNIQUE (checkpoint_digest)\n)"
+      ],
+      [
+        "table",
+        "control_records",
+        "control_records",
+        "CREATE TABLE control_records (\n\tcontrol_revision_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tnamespace VARCHAR(80) NOT NULL, \n\trecord_type VARCHAR(120) NOT NULL, \n\trecord_id VARCHAR(160) NOT NULL, \n\tversion INTEGER NOT NULL, \n\tstate VARCHAR(80) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trecord_digest VARCHAR(64) NOT NULL, \n\tsupersedes_digest VARCHAR(64), \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (control_revision_id), \n\tUNIQUE (record_digest)\n)"
+      ],
+      [
+        "table",
+        "criterion_audit",
+        "criterion_audit",
+        "CREATE TABLE criterion_audit (\n\taudit_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tcriterion_id VARCHAR(160) NOT NULL, \n\tevent_type VARCHAR(120) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tevent_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (audit_id), \n\tUNIQUE (event_digest)\n)"
+      ],
+      [
+        "table",
+        "criterion_conflicts",
+        "criterion_conflicts",
+        "CREATE TABLE criterion_conflicts (\n\tconflict_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tcriterion_id VARCHAR(160) NOT NULL, \n\tfield_path VARCHAR(260) NOT NULL, \n\tcandidate_values_json TEXT NOT NULL, \n\tevidence_refs_json TEXT NOT NULL, \n\tstatus VARCHAR(40) NOT NULL, \n\timpact_json TEXT NOT NULL, \n\tconflict_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (conflict_id), \n\tUNIQUE (conflict_digest)\n)"
+      ],
+      [
+        "table",
+        "criterion_contracts",
+        "criterion_contracts",
+        "CREATE TABLE criterion_contracts (\n\tcriterion_revision_id VARCHAR(160) NOT NULL, \n\tcriterion_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tthread_id VARCHAR(160), \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tsupersedes_revision_digest VARCHAR(64), \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (criterion_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "criterion_profiles",
+        "criterion_profiles",
+        "CREATE TABLE criterion_profiles (\n\tprofile_ref VARCHAR(160) NOT NULL, \n\tversion INTEGER NOT NULL, \n\tname TEXT NOT NULL, \n\tdomain_hint VARCHAR(160) NOT NULL, \n\trequired_fields_json TEXT NOT NULL, \n\tconditional_fields_json TEXT NOT NULL, \n\tallowed_computation_types_json TEXT NOT NULL, \n\tauthority_policy_json TEXT NOT NULL, \n\tenabled INTEGER NOT NULL, \n\tprofile_digest VARCHAR(64) NOT NULL, profile_json TEXT, \n\tPRIMARY KEY (profile_ref, version), \n\tUNIQUE (profile_digest)\n)"
+      ],
+      [
+        "table",
+        "criterion_references",
+        "criterion_references",
+        "CREATE TABLE criterion_references (\n\treference_candidate_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tcriterion_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\treference_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (reference_candidate_id), \n\tUNIQUE (reference_digest)\n)"
+      ],
+      [
+        "table",
+        "decision_objects",
+        "decision_objects",
+        "CREATE TABLE decision_objects (\n\tobject_revision_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tthread_id VARCHAR(160) NOT NULL, \n\trevision_digest VARCHAR(160) NOT NULL, \n\tsupersedes_revision_digest VARCHAR(160), \n\tcontent_json TEXT NOT NULL, \n\tcreated_at VARCHAR(160) NOT NULL, \n\tPRIMARY KEY (object_revision_id)\n)"
+      ],
+      [
+        "table",
+        "dependency_states",
+        "dependency_states",
+        "CREATE TABLE dependency_states (\n\tproject_id VARCHAR(160) NOT NULL, \n\tentity_ref VARCHAR(260) NOT NULL, \n\tstatus VARCHAR(60) NOT NULL, \n\tcaused_by_revision VARCHAR(64) NOT NULL, \n\tupdated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (project_id, entity_ref)\n)"
+      ],
+      [
+        "table",
+        "entity_snapshots",
+        "entity_snapshots",
+        "CREATE TABLE \"entity_snapshots\" (\n\tsnapshot_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tentity_type VARCHAR(60) NOT NULL, \n\tentity_id VARCHAR(160) NOT NULL, \n\tschema_version VARCHAR(40) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tcontent_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (snapshot_id)\n)"
+      ],
+      [
+        "table",
+        "evaluation_runs",
+        "evaluation_runs",
+        "CREATE TABLE evaluation_runs (\n\tproject_id VARCHAR(160) NOT NULL, \n\tpair_id VARCHAR(200) NOT NULL, \n\tdedupe_digest VARCHAR(64) NOT NULL, \n\tplan_id VARCHAR(200) NOT NULL, \n\tplan_digest VARCHAR(64) NOT NULL, \n\tfixture_digest VARCHAR(64) NOT NULL, \n\tscorer_digest VARCHAR(64) NOT NULL, \n\tstate VARCHAR(32) NOT NULL, \n\trevision INTEGER NOT NULL, \n\trecord_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id, pair_id), \n\tCONSTRAINT uq_evaluation_request UNIQUE (project_id, dedupe_digest)\n)"
+      ],
+      [
+        "table",
+        "events",
+        "events",
+        "CREATE TABLE events (\n\tevent_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\toperation_id VARCHAR(160) NOT NULL, \n\tevent_type VARCHAR(160) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tprevious_event_digest VARCHAR(64), \n\tevent_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (event_id), \n\tFOREIGN KEY(operation_id) REFERENCES operations (operation_id), \n\tUNIQUE (event_digest)\n)"
+      ],
+      [
+        "table",
+        "evidence_audit",
+        "evidence_audit",
+        "CREATE TABLE evidence_audit (\n\taudit_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tevidence_ref VARCHAR(160) NOT NULL, \n\tevent_type VARCHAR(120) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tevent_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (audit_id), \n\tUNIQUE (event_digest)\n)"
+      ],
+      [
+        "table",
+        "evidence_conflicts",
+        "evidence_conflicts",
+        "CREATE TABLE evidence_conflicts (\n\tconflict_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tevidence_ids_json TEXT NOT NULL, \n\tfield VARCHAR(160) NOT NULL, \n\tstatus VARCHAR(40) NOT NULL, \n\treason TEXT NOT NULL, \n\tresolution_evidence_ids_json TEXT NOT NULL, \n\tconflict_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tupdated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (conflict_id), \n\tUNIQUE (conflict_digest)\n)"
+      ],
+      [
+        "table",
+        "evidence_leads",
+        "evidence_leads",
+        "CREATE TABLE evidence_leads (\n\tlead_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tinvestigation_id VARCHAR(160) NOT NULL, \n\tsearch_intent_id VARCHAR(160) NOT NULL, \n\tsource_id VARCHAR(160) NOT NULL, \n\tspan_id VARCHAR(160) NOT NULL, \n\tstate VARCHAR(60) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tlead_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (lead_id), \n\tUNIQUE (lead_digest)\n)"
+      ],
+      [
+        "table",
+        "evidence_links",
+        "evidence_links",
+        "CREATE TABLE evidence_links (\n\tevidence_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tthread_id VARCHAR(160), \n\ttarget_type VARCHAR(80) NOT NULL, \n\ttarget_id VARCHAR(160) NOT NULL, \n\trelation VARCHAR(40) NOT NULL, \n\tsource_ids_json TEXT NOT NULL, \n\tspan_ids_json TEXT NOT NULL, \n\tobservation_ids_json TEXT NOT NULL, \n\tconditions_json TEXT NOT NULL, \n\tapplicability TEXT NOT NULL, \n\tindependence_group VARCHAR(160) NOT NULL, \n\tsupport_status VARCHAR(60) NOT NULL, \n\tauthority_status VARCHAR(60) NOT NULL, \n\tverification_status VARCHAR(60) NOT NULL, \n\tcutoff_eligibility VARCHAR(60) NOT NULL, \n\tcontent_trust VARCHAR(60) NOT NULL, \n\tconflict_ids_json TEXT NOT NULL, \n\tsupersedes_evidence_id VARCHAR(160), \n\trevision INTEGER NOT NULL, \n\tevidence_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (evidence_id), \n\tUNIQUE (evidence_digest)\n)"
+      ],
+      [
+        "table",
+        "evidence_observations",
+        "evidence_observations",
+        "CREATE TABLE evidence_observations (\n\tobservation_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tspan_ids_json TEXT NOT NULL, \n\tobserved_statement TEXT NOT NULL, \n\tobserved_time VARCHAR(32), \n\tvalid_time VARCHAR(32), \n\tobserver_group VARCHAR(160) NOT NULL, \n\tindependence_basis TEXT NOT NULL, \n\tprovenance_class VARCHAR(80) NOT NULL, \n\tcontamination_note TEXT, \n\tsupersedes_observation_id VARCHAR(160), \n\tobservation_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (observation_id), \n\tUNIQUE (observation_digest)\n)"
+      ],
+      [
+        "table",
+        "evidence_sources",
+        "evidence_sources",
+        "CREATE TABLE evidence_sources (\n\tsource_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tartifact_id VARCHAR(160) NOT NULL, \n\tconnector_ref VARCHAR(160) NOT NULL, \n\turi TEXT NOT NULL, \n\tartifact_type VARCHAR(160) NOT NULL, \n\tversion VARCHAR(260), \n\tsha256 VARCHAR(64) NOT NULL, \n\tauthority_status VARCHAR(60) NOT NULL, \n\tsecurity_class VARCHAR(60) NOT NULL, \n\tofficial_copy INTEGER NOT NULL, \n\trights VARCHAR(160) NOT NULL, \n\tretention VARCHAR(160) NOT NULL, \n\tvalid_time VARCHAR(32), \n\tsnapshot_time VARCHAR(32), \n\tcutoff_eligibility VARCHAR(60) NOT NULL, \n\tlineage_root_id VARCHAR(160) NOT NULL, \n\tparent_source_ids_json TEXT NOT NULL, \n\tsupersedes_source_id VARCHAR(160), \n\tsource_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (source_id), \n\tUNIQUE (source_digest)\n)"
+      ],
+      [
+        "table",
+        "evidence_spans",
+        "evidence_spans",
+        "CREATE TABLE evidence_spans (\n\tspan_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tartifact_id VARCHAR(160) NOT NULL, \n\tsource_version_id VARCHAR(160) NOT NULL, \n\tlocator_json TEXT NOT NULL, \n\texact_text TEXT NOT NULL, \n\ttext_sha256 VARCHAR(64) NOT NULL, \n\textraction_method VARCHAR(160) NOT NULL, \n\tsupport_state VARCHAR(60) NOT NULL, \n\tauthority_state VARCHAR(60) NOT NULL, \n\tverification_state VARCHAR(60) NOT NULL, \n\tcutoff_state VARCHAR(60) NOT NULL, \n\tPRIMARY KEY (span_id), \n\tFOREIGN KEY(artifact_id) REFERENCES artifacts (artifact_id), \n\tFOREIGN KEY(source_version_id) REFERENCES artifact_versions (source_version_id)\n)"
+      ],
+      [
+        "table",
+        "execution_audit",
+        "execution_audit",
+        "CREATE TABLE execution_audit (\n\taudit_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tevent_type VARCHAR(120) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tevent_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (audit_id), \n\tUNIQUE (event_digest)\n)"
+      ],
+      [
+        "table",
+        "execution_effects",
+        "execution_effects",
+        "CREATE TABLE execution_effects (\n\teffect_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tattempt_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\teffect_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (effect_id), \n\tUNIQUE (effect_digest)\n)"
+      ],
+      [
+        "table",
+        "execution_reconciliations",
+        "execution_reconciliations",
+        "CREATE TABLE execution_reconciliations (\n\treconciliation_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tattempt_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\treconciliation_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (reconciliation_id), \n\tUNIQUE (reconciliation_digest)\n)"
+      ],
+      [
+        "table",
+        "field_events",
+        "field_events",
+        "CREATE TABLE field_events (\n\tevent_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tsession_id VARCHAR(200) NOT NULL, \n\tevent_type VARCHAR(80) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (event_id)\n)"
+      ],
+      [
+        "table",
+        "field_exports",
+        "field_exports",
+        "CREATE TABLE field_exports (\n\texport_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tprotocol_digest VARCHAR(64) NOT NULL, \n\tbundle_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (export_id), \n\tUNIQUE (bundle_digest)\n)"
+      ],
+      [
+        "table",
+        "field_protocol_seals",
+        "field_protocol_seals",
+        "CREATE TABLE field_protocol_seals (\n\tprotocol_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tprotocol_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (protocol_id), \n\tUNIQUE (protocol_digest)\n)"
+      ],
+      [
+        "table",
+        "field_scores",
+        "field_scores",
+        "CREATE TABLE field_scores (\n\tscore_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tsession_id VARCHAR(200) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (score_id)\n)"
+      ],
+      [
+        "table",
+        "field_session_metrics",
+        "field_session_metrics",
+        "CREATE TABLE field_session_metrics (\n\tsession_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (session_id)\n)"
+      ],
+      [
+        "table",
+        "field_sessions",
+        "field_sessions",
+        "CREATE TABLE field_sessions (\n\tsession_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tprotocol_digest VARCHAR(64) NOT NULL, \n\tstate VARCHAR(40) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (session_id)\n)"
+      ],
+      [
+        "table",
+        "governance_heads",
+        "governance_heads",
+        "CREATE TABLE governance_heads (\n\tproject_id VARCHAR(160) NOT NULL, \n\trecord_kind VARCHAR(32) NOT NULL, \n\trecord_id VARCHAR(200) NOT NULL, \n\trevision INTEGER NOT NULL, \n\trecord_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (project_id, record_kind, record_id)\n)"
+      ],
+      [
+        "table",
+        "governance_revisions",
+        "governance_revisions",
+        "CREATE TABLE governance_revisions (\n\tproject_id VARCHAR(160) NOT NULL, \n\trecord_kind VARCHAR(32) NOT NULL, \n\trecord_id VARCHAR(200) NOT NULL, \n\trevision INTEGER NOT NULL, \n\trecord_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\treceipt_digest VARCHAR(64) NOT NULL, \n\treceipt_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id, record_kind, record_id, revision), \n\tUNIQUE (record_digest), \n\tUNIQUE (receipt_digest)\n)"
+      ],
+      [
+        "table",
+        "hypothesis_appraisals",
+        "hypothesis_appraisals",
+        "CREATE TABLE hypothesis_appraisals (\n\tappraisal_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\thypothesis_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tappraisal_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (appraisal_id), \n\tUNIQUE (appraisal_digest)\n)"
+      ],
+      [
+        "table",
+        "hypothesis_assumptions",
+        "hypothesis_assumptions",
+        "CREATE TABLE hypothesis_assumptions (\n\tassumption_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\thypothesis_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tassumption_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (assumption_id), \n\tUNIQUE (assumption_digest)\n)"
+      ],
+      [
+        "table",
+        "hypothesis_audit",
+        "hypothesis_audit",
+        "CREATE TABLE hypothesis_audit (\n\taudit_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\thypothesis_id VARCHAR(160) NOT NULL, \n\tevent_type VARCHAR(120) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tevent_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (audit_id), \n\tUNIQUE (event_digest)\n)"
+      ],
+      [
+        "table",
+        "hypothesis_portfolios",
+        "hypothesis_portfolios",
+        "CREATE TABLE hypothesis_portfolios (\n\tportfolio_revision_id VARCHAR(160) NOT NULL, \n\tportfolio_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (portfolio_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "hypothesis_predictions",
+        "hypothesis_predictions",
+        "CREATE TABLE hypothesis_predictions (\n\tprediction_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\thypothesis_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tprediction_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (prediction_id), \n\tUNIQUE (prediction_digest)\n)"
+      ],
+      [
+        "table",
+        "hypothesis_records",
+        "hypothesis_records",
+        "CREATE TABLE hypothesis_records (\n\thypothesis_revision_id VARCHAR(160) NOT NULL, \n\thypothesis_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tportfolio_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (hypothesis_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "hypothesis_relations",
+        "hypothesis_relations",
+        "CREATE TABLE hypothesis_relations (\n\trelation_revision_id VARCHAR(160) NOT NULL, \n\trelation_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tportfolio_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (relation_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "hypothesis_test_bindings",
+        "hypothesis_test_bindings",
+        "CREATE TABLE hypothesis_test_bindings (\n\ttest_binding_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tprediction_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tbinding_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (test_binding_id), \n\tUNIQUE (binding_digest)\n)"
+      ],
+      [
+        "table",
+        "idempotency_keys",
+        "idempotency_keys",
+        "CREATE TABLE idempotency_keys (\n\tproject_id VARCHAR(160) NOT NULL, \n\tmethod VARCHAR(160) NOT NULL, \n\tidempotency_key VARCHAR(260) NOT NULL, \n\tscope_digest VARCHAR(64) NOT NULL, \n\toperation_id VARCHAR(160) NOT NULL, \n\tPRIMARY KEY (project_id, method, idempotency_key), \n\tFOREIGN KEY(operation_id) REFERENCES operations (operation_id)\n)"
+      ],
+      [
+        "table",
+        "investigation_audit",
+        "investigation_audit",
+        "CREATE TABLE investigation_audit (\n\taudit_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tinvestigation_id VARCHAR(160) NOT NULL, \n\tevent_type VARCHAR(120) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tevent_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (audit_id), \n\tUNIQUE (event_digest)\n)"
+      ],
+      [
+        "table",
+        "investigations",
+        "investigations",
+        "CREATE TABLE investigations (\n\tinvestigation_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tthread_id VARCHAR(160) NOT NULL, \n\tcycle_id VARCHAR(160) NOT NULL, \n\tparent_investigation_id VARCHAR(160), \n\t\"trigger\" VARCHAR(80) NOT NULL, \n\tquestion TEXT NOT NULL, \n\ttarget_object_id VARCHAR(160), \n\ttarget_hypothesis_id VARCHAR(160), \n\tmode VARCHAR(40) NOT NULL, \n\tscope_json TEXT NOT NULL, \n\trequired_evidence_groups_json TEXT NOT NULL, \n\tquery_families_json TEXT NOT NULL, \n\tcounter_search_policy VARCHAR(160) NOT NULL, \n\tbudget INTEGER NOT NULL, \n\tbudget_usage INTEGER NOT NULL, \n\tstop_conditions_json TEXT NOT NULL, \n\tdomain_state VARCHAR(40) NOT NULL, \n\texecution_state VARCHAR(40) NOT NULL, \n\tcurrent_wave INTEGER NOT NULL, \n\tobservation_count INTEGER NOT NULL, \n\topen_lead_count INTEGER NOT NULL, \n\tclaim_candidate_count INTEGER NOT NULL, \n\tgap_count INTEGER NOT NULL, \n\tsufficiency_json TEXT NOT NULL, \n\tcheckpoint_digest VARCHAR(64), \n\tresult_json TEXT, \n\tplan_revision INTEGER NOT NULL, \n\tinvestigation_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tupdated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (investigation_id), \n\tUNIQUE (investigation_digest)\n)"
+      ],
+      [
+        "table",
+        "memory_context_packs",
+        "memory_context_packs",
+        "CREATE TABLE memory_context_packs (\n\tcontext_pack_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tthread_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tquery_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (context_pack_id)\n)"
+      ],
+      [
+        "table",
+        "memory_projections",
+        "memory_projections",
+        "CREATE TABLE memory_projections (\n\tprojection_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tprojection_type VARCHAR(40) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trebuild_checkpoint VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (projection_id), \n\tCONSTRAINT uq_memory_projection_type UNIQUE (project_id, projection_type)\n)"
+      ],
+      [
+        "table",
+        "memory_records",
+        "memory_records",
+        "CREATE TABLE memory_records (\n\tmemory_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tpayload_mode VARCHAR(60) NOT NULL, \n\tkind VARCHAR(60) NOT NULL, \n\towner_revision_ref VARCHAR(160) NOT NULL, \n\tsource_ref VARCHAR(260), \n\tassertion TEXT, \n\trecall_eligibility VARCHAR(60) NOT NULL, \n\tlifecycle VARCHAR(60) NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (memory_id)\n)"
+      ],
+      [
+        "table",
+        "memory_revision_ledger",
+        "memory_revision_ledger",
+        "CREATE TABLE memory_revision_ledger (\n\tmemory_revision_id VARCHAR(200) NOT NULL, \n\tmemory_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\ttransition VARCHAR(40) NOT NULL, \n\towner_revision_ref VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (memory_revision_id), \n\tCONSTRAINT uq_memory_revision_source_memory UNIQUE (project_id, memory_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "memory_transition_receipts",
+        "memory_transition_receipts",
+        "CREATE TABLE memory_transition_receipts (\n\treceipt_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tmemory_revision_id VARCHAR(200) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\treceipt_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (receipt_id), \n\tUNIQUE (memory_revision_id), \n\tUNIQUE (receipt_digest)\n)"
+      ],
+      [
+        "table",
+        "object_attention",
+        "object_attention",
+        "CREATE TABLE object_attention (\n\tattention_revision_id VARCHAR(160) NOT NULL, \n\tattention_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\trevision_digest VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tcreated_at VARCHAR(160) NOT NULL, \n\tPRIMARY KEY (attention_revision_id)\n)"
+      ],
+      [
+        "table",
+        "object_audit",
+        "object_audit",
+        "CREATE TABLE object_audit (\n\taudit_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tevent_type VARCHAR(120) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tevent_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (audit_id), \n\tUNIQUE (event_digest)\n)"
+      ],
+      [
+        "table",
+        "object_candidates",
+        "object_candidates",
+        "CREATE TABLE object_candidates (\n\tcandidate_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tthread_id VARCHAR(160) NOT NULL, \n\tcandidate_digest VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tcreated_at VARCHAR(160) NOT NULL, \n\tPRIMARY KEY (candidate_id)\n)"
+      ],
+      [
+        "table",
+        "object_profiles",
+        "object_profiles",
+        "CREATE TABLE object_profiles (\n\tprofile_ref VARCHAR(160) NOT NULL, \n\tversion INTEGER NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tenabled INTEGER NOT NULL, \n\tprofile_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (profile_ref, version), \n\tUNIQUE (profile_digest)\n)"
+      ],
+      [
+        "table",
+        "object_relations",
+        "object_relations",
+        "CREATE TABLE object_relations (\n\trelation_revision_id VARCHAR(160) NOT NULL, \n\trelation_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tsource_object_id VARCHAR(160) NOT NULL, \n\trevision_digest VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tcreated_at VARCHAR(160) NOT NULL, \n\tPRIMARY KEY (relation_revision_id)\n)"
+      ],
+      [
+        "table",
+        "operation_resource_bindings",
+        "operation_resource_bindings",
+        "CREATE TABLE operation_resource_bindings (\n\toperation_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tbinding_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (operation_id)\n)"
+      ],
+      [
+        "table",
+        "operations",
+        "operations",
+        "CREATE TABLE operations (\n\toperation_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tmethod VARCHAR(160) NOT NULL, \n\tidempotency_key VARCHAR(260) NOT NULL, \n\tscope_digest VARCHAR(64) NOT NULL, \n\tstate VARCHAR(40) NOT NULL, \n\tresult_json TEXT, \n\terror_json TEXT, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tcompleted_at VARCHAR(32), \n\tepoch INTEGER DEFAULT '0' NOT NULL, owner_actor_id VARCHAR(160), owner_session_id VARCHAR(160), owner_role_assignment_id VARCHAR(160), owner_data_scopes_json TEXT DEFAULT '[]' NOT NULL, \n\tPRIMARY KEY (operation_id), \n\tCONSTRAINT uq_operation_idempotency_scope UNIQUE (project_id, method, idempotency_key)\n)"
+      ],
+      [
+        "table",
+        "organizations",
+        "organizations",
+        "CREATE TABLE organizations (\n\torganization_id VARCHAR(160) NOT NULL, \n\tname TEXT NOT NULL, \n\tkind VARCHAR(80) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (organization_id)\n)"
+      ],
+      [
+        "table",
+        "outcome_assessments",
+        "outcome_assessments",
+        "CREATE TABLE outcome_assessments (\n\tassessment_revision_id VARCHAR(160) NOT NULL, \n\toutcome_assessment_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\toutcome_series_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (assessment_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "outcome_attributions",
+        "outcome_attributions",
+        "CREATE TABLE outcome_attributions (\n\tattribution_assessment_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\toutcome_assessment_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tattribution_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (attribution_assessment_id), \n\tUNIQUE (attribution_digest)\n)"
+      ],
+      [
+        "table",
+        "outcome_audit",
+        "outcome_audit",
+        "CREATE TABLE outcome_audit (\n\taudit_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tsubject_id VARCHAR(160) NOT NULL, \n\tevent_type VARCHAR(120) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tevent_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (audit_id), \n\tUNIQUE (event_digest)\n)"
+      ],
+      [
+        "table",
+        "outcome_change_sets",
+        "outcome_change_sets",
+        "CREATE TABLE outcome_change_sets (\n\toutcome_change_set_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\toutcome_assessment_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tchange_set_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (outcome_change_set_id), \n\tUNIQUE (change_set_digest)\n)"
+      ],
+      [
+        "table",
+        "outcome_impacts",
+        "outcome_impacts",
+        "CREATE TABLE outcome_impacts (\n\timpact_assessment_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\toutcome_series_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\timpact_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (impact_assessment_id), \n\tUNIQUE (impact_digest)\n)"
+      ],
+      [
+        "table",
+        "outcome_profiles",
+        "outcome_profiles",
+        "CREATE TABLE outcome_profiles (\n\tprofile_ref VARCHAR(160) NOT NULL, \n\tversion INTEGER NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tenabled INTEGER NOT NULL, \n\tprofile_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (profile_ref, version), \n\tUNIQUE (profile_digest)\n)"
+      ],
+      [
+        "table",
+        "outcome_series",
+        "outcome_series",
+        "CREATE TABLE outcome_series (\n\tseries_revision_id VARCHAR(160) NOT NULL, \n\toutcome_series_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (series_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "plan_executions",
+        "plan_executions",
+        "CREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "project_head_sets",
+        "project_head_sets",
+        "CREATE TABLE project_head_sets (\n\tproject_id VARCHAR(160) NOT NULL, \n\trevision INTEGER NOT NULL, \n\thead_set_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)"
+      ],
+      [
+        "table",
+        "project_policies",
+        "project_policies",
+        "CREATE TABLE \"project_policies\" (\n\tpolicy_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tversion INTEGER NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tpolicy_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (policy_id), \n\tCONSTRAINT uq_project_policy_version UNIQUE (project_id, version)\n)"
+      ],
+      [
+        "table",
+        "project_references",
+        "project_references",
+        "CREATE TABLE project_references (\n\treference_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\torigin_project_id VARCHAR(160) NOT NULL, \n\torigin_revision VARCHAR(160) NOT NULL, \n\trights_status VARCHAR(80) NOT NULL, \n\tscope VARCHAR(260) NOT NULL, \n\tauthority_status VARCHAR(80) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (reference_id)\n)"
+      ],
+      [
+        "table",
+        "project_roles",
+        "project_roles",
+        "CREATE TABLE project_roles (\n\trole_assignment_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tactor_id VARCHAR(160) NOT NULL, \n\torganization_id VARCHAR(160), \n\trole VARCHAR(160) NOT NULL, \n\tscope VARCHAR(260) NOT NULL, \n\tauthority_tags_json TEXT NOT NULL, \n\tstate VARCHAR(40) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\trevoked_at VARCHAR(32), \n\tPRIMARY KEY (role_assignment_id)\n)"
+      ],
+      [
+        "table",
+        "projects",
+        "projects",
+        "CREATE TABLE projects (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname TEXT NOT NULL, \n\tcutoff_at VARCHAR(32) NOT NULL, \n\tlifecycle VARCHAR(40) NOT NULL, \n\tpolicy_ref VARCHAR(160) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, overlay VARCHAR(160) DEFAULT 'default' NOT NULL, description TEXT DEFAULT '' NOT NULL, revision INTEGER DEFAULT '0' NOT NULL, \n\tPRIMARY KEY (project_id)\n)"
+      ],
+      [
+        "table",
+        "receipt_dag_bundles",
+        "receipt_dag_bundles",
+        "CREATE TABLE receipt_dag_bundles (\n\tbundle_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tbundle_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (bundle_id), \n\tUNIQUE (bundle_digest)\n)"
+      ],
+      [
+        "table",
+        "receipt_dag_edges",
+        "receipt_dag_edges",
+        "CREATE TABLE \"receipt_dag_edges\" (\n\tedge_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tparent_node_id VARCHAR(200) NOT NULL, \n\tchild_node_id VARCHAR(200) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tedge_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (edge_id, project_id), \n\tUNIQUE (edge_digest)\n)"
+      ],
+      [
+        "table",
+        "receipt_dag_manifests",
+        "receipt_dag_manifests",
+        "CREATE TABLE receipt_dag_manifests (\n\tmanifest_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tmanifest_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (manifest_id), \n\tUNIQUE (project_id)\n)"
+      ],
+      [
+        "table",
+        "receipt_dag_nodes",
+        "receipt_dag_nodes",
+        "CREATE TABLE \"receipt_dag_nodes\" (\n\tnode_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tkind VARCHAR(40) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tnode_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (node_id, project_id), \n\tUNIQUE (node_digest)\n)"
+      ],
+      [
+        "table",
+        "receipt_dag_verifications",
+        "receipt_dag_verifications",
+        "CREATE TABLE receipt_dag_verifications (\n\tverification_id VARCHAR(200) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tsubject_id VARCHAR(200) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tverification_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (verification_id), \n\tUNIQUE (verification_digest)\n)"
+      ],
+      [
+        "table",
+        "receipts",
+        "receipts",
+        "CREATE TABLE receipts (\n\treceipt_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\treceipt_type VARCHAR(40) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\treceipt_digest VARCHAR(64) NOT NULL, \n\tprevious_transition_digest VARCHAR(64), \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (receipt_id), \n\tUNIQUE (receipt_digest)\n)"
+      ],
+      [
+        "table",
+        "relations",
+        "relations",
+        "CREATE TABLE relations (\n\trelation_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tsource_ref VARCHAR(260) NOT NULL, \n\trelation_type VARCHAR(80) NOT NULL, \n\ttarget_ref VARCHAR(260) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (relation_id)\n)"
+      ],
+      [
+        "table",
+        "research_identities",
+        "research_identities",
+        "CREATE TABLE research_identities (\n\tproject_id VARCHAR(160) NOT NULL, \n\towner_revision VARCHAR(64) NOT NULL, \n\tentity_id VARCHAR(200) NOT NULL, \n\taggregate_kind VARCHAR(40) NOT NULL, \n\tobject_id VARCHAR(200), \n\tschema_family VARCHAR(80) NOT NULL, \n\tsnapshot_id VARCHAR(200) NOT NULL, \n\tcontent_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id, owner_revision)\n)"
+      ],
+      [
+        "table",
+        "research_test_assessments",
+        "research_test_assessments",
+        "CREATE TABLE research_test_assessments (\n\tproject_id VARCHAR(160) NOT NULL, \n\tassessment_id VARCHAR(200) NOT NULL, \n\tprediction_id VARCHAR(200) NOT NULL, \n\tattempt_ref VARCHAR(200) NOT NULL, \n\tassessment_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id, assessment_id)\n)"
+      ],
+      [
+        "table",
+        "resource_scope_heads",
+        "resource_scope_heads",
+        "CREATE TABLE resource_scope_heads (\n\tproject_id VARCHAR(160) NOT NULL, \n\tresource_ref VARCHAR(260) NOT NULL, \n\trevision INTEGER NOT NULL, \n\trecord_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (project_id, resource_ref)\n)"
+      ],
+      [
+        "table",
+        "resource_scope_history",
+        "resource_scope_history",
+        "CREATE TABLE resource_scope_history (\n\tproject_id VARCHAR(160) NOT NULL, \n\tresource_ref VARCHAR(260) NOT NULL, \n\trevision INTEGER NOT NULL, \n\trecord_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id, resource_ref, revision)\n)"
+      ],
+      [
+        "table",
+        "resource_scope_receipts",
+        "resource_scope_receipts",
+        "CREATE TABLE resource_scope_receipts (\n\tproject_id VARCHAR(160) NOT NULL, \n\treceipt_id VARCHAR(200) NOT NULL, \n\tresource_ref VARCHAR(260) NOT NULL, \n\treceipt_digest VARCHAR(64) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id, receipt_id)\n)"
+      ],
+      [
+        "table",
+        "revision_parents",
+        "revision_parents",
+        "CREATE TABLE revision_parents (\n\trevision_id VARCHAR(160) NOT NULL, \n\tordinal INTEGER NOT NULL, \n\tparent_digest VARCHAR(64) NOT NULL, \n\tPRIMARY KEY (revision_id, ordinal), \n\tFOREIGN KEY(revision_id) REFERENCES semantic_revisions (revision_id)\n)"
+      ],
+      [
+        "table",
+        "semantic_revisions",
+        "semantic_revisions",
+        "CREATE TABLE semantic_revisions (\n\trevision_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tentity_type VARCHAR(60) NOT NULL, \n\tentity_id VARCHAR(160) NOT NULL, \n\tsnapshot_id VARCHAR(160) NOT NULL, \n\tactor_json TEXT NOT NULL, \n\treason TEXT NOT NULL, \n\tevidence_refs_json TEXT NOT NULL, \n\taffected_refs_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tschema_version VARCHAR(40) NOT NULL, \n\tPRIMARY KEY (revision_id), \n\tFOREIGN KEY(snapshot_id) REFERENCES entity_snapshots (snapshot_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "source_bindings",
+        "source_bindings",
+        "CREATE TABLE source_bindings (\n\tbinding_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tartifact_id VARCHAR(160) NOT NULL, \n\tcapability VARCHAR(40) NOT NULL, \n\tstate VARCHAR(40) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tupdated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (binding_id), \n\tCONSTRAINT uq_source_binding_artifact UNIQUE (project_id, artifact_id)\n)"
+      ],
+      [
+        "table",
+        "span_corrections",
+        "span_corrections",
+        "CREATE TABLE span_corrections (\n\tcorrection_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tspan_id VARCHAR(160) NOT NULL, \n\tcorrected_text TEXT NOT NULL, \n\treason TEXT NOT NULL, \n\tcorrection_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (correction_id), \n\tUNIQUE (correction_digest)\n)"
+      ],
+      [
+        "table",
+        "step_execution_attempts",
+        "step_execution_attempts",
+        "CREATE TABLE step_execution_attempts (\n\tattempt_revision_id VARCHAR(160) NOT NULL, \n\tattempt_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tstep_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (attempt_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "structural_fts",
+        "structural_fts",
+        "CREATE VIRTUAL TABLE structural_fts USING fts5(node_id UNINDEXED, project_id UNINDEXED, artifact_id UNINDEXED, text, tokenize='trigram')"
+      ],
+      [
+        "table",
+        "structural_fts_config",
+        "structural_fts_config",
+        "CREATE TABLE 'structural_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID"
+      ],
+      [
+        "table",
+        "structural_fts_content",
+        "structural_fts_content",
+        "CREATE TABLE 'structural_fts_content'(id INTEGER PRIMARY KEY, c0, c1, c2, c3)"
+      ],
+      [
+        "table",
+        "structural_fts_data",
+        "structural_fts_data",
+        "CREATE TABLE 'structural_fts_data'(id INTEGER PRIMARY KEY, block BLOB)"
+      ],
+      [
+        "table",
+        "structural_fts_docsize",
+        "structural_fts_docsize",
+        "CREATE TABLE 'structural_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB)"
+      ],
+      [
+        "table",
+        "structural_fts_idx",
+        "structural_fts_idx",
+        "CREATE TABLE 'structural_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID"
+      ],
+      [
+        "table",
+        "structural_nodes",
+        "structural_nodes",
+        "CREATE TABLE \"structural_nodes\" (\n\tnode_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tartifact_id VARCHAR(160) NOT NULL, \n\ttext TEXT, \n\tlocator_json TEXT NOT NULL, \n\tparent_id VARCHAR(160), \n\tkind VARCHAR(60), \n\tordinal INTEGER, source_version_id VARCHAR(160), content_json TEXT, \n\tPRIMARY KEY (node_id)\n)"
+      ],
+      [
+        "table",
+        "thread_activities",
+        "thread_activities",
+        "CREATE TABLE thread_activities (\n\tactivity_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tthread_id VARCHAR(160) NOT NULL, \n\tcycle_id VARCHAR(160) NOT NULL, \n\tevent_type VARCHAR(120) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tactor_id VARCHAR(160) NOT NULL, \n\tactivity_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (activity_id), \n\tUNIQUE (activity_digest)\n)"
+      ],
+      [
+        "table",
+        "thread_checkpoints",
+        "thread_checkpoints",
+        "CREATE TABLE thread_checkpoints (\n\tcheckpoint_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tthread_id VARCHAR(160) NOT NULL, \n\tcycle_id VARCHAR(160) NOT NULL, \n\thead_set_digest VARCHAR(64) NOT NULL, \n\tpayload_json TEXT NOT NULL, \n\tcheckpoint_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (checkpoint_id), \n\tUNIQUE (checkpoint_digest)\n)"
+      ],
+      [
+        "table",
+        "thread_inputs",
+        "thread_inputs",
+        "CREATE TABLE thread_inputs (\n\tinput_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tthread_id VARCHAR(160) NOT NULL, \n\tkind VARCHAR(40) NOT NULL, \n\ttext TEXT NOT NULL, \n\tstate VARCHAR(40) NOT NULL, \n\tordinal INTEGER NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (input_id), \n\tCONSTRAINT uq_thread_input_ordinal UNIQUE (thread_id, ordinal)\n)"
+      ],
+      [
+        "table",
+        "threads",
+        "threads",
+        "CREATE TABLE threads (\n\tthread_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tcycle_id VARCHAR(160) NOT NULL, \n\tproblem TEXT NOT NULL, \n\tlifecycle VARCHAR(60) NOT NULL, \n\texecution_state VARCHAR(60) NOT NULL, \n\tcurrent_object_ids_json TEXT NOT NULL, \n\tworking_head_digest VARCHAR(64) NOT NULL, display_name TEXT DEFAULT '' NOT NULL, scope_json TEXT DEFAULT '{}' NOT NULL, parent_thread_id VARCHAR(160), fork_origin VARCHAR(160), revision INTEGER DEFAULT '0' NOT NULL, created_at VARCHAR(32) DEFAULT '1970-01-01T00:00:00Z' NOT NULL, updated_at VARCHAR(32) DEFAULT '1970-01-01T00:00:00Z' NOT NULL, \n\tPRIMARY KEY (thread_id)\n)"
+      ],
+      [
+        "table",
+        "tui_sessions",
+        "tui_sessions",
+        "CREATE TABLE tui_sessions (\n\tsession_id VARCHAR(200) NOT NULL, \n\trevision INTEGER NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (session_id)\n)"
+      ],
+      [
+        "table",
+        "working_heads",
+        "working_heads",
+        "CREATE TABLE working_heads (\n\tproject_id VARCHAR(160) NOT NULL, \n\taggregate_key VARCHAR(260) NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tupdated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (project_id, aggregate_key)\n)"
+      ],
+      [
+        "table",
+        "workstreams",
+        "workstreams",
+        "CREATE TABLE workstreams (\n\tworkstream_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tname TEXT NOT NULL, \n\tparent_workstream_id VARCHAR(160), \n\towner_role_assignment_id VARCHAR(160), \n\tstate VARCHAR(40) NOT NULL, \n\trevision INTEGER DEFAULT '0' NOT NULL, \n\tPRIMARY KEY (workstream_id)\n)"
+      ]
+    ]
+  },
+  "target_metadata_same_object_checks": 3
+}

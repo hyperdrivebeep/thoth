@@ -3,7 +3,17 @@ from __future__ import annotations
 from sqlalchemy import Column, ForeignKey, MetaData, Table, UniqueConstraint
 from sqlalchemy.types import Integer, String, Text
 
+from thoth.adapters.storage.action_schema import define_action_tables
 from thoth.adapters.storage.artifact_schema import define_artifact_tables
+from thoth.adapters.storage.baseline_schema import define_baseline_tables
+from thoth.adapters.storage.behavior_catalog_schema import define_behavior_catalog_tables
+from thoth.adapters.storage.criterion_schema import define_criterion_tables
+from thoth.adapters.storage.decision_object_schema import define_decision_object_tables
+from thoth.adapters.storage.evidence_schema import define_evidence_tables
+from thoth.adapters.storage.execution_schema import define_execution_tables
+from thoth.adapters.storage.hypothesis_schema import define_hypothesis_tables
+from thoth.adapters.storage.investigation_schema import define_investigation_tables
+from thoth.adapters.storage.outcome_schema import define_outcome_tables
 
 metadata = MetaData()
 
@@ -114,74 +124,11 @@ field_exports = Table(
     Column("content_json", Text, nullable=False),
 )
 
-project_head_sets = Table(
-    "project_head_sets",
-    metadata,
-    Column("project_id", String(160), primary_key=True),
-    Column("revision", Integer, nullable=False),
-    Column("head_set_digest", String(64), nullable=False),
-    Column("content_json", Text, nullable=False),
+project_head_sets, baseline_candidates, baseline_sets, baseline_decisions = define_baseline_tables(
+    metadata
 )
 
-baseline_candidates = Table(
-    "baseline_candidates",
-    metadata,
-    Column("candidate_id", String(200), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("scope", String(80), nullable=False),
-    Column("state", String(60), nullable=False),
-    Column("candidate_digest", String(64), nullable=False, unique=True),
-    Column("content_json", Text, nullable=False),
-)
-
-baseline_sets = Table(
-    "baseline_sets",
-    metadata,
-    Column("baseline_set_id", String(200), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("scope", String(80), nullable=False),
-    Column("lifecycle", String(40), nullable=False),
-    Column("baseline_set_digest", String(64), nullable=False, unique=True),
-    Column("content_json", Text, nullable=False),
-)
-
-baseline_decisions = Table(
-    "baseline_decisions",
-    metadata,
-    Column("decision_id", String(200), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("candidate_id", String(200), nullable=False),
-    Column("decision", String(20), nullable=False),
-    Column("decision_digest", String(64), nullable=False, unique=True),
-    Column("content_json", Text, nullable=False),
-)
-
-behavior_artifacts = Table(
-    "behavior_artifacts",
-    metadata,
-    Column("artifact_id", String(200), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("kind", String(80), nullable=False),
-    Column("state", String(40), nullable=False),
-    Column("content_digest", String(64), nullable=False),
-    Column("content_json", Text, nullable=False),
-    UniqueConstraint(
-        "project_id",
-        "kind",
-        "content_digest",
-        name="uq_behavior_artifact_content",
-    ),
-)
-
-behavior_registry = Table(
-    "behavior_registry",
-    metadata,
-    Column("project_id", String(160), primary_key=True),
-    Column("kind", String(80), primary_key=True),
-    Column("active_digest", String(64), nullable=False),
-    Column("revision", Integer, nullable=False),
-    Column("content_json", Text, nullable=False),
-)
+behavior_artifacts, behavior_registry = define_behavior_catalog_tables(metadata)
 
 tui_sessions = Table(
     "tui_sessions",
@@ -302,622 +249,68 @@ thread_inputs = Table(
     UniqueConstraint("thread_id", "ordinal", name="uq_thread_input_ordinal"),
 )
 
-investigations = Table(
-    "investigations",
-    metadata,
-    Column("investigation_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("thread_id", String(160), nullable=False, index=True),
-    Column("cycle_id", String(160), nullable=False),
-    Column("parent_investigation_id", String(160), nullable=True),
-    Column("trigger", String(80), nullable=False),
-    Column("question", Text, nullable=False),
-    Column("target_object_id", String(160), nullable=True),
-    Column("target_hypothesis_id", String(160), nullable=True),
-    Column("mode", String(40), nullable=False),
-    Column("scope_json", Text, nullable=False),
-    Column("required_evidence_groups_json", Text, nullable=False),
-    Column("query_families_json", Text, nullable=False),
-    Column("counter_search_policy", String(160), nullable=False),
-    Column("budget", Integer, nullable=False),
-    Column("budget_usage", Integer, nullable=False),
-    Column("stop_conditions_json", Text, nullable=False),
-    Column("domain_state", String(40), nullable=False),
-    Column("execution_state", String(40), nullable=False),
-    Column("current_wave", Integer, nullable=False),
-    Column("observation_count", Integer, nullable=False),
-    Column("open_lead_count", Integer, nullable=False),
-    Column("claim_candidate_count", Integer, nullable=False),
-    Column("gap_count", Integer, nullable=False),
-    Column("sufficiency_json", Text, nullable=False),
-    Column("checkpoint_digest", String(64), nullable=True),
-    Column("result_json", Text, nullable=True),
-    Column("plan_revision", Integer, nullable=False),
-    Column("investigation_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-    Column("updated_at", String(32), nullable=False),
+investigations, investigation_audit, acquisition_search_intents, evidence_leads = (
+    define_investigation_tables(metadata)
 )
 
-investigation_audit = Table(
-    "investigation_audit",
-    metadata,
-    Column("audit_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("investigation_id", String(160), nullable=False, index=True),
-    Column("event_type", String(120), nullable=False),
-    Column("payload_json", Text, nullable=False),
-    Column("event_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
+(
+    evidence_sources,
+    evidence_observations,
+    evidence_links,
+    evidence_conflicts,
+    evidence_audit,
+    span_corrections,
+) = define_evidence_tables(metadata)
+
+(
+    criterion_profiles,
+    criterion_contracts,
+    criterion_references,
+    criterion_conflicts,
+    criterion_audit,
+) = define_criterion_tables(metadata)
+
+(
+    object_profiles,
+    object_candidates,
+    decision_objects,
+    object_relations,
+    object_attention,
+    object_audit,
+) = define_decision_object_tables(metadata)
+
+(
+    hypothesis_records,
+    hypothesis_portfolios,
+    hypothesis_relations,
+    hypothesis_assumptions,
+    hypothesis_predictions,
+    hypothesis_test_bindings,
+    hypothesis_appraisals,
+    hypothesis_audit,
+) = define_hypothesis_tables(metadata)
+
+action_records, action_portfolios, action_plans, action_authorizations, action_audit = (
+    define_action_tables(metadata)
 )
 
-acquisition_search_intents = Table(
-    "acquisition_search_intents",
-    metadata,
-    Column("search_intent_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("investigation_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("intent_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
+(
+    plan_executions,
+    step_execution_attempts,
+    execution_effects,
+    execution_reconciliations,
+    execution_audit,
+) = define_execution_tables(metadata)
 
-evidence_leads = Table(
-    "evidence_leads",
-    metadata,
-    Column("lead_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("investigation_id", String(160), nullable=False, index=True),
-    Column("search_intent_id", String(160), nullable=False, index=True),
-    Column("source_id", String(160), nullable=False, index=True),
-    Column("span_id", String(160), nullable=False, index=True),
-    Column("state", String(60), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("lead_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-evidence_sources = Table(
-    "evidence_sources",
-    metadata,
-    Column("source_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("artifact_id", String(160), nullable=False, index=True),
-    Column("connector_ref", String(160), nullable=False),
-    Column("uri", Text, nullable=False),
-    Column("artifact_type", String(160), nullable=False),
-    Column("version", String(260), nullable=True),
-    Column("sha256", String(64), nullable=False),
-    Column("authority_status", String(60), nullable=False),
-    Column("security_class", String(60), nullable=False),
-    Column("official_copy", Integer, nullable=False),
-    Column("rights", String(160), nullable=False),
-    Column("retention", String(160), nullable=False),
-    Column("valid_time", String(32), nullable=True),
-    Column("snapshot_time", String(32), nullable=True),
-    Column("cutoff_eligibility", String(60), nullable=False),
-    Column("lineage_root_id", String(160), nullable=False),
-    Column("parent_source_ids_json", Text, nullable=False),
-    Column("supersedes_source_id", String(160), nullable=True),
-    Column("source_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-evidence_observations = Table(
-    "evidence_observations",
-    metadata,
-    Column("observation_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("span_ids_json", Text, nullable=False),
-    Column("observed_statement", Text, nullable=False),
-    Column("observed_time", String(32), nullable=True),
-    Column("valid_time", String(32), nullable=True),
-    Column("observer_group", String(160), nullable=False),
-    Column("independence_basis", Text, nullable=False),
-    Column("provenance_class", String(80), nullable=False),
-    Column("contamination_note", Text, nullable=True),
-    Column("supersedes_observation_id", String(160), nullable=True),
-    Column("observation_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-evidence_links = Table(
-    "evidence_links",
-    metadata,
-    Column("evidence_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("thread_id", String(160), nullable=True),
-    Column("target_type", String(80), nullable=False),
-    Column("target_id", String(160), nullable=False, index=True),
-    Column("relation", String(40), nullable=False),
-    Column("source_ids_json", Text, nullable=False),
-    Column("span_ids_json", Text, nullable=False),
-    Column("observation_ids_json", Text, nullable=False),
-    Column("conditions_json", Text, nullable=False),
-    Column("applicability", Text, nullable=False),
-    Column("independence_group", String(160), nullable=False),
-    Column("support_status", String(60), nullable=False),
-    Column("authority_status", String(60), nullable=False),
-    Column("verification_status", String(60), nullable=False),
-    Column("cutoff_eligibility", String(60), nullable=False),
-    Column("content_trust", String(60), nullable=False),
-    Column("conflict_ids_json", Text, nullable=False),
-    Column("supersedes_evidence_id", String(160), nullable=True),
-    Column("revision", Integer, nullable=False),
-    Column("evidence_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-evidence_conflicts = Table(
-    "evidence_conflicts",
-    metadata,
-    Column("conflict_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("evidence_ids_json", Text, nullable=False),
-    Column("field", String(160), nullable=False),
-    Column("status", String(40), nullable=False),
-    Column("reason", Text, nullable=False),
-    Column("resolution_evidence_ids_json", Text, nullable=False),
-    Column("conflict_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-    Column("updated_at", String(32), nullable=False),
-)
-
-evidence_audit = Table(
-    "evidence_audit",
-    metadata,
-    Column("audit_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("evidence_ref", String(160), nullable=False, index=True),
-    Column("event_type", String(120), nullable=False),
-    Column("payload_json", Text, nullable=False),
-    Column("event_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-span_corrections = Table(
-    "span_corrections",
-    metadata,
-    Column("correction_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("span_id", String(160), nullable=False, index=True),
-    Column("corrected_text", Text, nullable=False),
-    Column("reason", Text, nullable=False),
-    Column("correction_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-criterion_profiles = Table(
-    "criterion_profiles",
-    metadata,
-    Column("profile_ref", String(160), primary_key=True),
-    Column("version", Integer, primary_key=True),
-    Column("name", Text, nullable=False),
-    Column("domain_hint", String(160), nullable=False),
-    Column("required_fields_json", Text, nullable=False),
-    Column("conditional_fields_json", Text, nullable=False),
-    Column("allowed_computation_types_json", Text, nullable=False),
-    Column("authority_policy_json", Text, nullable=False),
-    Column("enabled", Integer, nullable=False),
-    Column("profile_digest", String(64), nullable=False, unique=True),
-    Column("profile_json", Text, nullable=True),
-)
-
-criterion_contracts = Table(
-    "criterion_contracts",
-    metadata,
-    Column("criterion_revision_id", String(160), primary_key=True),
-    Column("criterion_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("thread_id", String(160), nullable=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("supersedes_revision_digest", String(64), nullable=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-criterion_references = Table(
-    "criterion_references",
-    metadata,
-    Column("reference_candidate_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("criterion_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("reference_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-criterion_conflicts = Table(
-    "criterion_conflicts",
-    metadata,
-    Column("conflict_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("criterion_id", String(160), nullable=False, index=True),
-    Column("field_path", String(260), nullable=False),
-    Column("candidate_values_json", Text, nullable=False),
-    Column("evidence_refs_json", Text, nullable=False),
-    Column("status", String(40), nullable=False),
-    Column("impact_json", Text, nullable=False),
-    Column("conflict_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-criterion_audit = Table(
-    "criterion_audit",
-    metadata,
-    Column("audit_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("criterion_id", String(160), nullable=False, index=True),
-    Column("event_type", String(120), nullable=False),
-    Column("payload_json", Text, nullable=False),
-    Column("event_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-object_profiles = Table(
-    "object_profiles",
-    metadata,
-    Column("profile_ref", String(160), primary_key=True),
-    Column("version", Integer, primary_key=True),
-    Column("content_json", Text, nullable=False),
-    Column("enabled", Integer, nullable=False),
-    Column("profile_digest", String(64), nullable=False, unique=True),
-)
-
-object_candidates = Table(
-    "object_candidates",
-    metadata,
-    Column("candidate_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("thread_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("candidate_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-decision_objects = Table(
-    "decision_objects",
-    metadata,
-    Column("object_revision_id", String(160), primary_key=True),
-    Column("object_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("thread_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("supersedes_revision_digest", String(64), nullable=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-object_relations = Table(
-    "object_relations",
-    metadata,
-    Column("relation_revision_id", String(160), primary_key=True),
-    Column("relation_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("source_object_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-object_attention = Table(
-    "object_attention",
-    metadata,
-    Column("attention_revision_id", String(160), primary_key=True),
-    Column("attention_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("object_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-object_audit = Table(
-    "object_audit",
-    metadata,
-    Column("audit_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("object_id", String(160), nullable=False, index=True),
-    Column("event_type", String(120), nullable=False),
-    Column("payload_json", Text, nullable=False),
-    Column("event_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-hypothesis_records = Table(
-    "hypothesis_records",
-    metadata,
-    Column("hypothesis_revision_id", String(160), primary_key=True),
-    Column("hypothesis_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("object_id", String(160), nullable=False, index=True),
-    Column("portfolio_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-hypothesis_portfolios = Table(
-    "hypothesis_portfolios",
-    metadata,
-    Column("portfolio_revision_id", String(160), primary_key=True),
-    Column("portfolio_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("object_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-hypothesis_relations = Table(
-    "hypothesis_relations",
-    metadata,
-    Column("relation_revision_id", String(160), primary_key=True),
-    Column("relation_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("portfolio_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-hypothesis_assumptions = Table(
-    "hypothesis_assumptions",
-    metadata,
-    Column("assumption_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("hypothesis_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("assumption_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-hypothesis_predictions = Table(
-    "hypothesis_predictions",
-    metadata,
-    Column("prediction_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("hypothesis_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("prediction_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-hypothesis_test_bindings = Table(
-    "hypothesis_test_bindings",
-    metadata,
-    Column("test_binding_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("prediction_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("binding_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-hypothesis_appraisals = Table(
-    "hypothesis_appraisals",
-    metadata,
-    Column("appraisal_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("hypothesis_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("appraisal_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-hypothesis_audit = Table(
-    "hypothesis_audit",
-    metadata,
-    Column("audit_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("hypothesis_id", String(160), nullable=False, index=True),
-    Column("event_type", String(120), nullable=False),
-    Column("payload_json", Text, nullable=False),
-    Column("event_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-action_records = Table(
-    "action_records",
-    metadata,
-    Column("action_revision_id", String(160), primary_key=True),
-    Column("action_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("object_id", String(160), nullable=False, index=True),
-    Column("portfolio_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-action_portfolios = Table(
-    "action_portfolios",
-    metadata,
-    Column("portfolio_revision_id", String(160), primary_key=True),
-    Column("portfolio_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("object_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-action_plans = Table(
-    "action_plans",
-    metadata,
-    Column("plan_revision_id", String(160), primary_key=True),
-    Column("plan_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("object_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-action_authorizations = Table(
-    "action_authorizations",
-    metadata,
-    Column("authorization_revision_id", String(160), primary_key=True),
-    Column("authorization_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("plan_id", String(160), nullable=False, index=True),
-    Column("step_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-action_audit = Table(
-    "action_audit",
-    metadata,
-    Column("audit_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("subject_id", String(160), nullable=False, index=True),
-    Column("event_type", String(120), nullable=False),
-    Column("payload_json", Text, nullable=False),
-    Column("event_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-plan_executions = Table(
-    "plan_executions",
-    metadata,
-    Column("execution_revision_id", String(160), primary_key=True),
-    Column("plan_execution_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("object_id", String(160), nullable=False, index=True),
-    Column("plan_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-step_execution_attempts = Table(
-    "step_execution_attempts",
-    metadata,
-    Column("attempt_revision_id", String(160), primary_key=True),
-    Column("attempt_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("plan_execution_id", String(160), nullable=False, index=True),
-    Column("step_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-execution_effects = Table(
-    "execution_effects",
-    metadata,
-    Column("effect_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("attempt_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("effect_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-execution_reconciliations = Table(
-    "execution_reconciliations",
-    metadata,
-    Column("reconciliation_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("plan_execution_id", String(160), nullable=False, index=True),
-    Column("attempt_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("reconciliation_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-execution_audit = Table(
-    "execution_audit",
-    metadata,
-    Column("audit_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("plan_execution_id", String(160), nullable=False, index=True),
-    Column("event_type", String(120), nullable=False),
-    Column("payload_json", Text, nullable=False),
-    Column("event_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-outcome_profiles = Table(
-    "outcome_profiles",
-    metadata,
-    Column("profile_ref", String(160), primary_key=True),
-    Column("version", Integer, primary_key=True),
-    Column("content_json", Text, nullable=False),
-    Column("enabled", Integer, nullable=False),
-    Column("profile_digest", String(64), nullable=False, unique=True),
-)
-
-outcome_series = Table(
-    "outcome_series",
-    metadata,
-    Column("series_revision_id", String(160), primary_key=True),
-    Column("outcome_series_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("object_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-outcome_assessments = Table(
-    "outcome_assessments",
-    metadata,
-    Column("assessment_revision_id", String(160), primary_key=True),
-    Column("outcome_assessment_id", String(160), nullable=False, index=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("outcome_series_id", String(160), nullable=False, index=True),
-    Column("object_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("revision_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-outcome_attributions = Table(
-    "outcome_attributions",
-    metadata,
-    Column("attribution_assessment_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("outcome_assessment_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("attribution_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-outcome_change_sets = Table(
-    "outcome_change_sets",
-    metadata,
-    Column("outcome_change_set_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("outcome_assessment_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("change_set_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-outcome_impacts = Table(
-    "outcome_impacts",
-    metadata,
-    Column("impact_assessment_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("outcome_series_id", String(160), nullable=False, index=True),
-    Column("content_json", Text, nullable=False),
-    Column("impact_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
-
-outcome_audit = Table(
-    "outcome_audit",
-    metadata,
-    Column("audit_id", String(160), primary_key=True),
-    Column("project_id", String(160), nullable=False, index=True),
-    Column("subject_id", String(160), nullable=False, index=True),
-    Column("event_type", String(120), nullable=False),
-    Column("payload_json", Text, nullable=False),
-    Column("event_digest", String(64), nullable=False, unique=True),
-    Column("created_at", String(32), nullable=False),
-)
+(
+    outcome_profiles,
+    outcome_series,
+    outcome_assessments,
+    outcome_attributions,
+    outcome_change_sets,
+    outcome_impacts,
+    outcome_audit,
+) = define_outcome_tables(metadata)
 
 control_records = Table(
     "control_records",

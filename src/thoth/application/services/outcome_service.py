@@ -1,12 +1,31 @@
 from __future__ import annotations
 
 from thoth.application.services.baseline_service import BaselineService
+from thoth.application.services.outcome_record_drafts import (
+    BUILTIN_OUTCOME_PROFILES,
+    assessed_series_updates,
+    assessment_record,
+    attribution_record,
+    attribution_support,
+    change_set_record,
+    impact_record,
+    judge_assessment,
+    linked_phase_updates,
+    missing_series_fields,
+    outcome_profile_record,
+    reassessed_record,
+    series_record,
+)
+from thoth.application.services.outcome_revision_drafts import (
+    commit_parts,
+    revised_assessment_record,
+    revised_series_record,
+)
 from thoth.application.services.revision_service import CommitResult, RevisionCommitService
 from thoth.domain.action import ActionPlan
 from thoth.domain.action_full import ActionPlanRecord
-from thoth.domain.actor import ActorRef
 from thoth.domain.canonical import canonical_payload, domain_digest
-from thoth.domain.enums import ActorKind, CutoffState, EntityType
+from thoth.domain.enums import CutoffState, EntityType
 from thoth.domain.outcome_full import (
     AttributionAssessmentRecord,
     OutcomeAssessmentRecord,
@@ -18,10 +37,8 @@ from thoth.domain.outcome_full import (
 )
 from thoth.domain.research_identity import decode_research
 from thoth.domain.revision import (
-    EntitySnapshot,
     ImpactPropagationPlan,
     RevisionChangeSet,
-    SemanticRevision,
     StagedRevision,
 )
 from thoth.ports.action import ActionStorePort
@@ -31,33 +48,6 @@ from thoth.ports.execution import ExecutionStorePort
 from thoth.ports.ledger import LedgerPort
 from thoth.ports.outcome import OutcomeStorePort
 from thoth.ports.runtime import ClockPort, IdGeneratorPort
-
-BUILTIN_OUTCOME_PROFILES = (
-    (
-        "REQUIREMENT_VERIFICATION_OUTCOME",
-        "Requirement verification outcome",
-        ("REQUIREMENT_VERIFICATION", "EXPERIMENT_TEST"),
-        ("observation", "comparator", "criterion"),
-        ("requirement_result", "effect_direction", "residual_risk"),
-        "CONTRIBUTION_ONLY_WITHOUT_CAUSAL_DESIGN",
-    ),
-    (
-        "EXPERIMENT_LEARNING_OUTCOME",
-        "Experiment learning outcome",
-        ("HYPOTHESIS_DISCRIMINATION", "ANALYSIS_COMPUTATION", "SIMULATION"),
-        ("observation", "comparator", "test_validity"),
-        ("hypothesis_discrimination", "information_gain", "unexpected_effect"),
-        "ASSOCIATION_BY_DEFAULT",
-    ),
-    (
-        "DELIVERY_ACKNOWLEDGEMENT_OUTCOME",
-        "Delivery acknowledgement outcome",
-        ("COMMUNICATION_SUBMISSION",),
-        ("delivery_receipt",),
-        ("delivery_acknowledgement",),
-        "NOT_APPLICABLE",
-    ),
-)
 
 
 class OutcomeService:
@@ -96,31 +86,9 @@ class OutcomeService:
                 dimensions,
                 attribution,
             ) in BUILTIN_OUTCOME_PROFILES:
-                draft: dict[str, object] = {
-                    "profile_ref": profile_ref,
-                    "version": 1,
-                    "name": name,
-                    "action_purposes": purposes,
-                    "required_evidence": required,
-                    "comparator_contract": "EXACT_BASELINE_SET_DIGEST_REQUIRED",
-                    "window_contract": "PHASE_AND_TIME_WINDOW_REQUIRED",
-                    "evaluator_contract": "SOURCE_BOUND_DETERMINISTIC_OR_EXPLICIT_ABSTENTION",
-                    "effect_dimensions": dimensions,
-                    "attribution_standard": attribution,
-                    "closure_criteria": {
-                        "validity": "VALID_OR_PROFILE_ACCEPTED_LIMITED",
-                        "objective": "EXPLICITLY_ASSESSED",
-                        "residual_effect": "HANDLED_OR_ACCEPTED",
-                    },
-                    "enabled": True,
-                    "authority_owner": "OUTCOME_EVALUATION_OWNER",
-                }
                 self._store.put_profile(
-                    OutcomeProfileRecord.model_validate(
-                        {
-                            **draft,
-                            "profile_digest": self._digest("OUTCOME_PROFILE", draft),
-                        }
+                    outcome_profile_record(
+                        profile_ref, name, purposes, required, dimensions, attribution
                     )
                 )
 
@@ -161,35 +129,18 @@ class OutcomeService:
             allowed = {"INTERIM", "FOLLOW_UP", "FINAL_WITHIN_SCOPE"}
             if not phases or any(phase not in allowed for phase in phases):
                 raise ValueError("Outcome windows require valid, explicit assessment phases")
-            missing = tuple(
-                field
-                for field, present in (
-                    ("assessment_windows", bool(assessment_windows)),
-                    ("comparison_baseline_set_digest", bool(comparison_baseline_set_digest)),
-                    ("profile", True),
-                )
-                if not present
-            )
-            draft: dict[str, object] = {
-                "series_revision_id": self._ids.new("outcome-series-revision"),
-                "outcome_series_id": self._ids.new("outcome-series"),
-                "project_id": project_id,
-                "object_id": object_id,
-                "action_plan_revision_digest": action_plan_revision_digest,
-                "planned_execution_ref": planned_execution_ref,
-                "profile_ref": profile_ref,
-                "comparison_baseline_set_digest": comparison_baseline_set_digest,
-                "assessment_windows": assessment_windows,
-                "phase_states": {phase: "WAITING_OBSERVATION" for phase in phases},
-                "observation_refs_by_phase": {},
-                "observation_completeness_by_phase": {},
-                "assessment_refs": (),
-                "final_within_scope_state": "NOT_ASSESSED",
-                "revision": 0,
-                "created_at": self._clock.now(),
-            }
-            record = OutcomeSeriesRecord.model_validate(
-                {**draft, "revision_digest": self._digest("OUTCOME_SERIES", draft)}
+            missing = missing_series_fields(assessment_windows, comparison_baseline_set_digest)
+            record = series_record(
+                project_id,
+                object_id,
+                action_plan_revision_digest,
+                planned_execution_ref,
+                profile_ref,
+                comparison_baseline_set_digest,
+                assessment_windows,
+                phases,
+                ids=self._ids,
+                clock=self._clock,
             )
             committed, commit = self._persist_series(record, "outcome/seriesCreated")
             return committed, missing, commit
@@ -207,23 +158,9 @@ class OutcomeService:
             self._validate_evidence(current.project_id, (*observation_refs, *evidence_refs))
             if phase not in current.phase_states:
                 raise ValueError("assessment phase is not planned in this OutcomeSeries")
-            refs = dict(current.observation_refs_by_phase)
-            refs[phase] = observation_refs
-            completeness_by_phase = dict(current.observation_completeness_by_phase)
-            completeness_by_phase[phase] = completeness
-            states = dict(current.phase_states)
-            states[phase] = (
-                "READY_TO_ASSESS"
-                if observation_refs and completeness in {"COMPLETE", "PARTIAL"}
-                else "WAITING_OBSERVATION"
-            )
             return self._revise_series(
                 current,
-                updates={
-                    "observation_refs_by_phase": refs,
-                    "observation_completeness_by_phase": completeness_by_phase,
-                    "phase_states": states,
-                },
+                updates=linked_phase_updates(current, phase, observation_refs, completeness),
                 event_type="outcome/observationLinked",
             )
 
@@ -242,73 +179,28 @@ class OutcomeService:
             if phase not in current.phase_states:
                 raise ValueError("assessment phase is not planned")
             self._validate_evidence(current.project_id, (*observation_refs, *comparator_refs))
-            completeness = current.observation_completeness_by_phase.get(phase, "MISSING")
-            validity = (
-                "INVALID"
-                if completeness == "CORRUPT"
-                else "VALID"
-                if completeness == "COMPLETE" and observation_refs and comparator_refs
-                else "LIMITED"
-                if completeness == "PARTIAL" and observation_refs
-                else "INCONCLUSIVE"
+            validity, limitations, attribution = judge_assessment(
+                current, phase, observation_refs, comparator_refs
             )
-            limitations: list[str] = []
-            if not comparator_refs:
-                limitations.append("comparator evidence is missing")
-            if completeness != "COMPLETE":
-                limitations.append(f"observation completeness is {completeness}")
-            attribution = (
-                "ASSOCIATED"
-                if current.planned_execution_ref and observation_refs
-                else "NOT_ASSESSED"
-            )
-            draft: dict[str, object] = {
-                "assessment_revision_id": self._ids.new("outcome-assessment-revision"),
-                "outcome_assessment_id": self._ids.new("outcome-assessment"),
-                "project_id": current.project_id,
-                "outcome_series_id": current.outcome_series_id,
-                "object_id": current.object_id,
-                "assessment_phase": phase,
-                "plan_revision_digest": current.action_plan_revision_digest,
-                "execution_ref": current.planned_execution_ref,
-                "baseline_set_digest": current.comparison_baseline_set_digest,
-                "profile_ref": profile.profile_ref,
-                "profile_version": profile.version,
-                "expected_observation_refs": (),
-                "actual_observation_refs": observation_refs,
-                "comparator_refs": comparator_refs,
-                "assumptions": assumptions,
-                "lifecycle": "ASSESSED",
-                "validity": validity,
-                "objective_attainment": "NOT_ASSESSED",
-                "attribution_state": attribution,
-                "follow_up_state": "MORE_EVIDENCE_REQUIRED",
-                "limitations": tuple(limitations),
-                "changed_dimensions": tuple(profile.effect_dimensions),
-                "created_at": self._clock.now(),
-            }
-            assessment = OutcomeAssessmentRecord.model_validate(
-                {**draft, "revision_digest": self._digest("OUTCOME_ASSESSMENT", draft)}
+            assessment = assessment_record(
+                current,
+                profile,
+                phase,
+                observation_refs,
+                comparator_refs,
+                assumptions,
+                validity,
+                limitations,
+                attribution,
+                ids=self._ids,
+                clock=self._clock,
             )
             committed_assessment, assessment_commit = self._persist_assessment(
                 assessment, "outcome/assessed"
             )
-            states = dict(current.phase_states)
-            states[phase] = "ASSESSED"
             series, series_commit = self._revise_series(
                 current,
-                updates={
-                    "phase_states": states,
-                    "assessment_refs": (
-                        *current.assessment_refs,
-                        assessment.outcome_assessment_id,
-                    ),
-                    "final_within_scope_state": (
-                        validity
-                        if phase == "FINAL_WITHIN_SCOPE"
-                        else current.final_within_scope_state
-                    ),
-                },
+                updates=assessed_series_updates(current, phase, assessment, validity),
                 event_type="outcome/assessed",
             )
             return committed_assessment, series, assessment_commit, series_commit
@@ -322,28 +214,8 @@ class OutcomeService:
     ) -> tuple[OutcomeAssessmentRecord, CommitResult]:
         with self._ledger.transaction():
             self._validate_evidence(current.project_id, new_evidence_refs)
-            draft = current.model_dump(mode="python")
-            merged = tuple(dict.fromkeys((*current.actual_observation_refs, *new_evidence_refs)))
-            changed = ("evidence_coverage",) if merged != current.actual_observation_refs else ()
-            draft.update(
-                {
-                    "assessment_revision_id": self._ids.new("outcome-assessment-revision"),
-                    "actual_observation_refs": merged,
-                    "lifecycle": "ASSESSED",
-                    "validity": (
-                        "LIMITED"
-                        if current.validity == "INCONCLUSIVE" and merged
-                        else current.validity
-                    ),
-                    "changed_dimensions": changed,
-                    "limitations": (*current.limitations, f"reassessment reason: {reason}"),
-                    "supersedes_revision_digest": current.revision_digest,
-                    "created_at": self._clock.now(),
-                }
-            )
-            draft.pop("revision_digest", None)
-            record = OutcomeAssessmentRecord.model_validate(
-                {**draft, "revision_digest": self._digest("OUTCOME_ASSESSMENT", draft)}
+            record = reassessed_record(
+                current, new_evidence_refs, reason, ids=self._ids, clock=self._clock
             )
             return self._persist_assessment(record, "outcome/reassessed")
 
@@ -360,36 +232,19 @@ class OutcomeService:
             self._validate_evidence(
                 current.project_id, (*counterfactual_evidence_refs, *evidence_refs)
             )
-            causal_methods = {"RANDOMIZED", "QUASI_EXPERIMENTAL", "VALID_N_OF_1"}
-            contribution_methods = {"CONTRIBUTION_ANALYSIS", "PROCESS_TRACING"}
-            supported = (
-                "CAUSAL_ATTRIBUTION_SUPPORTED"
-                if method in causal_methods and counterfactual_evidence_refs and evidence_refs
-                else "CONTRIBUTION_SUPPORTED"
-                if method in contribution_methods and evidence_refs
-                else "ASSOCIATED"
-                if evidence_refs
-                else "INCONCLUSIVE"
+            supported, limitations = attribution_support(
+                method, contextual_factor_refs, counterfactual_evidence_refs, evidence_refs
             )
-            limitations: list[str] = []
-            if supported != "CAUSAL_ATTRIBUTION_SUPPORTED":
-                limitations.append("causal attribution design/evidence is insufficient")
-            if not contextual_factor_refs:
-                limitations.append("contextual factors are not explicitly represented")
-            draft: dict[str, object] = {
-                "attribution_assessment_id": self._ids.new("outcome-attribution"),
-                "project_id": current.project_id,
-                "outcome_assessment_id": current.outcome_assessment_id,
-                "method": method,
-                "contextual_factor_refs": contextual_factor_refs,
-                "counterfactual_evidence_refs": counterfactual_evidence_refs,
-                "evidence_refs": evidence_refs,
-                "supported_level": supported,
-                "limitations": tuple(limitations),
-                "created_at": self._clock.now(),
-            }
-            attribution = AttributionAssessmentRecord.model_validate(
-                {**draft, "attribution_digest": self._digest("OUTCOME_ATTRIBUTION", draft)}
+            attribution = attribution_record(
+                current,
+                method,
+                contextual_factor_refs,
+                counterfactual_evidence_refs,
+                evidence_refs,
+                supported,
+                limitations,
+                ids=self._ids,
+                clock=self._clock,
             )
             self._store.add_attribution(attribution)
             revised, commit = self._revise_assessment(
@@ -411,43 +266,13 @@ class OutcomeService:
         expected_project_head_set: str,
     ) -> OutcomeChangeSetRecord:
         with self._ledger.transaction():
-            restrictions: list[str] = []
-            if current.validity in {"INVALID", "LIMITED", "INCONCLUSIVE"}:
-                restrictions.extend(
-                    (
-                        "NO_OFFICIAL_CRITERION_CHANGE",
-                        "NO_HYPOTHESIS_APPRAISAL_MUTATION",
-                        "NO_BASELINE_MOVEMENT",
-                        "NO_INSTITUTIONAL_DISPOSITION",
-                    )
-                )
-            candidate_revisions = tuple(
-                {
-                    "entity_namespace": namespace,
-                    "candidate_patch": patch,
-                    "applied": False,
-                }
-                for namespace, patch in proposed_entity_changes.items()
-            )
-            draft: dict[str, object] = {
-                "outcome_change_set_id": self._ids.new("outcome-change-set"),
-                "project_id": current.project_id,
-                "outcome_assessment_id": current.outcome_assessment_id,
-                "proposed_entity_changes": proposed_entity_changes,
-                "impact_policy_ref": impact_policy_ref,
-                "expected_project_head_set": expected_project_head_set,
-                "candidate_revisions": candidate_revisions,
-                "impact_propagation_plan": {
-                    "stale_refs": tuple(proposed_entity_changes),
-                    "invalidated_refs": (),
-                    "recalculate_refs": tuple(proposed_entity_changes),
-                },
-                "validity_restrictions": tuple(restrictions),
-                "status": "PROPOSED_NOT_APPLIED",
-                "created_at": self._clock.now(),
-            }
-            record = OutcomeChangeSetRecord.model_validate(
-                {**draft, "change_set_digest": self._digest("OUTCOME_CHANGE_SET", draft)}
+            record = change_set_record(
+                current,
+                proposed_entity_changes,
+                impact_policy_ref,
+                expected_project_head_set,
+                ids=self._ids,
+                clock=self._clock,
             )
             self._store.add_change_set(record)
             self.audit(
@@ -469,31 +294,14 @@ class OutcomeService:
     ) -> OutcomeImpactRecord:
         with self._ledger.transaction():
             self._validate_evidence(series.project_id, evidence_refs)
-            sufficient = bool(
-                evidence_refs
-                and broader_window
-                and attribution_design_ref
-                and attribution_design_ref != "TEMPORAL_ONLY"
-            )
-            draft: dict[str, object] = {
-                "impact_assessment_id": self._ids.new("outcome-impact"),
-                "project_id": series.project_id,
-                "outcome_series_id": series.outcome_series_id,
-                "broader_window": broader_window,
-                "impact_profile_ref": impact_profile_ref,
-                "evidence_refs": evidence_refs,
-                "attribution_design_ref": attribution_design_ref,
-                "status": ("CANDIDATE" if sufficient else "INSUFFICIENT_CAUSAL_DESIGN"),
-                "contextual_factors": (),
-                "limitations": (
-                    ()
-                    if sufficient
-                    else ("broader impact cannot be inferred from one execution alone",)
-                ),
-                "created_at": self._clock.now(),
-            }
-            record = OutcomeImpactRecord.model_validate(
-                {**draft, "impact_digest": self._digest("OUTCOME_IMPACT", draft)}
+            record = impact_record(
+                series,
+                broader_window,
+                impact_profile_ref,
+                evidence_refs,
+                attribution_design_ref,
+                ids=self._ids,
+                clock=self._clock,
             )
             self._store.add_impact(record)
             return record
@@ -528,20 +336,7 @@ class OutcomeService:
         updates: dict[str, object],
         event_type: str,
     ) -> tuple[OutcomeSeriesRecord, CommitResult]:
-        draft = current.model_dump(mode="python")
-        draft.update(updates)
-        draft.update(
-            {
-                "series_revision_id": self._ids.new("outcome-series-revision"),
-                "revision": current.revision + 1,
-                "supersedes_revision_digest": current.revision_digest,
-                "created_at": self._clock.now(),
-            }
-        )
-        draft.pop("revision_digest", None)
-        record = OutcomeSeriesRecord.model_validate(
-            {**draft, "revision_digest": self._digest("OUTCOME_SERIES", draft)}
-        )
+        record = revised_series_record(current, updates, ids=self._ids, clock=self._clock)
         return self._persist_series(record, event_type)
 
     def _revise_assessment(
@@ -551,19 +346,7 @@ class OutcomeService:
         updates: dict[str, object],
         event_type: str,
     ) -> tuple[OutcomeAssessmentRecord, CommitResult]:
-        draft = current.model_dump(mode="python")
-        draft.update(updates)
-        draft.update(
-            {
-                "assessment_revision_id": self._ids.new("outcome-assessment-revision"),
-                "supersedes_revision_digest": current.revision_digest,
-                "created_at": self._clock.now(),
-            }
-        )
-        draft.pop("revision_digest", None)
-        record = OutcomeAssessmentRecord.model_validate(
-            {**draft, "revision_digest": self._digest("OUTCOME_ASSESSMENT", draft)}
-        )
+        record = revised_assessment_record(current, updates, ids=self._ids, clock=self._clock)
         return self._persist_assessment(record, event_type)
 
     def _persist_series(
@@ -610,34 +393,15 @@ class OutcomeService:
         event_type: str,
         evidence_refs: tuple[str, ...],
     ) -> CommitResult:
-        content = record.model_dump(mode="python")
-        snapshot = EntitySnapshot(
-            snapshot_id=self._ids.new("snapshot"),
-            project_id=record.project_id,
-            entity_type=EntityType.OUTCOME,
-            entity_id=entity_id,
-            schema_version="1.0.0",
-            content=content,
-            content_digest=self._digest("ENTITY_SNAPSHOT", content),
-        )
-        actor = ActorRef(
-            actor_id="agent:outcome-evaluator",
-            kind=ActorKind.AGENT,
-            role="outcome-evaluator",
-        )
-        revision = SemanticRevision(
-            revision_id=revision_id,
-            project_id=record.project_id,
-            entity_type=EntityType.OUTCOME,
-            entity_id=entity_id,
-            snapshot_id=snapshot.snapshot_id,
-            parent_revision_digests=() if supersedes is None else (supersedes,),
-            actor=actor,
-            reason=event_type,
-            evidence_refs=evidence_refs,
-            affected_refs=(),
-            revision_digest=revision_digest,
-            created_at=record.created_at,
+        snapshot, actor, revision = commit_parts(
+            record,
+            entity_id,
+            revision_id,
+            revision_digest,
+            supersedes,
+            event_type,
+            evidence_refs,
+            ids=self._ids,
         )
         expected = {} if supersedes is None else {f"OUTCOME:{entity_id}": supersedes}
         commit = self._commits.commit(

@@ -9,8 +9,10 @@ import { parseRequests, type ReviewControls, type ReviewTarget } from "./judgmen
 import { ReviewDialog } from "./ReviewDialog";
 import { useHypothesisLinks } from "./useHypothesisLinks";
 import { useDiscrimination, useLessons, useSameHypotheses } from "./useJudgmentRecords";
+import { useDraftGeneration, type DraftTicket } from "./useDraftGeneration";
+import { useReadAccessProtection } from "./useReadAccessProtection";
 
-type SendInput = { hypothesisId: string; evidenceRef: string | null; reasons: string[]; note: string; digest?: string };
+type SendInput = { hypothesisId: string; evidenceRef: string | null; reasons: string[]; note: string; digest?: string; ticket?: DraftTicket };
 
 /** Hypothesis comparison with review requests: reads the thread's requests and sends new ones. */
 export function HypothesisCompareLive({ result, projectId, threadId }: { result: Record<string, unknown>; projectId: string; threadId: string }) {
@@ -19,8 +21,10 @@ export function HypothesisCompareLive({ result, projectId, threadId }: { result:
   const list = useQuery({ queryKey: key, retry: false,
     queryFn: ({ signal }) => rpc<{ requests: unknown }>("hypothesis/review/list", { project_id: projectId, thread_id: threadId }, crypto.randomUUID(), signal),
     refetchInterval: query => parseRequests(query.state.data?.value.requests).some(item => item.status === "REVIEWING") ? 3000 : false });
-  const requests = parseRequests(list.data?.value.requests);
+  const blocked = useReadAccessProtection(key, list.error);
+  const requests = parseRequests(blocked ? undefined : list.data?.value.requests);
   const [target, setTarget] = useState<ReviewTarget | null>(null);
+  const ownership = useDraftGeneration(JSON.stringify([projectId, threadId]));
   const linked = useHypothesisLinks(projectId);
   const discrimination = useDiscrimination(projectId);
   const lessons = useLessons(projectId);
@@ -33,21 +37,21 @@ export function HypothesisCompareLive({ result, projectId, threadId }: { result:
         hypothesis_revision_digest: digest, ...(input.evidenceRef ? { evidence_ref: input.evidenceRef } : {}),
         reason_codes: input.reasons, note: input.note }, crypto.randomUUID());
     },
-    onSuccess: async () => {
-      setTarget(null);
+    onSuccess: async (_result, input) => {
+      if (ownership.isCurrent(input.ticket)) { ownership.advance(); setTarget(null); }
       await Promise.all([key, ["research", projectId, threadId], ["conversation", projectId, threadId]].map(queryKey => client.invalidateQueries({ queryKey })));
     },
   });
   const controls: ReviewControls = {
     requests,
-    onRequest: next => { send.reset(); setTarget(next); },
+    onRequest: next => { ownership.advance(); send.reset(); setTarget(next); },
     onResend: item => send.mutate({ hypothesisId: item.hypothesis_id, evidenceRef: item.evidence_ref, reasons: item.reason_codes, note: item.note, digest: item.hypothesis_revision_digest }),
   };
   return <>
-    {list.error && <Callout compact intent="warning" role="status">{t("review.stateFailed")}</Callout>}
+    {(list.error || blocked) && <Callout compact intent="warning" role="status">{t("review.stateFailed")}</Callout>}
     {!target && send.error && <Callout compact intent="danger" role="alert">{t("reviewDialog.failed")}{" "}{send.error.message}</Callout>}
     <HypothesisCompare result={result} review={controls} projectId={projectId} links={linked.links} distribution={linked.distribution} canDraft discrimination={discrimination.items} lessons={lessons.lessons} same={same.same}/>
-    <ReviewDialog target={target} pending={send.isPending} error={target && send.error ? send.error.message : null} onClose={() => setTarget(null)}
-      onSubmit={(reasons, note) => target && send.mutate({ hypothesisId: target.hypothesisId, evidenceRef: target.evidenceRef, reasons, note })}/>
+    <ReviewDialog target={target} pending={send.isPending} error={target && send.error && ownership.isCurrent(send.variables?.ticket) ? send.error.message : null} onClose={() => { ownership.advance(); setTarget(null); }} onDraftChange={ownership.advance}
+      onSubmit={(reasons, note) => target && send.mutate({ hypothesisId: target.hypothesisId, evidenceRef: target.evidenceRef, reasons, note, ticket: ownership.capture() })}/>
   </>;
 }

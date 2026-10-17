@@ -36,13 +36,42 @@ from thoth.application.commands.action_inputs import (
     StepReadInput,
     StepReviseInput,
 )
+from thoth.application.commands.action_mutation_projection import (
+    authorization_decide_result,
+    authorization_prepare_result,
+    compensation_result,
+    compensation_specification,
+    create_result,
+    impact_recalculate_result,
+    merge_proposal_payload,
+    merge_proposal_result,
+    plan_compose_result,
+    plan_revalidate_result,
+    policy_classify_result,
+    portfolio_compose_result,
+    portfolio_evaluate_result,
+    recommend_result,
+    select_result,
+    step_add_result,
+    step_revise_result,
+)
+from thoth.application.commands.action_read_projection import (
+    action_matches,
+    action_revision_result,
+    action_summary,
+    plan_graph_view,
+    plan_revision_result,
+    plan_step,
+    portfolio_matches,
+    semantic_diff,
+)
+from thoth.application.commands.action_read_queries import read_impact
+from thoth.application.commands.action_step_input import step_with_id
 from thoth.application.services.action_currentness import action_read_view, plan_read_view
 from thoth.application.services.action_service import ActionService
 from thoth.application.services.authorization_currentness import authorization_read_view
 from thoth.application.services.revision_service import CommitResult
 from thoth.domain.action_full import ActionPlanRecord, ActionPortfolioRecord, ActionRecord
-from thoth.domain.base import DomainModel
-from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.ports.action import ActionStorePort
 from thoth.ports.decision_object import DecisionObjectStorePort
 from thoth.ports.operation import OperationStorePort
@@ -68,15 +97,7 @@ class ActionHandlers:
         items = tuple(
             item
             for item in self._store.list_actions(request.project_id)
-            if (request.object_id is None or item.object_id == request.object_id)
-            and (request.portfolio_id is None or item.portfolio_id == request.portfolio_id)
-            and (request.purpose is None or item.primary_purpose == request.purpose)
-            and (request.proposal_state is None or item.proposal_state == request.proposal_state)
-            and (request.policy_state is None or item.policy_state == request.policy_state)
-            and (
-                request.authorization_state is None
-                or item.authorization_state == request.authorization_state
-            )
+            if action_matches(item, request)
         )
         return {"actions": [self._summary(item) for item in items], "next_cursor": None}
 
@@ -89,8 +110,7 @@ class ActionHandlers:
         items = tuple(
             item
             for item in self._store.list_portfolios(request.project_id)
-            if (request.object_id is None or item.object_id == request.object_id)
-            and (request.decision_state is None or item.decision_state == request.decision_state)
+            if portfolio_matches(item, request)
         )
         return {"portfolios": [item.model_dump(mode="json") for item in items]}
 
@@ -109,24 +129,7 @@ class ActionHandlers:
     async def plan_graph(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = PlanReadInput.model_validate(value)
         plan = self._read_plan(request)
-        return cast(
-            dict[str, JsonValue],
-            {
-                "nodes": list(plan.steps),
-                "dependency_edges": list(plan.dependency_edges),
-                "gates": [
-                    {
-                        "step_id": step["step_id"],
-                        "policy_state": step.get("policy_state"),
-                        "risk_tier": step.get("risk_tier"),
-                    }
-                    for step in plan.steps
-                ],
-                "parallel_groups": [list(plan.auto_executable_frontier)],
-                "point_of_no_return_steps": list(plan.point_of_no_return_steps),
-                "current_frontier": list(plan.auto_executable_frontier),
-            },
-        )
+        return plan_graph_view(plan)
 
     async def step_read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = StepReadInput.model_validate(value)
@@ -135,44 +138,7 @@ class ActionHandlers:
 
     async def impact_read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ImpactReadInput.model_validate(value)
-        if request.action_id:
-            action = self._store.read_action(
-                request.project_id, request.action_id, request.revision_digest
-            )
-            if action is None:
-                raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "Action not found")
-            return cast(
-                dict[str, JsonValue],
-                {
-                    "direct_impact": action.impact_set,
-                    "risk_tier": action.risk_tier,
-                    "required_processes": list(action.required_processes),
-                    "required_roles": list(action.required_roles),
-                },
-            )
-        if request.plan_id:
-            plan = self._store.read_plan(
-                request.project_id, request.plan_id, request.revision_digest
-            )
-            if plan is None:
-                raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "plan not found")
-            if request.step_id:
-                return {
-                    "step_impact": cast(
-                        JsonValue, self._step(plan, request.step_id).get("impact", {})
-                    )
-                }
-            return cast(
-                dict[str, JsonValue],
-                {
-                    "cumulative_impact": plan.cumulative_impact,
-                    "required_process_union": list(plan.required_process_union),
-                    "required_role_union": list(plan.required_role_union),
-                },
-            )
-        raise RpcApplicationError(
-            RpcErrorCode.DOMAIN_REJECTED, "impact query needs action_id or plan_id"
-        )
+        return read_impact(self._store, request)
 
     async def policy_read(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         result = await self.impact_read(value)
@@ -221,21 +187,7 @@ class ActionHandlers:
             )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
-        missing = item.specification.get("missing_fields", ())
-        return {
-            "action": item.model_dump(mode="json"),
-            "impact_policy_precheck": {
-                "risk_tier": item.risk_tier,
-                "policy_state": item.policy_state,
-            },
-            "missing_fields": (
-                [str(item) for item in cast(tuple[object, ...], missing)]
-                if isinstance(missing, tuple)
-                else []
-            ),
-            "duplicate_candidates": list(duplicates),
-            "commit": commit.model_dump(mode="json"),
-        }
+        return create_result(item, duplicates, commit)
 
     async def revise(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ReviseInput.model_validate(value)
@@ -267,15 +219,7 @@ class ActionHandlers:
             )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
-        return cast(
-            dict[str, JsonValue],
-            {
-                "portfolio": portfolio.model_dump(mode="json"),
-                "missing_alternatives": [],
-                "missing_criteria": [],
-                "commit": commit.model_dump(mode="json"),
-            },
-        )
+        return portfolio_compose_result(portfolio, commit)
 
     async def portfolio_evaluate(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = PortfolioEvaluateInput.model_validate(value)
@@ -291,19 +235,7 @@ class ActionHandlers:
             )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
-        return cast(
-            dict[str, JsonValue],
-            {
-                "portfolio": revised.model_dump(mode="json"),
-                "mandatory_gate_results": list(revised.scenario_results),
-                "comparison": list(revised.scenario_results),
-                "uncertainty": revised.uncertainty,
-                "sensitivity": revised.sensitivity,
-                "value_of_information": revised.value_of_information,
-                "rank_stability": revised.decision_state,
-                "commit": commit.model_dump(mode="json"),
-            },
-        )
+        return portfolio_evaluate_result(revised, commit)
 
     async def recommend(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = RecommendInput.model_validate(value)
@@ -312,17 +244,7 @@ class ActionHandlers:
             revised, commit = self._service.recommend(current, request.rationale)
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
-        return cast(
-            dict[str, JsonValue],
-            {
-                "portfolio": revised.model_dump(mode="json"),
-                "recommendation": revised.recommendation_ref,
-                "selection_implied": False,
-                "authorization_implied": False,
-                "sensitivity": revised.sensitivity,
-                "commit": commit.model_dump(mode="json"),
-            },
-        )
+        return recommend_result(revised, commit)
 
     async def select(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = SelectInput.model_validate(value)
@@ -340,19 +262,7 @@ class ActionHandlers:
             )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
-        return cast(
-            dict[str, JsonValue],
-            {
-                "action": action.model_dump(mode="json"),
-                "portfolio": portfolio.model_dump(mode="json"),
-                "selection_rationale": request.decision_context,
-                "authorization_implied": False,
-                "commits": [
-                    action_commit.model_dump(mode="json"),
-                    portfolio_commit.model_dump(mode="json"),
-                ],
-            },
-        )
+        return select_result(request, action, portfolio, action_commit, portfolio_commit)
 
     async def plan_compose(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = PlanComposeInput.model_validate(value)
@@ -372,15 +282,7 @@ class ActionHandlers:
             )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
-        return cast(
-            dict[str, JsonValue],
-            {
-                "plan": plan.model_dump(mode="json"),
-                "profile_schema_impact_policy_validation": plan.validation_state,
-                "initial_frontier": list(plan.auto_executable_frontier),
-                "commit": commit.model_dump(mode="json"),
-            },
-        )
+        return plan_compose_result(plan, commit)
 
     async def plan_revise(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = PlanReviseInput.model_validate(value)
@@ -414,28 +316,14 @@ class ActionHandlers:
             updates={"validation_state": "VALIDATED"},
             event_type="action/planUpdated",
         )
-        return cast(
-            dict[str, JsonValue],
-            {
-                "plan": revised.model_dump(mode="json"),
-                "dependency": list(revised.dependency_edges),
-                "impact": revised.cumulative_impact,
-                "policy": list(revised.required_process_union),
-                "frontier": list(revised.auto_executable_frontier),
-                "point_of_no_return": list(revised.point_of_no_return_steps),
-                "authorization": list(revised.authorization_refs),
-                "trigger_reason": request.trigger_reason,
-                "commit": commit.model_dump(mode="json"),
-            },
-        )
+        return plan_revalidate_result(revised, request, commit)
 
     async def step_add(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = StepAddInput.model_validate(value)
+        step, step_id = step_with_id(request.step_spec)
         current = self._plan_expected(
             request.project_id, request.plan_id, request.expected_plan_revision
         )
-        step = cast(dict[str, object], request.step_spec)
-        step_id = str(step.get("step_id") or "")
         edges = tuple(
             (
                 *current.dependency_edges,
@@ -447,15 +335,7 @@ class ActionHandlers:
             updates={"steps": (*current.steps, step), "dependency_edges": edges},
             event_type="action/planUpdated",
         )
-        return cast(
-            dict[str, JsonValue],
-            {
-                "plan": revised.model_dump(mode="json"),
-                "step": self._step(revised, step_id),
-                "frontier_delta": list(revised.auto_executable_frontier),
-                "commit": commit.model_dump(mode="json"),
-            },
-        )
+        return step_add_result(revised, step_id, commit)
 
     async def step_revise(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = StepReviseInput.model_validate(value)
@@ -478,16 +358,7 @@ class ActionHandlers:
             event_type="action/planUpdated",
             evidence_refs=request.evidence_refs,
         )
-        return cast(
-            dict[str, JsonValue],
-            {
-                "plan": revised.model_dump(mode="json"),
-                "step": self._step(revised, request.step_id),
-                "invalidated_authorizations_executions": "ALL_BOUND_TO_PREVIOUS_PLAN_REVISION",
-                "cumulative_impact": revised.cumulative_impact,
-                "commit": commit.model_dump(mode="json"),
-            },
-        )
+        return step_revise_result(revised, request, commit)
 
     async def impact_recalculate(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ImpactRecalculateInput.model_validate(value)
@@ -497,19 +368,7 @@ class ActionHandlers:
             updates={},
             event_type="action/impactChanged",
         )
-        return cast(
-            dict[str, JsonValue],
-            {
-                "plan": revised.model_dump(mode="json"),
-                "per_step_effects": revised.cumulative_impact.get("per_step", {}),
-                "cumulative_effects": revised.cumulative_impact,
-                "process_union": list(revised.required_process_union),
-                "role_union": list(revised.required_role_union),
-                "risk_changes": [],
-                "trigger_refs": list(request.trigger_refs),
-                "commit": commit.model_dump(mode="json"),
-            },
-        )
+        return impact_recalculate_result(revised, request, commit)
 
     async def policy_classify(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = PolicyClassifyInput.model_validate(value)
@@ -519,27 +378,7 @@ class ActionHandlers:
             updates={},
             event_type="action/policyChanged",
         )
-        return cast(
-            dict[str, JsonValue],
-            {
-                "plan": revised.model_dump(mode="json"),
-                "risk_tiers": {
-                    str(step["step_id"]): step.get("risk_tier") for step in revised.steps
-                },
-                "policy_states": {
-                    str(step["step_id"]): step.get("policy_state") for step in revised.steps
-                },
-                "required_processes": list(revised.required_process_union),
-                "required_roles": list(revised.required_role_union),
-                "unknown_mappings": [
-                    str(step["step_id"])
-                    for step in revised.steps
-                    if step.get("policy_state") == "POLICY_UNDEFINED"
-                ],
-                "policy_version": request.policy_version or "project-policy:current",
-                "commit": commit.model_dump(mode="json"),
-            },
-        )
+        return policy_classify_result(revised, request, commit)
 
     async def authorization_prepare(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = AuthorizationPrepareInput.model_validate(value)
@@ -558,14 +397,7 @@ class ActionHandlers:
             )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
-        return {
-            "authorization": None if envelope is None else envelope.model_dump(mode="json"),
-            "state": state,
-            "preflight_requirements": {
-                "predecessor_outputs": list(request.predecessor_output_digests),
-                "target_baselines": list(request.target_baseline_digests),
-            },
-        }
+        return authorization_prepare_result(envelope, state, request)
 
     async def authorization_decide(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = AuthorizationDecideInput.model_validate(value)
@@ -584,11 +416,7 @@ class ActionHandlers:
             )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
-        return {
-            "authorization": decided.model_dump(mode="json"),
-            "exact_scope_digest": decided.exact_scope_digest,
-            "single_use": decided.single_use,
-        }
+        return authorization_decide_result(decided)
 
     async def compensation_create(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = CompensationCreateInput.model_validate(value)
@@ -598,18 +426,7 @@ class ActionHandlers:
                 RpcErrorCode.DOMAIN_REJECTED,
                 "compensation requires an unambiguous DecisionObject context",
             )
-        specification: dict[str, object] = {
-            "description": request.intended_mitigation,
-            "caused_by_execution_attempt_ref": request.caused_by_execution_attempt_ref,
-            "observed_effect_refs": request.observed_effect_refs,
-            "expected_observation_or_change": {
-                "residual_effect_expectation": request.residual_effect_expectation
-            },
-            "effect_completeness_confirmed": False,
-            "effect_vector": {"effect_completeness_confirmed": False},
-            "stop_conditions": ("mitigation boundary reached",),
-            "observability": "residual effect evidence required",
-        }
+        specification = compensation_specification(request)
         try:
             action, _duplicates, commit = self._service.create(
                 project_id=request.project_id,
@@ -623,12 +440,7 @@ class ActionHandlers:
             )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
-        return {
-            "action": action.model_dump(mode="json"),
-            "exact_rollback_claimed": False,
-            "residual_risk_contract": request.residual_effect_expectation,
-            "commit": commit.model_dump(mode="json"),
-        }
+        return compensation_result(request, action, commit)
 
     async def merge_propose(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = MergeProposeInput.model_validate(value)
@@ -647,18 +459,7 @@ class ActionHandlers:
         if actual != request.expected_revision_digests:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "revision mismatch")
         purposes = {action.primary_purpose for action in actions if action is not None}
-        payload: dict[str, JsonValue] = {
-            "project_id": request.project_id,
-            "action_ids": list(request.action_ids),
-            "field_mapping": request.field_mapping,
-            "evidence_refs": list(request.evidence_refs),
-            "rationale": request.rationale,
-            "expected_revision_digests": list(request.expected_revision_digests),
-            "conflicts": cast(JsonValue, [] if len(purposes) == 1 else ["primary_purpose"]),
-            "applied": False,
-            "owner_namespace": "REVISION",
-        }
-        digest = domain_digest("ACTION_MERGE_PROPOSAL", "1.0.0", canonical_payload(payload))
+        payload, digest = merge_proposal_payload(request, purposes)
         first = cast(ActionRecord, actions[0])
         self._service.audit(
             request.project_id,
@@ -666,14 +467,7 @@ class ActionHandlers:
             "action/mergeProposed",
             {**payload, "digest": digest},
         )
-        return cast(
-            dict[str, JsonValue],
-            {
-                "merge_proposal": {**payload, "digest": digest},
-                "impact_preview": [action.impact_set for action in actions if action is not None],
-                "lineage_preview": [f"SUPERSEDES:{item}" for item in request.action_ids],
-            },
-        )
+        return merge_proposal_result(payload, digest, actions, request)
 
     def _read_action(self, request: ActionReadInput) -> ActionRecord:
         item = self._store.read_action(
@@ -764,67 +558,12 @@ class ActionHandlers:
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
 
-    @staticmethod
-    def _step(plan: ActionPlanRecord, step_id: str) -> dict[str, object]:
-        for step in plan.steps:
-            if step.get("step_id") == step_id:
-                return step
-        raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "step not found")
+    _step = staticmethod(plan_step)
 
-    @staticmethod
-    def _summary(item: ActionRecord) -> dict[str, JsonValue]:
-        return {
-            "action_id": item.action_id,
-            "object_id": item.object_id,
-            "portfolio_id": item.portfolio_id,
-            "primary_purpose": item.primary_purpose,
-            "proposal_state": item.proposal_state,
-            "decision_state": item.decision_state,
-            "policy_state": item.policy_state,
-            "authorization_state": item.authorization_state,
-            "risk_tier": item.risk_tier,
-            "freshness": item.freshness,
-            "revision_digest": item.revision_digest,
-        }
+    _summary = staticmethod(action_summary)
 
-    @staticmethod
-    def _action_revision_result(
-        before: ActionRecord, after: ActionRecord, commit: CommitResult
-    ) -> dict[str, JsonValue]:
-        return cast(
-            dict[str, JsonValue],
-            {
-                "action": after.model_dump(mode="json"),
-                "semantic_diff": ActionHandlers._diff(before, after),
-                "invalidated_decisions_plans_authorizations_executions": True,
-                "commit": commit.model_dump(mode="json"),
-            },
-        )
+    _action_revision_result = staticmethod(action_revision_result)
 
-    @staticmethod
-    def _plan_revision_result(
-        before: ActionPlanRecord, after: ActionPlanRecord, commit: CommitResult
-    ) -> dict[str, JsonValue]:
-        return cast(
-            dict[str, JsonValue],
-            {
-                "plan": after.model_dump(mode="json"),
-                "semantic_diff": ActionHandlers._diff(before, after),
-                "frontier_impact_auth_invalidations": True,
-                "commit": commit.model_dump(mode="json"),
-            },
-        )
+    _plan_revision_result = staticmethod(plan_revision_result)
 
-    @staticmethod
-    def _diff(before: DomainModel, after: DomainModel) -> list[dict[str, JsonValue]]:
-        left = before.model_dump(mode="json")
-        right = after.model_dump(mode="json")
-        return [
-            {
-                "path": key,
-                "before": cast(JsonValue, left.get(key)),
-                "after": cast(JsonValue, right.get(key)),
-            }
-            for key in sorted(set(left) | set(right))
-            if left.get(key) != right.get(key)
-        ]
+    _diff = staticmethod(semantic_diff)

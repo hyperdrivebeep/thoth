@@ -1,6 +1,8 @@
 """Compose research admission, its worker lifetime, and user model preferences."""
 
+from collections.abc import Callable
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
 from typing import cast
 
@@ -106,6 +108,28 @@ class ResearchEntryComposition:
                                 release_xai_workspace_broker(self.broker_workspace)
                             finally:
                                 release_workspace_broker(self.broker_workspace)
+
+    def release_after_failed_startup(self) -> list[tuple[str, BaseException]]:
+        """Return this entry's resources; the startup caller still owns the stores."""
+        steps: list[tuple[str, Callable[[], None]]] = []
+        if self.catalog_refresher is not None:
+            steps.append(("refresher", self.catalog_refresher.close))
+        steps.append(("worker", self.worker.close))
+        if self.broker_workspace is not None:
+            for label, release in (
+                ("claude_code", release_claude_code_login_broker),
+                ("claude_oauth", release_claude_workspace_broker),
+                ("xai", release_xai_workspace_broker),
+                ("codex", release_workspace_broker),
+            ):
+                steps.append((label, partial(release, self.broker_workspace)))
+        failures: list[tuple[str, BaseException]] = []
+        for label, close in steps:
+            try:
+                close()
+            except BaseException as error:
+                failures.append((label, error))
+        return failures
 
 
 def _configured_model_available(

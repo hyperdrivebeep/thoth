@@ -52,6 +52,7 @@ from thoth.protocol.jsonrpc import (
     RpcErrorCode,
 )
 from thoth.protocol.notifications import notifications_for
+from thoth.protocol.operation_claim import claim_operation
 from thoth.protocol.read_queries import READ_QUERY_METHODS
 from thoth.protocol.registry import CommandHandler, MethodRegistry
 
@@ -207,7 +208,7 @@ class CommandBus:
                 state=OperationState.RUNNING,
                 created_at=self._clock.now(),
             )
-            operation, replayed = self._operations.claim(candidate)
+            operation, replayed = claim_operation(self._operations, candidate, self._journal)
             if replayed:
                 if operation.state == OperationState.RUNNING:
                     self._registry.authorize_reentry(operation)
@@ -254,7 +255,6 @@ class CommandBus:
                         },
                     )
                 return self._replay(request.id, operation)
-            self._append_event(operation, "operation.started", {"method": request.method})
             return DispatchTicket(request=request, operation=operation, handler=handler)
         except OperationReentryDenied as exc:
             return self._reentry_denied(request, exc)

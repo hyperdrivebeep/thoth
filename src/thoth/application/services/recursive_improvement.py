@@ -6,6 +6,7 @@ from typing import cast
 
 from pydantic import AwareDatetime
 
+from thoth.application.services import recursive_improvement_records as records
 from thoth.application.services.baseline_service import BaselineService
 from thoth.application.services.behavior_candidate_service import BehaviorCandidateService
 from thoth.application.services.control_record_service import ControlRecordService
@@ -149,34 +150,9 @@ class RecursiveImprovementCoordinator:
         result: RecursiveImprovementResult | None,
     ) -> ImprovementObservation:
         if result is None:
-            return ImprovementObservation(
-                trigger_state="NOT_TRIGGERED",
-                reason_code=(
-                    "NO_EXECUTION"
-                    if projection is None
-                    else "NO_FAILURE"
-                    if projection.get("terminal_state") == "COMPLETED"
-                    else "NO_QUALIFYING_FAILURE_EVENT"
-                ),
-            )
+            return records.untriggered_observation(projection)
         event = self._failure_event(project, thread, projection)
-        state = (
-            "OBSERVED"
-            if result.state == ImprovementRunState.BELOW_THRESHOLD
-            else (
-                "EVALUATED"
-                if result.paired_evaluation_id is not None or result.evaluation is not None
-                else "HELD"
-            )
-        )
-        return ImprovementObservation(
-            trigger_state=state,
-            reason_code=result.state.value,
-            failure_observation_ref=None if event is None else f"failure:{event}",
-            evaluation_run_ref=result.paired_evaluation_id,
-            active_baseline_digest=result.active_digest,
-            result_ref=result.receipt_digest,
-        )
+        return records.result_observation(result, event)
 
     async def _observe(
         self,
@@ -252,27 +228,7 @@ class RecursiveImprovementCoordinator:
                 rollback_reason=reason,
                 now=self._clock.now(),
             )
-            changes = {
-                "paired_evaluation_id": None if run is None else run.spec.pair_id,
-                "paired_result_digest": None
-                if run is None or run.result is None
-                else run.result.result_digest,
-                "evaluation_provenance": "MEASURED_PAIR"
-                if run is not None and run.result is not None
-                else None,
-            }
-            updated = result.model_copy(update=changes)
-            updated = updated.model_copy(
-                update={
-                    "receipt_digest": domain_digest(
-                        "RECURSIVE_IMPROVEMENT_RECEIPT",
-                        "1.0.0",
-                        canonical_payload(
-                            updated.model_dump(mode="python", exclude={"receipt_digest"})
-                        ),
-                    )
-                }
-            )
+            updated = records.paired_result(result, run)
             return self._persist_result(updated)
 
     def _hold_unavailable(
@@ -321,17 +277,7 @@ class RecursiveImprovementCoordinator:
         last_values = cast(dict[str, object], last)
         failure_class = str(last_values.get("failure_class") or "UNKNOWN")
         detail = str(last_values.get("failure_detail") or "")
-        fingerprint = domain_digest(
-            "IMPROVEMENT_FAILURE_FINGERPRINT",
-            "1.0.0",
-            canonical_payload(
-                {
-                    "failure_class": failure_class,
-                    "failure_detail": detail.casefold().strip(),
-                    "action_id": str(r2_projection.get("action_id") or "UNKNOWN"),
-                }
-            ),
-        )
+        fingerprint = records.failure_fingerprint(failure_class, detail, r2_projection)
         with self._ledger.transaction(), self._unit_of_work.transaction():
             baseline = (
                 None
@@ -372,14 +318,9 @@ class RecursiveImprovementCoordinator:
                 record_type="FAILURE_OBSERVATION",
                 record_id=f"failure:{event}",
                 state="OBSERVED",
-                payload={
-                    "thread_id": thread_id,
-                    "failure_fingerprint": fingerprint,
-                    "failure_class": failure_class,
-                    "failure_detail": detail,
-                    "baseline_digest": baseline,
-                    "ordinal": count,
-                },
+                payload=records.failure_observation_payload(
+                    thread_id, fingerprint, failure_class, detail, baseline, count
+                ),
             )
             if count < self._threshold:
                 result = self._result(
@@ -459,17 +400,7 @@ class RecursiveImprovementCoordinator:
         now: AwareDatetime,
         failure_class: str,
     ) -> PreparedImprovement | RecursiveImprovementResult:
-        candidate_draft: dict[str, object] = {
-            "target_component": "WORKFLOW_DEFINITION",
-            "failure_fingerprint": fingerprint,
-            "repair_basis": f"typed repeated {failure_class} failure",
-            "bounded_change": "add deterministic precondition and repair branch",
-        }
-        candidate_digest = domain_digest(
-            "IMPROVEMENT_CANDIDATE",
-            "1.0.0",
-            canonical_payload(candidate_draft),
-        )
+        candidate_draft, candidate_digest = records.legacy_candidate(fingerprint, failure_class)
         behavior_baseline = None
         behavior_candidate = None
         if self._behavior_candidates is not None:
@@ -525,21 +456,7 @@ class RecursiveImprovementCoordinator:
                     now=now,
                 )
             )
-        fixture_digest = domain_digest(
-            "FROZEN_IMPROVEMENT_FIXTURE",
-            "1.0.0",
-            canonical_payload(
-                {
-                    "failure_fingerprint": fingerprint,
-                    "fixture_version": "a08-frozen-v1",
-                }
-            ),
-        )
-        hidden_holdout_digest = domain_digest(
-            "HIDDEN_HOLDOUT_OPAQUE_REF",
-            "1.0.0",
-            canonical_payload({"fixture_digest": fixture_digest}),
-        )
+        fixture_digest, hidden_holdout_digest = records.fixture_digests(fingerprint)
         request_draft: dict[str, object] = {
             "request_id": self._ids.new("improvement-evaluation"),
             "project_id": project_id,
@@ -553,16 +470,7 @@ class RecursiveImprovementCoordinator:
             "timeout_seconds": 60,
             "created_at": now,
         }
-        request = ImprovementEvaluationRequest.model_validate(
-            {
-                **request_draft,
-                "request_digest": domain_digest(
-                    "IMPROVEMENT_EVALUATION_REQUEST",
-                    "1.0.0",
-                    canonical_payload(request_draft),
-                ),
-            }
-        )
+        request = records.seal_evaluation_request(request_draft)
         record = self._controls.create(
             project_id=project_id,
             namespace="IMPROVEMENT_RUNTIME",
@@ -662,27 +570,7 @@ class RecursiveImprovementCoordinator:
                         behavior_candidate,
                     )
                 )
-                result = result.model_copy(
-                    update={
-                        "behavior_artifact_id": behavior_candidate.artifact_id,
-                        "behavior_artifact_kind": behavior_candidate.kind.value,
-                        "behavior_registry_active_digest": registry.active_digest,
-                    }
-                )
-                result = result.model_copy(
-                    update={
-                        "receipt_digest": domain_digest(
-                            "RECURSIVE_IMPROVEMENT_RECEIPT",
-                            "1.0.0",
-                            canonical_payload(
-                                result.model_dump(
-                                    mode="python",
-                                    exclude={"receipt_digest"},
-                                )
-                            ),
-                        )
-                    }
-                )
+                result = records.behavior_result(result, behavior_candidate, registry)
             for exposure in exposures:
                 self._controls.create(
                     project_id=project_id,
@@ -727,44 +615,25 @@ class RecursiveImprovementCoordinator:
     ) -> RecursiveImprovementResult:
         draft: dict[str, object] = {
             "run_id": self._ids.new("improvement-run"),
-            "project_id": project_id,
-            "thread_id": thread_id,
-            "state": state.value,
-            "failure_fingerprint": fingerprint,
-            "failure_count": count,
-            "baseline_digest": baseline,
-            "candidate_digest": candidate,
-            "fixture_digest": fixture,
-            "evaluator_id": evaluator_id,
-            "evaluation": evaluation,
-            "evaluation_provenance": "TEST_ONLY" if evaluation is not None else None,
-            "paired_evaluation_id": None,
-            "paired_result_digest": None,
-            "exposures": exposures,
-            "rollback_reason": rollback_reason,
-            "active_digest": active,
-            "hidden_holdout_exposed": False
-            if evaluation is None
-            else bool(getattr(evaluation, "hidden_holdout_exposed", False)),
-            "exact_digest_canary": exact_digest_canary,
-            "official_kpi_changed": False,
-            "safety_threshold_changed": False,
-            "waiver_changed": False,
-            "r4_decision_changed": False,
-            "model_weights_changed": False,
-            "semantic_truth_certified": False,
-            "created_at": now,
+            **records.result_fields(
+                project_id,
+                thread_id,
+                state,
+                fingerprint,
+                count,
+                baseline,
+                candidate,
+                fixture,
+                evaluator_id,
+                evaluation,
+                exposures,
+                rollback_reason,
+                active,
+                exact_digest_canary,
+                now,
+            ),
         }
-        return RecursiveImprovementResult.model_validate(
-            {
-                **draft,
-                "receipt_digest": domain_digest(
-                    "RECURSIVE_IMPROVEMENT_RECEIPT",
-                    "1.0.0",
-                    canonical_payload(draft),
-                ),
-            }
-        )
+        return records.seal_result(draft)
 
     def _exposures(
         self,
@@ -793,18 +662,7 @@ class RecursiveImprovementCoordinator:
                 "external_effect": False,
                 "recorded_at": now,
             }
-            values.append(
-                ImprovementExposure.model_validate(
-                    {
-                        **draft,
-                        "exposure_digest": domain_digest(
-                            "IMPROVEMENT_EXPOSURE",
-                            "1.0.0",
-                            canonical_payload(draft),
-                        ),
-                    }
-                )
-            )
+            values.append(records.seal_exposure(draft))
         return tuple(values)
 
     @staticmethod

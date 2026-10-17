@@ -1,6 +1,9 @@
+import type { MessageKey } from "../i18n/messages";
+import { useDraftGeneration, type DraftTicket } from "./useDraftGeneration";
+import { useReadAccessProtection } from "./useReadAccessProtection";
 import { message as formatMessage } from "../i18n/formatMessages";
-import { t } from "../i18n/locale";
-import { Button, HTMLSelect, InputGroup } from "@blueprintjs/core";
+import { t, useTranslation } from "../i18n/locale";
+import { Button, Callout, HTMLSelect, InputGroup } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { objectValue, textValue } from "../api/presentation";
@@ -43,35 +46,39 @@ const emptyDraft = (): Draft => ({ TIME: { band: "", basis: "" }, COST_EFFORT: {
 
 /** Shows the record's current estimates and lets a person add their own as a new revision. */
 export function ActionEffort({ projectId, actionId, initial, legacy }: { projectId: string; actionId: string; initial: unknown; legacy?: string }) {
+  useTranslation();
   const client = useQueryClient();
+  const ownership = useDraftGeneration(JSON.stringify([projectId, actionId]));
   const key = ["action-effort", projectId, actionId];
   const record = useQuery({ queryKey: key, retry: false,
     queryFn: ({ signal }) => rpc<{ action: Record<string, unknown>; research_running?: boolean }>("action/read", { project_id: projectId, action_id: actionId }, crypto.randomUUID(), signal),
     refetchInterval: current => current.state.data?.value.research_running ? 3000 : false });
   const running = record.data?.value.research_running === true;
+  const blocked = useReadAccessProtection(key, record.error);
   const action = objectValue(record.data?.value.action);
   const details = objectValue(action.generation_details);
   const estimates = parseEstimates(record.data && Array.isArray(details.effort_estimates) ? details.effort_estimates : initial);
   const digest = textValue(action.revision_digest);
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<MessageKey | "">("");
   const save = useMutation({
-    mutationFn: (entries: { dimension: string; band: string; basis_text: string }[]) => rpc("action/revise", {
+    mutationFn: ({ entries }: { entries: { dimension: string; band: string; basis_text: string }[]; ticket: DraftTicket }) => rpc("action/revise", {
       project_id: projectId, action_id: actionId, expected_revision_digest: digest, patch: {}, evidence_refs: [],
       get reason() { return t("effort.humanEntry"); }, estimator_ref: HUMAN_REF, human_effort_estimates: entries }, crypto.randomUUID()),
-    onSuccess: async () => { setDraft(emptyDraft()); setOpen(false); setMessage(""); await client.invalidateQueries({ queryKey: key }); },
+    onSuccess: async (_result, input) => { if (ownership.isCurrent(input.ticket)) { ownership.advance(); setDraft(emptyDraft()); setOpen(false); setMessage(""); } await client.invalidateQueries({ queryKey: key }); },
   });
   const submit = () => {
     const entries = DIMENSIONS.filter(dimension => draft[dimension].band).map(dimension => ({ dimension, band: draft[dimension].band, basis_text: draft[dimension].basis.trim() }));
-    if (entries.length === 0) { setMessage(t("effort.choose")); return; }
-    if (entries.some(entry => entry.band !== "UNKNOWN" && !entry.basis_text)) { setMessage(t("effort.basisNeeded")); return; }
-    setMessage(""); save.mutate(entries);
+    if (entries.length === 0) { setMessage("effort.choose"); return; }
+    if (entries.some(entry => entry.band !== "UNKNOWN" && !entry.basis_text)) { setMessage("effort.basisNeeded"); return; }
+    setMessage(""); save.mutate({ entries, ticket: ownership.capture() });
   };
-  const set = (dimension: string, part: "band" | "basis", value: string) => setDraft(current => ({ ...current, [dimension]: { ...current[dimension], [part]: value } }));
+  const set = (dimension: string, part: "band" | "basis", value: string) => { ownership.advance(); setDraft(current => ({ ...current, [dimension]: { ...current[dimension], [part]: value } })); };
+  if (blocked) return <Callout compact intent="warning" role="alert">{t("records.failed")}</Callout>;
   return <div className="action-effort">
     <EffortLines estimates={estimates} legacy={legacy}/>
-    <Button small minimal icon={open ? "chevron-up" : "edit"} aria-label={t("effort.open")} aria-expanded={open} disabled={!digest || running} onClick={() => setOpen(value => !value)}>{t("effort.humanEntry")}</Button>
+    <Button small minimal icon={open ? "chevron-up" : "edit"} aria-label={t("effort.open")} aria-expanded={open} disabled={!digest || running} onClick={() => { ownership.advance(); setOpen(value => !value); }}>{t("effort.humanEntry")}</Button>
     {running && <small className="muted">{researchRunningNotice}</small>}
     {open && <div className="effort-editor">
       {DIMENSIONS.map(dimension => <div className="effort-editor-row" key={dimension}>
@@ -82,7 +89,7 @@ export function ActionEffort({ projectId, actionId, initial, legacy }: { project
       </div>)}
       <small className="muted">{t("effort.preserveAI")}</small>
       <Button small intent="primary" aria-label={t("effort.saveHuman")} loading={save.isPending} onClick={submit}>{t("effort.save")}</Button>
-      {message && <p role="alert">{message}</p>}
+      {message && <p role="alert">{t(message)}</p>}
       {save.error && <p role="alert">{t("effort.failed")}{" "}{save.error.message}</p>}
     </div>}
   </div>;

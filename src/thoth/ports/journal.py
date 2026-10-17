@@ -5,9 +5,14 @@ from typing import Protocol
 from pydantic import JsonValue
 
 from thoth.domain.event import Checkpoint, EventRecord
+from thoth.domain.operation import OperationRecord
 
 
 class JournalPort(Protocol):
+    def prepare_started(self, operation: OperationRecord) -> EventRecord:
+        """Build the first event with ID/clock/digest only; never read or write storage."""
+        ...
+
     def append(
         self,
         *,
@@ -17,6 +22,4 @@ class JournalPort(Protocol):
         payload: dict[str, JsonValue],
     ) -> EventRecord: ...
 
-    def checkpoint(
-        self, *, operation_id: str, payload: dict[str, JsonValue]
-    ) -> Checkpoint: ...
+    def checkpoint(self, *, operation_id: str, payload: dict[str, JsonValue]) -> Checkpoint: ...

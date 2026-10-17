@@ -1,0 +1,684 @@
+{
+  "counter": {
+    "intents": [
+      {
+        "search_intent_id": "search-intent:6",
+        "project_id": "p",
+        "thread_id": "thread:1",
+        "investigation_id": "investigation:1",
+        "evidence_group": "counterevidence:hypothesis:1",
+        "query_families": [
+          "independent",
+          "alternative"
+        ],
+        "connector_id": "fixture-reader",
+        "selector": {
+          "index": 0
+        },
+        "max_waves": 1,
+        "max_results": 3,
+        "stop_conditions": [
+          "INDEPENDENT_GATE_TERMINAL",
+          "SEARCH_SATURATED",
+          "POLICY_BLOCKED",
+          "BUDGET_EXHAUSTED"
+        ],
+        "policy_id": "policy:p",
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "state": "READY",
+        "intent_digest": "d82360b1ca13248e5efc940658aeeb0481920667df31951e0014a680a143da3a",
+        "created_at": "2026-10-08T00:00:00Z"
+      },
+      {
+        "search_intent_id": "search-intent:19",
+        "project_id": "p",
+        "thread_id": "thread:1",
+        "investigation_id": "investigation:1",
+        "evidence_group": "counterevidence:hypothesis:1",
+        "query_families": [
+          "independent",
+          "alternative"
+        ],
+        "connector_id": "fixture-reader",
+        "selector": {
+          "index": 1
+        },
+        "max_waves": 1,
+        "max_results": 3,
+        "stop_conditions": [
+          "INDEPENDENT_GATE_TERMINAL",
+          "SEARCH_SATURATED",
+          "POLICY_BLOCKED",
+          "BUDGET_EXHAUSTED"
+        ],
+        "policy_id": "policy:p",
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "state": "READY",
+        "intent_digest": "93e1a5948a516b621f5bdc1f3e433587811f39242f967547027aef1021ddae65",
+        "created_at": "2026-10-08T00:00:00Z"
+      }
+    ],
+    "stages": [
+      {
+        "applicability": "INDEPENDENT_CRITICAL_REVIEW_CANDIDATE",
+        "conditions": {
+          "alternative_explanation": "other mechanism",
+          "source_territory": "territory:0"
+        },
+        "independence_group": "group:0",
+        "lead": {
+          "authority_basis": "independent deterministic gate pass",
+          "created_at": "2026-10-08T00:00:00.000Z",
+          "evidence_group": "counterevidence:hypothesis:1",
+          "information_value": "CRITICAL_COUNTEREVIDENCE",
+          "investigation_id": "investigation:1",
+          "lead_digest": "872cd2f712491dd7808c473573ce814682ff81e42a71637fd061e0e45ae18d0e",
+          "lead_id": "counterevidence-lead:11",
+          "project_id": "p",
+          "search_intent_id": "search-intent:6",
+          "source_id": "source:0",
+          "span_id": "span:0",
+          "state": "CLAIM_CANDIDATE"
+        },
+        "observed_statement": "counter first",
+        "project_id": "p",
+        "relation": "CONTRADICTS",
+        "span_ids": [
+          "span:0"
+        ],
+        "target_id": "hypothesis:1",
+        "target_type": "HYPOTHESIS",
+        "thread_id": "thread:1"
+      },
+      {
+        "applicability": "INDEPENDENT_CRITICAL_REVIEW_CANDIDATE",
+        "conditions": {
+          "alternative_explanation": "other mechanism",
+          "source_territory": "territory:1"
+        },
+        "independence_group": "group:1",
+        "lead": {
+          "authority_basis": "independent deterministic gate pass",
+          "created_at": "2026-10-08T00:00:00.000Z",
+          "evidence_group": "counterevidence:hypothesis:1",
+          "information_value": "CRITICAL_COUNTEREVIDENCE",
+          "investigation_id": "investigation:1",
+          "lead_digest": "2727449d2f630a2c41066ddbe93d11adda6382bfa69d7cad6845b8cbf05e3b99",
+          "lead_id": "counterevidence-lead:24",
+          "project_id": "p",
+          "search_intent_id": "search-intent:19",
+          "source_id": "source:1",
+          "span_id": "span:1",
+          "state": "CLAIM_CANDIDATE"
+        },
+        "observed_statement": "counter second",
+        "project_id": "p",
+        "relation": "CONTRADICTS",
+        "span_ids": [
+          "span:1"
+        ],
+        "target_id": "hypothesis:1",
+        "target_type": "HYPOTHESIS",
+        "thread_id": "thread:1"
+      }
+    ],
+    "commits": [
+      {
+        "basis": {
+          "project_id": "p",
+          "sources": [
+            {
+              "project_id": "p",
+              "artifact_id": "artifact:1",
+              "artifact_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "source_id": "source:1",
+              "source_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "source_state_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          ],
+          "spans": [
+            {
+              "project_id": "p",
+              "artifact_id": "artifact:1",
+              "span_id": "span:0",
+              "source_version_id": "version:1",
+              "span_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          ],
+          "predecessor_id": null,
+          "predecessor_digest": null
+        },
+        "observation": {
+          "observation_id": "observation:1",
+          "project_id": "p",
+          "span_ids": [
+            "span:0"
+          ],
+          "observed_statement": "counter first",
+          "observed_time": null,
+          "valid_time": null,
+          "observer_group": "fixture-reader",
+          "independence_basis": "fixture",
+          "provenance_class": "PROJECT_SOURCE",
+          "contamination_note": null,
+          "supersedes_observation_id": null,
+          "observation_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "created_at": "2026-10-08T00:00:00Z",
+          "schema_version": "1.0.0"
+        },
+        "lead": {
+          "lead_id": "counterevidence-lead:11",
+          "project_id": "p",
+          "investigation_id": "investigation:1",
+          "search_intent_id": "search-intent:6",
+          "source_id": "source:0",
+          "span_id": "span:0",
+          "evidence_group": "counterevidence:hypothesis:1",
+          "state": "CLAIM_CANDIDATE",
+          "information_value": "CRITICAL_COUNTEREVIDENCE",
+          "authority_basis": "independent deterministic gate pass",
+          "lead_digest": "872cd2f712491dd7808c473573ce814682ff81e42a71637fd061e0e45ae18d0e",
+          "created_at": "2026-10-08T00:00:00Z"
+        },
+        "claim_candidate": {
+          "evidence_id": "link:1",
+          "project_id": "p",
+          "thread_id": "thread:1",
+          "target_type": "DECISION_OBJECT",
+          "target_id": "object:1",
+          "relation": "SUPPORTS",
+          "source_ids": [
+            "source:1"
+          ],
+          "span_ids": [
+            "span:0"
+          ],
+          "observation_ids": [
+            "observation:1"
+          ],
+          "conditions": {},
+          "applicability": "WITHIN_STATED_CONDITIONS",
+          "independence_group": "fixture-reader",
+          "support_status": "SUPPORTED_CANDIDATE",
+          "authority_status": "UNCLASSIFIED",
+          "verification_status": "NOT_CHECKED",
+          "cutoff_eligibility": "UNKNOWN_TIME",
+          "content_trust": "UNTRUSTED_EVIDENCE",
+          "conflict_ids": [],
+          "supersedes_evidence_id": null,
+          "revision": 0,
+          "evidence_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "created_at": "2026-10-08T00:00:00Z",
+          "schema_version": "1.0.0"
+        },
+        "audit_records": [
+          {
+            "audit_id": "audit:evidence",
+            "project_id": "p",
+            "evidence_ref": "link:1",
+            "event_type": "evidence/updated",
+            "payload": {},
+            "event_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "created_at": "2026-10-08T00:00:00Z",
+            "schema_version": "1.0.0"
+          }
+        ]
+      },
+      {
+        "basis": {
+          "project_id": "p",
+          "sources": [
+            {
+              "project_id": "p",
+              "artifact_id": "artifact:1",
+              "artifact_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "source_id": "source:1",
+              "source_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "source_state_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          ],
+          "spans": [
+            {
+              "project_id": "p",
+              "artifact_id": "artifact:1",
+              "span_id": "span:1",
+              "source_version_id": "version:1",
+              "span_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          ],
+          "predecessor_id": null,
+          "predecessor_digest": null
+        },
+        "observation": {
+          "observation_id": "observation:1",
+          "project_id": "p",
+          "span_ids": [
+            "span:1"
+          ],
+          "observed_statement": "counter second",
+          "observed_time": null,
+          "valid_time": null,
+          "observer_group": "fixture-reader",
+          "independence_basis": "fixture",
+          "provenance_class": "PROJECT_SOURCE",
+          "contamination_note": null,
+          "supersedes_observation_id": null,
+          "observation_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "created_at": "2026-10-08T00:00:00Z",
+          "schema_version": "1.0.0"
+        },
+        "lead": {
+          "lead_id": "counterevidence-lead:24",
+          "project_id": "p",
+          "investigation_id": "investigation:1",
+          "search_intent_id": "search-intent:19",
+          "source_id": "source:1",
+          "span_id": "span:1",
+          "evidence_group": "counterevidence:hypothesis:1",
+          "state": "CLAIM_CANDIDATE",
+          "information_value": "CRITICAL_COUNTEREVIDENCE",
+          "authority_basis": "independent deterministic gate pass",
+          "lead_digest": "2727449d2f630a2c41066ddbe93d11adda6382bfa69d7cad6845b8cbf05e3b99",
+          "created_at": "2026-10-08T00:00:00Z"
+        },
+        "claim_candidate": {
+          "evidence_id": "link:1",
+          "project_id": "p",
+          "thread_id": "thread:1",
+          "target_type": "DECISION_OBJECT",
+          "target_id": "object:1",
+          "relation": "SUPPORTS",
+          "source_ids": [
+            "source:1"
+          ],
+          "span_ids": [
+            "span:1"
+          ],
+          "observation_ids": [
+            "observation:1"
+          ],
+          "conditions": {},
+          "applicability": "WITHIN_STATED_CONDITIONS",
+          "independence_group": "fixture-reader",
+          "support_status": "SUPPORTED_CANDIDATE",
+          "authority_status": "UNCLASSIFIED",
+          "verification_status": "NOT_CHECKED",
+          "cutoff_eligibility": "UNKNOWN_TIME",
+          "content_trust": "UNTRUSTED_EVIDENCE",
+          "conflict_ids": [],
+          "supersedes_evidence_id": null,
+          "revision": 0,
+          "evidence_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "created_at": "2026-10-08T00:00:00Z",
+          "schema_version": "1.0.0"
+        },
+        "audit_records": [
+          {
+            "audit_id": "audit:evidence",
+            "project_id": "p",
+            "evidence_ref": "link:1",
+            "event_type": "evidence/updated",
+            "payload": {},
+            "event_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "created_at": "2026-10-08T00:00:00Z",
+            "schema_version": "1.0.0"
+          }
+        ]
+      }
+    ],
+    "events": [
+      "io.enter",
+      "io.return",
+      "stage",
+      "commit",
+      "io.enter",
+      "io.return",
+      "stage",
+      "commit",
+      "finalize"
+    ]
+  },
+  "supports": {
+    "intents": [
+      {
+        "search_intent_id": "search-intent:6",
+        "project_id": "p",
+        "thread_id": "thread:1",
+        "investigation_id": "investigation:1",
+        "evidence_group": "counterevidence:hypothesis:1",
+        "query_families": [
+          "independent",
+          "alternative"
+        ],
+        "connector_id": "fixture-reader",
+        "selector": {
+          "index": 0
+        },
+        "max_waves": 1,
+        "max_results": 3,
+        "stop_conditions": [
+          "INDEPENDENT_GATE_TERMINAL",
+          "SEARCH_SATURATED",
+          "POLICY_BLOCKED",
+          "BUDGET_EXHAUSTED"
+        ],
+        "policy_id": "policy:p",
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "state": "READY",
+        "intent_digest": "d82360b1ca13248e5efc940658aeeb0481920667df31951e0014a680a143da3a",
+        "created_at": "2026-10-08T00:00:00Z"
+      },
+      {
+        "search_intent_id": "search-intent:19",
+        "project_id": "p",
+        "thread_id": "thread:1",
+        "investigation_id": "investigation:1",
+        "evidence_group": "counterevidence:hypothesis:1",
+        "query_families": [
+          "independent",
+          "alternative"
+        ],
+        "connector_id": "fixture-reader",
+        "selector": {
+          "index": 1
+        },
+        "max_waves": 1,
+        "max_results": 3,
+        "stop_conditions": [
+          "INDEPENDENT_GATE_TERMINAL",
+          "SEARCH_SATURATED",
+          "POLICY_BLOCKED",
+          "BUDGET_EXHAUSTED"
+        ],
+        "policy_id": "policy:p",
+        "policy_revision": 1,
+        "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "state": "READY",
+        "intent_digest": "93e1a5948a516b621f5bdc1f3e433587811f39242f967547027aef1021ddae65",
+        "created_at": "2026-10-08T00:00:00Z"
+      }
+    ],
+    "stages": [
+      {
+        "applicability": "INDEPENDENT_CRITICAL_REVIEW_CANDIDATE",
+        "conditions": {
+          "alternative_explanation": "other mechanism",
+          "source_territory": "territory:0"
+        },
+        "independence_group": "group:0",
+        "lead": {
+          "authority_basis": "independent deterministic gate pass",
+          "created_at": "2026-10-08T00:00:00.000Z",
+          "evidence_group": "counterevidence:hypothesis:1",
+          "information_value": "CRITICAL_COUNTEREVIDENCE",
+          "investigation_id": "investigation:1",
+          "lead_digest": "872cd2f712491dd7808c473573ce814682ff81e42a71637fd061e0e45ae18d0e",
+          "lead_id": "counterevidence-lead:11",
+          "project_id": "p",
+          "search_intent_id": "search-intent:6",
+          "source_id": "source:0",
+          "span_id": "span:0",
+          "state": "CLAIM_CANDIDATE"
+        },
+        "observed_statement": "supports first",
+        "project_id": "p",
+        "relation": "SUPPORTS",
+        "span_ids": [
+          "span:0"
+        ],
+        "target_id": "hypothesis:1",
+        "target_type": "HYPOTHESIS",
+        "thread_id": "thread:1"
+      },
+      {
+        "applicability": "INDEPENDENT_CRITICAL_REVIEW_CANDIDATE",
+        "conditions": {
+          "alternative_explanation": "other mechanism",
+          "source_territory": "territory:1"
+        },
+        "independence_group": "group:1",
+        "lead": {
+          "authority_basis": "independent deterministic gate pass",
+          "created_at": "2026-10-08T00:00:00.000Z",
+          "evidence_group": "counterevidence:hypothesis:1",
+          "information_value": "CRITICAL_COUNTEREVIDENCE",
+          "investigation_id": "investigation:1",
+          "lead_digest": "2727449d2f630a2c41066ddbe93d11adda6382bfa69d7cad6845b8cbf05e3b99",
+          "lead_id": "counterevidence-lead:24",
+          "project_id": "p",
+          "search_intent_id": "search-intent:19",
+          "source_id": "source:1",
+          "span_id": "span:1",
+          "state": "CLAIM_CANDIDATE"
+        },
+        "observed_statement": "supports second",
+        "project_id": "p",
+        "relation": "SUPPORTS",
+        "span_ids": [
+          "span:1"
+        ],
+        "target_id": "hypothesis:1",
+        "target_type": "HYPOTHESIS",
+        "thread_id": "thread:1"
+      }
+    ],
+    "commits": [
+      {
+        "basis": {
+          "project_id": "p",
+          "sources": [
+            {
+              "project_id": "p",
+              "artifact_id": "artifact:1",
+              "artifact_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "source_id": "source:1",
+              "source_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "source_state_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          ],
+          "spans": [
+            {
+              "project_id": "p",
+              "artifact_id": "artifact:1",
+              "span_id": "span:0",
+              "source_version_id": "version:1",
+              "span_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          ],
+          "predecessor_id": null,
+          "predecessor_digest": null
+        },
+        "observation": {
+          "observation_id": "observation:1",
+          "project_id": "p",
+          "span_ids": [
+            "span:0"
+          ],
+          "observed_statement": "supports first",
+          "observed_time": null,
+          "valid_time": null,
+          "observer_group": "fixture-reader",
+          "independence_basis": "fixture",
+          "provenance_class": "PROJECT_SOURCE",
+          "contamination_note": null,
+          "supersedes_observation_id": null,
+          "observation_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "created_at": "2026-10-08T00:00:00Z",
+          "schema_version": "1.0.0"
+        },
+        "lead": {
+          "lead_id": "counterevidence-lead:11",
+          "project_id": "p",
+          "investigation_id": "investigation:1",
+          "search_intent_id": "search-intent:6",
+          "source_id": "source:0",
+          "span_id": "span:0",
+          "evidence_group": "counterevidence:hypothesis:1",
+          "state": "CLAIM_CANDIDATE",
+          "information_value": "CRITICAL_COUNTEREVIDENCE",
+          "authority_basis": "independent deterministic gate pass",
+          "lead_digest": "872cd2f712491dd7808c473573ce814682ff81e42a71637fd061e0e45ae18d0e",
+          "created_at": "2026-10-08T00:00:00Z"
+        },
+        "claim_candidate": {
+          "evidence_id": "link:1",
+          "project_id": "p",
+          "thread_id": "thread:1",
+          "target_type": "DECISION_OBJECT",
+          "target_id": "object:1",
+          "relation": "SUPPORTS",
+          "source_ids": [
+            "source:1"
+          ],
+          "span_ids": [
+            "span:0"
+          ],
+          "observation_ids": [
+            "observation:1"
+          ],
+          "conditions": {},
+          "applicability": "WITHIN_STATED_CONDITIONS",
+          "independence_group": "fixture-reader",
+          "support_status": "SUPPORTED_CANDIDATE",
+          "authority_status": "UNCLASSIFIED",
+          "verification_status": "NOT_CHECKED",
+          "cutoff_eligibility": "UNKNOWN_TIME",
+          "content_trust": "UNTRUSTED_EVIDENCE",
+          "conflict_ids": [],
+          "supersedes_evidence_id": null,
+          "revision": 0,
+          "evidence_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "created_at": "2026-10-08T00:00:00Z",
+          "schema_version": "1.0.0"
+        },
+        "audit_records": [
+          {
+            "audit_id": "audit:evidence",
+            "project_id": "p",
+            "evidence_ref": "link:1",
+            "event_type": "evidence/updated",
+            "payload": {},
+            "event_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "created_at": "2026-10-08T00:00:00Z",
+            "schema_version": "1.0.0"
+          }
+        ]
+      },
+      {
+        "basis": {
+          "project_id": "p",
+          "sources": [
+            {
+              "project_id": "p",
+              "artifact_id": "artifact:1",
+              "artifact_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "source_id": "source:1",
+              "source_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "source_state_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          ],
+          "spans": [
+            {
+              "project_id": "p",
+              "artifact_id": "artifact:1",
+              "span_id": "span:1",
+              "source_version_id": "version:1",
+              "span_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            }
+          ],
+          "predecessor_id": null,
+          "predecessor_digest": null
+        },
+        "observation": {
+          "observation_id": "observation:1",
+          "project_id": "p",
+          "span_ids": [
+            "span:1"
+          ],
+          "observed_statement": "supports second",
+          "observed_time": null,
+          "valid_time": null,
+          "observer_group": "fixture-reader",
+          "independence_basis": "fixture",
+          "provenance_class": "PROJECT_SOURCE",
+          "contamination_note": null,
+          "supersedes_observation_id": null,
+          "observation_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "created_at": "2026-10-08T00:00:00Z",
+          "schema_version": "1.0.0"
+        },
+        "lead": {
+          "lead_id": "counterevidence-lead:24",
+          "project_id": "p",
+          "investigation_id": "investigation:1",
+          "search_intent_id": "search-intent:19",
+          "source_id": "source:1",
+          "span_id": "span:1",
+          "evidence_group": "counterevidence:hypothesis:1",
+          "state": "CLAIM_CANDIDATE",
+          "information_value": "CRITICAL_COUNTEREVIDENCE",
+          "authority_basis": "independent deterministic gate pass",
+          "lead_digest": "2727449d2f630a2c41066ddbe93d11adda6382bfa69d7cad6845b8cbf05e3b99",
+          "created_at": "2026-10-08T00:00:00Z"
+        },
+        "claim_candidate": {
+          "evidence_id": "link:1",
+          "project_id": "p",
+          "thread_id": "thread:1",
+          "target_type": "DECISION_OBJECT",
+          "target_id": "object:1",
+          "relation": "SUPPORTS",
+          "source_ids": [
+            "source:1"
+          ],
+          "span_ids": [
+            "span:1"
+          ],
+          "observation_ids": [
+            "observation:1"
+          ],
+          "conditions": {},
+          "applicability": "WITHIN_STATED_CONDITIONS",
+          "independence_group": "fixture-reader",
+          "support_status": "SUPPORTED_CANDIDATE",
+          "authority_status": "UNCLASSIFIED",
+          "verification_status": "NOT_CHECKED",
+          "cutoff_eligibility": "UNKNOWN_TIME",
+          "content_trust": "UNTRUSTED_EVIDENCE",
+          "conflict_ids": [],
+          "supersedes_evidence_id": null,
+          "revision": 0,
+          "evidence_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "created_at": "2026-10-08T00:00:00Z",
+          "schema_version": "1.0.0"
+        },
+        "audit_records": [
+          {
+            "audit_id": "audit:evidence",
+            "project_id": "p",
+            "evidence_ref": "link:1",
+            "event_type": "evidence/updated",
+            "payload": {},
+            "event_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "created_at": "2026-10-08T00:00:00Z",
+            "schema_version": "1.0.0"
+          }
+        ]
+      }
+    ],
+    "events": [
+      "io.enter",
+      "io.return",
+      "stage",
+      "commit",
+      "io.enter",
+      "io.return",
+      "stage",
+      "commit",
+      "finalize"
+    ]
+  }
+}

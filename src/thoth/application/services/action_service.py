@@ -14,6 +14,15 @@ from thoth.application.services.action_effect_policy import (
 from thoth.application.services.action_effect_vector import checked_effect_vector
 from thoth.application.services.action_plan_derivation import derive_plan
 from thoth.application.services.action_plan_validation import validate_action_plan_dag
+from thoth.application.services.action_record_drafts import (
+    creation_draft,
+    creation_expectation,
+    plan_composition_draft,
+    portfolio_composition_draft,
+    portfolio_evaluation_updates,
+    portfolio_revision_draft,
+)
+from thoth.application.services.action_revision_drafts import action_revision_records
 from thoth.application.services.authorization_consumption import (
     consume_authorization,
     decide_authorization,
@@ -29,14 +38,11 @@ from thoth.domain.action_full import (
     ActionTestRef,
     AuthorizationEnvelopeRecord,
 )
-from thoth.domain.actor import ActorRef
 from thoth.domain.canonical import canonical_payload, domain_digest
-from thoth.domain.enums import ActorKind, CutoffState, EntityType
+from thoth.domain.enums import CutoffState
 from thoth.domain.revision import (
-    EntitySnapshot,
     ImpactPropagationPlan,
     RevisionChangeSet,
-    SemanticRevision,
     StagedRevision,
 )
 from thoth.ports.action import ActionStorePort
@@ -122,25 +128,7 @@ class ActionService:
         self._validate_hypotheses(project_id, object_id, hypothesis_refs)
         effect = self._effect_vector(specification)
         risk_tier, policy_state, processes, roles = classify_effect_vector(effect)
-        expected = specification.get("expected_observation_or_change")
-        expected_mapping: dict[str, object] = (
-            {str(key): child for key, child in cast(dict[object, object], expected).items()}
-            if isinstance(expected, dict)
-            else {"description": "UNRESOLVED", "status": "MISSING"}
-        )
-        missing = tuple(
-            field
-            for field, present in (
-                ("expected_observation_or_change", bool(expected_mapping)),
-                (
-                    "effect_completeness_confirmed",
-                    effect.get("effect_completeness_confirmed") is True,
-                ),
-                ("stop_conditions", bool(specification.get("stop_conditions"))),
-                ("observability", bool(specification.get("observability"))),
-            )
-            if not present
-        )
+        expected_mapping, missing = creation_expectation(specification, effect)
         duplicates = tuple(
             item.action_id
             for item in self._store.list_actions(project_id)
@@ -150,33 +138,26 @@ class ActionService:
             and item.test_refs == test_refs
             and item.freshness != "INVALIDATED"
         )
-        draft: dict[str, object] = {
-            "action_revision_id": self._ids.new("action-revision"),
-            "action_id": self._ids.new("action"),
-            "project_id": project_id,
-            "object_id": object_id,
-            "portfolio_id": portfolio_id,
-            "hypothesis_refs": hypothesis_refs,
-            "test_refs": test_refs,
-            "primary_purpose": primary_purpose,
-            "secondary_purposes": secondary_purposes,
-            "specification": {**specification, "missing_fields": missing},
-            "evidence_refs": evidence_refs,
-            "expected_observation_or_change": expected_mapping,
-            "effect_vector": effect,
-            "impact_set": self._impact(effect),
-            "risk_tier": risk_tier,
-            "required_processes": processes,
-            "required_roles": roles,
-            "proposal_state": "CANDIDATE" if not missing else "DRAFT",
-            "decision_state": "NOT_EVALUATED",
-            "policy_state": policy_state,
-            "authorization_state": (
-                "NOT_REQUIRED" if risk_tier in {"R0", "R1", "R2", "R4"} else "NOT_PREPARED"
-            ),
-            "freshness": "CURRENT",
-            "created_at": self._clock.now(),
-        }
+        draft = creation_draft(
+            project_id=project_id,
+            object_id=object_id,
+            portfolio_id=portfolio_id,
+            hypothesis_refs=hypothesis_refs,
+            test_refs=test_refs,
+            primary_purpose=primary_purpose,
+            secondary_purposes=secondary_purposes,
+            specification=specification,
+            evidence_refs=evidence_refs,
+            effect=effect,
+            risk_tier=risk_tier,
+            policy_state=policy_state,
+            processes=processes,
+            roles=roles,
+            expected_mapping=expected_mapping,
+            missing=missing,
+            ids=self._ids,
+            clock=self._clock,
+        )
         record = ActionRecord.model_validate(
             {**draft, "revision_digest": self._digest("ACTION_RECORD", draft)}
         )
@@ -259,35 +240,17 @@ class ActionService:
             raise ValueError("ActionPortfolio requires materially different alternatives")
         effective_id = portfolio_id or self._ids.new("action-portfolio")
         current = self._store.read_portfolio(project_id, effective_id, None)
-        mandatory = tuple(item for item in criteria_proposal if item.get("mandatory") is True)
-        enhancing = tuple(item for item in criteria_proposal if item.get("mandatory") is not True)
-        if not mandatory:
-            mandatory = (
-                {
-                    "criterion_id": "mandatory:policy",
-                    "name": "policy admissibility",
-                    "mandatory": True,
-                    "rationale": "prohibited actions cannot enter the feasible set",
-                },
-            )
-        draft: dict[str, object] = {
-            "portfolio_revision_id": self._ids.new("action-portfolio-revision"),
-            "portfolio_id": effective_id,
-            "project_id": project_id,
-            "object_id": object_id,
-            "action_refs": action_ids,
-            "decision_need": decision_need,
-            "mandatory_criteria": mandatory,
-            "enhancing_criteria": enhancing,
-            "evaluation_method": "NOT_EVALUATED",
-            "scenario_results": (),
-            "uncertainty": "UNASSESSED",
-            "sensitivity": "UNASSESSED",
-            "value_of_information": "UNASSESSED",
-            "decision_state": "NOT_EVALUATED",
-            "supersedes_revision_digest": None if current is None else current.revision_digest,
-            "created_at": self._clock.now(),
-        }
+        draft = portfolio_composition_draft(
+            project_id=project_id,
+            object_id=object_id,
+            action_ids=action_ids,
+            decision_need=decision_need,
+            criteria_proposal=criteria_proposal,
+            effective_id=effective_id,
+            current=current,
+            ids=self._ids,
+            clock=self._clock,
+        )
         record = ActionPortfolioRecord.model_validate(
             {**draft, "revision_digest": self._digest("ACTION_PORTFOLIO", draft)}
         )
@@ -302,48 +265,13 @@ class ActionService:
         preference_inputs: tuple[dict[str, object], ...],
     ) -> tuple[ActionPortfolioRecord, CommitResult]:
         actions = self._actions(current.project_id, current.action_refs)
-        results: list[dict[str, object]] = []
-        feasible: list[str] = []
-        for action in actions:
-            mandatory_pass = action.policy_state != "PROHIBITED"
-            if mandatory_pass:
-                feasible.append(action.action_id)
-            results.append(
-                {
-                    "action_id": action.action_id,
-                    "mandatory_gate": "PASS" if mandatory_pass else "FAIL",
-                    "risk_tier": action.risk_tier,
-                    "impact": action.impact_set,
-                    "expected": action.expected_observation_or_change,
-                }
-            )
-        preference_required = len(feasible) > 1 and not preference_inputs
-        state = (
-            "PREFERENCE_REQUIRED"
-            if preference_required
-            else "RECOMMENDATION_READY"
-            if feasible
-            else "EVALUATED"
-        )
         return self._revise_portfolio(
             current,
-            updates={
-                "evaluation_method": evaluation_method,
-                "scenario_results": tuple(results),
-                "uncertainty": "EXPLICIT_SCENARIO_COMPARISON",
-                "sensitivity": (
-                    "RANK_UNSTABLE_WITHOUT_PREFERENCES"
-                    if preference_required
-                    else "STABLE_WITH_SUPPLIED_PREFERENCES"
-                ),
-                "value_of_information": (
-                    "PREFERENCE_INPUT_HAS_DECISION_VALUE"
-                    if preference_required
-                    else "NO_ADDITIONAL_PREFERENCE_REQUIRED"
-                ),
-                "decision_state": state,
-                "recommendation_ref": None,
-            },
+            updates=portfolio_evaluation_updates(
+                actions,
+                evaluation_method=evaluation_method,
+                preference_inputs=preference_inputs,
+            ),
             event_type="action/evaluated",
             audit_payload={"policy_criteria_ref": policy_criteria_ref},
         )
@@ -422,21 +350,18 @@ class ActionService:
         effective_id = plan_id or self._ids.new("action-plan")
         current = self._store.read_plan(project_id, effective_id, None)
         derived = self._derive_plan(steps, dependency_edges)
-        draft: dict[str, object] = {
-            "plan_revision_id": self._ids.new("action-plan-revision"),
-            "plan_id": effective_id,
-            "project_id": project_id,
-            "object_id": object_id,
-            "selected_action_refs": selected_action_refs,
-            "steps": steps,
-            "dependency_edges": dependency_edges,
-            **derived,
-            "authorization_refs": () if current is None else current.authorization_refs,
-            "validation_state": "VALIDATED",
-            "freshness": "CURRENT",
-            "supersedes_revision_digest": None if current is None else current.revision_digest,
-            "created_at": self._clock.now(),
-        }
+        draft = plan_composition_draft(
+            project_id=project_id,
+            object_id=object_id,
+            selected_action_refs=selected_action_refs,
+            steps=steps,
+            dependency_edges=dependency_edges,
+            effective_id=effective_id,
+            derived=derived,
+            current=current,
+            ids=self._ids,
+            clock=self._clock,
+        )
         record = ActionPlanRecord.model_validate(
             {**draft, "revision_digest": self._digest("ACTION_PLAN", draft)}
         )
@@ -682,16 +607,7 @@ class ActionService:
         event_type: str,
         audit_payload: dict[str, object] | None = None,
     ) -> tuple[ActionPortfolioRecord, CommitResult]:
-        draft = current.model_dump(mode="python")
-        draft.update(updates)
-        draft.update(
-            {
-                "portfolio_revision_id": self._ids.new("action-portfolio-revision"),
-                "supersedes_revision_digest": current.revision_digest,
-                "created_at": self._clock.now(),
-            }
-        )
-        draft.pop("revision_digest", None)
+        draft = portfolio_revision_draft(current, updates=updates, ids=self._ids, clock=self._clock)
         revised = ActionPortfolioRecord.model_validate(
             {**draft, "revision_digest": self._digest("ACTION_PORTFOLIO", draft)}
         )
@@ -711,34 +627,15 @@ class ActionService:
         event_type: str,
         evidence_refs: tuple[str, ...],
     ) -> CommitResult:
-        content = record.model_dump(mode="python")
-        snapshot = EntitySnapshot(
-            snapshot_id=self._ids.new("snapshot"),
-            project_id=record.project_id,
-            entity_type=EntityType.ACTION,
+        snapshot, actor, revision = action_revision_records(
+            record,
             entity_id=entity_id,
-            schema_version="1.0.0",
-            content=content,
-            content_digest=domain_digest("ENTITY_SNAPSHOT", "1.0.0", canonical_payload(content)),
-        )
-        actor = ActorRef(
-            actor_id="agent:action-service",
-            kind=ActorKind.AGENT,
-            role="action-planner",
-        )
-        revision = SemanticRevision(
             revision_id=revision_id,
-            project_id=record.project_id,
-            entity_type=EntityType.ACTION,
-            entity_id=entity_id,
-            snapshot_id=snapshot.snapshot_id,
-            parent_revision_digests=() if supersedes is None else (supersedes,),
-            actor=actor,
-            reason=event_type,
-            evidence_refs=evidence_refs,
-            affected_refs=(),
             revision_digest=revision_digest,
-            created_at=record.created_at,
+            supersedes=supersedes,
+            event_type=event_type,
+            evidence_refs=evidence_refs,
+            ids=self._ids,
         )
         expected = {} if supersedes is None else {f"ACTION:{entity_id}": supersedes}
         commit = self._commits.commit(
