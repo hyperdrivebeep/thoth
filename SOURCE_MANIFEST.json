@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-17T04:51:42.081412+00:00",
+  "created_at": "2026-10-17T07:42:48.547432+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -938,8 +938,8 @@
     },
     {
       "path": "apps/web/src/components/ResearchEvidenceDetail.test.tsx",
-      "sha256": "db7715c70ee563e82544944ea955b339ab1224b8de32ba9bd70398b68856601d",
-      "bytes": 10927
+      "sha256": "62abc151c672817c0be1bdd5d0af7915940300a97b8f094d70cdde7333d99c4c",
+      "bytes": 11490
     },
     {
       "path": "apps/web/src/components/ResearchFollowupSummary.tsx",

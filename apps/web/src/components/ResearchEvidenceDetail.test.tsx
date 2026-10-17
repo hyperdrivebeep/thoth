@@ -96,8 +96,15 @@ it("does not restore rejected source bytes when a later refetch is cancelled", a
   await act(async () => { await client.invalidateQueries({ queryKey: ["result-evidence"] }); });
   await settle(() => Boolean(node.textContent?.includes("근거를 읽지 못했습니다")));
   vi.mocked(rpc).mockImplementation(() => new Promise(() => {}));
+  const callsBefore = vi.mocked(rpc).mock.calls.length;
   await act(async () => { void client.invalidateQueries({ queryKey: ["result-evidence"] }); });
+  // Cancel only a fetch that has really started: otherwise there is nothing to cancel.
+  expect(client.isFetching({ queryKey: ["result-evidence"] })).toBe(1);
+  expect(vi.mocked(rpc).mock.calls.length).toBeGreaterThan(callsBefore);
   await act(async () => { await client.cancelQueries({ queryKey: ["result-evidence"] }); });
+  // The cancelled query is idle again; wait for the screen to follow it (React Query notifies observers later).
+  expect(client.isFetching({ queryKey: ["result-evidence"] })).toBe(0);
+  await settle(() => !node.textContent?.includes("이 답변의 근거를 읽는 중"));
   expect(node.querySelectorAll(".evidence-item")).toHaveLength(0);
   expect(node.textContent).toContain("근거를 읽지 못했습니다");
 });
