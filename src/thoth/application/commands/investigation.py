@@ -2,13 +2,25 @@ from __future__ import annotations
 
 from pydantic import Field, JsonValue
 
-from thoth.application.services.investigation_service import InvestigationService
+from thoth.application.services.investigation_service import (
+    TERMINAL_STATE_BY_STOP_REASON,
+    InvestigationService,
+)
 from thoth.domain.base import DomainModel
 from thoth.domain.investigation import InvestigationRecord
 from thoth.ports.acquisition import AcquisitionTraceStorePort
 from thoth.ports.investigation import InvestigationStorePort
 from thoth.ports.thread import ThreadStorePort
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
+
+
+def _unchanged(current: InvestigationRecord, reason: str) -> dict[str, JsonValue]:
+    """The state was already in place: answer with it and write nothing."""
+    return {
+        "investigation": current.model_dump(mode="json"),
+        "unchanged": True,
+        "unchanged_reason": reason,
+    }
 
 
 class InvestigationListInput(DomainModel):
@@ -177,6 +189,13 @@ class InvestigationQueryHandlers:
     async def pause(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = InvestigationReadInput.model_validate(value)
         current = self._read(request)
+        if current.is_ended or current.execution_state == "PAUSED":
+            return _unchanged(
+                current,
+                "INVESTIGATION_ALREADY_ENDED"
+                if current.is_ended
+                else "INVESTIGATION_ALREADY_PAUSED",
+            )
         try:
             updated = self._service.pause(current)
         except ValueError as exc:
@@ -198,6 +217,9 @@ class InvestigationQueryHandlers:
     async def stop(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = InvestigationStopInput.model_validate(value)
         current = self._read(request)
+        if current.is_ended and request.reason in TERMINAL_STATE_BY_STOP_REASON:
+            # An ended investigation keeps its verdict and result; a later stop never replaces them.
+            return _unchanged(current, "INVESTIGATION_ALREADY_ENDED")
         try:
             updated = self._service.stop(current, reason=request.reason)
         except ValueError as exc:

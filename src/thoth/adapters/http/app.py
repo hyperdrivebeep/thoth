@@ -29,6 +29,7 @@ from thoth.adapters.http.hosted_review import (
     is_hosted_credential_method,
 )
 from thoth.adapters.http.internal_routes import mount_internal_routes
+from thoth.adapters.storage.workspace_owner import WorkspaceInUse
 from thoth.apps.hosted_review_dispatch import hosted_dispatch
 from thoth.apps.hosted_review_snapshot import (
     mark_workspace_live,
@@ -431,7 +432,19 @@ def _resolve_bus(application: FastAPI) -> CommandBus:
     if existing is not None:
         return existing
     workspace = Path(os.environ.get("THOTH_WORKSPACE", ".thoth"))
-    runtime = create_runtime(workspace)
+    try:
+        runtime = create_runtime(workspace)
+    except WorkspaceInUse as error:
+        # Only reached when the server was not started through the CLI (which owns the workspace
+        # first). The path and process id are shown to the caller, never stored.
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "code": "WORKSPACE_IN_USE",
+                "message_ko": error.message_ko,
+                "message_en": error.message_en,
+            },
+        ) from error
     application.state.runtime = runtime
     application.state.bus = runtime.bus
     if hosted_mode():

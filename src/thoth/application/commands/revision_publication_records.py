@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from thoth.application.commands.revisions_inputs import (
     BaselineDecideInput,
     ChangeSetCommitInput,
@@ -21,6 +23,21 @@ from thoth.domain.revision import (
     SemanticRevision,
     StagedRevision,
 )
+
+
+def current_baseline_for(
+    baselines: Iterable[ControlRecord], candidate: ControlRecord
+) -> ControlRecord | None:
+    """The CURRENT baseline that was already made from this candidate, if there is one."""
+    return next(
+        (
+            item
+            for item in baselines
+            if item.state == "CURRENT"
+            and item.payload.get("candidate_digest") == candidate.record_digest
+        ),
+        None,
+    )
 
 
 def domain_transition_names(entity_type: str, content: dict[str, object]) -> list[str]:

@@ -37,6 +37,7 @@ from thoth.apps.model_composition import create_codex_model
 from thoth.apps.projectpack_execution import run_project_pack
 from thoth.apps.runtime import create_runtime
 from thoth.apps.tui_presentation import present_research_progress, render_tui_turn
+from thoth.apps.workspace_guard import owned_workspace, workspace_guard
 from thoth.apps.workspace_paths import (
     default_workspace,
     legacy_workspace_candidates,
@@ -86,11 +87,12 @@ def main(
     if context.invoked_subcommand is not None:
         return
     announce_workspace(workspace, command="thoth")
-    _interactive_shell(
-        workspace,
-        sandbox_profile=sandbox_profile,
-        connector_config=connector_config,
-    )
+    with workspace_guard():
+        _interactive_shell(
+            workspace,
+            sandbox_profile=sandbox_profile,
+            connector_config=connector_config,
+        )
 
 
 def _interactive_shell(
@@ -339,13 +341,14 @@ def run_request(
     ] = None,
 ) -> None:
     """Execute one JSON-RPC request and emit one machine-readable JSON result."""
-    runtime = create_runtime(
-        workspace,
-        sandbox_adapter=_sandbox_adapter(sandbox_profile, workspace),
-        connector_registry=(
-            None if connector_config is None else load_connector_registry(connector_config)
-        ),
-    )
+    with workspace_guard():
+        runtime = create_runtime(
+            workspace,
+            sandbox_adapter=_sandbox_adapter(sandbox_profile, workspace),
+            connector_registry=(
+                None if connector_config is None else load_connector_registry(connector_config)
+            ),
+        )
     try:
 
         async def run_and_finish() -> bytes:
@@ -395,13 +398,14 @@ def rpc_stdio(
     ] = None,
 ) -> None:
     """Serve JSON-RPC over stdin/stdout JSONL until EOF."""
-    runtime = create_runtime(
-        workspace,
-        sandbox_adapter=_sandbox_adapter(sandbox_profile, workspace),
-        connector_registry=(
-            None if connector_config is None else load_connector_registry(connector_config)
-        ),
-    )
+    with workspace_guard():
+        runtime = create_runtime(
+            workspace,
+            sandbox_adapter=_sandbox_adapter(sandbox_profile, workspace),
+            connector_registry=(
+                None if connector_config is None else load_connector_registry(connector_config)
+            ),
+        )
     try:
 
         async def serve() -> None:
@@ -432,7 +436,8 @@ def events(
             "input": {"project_id": project_id, "operation_id": operation_id},
         },
     }
-    runtime = create_runtime(workspace)
+    with workspace_guard():
+        runtime = create_runtime(workspace)
     try:
         response = asyncio.run(handle_json_line(orjson.dumps(request), runtime.bus))
     finally:
@@ -466,9 +471,10 @@ def run_pack(
             if selected_provider == "scripted"
             else create_codex_model(pack_workspace, model_name)
         )
-        result = asyncio.run(
-            run_project_pack(loaded, workspace=pack_workspace, model=selected_model)
-        )
+        with workspace_guard():
+            result = asyncio.run(
+                run_project_pack(loaded, workspace=pack_workspace, model=selected_model)
+            )
     except ModelExecutionHold as exc:
         typer.echo(str(exc), err=True)
         raise typer.Exit(code=1) from exc
@@ -492,10 +498,11 @@ def serve(
     if host not in {"127.0.0.1", "localhost", "::1"}:
         raise typer.BadParameter("V0 local server only permits loopback hosts")
     announce_workspace(workspace, command="thoth serve")
-    os.environ["THOTH_WORKSPACE"] = str(workspace.resolve())
-    from thoth.adapters.http import app as local_app
+    with owned_workspace(workspace, command="thoth serve"):
+        os.environ["THOTH_WORKSPACE"] = str(workspace.resolve())
+        from thoth.adapters.http import app as local_app
 
-    uvicorn.run(local_app, host=host, port=port, reload=False)
+        uvicorn.run(local_app, host=host, port=port, reload=False)
 
 
 @app.command("hosted-review-serve")
@@ -554,38 +561,39 @@ def desktop(
     if host not in {"127.0.0.1", "localhost", "::1"}:
         raise typer.BadParameter("V0 local server only permits loopback hosts")
     announce_workspace(workspace, command="thoth desktop")
-    os.environ["THOTH_WORKSPACE"] = str(workspace.resolve())
-    if web_ui_dist() is None:
-        console.print("apps/web/dist 없음. `npm --prefix apps/web run build` 후 다시 실행.")
-    from thoth.adapters.http import app as local_app
+    with owned_workspace(workspace, command="thoth desktop"):
+        os.environ["THOTH_WORKSPACE"] = str(workspace.resolve())
+        if web_ui_dist() is None:
+            console.print("apps/web/dist 없음. `npm --prefix apps/web run build` 후 다시 실행.")
+        from thoth.adapters.http import app as local_app
 
-    url = f"http://{host}:{port}/"
-    thread = threading.Thread(
-        target=lambda: uvicorn.run(local_app, host=host, port=port, reload=False),
-        daemon=True,
-    )
-    thread.start()
-    health = f"http://{host}:{port}/healthz"
-    for _ in range(50):
-        try:
-            urllib.request.urlopen(health, timeout=0.4)
-            break
-        except (OSError, urllib.error.URLError):
-            time.sleep(0.1)
-    else:
-        console.print("desktop API did not become ready on loopback")
-        raise typer.Exit(code=1)
-    command = desktop_window_command(
-        url,
-        system=platform.system(),
-        program_files=Path(os.environ.get("PROGRAMFILES", r"C:\Program Files")),
-        program_files_x86=Path(os.environ.get("PROGRAMFILES(X86)", r"C:\Program Files (x86)")),
-    )
-    if command is not None:
-        subprocess.Popen(command)
-    else:
-        webbrowser.open(url)
-    thread.join()
+        url = f"http://{host}:{port}/"
+        thread = threading.Thread(
+            target=lambda: uvicorn.run(local_app, host=host, port=port, reload=False),
+            daemon=True,
+        )
+        thread.start()
+        health = f"http://{host}:{port}/healthz"
+        for _ in range(50):
+            try:
+                urllib.request.urlopen(health, timeout=0.4)
+                break
+            except (OSError, urllib.error.URLError):
+                time.sleep(0.1)
+        else:
+            console.print("desktop API did not become ready on loopback")
+            raise typer.Exit(code=1)
+        command = desktop_window_command(
+            url,
+            system=platform.system(),
+            program_files=Path(os.environ.get("PROGRAMFILES", r"C:\Program Files")),
+            program_files_x86=Path(os.environ.get("PROGRAMFILES(X86)", r"C:\Program Files (x86)")),
+        )
+        if command is not None:
+            subprocess.Popen(command)
+        else:
+            webbrowser.open(url)
+        thread.join()
 
 
 if __name__ == "__main__":

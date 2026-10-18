@@ -236,12 +236,18 @@ def authorization_prepare_result(
     }
 
 
-def authorization_decide_result(decided: AuthorizationEnvelopeRecord) -> dict[str, JsonValue]:
-    return {
+def authorization_decide_result(
+    decided: AuthorizationEnvelopeRecord, before: AuthorizationEnvelopeRecord | None = None
+) -> dict[str, JsonValue]:
+    result: dict[str, JsonValue] = {
         "authorization": decided.model_dump(mode="json"),
         "exact_scope_digest": decided.exact_scope_digest,
         "single_use": decided.single_use,
     }
+    if before is not None and before.revision_digest == decided.revision_digest:
+        # The same role had already cast this vote: nothing was written.
+        result.update(unchanged=True, unchanged_reason="AUTHORIZATION_VOTE_ALREADY_RECORDED")
+    return result
 
 
 def compensation_specification(request: CompensationCreateInput) -> dict[str, object]:
