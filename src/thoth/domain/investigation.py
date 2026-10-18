@@ -55,6 +55,10 @@ class InvestigationRecord(DomainModel):
             raise ValueError("terminal investigation requires result")
         return self
 
+    @property
+    def is_ended(self) -> bool:
+        return self.domain_state in {"CONVERGED", "HOLD", "ABSTAINED", "STOPPED"}
+
 
 class InvestigationAuditRecord(DomainModel):
     audit_id: str

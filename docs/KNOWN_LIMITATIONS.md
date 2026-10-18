@@ -8,12 +8,15 @@ verification state is in [VERIFICATION.md](VERIFICATION.md).
 
 한국어 안내: [KNOWN_LIMITATIONS.ko.md](KNOWN_LIMITATIONS.ko.md)
 
-## Use one THOTH process per workspace
+## One THOTH process per workspace is enforced
 
-A workspace is supported with one running THOTH process. Starting a second one on the same
-workspace is not blocked, and two processes writing at the same time can leave two records with
-the same version number. A later read may then show the older one. If you are unsure whether
-another instance is running, close it before you continue.
+A workspace is open in one THOTH process at a time. Starting a second one on the same workspace
+stops with exit code 3 and a Korean and English message that names the other process, and a server
+that is already running answers a request with a "workspace in use" error (HTTP 503) instead of
+writing. Close the other one and run it again. The check relies on the operating system's file lock
+on a local disk. It does not cover a workspace folder shared between Windows and WSL, or one that a
+cloud sync client or a network share exposes to several computers; do not open the same workspace
+from two places that way. The hosted review mode does not use this lock.
 
 ## A request interrupted by a shutdown can stay "running"
 

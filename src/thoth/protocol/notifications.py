@@ -22,6 +22,11 @@ from thoth.protocol.notification_rules import (
 
 
 def notifications_for(method: str, result: dict[str, JsonValue]) -> tuple[str, ...]:
+    # "unchanged": True means the request found the state already in place: nothing was written,
+    # so nothing is announced. (A thread/stop result's "cancelled" then means "this request newly
+    # cancelled something", so it is False.)
+    if result.get("unchanged") is True:
+        return ()
     values = list(STATIC_NOTIFICATIONS.get(method, ()))
     append_research_notifications(method, result, values)
     append_decision_notifications(method, result, values)

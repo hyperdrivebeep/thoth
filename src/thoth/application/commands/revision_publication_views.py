@@ -80,6 +80,15 @@ def typed_baseline_response(
     }
 
 
+def unchanged_baseline_response(baseline: ControlRecord) -> dict[str, JsonValue]:
+    """The candidate already is the current baseline: answer with it and write nothing."""
+    return {
+        **baseline_response(baseline),
+        "unchanged": True,
+        "unchanged_reason": "BASELINE_ALREADY_DECIDED",
+    }
+
+
 def baseline_response(baseline: ControlRecord) -> dict[str, JsonValue]:
     return cast(
         dict[str, JsonValue],

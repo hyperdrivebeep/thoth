@@ -42,6 +42,8 @@ from thoth.adapters.storage.test_validity import SqliteTestValidityStore
 from thoth.adapters.storage.thread_runtime import SqliteThreadRuntimeStore
 from thoth.adapters.storage.threads import SqliteThreadStore
 from thoth.adapters.storage.transaction import SqliteAtomicUnitOfWork
+from thoth.adapters.storage.workspace_owner import WorkspaceOwnership, acquire_workspace_owner
+from thoth.domain.deployment_mode import DeploymentMode, parse_deployment_mode
 from thoth.ports.resource_scope import (
     ResourceAccessPort,
     ResourceRecordAccessPort,
@@ -52,6 +54,7 @@ from thoth.ports.resource_scope import (
 class SqliteStoreBundle:
     def __init__(self, ledger: SqliteLedger, workspace: Path) -> None:
         self.ledger = ledger
+        self._ownership: WorkspaceOwnership | None = None
         self.objects = ContentAddressedObjectStore(workspace)
         self.atomic_uow = SqliteAtomicUnitOfWork(ledger.engine)
         self.immediate_uow = SqliteAtomicUnitOfWork(ledger.engine, immediate=True)
@@ -129,8 +132,17 @@ class SqliteStoreBundle:
             self.ledger.engine, resource_scopes=resource_scopes, fault_injector=fault_injector
         )
 
+    def hold_workspace(self, ownership: WorkspaceOwnership | None) -> None:
+        """Release the workspace together with this bundle."""
+        self._ownership = ownership
+
     def close(self) -> None:
-        self.ledger.close()
+        try:
+            self.ledger.close()
+        finally:
+            ownership, self._ownership = self._ownership, None
+            if ownership is not None:
+                ownership.release()
 
     def scoped_ledger(self, resource_access: ResourceAccessPort) -> ScopedLedger:
         return ScopedLedger(self.ledger, resource_access)
@@ -141,12 +153,26 @@ class SqliteStoreFactory:
     version = "1.0.0"
 
     def open(self, workspace: Path) -> SqliteStoreBundle:
-        database = workspace / "db" / "thoth.sqlite3"
-        migrate_sqlite_database(database)
-        ledger = SqliteLedger(database)
+        # One THOTH process per local workspace; the hosted review mode keeps one runtime per
+        # session workspace by its own deployment rule and is not locked here.
+        ownership = (
+            None
+            if parse_deployment_mode() is DeploymentMode.HOSTED_REVIEW
+            else acquire_workspace_owner(workspace)
+        )
         try:
-            ledger.initialize()
-            return SqliteStoreBundle(ledger, workspace)
+            database = workspace / "db" / "thoth.sqlite3"
+            migrate_sqlite_database(database)
+            ledger = SqliteLedger(database)
+            try:
+                ledger.initialize()
+                bundle = SqliteStoreBundle(ledger, workspace)
+                bundle.hold_workspace(ownership)
+                return bundle
+            except BaseException:
+                ledger.close()
+                raise
         except BaseException:
-            ledger.close()
+            if ownership is not None:
+                ownership.release()
             raise

@@ -161,6 +161,8 @@ New Windows installations keep research data in `%LOCALAPPDATA%\THOTH`, independ
 downloaded source folder. If you used an earlier version, open its existing data directory with
 `serve --workspace "C:\path\to\your\old\.thoth-local" --port 8765`.
 THOTH reports the selected directory at startup and does not move old data automatically.
+One workspace is used by one THOTH process at a time; a second start on the same workspace stops
+with a message (exit code 3) until the first one is closed.
 
 Sign-in uses separate THOTH profiles; existing login information from other programs is not
 imported. Claude sign-in runs the official Claude Code executable in that profile, and xAI uses

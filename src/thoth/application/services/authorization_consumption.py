@@ -178,6 +178,14 @@ def decide_authorization(
             raise ValueError("actor lacks a required non-fungible role assignment")
         if decision not in {"APPROVE", "REJECT"}:
             raise ValueError("authorization decision must be APPROVE or REJECT")
+        if any(
+            vote.get("role_assignment_ref") == role_assignment_ref
+            and vote.get("actor_ref") == actor_ref
+            and vote.get("decision") == decision
+            and vote.get("approved_digest") == approved_digest
+            for vote in current.decision_history
+        ):
+            return current  # the same role already cast this vote: nothing to write
         now = clock.now()
         history: dict[str, object] = {
             "decision": decision,

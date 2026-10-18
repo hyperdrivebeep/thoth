@@ -62,6 +62,21 @@ class ThreadMetadataUpdateInput(ThreadReadInput):
     display_name: str = Field(min_length=1, max_length=500)
 
 
+# The state was already in place: the request answers with it and writes nothing.
+_UNCHANGED_PAUSE: dict[str, JsonValue] = {
+    "unchanged": True,
+    "unchanged_reason": "THREAD_ALREADY_PAUSED",
+}
+_UNCHANGED_RESUME: dict[str, JsonValue] = {
+    "unchanged": True,
+    "unchanged_reason": "THREAD_ALREADY_RESUMED",
+}
+_UNCHANGED_STOP: dict[str, JsonValue] = {
+    "unchanged": True,
+    "unchanged_reason": "THREAD_ALREADY_STOPPED",
+}
+
+
 class ThreadCommandHandlers:
     def __init__(
         self,
@@ -284,6 +299,16 @@ class ThreadCommandHandlers:
         with self._ledger.transaction():
             request = ThreadReadInput.model_validate(value)
             thread = self._read_scoped(request)
+            if thread.execution_state in {
+                ThreadExecutionState.PAUSED,
+                ThreadExecutionState.PAUSE_PENDING,
+            }:
+                checkpoints = self._runtime.list_checkpoints(request.project_id, request.thread_id)
+                return {
+                    **self._serialize(thread),
+                    "checkpoint": checkpoints[-1].model_dump(mode="json") if checkpoints else None,
+                    **_UNCHANGED_PAUSE,
+                }
             target = (
                 ThreadExecutionState.PAUSE_PENDING
                 if thread.execution_state == ThreadExecutionState.RUNNING
@@ -323,6 +348,8 @@ class ThreadCommandHandlers:
                     RpcErrorCode.STALE_CHECKPOINT,
                     "thread resume rejected because checkpoint is missing or stale",
                 )
+            if thread.execution_state == ThreadExecutionState.IDLE:
+                return {**self._serialize(thread), **_UNCHANGED_RESUME}
             updated = thread.model_copy(
                 update={
                     "execution_state": ThreadExecutionState.IDLE,
@@ -338,6 +365,8 @@ class ThreadCommandHandlers:
         with self._ledger.transaction():
             request = ThreadReadInput.model_validate(value)
             thread = self._read_scoped(request)
+            if thread.lifecycle == ThreadLifecycle.STOPPED:
+                return {**self._serialize(thread), **_UNCHANGED_STOP}
             updated = thread.model_copy(
                 update={
                     "lifecycle": ThreadLifecycle.STOPPED,

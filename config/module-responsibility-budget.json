@@ -137,7 +137,7 @@
       "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     },
     "src/thoth/application/commands/revisions_full.py": {
-      "baseline_lines": 926,
+      "baseline_lines": 917,
       "top_level_symbols": [
         "_authenticated_revision_provenance",
         "RevisionFullHandlers"

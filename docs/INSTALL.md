@@ -213,6 +213,14 @@ Startup reports the chosen root and nearby legacy directories. Legacy detection 
 current directory; it cannot discover every older ZIP extraction. Nothing is automatically moved
 or merged. An empty project list can mean a different workspace was selected.
 
+One workspace is open in one THOTH process at a time. `serve`, `desktop`, `run`, `rpc`, `events`,
+`run-pack` and the interactive shell take the workspace when they start. A second one on the same
+workspace stops with exit code 3 and a Korean and English message that names the other process;
+close that one and run it again. Commands that do not open the database (`workspace`, `doctor`
+and the sign-in commands) still work next to a running server. The lock belongs to the process, so
+a crash frees it. It is meant for a local disk; a folder shared between Windows and WSL or synced by
+a cloud client is not covered.
+
 | Stored item | What restarting preserves |
 | --- | --- |
 | Projects, sources, evidence, saved results and model preferences | Stored under the workspace. Reopen the same root after restarting the backend. A lost model connection does not hide existing local research. |

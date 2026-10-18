@@ -18,6 +18,16 @@ from thoth.ports.outcome import OutcomeStorePort
 from thoth.ports.runtime import AtomicUnitOfWorkPort
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 
+# The decision or reopening was already recorded: answer with it and write nothing.
+_UNCHANGED_DECIDED: dict[str, JsonValue] = {
+    "unchanged": True,
+    "unchanged_reason": "CLOSURE_ALREADY_DECIDED",
+}
+_UNCHANGED_REOPENED: dict[str, JsonValue] = {
+    "unchanged": True,
+    "unchanged_reason": "CLOSURE_ALREADY_REOPENED",
+}
+
 
 class ProjectInput(DomainModel):
     project_id: str = Field(min_length=1, max_length=160)
@@ -285,6 +295,18 @@ class ClosureHandlers:
             readiness = self._records.read(request.project_id, "CLOSURE", request.readiness_id)
             if readiness is None or readiness.record_type != "READINESS":
                 raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "readiness not found")
+            outcome = "DECIDED" if request.decision == "DECIDE" else "REJECTED"
+            existing = next(
+                (
+                    item
+                    for item in self._records.list(request.project_id, "CLOSURE", "DECISION")
+                    if item.payload.get("readiness_id") == readiness.record_id
+                    and item.state == outcome
+                ),
+                None,
+            )
+            if existing is not None:
+                return {"closure": existing.model_dump(mode="json"), **_UNCHANGED_DECIDED}
             if request.decision == "DECIDE" and readiness.state == "NOT_READY":
                 raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "closure is blocked")
             current_payload, _ = self._assess_readiness(
@@ -310,7 +332,7 @@ class ClosureHandlers:
                 project_id=request.project_id,
                 namespace="CLOSURE",
                 record_type="DECISION",
-                state="DECIDED" if request.decision == "DECIDE" else "REJECTED",
+                state=outcome,
                 payload={
                     "readiness_id": readiness.record_id,
                     "closure_scope": readiness.payload.get("closure_scope"),
@@ -358,6 +380,17 @@ class ClosureHandlers:
         parent = self._records.read(request.project_id, "CLOSURE", request.closure_id)
         if parent is None or parent.record_type != "DECISION" or parent.state != "DECIDED":
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "CLOSURE_DECISION_REQUIRED")
+        existing = next(
+            (
+                item
+                for item in self._records.list(request.project_id, "CLOSURE", "REOPEN")
+                if item.payload.get("closure_id") == request.closure_id
+                and item.payload.get("child_scope_ref") == request.child_scope_ref
+            ),
+            None,
+        )
+        if existing is not None:
+            return {"reopen": existing.model_dump(mode="json"), **_UNCHANGED_REOPENED}
         record = self._controls.create(
             project_id=request.project_id,
             namespace="CLOSURE",

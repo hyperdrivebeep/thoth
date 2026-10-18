@@ -416,7 +416,7 @@ class ActionHandlers:
             )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
-        return authorization_decide_result(decided)
+        return authorization_decide_result(decided, current)
 
     async def compensation_create(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = CompensationCreateInput.model_validate(value)

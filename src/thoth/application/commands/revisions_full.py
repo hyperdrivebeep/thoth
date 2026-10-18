@@ -720,22 +720,7 @@ class RevisionFullHandlers:
             None,
         )
         if typed_candidate is not None:
-            role = next(
-                (
-                    item
-                    for item in self._governance.list_roles(request.project_id)
-                    if item.role_assignment_id == request.role_assignment_ref
-                    and item.actor_id == request.actor_ref
-                    and item.role == "baseline-owner"
-                    and item.state == "ACTIVE"
-                ),
-                None,
-            )
-            if role is None:
-                raise RpcApplicationError(
-                    RpcErrorCode.DOMAIN_REJECTED,
-                    "baseline authority role missing",
-                )
+            self._require_baseline_owner(request)
             try:
                 decision, baseline = self._baselines.decide(
                     project_id=request.project_id,
@@ -755,21 +740,7 @@ class RevisionFullHandlers:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "candidate not found")
         if candidate.record_digest != request.approved_digest:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "approved digest mismatch")
-        role = next(
-            (
-                item
-                for item in self._governance.list_roles(request.project_id)
-                if item.role_assignment_id == request.role_assignment_ref
-                and item.actor_id == request.actor_ref
-                and item.role == "baseline-owner"
-                and item.state == "ACTIVE"
-            ),
-            None,
-        )
-        if role is None:
-            raise RpcApplicationError(
-                RpcErrorCode.DOMAIN_REJECTED, "baseline authority role missing"
-            )
+        self._require_baseline_owner(request)
         if request.decision == "REJECT":
             rejected = self._controls.create(
                 project_id=request.project_id,
@@ -782,6 +753,9 @@ class RevisionFullHandlers:
             return {"baseline_candidate": rejected.model_dump(mode="json")}
         with self._ledger.transaction():
             prior = self._records.list(request.project_id, "REVISION", "BASELINE")
+            same = publication.current_baseline_for(prior, candidate)
+            if same is not None:
+                return publication_views.unchanged_baseline_response(same)
             for item in prior:
                 if item.state == "CURRENT":
                     self._controls.create(
@@ -800,6 +774,23 @@ class RevisionFullHandlers:
                 payload=publication.legacy_baseline_payload(candidate, request),
             )
             return publication_views.baseline_response(baseline)
+
+    def _require_baseline_owner(self, request: BaselineDecideInput) -> None:
+        role = next(
+            (
+                item
+                for item in self._governance.list_roles(request.project_id)
+                if item.role_assignment_id == request.role_assignment_ref
+                and item.actor_id == request.actor_ref
+                and item.role == "baseline-owner"
+                and item.state == "ACTIVE"
+            ),
+            None,
+        )
+        if role is None:
+            raise RpcApplicationError(
+                RpcErrorCode.DOMAIN_REJECTED, "baseline authority role missing"
+            )
 
     def _record(self, request: RecordReadInput, record_type: str) -> ControlRecord:
         item = self._records.read(request.project_id, "REVISION", request.record_id)

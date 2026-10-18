@@ -61,23 +61,29 @@ class ResearchControls:
             lease = self.host.records.journal_read(project, f"lease:{thread_id}", ResearchLease)
             active = lease is not None and lease.state == "HELD"
             state = ThreadExecutionState.PAUSE_PENDING if active else ThreadExecutionState.PAUSED
-            if not self.host.threads.update(
-                thread.model_copy(
-                    update={"execution_state": state, "revision": thread.revision + 1}
-                ),
-                expected_revision=thread.revision,
-            ):
-                raise ValueError("THREAD_REVISION_CHANGED")
             status = "PAUSE_REQUESTED" if active else "PAUSED"
-            self.host.records.journal(
-                project, operation.operation_id, attempt.model_copy(update={"status": status})
-            )
+            # Already in the requested pause (thread and attempt both): write nothing.
+            repeated = thread.execution_state == state and attempt.status == status
+            if not repeated:
+                if not self.host.threads.update(
+                    thread.model_copy(
+                        update={"execution_state": state, "revision": thread.revision + 1}
+                    ),
+                    expected_revision=thread.revision,
+                ):
+                    raise ValueError("THREAD_REVISION_CHANGED")
+                self.host.records.journal(
+                    project, operation.operation_id, attempt.model_copy(update={"status": status})
+                )
         return {
             "project_id": project,
             "thread_id": thread_id,
             "operation_id": operation.operation_id,
             "execution_state": state.value,
             "pause_accepted": True,
+            **(
+                {"unchanged": True, "unchanged_reason": "THREAD_ALREADY_PAUSED"} if repeated else {}
+            ),
         }
 
     async def resume(self, value: dict[str, JsonValue]) -> dict[str, JsonValue] | AcceptedRunning:
@@ -115,6 +121,25 @@ class ResearchControls:
             lease = self.host.records.journal_read(
                 operation.project_id, f"lease:{thread_id}", ResearchLease
             )
+            if (
+                attempt.status == "RUNNING"
+                and lease is not None
+                and lease.state == "HELD"
+                and lease.expires_at > self.host.records.clock.now()
+                and self.host.leases.worker.is_alive(
+                    lease.process_id, lease.process_marker, lease.worker_id
+                )
+                is True
+            ):
+                # Already running under a live worker: no write and no second dispatch. (A dead,
+                # unknown or expired holder still takes the recovery path below.)
+                return {
+                    **self.host.accepted_value(attempt),
+                    "resume_allowed": True,
+                    "execution_state": thread.execution_state.value,
+                    "unchanged": True,
+                    "unchanged_reason": "THREAD_ALREADY_RESUMED",
+                }
             state = (
                 ThreadExecutionState.RUNNING
                 if lease is not None and lease.state == "HELD"
@@ -141,6 +166,13 @@ class ResearchControls:
         result = await self.host.legacy.stop(value)
         if found is not None:
             attempt, operation = found
+            if result.get("unchanged") is True:
+                if operation.state != OperationState.RUNNING:
+                    result["cancelled"] = False  # this request cancelled nothing new
+                    return result
+                # Stopped thread, request still running (a first stop was cut off before it
+                # cancelled): finish that cancel now, as a normal stop.
+                del result["unchanged"], result["unchanged_reason"]
             self.host.operations.cancel(
                 operation.operation_id, completed_at=self.host.records.clock.now()
             )
