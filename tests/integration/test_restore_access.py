@@ -53,7 +53,7 @@ async def test_read_only_principal_gets_real_preview_without_writes_and_cannot_a
         )
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=create_app(runtime.bus, auth=auth)),
-            base_url="http://test",
+            base_url="http://127.0.0.1:8765",
         ) as client:
             issued = await client.post(
                 "/auth/session",

@@ -34,6 +34,9 @@ class ActionStorePort(Protocol):
     def list_authorizations(
         self, project_id: str, plan_id: str | None
     ) -> tuple[AuthorizationEnvelopeRecord, ...]: ...
+    def has_authorization_successor(
+        self, project_id: str, authorization_id: str, revision_digest: str
+    ) -> bool: ...
     def append_audit(self, value: ActionAuditRecord) -> None: ...
     def list_audit(
         self, project_id: str, subject_id: str | None

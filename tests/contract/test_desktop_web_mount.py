@@ -12,7 +12,7 @@ def test_same_origin_serves_ui_and_healthz(tmp_path: Path, monkeypatch: object) 
     (dist / "index.html").write_text("<html>THOTH UI</html>", encoding="utf-8")
     monkeypatch.setenv("THOTH_WEB_DIST", str(dist))  # type: ignore[union-attr]
     monkeypatch.setenv("THOTH_WORKSPACE", str(tmp_path / "ws"))  # type: ignore[union-attr]
-    client = TestClient(create_app())
+    client = TestClient(create_app(), base_url="http://127.0.0.1:8765")
     assert client.get("/healthz").json()["status"] == "ok"
     assert "THOTH UI" in client.get("/").text
 

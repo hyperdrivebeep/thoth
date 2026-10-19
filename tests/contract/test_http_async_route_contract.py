@@ -189,7 +189,9 @@ async def test_cancel_denies_each_owner_mismatch_without_touching_original_task(
     auth = StaticActorAuth({"owner": actor, "other": other})
     async with (
         running_app(tmp_path, auth) as (app, bundle, _blocker, _observed),
-        httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client,
+        httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:8765"
+        ) as client,
     ):
         started = await client.post(
             "/rpc/async", json=request_body(), headers={"authorization": "Bearer owner"}
@@ -215,7 +217,9 @@ async def test_matching_owner_scope_order_can_cancel_and_get_requires_rpc(tmp_pa
     auth = StaticActorAuth({"owner": actor, "reordered": reordered})
     async with (
         running_app(tmp_path, auth) as (app, bundle, _blocker, _observed),
-        httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client,
+        httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:8765"
+        ) as client,
     ):
         started = await client.post(
             "/rpc/async", json=request_body(), headers={"authorization": "Bearer owner"}
@@ -250,7 +254,9 @@ async def test_matching_owner_scope_order_can_cancel_and_get_requires_rpc(tmp_pa
 async def test_local_missing_or_wrong_project_read_and_empty_cancel(tmp_path: Path) -> None:
     async with (
         running_app(tmp_path) as (app, _bundle, _blocker, _observed),
-        httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client,
+        httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:8765"
+        ) as client,
     ):
         started = await client.post("/rpc/async", json=request_body())
         identifier = started.json()["result"]["operation_id"]
@@ -300,7 +306,9 @@ async def test_async_preclaim_rejections_never_resolve_runtime(
 async def test_local_identity_denial_never_claims_or_creates_a_task(tmp_path: Path) -> None:
     async with (
         running_app(tmp_path) as (app, _bundle, _blocker, observed),
-        httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client,
+        httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:8765"
+        ) as client,
     ):
         response = await client.post("/rpc/async", json=request_body(actor_id="human:spoofed"))
         assert response.status_code == 200
@@ -314,7 +322,7 @@ async def test_lifespan_cancels_task_from_the_same_registry(tmp_path: Path) -> N
         async with (
             app.router.lifespan_context(app),
             httpx.AsyncClient(
-                transport=httpx.ASGITransport(app=app), base_url="http://test"
+                transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:8765"
             ) as client,
         ):
             started = await client.post("/rpc/async", json=request_body())
@@ -342,7 +350,9 @@ async def test_custom_local_actor_is_forwarded_at_request_time(
 
     async with (
         running_app(tmp_path, local_actor_id="human:custom-local") as (app, _, blocker, observed),
-        httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client,
+        httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:8765"
+        ) as client,
     ):
         monkeypatch.setattr(http_app, "_claim_local_rpc", claim)
         response = await client.post("/rpc/async", json=request_body(actor_id="human:custom-local"))

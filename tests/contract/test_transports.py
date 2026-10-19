@@ -37,7 +37,7 @@ async def test_stdio_and_http_return_same_payload(command_bus: CommandBus) -> No
     )
 
     transport = httpx.ASGITransport(app=create_app(command_bus))
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+    async with httpx.AsyncClient(transport=transport, base_url="http://127.0.0.1:8765") as client:
         http_response = await client.post(
             "/rpc", content=request, headers={"content-type": "application/json"}
         )

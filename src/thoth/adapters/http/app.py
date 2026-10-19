@@ -29,6 +29,7 @@ from thoth.adapters.http.hosted_review import (
     is_hosted_credential_method,
 )
 from thoth.adapters.http.internal_routes import mount_internal_routes
+from thoth.adapters.http.local_request_guard import LocalRequestGuard
 from thoth.adapters.storage.workspace_owner import WorkspaceInUse
 from thoth.apps.hosted_review_dispatch import hosted_dispatch
 from thoth.apps.hosted_review_snapshot import (
@@ -217,6 +218,8 @@ def create_app(
         version=__version__,
         lifespan=lifespan,
     )
+    if not hosted_mode():
+        application.add_middleware(LocalRequestGuard)
     application.state.bus = bus
     application.state.runtime = None
     application.state.session_runtimes = {}
@@ -309,7 +312,6 @@ def create_app(
     return application
 
 
-
 def _mount_async_rpc_route(
     application: FastAPI, auth: HttpAuthenticationPort | None, local_actor_id: str
 ) -> None:
@@ -337,13 +339,10 @@ def _mount_internal_routes(application: FastAPI) -> None:
         _resolve_bus_for_request=lambda app, request: _resolve_bus_for_request(app, request),
     )
 
+
 def web_ui_dist() -> Path | None:
     raw = os.environ.get("THOTH_WEB_DIST")
-    dist = (
-        Path(raw)
-        if raw
-        else Path(__file__).resolve().parents[4] / "apps" / "web" / "dist"
-    )
+    dist = Path(raw) if raw else Path(__file__).resolve().parents[4] / "apps" / "web" / "dist"
     if (dist / "index.html").is_file():
         return dist
     return None

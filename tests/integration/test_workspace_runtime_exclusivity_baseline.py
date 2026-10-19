@@ -128,7 +128,9 @@ async def test_the_local_server_opens_its_runtime_on_the_first_request(
     application = create_app()
     transport = httpx.ASGITransport(app=application)
     try:
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             assert (await client.get("/healthz")).status_code == 200
             assert application.state.runtime is None
             assert not (workspace / "db").exists()

@@ -725,7 +725,7 @@ async def test_http_session_expiry_during_evaluation_holds_activation(
         )
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=create_app(runtime.bus, auth=auth)),
-            base_url="http://test",
+            base_url="http://127.0.0.1:8765",
         ) as client:
             response = await client.post(
                 "/rpc",

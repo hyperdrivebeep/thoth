@@ -8,6 +8,10 @@ verification state is in [VERIFICATION.md](VERIFICATION.md).
 
 한국어 안내: [KNOWN_LIMITATIONS.ko.md](KNOWN_LIMITATIONS.ko.md)
 
+## Local access trusts the user of this computer
+
+Local mode assumes one user and trusts programs on the same computer without authenticating them. The server checks local Host names and, for requests that can change state, accepts only local HTTP Origins when an Origin is present; RPC and cancellation requests also require JSON. This rejects requests with foreign Host/Origin values and plain-text RPC bodies while preserving the built-in UI, the Vite development proxy and local JSON clients. These checks are not authentication: another program on this computer can omit Origin and send allowed headers. Hosted review has separate access controls.
+
 ## One THOTH process per workspace is enforced
 
 A workspace is open in one THOTH process at a time. Starting a second one on the same workspace

@@ -140,7 +140,7 @@ async def test_source_connect_caller_cancel_during_cleanup_is_not_swallowed(
         monkeypatch.setattr(ControlRecordService, "create", create)
         app = create_app(runtime.bus)
         async with httpx.AsyncClient(
-            transport=httpx.ASGITransport(app=app), base_url="http://test"
+            transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:8765"
         ) as client:
             response = await client.post(
                 "/rpc/async",

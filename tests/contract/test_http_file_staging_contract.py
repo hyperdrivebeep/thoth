@@ -140,7 +140,7 @@ async def test_authenticated_project_and_late_workspace_callback_are_consumed(
 
     monkeypatch.setattr(http_app, "_workspace_path_for_request", workspace)
     async with httpx.AsyncClient(
-        transport=httpx.ASGITransport(app=app), base_url="http://test"
+        transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:8765"
     ) as client:
         response = await client.post(
             "/files/stage",
@@ -167,7 +167,7 @@ async def test_hosted_transport_denial_precedes_helper_and_inbox(
 
     monkeypatch.setattr(http_app, "_workspace_path_for_request", forbidden)
     async with httpx.AsyncClient(
-        transport=httpx.ASGITransport(app=app), base_url="http://test"
+        transport=httpx.ASGITransport(app=app), base_url="http://127.0.0.1:8765"
     ) as client:
         response = await client.post(
             "/files/stage",

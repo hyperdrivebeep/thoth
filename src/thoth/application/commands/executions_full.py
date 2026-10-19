@@ -30,6 +30,7 @@ from thoth.application.services.execution_service import ExecutionService
 from thoth.application.services.sandbox_service import SandboxService
 from thoth.domain.action_full import ActionPlanRecord
 from thoth.domain.auth import current_authenticated_actor
+from thoth.domain.authorization_errors import AuthorizationAlreadyConsumed
 from thoth.domain.execution_full import PlanExecutionRecord, StepExecutionAttemptRecord
 from thoth.domain.sandbox import SandboxFailure, SandboxRunSpec
 from thoth.ports.action import ActionStorePort
@@ -277,6 +278,10 @@ class ExecutionHandlers:
                 str(exc),
                 data=data,
             ) from exc
+        except AuthorizationAlreadyConsumed as exc:
+            raise RpcApplicationError(
+                RpcErrorCode.DOMAIN_REJECTED, str(exc), data={"reason_code": exc.reason_code}
+            ) from exc
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
         return cast(
@@ -316,6 +321,10 @@ class ExecutionHandlers:
             execution, attempts, commit = self._service.resume(
                 current, self._plan(current), request.checkpoint_digest
             )
+        except AuthorizationAlreadyConsumed as exc:
+            raise RpcApplicationError(
+                RpcErrorCode.DOMAIN_REJECTED, str(exc), data={"reason_code": exc.reason_code}
+            ) from exc
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
         return {
@@ -367,6 +376,10 @@ class ExecutionHandlers:
                 failed_attempt_id=request.failed_attempt_id,
                 retry_reason=request.retry_reason,
             )
+        except AuthorizationAlreadyConsumed as exc:
+            raise RpcApplicationError(
+                RpcErrorCode.DOMAIN_REJECTED, str(exc), data={"reason_code": exc.reason_code}
+            ) from exc
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
         return {
@@ -391,6 +404,10 @@ class ExecutionHandlers:
                     method=request.reconciliation_method,
                 )
             )
+        except AuthorizationAlreadyConsumed as exc:
+            raise RpcApplicationError(
+                RpcErrorCode.DOMAIN_REJECTED, str(exc), data={"reason_code": exc.reason_code}
+            ) from exc
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
         return {
