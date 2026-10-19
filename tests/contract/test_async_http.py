@@ -99,7 +99,9 @@ async def test_async_rpc_returns_operation_then_cancels_running_task(
     application = create_app(bus)
     transport = httpx.ASGITransport(app=application)
     try:
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             started = await client.post("/rpc/async", json=_request())
             assert started.status_code == 200
             payload = started.json()
@@ -170,7 +172,9 @@ async def test_authenticated_async_cancel_requires_original_actor_session(
     application = create_app(bus, auth=auth)
     transport = httpx.ASGITransport(app=application)
     try:
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             started = await client.post(
                 "/rpc/async",
                 json=_request(),

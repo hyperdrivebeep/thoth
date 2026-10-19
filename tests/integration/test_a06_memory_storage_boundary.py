@@ -502,7 +502,7 @@ async def test_real_http_session_stays_current_through_memory_review(
         monkeypatch.setattr(DeterministicRoleMemoryReviewer, "review", review)
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=create_app(runtime.bus, auth=auth)),
-            base_url="http://test",
+            base_url="http://127.0.0.1:8765",
         ) as client:
             response = await client.post(
                 "/rpc",

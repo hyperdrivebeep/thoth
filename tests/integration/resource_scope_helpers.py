@@ -150,7 +150,7 @@ async def scope_peer(original: ScopeHarness) -> AsyncGenerator[ScopeHarness]:
         )
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=create_app(runtime.bus, auth=auth)),
-            base_url="http://test",
+            base_url="http://127.0.0.1:8765",
         ) as client:
             yield ScopeHarness(
                 original.workspace,
@@ -241,7 +241,7 @@ async def scope_harness(
         )
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=create_app(runtime.bus, auth=auth)),
-            base_url="http://test",
+            base_url="http://127.0.0.1:8765",
         ) as client:
             tokens: dict[str, str] = {}
             for name, actor in actors.items():

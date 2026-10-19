@@ -71,7 +71,9 @@ async def test_http_rpc_denies_unauthenticated_request_before_bus_io(tmp_path: P
             )
         app = create_app(runtime.bus, auth=DenyAllAuth())
         transport = httpx.ASGITransport(app=app)
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             response = await client.post(
                 "/rpc",
                 json={
@@ -166,7 +168,9 @@ async def test_two_authenticated_scoped_actors_branch_merge_and_bind_revision_re
             ids=UuidIdGenerator(),
         )
         transport = httpx.ASGITransport(app=create_app(runtime.bus, auth=auth))
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             sessions: dict[str, dict[str, JsonValue]] = {}
             for actor in (alice, bob, scoped):
                 response = await client.post(

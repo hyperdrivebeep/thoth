@@ -372,7 +372,9 @@ async def test_device_login_http_rpc_persists_integer_expiry_and_replays_once(
         }
 
     try:
-        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             response = await client.post("/rpc", json=start_request)
             assert response.status_code == 200, response.text
             started = response.json()["result"]
@@ -540,19 +542,29 @@ async def test_manual_complete_secret_is_ephemeral_in_normal_rpc(
         assert replay == operation.result
 
         def reject(
-            self: LocalModelCredentials, provider: str, login_id: str,
-            response: str, auth_method: str,
+            self: LocalModelCredentials,
+            provider: str,
+            login_id: str,
+            response: str,
+            auth_method: str,
         ) -> dict[str, object]:
             del self, provider, login_id, auth_method
             raise ModelCredentialError(response)
 
         monkeypatch.setattr(LocalModelCredentials, "submit_login_response", reject)
-        rejected = await runtime.bus.dispatch(request(
-            "model/credential/login/complete", "manual-secret-error",
-            {"project_id": "system:workspace", "provider": "anthropic",
-             "auth_method": "claude_pkce", "login_id": "synthetic-attempt",
-             "response": secret},
-        ))
+        rejected = await runtime.bus.dispatch(
+            request(
+                "model/credential/login/complete",
+                "manual-secret-error",
+                {
+                    "project_id": "system:workspace",
+                    "provider": "anthropic",
+                    "auth_method": "claude_pkce",
+                    "login_id": "synthetic-attempt",
+                    "response": secret,
+                },
+            )
+        )
         assert rejected.error is not None
         assert rejected.error.message == "MODEL_LOGIN_COMPLETE_FAILED"
         assert secret not in rejected.model_dump_json()

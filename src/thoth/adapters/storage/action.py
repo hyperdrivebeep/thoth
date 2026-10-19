@@ -292,10 +292,7 @@ class SqliteActionStore(ActionStorePort):
                         action_authorizations.c.project_id == project_id,
                         action_authorizations.c.authorization_id == authorization_id,
                     )
-                    .order_by(
-                        action_authorizations.c.created_at.desc(),
-                        literal_column("rowid", Integer()).desc(),
-                    )
+                    .order_by(literal_column("rowid", Integer()).desc())
                     .limit(1)
                 )
                 .mappings()
@@ -320,9 +317,7 @@ class SqliteActionStore(ActionStorePort):
             statement = statement.where(action_authorizations.c.plan_id == plan_id)
         with read_connection(self._engine) as connection:
             rows = connection.execute(
-                statement.order_by(
-                    action_authorizations.c.created_at, literal_column("rowid", Integer())
-                )
+                statement.order_by(literal_column("rowid", Integer()))
             ).mappings()
             values = tuple(
                 AuthorizationEnvelopeRecord.model_validate(load(row["content_json"]))
@@ -337,6 +332,22 @@ class SqliteActionStore(ActionStorePort):
             if self._resource_access is None
             or self._resource_access.may_read_revision(project_id, latest[key].plan_revision_digest)
         )
+
+    def has_authorization_successor(
+        self, project_id: str, authorization_id: str, revision_digest: str
+    ) -> bool:
+        with read_connection(self._engine) as connection:
+            rows = connection.execute(
+                select(action_authorizations.c.content_json).where(
+                    action_authorizations.c.project_id == project_id,
+                    action_authorizations.c.authorization_id == authorization_id,
+                )
+            ).scalars()
+            return any(
+                AuthorizationEnvelopeRecord.model_validate(load(row)).supersedes_revision_digest
+                == revision_digest
+                for row in rows
+            )
 
     def append_audit(self, value: ActionAuditRecord) -> None:
         with write_connection(self._engine) as connection:

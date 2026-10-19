@@ -7,6 +7,7 @@ from collections.abc import Callable
 from thoth.application.services.hypothesis_link_view import HypothesisLinkReader
 from thoth.domain.action_full import ActionAuditRecord, AuthorizationEnvelopeRecord
 from thoth.domain.auth import require_authenticated_authority
+from thoth.domain.authorization_errors import AuthorizationAlreadyConsumed
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.ports.action import ActionStorePort
 from thoth.ports.governance import GovernanceStorePort
@@ -28,7 +29,11 @@ def consume_authorization(
     with ledger.transaction():
         current = store.read_authorization(expected.project_id, expected.authorization_id)
         if current is None or current.revision_digest != expected.revision_digest:
-            raise ValueError("authorization revision changed before consumption")
+            raise AuthorizationAlreadyConsumed()
+        if store.has_authorization_successor(
+            expected.project_id, expected.authorization_id, expected.revision_digest
+        ):
+            raise AuthorizationAlreadyConsumed()
         if current.state != "APPROVED":
             raise ValueError("authorization is not approved")
         if current.exact_scope_digest != exact_scope_digest:

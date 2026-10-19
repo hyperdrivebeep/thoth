@@ -15,7 +15,7 @@ async def test_file_stage_writes_content_addressed_inbox_file(
     workspace = tmp_path / "workspace"
     monkeypatch.setenv("THOTH_WORKSPACE", str(workspace))
     transport = httpx.ASGITransport(app=create_app())
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+    async with httpx.AsyncClient(transport=transport, base_url="http://127.0.0.1:8765") as client:
         response = await client.post(
             "/files/stage",
             files={"file": ("../계획서.md", b"# approved plan\n", "text/markdown")},
@@ -38,7 +38,7 @@ async def test_file_stage_bounds_name_and_reuses_verified_digest(
     monkeypatch.setenv("THOTH_WORKSPACE", str(workspace))
     transport = httpx.ASGITransport(app=create_app())
     name = f"{'a' * 300}.md"
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+    async with httpx.AsyncClient(transport=transport, base_url="http://127.0.0.1:8765") as client:
         first = await client.post(
             "/files/stage",
             files={"file": (name, b"bounded", "text/markdown")},
@@ -62,7 +62,7 @@ async def test_file_stage_rejects_unsupported_type(
 ) -> None:
     monkeypatch.setenv("THOTH_WORKSPACE", str(tmp_path / "workspace"))
     transport = httpx.ASGITransport(app=create_app())
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+    async with httpx.AsyncClient(transport=transport, base_url="http://127.0.0.1:8765") as client:
         response = await client.post(
             "/files/stage",
             files={"file": ("payload.exe", b"MZ", "application/octet-stream")},
@@ -79,7 +79,7 @@ async def test_file_stage_rejects_corrupt_existing_digest_path(
     workspace = tmp_path / "workspace"
     monkeypatch.setenv("THOTH_WORKSPACE", str(workspace))
     transport = httpx.ASGITransport(app=create_app())
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+    async with httpx.AsyncClient(transport=transport, base_url="http://127.0.0.1:8765") as client:
         first = await client.post(
             "/files/stage",
             files={"file": ("plan.md", b"trusted", "text/markdown")},
@@ -105,7 +105,7 @@ async def test_file_stage_takes_yaml_as_plain_text_and_keeps_its_name(
     monkeypatch.setenv("THOTH_WORKSPACE", str(workspace))
     transport = httpx.ASGITransport(app=create_app())
     body = b"identity: example\nnumerator: 19\n"
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+    async with httpx.AsyncClient(transport=transport, base_url="http://127.0.0.1:8765") as client:
         response = await client.post(
             "/files/stage",
             files={"file": (name, body, "application/octet-stream")},
@@ -126,7 +126,7 @@ async def test_file_stage_still_rejects_other_types_next_to_yaml(
 ) -> None:
     monkeypatch.setenv("THOTH_WORKSPACE", str(tmp_path / "workspace"))
     transport = httpx.ASGITransport(app=create_app())
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+    async with httpx.AsyncClient(transport=transport, base_url="http://127.0.0.1:8765") as client:
         response = await client.post(
             "/files/stage",
             files={"file": (name, b"a: 1\n", "text/plain")},

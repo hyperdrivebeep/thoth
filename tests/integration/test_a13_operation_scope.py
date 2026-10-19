@@ -131,7 +131,9 @@ async def harness(tmp_path: Path, request: pytest.FixtureRequest) -> AsyncIterat
     assert legacy.result is not None
     transport = httpx.ASGITransport(app=create_app(runtime.bus, auth=auth_service(runtime)))
     try:
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             for alias in (*scopes, "renewed"):
                 actor = "alpha" if alias == "renewed" else alias
                 issued = await client.post(
@@ -348,7 +350,9 @@ async def test_operation_scope_and_result_persist_after_reopen(
     reopened = create_runtime(tmp_path / "scope")
     transport = httpx.ASGITransport(app=create_app(reopened.bus, auth=auth_service(reopened)))
     try:
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             restored = ScopeHarness(
                 reopened,
                 client,

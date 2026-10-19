@@ -347,7 +347,9 @@ async def test_a_server_not_started_by_the_cli_answers_503_until_the_workspace_i
     }
     transport = httpx.ASGITransport(app=application)
     try:
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             with _holder(tmp_path, workspace, _LOCK_HOLDER):
                 refused = await client.post("/rpc", json=body)
                 assert refused.status_code == 503

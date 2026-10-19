@@ -93,7 +93,9 @@ async def test_local_loopback_rejects_protected_actor_ref_override(tmp_path: Pat
     application = create_app(runtime.bus)
     transport = httpx.ASGITransport(app=application)
     try:
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             response = await client.post(
                 "/rpc",
                 json={
@@ -201,7 +203,9 @@ async def test_authenticated_upload_path_is_project_scoped_at_stage_and_connect(
             auth=StaticProjectAuth({"token-a": context_a, "token-b": context_b}),
         )
         transport = httpx.ASGITransport(app=application)
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             staged = await client.post(
                 "/files/stage",
                 files={"file": ("plan.md", b"# project A\n", "text/markdown")},

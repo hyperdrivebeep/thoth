@@ -35,7 +35,7 @@ prepare = _load()
 @pytest.fixture
 def api(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[Any]:
     monkeypatch.setenv("THOTH_WORKSPACE", str(tmp_path / "workspace"))
-    with TestClient(create_app()) as client:
+    with TestClient(create_app(), base_url="http://127.0.0.1:8765") as client:
 
         def send(path: str, body: bytes, headers: dict[str, str]) -> dict[str, Any]:
             response = client.post(path, content=body, headers=headers)

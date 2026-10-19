@@ -333,9 +333,7 @@ async def test_persisted_self_queue_projects_hold_without_rewriting_record(
     assert operation is not None
     item = handler.queue.read(operation)
     assert item is not None
-    handler.queue.store.save(
-        item.model_copy(update={"after_operation_id": item.operation_id})
-    )
+    handler.queue.store.save(item.model_copy(update={"after_operation_id": item.operation_id}))
     runtime.bus.close_tasks()
     await runtime.bus.drain()
     runtime.close()
@@ -383,7 +381,7 @@ async def test_hosted_http_accepts_same_thread_queue_without_superseding_first(
     runtime = await setup(tmp_path, model, source=False)
     client = httpx.AsyncClient(
         transport=httpx.ASGITransport(app=create_app(runtime.bus)),
-        base_url="http://test",
+        base_url="http://127.0.0.1:8765",
         headers={"x-thoth-review-session": "queue-http-session"},
     )
     try:

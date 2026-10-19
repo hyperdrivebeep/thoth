@@ -82,10 +82,20 @@ def approved_authorization(
 ) -> AuthorizationEnvelopeRecord | None:
     """The approved envelope that still covers this step, if any."""
 
+    by_id: dict[str, dict[str, AuthorizationEnvelopeRecord]] = {}
+    for item in envelopes:
+        by_id.setdefault(item.authorization_id, {})[item.revision_digest] = item
+    current: list[AuthorizationEnvelopeRecord] = []
+    for revisions in by_id.values():
+        superseded = {item.supersedes_revision_digest for item in revisions.values()}
+        tips = [item for digest, item in revisions.items() if digest not in superseded]
+        # Ambiguous branches must not revive an earlier APPROVED revision.
+        if len(tips) == 1:
+            current.append(tips[0])
     return next(
         (
             item
-            for item in envelopes
+            for item in current
             if item.step_id == step.get("step_id")
             and item.state == "APPROVED"
             and authorization_applies(item, plan, step)

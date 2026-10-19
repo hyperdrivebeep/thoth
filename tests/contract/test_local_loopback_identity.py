@@ -48,7 +48,9 @@ async def test_local_loopback_rejects_spoofed_actor_before_command_bus_io(
     bus = CommandBus(registry, operations, SystemClock(), UuidIdGenerator())
     transport = httpx.ASGITransport(app=create_app(bus))
     try:
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             denied = await client.post("/rpc", json=rpc("human:spoof"))
 
         payload = denied.json()
@@ -81,7 +83,9 @@ async def test_local_loopback_accepts_fixed_actor_without_claiming_authenticatio
     bus = CommandBus(registry, operations, SystemClock(), UuidIdGenerator())
     transport = httpx.ASGITransport(app=create_app(bus))
     try:
-        async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://127.0.0.1:8765"
+        ) as client:
             accepted = await client.post("/rpc", json=rpc("human:local-user"))
 
         payload = accepted.json()

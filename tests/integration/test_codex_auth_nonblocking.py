@@ -31,16 +31,16 @@ async def test_slow_credential_status_keeps_health_and_saved_project_read_live(
 
     try:
         created = await runtime.bus.dispatch(
-                request(
-                    "project/create",
-                    "create",
-                    {
-                        "project_id": "project:nonblocking",
-                        "name": "Saved",
-                        "cutoff_at": "2026-09-01T00:00:00Z",
-                    },
-                )
+            request(
+                "project/create",
+                "create",
+                {
+                    "project_id": "project:nonblocking",
+                    "name": "Saved",
+                    "cutoff_at": "2026-09-01T00:00:00Z",
+                },
             )
+        )
         value(created)
         assert created.result is not None
         operation_id = created.result["operation_id"]
@@ -56,7 +56,8 @@ async def test_slow_credential_status_keeps_health_and_saved_project_read_live(
         )
         assert await asyncio.to_thread(entered.wait, 3)
         async with httpx.AsyncClient(
-            transport=httpx.ASGITransport(app=create_app(runtime.bus)), base_url="http://test"
+            transport=httpx.ASGITransport(app=create_app(runtime.bus)),
+            base_url="http://127.0.0.1:8765",
         ) as client:
             health = await asyncio.wait_for(client.get("/healthz"), timeout=1)
         saved = await asyncio.wait_for(
@@ -127,9 +128,7 @@ async def test_normal_rpc_reads_isolated_account_catalog_and_pending_login(
         assert openai["execution_verified"] is False
         settings = value(
             await runtime.bus.dispatch(
-                request(
-                    "model/settings/read", "settings", {"project_id": "project:codex-rpc"}
-                )
+                request("model/settings/read", "settings", {"project_id": "project:codex-rpc"})
             )
         )
         assert any(item["model"] == "synthetic-codex" for item in settings["model_options"])
