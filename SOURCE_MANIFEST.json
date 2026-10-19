@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-19T10:25:51.945157+00:00",
+  "created_at": "2026-10-19T13:28:27.492646+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -1878,7 +1878,7 @@
     },
     {
       "path": "config/module-responsibility-budget.json",
-      "sha256": "428bab7a87160af210a40f3d8c5a8762aa588981bdbbc07cf53c8509f83b7195",
+      "sha256": "2c8eee608d261d612e04010f1e3e18bd1df3549a91b91d323beee60316924f58",
       "bytes": 8580
     },
     {
@@ -1948,13 +1948,13 @@
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.ko.md",
-      "sha256": "d8b0bd6598ae913e90c5144b163d6938009845e06c179ca21e56f0cd24b4e33f",
-      "bytes": 8165
+      "sha256": "777febcf50b13b2878658fe826e34c0230d3d9930efbf9cea72897facfcefe60",
+      "bytes": 8864
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.md",
-      "sha256": "1d782ae99f440fdd981ae120ab33592b8f90d6146d4b47f07d2bb314fac3398e",
-      "bytes": 7100
+      "sha256": "f294c9aaaefcca87c0d61f9704d0bbf3a9a97568bcf00570467eec74128ce113",
+      "bytes": 7626
     },
     {
       "path": "docs/KNOWN_TEST_FAILURES.json",
@@ -2508,8 +2508,8 @@
     },
     {
       "path": "migrations/env.py",
-      "sha256": "feb20ec5fb10d3cb726e07d14b1b6c5ae413a18b1072f5de787c930ad3555c54",
-      "bytes": 1820
+      "sha256": "34cf2a8e8da9eeecd7771517a2a8f4cb828404710abea66e502a491e065e4396",
+      "bytes": 1904
     },
     {
       "path": "migrations/script.py.mako",
@@ -2560,6 +2560,11 @@
       "path": "migrations/versions/3dca0215d6a9_f4_outcome.py",
       "sha256": "613e8a6fb5593ebb8fea445bd1717211f6c4fdc6d69176e8099c166190a4b9fd",
       "bytes": 3880
+    },
+    {
+      "path": "migrations/versions/4c17f5089ea3_operation_owners.py",
+      "sha256": "11e8a4955e3a8515118e907bbda150856a27b71a8369a10874f1624b15c02781",
+      "bytes": 702
     },
     {
       "path": "migrations/versions/4edb1326e7ba_control_records.py",
@@ -3732,6 +3737,11 @@
       "bytes": 9429
     },
     {
+      "path": "src/thoth/adapters/operation_host_identity.py",
+      "sha256": "35342a6370b5fd7cfaa22b0130bdab496fc5c2fe45f5f843d20706e168e827a9",
+      "bytes": 3277
+    },
+    {
       "path": "src/thoth/adapters/parsers/__init__.py",
       "sha256": "afd09e7f809b052ac67df1bad9d16f4bee4fb3ecce7e6cfdf5b7447f2efda6a8",
       "bytes": 141
@@ -4112,9 +4122,19 @@
       "bytes": 2463
     },
     {
+      "path": "src/thoth/adapters/storage/operation_owner_schema.py",
+      "sha256": "b3ff285f2e632dd1c0c223b3292606bd531bc7b096d28f83927b141e178c5a7d",
+      "bytes": 530
+    },
+    {
+      "path": "src/thoth/adapters/storage/operation_owner_store.py",
+      "sha256": "4b6e37108fe02464410bf56a4efd7b2f056a440f9047745776fcd79225970050",
+      "bytes": 1024
+    },
+    {
       "path": "src/thoth/adapters/storage/operations.py",
-      "sha256": "a69dc2b43fdab8bcdf3fb3962e95e9979205fa17e9e38aa6f1282e697b52ec8d",
-      "bytes": 17632
+      "sha256": "88eadd4ad1e2ba972821f30b11bcbf014d3d131f92c57c73d07b97108e33a2e7",
+      "bytes": 18053
     },
     {
       "path": "src/thoth/adapters/storage/outcome.py",
@@ -4218,8 +4238,8 @@
     },
     {
       "path": "src/thoth/adapters/storage/workspace_owner.py",
-      "sha256": "39e1eb1688ea5ed18d658d7f4cb3dde7e1950d130111e0e213eeef628d963e42",
-      "bytes": 6348
+      "sha256": "ec0f5d99b5e71ba00fc16f988ace72779788cdaa0a9f1ac011646ebf5f213584",
+      "bytes": 6935
     },
     {
       "path": "src/thoth/adapters/storage/workspace_setup.py",
@@ -6168,8 +6188,8 @@
     },
     {
       "path": "src/thoth/apps/resource_scope_composition.py",
-      "sha256": "c43ba984adac460a0add497ead45591c7cea145e8d9e4102d1e912aaaac8ad41",
-      "bytes": 6964
+      "sha256": "f29ad10251d86251ac70f5c6330ef08db1fefa631b3ad66c7e8ed41d0bdfca5a",
+      "bytes": 7204
     },
     {
       "path": "src/thoth/apps/restore_profiles.py",
@@ -6188,8 +6208,8 @@
     },
     {
       "path": "src/thoth/apps/runtime_entry.py",
-      "sha256": "981d5168692375e90e79e62cabe2c7f182ef4368791d32121d0b5541ee818d3a",
-      "bytes": 5011
+      "sha256": "b9bc5d885152e0fe4bc084678b8f17810facb37313a4c46651f1ce481413b50d",
+      "bytes": 6005
     },
     {
       "path": "src/thoth/apps/runtime_registration.py",
@@ -6638,8 +6658,8 @@
     },
     {
       "path": "src/thoth/domain/operation.py",
-      "sha256": "4cd49438c78a9ab1f7690a02d8a130d5a5d0de1a8fe31054dd80971a93194fb1",
-      "bytes": 1614
+      "sha256": "3838538ce23dfb081da960e2444421f5114a20ec264e068baf972aeeea95ee8b",
+      "bytes": 1934
     },
     {
       "path": "src/thoth/domain/outcome.py",
@@ -7203,8 +7223,8 @@
     },
     {
       "path": "src/thoth/protocol/bus.py",
-      "sha256": "96b88ef685f671415e29cdee5a6b5fdd864181da49856bf06f31e0eb42edf780",
-      "bytes": 31115
+      "sha256": "5a6f0012d36f4e719080566385916ce7441977baaaaaa6127f970b8b2f2d06a7",
+      "bytes": 31488
     },
     {
       "path": "src/thoth/protocol/deferred.py",
@@ -7233,8 +7253,13 @@
     },
     {
       "path": "src/thoth/protocol/operation_claim.py",
-      "sha256": "7d959c150a371bb2a0e9e2477c50fef1aecc4c5011975809e3531962ee987891",
-      "bytes": 583
+      "sha256": "da6237d8d5619e85cc650b2944730221ac29cb7c15e44d3988658f9c91a37554",
+      "bytes": 1121
+    },
+    {
+      "path": "src/thoth/protocol/operation_owner.py",
+      "sha256": "8f6da0b375e71715fe8ab4b959b8c41b9be1f7b826075ff0bc937dad4f0b8c73",
+      "bytes": 8187
     },
     {
       "path": "src/thoth/protocol/read_queries.py",
@@ -7513,8 +7538,8 @@
     },
     {
       "path": "tests/atomicity/harness.py",
-      "sha256": "2a1c0cdb5a6cc615a2992864e7e469881fa451a86d5172ddf924c275f03116e6",
-      "bytes": 6014
+      "sha256": "77de7714764378821c70ae59a82bc5bdff882b9d7a1c0836efa91138aa3ea812",
+      "bytes": 8892
     },
     {
       "path": "tests/atomicity/outcome_helpers.py",
@@ -7922,14 +7947,19 @@
       "bytes": 112407
     },
     {
+      "path": "tests/fixtures/sealable_methods.json",
+      "sha256": "feba3ef6fcde2e83ba7b5c9c376573a94b02dafaeafcf8da6ce4cefef14efb67",
+      "bytes": 2350
+    },
+    {
       "path": "tests/fixtures/storage_migration_ddl.json",
-      "sha256": "aa74ddf13cc5b40816dc22386a4da0a44603e463a47de30a64c5bc76c22b5352",
-      "bytes": 109395
+      "sha256": "7650d89b2e3d13106ab50fc4cebc691ddbfbc8c059d4871490b6057ef51d6b6d",
+      "bytes": 109872
     },
     {
       "path": "tests/fixtures/storage_schema_contract.json",
-      "sha256": "f9038cda6f0fce7eaf22022ff337afc5b1c4c71eeb66f268af6aab6c0e866144",
-      "bytes": 1396654
+      "sha256": "7352456044287d3c14955aa29fb7bcb3141fa95a545a3eba9890e8d54623adfa",
+      "bytes": 1560992
     },
     {
       "path": "tests/fixtures/structured_source_fixture.py",
@@ -8023,7 +8053,7 @@
     },
     {
       "path": "tests/integration/migration_head_helpers.py",
-      "sha256": "1a20359a8938c37ae8d7afe6f95068642d8af403195263dea9f32316230b7f56",
+      "sha256": "558317d21741346f81c115e2d2c60ea461d0831b60319593509756f470db7998",
       "bytes": 698
     },
     {
@@ -8073,8 +8103,8 @@
     },
     {
       "path": "tests/integration/schema_contract_probe.py",
-      "sha256": "477fb8231fcd57aa15c4efed0ffb309e28c5ba284faf82596393561963cbf842",
-      "bytes": 5725
+      "sha256": "c7dd94899f25b7fbdc4f793019ed87cd05a53acbc9bb06275caea145083ad987",
+      "bytes": 5808
     },
     {
       "path": "tests/integration/scoped_runtime.py",
@@ -8093,8 +8123,8 @@
     },
     {
       "path": "tests/integration/storage_coverage_helpers.py",
-      "sha256": "1e7e413b5b5debdd04fa7a687e2acd17193c955c976391a060833a1888258644",
-      "bytes": 2665
+      "sha256": "6a18b236a42439bcdecde9cb51de7e0bf079dc388b89a6e90683a87c3a6e31bb",
+      "bytes": 2689
     },
     {
       "path": "tests/integration/synthetic_field_baseline.py",
@@ -8363,8 +8393,8 @@
     },
     {
       "path": "tests/integration/test_action_step_add_step_id.py",
-      "sha256": "61d48c1d80db7a43812858e311777764ccf58e038304d9c9bb2463fb8304d4cf",
-      "bytes": 7319
+      "sha256": "0a3fe2fb46a20eca060b926abbe472eafcf4b41e1490e3ee92cc4ef38f6b447d",
+      "bytes": 7441
     },
     {
       "path": "tests/integration/test_active_behavior_consumed.py",
@@ -8508,8 +8538,8 @@
     },
     {
       "path": "tests/integration/test_d1_object_followup_atomicity.py",
-      "sha256": "3dac6c905c39f9cd3d566e99af64f338312dfb99771ed3b7eaa9dbdd573b6866",
-      "bytes": 15698
+      "sha256": "ee925b452b50cee46ec4ed634f3b839726e2f0fc4dabd102d02984c11273d995",
+      "bytes": 15839
     },
     {
       "path": "tests/integration/test_d2_counterevidence_stage.py",
@@ -8768,13 +8798,13 @@
     },
     {
       "path": "tests/integration/test_m3_action_authorization_atomicity.py",
-      "sha256": "e6d1c1c7c57a80908435d3dba119077b79ceeb54263b66fcdaa92a308d4c0da3",
-      "bytes": 26211
+      "sha256": "a41185e1c90a1e0b2dcd09baade22daff1dc62fd76b85722d52e35022c8e5a29",
+      "bytes": 26486
     },
     {
       "path": "tests/integration/test_m3_action_mutation_atomicity.py",
-      "sha256": "79f870a268a528ec5140dd868afdabbbeb706ec8066dcd698ce0005d7d937585",
-      "bytes": 32875
+      "sha256": "0d224249ac77c15abb54002a4f19f4e072f1d223143120c514ed801893b74f88",
+      "bytes": 33150
     },
     {
       "path": "tests/integration/test_m3_direct_test_binding_contract.py",
@@ -8783,13 +8813,13 @@
     },
     {
       "path": "tests/integration/test_m3_execution_effect_atomicity.py",
-      "sha256": "7838d6056ef61f727247543c5bf9ecf4d01d56e8125fafd3311ba92baa9bde62",
-      "bytes": 31334
+      "sha256": "40242101a1f779344f66d69cae8bff5cc2dee03a462c3bb93bccbdceb628b72b",
+      "bytes": 31609
     },
     {
       "path": "tests/integration/test_m3_execution_revision_atomicity.py",
-      "sha256": "a30deaf69c7695cbf7233e48bc242a7f7fe4b5225e966c3cef16bd298b316143",
-      "bytes": 22981
+      "sha256": "a897a144f056989f7a94a81b3cc5ae8007c58b1b47bece761185e4e0200c3092",
+      "bytes": 23256
     },
     {
       "path": "tests/integration/test_m3_hypothesis_auxiliary_atomicity.py",
@@ -8823,18 +8853,18 @@
     },
     {
       "path": "tests/integration/test_m3_object_mutation_atomicity.py",
-      "sha256": "964b7d293ce48d4127555661f4dfbe0211f3dcdf30ed279fdbbb05f3a8562ca3",
-      "bytes": 27362
+      "sha256": "fee25beeba736d033fcf43ce144cc3dae61cc2800acd17d57cc1ae3f00e39ee6",
+      "bytes": 27543
     },
     {
       "path": "tests/integration/test_m3_outcome_child_atomicity.py",
-      "sha256": "0f2f2054d3abcf7bb30969ee6fd5bebda42ccdf2cf1561fa7d0d3feaaf4afd2e",
-      "bytes": 30876
+      "sha256": "d072e490208a9f5505179e003b4829e7a912fa1ac01e6d5ec587e292ebbf1538",
+      "bytes": 31695
     },
     {
       "path": "tests/integration/test_m3_outcome_revision_atomicity.py",
-      "sha256": "f6468d7624162fda66f31900f1f35b225925e456d29c7fab82255ba80a0b1a00",
-      "bytes": 25504
+      "sha256": "8fc75182af37902a10b5541a117192daa8c22955c4a865d669eb2a6b6ef42e58",
+      "bytes": 25779
     },
     {
       "path": "tests/integration/test_m3_prediction_preparation_atomicity.py",
@@ -8848,8 +8878,8 @@
     },
     {
       "path": "tests/integration/test_m4_memory_control_multiwrite_observation.py",
-      "sha256": "c3f2bb4eaf2836b958e038d244c3074e016f60f19eb5b352282a1eba96b0e12e",
-      "bytes": 17723
+      "sha256": "49663656a8527b1f8c10311ef1edc731be6bee31e8af56293c4af46b649883ef",
+      "bytes": 18382
     },
     {
       "path": "tests/integration/test_m5_exposure_service_atomicity.py",
@@ -9020,6 +9050,31 @@
       "path": "tests/integration/test_operation_journal_failure_boundaries.py",
       "sha256": "7b269e5c1382f64823122be46004ea6e0679725d3ba6b6d9644523596e37a927",
       "bytes": 13419
+    },
+    {
+      "path": "tests/integration/test_operation_owner_atomicity.py",
+      "sha256": "c9d5937379847011fd6381efb2b1f2bf5c2447d57df294f347550ac34e5a8a5e",
+      "bytes": 4492
+    },
+    {
+      "path": "tests/integration/test_operation_owner_completion_race.py",
+      "sha256": "b01b01b8ad62891167943f2893791137f8ea34cc83c5c5ce33ea76952914e1cb",
+      "bytes": 7531
+    },
+    {
+      "path": "tests/integration/test_operation_owner_migration.py",
+      "sha256": "9d92163feccecd485ebaed50553e9adaa451e26315fae803f9818eb2b219b76b",
+      "bytes": 4851
+    },
+    {
+      "path": "tests/integration/test_operation_owner_recovery.py",
+      "sha256": "5a8bf32436df6ebf36f7d5dbc25d548ee4087201dd1887592ddd640b02b9138f",
+      "bytes": 6789
+    },
+    {
+      "path": "tests/integration/test_operation_owner_storage.py",
+      "sha256": "b7ab6e89c25983737be61165c897fe9225313e586379612c118f56f1430843cf",
+      "bytes": 9563
     },
     {
       "path": "tests/integration/test_operation_started_atomic.py",
@@ -9483,8 +9538,8 @@
     },
     {
       "path": "tests/integration/test_resource_scope_transition_boundaries.py",
-      "sha256": "cd12e11703e24014dc747d000be07fd08bc5a6e416ea9c3bf6b7eb2010949318",
-      "bytes": 16263
+      "sha256": "eecfac5e09c950b271e121060dad638e5aca7526a37713d0c3a7d982444e23e7",
+      "bytes": 18949
     },
     {
       "path": "tests/integration/test_restore_access.py",
@@ -9563,8 +9618,8 @@
     },
     {
       "path": "tests/integration/test_revision_full_rpc.py",
-      "sha256": "0ad36d95ea809f99c6e74db0cea6ce5a2560eb0bcb1fdcf056df3e4bbdfe45f5",
-      "bytes": 22002
+      "sha256": "f27a1c5773020ad0d53a78ad63d4a1d9cd48813901cfaf59036c0b7731f67a2b",
+      "bytes": 22230
     },
     {
       "path": "tests/integration/test_revision_merge_late_write_observation.py",
@@ -9688,8 +9743,8 @@
     },
     {
       "path": "tests/integration/test_stale_running_current_behavior.py",
-      "sha256": "b64169bb51afebab03c03497fa23b252049dff38954988e504cfe7e1a47d38ab",
-      "bytes": 13545
+      "sha256": "dd6ab402e02900c2e42504d0bc20e28faa8e94b8bb4771cf2a5e3786ba24fa38",
+      "bytes": 15507
     },
     {
       "path": "tests/integration/test_state_transition_noop.py",
@@ -9815,6 +9870,11 @@
       "path": "tests/integration/test_v2_cycle_lineage_values.py",
       "sha256": "7b5656a82f03b863c9e2bcce445385d79aac3450a3615c38ddb2e9d42094c194",
       "bytes": 2668
+    },
+    {
+      "path": "tests/integration/test_workspace_owner_pin.py",
+      "sha256": "4b62b04db34039b1ee9c5958b54f6b127b57f3b54fcc02f8fca6646aeaed02f2",
+      "bytes": 1578
     },
     {
       "path": "tests/integration/test_workspace_restart_storage.py",
@@ -11145,6 +11205,21 @@
       "path": "tests/unit/test_memory_terms.py",
       "sha256": "11edc80dabe3d3cb9a210613ea22428052e1be8cb0143c66e1914b355d8a6269",
       "bytes": 2321
+    },
+    {
+      "path": "tests/unit/test_operation_host_identity.py",
+      "sha256": "7cb67880b5deaebf2906087489764f3a80bfc68d95bb8eb33b672ba931626252",
+      "bytes": 7012
+    },
+    {
+      "path": "tests/unit/test_operation_owner_allowances.py",
+      "sha256": "78165376eab556e94660124f2ad7ca1645176ea52e6610ceb6d138d99f8a6288",
+      "bytes": 5114
+    },
+    {
+      "path": "tests/unit/test_operation_owner_policy.py",
+      "sha256": "c89a0ce411e1b781e551790c492e44fa44e8c5d365f4eef323626714a8f8246e",
+      "bytes": 6335
     },
     {
       "path": "tests/unit/test_operation_reentry_registry.py",

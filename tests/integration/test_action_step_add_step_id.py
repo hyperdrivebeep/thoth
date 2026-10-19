@@ -14,7 +14,12 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from tests.atomicity.harness import assert_phase_delta, failed_command_allowances, snapshot
+from tests.atomicity.harness import (
+    assert_phase_delta,
+    failed_command_allowances,
+    snapshot,
+    unchanged_or_operation_owner,
+)
 from tests.integration.scoped_runtime import create_runtime
 from tests.integration.storage_coverage_helpers import request, value
 from tests.integration.test_a03_storage_atomicity import setup
@@ -119,7 +124,10 @@ async def test_failed_step_add_never_publishes_a_plan_revision(
             assert named in await plan_steps(runtime, ctx, "d-step-read-success")
             return
         domain_changed = sorted(
-            name for name in before if name not in BOOKKEEPING and before[name] != after[name]
+            name
+            for name in before
+            if name not in BOOKKEEPING
+            and not unchanged_or_operation_owner(before, after, name, command)
         )
         assert domain_changed == [], ("error response left published rows", domain_changed)
         assert heads_after == heads_before

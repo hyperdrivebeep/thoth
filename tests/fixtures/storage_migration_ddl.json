@@ -1,7 +1,7 @@
 {
   "contract": {
     "heads": [
-      "3b06e4f87d92"
+      "4c17f5089ea3"
     ],
     "schema_rows": [
       [
@@ -1728,6 +1728,12 @@
       ],
       [
         "index",
+        "sqlite_autoindex_operation_owners_1",
+        "operation_owners",
+        null
+      ],
+      [
+        "index",
         "sqlite_autoindex_operation_resource_bindings_1",
         "operation_resource_bindings",
         null
@@ -2523,6 +2529,12 @@
         "object_relations",
         "object_relations",
         "CREATE TABLE object_relations (\n\trelation_revision_id VARCHAR(160) NOT NULL, \n\trelation_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tsource_object_id VARCHAR(160) NOT NULL, \n\trevision_digest VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tcreated_at VARCHAR(160) NOT NULL, \n\tPRIMARY KEY (relation_revision_id)\n)"
+      ],
+      [
+        "table",
+        "operation_owners",
+        "operation_owners",
+        "CREATE TABLE operation_owners (\n\toperation_id VARCHAR(160) NOT NULL, \n\tworker_id VARCHAR(160) NOT NULL, \n\tprocess_id INTEGER NOT NULL, \n\tprocess_marker VARCHAR(160) NOT NULL, \n\thost_token VARCHAR(160) NOT NULL, \n\tPRIMARY KEY (operation_id)\n)"
       ],
       [
         "table",

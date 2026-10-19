@@ -13,6 +13,7 @@ from sqlalchemy import Connection, Engine, Table, func, insert, select, update
 from sqlalchemy.exc import OperationalError
 
 from thoth.adapters.storage.events import insert_event_on_connection
+from thoth.adapters.storage.operation_owner_store import insert_owner, read_owner
 from thoth.adapters.storage.resource_scope_schema import operation_resource_bindings
 from thoth.adapters.storage.schema import (
     idempotency_keys,
@@ -150,6 +151,8 @@ class SqliteOperationStore(OperationStorePort):
         *,
         started_event: Callable[[], EventRecord] | None = None,
     ) -> tuple[OperationRecord, bool]:
+        if candidate.owner is not None and candidate.owner.host_token is None:
+            candidate = candidate.model_copy(update={"owner": None})
         # Logical operation bookkeeping owns its transaction; it must not borrow a
         # domain transaction that could later commit a partially failed claim.
         with self._engine.begin() as connection:
@@ -203,6 +206,7 @@ class SqliteOperationStore(OperationStorePort):
                     operation_id=candidate.operation_id,
                 )
             )
+            insert_owner(connection, candidate.operation_id, candidate.owner)
             if started_event is not None:
                 insert_event_on_connection(connection, started_event())
             return candidate, False
@@ -362,7 +366,10 @@ class SqliteOperationStore(OperationStorePort):
         )
         if row is None:
             return None
-        return self._with_resource_binding(connection, self._deserialize(row))
+        record = self._deserialize(row).model_copy(
+            update={"owner": read_owner(connection, operation_id)}
+        )
+        return self._with_resource_binding(connection, record)
 
     @staticmethod
     def _with_resource_binding(

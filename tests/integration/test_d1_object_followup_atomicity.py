@@ -305,7 +305,11 @@ async def test_creation_fault_checkpoint(
             "idempotency_keys",
             "events",
             "operation_resource_bindings",
-        }
+        } | (
+            {"operation_owners"}
+            if before["operation_owners"] != after["operation_owners"]
+            else set()
+        )
     finally:
         runtime.close()
     reopened = create_runtime(tmp_path)

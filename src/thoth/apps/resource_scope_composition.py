@@ -23,6 +23,7 @@ from thoth.ports.connectors import ConnectorRegistryPort
 from thoth.ports.event_store import EventStorePort
 from thoth.ports.field_measurement import FieldMeasurementObserverPort
 from thoth.ports.governance import GovernanceStorePort
+from thoth.ports.journal import JournalPort
 from thoth.ports.ledger import ManagedLedgerPort
 from thoth.ports.operation import OperationStorePort
 from thoth.ports.project import ProjectStorePort
@@ -30,6 +31,7 @@ from thoth.ports.runtime import ClockPort, IdGeneratorPort
 from thoth.ports.sandbox import SandboxPort
 from thoth.ports.store_bundle import StoreBundlePort
 from thoth.protocol.bus import CommandBus
+from thoth.protocol.operation_owner import OperationOwner
 from thoth.protocol.registry import MethodRegistry
 
 _LOCAL_SOURCE_KINDS = frozenset({"LOCAL", "GIT"})
@@ -113,6 +115,8 @@ def scope_bus(
     seal_abandoned_running: bool = False,
     before_continue: Callable[[str], Awaitable[None]] | None = None,
     queued_admission: Callable[[OperationRecord], dict[str, JsonValue] | None] | None = None,
+    owner: OperationOwner | None = None,
+    journal: JournalPort | None = None,
 ) -> CommandBus:
     handlers = OperationCommandHandlers(
         operations,
@@ -132,12 +136,13 @@ def scope_bus(
         operations,
         clock,
         ids,
-        journal=OperationJournal(events, clock, ids),
+        journal=journal if journal is not None else OperationJournal(events, clock, ids),
         measurement=measurement,
         resource_access=scopes,
         seal_abandoned_running=seal_abandoned_running,
         before_continue=before_continue,
         queued_admission=queued_admission,
+        owner=owner,
     )
 
 

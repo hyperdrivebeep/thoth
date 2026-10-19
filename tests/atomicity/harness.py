@@ -12,6 +12,7 @@ from sqlalchemy import Engine, select, text
 from thoth.adapters.storage.resource_scope_schema import operation_resource_bindings
 from thoth.adapters.storage.schema import events, metadata, operations
 from thoth.domain.canonical import canonical_payload, domain_digest
+from thoth.domain.operation import OperationOwnerRecord
 from thoth.domain.resource_scope import OperationResourceBinding
 from thoth.protocol.jsonrpc import JsonRpcRequest
 
@@ -60,6 +61,7 @@ class AllowedRow:
 def assert_phase_delta(
     before: Snapshot, after: Snapshot, allowed: tuple[AllowedRow, ...] = ()
 ) -> None:
+    allowed = (*allowed, *operation_owner_allowances(before, after, allowed))
     unexpected: list[tuple[str, str, str]] = []
     for table in sorted(before.keys() | after.keys()):
         left, right = Counter(before.get(table, ())), Counter(after.get(table, ()))
@@ -69,6 +71,66 @@ def assert_phase_delta(
                 if not any(rule.matches(table, direction, row) for rule in allowed):
                     unexpected.append((table, direction, serialized))
     assert not unexpected, unexpected
+
+
+def operation_owner_allowances(
+    before: Snapshot, after: Snapshot, allowed: tuple[AllowedRow, ...]
+) -> tuple[AllowedRow, ...]:
+    """At most one owner added for each explicitly allowed, newly created operation."""
+    old_ids = {json.loads(row)["operation_id"] for row in before.get("operations", ())}
+    old_owner_ids = {json.loads(row)["operation_id"] for row in before.get("operation_owners", ())}
+    new_operations = Counter(after.get("operations", ())) - Counter(before.get("operations", ()))
+    owners = [json.loads(row) for row in after.get("operation_owners", ())]
+    result: list[AllowedRow] = []
+    for raw in new_operations:
+        operation = json.loads(raw)
+        identifier = operation["operation_id"]
+        if identifier in old_ids or identifier in old_owner_ids:
+            continue
+        if not any(
+            rule.identity.get("operation_id") == identifier
+            and rule.matches("operations", "added", operation)
+            for rule in allowed
+        ):
+            continue
+        rows = [row for row in owners if row["operation_id"] == identifier]
+        assert len(rows) <= 1, "duplicate owner rows for one operation"
+        if rows:
+            row = rows[0]
+            owner = OperationOwnerRecord.model_validate(
+                {key: value for key, value in row.items() if key != "operation_id"}
+            )
+            assert owner.host_token is not None
+            result.append(AllowedRow("operation_owners", row, "added", {}))
+    return tuple(result)
+
+
+def unchanged_or_operation_owner(
+    before: Snapshot, after: Snapshot, table: str, command: JsonRpcRequest
+) -> bool:
+    """Keep domain equality exact; validate only this new request's companion owner."""
+    if before.get(table, ()) == after.get(table, ()):
+        return True
+    if table != "operation_owners":
+        return False
+    candidates = [
+        json.loads(row)
+        for row in after.get("operations", ())
+        if json.loads(row)["method"] == command.method
+        and json.loads(row)["idempotency_key"] == command.params.meta.idempotency_key
+        and json.loads(row)["project_id"] == command.params.input["project_id"]
+    ]
+    assert len(candidates) == 1
+    operation = candidates[0]
+    allowed = operation_owner_allowances(
+        before, after, (AllowedRow("operations", operation, "added", {}),)
+    )
+    left, right = Counter(before.get(table, ())), Counter(after.get(table, ()))
+    assert not left - right, "owner removal or replacement is not bookkeeping"
+    added = list((right - left).elements())
+    assert len(added) == 1 and len(allowed) == 1, "expected exactly this request's owner row"
+    assert allowed[0].matches(table, "added", json.loads(added[0]))
+    return True
 
 
 def failed_command_allowances(

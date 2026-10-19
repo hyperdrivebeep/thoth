@@ -4,16 +4,12 @@ The change that follows (an owner record, then sealing a request whose owner is 
 must change exactly what is pinned here and nothing else. Children are real processes killed for
 real, with a synthetic home; no model, login or network is used.
 
-Observed today:
- - a request that was interrupted after its domain change was committed stays RUNNING, and the same
-   idempotency key returns RUNNING for as long as it is asked (the handler never runs again);
- - a request that was interrupted inside its handler stays RUNNING with nothing changed, and only a
-   new key makes it run;
- - the operation row records no process that owned the request, so nothing can tell "owner gone"
-   from "owner slow" (rows that exist without such information are exactly these rows);
- - the domain change and the terminal result are two separate commits for this command;
- - the repeat of an applied change under a new key is refused by the revision guard, so nothing is
-   applied twice.
+Updated D-B2 observations:
+ - measured commands with a confirmed dead owner seal on same-key replay;
+ - an unmeasured source connection stays RUNNING without automatic redispatch;
+ - operations columns stay unchanged; process identity lives in operation_owners;
+ - domain and normal terminal publication remain separate commits;
+ - a new key after an applied change is still refused by its revision guard.
 """
 
 from __future__ import annotations
@@ -73,6 +69,20 @@ async def main(workspace, mode, marker):
     assert created.error is None, created.error
     update = build("project/metadata/update", "rename", {
         "project_id": "project:stale-running", "expected_revision": 0, "name": "Renamed"})
+    if mode == "excluded":
+        inbox = workspace / "inbox"
+        inbox.mkdir(exist_ok=True)
+        (inbox / "source.md").write_text("Synthetic source", encoding="utf-8")
+        async def stuck_connect(value):
+            Path(marker).write_text(str(os.getpid()), encoding="utf-8")
+            await asyncio.Event().wait()
+            return {}
+        runtime.bus._registry.decorate("project/source/connect", lambda handler: stuck_connect)
+        update = build("project/source/connect", "connect", {
+            "project_id": "project:stale-running", "relative_path": "source.md",
+            "media_type": "text/markdown", "authority": "OFFICIAL",
+            "cutoff_state": "ELIGIBLE", "security_class": "INTERNAL",
+            "expected_project_revision": 0})
     if mode == "after-domain-commit":
         def die(*_args, **_kwargs):
             Path(marker).write_text(str(os.getpid()), encoding="utf-8")
@@ -145,7 +155,7 @@ def _rename(key: str, expected_revision: int) -> JsonRpcRequest:
     )
 
 
-async def test_a_request_interrupted_after_its_change_was_committed_stays_running(
+async def test_a_request_interrupted_after_its_change_was_committed_is_sealed(
     tmp_path: Path,
 ) -> None:
     workspace = tmp_path / "workspace"
@@ -159,15 +169,16 @@ async def test_a_request_interrupted_after_its_change_was_committed_stays_runnin
         )
         assert read["name"] == "Renamed" and read["revision"] == 1
 
-        # The same key is answered with RUNNING every time; the handler never runs again.
+        # Same-key replay seals the confirmed dead owner once; it never reruns the handler.
         first = await runtime.bus.dispatch(_rename("rename", 0))
         again = await runtime.bus.dispatch(_rename("rename", 0))
         for replay in (first, again):
-            assert replay.error is None and replay.result is not None
-            assert replay.result["state"] == "RUNNING"
-            assert replay.result["value"] is None
-            assert replay.result["execution_observation"] == "UNKNOWN"
-        assert [row[1] for row in _rows(runtime, "project/metadata/update")] == ["RUNNING"]
+            assert replay.error is not None and replay.result is None
+            assert replay.error.data["reason_code"] == "OPERATION_OWNER_GONE"
+            assert replay.error.data["remote_observation"] == "UNKNOWN"
+            assert replay.error.data["new_request_required"] is True
+        assert first.error == again.error
+        assert [row[1] for row in _rows(runtime, "project/metadata/update")] == ["FAILED"]
         after_replays = domain_snapshot(runtime.ledger.engine)
 
         # The repeat of the applied change under a NEW key is refused by the revision guard:
@@ -177,14 +188,14 @@ async def test_a_request_interrupted_after_its_change_was_committed_stays_runnin
         assert "expected_revision" in repeat.error.message
         assert domain_snapshot(runtime.ledger.engine) == after_replays
         assert [row[1] for row in _rows(runtime, "project/metadata/update")] == [
-            "RUNNING",
+            "FAILED",
             "FAILED",
         ]
     finally:
         runtime.close()
 
 
-async def test_a_request_interrupted_inside_its_handler_stays_running_with_nothing_changed(
+async def test_a_request_interrupted_inside_its_handler_is_sealed_with_nothing_changed(
     tmp_path: Path,
 ) -> None:
     workspace = tmp_path / "workspace"
@@ -197,11 +208,11 @@ async def test_a_request_interrupted_inside_its_handler_stays_running_with_nothi
         )
         assert before["name"] == "Original" and before["revision"] == 0
 
-        # Asking again with the same key neither runs the change nor closes the request.
+        # Asking again seals the request without running the interrupted handler.
         for _ in range(2):
             replay = await runtime.bus.dispatch(_rename("rename", 0))
-            assert replay.error is None and replay.result is not None
-            assert replay.result["state"] == "RUNNING" and replay.result["value"] is None
+            assert replay.error is not None and replay.result is None
+            assert replay.error.data["reason_code"] == "OPERATION_OWNER_GONE"
         unchanged = value(
             await runtime.bus.query(request("project/read", "unchanged", {"project_id": PROJECT}))
         )
@@ -211,14 +222,14 @@ async def test_a_request_interrupted_inside_its_handler_stays_running_with_nothi
         fresh = value(await runtime.bus.dispatch(_rename("rename-new", 0)))
         assert fresh["name"] == "Renamed" and fresh["revision"] == 1
         assert [row[1] for row in _rows(runtime, "project/metadata/update")] == [
-            "RUNNING",
+            "FAILED",
             "SUCCEEDED",
         ]
     finally:
         runtime.close()
 
 
-async def test_the_operation_row_records_no_owning_process(tmp_path: Path) -> None:
+async def test_process_owner_is_separate_from_unchanged_operation_columns(tmp_path: Path) -> None:
     workspace = tmp_path / "workspace"
     assert _interrupted_child(tmp_path, workspace, "after-domain-commit") == 37
     runtime = _open(workspace)
@@ -235,8 +246,13 @@ async def test_the_operation_row_records_no_owning_process(tmp_path: Path) -> No
                 .mappings()
                 .one()
             )
-        # Only the authenticated actor is recorded, never the process that was running the work, so
-        # a RUNNING row cannot say whether its owner is gone. D-B adds those columns on purpose.
+        # Runtime now supplies the separate owner table, never new operations columns.
+        from thoth.adapters.storage.operations import SqliteOperationStore
+
+        stored = SqliteOperationStore(runtime.ledger.engine).read(str(stuck["operation_id"]))
+        assert stored is not None and stored.owner is not None
+        assert stored.owner.host_token is not None
+        assert "owner" not in stored.model_dump(mode="json")
         assert not _OWNER_PROCESS_COLUMNS & columns
         assert not _OWNER_PROCESS_COLUMNS & set(OperationRecord.model_fields)
         assert stuck["state"] == "RUNNING"
@@ -338,5 +354,36 @@ async def test_an_interrupted_project_change_is_refused_when_asked_again_with_a_
         repeat = await runtime.bus.dispatch(request(method, "second", payload))
         assert repeat.error is not None and "expected_revision" in repeat.error.message
         assert domain_snapshot(runtime.ledger.engine) == applied
+    finally:
+        runtime.close()
+
+
+async def test_excluded_source_connection_stays_running_after_actual_child_kill(
+    tmp_path: Path,
+) -> None:
+    workspace = tmp_path / "workspace"
+    assert _interrupted_child(tmp_path, workspace, "excluded") is None
+    runtime = _open(workspace)
+    try:
+        before = domain_snapshot(runtime.ledger.engine)
+        command = request(
+            "project/source/connect",
+            "connect",
+            {
+                "project_id": PROJECT,
+                "relative_path": "source.md",
+                "media_type": "text/markdown",
+                "authority": "OFFICIAL",
+                "cutoff_state": "ELIGIBLE",
+                "security_class": "INTERNAL",
+                "expected_project_revision": 0,
+            },
+        )
+        for _ in range(2):
+            response = await runtime.bus.dispatch(command)
+            assert response.error is None and response.result is not None
+            assert response.result["state"] == "RUNNING" and response.result["value"] is None
+        assert [r[1] for r in _rows(runtime, "project/source/connect")] == ["RUNNING"]
+        assert domain_snapshot(runtime.ledger.engine) == before
     finally:
         runtime.close()

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydantic import AwareDatetime, JsonValue
+from pydantic import AwareDatetime, Field, JsonValue
 
 from thoth.domain.base import DomainModel
 from thoth.domain.enums import OperationState
@@ -35,6 +35,13 @@ class InternalFailureDiagnostic(DomainModel):
     post_state: InternalFailureStateSnapshot
 
 
+class OperationOwnerRecord(DomainModel):
+    worker_id: str = Field(min_length=1, max_length=160)
+    process_id: int = Field(gt=0)
+    process_marker: str = Field(min_length=1, max_length=160)
+    host_token: Sha256 | None
+
+
 class OperationRecord(DomainModel):
     operation_id: OperationId
     project_id: ProjectId
@@ -53,3 +60,4 @@ class OperationRecord(DomainModel):
     epoch: int = 0
     schema_version: str = "1.0.0"
     resource_uses: tuple[ResourceUse, ...] | None = None
+    owner: OperationOwnerRecord | None = Field(default=None, exclude=True, repr=False)

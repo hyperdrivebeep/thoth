@@ -12,7 +12,6 @@ from thoth.adapters.storage.operations import IdempotencyConflict
 from thoth.application.services.historical_access_verification import historical_query_verification
 from thoth.domain.auth import current_authenticated_actor
 from thoth.domain.canonical import canonical_payload, domain_digest
-from thoth.domain.deployment_mode import STALE_RUNNING_MESSAGE, STALE_RUNNING_REASON
 from thoth.domain.enums import OperationState
 from thoth.domain.operation import (
     RESEARCH_OPERATION_METHODS,
@@ -52,7 +51,8 @@ from thoth.protocol.jsonrpc import (
     RpcErrorCode,
 )
 from thoth.protocol.notifications import notifications_for
-from thoth.protocol.operation_claim import claim_operation
+from thoth.protocol.operation_claim import claim_busy_response, claim_operation
+from thoth.protocol.operation_owner import OperationOwner, stale_running_error
 from thoth.protocol.read_queries import READ_QUERY_METHODS
 from thoth.protocol.registry import CommandHandler, MethodRegistry
 
@@ -83,6 +83,7 @@ class CommandBus:
         seal_abandoned_running: bool = False,
         before_continue: Callable[[str], Awaitable[None]] | None = None,
         queued_admission: Callable[[OperationRecord], dict[str, JsonValue] | None] | None = None,
+        owner: OperationOwner | None = None,
     ) -> None:
         self._registry = registry
         self._operations = operations
@@ -94,6 +95,7 @@ class CommandBus:
         self._seal_abandoned_running = seal_abandoned_running
         self._before_continue = before_continue
         self._queued_admission = queued_admission
+        self._owner = owner
         self._operation_task_canceller: Callable[[str], None] | None = None
         self._failure_diagnostics = (
             operations if isinstance(operations, InternalFailureDiagnosticPort) else None
@@ -207,11 +209,16 @@ class CommandBus:
                 ),
                 state=OperationState.RUNNING,
                 created_at=self._clock.now(),
+                owner=None if self._owner is None else self._owner.record(),
             )
             operation, replayed = claim_operation(self._operations, candidate, self._journal)
             if replayed:
                 if operation.state == OperationState.RUNNING:
                     self._registry.authorize_reentry(operation)
+                    if self._owner is not None:
+                        sealed = self._owner.seal(request, operation, self._measure)
+                        if sealed is not None:
+                            return self._replay(request.id, sealed)
                     live_task = operation.operation_id in self._research_tasks
                     if (
                         self._seal_abandoned_running
@@ -259,18 +266,7 @@ class CommandBus:
         except OperationReentryDenied as exc:
             return self._reentry_denied(request, exc)
         except OperationClaimBusy:
-            return JsonRpcResponse(
-                id=request.id,
-                error=JsonRpcError(
-                    code=RpcErrorCode.DOMAIN_REJECTED,
-                    message="operation storage is busy; retry the same request later",
-                    data={
-                        "reason_code": "OPERATION_CLAIM_BUSY",
-                        "operation_claimed": False,
-                        "retryable": True,
-                    },
-                ),
-            )
+            return claim_busy_response(request.id)
         except IdempotencyConflict as exc:
             return JsonRpcResponse(
                 id=request.id,
@@ -373,11 +369,13 @@ class CommandBus:
             )
         except (RpcApplicationError, ResourceScopeError) as exc:
             error = self._application_error(exc)
-            self._operations.fail(
+            failed = self._operations.fail(
                 operation.operation_id,
                 error.model_dump(mode="json"),
                 completed_at=self._clock.now(),
             )
+            if failed.error != error.model_dump(mode="json"):
+                return self._replay(request.id, failed)
             self._append_event(
                 operation,
                 "operation.failed",
@@ -391,11 +389,13 @@ class CommandBus:
                 message="authenticated authority identity mismatch",
                 data={"reason_code": str(exc), "pre_io": True},
             )
-            self._operations.fail(
+            failed = self._operations.fail(
                 operation.operation_id,
                 error.model_dump(mode="json"),
                 completed_at=self._clock.now(),
             )
+            if failed.error != error.model_dump(mode="json"):
+                return self._replay(request.id, failed)
             self._append_event(
                 operation,
                 "operation.failed",
@@ -414,11 +414,13 @@ class CommandBus:
                     )
                 },
             )
-            self._operations.fail(
+            failed = self._operations.fail(
                 operation.operation_id,
                 error.model_dump(mode="json"),
                 completed_at=self._clock.now(),
             )
+            if failed.error != error.model_dump(mode="json"):
+                return self._replay(request.id, failed)
             self._append_event(
                 operation,
                 "operation.failed",
@@ -438,11 +440,13 @@ class CommandBus:
                 message="internal command failure",
                 data={"operation_id": operation.operation_id},
             )
-            self._operations.fail(
+            failed = self._operations.fail(
                 operation.operation_id,
                 error.model_dump(mode="json"),
                 completed_at=self._clock.now(),
             )
+            if failed.error != error.model_dump(mode="json"):
+                return self._replay(request.id, failed)
             self._append_event(
                 operation,
                 "operation.failed",
@@ -455,6 +459,8 @@ class CommandBus:
             durable_value,
             completed_at=self._clock.now(),
         )
+        if completed.state is not OperationState.SUCCEEDED:
+            return self._replay(request.id, completed)
         result_digest = domain_digest("OPERATION_RESULT", "1.0.0", canonical_payload(durable_value))
         if self._journal is not None:
             self._journal.checkpoint(
@@ -584,14 +590,7 @@ class CommandBus:
     def _fail_abandoned_running(
         self, request: JsonRpcRequest, operation: OperationRecord
     ) -> JsonRpcResponse:
-        error = JsonRpcError(
-            code=RpcErrorCode.DOMAIN_REJECTED,
-            message=STALE_RUNNING_MESSAGE,
-            data={
-                "reason_code": STALE_RUNNING_REASON,
-                "remote_observation": "UNKNOWN",
-            },
-        )
+        error = stale_running_error()
         failed = self._operations.fail(
             operation.operation_id,
             error.model_dump(mode="json"),

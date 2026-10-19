@@ -27,7 +27,12 @@ from typing import Any, cast
 
 import pytest
 from sqlalchemy import Connection, event, func, select
-from tests.atomicity.harness import assert_phase_delta, failed_command_allowances, snapshot
+from tests.atomicity.harness import (
+    assert_phase_delta,
+    failed_command_allowances,
+    snapshot,
+    unchanged_or_operation_owner,
+)
 from tests.atomicity.outcome_helpers import prepare_outcome
 from tests.integration.scoped_runtime import create_runtime
 from tests.integration.storage_coverage_helpers import request, value
@@ -252,7 +257,10 @@ def install_fault(
         )
         external = snapshot(runtime.ledger.engine)
         external_changes = sorted(
-            name for name in before if name not in BOOKKEEPING and external[name] != before[name]
+            name
+            for name in before
+            if name not in BOOKKEEPING
+            and not unchanged_or_operation_owner(before, external, name, command)
         )
         staged: list[dict[str, Any]] = []
         # 2026-10-15 (see 92b): set_head updates the working_heads row of an aggregate in place,
@@ -471,7 +479,11 @@ async def test_outcome_child_post_write_failure_is_atomic(
             "expected_writer_order": [list(step) for step in expected_order],
             "observed_writer_order": [list(step) for step in state["order"]],
             "fault": state,
-            "changed_tables": sorted(name for name in before if before[name] != after[name]),
+            "changed_tables": sorted(
+                name
+                for name in before
+                if not unchanged_or_operation_owner(before, after, name, command)
+            ),
         }
         assert len(state["hits"]) == 1, "HOLD_CONTRACT_MISMATCH: expected target hit1"
         assert state["order"] == expected_order, (
@@ -482,9 +494,11 @@ async def test_outcome_child_post_write_failure_is_atomic(
         assert not state["violations"], ("HOLD_DEFECT", state["violations"])
         assert failed.error is not None, "HOLD_DEFECT: post-write failure reported success"
         # Every non-bookkeeping table, Execution tables included, equals the state before.
-        assert all(before[t] == after[t] for t in before if t not in BOOKKEEPING), (
-            "HOLD_DEFECT: failed mutation published domain rows"
-        )
+        assert all(
+            unchanged_or_operation_owner(before, after, t, command)
+            for t in before
+            if t not in BOOKKEEPING
+        ), "HOLD_DEFECT: failed mutation published domain rows"
         assert actual_reads == [(ref, "READ") for ref in reads], (
             "HOLD_CONTRACT_MISMATCH: source-defined read-set differs",
             reads,
@@ -530,6 +544,7 @@ async def test_followup_writes_one_standalone_audit_row(tmp_path: Path) -> None:
 
     engine = runtime.ledger.engine
     try:
+        command = request(method, "94b-followup-normal", payload)
         before = snapshot(engine)
         event.listen(engine, "before_cursor_execute", statement)
         try:
@@ -547,12 +562,20 @@ async def test_followup_writes_one_standalone_audit_row(tmp_path: Path) -> None:
             "INSERT INTO CHECKPOINTS",
             "UPDATE CHECKPOINTS SET",
         }
+        assert unchanged_or_operation_owner(before, after, "operation_owners", command)
+        owner_count = len(after.get("operation_owners", ())) - len(
+            before.get("operation_owners", ())
+        )
+        assert statements.count("INSERT INTO OPERATION_OWNERS") == owner_count
+        if owner_count:
+            bus_tables.add("INSERT INTO OPERATION_OWNERS")
         domain = sorted(item for item in statements if item not in bus_tables)
         assert domain == ["INSERT INTO OUTCOME_AUDIT"], domain
         changed = sorted(
             name
             for name in before
-            if name not in BOOKKEEPING | {"checkpoints"} and before[name] != after[name]
+            if name not in BOOKKEEPING | {"checkpoints"}
+            and not unchanged_or_operation_owner(before, after, name, command)
         )
         assert changed == ["outcome_audit"], changed
         assert "digest" in result["candidates"]
@@ -592,9 +615,11 @@ async def test_followup_audit_statement_failure_is_atomic(tmp_path: Path) -> Non
         after = snapshot(runtime.ledger.engine)
         assert hits == [True], hits
         assert failed.error is not None
-        assert all(before[t] == after[t] for t in before if t not in BOOKKEEPING), (
-            "HOLD_DEFECT: failed follow-up published domain rows"
-        )
+        assert all(
+            unchanged_or_operation_owner(before, after, t, command)
+            for t in before
+            if t not in BOOKKEEPING
+        ), "HOLD_DEFECT: failed follow-up published domain rows"
         assert_phase_delta(
             before,
             after,

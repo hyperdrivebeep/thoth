@@ -22,16 +22,23 @@ on a local disk. It does not cover a workspace folder shared between Windows and
 cloud sync client or a network share exposes to several computers; do not open the same workspace
 from two places that way. The hosted review mode does not use this lock.
 
-## A request interrupted by a shutdown can stay "running"
+## Recovery of a request interrupted by shutdown
 
-THOTH records a request as running before it starts the work. If the application stops while the
-work is in progress, the record can stay "running". Sending the same request again with the same
-idempotency key returns "running" instead of starting the work a second time, so that nothing is
-done twice. To continue, ask again as a new question. A new question can use model capacity again,
-so check first whether the earlier result has already been saved.
+In LOCAL mode, 67 measured commands can be closed as failed when the same idempotency key is
+sent again and the original worker is confirmed gone. THOTH also requires matching host/boot
+identity and an already-held workspace lock. It returns `OPERATION_OWNER_GONE` with guidance to
+check what was saved; it does not rerun the handler or scan old requests automatically.
 
-In the hosted review mode a restart can also close such a request with a message that the previous
-call could not be confirmed. See [VERIFICATION.md](VERIFICATION.md) for that mode's known limit.
+Requests outside that list (including research start/input/steer and pause/resume/stop), old
+records without ownership, an unavailable or different host identity, and a live or unknown
+worker can remain running. A timeout alone is not proof of death. The hosted review recovery
+policy is unchanged. `improvement/evaluation/run` remains outside the list pending separate
+review because its no-effect response lacks an explicit unchanged marker.
+
+If sealing wins a race with the original completion, a domain change may already be saved while
+its ordinary change notification is omitted. Check the saved result before sending a new request.
+A new question may use model capacity again; a newly refreshed revision guard can also permit a
+second change. This recovery is not a guarantee of exactly-once external effects.
 
 ## A finished request can miss some follow-up log entries
 
