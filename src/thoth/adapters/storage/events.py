@@ -1,15 +1,20 @@
 from __future__ import annotations
 
+from collections.abc import Generator
+from contextlib import contextmanager
 from datetime import datetime
 from typing import cast
 
 import orjson
-from sqlalchemy import Connection, Engine, insert, select
+from sqlalchemy import Connection, Engine, Integer, insert, literal_column, select
+from sqlalchemy.exc import OperationalError
 
 from thoth.adapters.storage.schema import checkpoints, events
 from thoth.adapters.storage.transaction import read_connection, write_connection
 from thoth.domain.event import Checkpoint, EventRecord
 from thoth.ports.event_store import EventStorePort
+from thoth.ports.journal import JournalCompletionUnavailable
+from thoth.ports.runtime import AtomicUnitOfWorkPort
 
 
 def _object(value: str) -> dict[str, object]:
@@ -39,6 +44,36 @@ def insert_event_on_connection(connection: Connection, event: EventRecord) -> No
 class SqliteEventStore(EventStorePort):
     def __init__(self, engine: Engine) -> None:
         self._engine = engine
+
+    @contextmanager
+    def completion_transaction(self, uow: AtomicUnitOfWorkPort) -> Generator[None]:
+        try:
+            with uow.transaction():
+                yield
+        except OperationalError as exc:
+            raise JournalCompletionUnavailable("JOURNAL_STORAGE_UNAVAILABLE") from exc
+
+    def list_checkpoints(self, operation_id: str) -> tuple[Checkpoint, ...]:
+        with read_connection(self._engine) as connection:
+            rows = (
+                connection.execute(
+                    select(checkpoints)
+                    .where(checkpoints.c.operation_id == operation_id)
+                    .order_by(checkpoints.c.created_at, checkpoints.c.checkpoint_id)
+                )
+                .mappings()
+                .all()
+            )
+        return tuple(
+            Checkpoint(
+                checkpoint_id=str(row["checkpoint_id"]),
+                operation_id=str(row["operation_id"]),
+                payload=_object(str(row["payload_json"])),
+                checkpoint_digest=str(row["checkpoint_digest"]),
+                created_at=datetime.fromisoformat(str(row["created_at"])),
+            )
+            for row in rows
+        )
 
     def insert_event(self, event: EventRecord) -> None:
         with write_connection(self._engine) as connection:
@@ -93,7 +128,7 @@ class SqliteEventStore(EventStorePort):
                 connection.execute(
                     select(checkpoints)
                     .where(checkpoints.c.operation_id == operation_id)
-                    .order_by(checkpoints.c.created_at.desc(), checkpoints.c.checkpoint_id.desc())
+                    .order_by(literal_column("rowid", Integer()).desc())
                     .limit(1)
                 )
                 .mappings()

@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import cast
 
 import orjson
-from sqlalchemy import Engine, Integer, Table, insert, literal_column, select
+from sqlalchemy import Engine, Integer, Table, func, insert, literal_column, select
 
 from thoth.adapters.storage.schema import (
     execution_audit,
@@ -74,7 +74,12 @@ class SqliteExecutionStore(ExecutionStorePort):
             rows = connection.execute(
                 select(plan_executions)
                 .where(plan_executions.c.project_id == project_id)
-                .order_by(plan_executions.c.created_at, literal_column("rowid", Integer()))
+                .order_by(
+                    func.coalesce(
+                        func.json_extract(plan_executions.c.content_json, "$.revision"), 0
+                    ),
+                    literal_column("rowid", Integer()),
+                )
             ).mappings()
             values = tuple(
                 PlanExecutionRecord.model_validate(load(row["content_json"])) for row in rows
@@ -94,7 +99,9 @@ class SqliteExecutionStore(ExecutionStorePort):
                         plan_executions.c.plan_execution_id == plan_execution_id,
                     )
                     .order_by(
-                        plan_executions.c.created_at.desc(),
+                        func.coalesce(
+                            func.json_extract(plan_executions.c.content_json, "$.revision"), 0
+                        ).desc(),
                         literal_column("rowid", Integer()).desc(),
                     )
                     .limit(1)
@@ -128,7 +135,7 @@ class SqliteExecutionStore(ExecutionStorePort):
                     step_execution_attempts.c.project_id == project_id,
                     step_execution_attempts.c.plan_execution_id == plan_execution_id,
                 )
-                .order_by(step_execution_attempts.c.created_at, literal_column("rowid", Integer()))
+                .order_by(literal_column("rowid", Integer()))
             ).mappings()
             values = tuple(
                 StepExecutionAttemptRecord.model_validate(load(row["content_json"])) for row in rows
@@ -147,10 +154,7 @@ class SqliteExecutionStore(ExecutionStorePort):
                         step_execution_attempts.c.project_id == project_id,
                         step_execution_attempts.c.attempt_id == attempt_id,
                     )
-                    .order_by(
-                        step_execution_attempts.c.created_at.desc(),
-                        literal_column("rowid", Integer()).desc(),
-                    )
+                    .order_by(literal_column("rowid", Integer()).desc())
                     .limit(1)
                 )
                 .mappings()

@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import cast
 
 import orjson
-from sqlalchemy import Engine, func, insert, select, update
+from sqlalchemy import Engine, Integer, func, insert, literal_column, select, update
 
 from thoth.adapters.storage.schema import thread_activities, thread_checkpoints, thread_inputs
 from thoth.adapters.storage.transaction import read_connection, write_connection
@@ -87,7 +87,7 @@ class SqliteThreadRuntimeStore(ThreadRuntimeStorePort):
                     thread_checkpoints.c.project_id == project_id,
                     thread_checkpoints.c.thread_id == thread_id,
                 )
-                .order_by(thread_checkpoints.c.created_at, thread_checkpoints.c.checkpoint_id)
+                .order_by(literal_column("rowid", Integer()))
             ).mappings()
             return tuple(self._checkpoint(row) for row in rows)
 

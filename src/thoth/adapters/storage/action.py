@@ -92,7 +92,7 @@ class SqliteActionStore(ActionStorePort):
             rows = connection.execute(
                 select(action_records)
                 .where(action_records.c.project_id == project_id)
-                .order_by(action_records.c.created_at, literal_column("rowid", Integer()))
+                .order_by(literal_column("rowid", Integer()))
             ).mappings()
             values = tuple(ActionRecord.model_validate(load(row["content_json"])) for row in rows)
         latest: dict[str, ActionRecord] = {}
@@ -122,9 +122,7 @@ class SqliteActionStore(ActionStorePort):
             action_records.c.action_id == action_id,
         )
         if revision_digest is None:
-            statement = statement.order_by(
-                action_records.c.created_at.desc(), literal_column("rowid", Integer()).desc()
-            ).limit(1)
+            statement = statement.order_by(literal_column("rowid", Integer()).desc()).limit(1)
         else:
             statement = statement.where(action_records.c.revision_digest == revision_digest)
         with read_connection(self._engine) as connection:
@@ -158,7 +156,7 @@ class SqliteActionStore(ActionStorePort):
             rows = connection.execute(
                 select(action_portfolios)
                 .where(action_portfolios.c.project_id == project_id)
-                .order_by(action_portfolios.c.created_at, literal_column("rowid", Integer()))
+                .order_by(literal_column("rowid", Integer()))
             ).mappings()
             values = tuple(
                 ActionPortfolioRecord.model_validate(load(row["content_json"])) for row in rows
@@ -190,9 +188,7 @@ class SqliteActionStore(ActionStorePort):
             action_portfolios.c.portfolio_id == portfolio_id,
         )
         if revision_digest is None:
-            statement = statement.order_by(
-                action_portfolios.c.created_at.desc(), literal_column("rowid", Integer()).desc()
-            ).limit(1)
+            statement = statement.order_by(literal_column("rowid", Integer()).desc()).limit(1)
         else:
             statement = statement.where(action_portfolios.c.revision_digest == revision_digest)
         with read_connection(self._engine) as connection:
@@ -228,7 +224,7 @@ class SqliteActionStore(ActionStorePort):
             rows = connection.execute(
                 select(action_plans)
                 .where(action_plans.c.project_id == project_id)
-                .order_by(action_plans.c.created_at, literal_column("rowid", Integer()))
+                .order_by(literal_column("rowid", Integer()))
             ).mappings()
             values = tuple(
                 ActionPlanRecord.model_validate(load(row["content_json"])) for row in rows
@@ -260,9 +256,7 @@ class SqliteActionStore(ActionStorePort):
             action_plans.c.plan_id == plan_id,
         )
         if revision_digest is None:
-            statement = statement.order_by(
-                action_plans.c.created_at.desc(), literal_column("rowid", Integer()).desc()
-            ).limit(1)
+            statement = statement.order_by(literal_column("rowid", Integer()).desc()).limit(1)
         else:
             statement = statement.where(action_plans.c.revision_digest == revision_digest)
         with read_connection(self._engine) as connection:

@@ -4,6 +4,7 @@ from typing import cast
 
 from pydantic import JsonValue
 
+from thoth.application.services.reference_failure import SavedReferenceFailure
 from thoth.application.services.request_records import RequestRecords
 from thoth.domain.enums import EntityType, OperationState, ThreadExecutionState
 from thoth.domain.research_failure import ResearchFailureCause, ResearchFailureRecord
@@ -25,6 +26,8 @@ class ResearchTerminationService:
         request: ThreadRequestRevision,
         primary: ResearchFailureCause,
         secondary: ResearchFailureCause | None = None,
+        *,
+        notice: SavedReferenceFailure | None = None,
     ) -> ResearchFailureRecord | None:
         project, op_id = request.project_id, attempt.operation_id
         key = f"failure:{op_id}:{attempt.attempt_epoch}"
@@ -82,10 +85,13 @@ class ResearchTerminationService:
                     dict[str, JsonValue],
                     {
                         "code": -32603,
-                        "message": "research execution failed",
+                        "message": "research execution failed"
+                        if notice is None
+                        else notice.message,
                         "data": {
                             "reason_code": primary.reason_code,
                             "failure": failure.model_dump(mode="json"),
+                            **({"research_saved": True} if notice is not None else {}),
                         },
                     },
                 ),

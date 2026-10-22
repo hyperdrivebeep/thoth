@@ -116,9 +116,7 @@ class SqliteHypothesisStore(HypothesisStorePort):
             hypothesis_records.c.hypothesis_id == hypothesis_id,
         )
         if revision_digest is None:
-            statement = statement.order_by(
-                hypothesis_records.c.created_at.desc(), literal_column("rowid", Integer()).desc()
-            ).limit(1)
+            statement = statement.order_by(literal_column("rowid", Integer()).desc()).limit(1)
         else:
             statement = statement.where(hypothesis_records.c.revision_digest == revision_digest)
         with read_connection(self._engine) as connection:
@@ -170,9 +168,7 @@ class SqliteHypothesisStore(HypothesisStorePort):
             hypothesis_portfolios.c.portfolio_id == portfolio_id,
         )
         if revision_digest is None:
-            statement = statement.order_by(
-                hypothesis_portfolios.c.created_at.desc(), literal_column("rowid", Integer()).desc()
-            ).limit(1)
+            statement = statement.order_by(literal_column("rowid", Integer()).desc()).limit(1)
         else:
             statement = statement.where(hypothesis_portfolios.c.revision_digest == revision_digest)
         with read_connection(self._engine) as connection:
@@ -199,7 +195,7 @@ class SqliteHypothesisStore(HypothesisStorePort):
     ) -> tuple[HypothesisRelationRecord, ...]:
         statement = (
             select(hypothesis_relations)
-            .order_by(hypothesis_relations.c.created_at, literal_column("rowid", Integer()))
+            .order_by(literal_column("rowid", Integer()))
             .where(hypothesis_relations.c.project_id == project_id)
         )
         if portfolio_id is not None:
@@ -216,10 +212,7 @@ class SqliteHypothesisStore(HypothesisStorePort):
                 connection.execute(
                     select(hypothesis_relations)
                     .where(hypothesis_relations.c.relation_id == relation_id)
-                    .order_by(
-                        hypothesis_relations.c.created_at.desc(),
-                        literal_column("rowid", Integer()).desc(),
-                    )
+                    .order_by(literal_column("rowid", Integer()).desc())
                     .limit(1)
                 )
                 .mappings()
@@ -398,7 +391,7 @@ class SqliteHypothesisStore(HypothesisStorePort):
         return self._execute(
             select(table)
             .where(table.c[field] == value)
-            .order_by(table.c.created_at, literal_column("rowid", Integer())),
+            .order_by(literal_column("rowid", Integer())),
             model,
         )
 

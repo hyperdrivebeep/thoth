@@ -140,7 +140,7 @@ class SqliteCriterionContractStore(CriterionContractStorePort):
             rows = connection.execute(
                 select(criterion_contracts)
                 .where(criterion_contracts.c.project_id == project_id)
-                .order_by(criterion_contracts.c.created_at, literal_column("rowid", Integer()))
+                .order_by(literal_column("rowid", Integer()))
             ).mappings()
             return self._latest(tuple(self._contract(row) for row in rows))
 
@@ -168,9 +168,7 @@ class SqliteCriterionContractStore(CriterionContractStorePort):
         if revision_digest is not None:
             statement = statement.where(criterion_contracts.c.revision_digest == revision_digest)
         else:
-            statement = statement.order_by(
-                criterion_contracts.c.created_at.desc(), literal_column("rowid", Integer()).desc()
-            ).limit(1)
+            statement = statement.order_by(literal_column("rowid", Integer()).desc()).limit(1)
         with read_connection(self._engine) as connection:
             row = connection.execute(statement).mappings().first()
         return None if row is None else self._contract(row)

@@ -93,10 +93,7 @@ class SqliteEvidenceGraphStore(EvidenceGraphStorePort):
                 connection.execute(
                     select(evidence_sources)
                     .where(evidence_sources.c.artifact_id == artifact_id)
-                    .order_by(
-                        evidence_sources.c.created_at.desc(),
-                        literal_column("rowid", Integer()).desc(),
-                    )
+                    .order_by(literal_column("rowid", Integer()).desc())
                     .limit(1)
                 )
                 .mappings()

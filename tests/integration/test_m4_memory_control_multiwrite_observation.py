@@ -1,19 +1,17 @@
-"""Step 0 of 96b: what the second write of a two-write MEMORY control route leaves behind.
+"""Two-write MEMORY observations, updated to the approved P1 atomic-pair contract.
 
 memory/validate (GATE then CANDIDATE revision), memory/changeSet/propose
 (MEMORY_ENTRY_CANDIDATE then CHANGE_SET_PROPOSAL) and memory/retire/propose (RETIRE_CANDIDATE then
-CHANGE_SET_PROPOSAL) call ControlRecordService.create twice. Each create is its own
-SqliteControlRecordStore.append commit, the bus does not wrap a handler in a ledger transaction, and
-the handler awaits nothing between the two writes. This file observes the current contract and fixes
-nothing; it is test-only.
+CHANGE_SET_PROPOSAL) call ControlRecordService.create twice. P1 wraps each pair in the handler's
+short ledger transaction; the handler awaits nothing between these writes.
 
 The second append of the target request is made to fail with an injected error, either before it
-writes ("before": the state is exactly what the first write left) or after it wrote ("after": both
-rows are committed but the caller sees an error). Everything else is observed from the real runtime:
-the rows, the other tables, the sealed failed operation, a same-key replay, a reopened runtime, a
-new-key retry and the reads a later request would make. validate also gets one simulated competing
+writes ("before") or after it wrote ("after"). Both now roll back the whole pair. Before P1, these
+faults left one or two committed rows; the V-P1 evidence retains that baseline. The real runtime
+checks all tables, the failed operation, same-key replay, runtime reopening, new-key retry,
+and later reads. validate also gets one simulated competing
 writer (a second revision of the same record between the read and the append), which is what another
-process could do; in one process it cannot happen.
+process could previously do; this nested injection does not prove cross-process concurrency safety.
 
 Evidence files: outputs/refactor-step96-20261015/step0-multiwrite-*.json.
 """
@@ -300,7 +298,7 @@ async def test_control_route_success_writes_the_two_rows_in_source_order(
 @pytest.mark.asyncio
 @pytest.mark.parametrize("mode", ["before", "after"])
 @pytest.mark.parametrize("route", ROUTES)
-async def test_second_control_write_failure_leaves_the_first_row_and_a_failed_operation(
+async def test_second_control_write_failure_rolls_back_both_rows_and_keeps_failed_operation(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, route: str, mode: str
 ) -> None:
     workspace = tmp_path / "workspace"
@@ -320,13 +318,9 @@ async def test_second_control_write_failure_leaves_the_first_row_and_a_failed_op
         fault_after = snapshot(runtime.ledger.engine)
         changes = table_changes(before, fault_after)
         added = rows_after[len(rows_before) :]
-        expected_added = 1 if mode == "before" else 2
-        assert [item["type"] for item in added] == [t for t, _ in EXPECTED_ORDER[route]][
-            :expected_added
-        ]
-        assert set(domain_changes(changes, before, fault_after, request(method, key, payload))) == {
-            "control_records"
-        }
+        assert added == []
+        assert rows_after == rows_before
+        assert domain_changes(changes, before, fault_after, request(method, key, payload)) == {}
         reads_after_fault = await later_reads(runtime, route, candidate_id, "fault")
         runtime.close()
 
@@ -381,16 +375,12 @@ async def test_second_control_write_failure_leaves_the_first_row_and_a_failed_op
         )
         assert [item["type"] for item in retry_added] == [t for t, _ in EXPECTED_ORDER[route]]
         if route == "validate":
-            # Current contract: the first row is a visible VALIDATED gate while the candidate
-            # has not advanced ("before"), or the candidate advanced although the caller saw an
-            # error ("after"); a new-key retry then adds a second gate with the same digest.
-            assert reads_after_fault["candidate_state"] == (
-                "CANDIDATE" if mode == "before" else "VALIDATED"
-            )
-            assert len(reads_after_fault["gates"]) == 1
-            assert reads_after_fault["gates"][0]["state"] == "VALIDATED"
+            # Approved P1 contract: neither gate nor candidate revision leaks on either fault.
+            assert reads_after_fault == reads_before
+            assert reads_after_fault["candidate_state"] == "CANDIDATE"
+            assert reads_after_fault["gates"] == []
             assert reads_after_retry["candidate_state"] == "VALIDATED"
-            assert len(reads_after_retry["gates"]) == 2
+            assert len(reads_after_retry["gates"]) == 1
             assert len({gate["gate_digest"] for gate in reads_after_retry["gates"]}) == 1
         else:
             assert reads_after_fault == reads_before

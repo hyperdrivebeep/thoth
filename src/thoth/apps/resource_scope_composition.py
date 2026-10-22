@@ -31,6 +31,7 @@ from thoth.ports.runtime import ClockPort, IdGeneratorPort
 from thoth.ports.sandbox import SandboxPort
 from thoth.ports.store_bundle import StoreBundlePort
 from thoth.protocol.bus import CommandBus
+from thoth.protocol.journal_completion import JournalCompletion
 from thoth.protocol.operation_owner import OperationOwner
 from thoth.protocol.registry import MethodRegistry
 
@@ -117,6 +118,7 @@ def scope_bus(
     queued_admission: Callable[[OperationRecord], dict[str, JsonValue] | None] | None = None,
     owner: OperationOwner | None = None,
     journal: JournalPort | None = None,
+    journal_completion: JournalCompletion | None = None,
 ) -> CommandBus:
     handlers = OperationCommandHandlers(
         operations,
@@ -143,6 +145,7 @@ def scope_bus(
         before_continue=before_continue,
         queued_admission=queued_admission,
         owner=owner,
+        journal_completion=journal_completion,
     )
 
 

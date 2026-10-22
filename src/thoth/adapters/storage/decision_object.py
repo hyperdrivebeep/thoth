@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import cast
 
 import orjson
-from sqlalchemy import Engine, insert, select
+from sqlalchemy import Engine, Integer, insert, literal_column, select
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from thoth.adapters.storage.schema import (
@@ -186,7 +186,7 @@ class SqliteDecisionObjectStore(DecisionObjectStorePort):
             rows = connection.execute(
                 select(decision_objects)
                 .where(decision_objects.c.project_id == project_id)
-                .order_by(decision_objects.c.created_at)
+                .order_by(literal_column("rowid", Integer()))
             ).mappings()
             values = tuple(
                 DecisionObjectRecord.model_validate(load(row["content_json"])) for row in rows
@@ -209,7 +209,7 @@ class SqliteDecisionObjectStore(DecisionObjectStorePort):
             decision_objects.c.object_id == object_id,
         )
         if revision_digest is None:
-            statement = statement.order_by(decision_objects.c.created_at.desc()).limit(1)
+            statement = statement.order_by(literal_column("rowid", Integer()).desc()).limit(1)
         else:
             statement = statement.where(decision_objects.c.revision_digest == revision_digest)
         with read_connection(self._engine) as connection:
@@ -252,7 +252,7 @@ class SqliteDecisionObjectStore(DecisionObjectStorePort):
                     object_relations.c.project_id == project_id,
                     object_relations.c.source_object_id == object_id,
                 )
-                .order_by(object_relations.c.created_at)
+                .order_by(literal_column("rowid", Integer()))
             ).mappings()
             values = tuple(
                 ObjectRelationRecord.model_validate(load(row["content_json"])) for row in rows
@@ -272,7 +272,7 @@ class SqliteDecisionObjectStore(DecisionObjectStorePort):
                 connection.execute(
                     select(object_relations)
                     .where(object_relations.c.relation_id == relation_id)
-                    .order_by(object_relations.c.created_at.desc())
+                    .order_by(literal_column("rowid", Integer()).desc())
                     .limit(1)
                 )
                 .mappings()
@@ -315,7 +315,9 @@ class SqliteDecisionObjectStore(DecisionObjectStorePort):
         if object_id is not None:
             statement = statement.where(object_attention.c.object_id == object_id)
         with read_connection(self._engine) as connection:
-            rows = connection.execute(statement.order_by(object_attention.c.created_at)).mappings()
+            rows = connection.execute(
+                statement.order_by(literal_column("rowid", Integer()))
+            ).mappings()
             values = tuple(
                 ObjectAttentionRecord.model_validate(load(row["content_json"])) for row in rows
             )
@@ -334,7 +336,7 @@ class SqliteDecisionObjectStore(DecisionObjectStorePort):
                 connection.execute(
                     select(object_attention)
                     .where(object_attention.c.attention_id == attention_id)
-                    .order_by(object_attention.c.created_at.desc())
+                    .order_by(literal_column("rowid", Integer()).desc())
                     .limit(1)
                 )
                 .mappings()

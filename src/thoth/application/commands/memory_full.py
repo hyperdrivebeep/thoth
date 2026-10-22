@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import partial
 from typing import cast
 
 from pydantic import JsonValue
@@ -42,6 +43,7 @@ from thoth.application.commands.memory_read_projection import (
     projection_status_view,
     select_policies,
 )
+from thoth.application.commands.memory_records import memory_record
 from thoth.application.services.control_record_service import ControlRecordService
 from thoth.application.services.memory_router import build_recall_context
 from thoth.domain.control_record import ControlRecord
@@ -63,6 +65,7 @@ class MemoryFullHandlers:
     ) -> None:
         self._records = records
         self._controls = controls
+        self._memory_record = partial(memory_record, controls)
         self._legacy = legacy
         self._full = full
         self._ledger = ledger
@@ -303,23 +306,19 @@ class MemoryFullHandlers:
 
     async def validate(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ValidateInput.model_validate(value)
-        current = self._candidate(request)
-        plan, reducer, verdicts, gate_payload, gate_digest = gate_draft(request, current)
-        gate = self._controls.create(
-            project_id=request.project_id,
-            namespace="MEMORY",
-            record_type="GATE",
-            state=reducer,
-            payload={**gate_payload, "gate_digest": gate_digest},
-        )
-        revised = self._controls.create(
-            project_id=request.project_id,
-            namespace="MEMORY",
-            record_type="CANDIDATE",
-            record_id=current.record_id,
-            state=reducer,
-            payload={**current.payload, "validated_gate_digest": gate_digest},
-        )
+        with self._ledger.transaction():
+            current = self._candidate(request)
+            plan, reducer, verdicts, gate_payload, gate_digest = gate_draft(request, current)
+            gate = self._memory_record(
+                request, "GATE", reducer, {**gate_payload, "gate_digest": gate_digest}
+            )
+            revised = self._memory_record(
+                request,
+                "CANDIDATE",
+                reducer,
+                {**current.payload, "validated_gate_digest": gate_digest},
+                record_id=current.record_id,
+            )
         return cast(
             dict[str, JsonValue],
             {
@@ -334,34 +333,30 @@ class MemoryFullHandlers:
 
     async def change_set_propose(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ChangeSetProposeInput.model_validate(value)
-        candidate = self._candidate(request)
-        if (
-            candidate.state != "VALIDATED"
-            or candidate.payload.get("validated_gate_digest") != request.validated_gate_digest
-        ):
-            raise RpcApplicationError(
-                RpcErrorCode.DOMAIN_REJECTED, "candidate gate is not validated"
+        with self._ledger.transaction():
+            candidate = self._candidate(request)
+            if (
+                candidate.state != "VALIDATED"
+                or candidate.payload.get("validated_gate_digest") != request.validated_gate_digest
+            ):
+                raise RpcApplicationError(
+                    RpcErrorCode.DOMAIN_REJECTED, "candidate gate is not validated"
+                )
+            entry_payload = memory_entry_payload(candidate)
+            memory_candidate = self._memory_record(
+                request, "MEMORY_ENTRY_CANDIDATE", "PROPOSED_NOT_APPLIED", entry_payload
             )
-        entry_payload = memory_entry_payload(candidate)
-        memory_candidate = self._controls.create(
-            project_id=request.project_id,
-            namespace="MEMORY",
-            record_type="MEMORY_ENTRY_CANDIDATE",
-            state="PROPOSED_NOT_APPLIED",
-            payload=entry_payload,
-        )
-        change_set = self._controls.create(
-            project_id=request.project_id,
-            namespace="MEMORY",
-            record_type="CHANGE_SET_PROPOSAL",
-            state="PROPOSED_NOT_APPLIED",
-            payload={
-                "memory_candidate_digest": memory_candidate.record_digest,
-                "transition_intent": request.transition_intent,
-                "expected_memory_head_digest": request.expected_memory_head_digest,
-                "current_state_mutated": False,
-            },
-        )
+            change_set = self._memory_record(
+                request,
+                "CHANGE_SET_PROPOSAL",
+                "PROPOSED_NOT_APPLIED",
+                {
+                    "memory_candidate_digest": memory_candidate.record_digest,
+                    "transition_intent": request.transition_intent,
+                    "expected_memory_head_digest": request.expected_memory_head_digest,
+                    "current_state_mutated": False,
+                },
+            )
         return cast(
             dict[str, JsonValue],
             {
@@ -405,28 +400,27 @@ class MemoryFullHandlers:
 
     async def retire_propose(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = RetireProposeInput.model_validate(value)
-        current = self._memory(request)
-        if current.record_digest != request.expected_revision_digest:
-            raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "memory revision changed")
-        candidate = self._controls.create(
-            project_id=request.project_id,
-            namespace="MEMORY",
-            record_type="RETIRE_CANDIDATE",
-            state="PROPOSED_NOT_APPLIED",
-            payload={
-                "memory_entry_id": current.record_id,
-                "reason": request.reason,
-                "evidence_refs": request.evidence_refs,
-                "history_preserved": True,
-            },
-        )
-        change_set = self._controls.create(
-            project_id=request.project_id,
-            namespace="MEMORY",
-            record_type="CHANGE_SET_PROPOSAL",
-            state="PROPOSED_NOT_APPLIED",
-            payload={"retire_candidate_digest": candidate.record_digest},
-        )
+        with self._ledger.transaction():
+            current = self._memory(request)
+            if current.record_digest != request.expected_revision_digest:
+                raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "memory revision changed")
+            candidate = self._memory_record(
+                request,
+                "RETIRE_CANDIDATE",
+                "PROPOSED_NOT_APPLIED",
+                {
+                    "memory_entry_id": current.record_id,
+                    "reason": request.reason,
+                    "evidence_refs": request.evidence_refs,
+                    "history_preserved": True,
+                },
+            )
+            change_set = self._memory_record(
+                request,
+                "CHANGE_SET_PROPOSAL",
+                "PROPOSED_NOT_APPLIED",
+                {"retire_candidate_digest": candidate.record_digest},
+            )
         return {
             "retirement_candidate": candidate.model_dump(mode="json"),
             "change_set": change_set.model_dump(mode="json"),

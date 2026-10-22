@@ -6,7 +6,11 @@ from functools import partial
 from pathlib import Path
 
 from thoth.adapters.operation_host_identity import operation_host_token
-from thoth.adapters.storage.workspace_owner import holds_workspace, pin_workspace_owner
+from thoth.adapters.storage.workspace_owner import (
+    holds_workspace,
+    pin_workspace_owner,
+    workspace_owner_key,
+)
 from thoth.application.commands import ThreadCommandHandlers
 from thoth.application.commands.research_operations import register_research_operations
 from thoth.application.services import FieldMeasurementService
@@ -22,6 +26,7 @@ from thoth.apps.runtime_types import RuntimeWithLedger
 from thoth.domain.deployment_mode import DeploymentMode
 from thoth.ports.criterion_contract import CriterionContractStorePort
 from thoth.ports.evidence_graph import EvidenceGraphStorePort
+from thoth.ports.journal import JournalCompletionStorePort
 from thoth.ports.ledger import ManagedLedgerPort
 from thoth.ports.model import ModelResolverPort
 from thoth.ports.model_catalog import ModelCatalogPort
@@ -30,6 +35,7 @@ from thoth.ports.runtime import ClockPort, IdGeneratorPort
 from thoth.ports.store_bundle import StoreBundlePort
 from thoth.ports.task_profile import TaskProfileCatalogPort
 from thoth.protocol.bus import CommandBus
+from thoth.protocol.journal_completion import JournalCompletion
 from thoth.protocol.operation_owner import OperationOwner
 
 
@@ -84,6 +90,7 @@ def assemble_runtime_entry(
             before_continue = wait_for_hosted_dispatch
         journal = OperationJournal(stores.events, clock, ids)
         owner = None
+        journal_completion = None
         if mode is DeploymentMode.LOCAL:
             owner = OperationOwner(
                 worker=research_component.worker,
@@ -96,6 +103,16 @@ def assemble_runtime_entry(
                 clock=clock,
                 resource_access=artifact_ledger.scopes,
             )
+            if isinstance(stores.events, JournalCompletionStorePort):
+                journal_completion = JournalCompletion(
+                    workspace_key=workspace_owner_key(workspace),
+                    pin_workspace=partial(pin_workspace_owner, workspace),
+                    operations=operations,
+                    journal=journal,
+                    store=stores.events,
+                    uow=stores.immediate_uow,
+                    resource_access=artifact_ledger.scopes,
+                )
         bus = scope_bus(
             registration.registry,
             ledger,
@@ -109,6 +126,7 @@ def assemble_runtime_entry(
             before_continue=before_continue,
             queued_admission=research_component.entry.queued_admission,
             owner=owner,
+            journal_completion=journal_completion,
             journal=journal,
         )
         registration.judgment_review.connect(bus, research_component.entry)
