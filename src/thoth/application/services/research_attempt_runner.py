@@ -10,6 +10,7 @@ from pydantic import JsonValue
 
 from thoth.application.services.model_outcomes import record_model_outcome
 from thoth.application.services.post_execution_resume import resume_post_execution_learning
+from thoth.application.services.reference_failure import reference_failure_cause
 from thoth.application.services.request_language import apply_request_language
 from thoth.application.services.research_boundary import RequestBoundary
 from thoth.application.services.research_termination import ResearchTerminationService
@@ -181,7 +182,7 @@ async def _execute_owned(
     ) -> PendingExecution:
         from thoth.domain.research_failure import FailureOrigin
 
-        primary = failure_cause(primary_error, cast(FailureOrigin, origin))
+        primary, notice = reference_failure_cause(primary_error, cast(FailureOrigin, origin))
         secondary = (
             None if secondary_error is None else failure_cause(secondary_error, "HOLD_PUBLICATION")
         )
@@ -194,7 +195,7 @@ async def _execute_owned(
         )
         try:
             ResearchTerminationService(host.records, host.operations, host.threads).finish_failure(
-                attempt, request, primary, secondary
+                attempt, request, primary, secondary, notice=notice
             )
         except ResearchLeaseLost:
             return PendingExecution({"status": "ATTEMPT_FENCED"})

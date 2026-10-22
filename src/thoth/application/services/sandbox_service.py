@@ -327,6 +327,8 @@ class SandboxService:
         self,
         spec: SandboxRunSpec,
         bundle: SandboxExecutionBundle,
+        *,
+        defer_rejection: bool = False,
     ) -> Generator[ArtifactEnvelope, None, None]:
         try:
             with self._ledger.transaction():
@@ -385,7 +387,8 @@ class SandboxService:
                     },
                 )
         except SandboxFailure:
-            self.reject_observation(bundle, reason="SANDBOX_ADMISSION_BASIS_CHANGED")
+            if not defer_rejection:
+                self.reject_observation(bundle, reason="SANDBOX_ADMISSION_BASIS_CHANGED")
             raise
 
     def reject_observation(self, bundle: SandboxExecutionBundle, *, reason: str) -> None:

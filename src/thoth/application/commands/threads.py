@@ -247,7 +247,10 @@ class ThreadCommandHandlers:
         return {
             "checkpoints": [
                 item.model_dump(mode="json")
-                for item in self._runtime.list_checkpoints(request.project_id, request.thread_id)
+                for item in sorted(
+                    self._runtime.list_checkpoints(request.project_id, request.thread_id),
+                    key=lambda item: (item.created_at.isoformat(), item.checkpoint_id),
+                )
             ]
         }
 

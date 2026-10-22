@@ -81,9 +81,13 @@ async def test_post_io_acceptance_is_atomic_and_does_not_repeat_execution(
         ) == ("thread/input", key, project)
 
     @contextmanager
-    def observe_accept(service: SandboxService, spec: Any, bundle: Any) -> Generator[Any]:
+    def observe_accept(
+        service: SandboxService, spec: Any, bundle: Any, *, defer_rejection: bool = False
+    ) -> Generator[Any]:
         if not active() or spec.project_id != project:
-            with original_accept(service, spec, bundle) as artifact:
+            with original_accept(
+                service, spec, bundle, defer_rejection=defer_rejection
+            ) as artifact:
                 yield artifact
             return
         phase_attempt.append(spec.attempt_id)
@@ -99,7 +103,9 @@ async def test_post_io_acceptance_is_atomic_and_does_not_repeat_execution(
         if not evidence["ambient_at_entry"]:
             evidence["before"] = snapshot(runtime.ledger.engine)
         try:
-            with original_accept(service, spec, bundle) as artifact:
+            with original_accept(
+                service, spec, bundle, defer_rejection=defer_rejection
+            ) as artifact:
                 evidence["trace"].append("original-entered")
                 yield artifact
         except BaseException as exc:

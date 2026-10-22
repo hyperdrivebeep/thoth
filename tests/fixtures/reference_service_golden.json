@@ -7,9 +7,10 @@
      "error": {
       "code": -32030,
       "data": {
-       "reason_code": "REFERENCE_ANSWER_REVISION_CONFLICT"
+       "reason_code": "REFERENCE_ANSWER_REVISION_CONFLICT",
+       "research_saved": true
       },
-      "message": "REFERENCE_ANSWER_REVISION_CONFLICT"
+      "message": "\uc5f0\uad6c \uacb0\uacfc\ub294 \uc800\uc7a5\ub410\uc2b5\ub2c8\ub2e4. \uae30\uc900(reference) \ub2e8\uacc4\ub9cc \uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4 (\uc0ac\uc720: REFERENCE_ANSWER_REVISION_CONFLICT). \uacb0\uacfc\ub294 \uae30\ub85d\uc5d0\uc11c \ubcfc \uc218 \uc788\uc2b5\ub2c8\ub2e4. \uac19\uc740 \uc9c8\ubb38\uc744 \uc0c8\ub85c \ubcf4\ub0b4\uba74 \uc5f0\uad6c\uac00 \ub2e4\uc2dc \uc2e4\ud589\ub420 \uc218 \uc788\uc73c\ub2c8 \uba3c\uc800 \uc800\uc7a5\ub41c \uacb0\uacfc\ub97c \ud655\uc778\ud558\uc138\uc694. / The research result was saved. Only the reference step failed (reason: REFERENCE_ANSWER_REVISION_CONFLICT). You can read the result in the history. Sending the same question again as a new request may run the research again, so check the saved result first."
      }
     }
    ]

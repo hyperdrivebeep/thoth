@@ -40,4 +40,5 @@ def reference_thread_entry(
             ids=ids,
         ),
         ModelReferenceMapper(models, projects, ledger),
+        ledger,
     )

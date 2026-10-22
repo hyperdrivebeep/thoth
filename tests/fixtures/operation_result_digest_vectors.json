@@ -1,0 +1,44 @@
+{
+  "source": "CP56 OPERATION_RESULT/1.0.0 formula; independent of J helper",
+  "vectors": [
+    {
+      "value": {},
+      "digest": "bca32c7f85e8328c9805776a42733883e04f0f358c2b97ac00a9538e2b4f7e9f"
+    },
+    {
+      "value": {
+        "revision": 1,
+        "name": "Changed exactly once"
+      },
+      "digest": "f5659a222b58a5109567afbe95c662e7ec9fb12c2002ea4ca9be9a1c85376785"
+    },
+    {
+      "value": {
+        "z": "한국어 · English",
+        "a": [
+          null,
+          false,
+          7
+        ]
+      },
+      "digest": "d312b684a88236c57206e1e3a43a2ffd69c33845935a464fc71498032bbb07c6"
+    },
+    {
+      "value": {
+        "nested": {
+          "b": "2.5",
+          "a": "value"
+        },
+        "empty": []
+      },
+      "digest": "1a59a9351dc1d90ec328496bb7354172bb4ad58a8ee46382cf3df59fa6ea4c82"
+    },
+    {
+      "value": {
+        "state": "SUCCEEDED",
+        "unchanged": true
+      },
+      "digest": "a57f47caee392c540518a8c1705345305f5e60a74d23bb6fbdaccd73a376386f"
+    }
+  ]
+}

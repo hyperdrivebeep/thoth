@@ -3,19 +3,20 @@
 These functions build the values the coordinator stages, links or reports: the R2 action pick,
 a recovery attempt, the linked outcome, the two coordinator actors, failure classification, the
 recovery candidate and reconciliation records, and the staged revision of one entity. They read
-nothing and write nothing. The coordinator keeps every await, every ledger, sandbox, research and
-lifecycle call and every transaction, and passes the id generator and the clock through as the
-original objects so ids and times are drawn in the same order as before.
+nothing and write nothing to storage. The coordinator and failure publisher retain every await,
+ledger, sandbox, research, lifecycle call and transaction. The original id generator and clock
+are passed through, so ids and times are drawn in the same order as before.
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import cast
 
 from thoth.application.services.sandbox_service import SandboxExecutionBundle
 from thoth.domain.action import ActionCandidate, ActionPlan
 from thoth.domain.actor import ActorRef
-from thoth.domain.canonical import canonical_payload, domain_digest
+from thoth.domain.canonical import canonical_payload, domain_digest, head_set_digest
 from thoth.domain.enums import ActorKind, EntityType, RiskTier
 from thoth.domain.outcome import OutcomeRecord
 from thoth.domain.policy import R2RecoveryPolicy
@@ -195,6 +196,48 @@ def reconciliation_record(
         }
     )
     return reconciliation
+
+
+@dataclass(frozen=True)
+class RecoveryDraft:
+    heads: dict[str, str]
+    digest: str
+    repair_basis: str
+    plan: ActionPlan
+    reconciliation: ReconciliationRecord | None
+    action_head_key: str
+    actor: ActorRef
+
+
+def recovery_draft(
+    ids: IdGeneratorPort,
+    action_plan: ActionPlan,
+    action_id: str,
+    expected_heads: dict[str, str],
+    failure_class: ExecutionFailureClass,
+    attempts: tuple[RecoveryAttempt, ...],
+) -> RecoveryDraft:
+    baseline_heads = dict(expected_heads)
+    baseline_digest = head_set_digest(baseline_heads)
+    repair_basis = repair_basis_text(failure_class, attempts)
+    candidate = recovery_candidate(
+        ids, action_plan, action_id, baseline_digest, failure_class, repair_basis, attempts
+    )
+    reconciliation = None
+    if failure_class == ExecutionFailureClass.AMBIGUOUS_EXTERNAL:
+        reconciliation = reconciliation_record(ids, action_id, attempts)
+    revised_plan = action_plan.model_copy(update={"recovery_candidate": candidate})
+    action_head_key = f"ACTION:{action_plan.plan_id}"
+    actor = recovery_actor()
+    return RecoveryDraft(
+        baseline_heads,
+        baseline_digest,
+        repair_basis,
+        revised_plan,
+        reconciliation,
+        action_head_key,
+        actor,
+    )
 
 
 def terminal_state(failure_class: ExecutionFailureClass, retry_budget_exhausted: bool) -> str:

@@ -15,6 +15,10 @@ from thoth.application.services.r2_execution_projections import (
     stale_head_projection,
     template_required_projection,
 )
+from thoth.application.services.r2_failure_publication import (
+    AdmissionRejected,
+    R2FailurePublication,
+)
 from thoth.application.services.r2_outcome_projection import (
     ProcessOutcomeProjection,
     build_process_outcome,
@@ -24,11 +28,8 @@ from thoth.application.services.r2_recovery_records import (
     closed_loop_actor,
     failure_class_of,
     r2_action,
-    reconciliation_record,
-    recovery_actor,
     recovery_attempt,
-    recovery_candidate,
-    repair_basis_text,
+    recovery_draft,
     stage_revision,
     terminal_state,
 )
@@ -114,6 +115,7 @@ class R2ClosedLoopCoordinator:
         self._clock = clock
         self._ids = ids
         self._test_lifecycle = test_lifecycle
+        self._failures = R2FailurePublication(ledger, sandbox)
 
     async def execute_if_required(
         self,
@@ -152,71 +154,81 @@ class R2ClosedLoopCoordinator:
                 return run_hold
             assert bundle is not None
             if head_set_digest(self._ledger.read_heads(project.project_id)) != sealed_head_digest:
-                self._record_test_hold(prepared_test, bundle, "SANDBOX_HEAD_STALE_AFTER_IO")
-                return self._stale_head_execution(
-                    project.project_id,
-                    portfolio,
-                    action_plan,
-                    action.action_id,
-                    bundle,
-                )
+                with self._failures.transaction():
+                    self._record_test_hold(prepared_test, bundle, "SANDBOX_HEAD_STALE_AFTER_IO")
+                    return self._stale_head_execution(
+                        project.project_id,
+                        portfolio,
+                        action_plan,
+                        action.action_id,
+                        bundle,
+                    )
             failure_class = failure_class_of(bundle, recovery_policy)
             assessments, assessment_hold = self._measurement_assessments(prepared_test, bundle)
             if assessment_hold is not None:
                 return assessment_hold
-            if failure_class is not None:
-                try:
-                    with self._sandbox.accepting_observation(spec, bundle):
-                        if prepared_test is not None and self._test_lifecycle is not None:
-                            failure_completion = self._test_lifecycle.complete(
-                                prepared_test, bundle, assessments
-                            )
-                except SandboxFailure as exc:
-                    self._record_test_hold(prepared_test, bundle, exc.code.value)
-                    return self._admission_hold(
-                        project.project_id, portfolio, action_plan, action.action_id, bundle, exc
-                    )
-            attempts.append(recovery_attempt(spec, bundle, failure_class, retry_ordinal))
-            if failure_class is None:
-                break
-            if (
+            retry_allowed = (
                 failure_class == ExecutionFailureClass.TRANSIENT_INFRA
                 and retry_ordinal < recovery_policy.max_transient_retries
-            ):
-                retry_ordinal += 1
-                if prepared_test is not None and self._test_lifecycle is not None:
-                    try:
-                        prepared_test = self._test_lifecycle.retry(project, action, prepared_test)
-                    except ValueError as exc:
-                        return self._test_hold(exc, bundle=bundle)
-                    spec, portfolio, action_plan = (
-                        prepared_test.spec,
-                        prepared_test.portfolio,
-                        prepared_test.action_plan,
-                    )
-                    sealed_heads = dict(self._ledger.read_heads(project.project_id))
-                    sealed_head_digest = head_set_digest(sealed_heads)
-                    research = self._research.context(
-                        project.project_id, portfolio.object_id, sealed_heads
-                    )
-                else:
-                    spec = spec.model_copy(update={"attempt_id": self._ids.new("r2-attempt")})
-                continue
-            return self._failure_execution(
-                project=project,
-                action_plan=action_plan,
-                action_id=action.action_id,
-                spec=spec,
-                failure_class=failure_class,
-                attempts=tuple(attempts),
-                expected_heads=sealed_heads,
-                expected_head_set_digest=sealed_head_digest,
-                retry_budget_exhausted=(
-                    failure_class == ExecutionFailureClass.TRANSIENT_INFRA
-                    and retry_ordinal >= recovery_policy.max_transient_retries
-                ),
-                test_completion=failure_completion,
             )
+            try:
+                with self._failures.final_attempt(prepared_test, failure_class, retry_allowed):
+                    if failure_class is not None:
+                        with self._failures.accepting_failure(spec, bundle):
+                            if prepared_test is not None and self._test_lifecycle is not None:
+                                failure_completion = self._test_lifecycle.complete(
+                                    prepared_test, bundle, assessments
+                                )
+                    attempts.append(recovery_attempt(spec, bundle, failure_class, retry_ordinal))
+                    if failure_class is None:
+                        break
+                    if retry_allowed:
+                        retry_ordinal += 1
+                        if prepared_test is not None and self._test_lifecycle is not None:
+                            try:
+                                prepared_test = self._test_lifecycle.retry(
+                                    project, action, prepared_test
+                                )
+                            except ValueError as exc:
+                                return self._test_hold(exc, bundle=bundle)
+                            spec, portfolio, action_plan = (
+                                prepared_test.spec,
+                                prepared_test.portfolio,
+                                prepared_test.action_plan,
+                            )
+                            sealed_heads = dict(self._ledger.read_heads(project.project_id))
+                            sealed_head_digest = head_set_digest(sealed_heads)
+                            research = self._research.context(
+                                project.project_id, portfolio.object_id, sealed_heads
+                            )
+                        else:
+                            spec = spec.model_copy(
+                                update={"attempt_id": self._ids.new("r2-attempt")}
+                            )
+                        continue
+                    return self._failure_execution(
+                        project=project,
+                        action_plan=action_plan,
+                        action_id=action.action_id,
+                        spec=spec,
+                        failure_class=failure_class,
+                        attempts=tuple(attempts),
+                        expected_heads=sealed_heads,
+                        expected_head_set_digest=sealed_head_digest,
+                        retry_budget_exhausted=(
+                            failure_class == ExecutionFailureClass.TRANSIENT_INFRA
+                            and retry_ordinal >= recovery_policy.max_transient_retries
+                        ),
+                        test_completion=failure_completion,
+                    )
+            except AdmissionRejected as rejected:
+                exc = rejected.failure
+                with self._failures.transaction():
+                    self._failures.reject_admission(bundle)
+                    self._record_test_hold(prepared_test, bundle, exc.code.value)
+                return self._admission_hold(
+                    project.project_id, portfolio, action_plan, action.action_id, bundle, exc
+                )
         process = build_process_outcome(
             project=project,
             portfolio=portfolio,
@@ -266,7 +278,9 @@ class R2ClosedLoopCoordinator:
                 assessments,
             )
         except SandboxFailure as exc:
-            self._record_test_hold(prepared_test, bundle, exc.code.value)
+            with self._failures.transaction():
+                self._failures.reject_admission(bundle)
+                self._record_test_hold(prepared_test, bundle, exc.code.value)
             return self._admission_hold(
                 project.project_id, portfolio, action_plan, action.action_id, bundle, exc
             )
@@ -371,8 +385,9 @@ class R2ClosedLoopCoordinator:
         try:
             return self._test_lifecycle.prepare_assessments(prepared, bundle), None
         except ValueError as exc:
-            self._sandbox.reject_observation(bundle, reason="RESEARCH_TEST_ASSESSMENT_REJECTED")
-            self._record_test_hold(prepared, bundle, "RESEARCH_TEST_ASSESSMENT_REJECTED")
+            with self._failures.transaction():
+                self._sandbox.reject_observation(bundle, reason="RESEARCH_TEST_ASSESSMENT_REJECTED")
+                self._record_test_hold(prepared, bundle, "RESEARCH_TEST_ASSESSMENT_REJECTED")
             return (), self._test_hold(exc, bundle=bundle)
 
     def _record_test_hold(
@@ -424,7 +439,7 @@ class R2ClosedLoopCoordinator:
         assessments: tuple[TestValidityAssessment, ...] = (),
     ) -> tuple[CommitResult, ResearchTestCompletion | None] | R2ClosedLoopExecution:
         try:
-            with self._sandbox.accepting_observation(spec, bundle):
+            with self._sandbox.accepting_observation(spec, bundle, defer_rejection=True):
                 commit = RevisionCommitService(
                     self._ledger,
                     self._clock,
@@ -458,8 +473,9 @@ class R2ClosedLoopCoordinator:
         except Exception:
             if prepared_test is None:
                 raise
-            self._sandbox.reject_observation(bundle, reason="RESEARCH_TEST_FINALIZATION_FAILED")
-            self._record_test_hold(prepared_test, bundle, "RESEARCH_TEST_FINALIZATION_FAILED")
+            with self._failures.transaction():
+                self._sandbox.reject_observation(bundle, reason="RESEARCH_TEST_FINALIZATION_FAILED")
+                self._record_test_hold(prepared_test, bundle, "RESEARCH_TEST_FINALIZATION_FAILED")
             return self._test_hold(ValueError("RESEARCH_TEST_FINALIZATION_FAILED"), bundle=bundle)
 
     def _admission_hold(
@@ -563,27 +579,12 @@ class R2ClosedLoopCoordinator:
         if test_completion is not None:
             expected_heads = dict(self._ledger.read_heads(project.project_id))
             expected_head_set_digest = head_set_digest(expected_heads)
-        baseline_heads = dict(expected_heads)
-        baseline_digest = head_set_digest(baseline_heads)
-        repair_basis = repair_basis_text(failure_class, attempts)
-        candidate = recovery_candidate(
-            self._ids,
-            action_plan,
-            action_id,
-            baseline_digest,
-            failure_class,
-            repair_basis,
-            attempts,
+        draft = recovery_draft(
+            self._ids, action_plan, action_id, expected_heads, failure_class, attempts
         )
-        reconciliation = None
-        if failure_class == ExecutionFailureClass.AMBIGUOUS_EXTERNAL:
-            reconciliation = reconciliation_record(self._ids, action_id, attempts)
-        revised_plan = action_plan.model_copy(update={"recovery_candidate": candidate})
-        action_head_key = f"ACTION:{action_plan.plan_id}"
-        actor = recovery_actor()
-        research = self._research.context(project.project_id, action_plan.object_id, baseline_heads)
+        research = self._research.context(project.project_id, action_plan.object_id, draft.heads)
         batch = self._research.stage_actions(
-            revised_plan, actor=actor, context=research, hypotheses=research.hypotheses
+            draft.plan, actor=draft.actor, context=research, hypotheses=research.hypotheses
         )
         # Recovery proposes a plan-only branch; no action/portfolio projection is activated.
         staged = batch.staged[0]
@@ -596,27 +597,26 @@ class R2ClosedLoopCoordinator:
             RevisionChangeSet(
                 changeset_id=self._ids.new("changeset"),
                 project_id=project.project_id,
-                expected_heads={action_head_key: "0" * 64},
+                expected_heads={draft.action_head_key: "0" * 64},
                 expected_head_set_digest=expected_head_set_digest,
                 staged_revisions=(staged,),
                 impact_plan=ImpactPropagationPlan(),
-                actor=actor,
-                reason=repair_basis,
+                actor=draft.actor,
+                reason=draft.repair_basis,
             )
         )
         baseline_after = head_set_digest(self._ledger.read_heads(project.project_id))
-        terminal = terminal_state(failure_class, retry_budget_exhausted)
         return R2ClosedLoopExecution(
             projection=failure_projection(
-                terminal,
+                terminal_state(failure_class, retry_budget_exhausted),
                 test_completion,
                 action_id,
                 attempts,
-                baseline_digest,
+                draft.digest,
                 baseline_after,
                 commit,
-                repair_basis,
-                reconciliation,
+                draft.repair_basis,
+                draft.reconciliation,
                 retry_budget_exhausted,
             )
         )

@@ -43,6 +43,11 @@ from thoth.protocol.deferred import (
     PendingExecution,
     current_operation,
 )
+from thoth.protocol.journal_completion import (
+    JournalCompletion,
+    journal_tail_guard,
+    operation_result_digest,
+)
 from thoth.protocol.jsonrpc import (
     JsonRpcError,
     JsonRpcRequest,
@@ -53,6 +58,7 @@ from thoth.protocol.jsonrpc import (
 from thoth.protocol.notifications import notifications_for
 from thoth.protocol.operation_claim import claim_busy_response, claim_operation
 from thoth.protocol.operation_owner import OperationOwner, stale_running_error
+from thoth.protocol.operation_scope import SYSTEM_PROJECT_METHODS
 from thoth.protocol.read_queries import READ_QUERY_METHODS
 from thoth.protocol.registry import CommandHandler, MethodRegistry
 
@@ -84,6 +90,7 @@ class CommandBus:
         before_continue: Callable[[str], Awaitable[None]] | None = None,
         queued_admission: Callable[[OperationRecord], dict[str, JsonValue] | None] | None = None,
         owner: OperationOwner | None = None,
+        journal_completion: JournalCompletion | None = None,
     ) -> None:
         self._registry = registry
         self._operations = operations
@@ -96,6 +103,7 @@ class CommandBus:
         self._before_continue = before_continue
         self._queued_admission = queued_admission
         self._owner = owner
+        self._journal_completion = journal_completion
         self._operation_task_canceller: Callable[[str], None] | None = None
         self._failure_diagnostics = (
             operations if isinstance(operations, InternalFailureDiagnosticPort) else None
@@ -454,30 +462,31 @@ class CommandBus:
             )
             self._measure(request, operation.project_id, "FAILED")
             return JsonRpcResponse(id=request.id, error=error)
-        completed = self._operations.complete(
-            operation.operation_id,
-            durable_value,
-            completed_at=self._clock.now(),
-        )
-        if completed.state is not OperationState.SUCCEEDED:
-            return self._replay(request.id, completed)
-        result_digest = domain_digest("OPERATION_RESULT", "1.0.0", canonical_payload(durable_value))
-        if self._journal is not None:
-            self._journal.checkpoint(
-                operation_id=operation.operation_id,
-                payload={"state": completed.state.value, "result_digest": result_digest},
+        with journal_tail_guard(self._journal_completion, operation):
+            completed = self._operations.complete(
+                operation.operation_id,
+                durable_value,
+                completed_at=self._clock.now(),
             )
-        for notification in notifications_for(request.method, durable_value):
+            if completed.state is not OperationState.SUCCEEDED:
+                return self._replay(request.id, completed)
+            result_digest = operation_result_digest(durable_value)
+            if self._journal is not None:
+                self._journal.checkpoint(
+                    operation_id=operation.operation_id,
+                    payload={"state": completed.state.value, "result_digest": result_digest},
+                )
+            for notification in notifications_for(request.method, durable_value):
+                self._append_event(
+                    operation,
+                    notification,
+                    {"method": request.method, "result_digest": result_digest},
+                )
             self._append_event(
                 operation,
-                notification,
-                {"method": request.method, "result_digest": result_digest},
+                "operation.succeeded",
+                {"result_digest": result_digest},
             )
-        self._append_event(
-            operation,
-            "operation.succeeded",
-            {"result_digest": result_digest},
-        )
         self._measure(request, operation.project_id, "SUCCEEDED")
         response = self._result_payload(completed)
         if isinstance(value, EphemeralCommandResult):
@@ -499,18 +508,7 @@ class CommandBus:
             return
 
     def _project_scope(self, request: JsonRpcRequest) -> str:
-        if request.method in {
-            "workspace/setup/read",
-            "workspace/setup/update",
-            "workspace/ready",
-            "model/credential/list",
-            "model/credential/register",
-            "model/credential/login/status",
-            "model/credential/login/cancel",
-            "model/credential/login/complete",
-            "model/catalog/refresh",
-            "model/tooling/install",
-        }:
+        if request.method in SYSTEM_PROJECT_METHODS:
             return "system:workspace"
         value = request.params.input.get("project_id")
         if not isinstance(value, str) or not value:
@@ -607,6 +605,8 @@ class CommandBus:
     def _replay(self, request_id: str | int, operation: OperationRecord) -> JsonRpcResponse:
         if self._resource_access is not None:
             self._resource_access.require_operation(operation)
+        if self._journal_completion is not None:
+            operation = self._journal_completion.repair(operation)
         if operation.state == OperationState.SUCCEEDED and operation.result is not None:
             return JsonRpcResponse(id=request_id, result=self._result_payload(operation))
         if operation.state == OperationState.FAILED and operation.error is not None:

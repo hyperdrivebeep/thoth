@@ -123,7 +123,7 @@
       "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     },
     "src/thoth/application/commands/memory_full.py": {
-      "baseline_lines": 519,
+      "baseline_lines": 513,
       "top_level_symbols": [
         "MemoryFullHandlers"
       ],

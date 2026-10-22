@@ -3,19 +3,26 @@
 from pydantic import JsonValue
 
 from thoth.application.commands.thread_analysis import ThreadInputRequest
+from thoth.application.services.reference_failure import reference_failure
 from thoth.application.services.reference_mapping import ModelReferenceMapper
 from thoth.application.services.reference_service import ReferenceService, ReferenceTransition
 from thoth.domain.evidence import InformationSufficiencyAssessment
 from thoth.domain.reference import ReferenceAnswerRequest, ReferenceError, ReferenceRequest
+from thoth.ports.ledger import LedgerPort
 from thoth.ports.thread import ThreadEntryPort
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 
 
 class ReferenceThreadEntry:
     def __init__(
-        self, delegate: ThreadEntryPort, service: ReferenceService, mapper: ModelReferenceMapper
+        self,
+        delegate: ThreadEntryPort,
+        service: ReferenceService,
+        mapper: ModelReferenceMapper,
+        ledger: LedgerPort,
     ) -> None:
         self._delegate, self._service, self._mapper = delegate, service, mapper
+        self._ledger = ledger
 
     def authorize_before_claim(self, method: str, value: dict[str, JsonValue]) -> None:
         self._delegate.authorize_before_claim(method, value)
@@ -45,12 +52,17 @@ class ReferenceThreadEntry:
                     selected.expected_revision_digest,
                 )
             result = await self._delegate.analyze(value)
-            if result.get("queued") is True or "assessment" not in result:
-                return result
-            transition = await self._reference(request, result)
         except ReferenceError as exc:
             raise RpcApplicationError(
                 RpcErrorCode.DOMAIN_REJECTED, exc.code, data={"reason_code": exc.code}
+            ) from exc
+        if result.get("queued") is True or "assessment" not in result:
+            return result
+        try:
+            transition = await self._reference(request, result)
+        except ReferenceError as exc:
+            raise reference_failure(
+                self._ledger, request.project_id, request.thread_id, result, exc.code
             ) from exc
         if transition is None:
             return result

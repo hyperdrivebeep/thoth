@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import cast
 
 import orjson
-from sqlalchemy import Engine, Table, insert, select
+from sqlalchemy import Engine, Integer, Table, func, insert, literal_column, select
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from thoth.adapters.storage.schema import (
@@ -115,7 +115,12 @@ class SqliteOutcomeStore(OutcomeStorePort):
             rows = connection.execute(
                 select(outcome_series)
                 .where(outcome_series.c.project_id == project_id)
-                .order_by(outcome_series.c.created_at)
+                .order_by(
+                    func.coalesce(
+                        func.json_extract(outcome_series.c.content_json, "$.revision"), 0
+                    ),
+                    literal_column("rowid", Integer()),
+                )
             ).mappings()
             values = tuple(
                 OutcomeSeriesRecord.model_validate(load(row["content_json"])) for row in rows
@@ -133,7 +138,12 @@ class SqliteOutcomeStore(OutcomeStorePort):
             outcome_series.c.outcome_series_id == series_id,
         )
         if revision_digest is None:
-            statement = statement.order_by(outcome_series.c.created_at.desc()).limit(1)
+            statement = statement.order_by(
+                func.coalesce(
+                    func.json_extract(outcome_series.c.content_json, "$.revision"), 0
+                ).desc(),
+                literal_column("rowid", Integer()).desc(),
+            ).limit(1)
         else:
             statement = statement.where(outcome_series.c.revision_digest == revision_digest)
         with read_connection(self._engine) as connection:
@@ -159,7 +169,7 @@ class SqliteOutcomeStore(OutcomeStorePort):
             rows = connection.execute(
                 select(outcome_assessments)
                 .where(outcome_assessments.c.project_id == project_id)
-                .order_by(outcome_assessments.c.created_at)
+                .order_by(literal_column("rowid", Integer()))
             ).mappings()
             values = tuple(
                 OutcomeAssessmentRecord.model_validate(load(row["content_json"])) for row in rows
@@ -177,7 +187,7 @@ class SqliteOutcomeStore(OutcomeStorePort):
             outcome_assessments.c.outcome_assessment_id == assessment_id,
         )
         if revision_digest is None:
-            statement = statement.order_by(outcome_assessments.c.created_at.desc()).limit(1)
+            statement = statement.order_by(literal_column("rowid", Integer()).desc()).limit(1)
         else:
             statement = statement.where(outcome_assessments.c.revision_digest == revision_digest)
         with read_connection(self._engine) as connection:

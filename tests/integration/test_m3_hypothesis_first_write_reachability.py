@@ -178,9 +178,13 @@ async def test_native_first_binding_visibility_and_post_persist_rollback(
         save(case, evidence)
 
     @contextmanager
-    def accept(service: Any, spec: Any, bundle: Any) -> Generator[Any]:
+    def accept(
+        service: Any, spec: Any, bundle: Any, *, defer_rejection: bool = False
+    ) -> Generator[Any]:
         if not active():
-            with originals["accept"](service, spec, bundle) as artifact:
+            with originals["accept"](
+                service, spec, bundle, defer_rejection=defer_rejection
+            ) as artifact:
                 yield artifact
             return
         evidence["ambient_at_entry"] = vars(transaction_module)["_AMBIENT"].get() is not None
@@ -190,7 +194,9 @@ async def test_native_first_binding_visibility_and_post_persist_rollback(
         evidence["before_phase"] = snapshot(runtime.ledger.engine)
         evidence["trace"].append("before_original_accept")
         try:
-            with originals["accept"](service, spec, bundle) as artifact:
+            with originals["accept"](
+                service, spec, bundle, defer_rejection=defer_rejection
+            ) as artifact:
                 evidence["trace"].append("original_accept_entered")
                 yield artifact
         except BaseException as exc:

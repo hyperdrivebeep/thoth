@@ -4123,6 +4123,10 @@
     "SandboxExecutionBundle"
    ],
    [
+    "L",
+    "transaction"
+   ],
+   [
     "X",
     "reject_observation",
     "SandboxExecutionBundle",
@@ -7476,10 +7480,15 @@
     "tuple:d01bf921a2fd20c7"
    ],
    [
+    "L",
+    "transaction"
+   ],
+   [
     "X",
     "accepting_observation",
     "SandboxRunSpec:92bdabb537c574c0",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",
@@ -13069,7 +13078,8 @@
     "X",
     "accepting_observation",
     "SandboxRunSpec:92bdabb537c574c0",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",
@@ -13575,6 +13585,10 @@
     "read_revision_by_digest",
     "project:a04:allowed",
     "d0a6cfbed30739d9a4438f597479803ad7436faf747e04fb2135ecd2662cb0eb"
+   ],
+   [
+    "L",
+    "transaction"
    ],
    [
     "X",
@@ -17276,7 +17290,8 @@
     "X",
     "accepting_observation",
     "SandboxRunSpec:92bdabb537c574c0",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",
@@ -23143,7 +23158,8 @@
     "X",
     "accepting_observation",
     "SandboxRunSpec:39352fb13a8e9978",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",
@@ -27229,7 +27245,8 @@
     "X",
     "accepting_observation",
     "SandboxRunSpec:60e264ea04d64b51",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",
@@ -30951,7 +30968,8 @@
     "X",
     "accepting_observation",
     "SandboxRunSpec:647dffad191532ca",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",
@@ -32223,7 +32241,8 @@
     "X",
     "accepting_observation",
     "SandboxRunSpec:ae549f5c7a2d01bf",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",
@@ -32525,7 +32544,8 @@
     "X",
     "accepting_observation",
     "SandboxRunSpec:87ac021e9c054bf0",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",
@@ -33785,7 +33805,8 @@
     "X",
     "accepting_observation",
     "SandboxRunSpec:8481b5ba1239c926",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",
@@ -35045,7 +35066,8 @@
     "X",
     "accepting_observation",
     "SandboxRunSpec:b9f2d962054617b7",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",
@@ -36518,7 +36540,8 @@
     "X",
     "accepting_observation",
     "SandboxRunSpec:0848943b2e1ca6a2",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",
@@ -36958,7 +36981,8 @@
     "X",
     "accepting_observation",
     "SandboxRunSpec:59a09a8fd8a8c946",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",
@@ -39469,6 +39493,10 @@
     "project:a04:allowed"
    ],
    [
+    "L",
+    "transaction"
+   ],
+   [
     "S",
     "enter",
     "_record_test_hold",
@@ -40859,7 +40887,8 @@
     "X",
     "accepting_observation",
     "SandboxRunSpec:5e5ec03e176405ed",
-    "SandboxExecutionBundle"
+    "SandboxExecutionBundle",
+    "defer_rejection=True"
    ],
    [
     "L",

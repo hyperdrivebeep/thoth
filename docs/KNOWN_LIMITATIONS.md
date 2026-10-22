@@ -40,13 +40,26 @@ its ordinary change notification is omitted. Check the saved result before sendi
 A new question may use model capacity again; a newly refreshed revision guard can also permit a
 second change. This recovery is not a guarantee of exactly-once external effects.
 
-## A finished request can miss some follow-up log entries
+## Missing success-log entries can be supplemented on retry
 
-When a request finishes, its result is saved first. The checkpoint, notification and "succeeded"
-entries of the activity log are saved afterwards. If a storage error or shutdown hits between the
-two, the result and its stored links stay intact and the same request returns that result, but
-those follow-up entries can be missing and are not filled in later. You do not need to repeat the
-request.
+In LOCAL mode, retrying the same idempotency key can fill missing checkpoint, notification and
+success entries for 20 measured commands and their supported saved result forms. The stored
+result and its links remain unchanged. The handler, model and other effects are not run again;
+once the missing entries are present, further retries add nothing.
+
+New entries use the actual supplementation time and carry `supplemented: true` and
+`supplemented_for` with the original completion time. Existing entries are not rewritten.
+An interrupted supplementation transaction rolls back its new entries and can be retried.
+
+This does not supplement hosted review, failed or running requests, research publication, or
+restore publication. Other methods and unmeasured legacy result forms remain deferred. Unknown
+or conflicting log formats, unsafe event-chain ordering (including clock rollback), missing
+workspace ownership or temporary repair-storage failure can leave the gap in place. Existing
+access denial and canonical result/binding checks still apply.
+
+Follow-up work includes the unmeasured methods and additional source-branch audits; hosted and
+cross-process supplementation are outside this change. Do not send a new request just to repair
+a log: it could run the effect again. Check the saved result first.
 
 ## Sandboxed research tests can leave a partial record
 

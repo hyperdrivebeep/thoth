@@ -284,6 +284,7 @@ async def exercise(
         "journal_after_failure": journal_status(after, identifier),
         "journal_after_reopen_retry": journal_status(final, identifier),
         "no_writes_on_retries": after == retried == final,
+        "no_writes_after_completion": retried == final,
         "snapshots": {
             "before": snapshot_summary(before),
             "after": snapshot_summary(after),
@@ -292,8 +293,8 @@ async def exercise(
         },
         "changed_tables": [name for name in before if before[name] != after[name]],
         "journal_disposition": (
-            "OBSERVED_POST_COMPLETION_GAP"
-            if mode == "checkpoint" and journal_status(final, identifier)["missing"]
+            "SUPPLEMENTED_POST_COMPLETION_GAP"
+            if mode == "checkpoint" and not journal_status(final, identifier)["missing"]
             else "OBSERVED"
         ),
     }
@@ -312,7 +313,26 @@ async def exercise(
             f"running_tasks={live_tasks, reopened_tasks}"
         )
     else:
-        assert after == retried == final
+        if mode == "checkpoint":
+            assert journal_status(after, identifier)["missing"]
+            assert journal_status(final, identifier)["missing"] == []
+            assert retried == final
+            assert all(
+                after[name] == final[name]
+                for name in after
+                if name not in {"events", "checkpoints"}
+            )
+            added_events = [json.loads(row) for row in set(final["events"]) - set(after["events"])]
+            added_points = [
+                json.loads(row) for row in set(final["checkpoints"]) - set(after["checkpoints"])
+            ]
+            assert len(added_events) == 2 and len(added_points) == 1
+            for row in (*added_events, *added_points):
+                payload = json.loads(row["payload_json"])
+                assert payload["supplemented"] is True
+                assert payload["supplemented_for"] == operation["completed_at"]
+        else:
+            assert after == retried == final
         assert same_runtime.result == after_reopen.result
         stored_result = operation["result_json"]
         assert isinstance(stored_result, str)

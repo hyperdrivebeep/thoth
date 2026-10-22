@@ -4,7 +4,7 @@ from typing import cast
 
 import orjson
 from pydantic import ValidationError
-from sqlalchemy import Engine, insert, select
+from sqlalchemy import Engine, Integer, insert, literal_column, select
 
 from thoth.adapters.storage.schema import control_records
 from thoth.adapters.storage.transaction import read_connection, write_connection
@@ -55,7 +55,9 @@ class SqliteControlRecordStore(ControlRecordStorePort):
                         control_records.c.namespace == namespace,
                         control_records.c.record_id == record_id,
                     )
-                    .order_by(control_records.c.version.desc())
+                    .order_by(
+                        control_records.c.version.desc(), literal_column("rowid", Integer()).desc()
+                    )
                     .limit(1)
                 )
                 .mappings()
@@ -91,10 +93,13 @@ class SqliteControlRecordStore(ControlRecordStorePort):
         )
         if record_type is not None:
             statement = statement.where(control_records.c.record_type == record_type)
+        order = (
+            (control_records.c.version, literal_column("rowid", Integer()))
+            if latest_only
+            else (control_records.c.created_at, control_records.c.version)
+        )
         with read_connection(self._engine) as connection:
-            rows = connection.execute(
-                statement.order_by(control_records.c.created_at, control_records.c.version)
-            ).mappings()
+            rows = connection.execute(statement.order_by(*order)).mappings()
             parsed: list[ControlRecord] = []
             for row in rows:
                 try:

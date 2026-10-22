@@ -190,6 +190,11 @@ def holds_workspace(workspace: Path) -> bool:
         return _key(workspace) in _OWNED
 
 
+def workspace_owner_key(workspace: Path) -> str:
+    """Use the existing ownership identity for other process-local coordination."""
+    return _key(workspace)
+
+
 @contextmanager
 def pin_workspace_owner(workspace: Path) -> Generator[bool]:
     """Retain only an already-owned lock; never acquire or create a lock file."""
