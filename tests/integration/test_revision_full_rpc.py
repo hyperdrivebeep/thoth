@@ -140,6 +140,13 @@ def assert_restore_proposal_delta(
         "resource_scope_history": 2,
         "resource_scope_receipts": 2,
     }
+    owner_rows = [
+        json.loads(row)
+        for row in after.get("operation_owners", ())
+        if json.loads(row)["operation_id"] == operation_id
+    ]
+    if owner_rows:
+        expected_counts["operation_owners"] = 1
     for table, count in expected_counts.items():
         rows = [json.loads(row) for row in set(after[table]) - set(before[table])]
         assert len(rows) == count

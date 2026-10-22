@@ -27,7 +27,7 @@ from typing import Any
 
 import pytest
 from sqlalchemy import select
-from tests.atomicity.harness import snapshot
+from tests.atomicity.harness import snapshot, unchanged_or_operation_owner
 from tests.integration.storage_coverage_helpers import request, value
 
 from thoth.adapters.runtime import SystemClock, UuidIdGenerator
@@ -104,7 +104,12 @@ def table_changes(before: Any, after: Any) -> dict[str, dict[str, int]]:
     return result
 
 
-def domain_changes(changes: dict[str, dict[str, int]]) -> dict[str, dict[str, int]]:
+def domain_changes(
+    changes: dict[str, dict[str, int]], before: Any, after: Any, command: Any
+) -> dict[str, dict[str, int]]:
+    if "operation_owners" in changes:
+        assert unchanged_or_operation_owner(before, after, "operation_owners", command)
+        changes = {name: delta for name, delta in changes.items() if name != "operation_owners"}
     return {name: delta for name, delta in changes.items() if name not in BOOKKEEPING}
 
 
@@ -271,9 +276,15 @@ async def test_control_route_success_writes_the_two_rows_in_source_order(
         await call(runtime, method, f"step0-{route}-ok", payload)
         added = rows(runtime)[len(before_rows) :]
         assert [(item["type"]) for item in added] == [t for t, _ in EXPECTED_ORDER[route]]
-        assert set(domain_changes(table_changes(before, snapshot(runtime.ledger.engine)))) == {
-            "control_records"
-        }
+        after = snapshot(runtime.ledger.engine)
+        assert set(
+            domain_changes(
+                table_changes(before, after),
+                before,
+                after,
+                request(method, f"step0-{route}-ok", payload),
+            )
+        ) == {"control_records"}
         save(
             f"{route}-success",
             {
@@ -306,13 +317,16 @@ async def test_second_control_write_failure_leaves_the_first_row_and_a_failed_op
         assert failed.error is not None
         assert [item["type"] for item in hits] == [t for t, _ in EXPECTED_ORDER[route]]
         rows_after = rows(runtime)
-        changes = table_changes(before, snapshot(runtime.ledger.engine))
+        fault_after = snapshot(runtime.ledger.engine)
+        changes = table_changes(before, fault_after)
         added = rows_after[len(rows_before) :]
         expected_added = 1 if mode == "before" else 2
         assert [item["type"] for item in added] == [t for t, _ in EXPECTED_ORDER[route]][
             :expected_added
         ]
-        assert set(domain_changes(changes)) == {"control_records"}
+        assert set(domain_changes(changes, before, fault_after, request(method, key, payload))) == {
+            "control_records"
+        }
         reads_after_fault = await later_reads(runtime, route, candidate_id, "fault")
         runtime.close()
 
@@ -350,7 +364,9 @@ async def test_second_control_write_failure_leaves_the_first_row_and_a_failed_op
                 "hits_in_order": hits,
                 "error": failed.error.model_dump(mode="json"),
                 "rows_added_by_failed_request": added,
-                "domain_tables_changed_by_failed_request": domain_changes(changes),
+                "domain_tables_changed_by_failed_request": domain_changes(
+                    changes, before, fault_after, request(method, key, payload)
+                ),
                 "later_reads_before": reads_before,
                 "later_reads_after_fault": reads_after_fault,
                 "reopened_rows_equal": True,

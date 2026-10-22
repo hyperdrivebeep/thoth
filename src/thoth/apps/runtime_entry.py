@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+from functools import partial
 from pathlib import Path
 
+from thoth.adapters.operation_host_identity import operation_host_token
+from thoth.adapters.storage.workspace_owner import holds_workspace, pin_workspace_owner
 from thoth.application.commands import ThreadCommandHandlers
 from thoth.application.commands.research_operations import register_research_operations
 from thoth.application.services import FieldMeasurementService
 from thoth.application.services.connector_service import ConnectorService
 from thoth.application.services.full_project_memory import FullProjectMemoryService
+from thoth.application.services.operation_journal import OperationJournal
 from thoth.application.services.scoped_artifacts import ScopedArtifactLedger
 from thoth.apps.research_entry_composition import ResearchEntryComposition, create_research_entry
 from thoth.apps.research_runtime import ResearchComponents
@@ -26,6 +30,7 @@ from thoth.ports.runtime import ClockPort, IdGeneratorPort
 from thoth.ports.store_bundle import StoreBundlePort
 from thoth.ports.task_profile import TaskProfileCatalogPort
 from thoth.protocol.bus import CommandBus
+from thoth.protocol.operation_owner import OperationOwner
 
 
 def assemble_runtime_entry(
@@ -77,6 +82,20 @@ def assemble_runtime_entry(
             from thoth.apps.hosted_review_dispatch import wait_for_hosted_dispatch
 
             before_continue = wait_for_hosted_dispatch
+        journal = OperationJournal(stores.events, clock, ids)
+        owner = None
+        if mode is DeploymentMode.LOCAL:
+            owner = OperationOwner(
+                worker=research_component.worker,
+                host_token=operation_host_token(mode),
+                holds_workspace=partial(holds_workspace, workspace),
+                pin_workspace=partial(pin_workspace_owner, workspace),
+                operations=operations,
+                uow=stores.immediate_uow,
+                journal=journal,
+                clock=clock,
+                resource_access=artifact_ledger.scopes,
+            )
         bus = scope_bus(
             registration.registry,
             ledger,
@@ -89,6 +108,8 @@ def assemble_runtime_entry(
             seal_abandoned_running=mode is DeploymentMode.HOSTED_REVIEW,
             before_continue=before_continue,
             queued_admission=research_component.entry.queued_admission,
+            owner=owner,
+            journal=journal,
         )
         registration.judgment_review.connect(bus, research_component.entry)
         from thoth.application.commands.research_queue_cancel import QueueAwareOperationCancel

@@ -12,6 +12,7 @@ from typing import Any, cast
 
 import pytest
 from sqlalchemy import Engine, create_engine, delete, select
+from tests.atomicity.harness import AllowedRow, assert_phase_delta, operation_owner_allowances
 from tests.integration.resource_scope_helpers import ScopeHarness, denial, scope_harness, value
 from tests.integration.test_a02_autonomous_acquisition import StaticModelResolver
 from tests.integration.test_m5_revision_control_atomicity import NoModel
@@ -41,11 +42,15 @@ BOOKKEEPING = {
     "checkpoints",
     "operation_resource_bindings",
 }
-Snapshot = dict[str, tuple[str, ...]]
+
+
+class Snapshot(dict[str, tuple[str, ...]]):
+    # Original operation rows identify fresh requests; they are not domain projection rows.
+    operation_rows: tuple[str, ...] = ()
 
 
 def snapshot(engine: Engine) -> Snapshot:
-    result: Snapshot = {}
+    result = Snapshot()
     with engine.connect() as connection:
         names = (
             connection.exec_driver_sql(
@@ -57,6 +62,15 @@ def snapshot(engine: Engine) -> Snapshot:
         for name in names:
             name = str(name)
             if name in BOOKKEEPING:
+                if name == "operations":
+                    result.operation_rows = tuple(
+                        sorted(
+                            json.dumps(dict(row), sort_keys=True, default=str)
+                            for row in connection.exec_driver_sql(
+                                "SELECT * FROM operations"
+                            ).mappings()
+                        )
+                    )
                 continue
             quoted = '"' + name.replace('"', '""') + '"'
             rows = connection.exec_driver_sql("SELECT * FROM " + quoted).mappings()
@@ -72,10 +86,42 @@ def snapshot(engine: Engine) -> Snapshot:
     return result
 
 
-def reopened(h: ScopeHarness, expected: Snapshot) -> None:
+def owner_adjusted(
+    before: Snapshot, after: Snapshot, project: str, method: str, keys: tuple[str, ...]
+) -> dict[str, tuple[str, ...]]:
+    """Validate one added owner per explicit request; retain every domain row verbatim."""
+    rules: list[AllowedRow] = []
+    for key in keys:
+        rows = [
+            json.loads(row)
+            for row in after.operation_rows
+            if json.loads(row)["project_id"] == project
+            and json.loads(row)["method"] == method
+            and json.loads(row)["idempotency_key"] == key
+        ]
+        assert len(rows) == 1
+        rules.append(AllowedRow("operations", rows[0], "added", {}))
+    allowances = operation_owner_allowances(
+        {**before, "operations": before.operation_rows},
+        {**after, "operations": after.operation_rows},
+        tuple(rules),
+    )
+    assert_phase_delta(
+        {"operation_owners": before.get("operation_owners", ())},
+        {"operation_owners": after.get("operation_owners", ())},
+        allowances,
+    )
+    return {**after, "operation_owners": before.get("operation_owners", ())}
+
+
+def reopened(
+    h: ScopeHarness, expected: Snapshot, *, method: str = "", keys: tuple[str, ...] = ()
+) -> None:
     engine = create_engine(h.runtime.ledger.engine.url)
     try:
-        assert snapshot(engine) == expected
+        observed = snapshot(engine)
+        compared = owner_adjusted(expected, observed, h.project, method, keys) if keys else observed
+        assert compared == expected
     finally:
         engine.dispose()
 
@@ -242,7 +288,17 @@ def failed_bookkeeping(h: ScopeHarness, method: str, key: str, error: dict[str, 
     assert json.loads(row["error_json"]) == error
 
 
-def assert_scope_delta(before: Snapshot, after: Snapshot, probe: Probe, *, assigned: bool) -> None:
+def assert_scope_delta(
+    before: Snapshot,
+    after: Snapshot,
+    probe: Probe,
+    *,
+    assigned: bool,
+    project: str,
+    method: str,
+    keys: tuple[str, ...],
+) -> None:
+    after = Snapshot(owner_adjusted(before, after, project, method, keys))
     assert len(probe.writes) == len(probe.receipts) == 1
     record, receipt = probe.writes[0], probe.receipts[0]
     for name in before:
@@ -338,17 +394,32 @@ async def test_scope_transition_post_append_rollback_and_retries(
             assert error["code"] == -32603 and probe.hits == 1 and len(probe.writes) == 1
             after = snapshot(h.runtime.ledger.engine)
             save(operation + "-fault", before, after, probe, error_code=error["code"])
-            assert after == before, "HOLD_PARTIAL_PUBLICATION: post-append transition"
-            reopened(h, before)
+            assert owner_adjusted(before, after, h.project, method, ("fault",)) == before, (
+                "HOLD_PARTIAL_PUBLICATION: post-append transition"
+            )
+            reopened(h, before, method=method, keys=("fault",))
             replay = await h.call(actor, method, "fault", body)
             assert replay.json()["error"] == error and probe.hits == 1 and len(probe.writes) == 1
-            assert snapshot(h.runtime.ledger.engine) == before
+            assert (
+                owner_adjusted(
+                    before, snapshot(h.runtime.ledger.engine), h.project, method, ("fault",)
+                )
+                == before
+            )
         failed_bookkeeping(h, method, "fault", error)
         with monkeypatch.context() as patch:
             retry = install(patch, h, scopes, resource, event, mode="observe")
             response = value(await h.call(actor, method, "new-key", body))["scope"]
             after = snapshot(h.runtime.ledger.engine)
-            assert_scope_delta(before, after, retry, assigned=operation == "assign")
+            assert_scope_delta(
+                before,
+                after,
+                retry,
+                assigned=operation == "assign",
+                project=h.project,
+                method=method,
+                keys=("fault", "new-key"),
+            )
             assert response == retry.writes[0].model_dump(mode="json")
             if operation != "assign":
                 assert all(g["state"] == "REVOKED" for g in response["grants"])
@@ -407,8 +478,10 @@ async def test_http_assign_expiry_after_append_rolls_back_denied_publication(
                 original_actor_check=True,
                 session_active_before_clock_advance=True,
             )
-            assert after == before, "HOLD_PARTIAL_PUBLICATION: actual post-append expiry denial"
-            reopened(h, before)
+            assert (
+                owner_adjusted(before, after, h.project, method, ("expired-after-write",)) == before
+            ), "HOLD_PARTIAL_PUBLICATION: actual post-append expiry denial"
+            reopened(h, before, method=method, keys=("expired-after-write",))
             assert file_hashes(tmp_path) == files and model.calls == 0
             failed_bookkeeping(h, method, "expired-after-write", rejected.json()["error"])
         # No replay or recovery after reversing a synthetic clock is claimed.

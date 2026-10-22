@@ -227,7 +227,7 @@
       "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     },
     "src/thoth/protocol/bus.py": {
-      "baseline_lines": 741,
+      "baseline_lines": 740,
       "top_level_symbols": [
         "DispatchTicket",
         "PreClaimAuthorization",

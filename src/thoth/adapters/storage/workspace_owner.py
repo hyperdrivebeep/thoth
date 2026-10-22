@@ -14,6 +14,8 @@ import json
 import os
 import sys
 import threading
+from collections.abc import Generator
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -181,6 +183,26 @@ def acquire_workspace_owner(workspace: Path, *, command: str | None = None) -> W
             raise
         _OWNED[key] = _Entry(count=1, stream=stream)
         return WorkspaceOwnership(key)
+
+
+def holds_workspace(workspace: Path) -> bool:
+    with _GUARD:
+        return _key(workspace) in _OWNED
+
+
+@contextmanager
+def pin_workspace_owner(workspace: Path) -> Generator[bool]:
+    """Retain only an already-owned lock; never acquire or create a lock file."""
+    key = _key(workspace)
+    with _GUARD:
+        entry = _OWNED.get(key)
+        if entry is not None:
+            entry.count += 1
+    try:
+        yield entry is not None
+    finally:
+        if entry is not None:
+            _release(key)
 
 
 def _release(key: str) -> None:

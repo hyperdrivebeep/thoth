@@ -8,6 +8,7 @@ from sqlalchemy import engine_from_config, pool
 
 from thoth.adapters.storage import behavior_execution_schema as behavior_execution_schema
 from thoth.adapters.storage import evaluation_run_schema as evaluation_run_schema
+from thoth.adapters.storage import operation_owner_schema as operation_owner_schema
 from thoth.adapters.storage import research_schema as research_schema
 from thoth.adapters.storage import resource_scope_schema as resource_scope_schema
 from thoth.adapters.storage import test_validity_schema as test_validity_schema

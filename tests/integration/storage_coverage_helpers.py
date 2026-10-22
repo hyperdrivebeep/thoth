@@ -20,6 +20,7 @@ _OPERATION_TABLES = {
     "events",
     "checkpoints",
     "operation_resource_bindings",
+    "operation_owners",
 }
 
 

@@ -21,7 +21,12 @@ from typing import Any, cast
 
 import pytest
 from sqlalchemy import func, select
-from tests.atomicity.harness import assert_phase_delta, failed_command_allowances, snapshot
+from tests.atomicity.harness import (
+    assert_phase_delta,
+    failed_command_allowances,
+    snapshot,
+    unchanged_or_operation_owner,
+)
 from tests.integration.scoped_runtime import create_runtime
 from tests.integration.storage_coverage_helpers import request, value
 from tests.integration.test_m3_execution_revision_atomicity import (
@@ -330,7 +335,10 @@ def install_fault(
         )
         external = snapshot(runtime.ledger.engine)
         external_changes = sorted(
-            name for name in before if name not in BOOKKEEPING and external[name] != before[name]
+            name
+            for name in before
+            if name not in BOOKKEEPING
+            and not unchanged_or_operation_owner(before, external, name, command)
         )
         staged: list[dict[str, Any]] = []
         # 2026-10-15 test-side correction: SqliteLedgerTransaction.set_head (sqlite.py:122-141)
@@ -545,7 +553,11 @@ async def test_execution_effect_post_write_failure_is_atomic(
             "expected_writer_order": [list(step) for step in expected_order],
             "observed_writer_order": [list(step) for step in state["order"]],
             "fault": state,
-            "changed_tables": sorted(name for name in before if before[name] != after[name]),
+            "changed_tables": sorted(
+                name
+                for name in before
+                if not unchanged_or_operation_owner(before, after, name, command)
+            ),
         }
         assert len(state["hits"]) == 1, "HOLD_CONTRACT_MISMATCH: expected target hit1"
         assert state["order"] == expected_order, (
@@ -555,9 +567,11 @@ async def test_execution_effect_post_write_failure_is_atomic(
         )
         assert not state["violations"], ("HOLD_DEFECT", state["violations"])
         assert failed.error is not None, "HOLD_DEFECT: post-write failure reported success"
-        assert all(before[t] == after[t] for t in before if t not in BOOKKEEPING), (
-            "HOLD_DEFECT: failed mutation published domain rows"
-        )
+        assert all(
+            unchanged_or_operation_owner(before, after, t, command)
+            for t in before
+            if t not in BOOKKEEPING
+        ), "HOLD_DEFECT: failed mutation published domain rows"
         assert actual_reads == [(ref, "READ") for ref in reads], (
             "HOLD_CONTRACT_MISMATCH: source-defined read-set differs",
             reads,
