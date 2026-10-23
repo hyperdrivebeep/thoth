@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import hashlib
 import json
 import os
 import platform
@@ -38,11 +37,16 @@ from thoth.apps.projectpack_execution import run_project_pack
 from thoth.apps.runtime import create_runtime
 from thoth.apps.tui_presentation import present_research_progress, render_tui_turn
 from thoth.apps.workspace_guard import owned_workspace, workspace_guard
+from thoth.apps.workspace_location_commands import (
+    register_workspace_location_commands,
+    workspace_location_info,
+)
 from thoth.apps.workspace_paths import (
     default_workspace,
     legacy_workspace_candidates,
     selected_workspace,
     workspace_id,
+    workspace_session_id,
 )
 from thoth.domain.base import DomainModel
 from thoth.domain.enums import ModelRole
@@ -59,12 +63,6 @@ DEFAULT_WORKSPACE = default_workspace()
 class ModelProbeOutput(DomainModel):
     status: Literal["OK"]
     message: str
-
-
-def workspace_session_id(workspace: Path) -> str:
-    normalized = os.path.normcase(str(workspace.resolve()))
-    digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:24]
-    return f"tui:workspace:{digest}:local"
 
 
 @app.callback(invoke_without_command=True)
@@ -87,7 +85,7 @@ def main(
     if context.invoked_subcommand is not None:
         return
     announce_workspace(workspace, command="thoth")
-    with workspace_guard():
+    with workspace_guard(workspace):
         _interactive_shell(
             workspace,
             sandbox_profile=sandbox_profile,
@@ -219,6 +217,7 @@ def workspace_info(
             {
                 "workspace": str(root),
                 "workspace_id": workspace_id(root),
+                "workspace_location": workspace_location_info(root),
                 "selection": "EXPLICIT" if workspace is not None else "STABLE_DEFAULT",
                 "legacy_candidates": [str(path) for path in legacy if path != root],
                 "resume_hint": (
@@ -244,6 +243,7 @@ def claude_code_login(
 
 
 register_diagnostic_commands(app, console, DEFAULT_WORKSPACE)
+register_workspace_location_commands(app, DEFAULT_WORKSPACE)
 
 
 @app.command("auth-status")
@@ -341,7 +341,7 @@ def run_request(
     ] = None,
 ) -> None:
     """Execute one JSON-RPC request and emit one machine-readable JSON result."""
-    with workspace_guard():
+    with workspace_guard(workspace):
         runtime = create_runtime(
             workspace,
             sandbox_adapter=_sandbox_adapter(sandbox_profile, workspace),
@@ -398,7 +398,7 @@ def rpc_stdio(
     ] = None,
 ) -> None:
     """Serve JSON-RPC over stdin/stdout JSONL until EOF."""
-    with workspace_guard():
+    with workspace_guard(workspace):
         runtime = create_runtime(
             workspace,
             sandbox_adapter=_sandbox_adapter(sandbox_profile, workspace),
@@ -436,7 +436,7 @@ def events(
             "input": {"project_id": project_id, "operation_id": operation_id},
         },
     }
-    with workspace_guard():
+    with workspace_guard(workspace):
         runtime = create_runtime(workspace)
     try:
         response = asyncio.run(handle_json_line(orjson.dumps(request), runtime.bus))
@@ -471,7 +471,7 @@ def run_pack(
             if selected_provider == "scripted"
             else create_codex_model(pack_workspace, model_name)
         )
-        with workspace_guard():
+        with workspace_guard(pack_workspace):
             result = asyncio.run(
                 run_project_pack(loaded, workspace=pack_workspace, model=selected_model)
             )

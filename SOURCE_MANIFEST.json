@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-22T18:37:46.948775+00:00",
+  "created_at": "2026-10-23T04:39:51.014673+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -53,13 +53,13 @@
     },
     {
       "path": "README.ko.md",
-      "sha256": "a78940c44f6de6de7e88c31888e9a142d2e9cf36f333f02e39fb017eb9c0c389",
-      "bytes": 15308
+      "sha256": "8e615dcc545c0086d81f84d90f4305bc8a7e7df9475307515bc68c7b65e57602",
+      "bytes": 15926
     },
     {
       "path": "README.md",
-      "sha256": "5f1ca35c11a5d6402775b966cbcfc8ab192d2df8b17fae66d1adb5888e605dee",
-      "bytes": 13380
+      "sha256": "43f2fd9cebc4acd2278ab5ee57c88005714727c9eb73f6a5327ef46c86a3bcc9",
+      "bytes": 13723
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -167,9 +167,14 @@
       "bytes": 401
     },
     {
+      "path": "apps/web/src/api/files.test.ts",
+      "sha256": "38574d9fb490f3858b936826cf436fe5cd91a9848531104cf61d53f25260e462",
+      "bytes": 8207
+    },
+    {
       "path": "apps/web/src/api/files.ts",
-      "sha256": "53163bbc5bbf9848caa6dbaf36153fe0291b9c8db976af3e12908e02c3aaceff",
-      "bytes": 735
+      "sha256": "c478b9ba85c6e9d503f7e63ad8fa2b73160a05bbd908c632b26bed381e365a4d",
+      "bytes": 3362
     },
     {
       "path": "apps/web/src/api/fixtures/iris-judgment-excerpt.json",
@@ -313,8 +318,8 @@
     },
     {
       "path": "apps/web/src/api/research.ts",
-      "sha256": "9b7045efd030f1df237e30ee6c79e4c4fdc782dfc01fe31da9c27af3c4bbcd78",
-      "bytes": 11565
+      "sha256": "c90fe3a06bca765d4306d6d1ca124537674cf4d11276766970b7516916badb77",
+      "bytes": 11858
     },
     {
       "path": "apps/web/src/api/researchFollowup.ts",
@@ -682,9 +687,14 @@
       "bytes": 1676
     },
     {
+      "path": "apps/web/src/components/FileConnectionPanel.test.tsx",
+      "sha256": "c9e1be62564212a573de09fd3ee01b111bea5edc8ffbd51a60e8cb8487f5838f",
+      "bytes": 7496
+    },
+    {
       "path": "apps/web/src/components/FileConnectionPanel.tsx",
-      "sha256": "7ea8c9ad1fa3a0ae944ce34fca0a12672ec56a37e1b709c95f5049f83b847f3c",
-      "bytes": 4371
+      "sha256": "faa6811d1e8c21e7796dcae8ff4c36c4defa9c15748766160fc5bdaa00d2098f",
+      "bytes": 6774
     },
     {
       "path": "apps/web/src/components/FirstRunSetup.test.tsx",
@@ -693,8 +703,8 @@
     },
     {
       "path": "apps/web/src/components/FirstRunSetup.tsx",
-      "sha256": "4a817b1bc91b7382764a806f67520f9497adf7d1c5a4e592e6c546be696d3ce8",
-      "bytes": 15649
+      "sha256": "5ec554e2209d00cb509bdaa040e0c5f748d33f92e378a7a44140db225782a4b5",
+      "bytes": 15791
     },
     {
       "path": "apps/web/src/components/HypothesisCompare.test.tsx",
@@ -783,8 +793,8 @@
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspace.tsx",
-      "sha256": "21856fad28f28098317f656557765b8c6317bdffe9dbdf399f51ec92106987da",
-      "bytes": 43632
+      "sha256": "1b156b93c8c570d1c2d04e2f1ddee45dd2f7060bbe23cc7867772d80695495a8",
+      "bytes": 43764
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspaceConsent.test.tsx",
@@ -1140,6 +1150,16 @@
       "path": "apps/web/src/components/WorkspaceInternetConsent.tsx",
       "sha256": "c401c77cbed99e84da691cf51a8ff8c12a750d3479cb31ddd9516fbfe2d4a290",
       "bytes": 2431
+    },
+    {
+      "path": "apps/web/src/components/WorkspaceLocationNotice.test.tsx",
+      "sha256": "2004942e5287061c090ee755e5aa7336ac512a10f2d11733d757b488507096df",
+      "bytes": 2699
+    },
+    {
+      "path": "apps/web/src/components/WorkspaceLocationNotice.tsx",
+      "sha256": "1df2ab32bfee5878e17ae7464c8fdadbb5f4192357d53078c3c26e9f818d9977",
+      "bytes": 599
     },
     {
       "path": "apps/web/src/components/XaiDeviceLogin.tsx",
@@ -1693,8 +1713,8 @@
     },
     {
       "path": "apps/web/src/i18n/sourceMessages.ts",
-      "sha256": "411b0ddc410873256b5e92f0e4c860534c7e8822d24b0db646c093b08a1b92fd",
-      "bytes": 7387
+      "sha256": "b7deae32291a516462adc0ec06829738ea8805f196ada71eb492f80e77931854",
+      "bytes": 7976
     },
     {
       "path": "apps/web/src/i18n/stateFormatMessages.ts",
@@ -1738,8 +1758,8 @@
     },
     {
       "path": "apps/web/src/i18n/uiFormatMessages.ts",
-      "sha256": "98be0f283f6cad865351f15b4494fc4374a3c2238bbc00e24c75ed2c4ac8e381",
-      "bytes": 5749
+      "sha256": "b3bfa703b1548268a7fc4646f065524999657c5372ce624777394c5a34e4043d",
+      "bytes": 6125
     },
     {
       "path": "apps/web/src/i18n/workspaceDetailMessages.ts",
@@ -1793,8 +1813,8 @@
     },
     {
       "path": "apps/web/src/workstation.css",
-      "sha256": "6b5b8bfd96343cc5bdb32b5e09f09be59304923df6e371768e976cc33563af5d",
-      "bytes": 60405
+      "sha256": "663eddc733f6e9c8f99263ce69fd00a9d9c5530b4d0b4e729f6152ca0e36add8",
+      "bytes": 60738
     },
     {
       "path": "apps/web/timeline-preview.html",
@@ -1948,18 +1968,18 @@
     },
     {
       "path": "docs/INSTALL.md",
-      "sha256": "1d13de828a5db4a5c42fcd1dc32d56541634ab81b4f96f4f50c293a15300aab7",
-      "bytes": 18422
+      "sha256": "b0afc44cc299a7e95af0f2da8afd8ab6843679bda22d3626b69dc3ce87206cca",
+      "bytes": 20549
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.ko.md",
-      "sha256": "ce5cc699dc080560681b09f0f7790365e13d57922c0f9d4ba117152b6d297e27",
-      "bytes": 10028
+      "sha256": "6304fc90fc010d75c995fb693170c9060a0d13c327cb0c540e1d6b2594e29dca",
+      "bytes": 12832
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.md",
-      "sha256": "6d7bbcb9c5b7e392c19b8d44d2dc7bccb03741cae9d524983f856a6efeb690d4",
-      "bytes": 8541
+      "sha256": "fbd264eba5ee88f650d85f04eade4a21ca6b4d45e790d028a1ad7163b8bafe9f",
+      "bytes": 10605
     },
     {
       "path": "docs/KNOWN_TEST_FAILURES.json",
@@ -2078,8 +2098,8 @@
     },
     {
       "path": "docs/architecture/rpc-method-catalog.md",
-      "sha256": "58ce46d1e19e14e154d7fde5ac34221339f05f06f30ffe292b35aaed0a451cb8",
-      "bytes": 16886
+      "sha256": "51ff54e967f9a8667abdf0f3036b0acdf9a128258f5fa493205312dfb43b63ce",
+      "bytes": 17711
     },
     {
       "path": "docs/architecture/user-activity-projection.md",
@@ -3438,8 +3458,8 @@
     },
     {
       "path": "src/thoth/adapters/http/app.py",
-      "sha256": "a56006788fef587dc53e012d27bdf41fc09c67e6fe93f5198ea758abf7f4e1e9",
-      "bytes": 20812
+      "sha256": "e43e4fc543f0ccebecdfb14840512ac398814618a092e933cf4602756aafd02d",
+      "bytes": 21097
     },
     {
       "path": "src/thoth/adapters/http/async_routes.py",
@@ -3993,8 +4013,8 @@
     },
     {
       "path": "src/thoth/adapters/storage/bundle.py",
-      "sha256": "d336ad1fd13776c9028d6a8b6da7a3db14cb27a7b6da873f1302528d9bceac89",
-      "bytes": 8741
+      "sha256": "f598436adb56e55ff0716587949f2d1915db959088d8f59499c42f1932611a05",
+      "bytes": 9239
     },
     {
       "path": "src/thoth/adapters/storage/control_record.py",
@@ -4240,6 +4260,21 @@
       "path": "src/thoth/adapters/storage/transaction.py",
       "sha256": "1873bb91ae61570a71ebc7a3510de7063e0c44d96374578a6e532c5cca156183",
       "bytes": 3077
+    },
+    {
+      "path": "src/thoth/adapters/storage/workspace_location.py",
+      "sha256": "b3bdbd1c749bf286e059b2b2652c2b5a8d1889246132d5d69d80e060711183ec",
+      "bytes": 7113
+    },
+    {
+      "path": "src/thoth/adapters/storage/workspace_location_probes.py",
+      "sha256": "c64f834b03b8c4300427353c7702f553755d3e37eff5cac70585c024cdcbf556",
+      "bytes": 10253
+    },
+    {
+      "path": "src/thoth/adapters/storage/workspace_location_registry.py",
+      "sha256": "2f64a88ba467a9c87020969c9451efe2cdbd9de3de320b39546397c271211faa",
+      "bytes": 3835
     },
     {
       "path": "src/thoth/adapters/storage/workspace_owner.py",
@@ -4698,8 +4733,8 @@
     },
     {
       "path": "src/thoth/application/commands/workspace_setup.py",
-      "sha256": "2ab1bd17ebc7154ec0c9525cf9d4565eca89596d4c24844dd8b4a2b2b774113c",
-      "bytes": 7433
+      "sha256": "624af5c8342f6f07c6001e9b25e95ccc0c1b17198b2c0f4901bab8f2a095f236",
+      "bytes": 7715
     },
     {
       "path": "src/thoth/application/reducers/__init__.py",
@@ -6193,8 +6228,8 @@
     },
     {
       "path": "src/thoth/apps/research_entry_composition.py",
-      "sha256": "517ccfeb83ea21d19f636792308338996149fa2776961b761105684efac988b1",
-      "bytes": 15272
+      "sha256": "ac18506ff0f77304a7365685ce4818891b086b42d6158d711b96c5dd1da26c0e",
+      "bytes": 15417
     },
     {
       "path": "src/thoth/apps/research_history_composition.py",
@@ -6223,8 +6258,8 @@
     },
     {
       "path": "src/thoth/apps/runtime.py",
-      "sha256": "b7fbebee2ed9dc395cffa9c8e81efd2d0099c65cd519cb48358ecb22967b07b2",
-      "bytes": 23384
+      "sha256": "38f7a8206fa4a66d51cd267d7ac50092154ba3ce002ba7e27e1ba07cd75598d5",
+      "bytes": 23406
     },
     {
       "path": "src/thoth/apps/runtime_entry.py",
@@ -6263,8 +6298,8 @@
     },
     {
       "path": "src/thoth/apps/storage_composition.py",
-      "sha256": "eb6c545eb5f3348c2d052b9f81a47713fb7386abdd9ff530853d0915b4360118",
-      "bytes": 1902
+      "sha256": "b8644b1e7a088262632120be11681b5e0f9e78ecf6c598be6d4a6ebc2a9fafc4",
+      "bytes": 2137
     },
     {
       "path": "src/thoth/apps/test_runtime.py",
@@ -6288,18 +6323,28 @@
     },
     {
       "path": "src/thoth/apps/workspace_guard.py",
-      "sha256": "a1006e536515fecb1be9a141854d7d01f0c5c386b02eccc29408102aa1c4a8a9",
-      "bytes": 1154
+      "sha256": "ae797df1136ac33b5d0f4087ae32b7cc17315bc8b497194dd1204aa28f7ce2bc",
+      "bytes": 2935
+    },
+    {
+      "path": "src/thoth/apps/workspace_location_commands.py",
+      "sha256": "655da07cc73e22174ff373e0a94ed33ad11229ddab8cd1e64b0845ae8cf9ac92",
+      "bytes": 1910
+    },
+    {
+      "path": "src/thoth/apps/workspace_location_presentation.py",
+      "sha256": "2fc07e493a1612cd618163941dc5690304c4555397806052564034705d5279a7",
+      "bytes": 3296
     },
     {
       "path": "src/thoth/apps/workspace_paths.py",
-      "sha256": "e476b133bdc0efdb21024818c2d50dab6fc8d3b0b22d217d3e0f4cde8f049216",
-      "bytes": 1546
+      "sha256": "43d2c2fa9ceb9bc049f437cccfeec9efc6de9c8df77a275e4a019eb925c4a008",
+      "bytes": 1766
     },
     {
       "path": "src/thoth/cli.py",
-      "sha256": "6781d09ba2bb520b6ff95123c117dbedbc155c9b741cf87ade2858811c1e87db",
-      "bytes": 22529
+      "sha256": "7b8f190d125a95ef9ee3c4f38bc31fa50eebc33cf56cb04ca6ac0e23204b3d31",
+      "bytes": 22618
     },
     {
       "path": "src/thoth/domain/__init__.py",
@@ -6862,6 +6907,11 @@
       "bytes": 11741
     },
     {
+      "path": "src/thoth/domain/storage_context.py",
+      "sha256": "609055ac9f97efa3416be462f2ae81bd62c26973788e19aff0997dc7bc07d298",
+      "bytes": 682
+    },
+    {
       "path": "src/thoth/domain/task_profile.py",
       "sha256": "fa9bd013a4bcc5f3e37a0cb46acf4e69a929fa23e38b3272dc45ff33eec24a57",
       "bytes": 461
@@ -6915,6 +6965,16 @@
       "path": "src/thoth/domain/web_acquisition.py",
       "sha256": "994a94f5223982a1791f66694ed9e1f179d1dbe2b76152831ad6840f95e3a285",
       "bytes": 1054
+    },
+    {
+      "path": "src/thoth/domain/workspace_identity.py",
+      "sha256": "d4d2a17b28bcc19dd247e0e695cf6e1f82019187089b0fe0ca2338f25e77d506",
+      "bytes": 569
+    },
+    {
+      "path": "src/thoth/domain/workspace_location.py",
+      "sha256": "ba624675eb37c7b322069d458e220cee1554836ea3be265808138b2a82b4b7ad",
+      "bytes": 1444
     },
     {
       "path": "src/thoth/domain/workspace_setup.py",
@@ -7230,6 +7290,11 @@
       "path": "src/thoth/ports/worker_identity.py",
       "sha256": "6ea77c241e6c217cabc6ffe7eae1815d4ad6c29e076efa52f2d63929496d6d04",
       "bytes": 352
+    },
+    {
+      "path": "src/thoth/ports/workspace_location.py",
+      "sha256": "599b062b590182351764b3c4e64c01d6bc14747d89a6c394e1f2297d0f7d2414",
+      "bytes": 244
     },
     {
       "path": "src/thoth/ports/workspace_setup.py",
@@ -7733,8 +7798,8 @@
     },
     {
       "path": "tests/cli_contract_capture.py",
-      "sha256": "92ef67cfffdc42e045535b5c9c16cb1b1cb535461776cb2d46f0fb92d1663cc6",
-      "bytes": 1924
+      "sha256": "e35e3ce9e618b79fbc8c3b1d1be535fee55ecce344c9266b0e3728860e65f540",
+      "bytes": 2044
     },
     {
       "path": "tests/conftest.py",
@@ -7807,9 +7872,19 @@
       "bytes": 1923
     },
     {
+      "path": "tests/contract/test_staged_unconnected_source.py",
+      "sha256": "8dffaa69d60b5718fb85c93d436ea744d12dbd79a5eff47bb37c4c56945739c3",
+      "bytes": 4096
+    },
+    {
       "path": "tests/contract/test_transports.py",
       "sha256": "2c5cba56f270fdca92adfd3387940e88d92782381c36dae5d60fc053d0b4c6b8",
       "bytes": 1741
+    },
+    {
+      "path": "tests/contract/test_workspace_location_boundary.py",
+      "sha256": "9df2c9ae6b88a3e41c34f00605c3446289a45c552b3a248c9f14c4de92dbcabb",
+      "bytes": 10208
     },
     {
       "path": "tests/fixtures/action_response_golden.json",
@@ -7823,8 +7898,8 @@
     },
     {
       "path": "tests/fixtures/cli_registration_contract.json",
-      "sha256": "ac658326c23cdf5612865fb310130635a0e022571f8877cf4a429e5c545f9a21",
-      "bytes": 17956
+      "sha256": "b01ded28da9cf07968eddaad3826ed5b1cb88f6e00dc9d7352ba834be07c97e6",
+      "bytes": 21845
     },
     {
       "path": "tests/fixtures/credential_auth_projection_v1.json",
@@ -8085,6 +8160,11 @@
       "path": "tests/fixtures/user_activity_projection_contract.json",
       "sha256": "350d69e901d11ec9d339dfa6608c34944c25ce3b94f14f8f5e9a5d49400df4a9",
       "bytes": 44981
+    },
+    {
+      "path": "tests/fixtures/workspace_location_cases.json",
+      "sha256": "b5563b0afda3b0c7f94980beaecbc41ccc625a47ef1dd8f38b8d821d5c504e57",
+      "bytes": 3317
     },
     {
       "path": "tests/integration/behavior_exposure_helpers.py",
@@ -9988,8 +10068,8 @@
     },
     {
       "path": "tests/integration/test_workspace_runtime_lock.py",
-      "sha256": "e1f2752589771c225cf0a0582137d13813aa6d3e5ad907953ed871413339c62e",
-      "bytes": 13701
+      "sha256": "243e868019b617dc03dc402aa155468692c5fed3cb567c6f829575b3c5fbb621",
+      "bytes": 13794
     },
     {
       "path": "tests/integration/test_xai_workspace_route.py",
@@ -11500,6 +11580,16 @@
       "path": "tests/unit/test_validate_synthetic_radar_demo.py",
       "sha256": "97e85877dccd5159a0285f53c31cd8b3032249dda33aedc9f5a2f389564c3324",
       "bytes": 5092
+    },
+    {
+      "path": "tests/unit/test_workspace_location.py",
+      "sha256": "d24a2ef9d54728fa94648424969f57a515ad19ffadb5cb59b88f56b00f10d52a",
+      "bytes": 12421
+    },
+    {
+      "path": "tests/unit/test_workspace_location_entry.py",
+      "sha256": "5fb0016651416ced8132931f2ef671b7eec3c865980279a3e403f1dfd9fc48cf",
+      "bytes": 2277
     },
     {
       "path": "tests/unit/test_workspace_paths.py",

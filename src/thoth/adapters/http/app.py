@@ -36,7 +36,9 @@ from thoth.apps.hosted_review_snapshot import (
     mark_workspace_live,
 )
 from thoth.apps.runtime import AppRuntime, create_runtime
+from thoth.apps.workspace_location_presentation import location_error_detail
 from thoth.domain.auth import AuthenticatedActorContext, authenticated_actor_scope
+from thoth.domain.workspace_location import WorkspaceLocationError
 from thoth.ports.auth import HttpAuthenticationPort
 from thoth.protocol.bus import CommandBus, DispatchTicket
 from thoth.protocol.jsonrpc import (
@@ -433,6 +435,8 @@ def _resolve_bus(application: FastAPI) -> CommandBus:
     workspace = Path(os.environ.get("THOTH_WORKSPACE", ".thoth"))
     try:
         runtime = create_runtime(workspace)
+    except WorkspaceLocationError as error:
+        raise HTTPException(status_code=503, detail=location_error_detail(error)) from error
     except WorkspaceInUse as error:
         # Only reached when the server was not started through the CLI (which owns the workspace
         # first). The path and process id are shown to the caller, never stored.

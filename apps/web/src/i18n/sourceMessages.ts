@@ -1,4 +1,13 @@
 export const sourceMessages = {
+  "sources.fileUploadStalled": {
+    "ko": "파일을 보내는 중 2분 동안 진행이 없어 멈췄습니다. 연결을 확인하고 다시 시도하세요. 연결된 자료는 없습니다.",
+    "en": "No data was sent for 2 minutes, so the upload stopped. Check your connection and try again. No source was connected."
+  },
+  "sources.fileUploadCancel": { "ko": "업로드 취소", "en": "Cancel upload" },
+  "sources.fileUploadCancelled": {
+    "ko": "업로드를 취소했습니다. 연결된 자료는 없습니다.",
+    "en": "Upload cancelled. No source was connected."
+  },
   "sources.fileTitle": {
     "ko": "파일 자료 연결",
     "en": "Connect source files"

@@ -164,6 +164,11 @@ THOTH reports the selected directory at startup and does not move old data autom
 One workspace is used by one THOTH process at a time; a second start on the same workspace stops
 with a message (exit code 3) until the first one is closed.
 
+LOCAL workspaces on detected sync, network, or Windows/WSL shared folders are refused (exit 4).
+Unclassified locations need explicit confirmation (exit 5); removable drives carry a warning.
+Use `thoth workspace` to inspect the selected path and read the
+[location policy and confirmation commands](docs/INSTALL.md#workspace-location-policy).
+
 Sign-in uses separate THOTH profiles; existing login information from other programs is not
 imported. Claude sign-in runs the official Claude Code executable in that profile, and xAI uses
 a device-code flow. Both were checked only with fake providers or fake executables (xAI also with a

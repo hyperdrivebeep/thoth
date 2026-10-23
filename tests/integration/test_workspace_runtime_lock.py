@@ -42,7 +42,9 @@ from thoth.adapters.storage.workspace_owner import acquire_workspace_owner
 
 workspace, marker = Path(sys.argv[1]), Path(sys.argv[2])
 ownership = acquire_workspace_owner(workspace, command="thoth serve")
-marker.write_text(str(os.getpid()), encoding="utf-8")
+temporary_marker = marker.with_suffix(".tmp")
+temporary_marker.write_text(str(os.getpid()), encoding="utf-8")
+os.replace(temporary_marker, marker)
 sys.stdin.readline()
 ownership.release()
 """

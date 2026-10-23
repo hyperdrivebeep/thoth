@@ -218,7 +218,7 @@ def create_runtime(
             model_catalog = hosted_review_catalog()
         if model_resolver is None:
             model_resolver = hosted_openai_resolver()
-    stores = open_stores(workspace, storage_factory)
+    stores = open_stores(workspace, storage_factory, deployment_mode=mode)
     ledger = stores.ledger
     try:
         clock = SystemClock()

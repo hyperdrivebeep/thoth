@@ -7,6 +7,16 @@ Requests use the public JSON-RPC `/rpc` surface. The method classification below
 
 ## Request-scoped response language and expected-result views
 
+LOCAL `workspace/ready` may also include `workspace_location`: `classification` (one of
+`KNOWN_LOCAL`, `KNOWN_SYNC`, `REMOTE_SHARE`, `UNSUPPORTED_BRIDGE`, `REMOVABLE`, `UNKNOWN`),
+`reason_codes`, `confirmed`, `message_ko`, and `message_en`. This optional projection describes
+the decision used when storage opened; it does not probe again or certify storage safety.
+Confirmed `UNKNOWN` and `REMOVABLE` remain warnings. Custom storage without the optional
+location reporter and hosted review may omit the field. Before a lazy LOCAL runtime opens,
+a location refusal returns HTTP 503 with `detail.code` of `WORKSPACE_LOCATION_BLOCKED` or
+`WORKSPACE_LOCATION_UNCONFIRMED` and `detail.message_ko` / `detail.message_en`. Known blocked
+locations cannot be overridden by confirmation. This is a startup error, not a completed RPC.
+
 `thread/start`, `thread/input` and new-revision `thread/steer` with `contract_version=2` accept an optional `response_language` of `ko` or `en`. Omission retains the legacy question-language policy; null, empty and unsupported values are rejected. Explicit selections are stored in `ThreadRequestRevision` 2.1.0; legacy 2.0.0 records are not rewritten. Each new question may choose another language within the same thread. Queued inputs and retries retain the submitted payload and key. Resume uses its target request's language; conflicting overrides are caller-scoped rejections. Omission versus explicit `ko`, and `ko` versus `en`, are different idempotency inputs.
 
 `workspace/ready` advertises `response_languages: ["ko", "en"]` and `response_language_scope: "REQUEST"`. Hosted review also supplies an opaque `browser_scope_id` tied to its workspace and authenticated session when present. This is only a browser storage namespace and grants no authority. Local pending records use localStorage; hosted pending records use sessionStorage. Display locale changes make no model call or canonical write.

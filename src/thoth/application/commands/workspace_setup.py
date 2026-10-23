@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import Callable
+from copy import deepcopy
 
 from pydantic import JsonValue
 
@@ -25,12 +26,14 @@ class WorkspaceSetupHandlers:
         model_connected: Callable[[], bool],
         ready_projection: Callable[[WorkspaceSetupState], dict[str, JsonValue]] | None = None,
         workspace_id: str | None = None,
+        workspace_location: dict[str, JsonValue] | None = None,
     ) -> None:
         self._setup = setup
         self._mode = deployment_mode or parse_deployment_mode()
         self._model_connected = model_connected
         self._ready_projection = ready_projection
         self._workspace_id = workspace_id
+        self._workspace_location = deepcopy(workspace_location)
 
     def _setup_unavailable(
         self, error: WorkspaceSetupUnavailable, *, readiness: bool
@@ -135,6 +138,8 @@ class WorkspaceSetupHandlers:
 
     async def ready(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         payload = await self._ready(value)
+        if self._workspace_location is not None:
+            payload["workspace_location"] = deepcopy(self._workspace_location)
         if self._mode is DeploymentMode.HOSTED_REVIEW and self._workspace_id is not None:
             payload["browser_scope_id"] = browser_submission_scope(self._workspace_id)
         return {**payload, "response_languages": ["ko", "en"], "response_language_scope": "REQUEST"}

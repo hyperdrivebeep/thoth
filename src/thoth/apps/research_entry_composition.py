@@ -68,6 +68,7 @@ from thoth.apps.hypothesis_link_composition import install_hypothesis_links
 from thoth.apps.judgment_records_composition import install_judgment_records
 from thoth.apps.test_runtime import TestComponents
 from thoth.apps.trace_composition import install_trace_origin, register_trace_methods
+from thoth.apps.workspace_location_presentation import workspace_location_payload
 from thoth.apps.workspace_paths import workspace_id
 from thoth.domain.deployment_mode import DeploymentMode, parse_deployment_mode
 from thoth.ports.criterion_contract import CriterionContractStorePort
@@ -261,6 +262,7 @@ def create_research_entry(
         model_connected=lambda: _configured_model_available(settings.catalog, local_credentials),
         ready_projection=ready_projection,
         workspace_id=workspace_id(workspace) if workspace else None,
+        workspace_location=workspace_location_payload(stores),
     )
     registry.register("workspace/setup/read", workspace_setup.read)
     registry.register("workspace/setup/update", workspace_setup.update)
