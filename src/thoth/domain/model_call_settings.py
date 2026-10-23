@@ -10,9 +10,9 @@ from thoth.domain.base import DomainModel
 # A retry can repeat remote work (no remote stop/idempotency proof). The existing limit remains
 # at most twice, waiting about 2 s then 4 s; projects can turn it off and resume manually.
 AUTO_RETRY_INTERRUPTED_DEFAULT = True
-# Hypothesis generation contract v3 (what each hypothesis expects from a test, and what would refute
-# it): off, so a project keeps the v2 contract exactly until it turns this on.
-HYPOTHESIS_CONTRACT_V3_DEFAULT = False
+# 사용자 결정 2026-10-23, 가설 v3 실제 비교(12차 3/3, S2 3/3, 10-23 재비교).
+# Only an absent choice defaults on; an explicitly saved False keeps the v2 contract.
+HYPOTHESIS_CONTRACT_V3_DEFAULT = True
 
 
 class ProjectModelCallSettings(DomainModel):

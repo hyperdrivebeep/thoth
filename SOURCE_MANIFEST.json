@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-23T04:39:51.014673+00:00",
+  "created_at": "2026-10-23T08:49:28.623906+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -18,8 +18,8 @@
     },
     {
       "path": ".github/workflows/product-check.yml",
-      "sha256": "6e58032f4e10fc0c7e896ab6ddc1730021aececb440be781ffe9d7159ae77ca9",
-      "bytes": 3386
+      "sha256": "418474e27a6faf3dda070566a987a69a9b8b5f995f94ca83e0d376012cd0c717",
+      "bytes": 8122
     },
     {
       "path": ".gitignore",
@@ -53,13 +53,13 @@
     },
     {
       "path": "README.ko.md",
-      "sha256": "8e615dcc545c0086d81f84d90f4305bc8a7e7df9475307515bc68c7b65e57602",
-      "bytes": 15926
+      "sha256": "6398580db8d526eb995377d437f1703fbf0dc250f430ab167764771be7e7a5f8",
+      "bytes": 16330
     },
     {
       "path": "README.md",
-      "sha256": "43f2fd9cebc4acd2278ab5ee57c88005714727c9eb73f6a5327ef46c86a3bcc9",
-      "bytes": 13723
+      "sha256": "2617a0c27e193ed5e190edb604c97954d7e7a658962dd5c44e51eef8aa4b9a4e",
+      "bytes": 14075
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -728,13 +728,13 @@
     },
     {
       "path": "apps/web/src/components/HypothesisContractSwitch.test.tsx",
-      "sha256": "3cecd4c579375e933a54dd1644a4724f87efd951b23091581fe178e0ae945f47",
-      "bytes": 3167
+      "sha256": "8f59233c433408a935bce18447b3cf0358c2843be5662e193e2886df5d6ef6a3",
+      "bytes": 4119
     },
     {
       "path": "apps/web/src/components/HypothesisContractSwitch.tsx",
-      "sha256": "47601c363d7d2a832f574b2c8587a2601b3439b68ae64cc02bf7ac2181dad067",
-      "bytes": 1753
+      "sha256": "92f2b19cf0d8684efbd57019d1a6c4622878fef40783f2763309b8e334417c8b",
+      "bytes": 1703
     },
     {
       "path": "apps/web/src/components/HypothesisFields.tsx",
@@ -1653,8 +1653,8 @@
     },
     {
       "path": "apps/web/src/i18n/modelHelpMessages.ts",
-      "sha256": "a674ce712e9efcc052851c487946d7872973328d3e46fc7d00c93099ac23a1f9",
-      "bytes": 2392
+      "sha256": "fde35f0cc7f76a9dd59f5539b695deda068a823f5c42e064da9e345bf6231cb7",
+      "bytes": 2530
     },
     {
       "path": "apps/web/src/i18n/oauthMessages.ts",
@@ -1973,13 +1973,13 @@
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.ko.md",
-      "sha256": "6304fc90fc010d75c995fb693170c9060a0d13c327cb0c540e1d6b2594e29dca",
-      "bytes": 12832
+      "sha256": "60a119b205924532f97dc3b8137d1c8248e8dcd8728193a47d7a04c052d01f81",
+      "bytes": 13386
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.md",
-      "sha256": "fbd264eba5ee88f650d85f04eade4a21ca6b4d45e790d028a1ad7163b8bafe9f",
-      "bytes": 10605
+      "sha256": "2be5949bcbbb3a5ea54e5f0b29688fec7de15f8439737409711107766e87deff",
+      "bytes": 11117
     },
     {
       "path": "docs/KNOWN_TEST_FAILURES.json",
@@ -2108,8 +2108,8 @@
     },
     {
       "path": "docs/architecture/verification-profiles.md",
-      "sha256": "05d1c7d5d776b23f27536c711dee5fdbaf89fec0472afccee47e6c5263f5bf34",
-      "bytes": 2656
+      "sha256": "edbd7848300938086f040249f2aa88c811506509cde55cc1f5508a3b0628f466",
+      "bytes": 4307
     },
     {
       "path": "docs/brand/README.md",
@@ -3055,6 +3055,16 @@
       "path": "scripts/checkpoint_commit_contract.py",
       "sha256": "bdaa3aeff1c58354a44d36011eca256cdd08f01a534e361b8d86c0b2fce35de2",
       "bytes": 7739
+    },
+    {
+      "path": "scripts/ci_test_shards.py",
+      "sha256": "dd47bf53bc54e90e5dc91d192d220402376955326f88f394232118eb6f8c7a3c",
+      "bytes": 7452
+    },
+    {
+      "path": "scripts/ci_test_summary.py",
+      "sha256": "408c84601430e119f2a0ad2d079903b9d35ba5b79a42e75e4c266d7bd0f2f466",
+      "bytes": 2950
     },
     {
       "path": "scripts/complete_architecture_gate.py",
@@ -5578,8 +5588,8 @@
     },
     {
       "path": "src/thoth/application/services/research_attempt_runner.py",
-      "sha256": "5e6499afabe6ea7d2d10f80123e8070f55eee4a265c02d2c06901e0d329dc088",
-      "bytes": 18958
+      "sha256": "db8a20ec7514b466fe289ba41edba517a6ba45e448161cc7c3bbd9588ced9236",
+      "bytes": 18959
     },
     {
       "path": "src/thoth/application/services/research_basis_capture.py",
@@ -6698,8 +6708,8 @@
     },
     {
       "path": "src/thoth/domain/model_call_settings.py",
-      "sha256": "ce35097577e69f060963892e485975758125b07a017ff85a881fc59836b7d9e5",
-      "bytes": 1071
+      "sha256": "a498edf0dd8a75861a859ac31ac4b71cd1d3665b725a75ffbfdd6963df7b4188",
+      "bytes": 1068
     },
     {
       "path": "src/thoth/domain/model_catalog.py",
@@ -7797,6 +7807,21 @@
       "bytes": 4708
     },
     {
+      "path": "tests/ci/integration_durations.json",
+      "sha256": "4863d6c2f6572bd3aa70dfbc16d50c6a17cc1a223a1343b5af8f20ae7d956473",
+      "bytes": 23221
+    },
+    {
+      "path": "tests/ci/test_ci_test_shards.py",
+      "sha256": "8233774edbf652f283e837d1d6bc816d3895a2ff40256f7fa1983ee55fba0970",
+      "bytes": 5139
+    },
+    {
+      "path": "tests/ci/test_ci_test_summary.py",
+      "sha256": "ba729abb8d3dc01f52853ca118e7665c58985790329b4ea16c488b991aea6fda",
+      "bytes": 2561
+    },
+    {
       "path": "tests/cli_contract_capture.py",
       "sha256": "e35e3ce9e618b79fbc8c3b1d1be535fee55ecce344c9266b0e3728860e65f540",
       "bytes": 2044
@@ -8813,8 +8838,8 @@
     },
     {
       "path": "tests/integration/test_hypothesis_contract_v3_run.py",
-      "sha256": "b8d2cdd96502289242aab2ab9cba73cfd70d61e5c76fd377cde681affc4db2a1",
-      "bytes": 17533
+      "sha256": "ba58f7b95b9936e9077b8f6d67115eb793d7259f8130ccf9ee7fb125c42852b4",
+      "bytes": 19143
     },
     {
       "path": "tests/integration/test_hypothesis_full_rpc.py",
@@ -9123,8 +9148,8 @@
     },
     {
       "path": "tests/integration/test_model_call_settings.py",
-      "sha256": "f1fec431b8a9b0ab7e7c370e30a39ccbe2f0ed0ca61c779d34f79734cf2a4020",
-      "bytes": 8862
+      "sha256": "b4f5c6f2ecfab8c9c63a0fd0b05ef248edc9312206b5dfcf9eb5f3c64c3600f3",
+      "bytes": 8861
     },
     {
       "path": "tests/integration/test_model_catalog_refresh_rpc.py",

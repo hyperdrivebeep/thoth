@@ -100,6 +100,11 @@ Older requests retain their original language policy. New questions use model ca
 
 ## A research loop you can revisit
 
+Expected results and refutation conditions are on by default for projects without a saved
+choice. A previously saved off choice stays off. You can change this in the project's advanced
+settings. Filling missing predictions may add a model call and use more tokens; predictions
+remain unconfirmed proposals, even when they include evidence references.
+
 | Step | In THOTH |
 | :--- | :--- |
 | **1 · Ask** | Start with a research question and connect the relevant documents. |

@@ -406,7 +406,7 @@ def _prepare_work(
         work.auto_retry_interrupted_call = True
     calls = host.call_settings
     if calls is not None and calls.hypothesis_contract_v3(request.project_id):
-        work.hypothesis_contract_v3 = True  # the project's own switch, off unless turned on
+        work.hypothesis_contract_v3 = True  # effective project choice, including its default
     boundary.validate_sources = lambda: host.analysis.require_current_sources(
         work.evidence, work.context.get("source_context_digest")
     )
