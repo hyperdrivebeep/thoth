@@ -221,6 +221,42 @@ and the sign-in commands) still work next to a running server. The lock belongs 
 a crash frees it. It is meant for a local disk; a folder shared between Windows and WSL or synced by
 a cloud client is not covered.
 
+### Workspace location policy
+
+Before opening a LOCAL database or taking its lock, THOTH checks the selected folder. Known
+cloud-sync folders, network shares (including mapped drives), and Windows/WSL shared paths are
+refused with exit code **4**. Move the whole workspace while its backend is stopped; sync only
+finished exports. THOTH does not move files or change sync settings for you.
+
+If the location cannot be classified, non-interactive commands stop with exit code **5**. Inspect
+the reason and, only if you choose to use that location, record your confirmation:
+
+```powershell
+.\.venv\Scripts\python.exe -m thoth.cli workspace --workspace "C:\Research\THOTH"
+.\.venv\Scripts\python.exe -m thoth.cli accept-location --workspace "C:\Research\THOTH"
+```
+
+The interactive shell and other interactive CLI commands can ask for that confirmation.
+`serve` and `desktop` never prompt: confirm first, then start them again. A lazy runtime opened
+through HTTP returns status 503 with `WORKSPACE_LOCATION_BLOCKED` or
+`WORKSPACE_LOCATION_UNCONFIRMED` and Korean/English guidance.
+
+Confirmation is stored in `workspace-location.json`, tied to the workspace identity,
+classification, and reason. A changed path or reason requires confirmation again. It never
+overrides a known blocked location and is not a safety certification. To forget only this record:
+
+```powershell
+.\.venv\Scripts\python.exe -m thoth.cli accept-location --workspace "C:\Research\THOTH" --forget
+```
+
+A removable drive with no sync uncertainty can be used with a warning; keep it connected and
+remove it safely afterward. Confirmed unknown locations also keep a warning in the setup and
+workspace screens. Classification is a snapshot taken when storage opens, not continuous
+monitoring. Restart after changing mounts or sync configuration. Hosted review storage does not
+use this LOCAL policy. macOS location detection is currently unknown and requires confirmation;
+Linux recognizes selected local, network, and Windows bridge mount types. Unrecognized or failed
+probes remain unknown. See [limitations](KNOWN_LIMITATIONS.md#workspace-location-detection).
+
 | Stored item | What restarting preserves |
 | --- | --- |
 | Projects, sources, evidence, saved results and model preferences | Stored under the workspace. Reopen the same root after restarting the backend. A lost model connection does not hide existing local research. |

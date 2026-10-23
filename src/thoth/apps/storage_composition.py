@@ -11,13 +11,21 @@ from thoth.application.services import (
     FieldMeasurementService,
     ReceiptDagService,
 )
+from thoth.domain.deployment_mode import DeploymentMode
+from thoth.domain.storage_context import storage_mode_scope
 from thoth.ports.runtime import ClockPort, IdGeneratorPort
 from thoth.ports.store_bundle import StoreBundlePort, StoreFactoryPort, StoreFactoryRegistryPort
 
 
-def open_stores(workspace: Path, factory: StoreFactoryPort | None = None) -> StoreBundlePort:
+def open_stores(
+    workspace: Path,
+    factory: StoreFactoryPort | None = None,
+    *,
+    deployment_mode: DeploymentMode | None = None,
+) -> StoreBundlePort:
     selected = factory or default_store_factory_registry().resolve("sqlite", "1.0.0")
-    return selected.open(workspace)
+    with storage_mode_scope(deployment_mode):
+        return selected.open(workspace)
 
 
 def open_registered_stores(

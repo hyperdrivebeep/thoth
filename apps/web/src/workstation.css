@@ -119,6 +119,9 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 /* Conversation surfaces use the existing workstation tokens and real record views. */
 .conversation-workstation {height:100dvh;min-height:0;overflow:hidden;grid-template-columns:var(--sidebar-width) minmax(0,1fr)}
 .conversation-workstation {grid-template-rows:48px 40px minmax(0,1fr)}
+.conversation-workstation:has(.workspace-location-notice) {grid-template-rows:48px auto minmax(0,1fr)}
+.conversation-workstation .workspace-navigation:has(.workspace-location-notice) {flex-wrap:wrap;gap:8px;padding-top:8px;padding-bottom:8px}
+.workspace-navigation .workspace-location-notice {flex-basis:100%;overflow-wrap:anywhere}
 .conversation-workstation .workstation-topbar {min-height:48px;padding:0 20px}
 .conversation-workstation .workspace-navigation {min-height:40px;padding:0 20px}
 .conversation-workstation .workspace-navigation .bp6-tab {line-height:40px}

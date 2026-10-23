@@ -22,6 +22,26 @@ on a local disk. It does not cover a workspace folder shared between Windows and
 cloud sync client or a network share exposes to several computers; do not open the same workspace
 from two places that way. The hosted review mode does not use this lock.
 
+## Workspace location detection
+
+LOCAL startup now refuses detected cloud-sync roots, network shares, and Windows/WSL bridges
+before the database lock is taken. Unknown locations need explicit confirmation; removable
+drives and confirmed unknown locations retain a warning. See the
+[inspection and confirmation commands](INSTALL.md#workspace-location-policy).
+
+Detection combines Windows drive and cloud queries, file attributes, known provider paths and
+registered sync roots. A native cloud query alone did not identify an existing OneDrive folder
+in the read-only host check; the known-root signal did. A DriveFS configured mount point alone
+is treated as unknown, not proof of an active sync root. Registry access failures are unknown;
+absent optional registration entries mean no configured root at that entry. The checks do not
+identify every sync client or guarantee that a folder is safe. macOS is currently unknown;
+Linux uses selected mount types. Physical removable drives, live network mounts and running
+sync-client behavior have not been verified by the focused injected tests.
+
+The classification and warning describe the storage-open snapshot. THOTH does not monitor later
+mount or sync-setting changes. Confirmation is bound to the canonical workspace identity and
+reason and cannot override a known block. Hosted review is outside this LOCAL policy.
+
 ## Recovery of a request interrupted by shutdown
 
 In LOCAL mode, 67 measured commands can be closed as failed when the same idempotency key is
@@ -127,4 +147,11 @@ exist.
   catalog.
 - A step whose last attempt ended with a terminal failure is not dispatched again on its own.
   The execution waits until you reconcile it or create a new revision.
-- File upload has no time limit of its own in the interface, only the server's size limit.
+- File uploads can be cancelled while staging. The interface aborts after two minutes without
+  increasing sent bytes. After all bytes are sent, server processing has no automatic deadline and
+  the user can cancel the wait. Progress that continues has no overall time limit; the server's 64 MiB limit remains.
+  All files in a selection are staged before any are connected. Cancelled or failed staging can
+  leave complete, unconnected files in the inbox; staging alone does not add them to sources or
+  evidence. Connecting sources is a separate step and cannot be cancelled by the upload button.
+  Browser/proxy progress behaviour has not been verified in a live deployment. There is no new
+  server-side receiving deadline or automatic cleanup of complete unconnected staged files.

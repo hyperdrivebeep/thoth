@@ -8,6 +8,8 @@ import sys
 from collections.abc import Mapping
 from pathlib import Path
 
+from thoth.domain.workspace_identity import workspace_identity
+
 
 def default_workspace(
     *,
@@ -31,9 +33,15 @@ def selected_workspace(explicit: Path | None = None) -> Path:
 
 def workspace_id(root: Path, *, platform: str | None = None) -> str:
     normalized = str(root.expanduser().resolve())
-    if (sys.platform if platform is None else platform) == "win32":
-        normalized = normalized.casefold()
-    return "workspace:" + hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:32]
+    return workspace_identity(
+        normalized, windows=(sys.platform if platform is None else platform) == "win32"
+    )
+
+
+def workspace_session_id(workspace: Path) -> str:
+    normalized = os.path.normcase(str(workspace.resolve()))
+    digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:24]
+    return f"tui:workspace:{digest}:local"
 
 
 def legacy_workspace_candidates(cwd: Path) -> tuple[Path, ...]:

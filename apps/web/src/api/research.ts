@@ -158,7 +158,15 @@ export type ResearchStatus = WorkThread & {
 };
 export type ResearchAdmission = { contract_version: number; project_id?: string; thread_id: string; operation_id?: string;
   status?: string; request_epoch?: number | null; terminal_reason?: string | null };
+export type WorkspaceLocationInfo = {
+  classification: "KNOWN_LOCAL" | "KNOWN_SYNC" | "REMOTE_SHARE" | "UNSUPPORTED_BRIDGE" | "REMOVABLE" | "UNKNOWN";
+  reason_codes: string[];
+  confirmed: boolean;
+  message_ko: string;
+  message_en: string;
+};
 export type WorkspaceReady = {
+  workspace_location?: WorkspaceLocationInfo;
   browser_scope_id?: string;
   response_languages?: ("ko" | "en")[];
   response_language_scope?: "REQUEST";

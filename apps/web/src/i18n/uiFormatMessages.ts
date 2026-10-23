@@ -1,6 +1,8 @@
 export const uiFormats = {
   filesSelected: {ko: (count: number) => `${count}개 선택`, en: (count: number) => `${count} ${count === 1 ? "file" : "files"} selected`},
   fileStaging: {ko: (name: string) => `${name} · 업로드 준비 / 구조 파싱`, en: (name: string) => `${name} · Preparing upload / parsing structure`},
+  fileUploadProgress: {ko: (name: string, percent: number) => `${name} 보내는 중 (${percent}%)`, en: (name: string, percent: number) => `Uploading ${name} (${percent}%)`},
+  fileUploadWaiting: {ko: (name: string) => `${name} 파일을 다 보냈습니다. 서버가 처리하는 중입니다…`, en: (name: string) => `${name} was sent. The server is processing it…`},
   restoreProject: {ko: (name: string) => `${name} 되살리기`, en: (name: string) => `Restore ${name}`},
   currentSetting: {ko: (state: string) => `현재: ${state}`, en: (state: string) => `Current: ${state}`},
   errorCode: {ko: (code: string) => ` 오류 코드: ${code}`, en: (code: string) => ` Error code: ${code}`},

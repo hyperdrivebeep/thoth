@@ -1,0 +1,23 @@
+[
+  {"name":"fixed-clean","path":"C:\\work\\project","platform":"win32","drive_type":"FIXED","cloud":"NOT_UNDER_SYNC_ROOT","expected":"KNOWN_LOCAL"},
+  {"name":"cloud-root","path":"C:\\work\\project","platform":"win32","drive_type":"FIXED","cloud":"SYNC","expected":"KNOWN_SYNC"},
+  {"name":"cloud-failed","path":"C:\\work\\project","platform":"win32","drive_type":"FIXED","cloud":"UNKNOWN","expected":"UNKNOWN"},
+  {"name":"unc","path":"\\\\server\\share\\project","platform":"win32","drive_type":"UNKNOWN","cloud":"UNKNOWN","expected":"REMOTE_SHARE"},
+  {"name":"wsl-dollar","path":"\\\\wsl$\\Ubuntu\\project","platform":"win32","drive_type":"REMOTE","cloud":"UNKNOWN","expected":"UNSUPPORTED_BRIDGE"},
+  {"name":"wsl-localhost","path":"\\\\wsl.localhost\\Ubuntu\\project","platform":"win32","drive_type":"REMOTE","cloud":"UNKNOWN","expected":"UNSUPPORTED_BRIDGE"},
+  {"name":"mapped-share","path":"Z:\\project","platform":"win32","drive_type":"REMOTE","cloud":"NOT_UNDER_SYNC_ROOT","expected":"REMOTE_SHARE"},
+  {"name":"removable-clean","path":"E:\\project","platform":"win32","drive_type":"REMOVABLE","cloud":"NOT_UNDER_SYNC_ROOT","expected":"REMOVABLE"},
+  {"name":"drive-unknown","path":"X:\\project","platform":"win32","drive_type":"UNKNOWN","cloud":"NOT_UNDER_SYNC_ROOT","expected":"UNKNOWN"},
+  {"name":"root-casefold","path":"c:\\ONEDRIVE\\project","platform":"win32","drive_type":"FIXED","cloud":"NOT_UNDER_SYNC_ROOT","known_roots":["C:\\OneDrive"],"expected":"KNOWN_SYNC"},
+  {"name":"root-component-boundary","path":"C:\\OneDrive-other\\project","platform":"win32","drive_type":"FIXED","cloud":"NOT_UNDER_SYNC_ROOT","known_roots":["C:\\OneDrive"],"expected":"KNOWN_LOCAL"},
+  {"name":"name-alone","path":"C:\\work\\OneDrive\\project","platform":"win32","drive_type":"FIXED","cloud":"NOT_UNDER_SYNC_ROOT","expected":"KNOWN_LOCAL"},
+  {"name":"cloud-attribute-uncertain","path":"C:\\work\\project","platform":"win32","drive_type":"FIXED","cloud":"NOT_UNDER_SYNC_ROOT","cloud_attributes":true,"expected":"UNKNOWN"},
+  {"name":"ordinary-reparse","path":"C:\\work\\project","platform":"win32","drive_type":"FIXED","cloud":"NOT_UNDER_SYNC_ROOT","reparse":true,"expected":"KNOWN_LOCAL"},
+  {"name":"linux-ext4","path":"/home/user/project","platform":"linux","mountinfo":"1 0 8:1 / / rw - ext4 /dev/sda rw","expected":"KNOWN_LOCAL"},
+  {"name":"linux-wsl","path":"/mnt/c/project","platform":"linux","mountinfo":"1 0 8:1 / / rw - ext4 /dev/sda rw\n2 1 0:1 / /mnt/c rw - 9p C: rw","expected":"UNSUPPORTED_BRIDGE"},
+  {"name":"linux-share","path":"/share/project","platform":"linux","mountinfo":"1 0 8:1 / / rw - ext4 /dev/sda rw\n2 1 0:1 / /share rw - cifs //server/share rw","expected":"REMOTE_SHARE"},
+  {"name":"longest-mount-unknown","path":"/home/user/project","platform":"linux","mountinfo":"1 0 8:1 / / rw - ext4 /dev/sda rw\n2 1 0:1 / /home/user rw - fuse.custom custom rw","expected":"UNKNOWN"},
+  {"name":"linux-prefix-boundary","path":"/mnt/case/project","platform":"linux","mountinfo":"1 0 8:1 / / rw - ext4 /dev/sda rw\n2 1 0:1 / /mnt/c rw - drvfs C: rw","expected":"KNOWN_LOCAL"},
+  {"name":"missing-mountinfo","path":"/work/project","platform":"linux","mountinfo":"","expected":"UNKNOWN"},
+  {"name":"unimplemented-platform","path":"/Users/user/project","platform":"darwin","expected":"UNKNOWN"}
+]

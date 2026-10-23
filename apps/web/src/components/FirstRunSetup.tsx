@@ -15,6 +15,7 @@ import { providerLabel } from "./statusLabels";
 import { OAuthLoginFlow } from "./OAuthLoginFlow";
 import { localCredentialWorkspaceId } from "./localCredentialWorkspace";
 import { workspaceSetupIssue, workspaceSetupIssueText } from "./workspaceSetupIssue";
+import { WorkspaceLocationNotice } from "./WorkspaceLocationNotice";
 
 const toneIntent: Record<ProviderTone, "success" | "primary" | "none" | "warning"> = {
   ready: "success", pending: "primary", action: "none", blocked: "warning",
@@ -98,6 +99,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
   return (
     <main className="first-run-shell bp6-dark">
       <section className="first-run-card" aria-labelledby="first-run-title">
+        <WorkspaceLocationNotice location={value?.workspace_location} />
         <p className="eyebrow">
           {hosted ? t("setup.reviewWorkspace") : message("setupStep", currentStep === "model" ? 1 : 2)}
         </p>
