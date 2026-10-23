@@ -53,7 +53,7 @@ def summarize(directory: Path, shards: int, job_results: list[str]) -> tuple[str
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reports", type=Path, required=True)
-    parser.add_argument("--shards", type=int, default=8)
+    parser.add_argument("--shards", type=int, default=16)
     parser.add_argument("--job-results", nargs=2, required=True)
     parser.add_argument("--markdown-output", type=Path)
     args = parser.parse_args()

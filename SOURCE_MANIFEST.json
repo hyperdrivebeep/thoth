@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-23T09:37:20.288881+00:00",
+  "created_at": "2026-10-23T11:45:06.957851+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -18,8 +18,8 @@
     },
     {
       "path": ".github/workflows/product-check.yml",
-      "sha256": "418474e27a6faf3dda070566a987a69a9b8b5f995f94ca83e0d376012cd0c717",
-      "bytes": 8122
+      "sha256": "5af2bc4e756190e35cec3cc6a725302063b18a512b83876bdfcb006dbe50e9ec",
+      "bytes": 8154
     },
     {
       "path": ".gitignore",
@@ -2108,8 +2108,8 @@
     },
     {
       "path": "docs/architecture/verification-profiles.md",
-      "sha256": "edbd7848300938086f040249f2aa88c811506509cde55cc1f5508a3b0628f466",
-      "bytes": 4307
+      "sha256": "0f9816439d8a2a0b220eb249bbe972c44b3049ffd66c4f57987d3111b74c2a08",
+      "bytes": 4309
     },
     {
       "path": "docs/brand/README.md",
@@ -3058,13 +3058,13 @@
     },
     {
       "path": "scripts/ci_test_shards.py",
-      "sha256": "dd47bf53bc54e90e5dc91d192d220402376955326f88f394232118eb6f8c7a3c",
-      "bytes": 7452
+      "sha256": "4a97a87737246f832a5daeab22f4308c366313c5a24c1975fc218bb83ea7af9c",
+      "bytes": 7455
     },
     {
       "path": "scripts/ci_test_summary.py",
-      "sha256": "408c84601430e119f2a0ad2d079903b9d35ba5b79a42e75e4c266d7bd0f2f466",
-      "bytes": 2950
+      "sha256": "faffb885f3b210cf05ac96146e642b8efe59aabc06ccbd398c08ec83327a38ea",
+      "bytes": 2951
     },
     {
       "path": "scripts/complete_architecture_gate.py",
@@ -3090,6 +3090,11 @@
       "path": "scripts/hook_owner_contract.py",
       "sha256": "3b7212b126c2a076c6b4cea8db292617db6b32eae9ddeca22a6d184031d3b007",
       "bytes": 8909
+    },
+    {
+      "path": "scripts/hypothesis_grounding_replay.py",
+      "sha256": "94d6603181566c2eb47d9fc6000153bf7f312ddcbd532f8c8c326781403a489b",
+      "bytes": 12496
     },
     {
       "path": "scripts/hypothesis_v3_metrics.py",
@@ -7813,13 +7818,13 @@
     },
     {
       "path": "tests/ci/test_ci_test_shards.py",
-      "sha256": "8233774edbf652f283e837d1d6bc816d3895a2ff40256f7fa1983ee55fba0970",
-      "bytes": 5139
+      "sha256": "6835029b914a67030daacd423fb16a4c2a56371876c5a34789b4f6bf3c55f0e5",
+      "bytes": 5318
     },
     {
       "path": "tests/ci/test_ci_test_summary.py",
-      "sha256": "ba729abb8d3dc01f52853ca118e7665c58985790329b4ea16c488b991aea6fda",
-      "bytes": 2561
+      "sha256": "4e477fceb7a32c67d31e8200ce9e9ca7619c1d848a113c747e544ced868e90f1",
+      "bytes": 2907
     },
     {
       "path": "tests/cli_contract_capture.py",
@@ -7962,6 +7967,21 @@
       "bytes": 35832
     },
     {
+      "path": "tests/fixtures/hypothesis_grounding/README.md",
+      "sha256": "4cf8e0c164bcfa2c5258bd4d06bf01298fa991c24ee9ff37e6c14cd4273857be",
+      "bytes": 2844
+    },
+    {
+      "path": "tests/fixtures/hypothesis_grounding/baseline.json",
+      "sha256": "04cec957721e59404608b4d39717f8f118c978edd9855113d6df4c4acfe1f490",
+      "bytes": 8709
+    },
+    {
+      "path": "tests/fixtures/hypothesis_grounding/cases.json",
+      "sha256": "2bc6b8bb2ccf1c33e506790eb3cec7fe4e0209a93bbca8476409975b4857d80e",
+      "bytes": 41592
+    },
+    {
       "path": "tests/fixtures/hypothesis_input_schemas.json",
       "sha256": "6448a35592adffb56c088f5d1cff16653be0d0e68ae08cf95de44d2050575697",
       "bytes": 34131
@@ -8090,6 +8110,11 @@
       "path": "tests/fixtures/runtime_registration_events.json",
       "sha256": "18b4236f9f0d283985bbfc15b170d9c62bfaa328248ea0f7974bbc76b9bf39d3",
       "bytes": 112407
+    },
+    {
+      "path": "tests/fixtures/scripted_hypothesis_responses.py",
+      "sha256": "403e7fee0186f57e99af7ed7edce792810f3c761fe9a06870e5ced001b745948",
+      "bytes": 4437
     },
     {
       "path": "tests/fixtures/sealable_methods.json",
@@ -8308,8 +8333,8 @@
     },
     {
       "path": "tests/integration/test_a02_autonomous_acquisition.py",
-      "sha256": "1b51c5a9e3f9e2372551ce7f9f3a25c0d2366f62295197c9382c31eabc7689aa",
-      "bytes": 24619
+      "sha256": "0b394d20691fadf60a056e431e9bf4a5538859f6224312ce4dd0a3a127ad7438",
+      "bytes": 25120
     },
     {
       "path": "tests/integration/test_a02_real_connector_routes.py",
@@ -8678,8 +8703,8 @@
     },
     {
       "path": "tests/integration/test_current_hero_normal_entry.py",
-      "sha256": "48f26bb509f2576ea79cc17779fd5ebbfbd6d3dcea10d3626e2bcddd3e4fc527",
-      "bytes": 1718
+      "sha256": "8b80e56c10f2a56d6ef70b9904b9a236176eb4ec31d762e541b653e532c4ec0c",
+      "bytes": 2722
     },
     {
       "path": "tests/integration/test_current_secondary_same_trace.py",
@@ -8768,8 +8793,8 @@
     },
     {
       "path": "tests/integration/test_four_projectpack_portability.py",
-      "sha256": "12347d341a8c6ef57313df45598f404e570a5cc352f512763c5f101b4e9bc5fd",
-      "bytes": 11888
+      "sha256": "ba257a035b5339ed1bcd330a413fc66477c86abe35c19f504278e031f2cfea8c",
+      "bytes": 12960
     },
     {
       "path": "tests/integration/test_full_backend_adversarial_isolation.py",
@@ -9623,8 +9648,8 @@
     },
     {
       "path": "tests/integration/test_research_request_v2.py",
-      "sha256": "d1400bc76e15f9a3bcc5cc764e3f4020b35e30b6d704d2aa449f6fc30137ae5b",
-      "bytes": 20993
+      "sha256": "ff6594cbc1b13352a105d14289e007fd03c6c5082e0186953d93068012c51aa5",
+      "bytes": 21334
     },
     {
       "path": "tests/integration/test_research_review_order.py",
@@ -11347,6 +11372,11 @@
       "bytes": 3142
     },
     {
+      "path": "tests/unit/test_hypothesis_grounding_replay.py",
+      "sha256": "0d560aa77710f47b71d8a0bdf11e3c948b63f861ab78116eef658091ac81f7f7",
+      "bytes": 10806
+    },
+    {
       "path": "tests/unit/test_hypothesis_v3_metrics.py",
       "sha256": "88e55392895bb63a1da1ad7c26abbee88778d813194bd29779ecb51dea18020f",
       "bytes": 10661
@@ -11550,6 +11580,11 @@
       "path": "tests/unit/test_scope_read_memo_context.py",
       "sha256": "748c245fba5caeea53f783e245da8c21c3348e62809664637583554677d01c5e",
       "bytes": 3596
+    },
+    {
+      "path": "tests/unit/test_scripted_hypothesis_responses.py",
+      "sha256": "bdee711069a62d4014704a31f50bbf1122c57c444110d26846a0f24b22857877",
+      "bytes": 6726
     },
     {
       "path": "tests/unit/test_selected_evidence_reader.py",

@@ -1,0 +1,1175 @@
+{
+  "schema_version": "grounding_replay_cases.v1",
+  "examples": [
+    {
+      "case_id": "exact-rain-observation",
+      "category": "POSITIVE_EXACT",
+      "context": {
+        "kind": "OBSERVATION",
+        "project_id": "project:fixture",
+        "cutoff_at": "2026-10-08T00:00:00Z",
+        "data_origin": "SYNTHETIC",
+        "target": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "evidence": [
+          {
+            "binding": {
+              "span_id": "span:rain",
+              "source_version_id": "source:rain:v1",
+              "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+            },
+            "project_id": "project:fixture",
+            "observation": {
+              "result_id": "result:rain",
+              "subject_id": "criterion:detection",
+              "condition": {
+                "weather": "rain"
+              },
+              "numerator": 16,
+              "denominator": 20,
+              "value": "0.80",
+              "unit": "ratio",
+              "observed_at": "2026-10-01T00:00:00Z",
+              "synthetic": true
+            },
+            "exact_text": "{\"condition\":{\"weather\":\"rain\"},\"denominator\":20,\"numerator\":16,\"observed_at\":\"2026-10-01T00:00:00Z\",\"result_id\":\"result:rain\",\"subject_id\":\"criterion:detection\",\"synthetic\":true,\"unit\":\"ratio\",\"value\":\"0.80\"}",
+            "relation": "SUPPORT"
+          }
+        ],
+        "permitted_span_ids": [
+          "span:rain"
+        ],
+        "pinned_sources": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "inference_support_ids": []
+      },
+      "accepted": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      },
+      "rejected": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      }
+    },
+    {
+      "case_id": "labelled-inference",
+      "category": "POSITIVE_INFERENCE",
+      "context": {
+        "kind": "INFERENCE",
+        "project_id": "project:fixture",
+        "cutoff_at": "2026-10-08T00:00:00Z",
+        "data_origin": "SYNTHETIC",
+        "target": null,
+        "evidence": [
+          {
+            "binding": {
+              "span_id": "span:rain",
+              "source_version_id": "source:rain:v1",
+              "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+            },
+            "project_id": "project:fixture",
+            "observation": {
+              "result_id": "result:rain",
+              "subject_id": "criterion:detection",
+              "condition": {
+                "weather": "rain"
+              },
+              "numerator": 16,
+              "denominator": 20,
+              "value": "0.80",
+              "unit": "ratio",
+              "observed_at": "2026-10-01T00:00:00Z",
+              "synthetic": true
+            },
+            "exact_text": "{\"condition\":{\"weather\":\"rain\"},\"denominator\":20,\"numerator\":16,\"observed_at\":\"2026-10-01T00:00:00Z\",\"result_id\":\"result:rain\",\"subject_id\":\"criterion:detection\",\"synthetic\":true,\"unit\":\"ratio\",\"value\":\"0.80\"}",
+            "relation": "SUPPORT"
+          }
+        ],
+        "permitted_span_ids": [
+          "span:rain"
+        ],
+        "pinned_sources": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "inference_support_ids": [
+          "span:rain"
+        ]
+      },
+      "accepted": {
+        "role": "EVIDENCE_INFERENCE",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건의 낮은 기록은 추가 원인 조사를 뒷받침한다",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "observation": null,
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      },
+      "rejected": {
+        "role": "EVIDENCE_INFERENCE",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건의 낮은 기록은 추가 원인 조사를 뒷받침한다",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "observation": null,
+        "data_origin": "SYNTHETIC",
+        "verification_claim": true
+      }
+    },
+    {
+      "case_id": "number-only",
+      "category": "NEGATIVE",
+      "context": {
+        "kind": "OBSERVATION",
+        "project_id": "project:fixture",
+        "cutoff_at": "2026-10-08T00:00:00Z",
+        "data_origin": "SYNTHETIC",
+        "target": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "evidence": [
+          {
+            "binding": {
+              "span_id": "span:rain",
+              "source_version_id": "source:rain:v1",
+              "text_sha256": "7bf39a33f60c6ce242eb5f52d54c6266eefcd279560b9eb093b5c7cabd201e23"
+            },
+            "project_id": "project:fixture",
+            "observation": {
+              "result_id": "result:other",
+              "subject_id": "criterion:other",
+              "condition": {
+                "weather": "rain"
+              },
+              "numerator": 16,
+              "denominator": 20,
+              "value": "0.80",
+              "unit": "ratio",
+              "observed_at": "2026-10-01T00:00:00Z",
+              "synthetic": true
+            },
+            "exact_text": "{\"condition\":{\"weather\":\"rain\"},\"denominator\":20,\"numerator\":16,\"observed_at\":\"2026-10-01T00:00:00Z\",\"result_id\":\"result:other\",\"subject_id\":\"criterion:other\",\"synthetic\":true,\"unit\":\"ratio\",\"value\":\"0.80\"}",
+            "relation": "SUPPORT"
+          }
+        ],
+        "permitted_span_ids": [
+          "span:rain"
+        ],
+        "pinned_sources": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "7bf39a33f60c6ce242eb5f52d54c6266eefcd279560b9eb093b5c7cabd201e23"
+          }
+        ],
+        "inference_support_ids": []
+      },
+      "accepted": {
+        "role": "UNASSESSED",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [],
+        "observation": null,
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      },
+      "rejected": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "7bf39a33f60c6ce242eb5f52d54c6266eefcd279560b9eb093b5c7cabd201e23"
+          }
+        ],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      }
+    },
+    {
+      "case_id": "condition-mismatch",
+      "category": "NEGATIVE",
+      "context": {
+        "kind": "OBSERVATION",
+        "project_id": "project:fixture",
+        "cutoff_at": "2026-10-08T00:00:00Z",
+        "data_origin": "SYNTHETIC",
+        "target": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "evidence": [
+          {
+            "binding": {
+              "span_id": "span:rain",
+              "source_version_id": "source:rain:v1",
+              "text_sha256": "08c8e7cffd853cf6f6bab447cb60c0f1a04f3fae17dc574b709b715e89fbad4b"
+            },
+            "project_id": "project:fixture",
+            "observation": {
+              "result_id": "result:rain",
+              "subject_id": "criterion:detection",
+              "condition": {
+                "weather": "dry"
+              },
+              "numerator": 16,
+              "denominator": 20,
+              "value": "0.80",
+              "unit": "ratio",
+              "observed_at": "2026-10-01T00:00:00Z",
+              "synthetic": true
+            },
+            "exact_text": "{\"condition\":{\"weather\":\"dry\"},\"denominator\":20,\"numerator\":16,\"observed_at\":\"2026-10-01T00:00:00Z\",\"result_id\":\"result:rain\",\"subject_id\":\"criterion:detection\",\"synthetic\":true,\"unit\":\"ratio\",\"value\":\"0.80\"}",
+            "relation": "SUPPORT"
+          }
+        ],
+        "permitted_span_ids": [
+          "span:rain"
+        ],
+        "pinned_sources": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "08c8e7cffd853cf6f6bab447cb60c0f1a04f3fae17dc574b709b715e89fbad4b"
+          }
+        ],
+        "inference_support_ids": []
+      },
+      "accepted": {
+        "role": "UNASSESSED",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [],
+        "observation": null,
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      },
+      "rejected": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "08c8e7cffd853cf6f6bab447cb60c0f1a04f3fae17dc574b709b715e89fbad4b"
+          }
+        ],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      }
+    },
+    {
+      "case_id": "unit-mismatch",
+      "category": "NEGATIVE",
+      "context": {
+        "kind": "OBSERVATION",
+        "project_id": "project:fixture",
+        "cutoff_at": "2026-10-08T00:00:00Z",
+        "data_origin": "SYNTHETIC",
+        "target": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "evidence": [
+          {
+            "binding": {
+              "span_id": "span:rain",
+              "source_version_id": "source:rain:v1",
+              "text_sha256": "701365cddfc62b8f7db7d45e2566840147654dd972f48d29a21145eae20dc6b9"
+            },
+            "project_id": "project:fixture",
+            "observation": {
+              "result_id": "result:rain",
+              "subject_id": "criterion:detection",
+              "condition": {
+                "weather": "rain"
+              },
+              "numerator": 16,
+              "denominator": 20,
+              "value": "0.80",
+              "unit": "per_min",
+              "observed_at": "2026-10-01T00:00:00Z",
+              "synthetic": true
+            },
+            "exact_text": "{\"condition\":{\"weather\":\"rain\"},\"denominator\":20,\"numerator\":16,\"observed_at\":\"2026-10-01T00:00:00Z\",\"result_id\":\"result:rain\",\"subject_id\":\"criterion:detection\",\"synthetic\":true,\"unit\":\"per_min\",\"value\":\"0.80\"}",
+            "relation": "SUPPORT"
+          }
+        ],
+        "permitted_span_ids": [
+          "span:rain"
+        ],
+        "pinned_sources": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "701365cddfc62b8f7db7d45e2566840147654dd972f48d29a21145eae20dc6b9"
+          }
+        ],
+        "inference_support_ids": []
+      },
+      "accepted": {
+        "role": "UNASSESSED",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [],
+        "observation": null,
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      },
+      "rejected": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "701365cddfc62b8f7db7d45e2566840147654dd972f48d29a21145eae20dc6b9"
+          }
+        ],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      }
+    },
+    {
+      "case_id": "denominator-mismatch",
+      "category": "NEGATIVE",
+      "context": {
+        "kind": "OBSERVATION",
+        "project_id": "project:fixture",
+        "cutoff_at": "2026-10-08T00:00:00Z",
+        "data_origin": "SYNTHETIC",
+        "target": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "evidence": [
+          {
+            "binding": {
+              "span_id": "span:rain",
+              "source_version_id": "source:rain:v1",
+              "text_sha256": "ae05cd8b91a3f6102ddfb0a3b2292b4c3800b51b8673cef708342deab432aa9c"
+            },
+            "project_id": "project:fixture",
+            "observation": {
+              "result_id": "result:rain",
+              "subject_id": "criterion:detection",
+              "condition": {
+                "weather": "rain"
+              },
+              "numerator": 20,
+              "denominator": 25,
+              "value": "0.80",
+              "unit": "ratio",
+              "observed_at": "2026-10-01T00:00:00Z",
+              "synthetic": true
+            },
+            "exact_text": "{\"condition\":{\"weather\":\"rain\"},\"denominator\":25,\"numerator\":20,\"observed_at\":\"2026-10-01T00:00:00Z\",\"result_id\":\"result:rain\",\"subject_id\":\"criterion:detection\",\"synthetic\":true,\"unit\":\"ratio\",\"value\":\"0.80\"}",
+            "relation": "SUPPORT"
+          }
+        ],
+        "permitted_span_ids": [
+          "span:rain"
+        ],
+        "pinned_sources": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "ae05cd8b91a3f6102ddfb0a3b2292b4c3800b51b8673cef708342deab432aa9c"
+          }
+        ],
+        "inference_support_ids": []
+      },
+      "accepted": {
+        "role": "UNASSESSED",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [],
+        "observation": null,
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      },
+      "rejected": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "ae05cd8b91a3f6102ddfb0a3b2292b4c3800b51b8673cef708342deab432aa9c"
+          }
+        ],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      }
+    },
+    {
+      "case_id": "stale-pinned-revision",
+      "category": "NEGATIVE",
+      "context": {
+        "kind": "OBSERVATION",
+        "project_id": "project:fixture",
+        "cutoff_at": "2026-10-08T00:00:00Z",
+        "data_origin": "SYNTHETIC",
+        "target": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "evidence": [
+          {
+            "binding": {
+              "span_id": "span:rain",
+              "source_version_id": "source:rain:v1",
+              "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+            },
+            "project_id": "project:fixture",
+            "observation": {
+              "result_id": "result:rain",
+              "subject_id": "criterion:detection",
+              "condition": {
+                "weather": "rain"
+              },
+              "numerator": 16,
+              "denominator": 20,
+              "value": "0.80",
+              "unit": "ratio",
+              "observed_at": "2026-10-01T00:00:00Z",
+              "synthetic": true
+            },
+            "exact_text": "{\"condition\":{\"weather\":\"rain\"},\"denominator\":20,\"numerator\":16,\"observed_at\":\"2026-10-01T00:00:00Z\",\"result_id\":\"result:rain\",\"subject_id\":\"criterion:detection\",\"synthetic\":true,\"unit\":\"ratio\",\"value\":\"0.80\"}",
+            "relation": "SUPPORT"
+          }
+        ],
+        "permitted_span_ids": [
+          "span:rain"
+        ],
+        "pinned_sources": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v2",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "inference_support_ids": []
+      },
+      "accepted": {
+        "role": "UNASSESSED",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [],
+        "observation": null,
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      },
+      "rejected": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      }
+    },
+    {
+      "case_id": "foreign-or-private-scope",
+      "category": "NEGATIVE",
+      "context": {
+        "kind": "OBSERVATION",
+        "project_id": "project:fixture",
+        "cutoff_at": "2026-10-08T00:00:00Z",
+        "data_origin": "SYNTHETIC",
+        "target": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "evidence": [
+          {
+            "binding": {
+              "span_id": "span:rain",
+              "source_version_id": "source:rain:v1",
+              "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+            },
+            "project_id": "project:foreign",
+            "observation": {
+              "result_id": "result:rain",
+              "subject_id": "criterion:detection",
+              "condition": {
+                "weather": "rain"
+              },
+              "numerator": 16,
+              "denominator": 20,
+              "value": "0.80",
+              "unit": "ratio",
+              "observed_at": "2026-10-01T00:00:00Z",
+              "synthetic": true
+            },
+            "exact_text": "{\"condition\":{\"weather\":\"rain\"},\"denominator\":20,\"numerator\":16,\"observed_at\":\"2026-10-01T00:00:00Z\",\"result_id\":\"result:rain\",\"subject_id\":\"criterion:detection\",\"synthetic\":true,\"unit\":\"ratio\",\"value\":\"0.80\"}",
+            "relation": "SUPPORT"
+          }
+        ],
+        "permitted_span_ids": [],
+        "pinned_sources": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "inference_support_ids": []
+      },
+      "accepted": {
+        "role": "UNASSESSED",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [],
+        "observation": null,
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      },
+      "rejected": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      }
+    },
+    {
+      "case_id": "invented-span",
+      "category": "NEGATIVE",
+      "context": {
+        "kind": "OBSERVATION",
+        "project_id": "project:fixture",
+        "cutoff_at": "2026-10-08T00:00:00Z",
+        "data_origin": "SYNTHETIC",
+        "target": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "evidence": [
+          {
+            "binding": {
+              "span_id": "span:rain",
+              "source_version_id": "source:rain:v1",
+              "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+            },
+            "project_id": "project:fixture",
+            "observation": {
+              "result_id": "result:rain",
+              "subject_id": "criterion:detection",
+              "condition": {
+                "weather": "rain"
+              },
+              "numerator": 16,
+              "denominator": 20,
+              "value": "0.80",
+              "unit": "ratio",
+              "observed_at": "2026-10-01T00:00:00Z",
+              "synthetic": true
+            },
+            "exact_text": "{\"condition\":{\"weather\":\"rain\"},\"denominator\":20,\"numerator\":16,\"observed_at\":\"2026-10-01T00:00:00Z\",\"result_id\":\"result:rain\",\"subject_id\":\"criterion:detection\",\"synthetic\":true,\"unit\":\"ratio\",\"value\":\"0.80\"}",
+            "relation": "SUPPORT"
+          }
+        ],
+        "permitted_span_ids": [
+          "span:rain"
+        ],
+        "pinned_sources": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "inference_support_ids": []
+      },
+      "accepted": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      },
+      "rejected": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:invented",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      }
+    },
+    {
+      "case_id": "past-observation-to-future-effect",
+      "category": "NEGATIVE",
+      "context": {
+        "kind": "FUTURE",
+        "project_id": "project:fixture",
+        "cutoff_at": "2026-10-08T00:00:00Z",
+        "data_origin": "SYNTHETIC",
+        "target": null,
+        "evidence": [
+          {
+            "binding": {
+              "span_id": "span:rain",
+              "source_version_id": "source:rain:v1",
+              "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+            },
+            "project_id": "project:fixture",
+            "observation": {
+              "result_id": "result:rain",
+              "subject_id": "criterion:detection",
+              "condition": {
+                "weather": "rain"
+              },
+              "numerator": 16,
+              "denominator": 20,
+              "value": "0.80",
+              "unit": "ratio",
+              "observed_at": "2026-10-01T00:00:00Z",
+              "synthetic": true
+            },
+            "exact_text": "{\"condition\":{\"weather\":\"rain\"},\"denominator\":20,\"numerator\":16,\"observed_at\":\"2026-10-01T00:00:00Z\",\"result_id\":\"result:rain\",\"subject_id\":\"criterion:detection\",\"synthetic\":true,\"unit\":\"ratio\",\"value\":\"0.80\"}",
+            "relation": "SUPPORT"
+          }
+        ],
+        "permitted_span_ids": [
+          "span:rain"
+        ],
+        "pinned_sources": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "inference_support_ids": []
+      },
+      "accepted": {
+        "role": "HYPOTHESIS_ONLY",
+        "knowledge_state": "PREDICTED",
+        "expected": "표면 물막 가설이 맞다면 건조 후 탐지가 회복될 것이다",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [],
+        "observation": null,
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      },
+      "rejected": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "표면 물막 가설이 맞다면 건조 후 탐지가 회복될 것이다",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      }
+    },
+    {
+      "case_id": "counterevidence-as-support",
+      "category": "NEGATIVE",
+      "context": {
+        "kind": "OBSERVATION",
+        "project_id": "project:fixture",
+        "cutoff_at": "2026-10-08T00:00:00Z",
+        "data_origin": "SYNTHETIC",
+        "target": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "evidence": [
+          {
+            "binding": {
+              "span_id": "span:rain",
+              "source_version_id": "source:rain:v1",
+              "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+            },
+            "project_id": "project:fixture",
+            "observation": {
+              "result_id": "result:rain",
+              "subject_id": "criterion:detection",
+              "condition": {
+                "weather": "rain"
+              },
+              "numerator": 16,
+              "denominator": 20,
+              "value": "0.80",
+              "unit": "ratio",
+              "observed_at": "2026-10-01T00:00:00Z",
+              "synthetic": true
+            },
+            "exact_text": "{\"condition\":{\"weather\":\"rain\"},\"denominator\":20,\"numerator\":16,\"observed_at\":\"2026-10-01T00:00:00Z\",\"result_id\":\"result:rain\",\"subject_id\":\"criterion:detection\",\"synthetic\":true,\"unit\":\"ratio\",\"value\":\"0.80\"}",
+            "relation": "COUNTER"
+          }
+        ],
+        "permitted_span_ids": [
+          "span:rain"
+        ],
+        "pinned_sources": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "inference_support_ids": []
+      },
+      "accepted": {
+        "role": "UNASSESSED",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [],
+        "observation": null,
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      },
+      "rejected": {
+        "role": "EVIDENCE_INFERENCE",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "observation": null,
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      }
+    },
+    {
+      "case_id": "synthetic-as-measured",
+      "category": "NEGATIVE",
+      "context": {
+        "kind": "OBSERVATION",
+        "project_id": "project:fixture",
+        "cutoff_at": "2026-10-08T00:00:00Z",
+        "data_origin": "SYNTHETIC",
+        "target": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "evidence": [
+          {
+            "binding": {
+              "span_id": "span:rain",
+              "source_version_id": "source:rain:v1",
+              "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+            },
+            "project_id": "project:fixture",
+            "observation": {
+              "result_id": "result:rain",
+              "subject_id": "criterion:detection",
+              "condition": {
+                "weather": "rain"
+              },
+              "numerator": 16,
+              "denominator": 20,
+              "value": "0.80",
+              "unit": "ratio",
+              "observed_at": "2026-10-01T00:00:00Z",
+              "synthetic": true
+            },
+            "exact_text": "{\"condition\":{\"weather\":\"rain\"},\"denominator\":20,\"numerator\":16,\"observed_at\":\"2026-10-01T00:00:00Z\",\"result_id\":\"result:rain\",\"subject_id\":\"criterion:detection\",\"synthetic\":true,\"unit\":\"ratio\",\"value\":\"0.80\"}",
+            "relation": "SUPPORT"
+          }
+        ],
+        "permitted_span_ids": [
+          "span:rain"
+        ],
+        "pinned_sources": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "inference_support_ids": []
+      },
+      "accepted": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "SYNTHETIC",
+        "verification_claim": false
+      },
+      "rejected": {
+        "role": "OBSERVATION_RESTATEMENT",
+        "knowledge_state": "PREDICTED",
+        "expected": "비 조건 탐지 관측: 16/20 = 0.80",
+        "rationale": "합성 재생 사례의 근거 역할을 평가하며 실험 검증을 주장하지 않는다.",
+        "basis": [
+          {
+            "span_id": "span:rain",
+            "source_version_id": "source:rain:v1",
+            "text_sha256": "a499653355658e71f28c402228f92052101a8fc5991d2e6af3e99c826310117a"
+          }
+        ],
+        "observation": {
+          "result_id": "result:rain",
+          "subject_id": "criterion:detection",
+          "condition": {
+            "weather": "rain"
+          },
+          "numerator": 16,
+          "denominator": 20,
+          "value": "0.80",
+          "unit": "ratio",
+          "observed_at": "2026-10-01T00:00:00Z",
+          "synthetic": true
+        },
+        "data_origin": "MEASURED",
+        "verification_claim": false
+      }
+    }
+  ]
+}

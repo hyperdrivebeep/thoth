@@ -7,7 +7,7 @@ During development, retain the focused checks specified in AGENTS.md.
 The Product check workflow provides this check on clean Windows runners for pull requests,
 main pushes, manual dispatches and the nightly default-branch run (18:00 UTC / 03:00 KST).
 The existing `checks` job keeps the static, Web and quick-start checks. `python-fast` collects
-everything except `tests/integration`; eight `python-integration` matrix jobs cover every
+everything except `tests/integration`; sixteen `python-integration` matrix jobs cover every
 integration test file exactly once. Each uses `-q -rfE -p no:cacheprovider` plus a JUnit report,
 with the same root conftest and inactive-Hook selection policy as a local full run.
 

@@ -43,9 +43,9 @@ def test_new_file_joins_lightest_group_and_removed_timing_is_ignored() -> None:
 
 
 def test_all_new_files_have_a_positive_balancing_estimate() -> None:
-    files = [f"tests/integration/test_{i}.py" for i in range(8)]
-    groups, loads = build_shards(files, {}, 8)
-    assert loads == [1.0] * 8 and all(len(group) == 1 for group in groups)
+    files = [f"tests/integration/test_{i}.py" for i in range(16)]
+    groups, loads = build_shards(files, {}, 16)
+    assert loads == [1.0] * 16 and all(len(group) == 1 for group in groups)
 
 
 @pytest.mark.parametrize("groups", [[["a"], []], [["a"], ["a", "b"]], [["a", "b", "c"]]])
@@ -129,9 +129,15 @@ def test_select_revalidates_actual_files_and_refuses_empty_shard(
     assert error.value.code == 2
 
 
-def test_real_repository_partition_is_complete_and_disjoint() -> None:
+def test_real_repository_partition_is_complete_and_disjoint(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     root = Path(__file__).resolve().parents[2]
     files = discover(root)
-    groups, _ = build_shards(files, load_durations(root / "tests/ci/integration_durations.json"), 8)
+    groups, _ = build_shards(
+        files, load_durations(root / "tests/ci/integration_durations.json"), 16
+    )
     validate_partition(files, groups)
     assert sum(map(len, groups)) == len(files)
+    assert main(["plan", "--root", str(root)]) == 0
+    assert len(json.loads(capsys.readouterr().out)["shards"]) == 16

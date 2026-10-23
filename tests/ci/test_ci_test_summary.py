@@ -1,9 +1,10 @@
 """Missing artifacts, failed jobs and duplicate tests cannot produce a passing summary."""
 
+import sys
 from pathlib import Path
 
 import pytest
-from scripts.ci_test_summary import summarize
+from scripts.ci_test_summary import main, summarize
 
 
 def write_report(path: Path, name: str, detail: str = "") -> None:
@@ -14,13 +15,22 @@ def write_report(path: Path, name: str, detail: str = "") -> None:
     )
 
 
-def test_summary_counts_every_report_and_keeps_skips_visible(tmp_path: Path) -> None:
+def test_summary_counts_every_report_and_keeps_skips_visible(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
     write_report(tmp_path / "python-fast.xml", "fast", "<skipped/>")
-    for i in range(8):
+    for i in range(16):
         write_report(tmp_path / f"python-integration-{i}.xml", f"integration-{i}")
-    report, passed = summarize(tmp_path, 8, ["success", "success"])
-    assert passed and "| **Total** | 9 | 0 | 0 | 1 |" in report
-    assert all(f"python-integration-{i}" in report for i in range(8))
+    report, passed = summarize(tmp_path, 16, ["success", "success"])
+    assert passed and "| **Total** | 17 | 0 | 0 | 1 |" in report
+    assert all(f"python-integration-{i}" in report for i in range(16))
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["ci_test_summary", "--reports", str(tmp_path), "--job-results", "success", "success"],
+    )
+    assert main() == 0
+    assert "| **Total** | 17 | 0 | 0 | 1 |" in capsys.readouterr().out
 
 
 @pytest.mark.parametrize("status", ["failure", "cancelled", "skipped"])

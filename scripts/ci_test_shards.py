@@ -3,8 +3,8 @@
 Refresh timings from a complete JUnit report (including failed tests):
   python scripts/ci_test_shards.py refresh --junit test-results/python.xml
 Preview all groups or select the JSON file list for one zero-based group:
-  python scripts/ci_test_shards.py plan --count 8
-  python scripts/ci_test_shards.py select --count 8 --index 0
+  python scripts/ci_test_shards.py plan --count 16
+  python scripts/ci_test_shards.py select --count 16 --index 0
 
 Only repository-relative integration paths and elapsed seconds are persisted. New files use
 the median positive measured duration (one second if none exist), then join the lightest group.
@@ -129,7 +129,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("command", choices=("plan", "select", "refresh"))
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--durations", type=Path, default=TIMINGS)
-    parser.add_argument("--count", type=int, default=8)
+    parser.add_argument("--count", type=int, default=16)
     parser.add_argument("--index", type=int)
     parser.add_argument("--junit", type=Path)
     args = parser.parse_args(argv)
