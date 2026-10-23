@@ -4,6 +4,10 @@ on:
   pull_request:
   push:
     branches: [main]
+  schedule:
+    # 18:00 UTC is 03:00 KST the following day; scheduled runs use the default branch.
+    - cron: "0 18 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -15,8 +19,7 @@ env:
 
 jobs:
   checks:
-    # Fast public checks (about ten minutes). The full Python suite takes hours on a hosted
-    # runner, so maintainers run it locally before merging.
+    # Public static, Web and quick-start checks. The jobs below cover the full Python suite.
     runs-on: windows-latest
     timeout-minutes: 60
     defaults:
@@ -85,3 +88,125 @@ jobs:
           } finally {
             & taskkill /PID $thothApi.Id /T /F | Out-Null
           }
+
+  python-fast:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.thoth-test-browsers
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "11.21.0"
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.5"
+      - name: Install locked test dependencies
+        run: |
+          python -m venv --copies --without-pip .venv
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev --extra browser
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pnpm install --frozen-lockfile
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          .\.venv\Scripts\python.exe -m playwright install --only-shell chromium
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Non-integration Python tests
+        run: .\.venv\Scripts\python.exe -m pytest --ignore=tests/integration -q -rfE -p no:cacheprovider --junitxml=test-results/python-fast.xml
+      - name: Upload Python test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-junit-fast
+          path: test-results/python-fast.xml
+          if-no-files-found: error
+
+  python-integration:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.thoth-test-browsers
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "11.21.0"
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.5"
+      - name: Install locked test dependencies
+        run: |
+          python -m venv --copies --without-pip .venv
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev --extra browser
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pnpm install --frozen-lockfile
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          .\.venv\Scripts\python.exe -m playwright install --only-shell chromium
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Validate and run integration shard
+        run: |
+          $thothFilesJson = & .\.venv\Scripts\python.exe scripts/ci_test_shards.py select --count 16 --index ${{ matrix.shard }}
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $thothFiles = @($thothFilesJson | ConvertFrom-Json)
+          if ($thothFiles.Count -eq 0) { throw 'Integration shard is empty.' }
+          & .\.venv\Scripts\python.exe -m pytest @thothFiles -q -rfE -p no:cacheprovider --junitxml=test-results/python-integration-${{ matrix.shard }}.xml
+          exit $LASTEXITCODE
+      - name: Upload Python test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-junit-integration-${{ matrix.shard }}
+          path: test-results/python-integration-${{ matrix.shard }}.xml
+          if-no-files-found: error
+
+  python-summary:
+    needs: [python-fast, python-integration]
+    if: ${{ always() }}
+    runs-on: windows-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: python-junit-*
+          path: test-results/aggregate
+          merge-multiple: true
+      - name: Summarize every Python group
+        if: ${{ always() }}
+        env:
+          FAST_RESULT: ${{ needs.python-fast.result }}
+          INTEGRATION_RESULT: ${{ needs.python-integration.result }}
+        run: >-
+          python scripts/ci_test_summary.py --reports test-results/aggregate --shards 16
+          --job-results "$env:FAST_RESULT" "$env:INTEGRATION_RESULT"
+          --markdown-output "$env:GITHUB_STEP_SUMMARY"

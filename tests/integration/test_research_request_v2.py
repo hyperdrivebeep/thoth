@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 from pydantic import BaseModel
+from tests.fixtures.scripted_hypothesis_responses import hypothesis_output, table_fill_output
 from tests.integration.scoped_runtime import fixture_scope_policy
 from tests.integration.storage_coverage_helpers import request, value
 
@@ -212,6 +213,8 @@ class ControlledResearchModel:
                 next_checks=("Collect a discriminating observation",),
                 uncertainty_reserve="Cause unknown",
             )
+        elif req.role == ModelRole.HYPOTHESIS_TABLE_FILLER:
+            output = table_fill_output(req)
         elif req.role == ModelRole.HYPOTHESIS_REVIEWER:
             output = HypothesisSemanticReview(
                 decisions=tuple(
@@ -283,7 +286,11 @@ class ControlledResearchModel:
             )
         else:
             raise AssertionError(req.role)
-        parsed = req.output_model.model_validate(output.model_dump())
+        parsed = (
+            hypothesis_output(req, output.model_dump())
+            if req.role == ModelRole.HYPOTHESIS_GENERATOR
+            else req.output_model.model_validate(output.model_dump())
+        )
         return ModelResult(
             output=parsed,
             model_id="CONTROLLED_RESEARCH",

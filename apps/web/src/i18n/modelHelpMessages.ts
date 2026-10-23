@@ -16,8 +16,8 @@ export const modelHelpMessages = {
     "en": "The setting could not be changed. The view was refreshed; try again."
   },
   "modelHelp.hypothesis": {
-    "ko": "켜면 가설을 만드는 호출에서 각 시험의 가설별 예상 결과와 기각 조건을 함께 받아 시험 순서를 정합니다. 비어 있는 예상 결과를 채우기 위해 추가 모델 호출이 생길 수 있습니다. 답이 길어져 토큰이 더 쓰일 수 있으며, 모델이 낸 내용은 미확정 제안입니다. 기본은 꺼짐입니다.",
-    "en": "Collects each test's expected results for each hypothesis and refutation conditions during hypothesis generation. Filling missing expected results may require an additional model call. Longer answers can use more tokens. Model output remains an unconfirmed proposal. Off by default."
+    "ko": "켜면 가설을 만드는 호출에서 각 시험의 가설별 예상 결과와 기각 조건을 함께 받아 시험 순서를 정합니다. 비어 있는 예상 결과를 채우기 위해 추가 모델 호출이 생길 수 있습니다. 답이 길어져 토큰이 더 쓰일 수 있으며, 모델이 낸 내용은 미확정 제안입니다. 저장된 선택이 없으면 기본으로 켜집니다. 이전에 끈 설정은 그대로 유지됩니다.",
+    "en": "Collects each test's expected results for each hypothesis and refutation conditions during hypothesis generation. Filling missing expected results may require an additional model call. Longer answers can use more tokens. Model output remains an unconfirmed proposal. On by default when no choice has been saved. Saved off choices stay off."
   },
   "modelHelp.hypothesisReadFailed": {
     "ko": "가설 생성 설정을 읽지 못했습니다.",

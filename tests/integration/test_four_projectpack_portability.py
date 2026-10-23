@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TypeVar
+from typing import TypeVar, cast
 
 import pytest
 from pydantic import BaseModel
+from tests.fixtures.scripted_hypothesis_responses import hypothesis_output, table_fill_output
 
 from thoth.adapters.projectpacks import load_project_pack
 from thoth.application.workflows.projectpack_run import ProjectPackRunResult
@@ -21,6 +22,7 @@ class GenericProjectPackModel:
     """Domain-neutral QA model: uses only the provided ContextPack, never pack oracle data."""
 
     control_capability = CONTROLLED_MODEL_CONTROL
+    complete_tables: bool = False
 
     async def structured(self, request: ModelRequest[TModel]) -> ModelResult[TModel]:
         if request.role in {
@@ -78,6 +80,8 @@ class GenericProjectPackModel:
                 "status": "TESTABLE",
                 "generated_from_head_set": context.input_head_set_digest,
             }
+        elif request.role == ModelRole.HYPOTHESIS_TABLE_FILLER:
+            payload = table_fill_output(request).model_dump()
         elif request.role == ModelRole.ACTION_PLANNER:
             payload = {
                 "plan_id": f"plan:{context.object_id}",
@@ -145,7 +149,11 @@ class GenericProjectPackModel:
             }
         else:
             raise AssertionError(f"unexpected generic model role: {request.role}")
-        output = request.output_model.model_validate(payload)
+        output = (
+            hypothesis_output(request, payload, complete=self.complete_tables)
+            if request.role == ModelRole.HYPOTHESIS_GENERATOR
+            else request.output_model.model_validate(payload)
+        )
         output_digest = domain_digest(
             "GENERIC_PROJECTPACK_MODEL_OUTPUT",
             "1.0.0",
@@ -231,6 +239,21 @@ class GenericProjectPackModel:
             "source_refs": [] if source_ref is None else [source_ref],
             "missing_evidence": [] if source_ref is not None else ["source evidence"],
         }
+
+
+class RecordingGenericProjectPackModel(GenericProjectPackModel):
+    """Observe calls without requiring existing subclasses to initialize new parent state."""
+
+    def __init__(self, *, complete_tables: bool = False) -> None:
+        self.complete_tables = complete_tables
+        self.calls: list[ModelRequest[BaseModel]] = []
+        self.outputs: list[BaseModel] = []
+
+    async def structured(self, request: ModelRequest[TModel]) -> ModelResult[TModel]:
+        self.calls.append(cast(ModelRequest[BaseModel], request))
+        result = await super().structured(request)
+        self.outputs.append(result.output)
+        return result
 
 
 @pytest.mark.asyncio

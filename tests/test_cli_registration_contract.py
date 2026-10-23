@@ -22,8 +22,11 @@ FIXTURE = ROOT / "tests/fixtures/cli_registration_contract.json"
 
 
 def capture_environment() -> dict[str, str]:
+    environment = dict(os.environ)
+    for name in ("GITHUB_ACTIONS", "FORCE_COLOR", "PY_COLORS", "TERMINAL_WIDTH"):
+        environment.pop(name, None)
     return {
-        **os.environ,
+        **environment,
         "COLUMNS": "120",
         "TERM": "dumb",
         "NO_COLOR": "1",

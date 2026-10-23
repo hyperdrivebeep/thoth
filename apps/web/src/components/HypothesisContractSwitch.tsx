@@ -6,7 +6,7 @@ import { rpc } from "../api/rpcClient";
 type CallSettings = { auto_retry_interrupted_model_call: boolean; hypothesis_contract_v3: boolean; settings_digest: string | null };
 
 
-/** A project's switch for asking the generator for expected results and refutation conditions (off unless turned on). It shows what the server says. */
+/** Show the server's effective expected-results choice, including its default and saved overrides. */
 export function HypothesisContractSwitch({ projectId }: { projectId: string }) {
   const client = useQueryClient();
   const key = ["model-call-settings", projectId];

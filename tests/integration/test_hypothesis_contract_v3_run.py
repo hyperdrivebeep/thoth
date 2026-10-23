@@ -1,4 +1,4 @@
-"""Hypothesis generation contract v3: off by default, the same calls when on, and a settled record.
+"""Hypothesis contract v3: default on, saved v2 choice, and settled records.
 
 A project turns it on in its model-call settings. When on, the one generator call is shown the v3
 form and contract text, what it says about expected results and refutation conditions is stored
@@ -14,11 +14,13 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from tests.integration.scoped_runtime import fixture_scope_policy
 from tests.integration.test_hypothesis_link import investigate
 from tests.integration.test_research_request_v2 import ControlledResearchModel
 from tests.integration.test_trace_origin import RAIN, Rpc, opened
 
 from thoth.application.services.hypothesis_projection import hypothesis_view
+from thoth.apps.runtime import create_runtime
 from thoth.domain.canonical import model_digest
 from thoth.domain.enums import ModelRole
 from thoth.domain.hypothesis import (
@@ -145,6 +147,14 @@ async def run(
     runtime, rpc = await opened(tmp_path, model)
     if on:
         await turn_on(rpc)
+    else:
+        current = await settings(rpc)
+        await rpc(
+            "model/callSettings/update",
+            project_id="p",
+            hypothesis_contract_v3=False,
+            expected_digest=current["settings_digest"],
+        )
     thread_id = await investigate(runtime, rpc, RAIN)
     return runtime, model, rpc, thread_id, model
 
@@ -155,13 +165,13 @@ async def portfolio_of(rpc: Rpc, thread_id: str) -> dict[str, Any]:
 
 
 @pytest.mark.asyncio
-async def test_the_switch_is_off_by_default_and_each_switch_keeps_the_other(tmp_path: Path) -> None:
+async def test_the_switch_is_on_by_default_and_each_switch_keeps_the_other(tmp_path: Path) -> None:
     runtime, rpc = await opened(tmp_path, GeneratorModel())
     try:
         first = await settings(rpc)
-        # 사용자 결정 20261010-01: only retry defaults on; v3 still defaults off.
+        # 사용자 결정 2026-10-23: both absent choices default on.
         assert (first["hypothesis_contract_v3"], first["auto_retry_interrupted_model_call"]) == (
-            False,
+            True,
             True,
         )
         await turn_on(rpc)
@@ -181,6 +191,41 @@ async def test_the_switch_is_off_by_default_and_each_switch_keeps_the_other(tmp_
             True,
             False,
         )
+    finally:
+        runtime.close()
+
+
+@pytest.mark.parametrize("saved", [None, False, True])
+async def test_choice_survives_reopen_without_rewrite_and_drives_generator(
+    tmp_path: Path, saved: bool | None
+) -> None:
+    runtime, rpc = await opened(tmp_path, GeneratorModel())
+    try:
+        if saved is not None:
+            await rpc(
+                "model/callSettings/update",
+                project_id="p",
+                hypothesis_contract_v3=saved,
+                expected_digest=None,
+            )
+        before = await settings(rpc)
+        assert before["hypothesis_contract_v3"] is (True if saved is None else saved)
+        assert (before["settings_digest"] is None) is (saved is None)
+        count = rpc.count
+    finally:
+        runtime.close()
+    model = GeneratorModel()
+    runtime = create_runtime(
+        tmp_path, model_resolver=model, resource_scope_policy=fixture_scope_policy()
+    )
+    rpc = Rpc(runtime)
+    rpc.count = count
+    try:
+        assert await settings(rpc) == before
+        await investigate(runtime, rpc, RAIN)
+        (call,) = generator_calls(model)
+        assert call.prompt_version == (CONTRACT_V2 if saved is False else CONTRACT_V3)
+        assert await settings(rpc) == before  # no default materialization or saved-choice rewrite
     finally:
         runtime.close()
 

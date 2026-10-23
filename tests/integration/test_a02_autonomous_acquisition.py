@@ -225,10 +225,19 @@ class DynamicA02Model:
         return output
 
     async def structured(self, request: ModelRequest[TModel]) -> ModelResult[TModel]:
+        from tests.fixtures.scripted_hypothesis_responses import (
+            hypothesis_output,
+            table_fill_output,
+        )
+
         context = request.context_pack
-        span_id = context.evidence[0].span_id
-        if request.role == ModelRole.HYPOTHESIS_GENERATOR:
-            output: BaseModel = HypothesisPortfolio(
+        span_id = (
+            "" if request.role == ModelRole.HYPOTHESIS_TABLE_FILLER else context.evidence[0].span_id
+        )
+        if request.role == ModelRole.HYPOTHESIS_TABLE_FILLER:
+            output: BaseModel = table_fill_output(request)
+        elif request.role == ModelRole.HYPOTHESIS_GENERATOR:
+            output = HypothesisPortfolio(
                 portfolio_id="portfolio:a02",
                 object_id=context.object_id,
                 hypotheses=(
@@ -302,7 +311,11 @@ class DynamicA02Model:
                 plan_revision_digest=context.input_head_set_digest,
             )
         output = self._scope_fixture_output(output, context)
-        typed = request.output_model.model_validate(output.model_dump(mode="python"))
+        typed = (
+            hypothesis_output(request, output.model_dump(mode="python"))
+            if request.role == ModelRole.HYPOTHESIS_GENERATOR
+            else request.output_model.model_validate(output.model_dump(mode="python"))
+        )
         input_digest = domain_digest(
             "A02_MODEL_INPUT",
             "1.0.0",

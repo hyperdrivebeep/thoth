@@ -57,7 +57,7 @@ async def test_the_switch_is_read_and_changed_with_the_digest_it_read(tmp_path: 
         # 사용자 결정 20261010-01: an unsaved project starts on.
         assert first == {
             "auto_retry_interrupted_model_call": True,
-            "hypothesis_contract_v3": False,
+            "hypothesis_contract_v3": True,
             "settings_digest": None,
         }
         on = await call(

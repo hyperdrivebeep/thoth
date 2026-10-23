@@ -4,6 +4,27 @@ User decision, 2026-10-02: before merge or public release, run one product check
 source checkout and report its results. The user approves the merge after reviewing those results.
 During development, retain the focused checks specified in AGENTS.md.
 
+The Product check workflow provides this check on clean Windows runners for pull requests,
+main pushes, manual dispatches and the nightly default-branch run (18:00 UTC / 03:00 KST).
+The existing `checks` job keeps the static, Web and quick-start checks. `python-fast` collects
+everything except `tests/integration`; sixteen `python-integration` matrix jobs cover every
+integration test file exactly once. Each uses `-q -rfE -p no:cacheprovider` plus a JUnit report,
+with the same root conftest and inactive-Hook selection policy as a local full run.
+
+Before merging, require both `checks` and `python-summary` to pass for the reviewed revision.
+The summary requires every Python job to succeed and every report to exist; it shows failures,
+errors and skips separately. A complete CI result can supply the full product check without
+another mandatory local FULL run. Missing, failed or unverified CI coverage does not waive it.
+The first rollout must be checked on a real PR before relying on it. Branch-protection settings
+are managed separately; editing this workflow does not configure required checks on the server.
+
+`python scripts/ci_test_shards.py plan` shows the deterministic file assignment and estimated
+times. Refresh `tests/ci/integration_durations.json` with
+`python scripts/ci_test_shards.py refresh --junit test-results/python.xml` from a complete run.
+Only relative file paths and seconds are published. New files join the lightest group using
+the median measured file time; stale timing entries do not remove or add tests. The union and
+disjointness checks run whenever a shard is selected. Timings are estimates, not timeout changes.
+
 The product check consists of:
 
 - Locked Python and Web installation and the README quick start, through the first setup screen.
