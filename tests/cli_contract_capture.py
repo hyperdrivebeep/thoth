@@ -4,12 +4,9 @@ from __future__ import annotations
 
 import inspect
 import json
+import os
 from pathlib import Path
 from unittest.mock import patch
-
-from typer.testing import CliRunner
-
-from thoth.apps import workspace_paths
 
 INVOCATIONS = (
     ("--help",),
@@ -29,6 +26,19 @@ INVOCATIONS = (
 
 
 def capture() -> dict[str, object]:
+    environment = dict(os.environ)
+    for name in ("GITHUB_ACTIONS", "FORCE_COLOR", "PY_COLORS", "TERMINAL_WIDTH"):
+        environment.pop(name, None)
+    # Typer reads these flags at import time; normalize before importing the CLI stack.
+    with patch.dict(os.environ, environment, clear=True):
+        return _capture()
+
+
+def _capture() -> dict[str, object]:
+    from typer.testing import CliRunner
+
+    from thoth.apps import workspace_paths
+
     with patch.object(
         workspace_paths, "default_workspace", return_value=Path("contract-workspace")
     ):
