@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-24T03:19:14.748193+00:00",
+  "created_at": "2026-10-24T04:58:35.206094+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -2853,8 +2853,8 @@
     },
     {
       "path": "schemas/protocol/historical-result-view.schema.json",
-      "sha256": "375f1aae4d7dd2367ede22acfaf14cae8e7c3799232205f548d16ec523689a05",
-      "bytes": 15604
+      "sha256": "c97bfc01e3773b44d38ebcb0201b649e45d20e799b3b28459895a222c2f2bd33",
+      "bytes": 15973
     },
     {
       "path": "schemas/protocol/history-detail.schema.json",
@@ -6378,8 +6378,8 @@
     },
     {
       "path": "src/thoth/apps/restore_profiles.py",
-      "sha256": "fc13c55c2df5bb4fb8e07aad0dbcb1b1037fdb1cbd1b7ee46db143cf00e6e851",
-      "bytes": 3349
+      "sha256": "a8d1f34e8d084b3191c4f4ee1983726f95de123b07874d3cb691e6a054d50694",
+      "bytes": 3451
     },
     {
       "path": "src/thoth/apps/revision_composition.py",
@@ -6993,8 +6993,8 @@
     },
     {
       "path": "src/thoth/domain/research_history.py",
-      "sha256": "3f84bb39100cf145f1ec8962a4e50e5a0d149e5b55267c239c245ee79ff34672",
-      "bytes": 6998
+      "sha256": "7e601e44b67ed45af29b23a271aaf2dd8b5350a7df3667ee2ce28ddab2616317",
+      "bytes": 7154
     },
     {
       "path": "src/thoth/domain/research_identity.py",
@@ -10158,8 +10158,8 @@
     },
     {
       "path": "tests/integration/test_state_transition_repeat_current_behavior.py",
-      "sha256": "1620bfa1c34d9c17cc5ed1477893596c720b097df597b99afa70f2e4ac919ba6",
-      "bytes": 18126
+      "sha256": "7aadc1fb9b886ae7c9ac612ccad684a42f578efc14d8197d62558e9603c3ad41",
+      "bytes": 18130
     },
     {
       "path": "tests/integration/test_storage_clock_currentness.py",
@@ -11535,6 +11535,11 @@
       "path": "tests/unit/test_docling_table_relations.py",
       "sha256": "937b85e198deb56f0ba9d0af34608f60616d981cf7939ab1ecbf8a97d3f65f47",
       "bytes": 4242
+    },
+    {
+      "path": "tests/unit/test_g2_restore_history_compatibility.py",
+      "sha256": "1c71bd6b633f4a36256fb0e2486091d5a210affc44a562c520c8139c9e6ae7b2",
+      "bytes": 4740
     },
     {
       "path": "tests/unit/test_gap_reconciliation.py",
