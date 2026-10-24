@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-24T12:05:19.989231+00:00",
+  "created_at": "2026-10-24T12:40:17.523721+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -18,8 +18,8 @@
     },
     {
       "path": ".github/workflows/product-check.yml",
-      "sha256": "5af2bc4e756190e35cec3cc6a725302063b18a512b83876bdfcb006dbe50e9ec",
-      "bytes": 8154
+      "sha256": "66cf3aaeeaafb58e42510643cb5b6854de050575ee9d222548bfedb3f4512f1e",
+      "bytes": 9484
     },
     {
       "path": ".gitignore",
@@ -2048,8 +2048,8 @@
     },
     {
       "path": "docs/VERIFICATION.md",
-      "sha256": "8b6d23f68173ed8e5227d4bb828a60fde104622b7ec3af97d6009a33d44b2b9f",
-      "bytes": 25323
+      "sha256": "4c15c01c70d2fd2d0104a37f43e5feb5e14bf6bf2e100ccf967fbc0383911c9e",
+      "bytes": 25996
     },
     {
       "path": "docs/architecture/agent-execution-rules.md",
@@ -3125,6 +3125,11 @@
       "path": "scripts/ci_test_summary.py",
       "sha256": "faffb885f3b210cf05ac96146e642b8efe59aabc06ccbd398c08ec83327a38ea",
       "bytes": 2951
+    },
+    {
+      "path": "scripts/ci_typecheck.py",
+      "sha256": "14c439da075fb6224eb57cb52b9782b3f7820ea57fb4eb89c33a8b6b7f1da22e",
+      "bytes": 13405
     },
     {
       "path": "scripts/complete_architecture_gate.py",
@@ -7970,6 +7975,11 @@
       "path": "tests/ci/test_ci_test_summary.py",
       "sha256": "4e477fceb7a32c67d31e8200ce9e9ca7619c1d848a113c747e544ced868e90f1",
       "bytes": 2907
+    },
+    {
+      "path": "tests/ci/test_ci_typecheck.py",
+      "sha256": "ab9621ff060d0493614e4ba932e3aa632690d03d7d25cebecd90ca91cb10e951",
+      "bytes": 12867
     },
     {
       "path": "tests/cli_contract_capture.py",
