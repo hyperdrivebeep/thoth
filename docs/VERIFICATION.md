@@ -1,5 +1,7 @@
 # Verification and known limits
 
+Python type checking runs in GitHub CI: without a reviewed `config/basedpyright-baseline.json` it reports diagnostics and uploads a baseline candidate for review; once that file is added, only diagnostics not matched by the native baseline fail the check. Baseline reductions are artifacts for a separate reviewed update, never automatic commits. Local type checking blocked by host policy remains NOT_RUN; CI evidence is recorded separately. Native matching compares file/rule/column ranges, not messages, so a different error with the same shape can be suppressed. See the `python-typecheck` artifact and job summary; initial baseline creation is not a type-check pass.
+
 ## Current merge gate (2026-10-03)
 
 The merge/publication gate is the product check defined in

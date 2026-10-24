@@ -81,7 +81,7 @@ def test_contract_selection_owns_version_and_output_budget_together() -> None:
     v4 = generator_contract(True, "en")
     v5 = grounding_generator_contract()
     assert (v4["prompt_version"], v4["max_output_tokens"]) == ("hypothesis_portfolio.v4", 4000)
-    assert (v5["prompt_version"], v5["max_output_tokens"]) == ("hypothesis_portfolio.v5", 6000)
+    assert (v5["prompt_version"], v5["max_output_tokens"]) == ("hypothesis_portfolio.v5", 8000)
     assert generator_contract(False)["max_output_tokens"] == 4000
 
 

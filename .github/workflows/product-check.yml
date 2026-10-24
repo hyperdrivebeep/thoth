@@ -210,3 +210,39 @@ jobs:
           python scripts/ci_test_summary.py --reports test-results/aggregate --shards 16
           --job-results "$env:FAST_RESULT" "$env:INTEGRATION_RESULT"
           --markdown-output "$env:GITHUB_STEP_SUMMARY"
+
+
+  python-types:
+    # First PR reports debt; a reviewed baseline enables enforcement in the next PR.
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      TYPECHECK_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.5"
+      - name: Install locked type-check dependencies
+        run: |
+          python -m venv --copies --without-pip .venv
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev --extra browser
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Report or enforce Python types
+        run: .\.venv\Scripts\python.exe scripts/ci_typecheck.py --markdown-output "$env:GITHUB_STEP_SUMMARY"
+      - name: Upload type diagnostics and baseline candidate
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-typecheck
+          path: test-results/typecheck/
+          if-no-files-found: error

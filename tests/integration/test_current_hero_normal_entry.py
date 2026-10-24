@@ -43,7 +43,7 @@ async def test_current_hero_enters_through_one_normal_thread_input(tmp_path: Pat
     assert result.manifest["external_write_performed"] is False
     generators = [call for call in model.calls if call.role == ModelRole.HYPOTHESIS_GENERATOR]
     assert generators and all(
-        call.prompt_version == "hypothesis_portfolio.v5" and call.max_output_tokens == 6000
+        call.prompt_version == "hypothesis_portfolio.v5" and call.max_output_tokens == 8000
         for call in generators
     )
     assert any(call.role == ModelRole.HYPOTHESIS_TABLE_FILLER for call in model.calls)

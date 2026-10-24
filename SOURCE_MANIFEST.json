@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-24T12:05:19.989231+00:00",
+  "created_at": "2026-10-24T17:46:47.244501+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -18,8 +18,8 @@
     },
     {
       "path": ".github/workflows/product-check.yml",
-      "sha256": "5af2bc4e756190e35cec3cc6a725302063b18a512b83876bdfcb006dbe50e9ec",
-      "bytes": 8154
+      "sha256": "66cf3aaeeaafb58e42510643cb5b6854de050575ee9d222548bfedb3f4512f1e",
+      "bytes": 9484
     },
     {
       "path": ".gitignore",
@@ -1907,6 +1907,11 @@
       "bytes": 67787
     },
     {
+      "path": "config/basedpyright-baseline.json",
+      "sha256": "0023c03237e54797dbd9db6012029d61163826629293f288c0b4bee788bc6545",
+      "bytes": 164586
+    },
+    {
       "path": "config/connectors/local-reference.yaml",
       "sha256": "e92bca6e55acc149e8bc398053680f7e58c56b810fd811884fa9b96f6c5fb3ff",
       "bytes": 164
@@ -2048,8 +2053,8 @@
     },
     {
       "path": "docs/VERIFICATION.md",
-      "sha256": "8b6d23f68173ed8e5227d4bb828a60fde104622b7ec3af97d6009a33d44b2b9f",
-      "bytes": 25323
+      "sha256": "4c15c01c70d2fd2d0104a37f43e5feb5e14bf6bf2e100ccf967fbc0383911c9e",
+      "bytes": 25996
     },
     {
       "path": "docs/architecture/agent-execution-rules.md",
@@ -3125,6 +3130,11 @@
       "path": "scripts/ci_test_summary.py",
       "sha256": "faffb885f3b210cf05ac96146e642b8efe59aabc06ccbd398c08ec83327a38ea",
       "bytes": 2951
+    },
+    {
+      "path": "scripts/ci_typecheck.py",
+      "sha256": "14c439da075fb6224eb57cb52b9782b3f7820ea57fb4eb89c33a8b6b7f1da22e",
+      "bytes": 13405
     },
     {
       "path": "scripts/complete_architecture_gate.py",
@@ -5288,7 +5298,7 @@
     },
     {
       "path": "src/thoth/application/services/hypothesis_grounding_v5.py",
-      "sha256": "f92e9f1bd72796e5f7a935db117a03d1929958d9df05e4a042d9da18e9c0274b",
+      "sha256": "2527262075b797ecde541eecfd574eaad110c6c7c7b3e9a9e42503df31cdc196",
       "bytes": 5336
     },
     {
@@ -5893,8 +5903,8 @@
     },
     {
       "path": "src/thoth/application/services/research_retrieval.py",
-      "sha256": "bd9d7e6e58aacba8fec9c6f875bc6788393f01e44a42386cda2aaf1c096c27e2",
-      "bytes": 7915
+      "sha256": "9069614a88329fa963f1bf036c57ff6c8c1ad89f7ac9f23f90f40e0eeb42810a",
+      "bytes": 8917
     },
     {
       "path": "src/thoth/application/services/research_retrieval_policy.py",
@@ -7972,6 +7982,11 @@
       "bytes": 2907
     },
     {
+      "path": "tests/ci/test_ci_typecheck.py",
+      "sha256": "b5a9a5c172f53c9e221ea7b4de9df61493a207a77b8ccb40db02bbfbbd556038",
+      "bytes": 12926
+    },
+    {
       "path": "tests/cli_contract_capture.py",
       "sha256": "72d918a69bae3c15bc051eb02ce77c913d43abe34d0fc4269535c474c839a60b",
       "bytes": 2426
@@ -8878,7 +8893,7 @@
     },
     {
       "path": "tests/integration/test_current_hero_normal_entry.py",
-      "sha256": "fb8e34ce5c03cc0b00230e970ebbd711e3dc58aa496ae243202688421d4f3dba",
+      "sha256": "582142aae8424826dc4281f552d9e5521ef59ad9ce1f23a067df4793d8fb7834",
       "bytes": 2820
     },
     {
@@ -9048,7 +9063,7 @@
     },
     {
       "path": "tests/integration/test_hypothesis_grounding_storage.py",
-      "sha256": "130b2e5da16419c998b1c38ff9a53875b1b9506a34477817212510e35118a571",
+      "sha256": "e586f86689bce51da9b47effef2bc24999811480bb17acbaa84b6a391730881c",
       "bytes": 15577
     },
     {
@@ -10443,7 +10458,7 @@
     },
     {
       "path": "tests/unit/application/test_hypothesis_grounding_capture.py",
-      "sha256": "1f9bedde2db19392e76151ee19cbb2dd8ca06b33d66f5d335d7960e1ebc9f49c",
+      "sha256": "20a66757723894b5b39e7bafcfa1b9a1700a0485bc699a09962d1b3f28d12094",
       "bytes": 8695
     },
     {
@@ -11003,7 +11018,7 @@
     },
     {
       "path": "tests/unit/models/test_hypothesis_grounding_wire.py",
-      "sha256": "dcd205fedffe2d9110601b13917fa317eba1e1bd9ba5c81e591fd94ba59e133b",
+      "sha256": "5e5a4fefdb19b7829dfb08f81482c918d6692f99d3ab630cc434f2aed455d14e",
       "bytes": 3412
     },
     {
@@ -11338,7 +11353,7 @@
     },
     {
       "path": "tests/unit/services/test_expected_result_v5_view.py",
-      "sha256": "bca538bbc1d7c1fcca2b65d10012f1321aa24521c74e28dfe34b5e1098aa9282",
+      "sha256": "35c165e8dcb6123d36b85653ce7c9dbc990ce3cb20863d48363ac155ea5b75e4",
       "bytes": 5062
     },
     {
@@ -11610,6 +11625,11 @@
       "path": "tests/unit/test_journal_completion_gate.py",
       "sha256": "471f7cfebed4b6694007c79e90f2c565875bee8f537ad650046d480b9d6e7928",
       "bytes": 3179
+    },
+    {
+      "path": "tests/unit/test_korean_retrieval_terms.py",
+      "sha256": "cbf91c041c285b78303d5b5817f68d88a662fdbe8d961aca24133ed926efefdd",
+      "bytes": 5283
     },
     {
       "path": "tests/unit/test_lesson_recall_cases.py",

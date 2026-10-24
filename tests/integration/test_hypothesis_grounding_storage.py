@@ -132,7 +132,7 @@ async def test_explicit_v5_persists_and_reopens_three_read_contracts(
                 ResearchFamily.HYPOTHESIS_PORTFOLIO,
             )
             details = snapshot.content["generation_details"]
-            assert details["stage_inputs"]["GENERATOR"]["max_output_tokens"] == 6000
+            assert details["stage_inputs"]["GENERATOR"]["max_output_tokens"] == 8000
             assert details["generating_request_ref"] == read["current_result"]["request_ref"]
             saved.append((snapshot.snapshot_id, canonical_payload(snapshot.content)))
         assert len(saved) >= 3
@@ -140,7 +140,7 @@ async def test_explicit_v5_persists_and_reopens_three_read_contracts(
             call.max_output_tokens
             for call in model.calls
             if call.role == ModelRole.HYPOTHESIS_GENERATOR
-        } == {6000}
+        } == {8000}
         assert {
             call.max_output_tokens
             for call in model.calls
@@ -222,7 +222,7 @@ async def test_default_v5_and_saved_off_v2_keep_distinct_budgets(tmp_path: Path)
         assert op.state.value == "SUCCEEDED", op.error
         generators = [c for c in model.calls if c.role == ModelRole.HYPOTHESIS_GENERATOR]
         assert [(c.prompt_version, c.max_output_tokens) for c in generators] == [
-            ("hypothesis_portfolio.v5", 6000),
+            ("hypothesis_portfolio.v5", 8000),
             ("hypothesis_portfolio.v2", 4000),
         ]
         assert all(
