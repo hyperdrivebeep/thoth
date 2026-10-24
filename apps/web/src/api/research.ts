@@ -170,6 +170,7 @@ export type WorkspaceReady = {
   browser_scope_id?: string;
   response_languages?: ("ko" | "en")[];
   response_language_scope?: "REQUEST";
+  expected_result_contracts?: string[];
   ready: boolean;
   model_connected?: boolean;
   deployment_mode?: string;

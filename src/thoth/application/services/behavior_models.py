@@ -83,9 +83,11 @@ class BehaviorBoundModel:
         )
 
     async def structured[T: BaseModel](self, request: ModelRequest[T]) -> ModelResult[T]:
+        from thoth.application.services.hypothesis_grounding_capture import dispatch_with_grounding
+
         context = current_behavior_work()
         if context is None:
-            return await self._delegate.structured(request)
+            return await dispatch_with_grounding(self._delegate, request)
         if context.project_id != request.project_id:
             raise BehaviorPolicyError("BEHAVIOR_WORK_PROJECT_MISMATCH")
         snapshot = context.snapshot(BehaviorArtifactKind.PROMPT_BUNDLE)
@@ -145,7 +147,7 @@ class BehaviorBoundModel:
             )
         )
         started = perf_counter_ns()
-        result = await self._delegate.structured(request)
+        result = await dispatch_with_grounding(self._delegate, request)
         if context.control is not None:
             context.control.validate_work(context.snapshots)
         context.uses.append(

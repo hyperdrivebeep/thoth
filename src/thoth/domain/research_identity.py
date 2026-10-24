@@ -138,7 +138,7 @@ def decode_research(revision: SemanticRevision, snapshot: EntitySnapshot) -> Dec
             continue
         payload = record.model_dump(mode="python")
         versions = (
-            {"1.0.0", "1.1.0", "1.2.0"}
+            {"1.0.0", "1.1.0", "1.2.0", "1.3.0"}
             if model in (HypothesisRecord, HypothesisPortfolioRecord)
             else {"1.0.0", "1.1.0"}
         )

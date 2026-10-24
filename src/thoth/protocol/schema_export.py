@@ -6,6 +6,10 @@ from pathlib import Path
 from pydantic import BaseModel
 
 from thoth.domain.hypothesis_v4 import HypothesisPortfolioV4, HypothesisTableFillV4
+from thoth.domain.hypothesis_v5_wire import (
+    ReceivedHypothesisPortfolioV5,
+    ReceivedHypothesisTableFillV5,
+)
 from thoth.domain.language_validation import HypothesisLanguageCheck
 from thoth.domain.research_followup import (
     CoverageMatrix,
@@ -43,6 +47,8 @@ SCHEMA_MODELS: dict[str, type[BaseModel]] = {
     "thread-request-v21.schema.json": ThreadRequestRevisionV21,
     "hypothesis-portfolio-v4.schema.json": HypothesisPortfolioV4,
     "hypothesis-table-fill-v4.schema.json": HypothesisTableFillV4,
+    "hypothesis-portfolio-v5.schema.json": ReceivedHypothesisPortfolioV5,
+    "hypothesis-table-fill-v6.schema.json": ReceivedHypothesisTableFillV5,
     "hypothesis-language-check.schema.json": HypothesisLanguageCheck,
     "jsonrpc-error.schema.json": JsonRpcError,
     "jsonrpc-request.schema.json": JsonRpcRequest,

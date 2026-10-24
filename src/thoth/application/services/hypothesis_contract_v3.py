@@ -66,12 +66,17 @@ class V3DetailFields(TypedDict, total=False):
 class GeneratorContract(TypedDict):
     output_model: type[HypothesisPortfolio]
     prompt_version: str
+    max_output_tokens: int
 
 
 def generator_contract_for_work() -> GeneratorContract:
     from thoth.domain.research_execution import research_work
 
     work = research_work.get()
+    if work is not None and work.hypothesis_contract_v3:
+        from thoth.application.services.hypothesis_grounding_v5 import grounding_generator_contract
+
+        return grounding_generator_contract()
     return generator_contract(
         work is not None and work.hypothesis_contract_v3,
         None if work is None else work.response_language,
@@ -81,10 +86,22 @@ def generator_contract_for_work() -> GeneratorContract:
 def generator_contract(v3: bool, response_language: str | None = None) -> GeneratorContract:
     """The form and contract version for the generator call; v2 exactly as it always was."""
     if v3 and response_language is not None:
-        return {"output_model": HypothesisPortfolioV4, "prompt_version": CONTRACT_V4}
+        return {
+            "output_model": HypothesisPortfolioV4,
+            "prompt_version": CONTRACT_V4,
+            "max_output_tokens": 4_000,
+        }
     if v3:
-        return {"output_model": HypothesisPortfolioV3, "prompt_version": CONTRACT_V3}
-    return {"output_model": HypothesisPortfolio, "prompt_version": CONTRACT_V2}
+        return {
+            "output_model": HypothesisPortfolioV3,
+            "prompt_version": CONTRACT_V3,
+            "max_output_tokens": 4_000,
+        }
+    return {
+        "output_model": HypothesisPortfolio,
+        "prompt_version": CONTRACT_V2,
+        "max_output_tokens": 4_000,
+    }
 
 
 def base_tests(candidate: Hypothesis) -> tuple[DiscriminatingTest, ...]:

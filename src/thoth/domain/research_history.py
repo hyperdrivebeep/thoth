@@ -131,7 +131,7 @@ class HistoryDiff(DomainModel):
 
 
 class HistoricalResultInput(DomainModel):
-    expected_result_contract: Literal["v4"] | None = None
+    expected_result_contract: Literal["v4", "v5"] | None = None
     project_id: str
     thread_id: str
     request_revision_digest: Sha256

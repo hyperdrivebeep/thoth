@@ -435,6 +435,14 @@ async def accepted_portfolio(
     require_unknown: bool,
 ) -> HypothesisPortfolio:
     """The generator's output settled, its open table cells filled (v3), and validated."""
+    from thoth.domain.hypothesis_v5_wire import ReceivedHypothesisPortfolioV5
+
+    if isinstance(generated, ReceivedHypothesisPortfolioV5):
+        from thoth.application.services.hypothesis_grounding_v5 import accepted_grounded_portfolio
+
+        return await accepted_grounded_portfolio(
+            model, generated, context, command, require_unknown
+        )
     settled = settle_contract(generated, command.evidence, context.problem, context=context)
     filled = await fill_tables(model, settled, context, command)
     accepted = validate_hypothesis_portfolio(

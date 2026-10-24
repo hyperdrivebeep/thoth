@@ -1,0 +1,151 @@
+{
+  "$defs": {
+    "ReceivedFilledRowV5": {
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "default": [],
+          "items": {
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Basis",
+          "type": "array"
+        },
+        "expected": {
+          "anyOf": [
+            {
+              "maxLength": 300,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Expected"
+        },
+        "grounding": {
+          "$ref": "#/$defs/ReceivedGroundingV1"
+        },
+        "hypothesis_id": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+          "title": "Hypothesis Id",
+          "type": "string"
+        },
+        "knowledge_state": {
+          "enum": [
+            "PREDICTED",
+            "UNKNOWN"
+          ],
+          "title": "Knowledge State",
+          "type": "string"
+        },
+        "unknown_reason": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unknown Reason"
+        }
+      },
+      "required": [
+        "hypothesis_id",
+        "knowledge_state",
+        "expected",
+        "grounding"
+      ],
+      "title": "ReceivedFilledRowV5",
+      "type": "object"
+    },
+    "ReceivedFilledTestV5": {
+      "additionalProperties": false,
+      "properties": {
+        "designed_for": {
+          "maxLength": 160,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+          "title": "Designed For",
+          "type": "string"
+        },
+        "rows": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ReceivedFilledRowV5"
+          },
+          "maxItems": 40,
+          "title": "Rows",
+          "type": "array"
+        },
+        "test_id": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Test Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "designed_for",
+        "test_id"
+      ],
+      "title": "ReceivedFilledTestV5",
+      "type": "object"
+    },
+    "ReceivedGroundingV1": {
+      "additionalProperties": false,
+      "properties": {
+        "derivation_role": {
+          "enum": [
+            "OBSERVATION_RESTATEMENT",
+            "EVIDENCE_INFERENCE",
+            "HYPOTHESIS_ONLY",
+            "UNASSESSED"
+          ],
+          "title": "Derivation Role",
+          "type": "string"
+        },
+        "rationale": {
+          "maxLength": 200,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "derivation_role",
+        "rationale"
+      ],
+      "title": "ReceivedGroundingV1",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "tests": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ReceivedFilledTestV5"
+      },
+      "maxItems": 60,
+      "title": "Tests",
+      "type": "array"
+    }
+  },
+  "title": "ReceivedHypothesisTableFillV5",
+  "type": "object"
+}

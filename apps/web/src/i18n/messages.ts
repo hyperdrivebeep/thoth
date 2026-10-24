@@ -1,4 +1,5 @@
 import { finishingMessages } from "./finishingMessages";
+import { groundingMessages } from "./groundingMessages";
 import { remainingMessages } from "./remainingMessages";
 import { apiNoticesMessages } from "./apiNoticesMessages";
 import { advancedMessages } from "./advancedMessages";
@@ -25,6 +26,7 @@ import { setupMessages } from "./setupMessages";
 export const messages = {
   "usage.memoryExpansion": { ko: "기억 검색어 넓히기", en: "Memory query expansion" },
   ...finishingMessages,
+  ...groundingMessages,
   ...remainingMessages,
   ...apiNoticesMessages,
   ...advancedMessages,
@@ -60,6 +62,7 @@ export const messages = {
   "language.cost": { ko: "새 질문에는 모델 사용량이 듭니다. 화면 언어만 바꾸면 모델을 호출하지 않습니다.", en: "New questions use model capacity. Changing only the display language makes no model call." },
   "language.unsupported": { ko: "이 서버는 답변 언어 선택을 지원하지 않습니다.", en: "This server does not support selecting a response language." },
   "expected.title": { ko: "각 가설의 예상 결과(AI 제안)", en: "Expected results for each hypothesis (AI proposal)" },
+  "expected.sourceUnavailable": { ko: "이 저장 결과에 포함된 근거가 아니어서 원문을 확인할 수 없습니다.", en: "The original text cannot be shown because this evidence is not part of the saved result." },
   "expected.unknown": { ko: "모름", en: "Unknown" },
   "expected.unconfirmed": { ko: "자료로 확인되지 않은 예상", en: "Prediction not confirmed by evidence" },
   "expected.notice": { ko: "모델이 낸 제안이며 사람이 확인하기 전에는 미확정입니다. 같은 말은 같은 결과로 봅니다. 확률이나 점수가 아닙니다.", en: "These model proposals remain unconfirmed until reviewed by a person. Matching labels represent the same result. They are not probabilities or scores." },

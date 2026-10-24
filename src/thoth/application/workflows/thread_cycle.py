@@ -156,7 +156,6 @@ class ThreadCycleService:
                 context_pack=context,
                 **generator_contract_for_work(),
                 model_policy_ref=command.model_policy_ref,
-                max_output_tokens=4_000,
             )
         )
         require_unknown = any(
@@ -426,6 +425,11 @@ class ThreadCycleService:
             self._unit_of_work.transaction() if self._unit_of_work is not None else nullcontext(),
         ):
             check_research_boundary()
+            from thoth.application.services.hypothesis_grounding_bindings import (
+                require_grounding_publication,
+            )
+
+            require_grounding_publication(research_work.get())
             if self._full_memory is not None and memory_basis is not None:
                 self._full_memory.require_authority(memory_basis)
             commit = self._commits.commit(

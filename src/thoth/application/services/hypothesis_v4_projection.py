@@ -7,6 +7,7 @@ from thoth.domain.hypothesis_v4_projection import (
     HypothesisGenerationDetailsV4,
     PortfolioGenerationDetailsV4,
 )
+from thoth.domain.hypothesis_v5 import HypothesisPortfolioV5, HypothesisV5
 from thoth.domain.research_execution import research_work
 from thoth.domain.research_projection import HypothesisGenerationDetails, PortfolioGenerationDetails
 
@@ -19,6 +20,10 @@ def _origin() -> dict[str, object]:
 
 
 def hypothesis_details(candidate: Hypothesis, values: dict[str, object]):
+    if isinstance(candidate, HypothesisV5):
+        from thoth.application.services.hypothesis_v5_projection import hypothesis_details_v5
+
+        return hypothesis_details_v5(candidate, values)
     if not isinstance(candidate, HypothesisV4):
         return HypothesisGenerationDetails.model_validate(values)
     return HypothesisGenerationDetailsV4.model_validate(
@@ -38,6 +43,10 @@ def hypothesis_details(candidate: Hypothesis, values: dict[str, object]):
 
 
 def portfolio_details(candidate: HypothesisPortfolio, values: dict[str, object]):
+    if isinstance(candidate, HypothesisPortfolioV5):
+        from thoth.application.services.hypothesis_v5_projection import portfolio_details_v5
+
+        return portfolio_details_v5(candidate, values)
     if not isinstance(candidate, HypothesisPortfolioV4):
         return PortfolioGenerationDetails.model_validate(values)
     return PortfolioGenerationDetailsV4.model_validate({**values, **_origin()})

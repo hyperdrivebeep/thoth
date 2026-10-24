@@ -27,7 +27,7 @@ class OperationReadInput(DomainModel):
 
 
 class OperationResultReadInput(OperationReadInput):
-    expected_result_contract: Literal["v4"] | None = None
+    expected_result_contract: Literal["v4", "v5"] | None = None
 
 
 class OperationResumeInput(OperationReadInput):

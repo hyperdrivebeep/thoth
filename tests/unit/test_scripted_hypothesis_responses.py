@@ -19,6 +19,10 @@ from thoth.domain.enums import ModelRole
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.hypothesis import HypothesisPortfolio, HypothesisPortfolioV3, HypothesisTableFill
 from thoth.domain.hypothesis_v4 import HypothesisPortfolioV4, HypothesisTableFillV4
+from thoth.domain.hypothesis_v5_wire import (
+    ReceivedHypothesisPortfolioV5,
+    ReceivedHypothesisTableFillV5,
+)
 from thoth.domain.model import ContextPack, ModelRequest
 
 CUTOFF = datetime(2026, 10, 23, tzinfo=UTC)
@@ -76,7 +80,13 @@ def request_for[T: BaseModel](
 
 @pytest.mark.parametrize("name", ["generic", "dynamic", "controlled"])
 @pytest.mark.parametrize(
-    "output", [HypothesisPortfolio, HypothesisPortfolioV3, HypothesisPortfolioV4]
+    "output",
+    [
+        HypothesisPortfolio,
+        HypothesisPortfolioV3,
+        HypothesisPortfolioV4,
+        ReceivedHypothesisPortfolioV5,
+    ],
 )
 @pytest.mark.parametrize("language", ["ko", "en"])
 async def test_models_generate_the_requested_version_with_stable_ids(
@@ -93,16 +103,24 @@ async def test_models_generate_the_requested_version_with_stable_ids(
                 "expected_by_hypothesis"
             ][0]
             assert row["hypothesis_id"] == owner.hypothesis_id and row["basis"] == []
-            assert ("knowledge_state" in row) is (output is HypothesisPortfolioV4)
+            assert ("knowledge_state" in row) is issubclass(output, HypothesisPortfolioV4)
+            if output is ReceivedHypothesisPortfolioV5:
+                assert row["grounding"] == {
+                    "schema_version": "1.0.0",
+                    "derivation_role": "HYPOTHESIS_ONLY",
+                    "rationale": "",
+                }
             assert ("차이" in row["expected"]) is (language == "ko")
         else:
             assert "refutation_conditions" not in owner.model_dump()
 
 
 @pytest.mark.parametrize("name", ["generic", "dynamic", "controlled"])
-@pytest.mark.parametrize("output", [HypothesisTableFill, HypothesisTableFillV4])
+@pytest.mark.parametrize(
+    "output", [HypothesisTableFill, HypothesisTableFillV4, ReceivedHypothesisTableFillV5]
+)
 async def test_models_answer_only_the_requested_open_cells(
-    name: str, output: type[HypothesisTableFill]
+    name: str, output: type[HypothesisTableFill] | type[ReceivedHypothesisTableFillV5]
 ) -> None:
     request = request_for(output, ModelRole.HYPOTHESIS_TABLE_FILLER, "en")
     context = request.context_pack.model_copy(

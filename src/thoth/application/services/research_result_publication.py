@@ -53,6 +53,12 @@ def publish_research_result(
         if operation is None:
             raise ResearchFence("OPERATION_MISSING")
         access.require_operation(operation.model_copy(update={"resource_uses": uses}))
+        if isinstance(result.get("portfolio"), dict):
+            from thoth.application.services.hypothesis_grounding_bindings import (
+                require_grounding_publication,
+            )
+
+            require_grounding_publication(work)
         staged = tuple(work.pending_revisions)
         records.commit_staged(staged)
         from thoth.application.services.research_basis_capture import capture_record_producers

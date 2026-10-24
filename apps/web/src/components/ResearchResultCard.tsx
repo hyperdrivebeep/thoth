@@ -28,6 +28,7 @@ import { CauseUnconfirmed } from "./HypothesisFields";
 import { nextActionLabel } from "./statusLabels";
 import { ReadableList } from "./ReadableList";
 import { ExecutionHoldNotice } from "./ExecutionHoldNotice";
+import { GroundingHoldNotice, GroundingRowsNotice } from "./GroundingNotice";
 import type { ExecutionHold } from "../api/research";
 
 function selectedEvidenceCount(result: Record<string, unknown>): number | undefined {
@@ -36,7 +37,7 @@ function selectedEvidenceCount(result: Record<string, unknown>): number | undefi
   return Array.isArray(result.selected_evidence_refs) && result.selected_evidence_refs.length ? result.selected_evidence_refs.length : undefined;
 }
 
-export function ResearchResultCard({ result, state, unavailable, error, failure, terminalReason, onDetail, onRetry, onResume, resumeCompleted, resuming, historySelection, currentness, progressSummary, coverageMatrix, nextUserAction, decisionDelta, usageLine, executionHold, projectId, holdCauseRef, onOpenTrace, hypothesisLinks, linkDistribution }: {
+export function ResearchResultCard({ result, state, unavailable, error, failure, terminalReason, onDetail, onRetry, onResume, resumeCompleted, resuming, historySelection, currentness, progressSummary, coverageMatrix, nextUserAction, decisionDelta, usageLine, executionHold, projectId, holdCauseRef, onOpenTrace, hypothesisLinks, linkDistribution, hasSavedResult = false }: {
   result: Record<string, unknown> | null; state: string; unavailable?: string; error?:ExecutionError | null; failure?:ResearchFailure | null; terminalReason?:string | null; onDetail: (detail: ResearchDetail) => void; onRetry?: () => void;
   /** Continue the interrupted run from where it stopped; only offered with the number of stages it had finished. */
   onResume?: () => void; resumeCompleted?: number; resuming?: boolean; historySelection?: HistorySelection; currentness?: Currentness;
@@ -47,6 +48,7 @@ export function ResearchResultCard({ result, state, unavailable, error, failure,
   onOpenTrace?: (row: { kind: string; id: string }) => void;
   /** Which of this answer's hypotheses came from a trace row and whether that row's verdict has changed since. */
   hypothesisLinks?: HypothesisLink[]; linkDistribution?: ReasonDistribution;
+  hasSavedResult?: boolean;
 }) {
   useTranslation();
   const languageCheck = objectValue(result?.hypothesis_language_check);
@@ -58,8 +60,9 @@ export function ResearchResultCard({ result, state, unavailable, error, failure,
   const failed=state==='FAILED';
   const cancelled=state==='CANCELLED';
   const cause=failure ?? error?.data?.failure;
-  const code=cause?.primary.reason_code ?? error?.data?.reason_code ?? terminalReason ?? '';
-  const interrupted=cancelled || failed || Boolean(terminalReason && terminalReason!=='BOUNDED_RESEARCH_COMPLETE');
+  const code=cause?.primary.reason_code ?? error?.data?.reason_code ?? terminalReason ?? textValue(result?.terminal_reason);
+  const groundingHold=code==='GROUNDING_PUBLICATION_BINDING_MISMATCH';
+  const interrupted=cancelled || failed || groundingHold || Boolean(terminalReason && terminalReason!=='BOUNDED_RESEARCH_COMPLETE');
   const publication=cause?.primary.origin==='RESULT_PUBLICATION'||cause?.secondary?.origin==='HOLD_PUBLICATION';
   const content=hasResearchContent(result);
   // A model call that stopped the research early (connection error or timeout) and left no answer.
@@ -67,11 +70,12 @@ export function ResearchResultCard({ result, state, unavailable, error, failure,
     : /OAUTH_[A-Z_]*TIMEOUT|OAUTH_TRANSPORT_DEADLINE/.test(code) ? t("result.responseTimeout") : null;
   const cutOff=cutOffKind!==null && !(typeof result?.answer==='string' && result.answer.trim()!=='');
   return <ResponseLanguageContext.Provider value={resultLanguage(result)}><article className="assistant-message"><header>THOTH</header>
-    {cancelled&&!unavailable&&<div className="result-notice" role="alert"><p>{t("result.cancelled")}</p>
+    {groundingHold&&!unavailable&&<GroundingHoldNotice hasSavedResult={hasSavedResult}/>}
+    {cancelled&&!unavailable&&!groundingHold&&<div className="result-notice" role="alert"><p>{t("result.cancelled")}</p>
       <p>{code ? message("terminationReason", code) : t("result.cancelUnknown")}</p>
       {content ? <strong>{t("result.beforeCancel")}</strong> : <p>{t("result.noSavedAnswer")}</p>}
     </div>}
-    {interrupted&&!cancelled&&!unavailable&&<div className="result-notice" role="alert"><p>{t("result.incomplete")}</p>
+    {interrupted&&!cancelled&&!unavailable&&!groundingHold&&<div className="result-notice" role="alert"><p>{t("result.incomplete")}</p>
       {/TIME_BUDGET|DEADLINE/.test(code)&&<p>{t("result.timeLimit")}</p>}
       {code==='TOTAL_RESEARCH_BUDGET_EXHAUSTED'&&<p>{t("result.researchLimit")}</p>}
       {/OAUTH_REQUEST_REJECTED_429/.test(code)&&<p>{t("result.quota")}</p>}
@@ -93,6 +97,7 @@ export function ResearchResultCard({ result, state, unavailable, error, failure,
       : state === "STALE" && <p className="result-notice">{t("result.stale")}</p>)}
     {unavailable && <p className="result-notice">{unavailable}</p>}
     {result && content && !unavailable ? <>
+      <GroundingRowsNotice result={result}/>
       {languageFlagged && <p className="result-notice" role="status">{t("language.proseFlag")}</p>}
       <TraceOriginLine result={result} onOpenTrace={onOpenTrace}/>
       {typeof result.answer === "string" && <AnswerBody answer={result.answer} language={resultLanguage(result)}

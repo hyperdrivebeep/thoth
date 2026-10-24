@@ -142,7 +142,12 @@ class WorkspaceSetupHandlers:
             payload["workspace_location"] = deepcopy(self._workspace_location)
         if self._mode is DeploymentMode.HOSTED_REVIEW and self._workspace_id is not None:
             payload["browser_scope_id"] = browser_submission_scope(self._workspace_id)
-        return {**payload, "response_languages": ["ko", "en"], "response_language_scope": "REQUEST"}
+        return {
+            **payload,
+            "response_languages": ["ko", "en"],
+            "response_language_scope": "REQUEST",
+            "expected_result_contracts": ["v4", "v5"],
+        }
 
     async def _ready(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         del value

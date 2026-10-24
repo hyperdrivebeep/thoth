@@ -19,6 +19,8 @@ from thoth.domain.hypothesis import (
 )
 from thoth.domain.hypothesis_full import HypothesisPortfolioRecord, HypothesisRecord
 from thoth.domain.hypothesis_v4 import CONTRACT_V4, HypothesisPortfolioV4, HypothesisV4
+from thoth.domain.hypothesis_v5 import HypothesisPortfolioV5, HypothesisV5
+from thoth.domain.hypothesis_v5_projection import HypothesisGenerationDetailsV5
 from thoth.domain.test_validity import hypothesis_semantic_digest
 
 
@@ -52,6 +54,10 @@ def hypothesis_view(record: HypothesisRecord) -> Hypothesis | None:
     }
     if details.contract_version is None:
         return Hypothesis.model_validate(fields)
+    if isinstance(details, HypothesisGenerationDetailsV5):
+        from thoth.application.services.hypothesis_v5_projection import hypothesis_view_v5
+
+        return hypothesis_view_v5(fields, details)
     if details.contract_version not in (CONTRACT_V3, CONTRACT_V4):
         raise ValueError("HYPOTHESIS_CONTRACT_VERSION_UNSUPPORTED")
     # The generator was shown the v3 form: give back what it said beside the v2 content.
@@ -208,7 +214,9 @@ def full_hypothesis(
             "supersedes_revision_digest": parent,
             "created_at": created_at,
             "receipt_ref": None,
-            "schema_version": "1.2.0"
+            "schema_version": "1.3.0"
+            if isinstance(candidate, HypothesisV5)
+            else "1.2.0"
             if isinstance(candidate, (HypothesisV4, HypothesisPortfolioV4))
             else "1.1.0",
             "revision_digest": "0" * 64,
@@ -305,7 +313,9 @@ def full_portfolio(
             "supersedes_revision_digest": parent,
             "created_at": created_at,
             "receipt_ref": None,
-            "schema_version": "1.2.0"
+            "schema_version": "1.3.0"
+            if isinstance(candidate, HypothesisPortfolioV5)
+            else "1.2.0"
             if isinstance(candidate, (HypothesisV4, HypothesisPortfolioV4))
             else "1.1.0",
             "revision_digest": "0" * 64,

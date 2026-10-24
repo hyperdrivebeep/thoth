@@ -4,10 +4,12 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from tests.fixtures.legacy_hypothesis_contract import legacy_generation_contract
 from tests.integration.scoped_runtime import fixture_scope_policy
 from tests.integration.test_hypothesis_contract_v3_run import GeneratorModel, turn_on
 from tests.integration.test_trace_origin import Rpc, opened
 
+from thoth.application.workflows import thread_cycle
 from thoth.apps.restore_profiles import restore_profiles
 from thoth.apps.runtime import create_runtime
 from thoth.domain.canonical import canonical_payload
@@ -41,6 +43,12 @@ class LanguageGenerator(GeneratorModel):
                     row["knowledge_state"] = "PREDICTED"
             return replace(result, output=HypothesisTableFillV4.model_validate(shaped))
         return await super().structured(request)
+
+
+@pytest.fixture(autouse=True)
+def explicit_legacy_v4_generator(monkeypatch):
+    # This module exercises the old codec, not the newly approved default-v5 selector.
+    monkeypatch.setattr(thread_cycle, "generator_contract_for_work", legacy_generation_contract)
 
 
 @pytest.mark.asyncio
