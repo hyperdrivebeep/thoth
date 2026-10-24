@@ -1,5 +1,7 @@
 """Read-only v5/older result projections; legacy citations never acquire support authority."""
 
+from typing import cast
+
 from pydantic import JsonValue, ValidationError
 
 from thoth.domain.prediction_grounding import GroundingSourceBinding
@@ -79,7 +81,11 @@ def project_grounding_rows(
             ):
                 available = False
                 break
-            value = source_basis.get(str(identifier)) if isinstance(source_basis, dict) else None
+            value = (
+                cast(dict[str, JsonValue], source_basis).get(str(identifier))
+                if isinstance(source_basis, dict)
+                else None
+            )
             version, separator, digest = (
                 value.rpartition(":") if isinstance(value, str) else ("", "", "")
             )

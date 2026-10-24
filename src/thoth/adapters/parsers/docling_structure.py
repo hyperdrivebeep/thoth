@@ -7,11 +7,19 @@ from typing import Any
 
 from thoth.adapters.parsers.common import node_id, parser_artifact
 from thoth.adapters.parsers.docling_locations import (
-    _located_segments,
-    _segment_node_id,
-    _source_locator,
-    _text_coordinate_basis,
-    _validated_charspan,
+    located_segments as _located_segments,
+)
+from thoth.adapters.parsers.docling_locations import (
+    segment_node_id as _segment_node_id,
+)
+from thoth.adapters.parsers.docling_locations import (
+    source_locator as _source_locator,
+)
+from thoth.adapters.parsers.docling_locations import (
+    text_coordinate_basis as _text_coordinate_basis,
+)
+from thoth.adapters.parsers.docling_locations import (
+    validated_charspan as _validated_charspan,
 )
 from thoth.domain.artifact import (
     ArtifactEnvelope,

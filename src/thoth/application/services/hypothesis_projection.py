@@ -28,7 +28,7 @@ def hypothesis_view(record: HypothesisRecord) -> Hypothesis | None:
     details = record.generation_details
     if details is None:
         return None
-    fields = {
+    fields: dict[str, object] = {
         "hypothesis_id": record.hypothesis_id,
         "object_id": record.object_id,
         "statement": record.statement,

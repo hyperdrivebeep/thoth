@@ -19,8 +19,10 @@ from thoth.application.services.hypothesis_table_filler import (
     TABLE_FILLER_MAX_OUTPUT_TOKENS,
     UNUSABLE_ANSWER,
     CycleInput,
-    _noted,
     count_cells,
+)
+from thoth.application.services.hypothesis_table_filler import (
+    noted as _noted,
 )
 from thoth.domain.enums import ModelRole
 from thoth.domain.hypothesis_grounding_result import GroundedPortfolioResult

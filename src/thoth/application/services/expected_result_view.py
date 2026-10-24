@@ -34,6 +34,8 @@ def expected_result_view(
         return payload
     if requested is not None and (not isinstance(requested, str) or requested not in ("v4", "v5")):
         raise RpcApplicationError(RpcErrorCode.INVALID_PARAMS, "EXPECTED_RESULT_VIEW_UNSUPPORTED")
+    # Keep the validated value independent of loop-local narrowing after continue.
+    display_contract: str | None = requested
     projected = deepcopy(payload)
     changed = False
     for name in ("current_result", "previous_result"):
@@ -65,9 +67,9 @@ def expected_result_view(
     if changed:
         projected["expected_result_view"] = (
             "V5_LEGACY_PROJECTION"
-            if requested == "v5"
+            if display_contract == "v5"
             else "V4_COMPATIBILITY_PROJECTION"
-            if requested == "v4"
+            if display_contract == "v4"
             else "LEGACY_DISPLAY_PROJECTION"
         )
     return projected
