@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-24T19:23:50.109886+00:00",
+  "created_at": "2026-10-24T21:30:48.100001+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -1908,8 +1908,8 @@
     },
     {
       "path": "config/basedpyright-baseline.json",
-      "sha256": "0023c03237e54797dbd9db6012029d61163826629293f288c0b4bee788bc6545",
-      "bytes": 164586
+      "sha256": "af59ccf2c3511f2cf54b0df3ff9fe4d8c8e890f6bdb3c5c62214a47ddabfc283",
+      "bytes": 159516
     },
     {
       "path": "config/connectors/local-reference.yaml",
