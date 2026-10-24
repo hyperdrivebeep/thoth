@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-24T17:16:01.492379+00:00",
+  "created_at": "2026-10-24T17:46:47.244501+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -1905,6 +1905,11 @@
       "path": "config/atomicity-requirements.json",
       "sha256": "9ce85c91d0ace3a0c0c139e1e55c910a8c3aa822ebc550c0e4031d21faa63026",
       "bytes": 67787
+    },
+    {
+      "path": "config/basedpyright-baseline.json",
+      "sha256": "0023c03237e54797dbd9db6012029d61163826629293f288c0b4bee788bc6545",
+      "bytes": 164586
     },
     {
       "path": "config/connectors/local-reference.yaml",
@@ -5293,7 +5298,7 @@
     },
     {
       "path": "src/thoth/application/services/hypothesis_grounding_v5.py",
-      "sha256": "f92e9f1bd72796e5f7a935db117a03d1929958d9df05e4a042d9da18e9c0274b",
+      "sha256": "2527262075b797ecde541eecfd574eaad110c6c7c7b3e9a9e42503df31cdc196",
       "bytes": 5336
     },
     {
@@ -8888,7 +8893,7 @@
     },
     {
       "path": "tests/integration/test_current_hero_normal_entry.py",
-      "sha256": "fb8e34ce5c03cc0b00230e970ebbd711e3dc58aa496ae243202688421d4f3dba",
+      "sha256": "582142aae8424826dc4281f552d9e5521ef59ad9ce1f23a067df4793d8fb7834",
       "bytes": 2820
     },
     {
@@ -9058,7 +9063,7 @@
     },
     {
       "path": "tests/integration/test_hypothesis_grounding_storage.py",
-      "sha256": "130b2e5da16419c998b1c38ff9a53875b1b9506a34477817212510e35118a571",
+      "sha256": "e586f86689bce51da9b47effef2bc24999811480bb17acbaa84b6a391730881c",
       "bytes": 15577
     },
     {
@@ -10453,7 +10458,7 @@
     },
     {
       "path": "tests/unit/application/test_hypothesis_grounding_capture.py",
-      "sha256": "1f9bedde2db19392e76151ee19cbb2dd8ca06b33d66f5d335d7960e1ebc9f49c",
+      "sha256": "20a66757723894b5b39e7bafcfa1b9a1700a0485bc699a09962d1b3f28d12094",
       "bytes": 8695
     },
     {
@@ -11013,7 +11018,7 @@
     },
     {
       "path": "tests/unit/models/test_hypothesis_grounding_wire.py",
-      "sha256": "dcd205fedffe2d9110601b13917fa317eba1e1bd9ba5c81e591fd94ba59e133b",
+      "sha256": "5e5a4fefdb19b7829dfb08f81482c918d6692f99d3ab630cc434f2aed455d14e",
       "bytes": 3412
     },
     {
@@ -11348,7 +11353,7 @@
     },
     {
       "path": "tests/unit/services/test_expected_result_v5_view.py",
-      "sha256": "bca538bbc1d7c1fcca2b65d10012f1321aa24521c74e28dfe34b5e1098aa9282",
+      "sha256": "35c165e8dcb6123d36b85653ce7c9dbc990ce3cb20863d48363ac155ea5b75e4",
       "bytes": 5062
     },
     {

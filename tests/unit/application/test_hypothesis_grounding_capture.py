@@ -181,8 +181,8 @@ async def test_generator_and_filler_capture_separate_inputs_on_acceptance_path()
         assert work.hypothesis_grounding.row_stages[("h1", "t-h1", "h3")] == "FILLER"
         assert accepted is work.hypothesis_grounding.portfolio
         assert '"rationale"' not in delegate.calls[1].context_pack.model_dump_json()
-        assert [call.max_output_tokens for call in delegate.calls] == [6000, 3000]
-        assert work.grounding_stages["GENERATOR"].metadata.max_output_tokens == 6000
+        assert [call.max_output_tokens for call in delegate.calls] == [8000, 3000]
+        assert work.grounding_stages["GENERATOR"].metadata.max_output_tokens == 8000
         assert work.grounding_stages["FILLER"].metadata.max_output_tokens == 3000
     finally:
         research_work.reset(token)

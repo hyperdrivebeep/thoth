@@ -69,7 +69,7 @@ def test_new_prompt_has_grounding_roles_and_explicit_authority_boundary(stage: s
 async def test_actual_http_serializer_keeps_reservation_and_does_not_claim_a_remote_cap() -> None:
     request = generator_request()
     data = await measured_wire(request, raw_portfolio({"h1": {"h1": "worse"}}))
-    assert data["output_tokens_reserved"] == 6000
+    assert data["output_tokens_reserved"] == 8000
     assert data["provider_output_control"] == "OBSERVATION_ONLY"
     assert data["remote_max_output_tokens_present"] is False
     assert data["serialized_request_bytes"] > 0 and data["network_calls"] == 0

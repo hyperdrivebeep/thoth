@@ -44,7 +44,7 @@ def grounding_generator_contract() -> GeneratorContract:
     return {
         "output_model": ReceivedHypothesisPortfolioV5,
         "prompt_version": CONTRACT_V5,
-        "max_output_tokens": 6_000,
+        "max_output_tokens": 8_000,
     }
 
 
