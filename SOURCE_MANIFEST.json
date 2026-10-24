@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-24T04:58:35.206094+00:00",
+  "created_at": "2026-10-24T12:05:19.989231+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -2023,13 +2023,13 @@
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.ko.md",
-      "sha256": "60a119b205924532f97dc3b8137d1c8248e8dcd8728193a47d7a04c052d01f81",
-      "bytes": 13386
+      "sha256": "d013741b43c2cd2a4da1ab525fa2c946689e403d56b0dcb9f8286ff8fa175a62",
+      "bytes": 13869
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.md",
-      "sha256": "2be5949bcbbb3a5ea54e5f0b29688fec7de15f8439737409711107766e87deff",
-      "bytes": 11117
+      "sha256": "00083b15e4018f8914ec6001f96d3995d6166b255671ec48f3fb7828fdcfb60b",
+      "bytes": 11542
     },
     {
       "path": "docs/KNOWN_TEST_FAILURES.json",
@@ -5713,8 +5713,8 @@
     },
     {
       "path": "src/thoth/application/services/research_basis_capture.py",
-      "sha256": "afd00a77b3388687893df949d5e16ef2e99ee3b58788bd917ad3fd7eb1bb74c2",
-      "bytes": 10770
+      "sha256": "20bb589a68085b4ce429c8362c521d07cbddf1d6313e7f32fb4b00f9660b0c44",
+      "bytes": 10543
     },
     {
       "path": "src/thoth/application/services/research_boundary.py",

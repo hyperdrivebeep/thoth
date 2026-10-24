@@ -163,3 +163,8 @@ exist.
   evidence. Connecting sources is a separate step and cannot be cancelled by the upload button.
   Browser/proxy progress behaviour has not been verified in a live deployment. There is no new
   server-side receiving deadline or automatic cleanup of complete unconnected staged files.
+- When THOTH reads a public web page, it waits up to two seconds each for the headless browser
+  and its driver to close. On a heavily loaded computer the driver can take slightly longer, and
+  THOTH then reports the read as failed instead of assuming the browser closed. In load tests the
+  driver still exited on its own within a second and no process was left behind. Read the page
+  again when the computer is less busy.
