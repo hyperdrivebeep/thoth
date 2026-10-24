@@ -15,7 +15,9 @@ import { useReadAccessProtection } from "./useReadAccessProtection";
 type SendInput = { hypothesisId: string; evidenceRef: string | null; reasons: string[]; note: string; digest?: string; ticket?: DraftTicket };
 
 /** Hypothesis comparison with review requests: reads the thread's requests and sends new ones. */
-export function HypothesisCompareLive({ result, projectId, threadId }: { result: Record<string, unknown>; projectId: string; threadId: string }) {
+export function HypothesisCompareLive({ result, projectId, threadId, onOpenEvidence }: {
+  result: Record<string, unknown>; projectId: string; threadId: string; onOpenEvidence?: (spanId: string) => void;
+}) {
   const client = useQueryClient();
   const key = ["judgment-review", projectId, threadId];
   const list = useQuery({ queryKey: key, retry: false,
@@ -50,7 +52,7 @@ export function HypothesisCompareLive({ result, projectId, threadId }: { result:
   return <>
     {(list.error || blocked) && <Callout compact intent="warning" role="status">{t("review.stateFailed")}</Callout>}
     {!target && send.error && <Callout compact intent="danger" role="alert">{t("reviewDialog.failed")}{" "}{send.error.message}</Callout>}
-    <HypothesisCompare result={result} review={controls} projectId={projectId} links={linked.links} distribution={linked.distribution} canDraft discrimination={discrimination.items} lessons={lessons.lessons} same={same.same}/>
+    <HypothesisCompare result={result} review={controls} projectId={projectId} links={linked.links} distribution={linked.distribution} canDraft discrimination={discrimination.items} lessons={lessons.lessons} same={same.same} onOpenEvidence={onOpenEvidence}/>
     <ReviewDialog target={target} pending={send.isPending} error={target && send.error && ownership.isCurrent(send.variables?.ticket) ? send.error.message : null} onClose={() => { ownership.advance(); setTarget(null); }} onDraftChange={ownership.advance}
       onSubmit={(reasons, note) => target && send.mutate({ hypothesisId: target.hypothesisId, evidenceRef: target.evidenceRef, reasons, note, ticket: ownership.capture() })}/>
   </>;

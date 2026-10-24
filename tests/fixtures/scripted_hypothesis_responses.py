@@ -8,6 +8,10 @@ from pydantic import BaseModel
 
 from thoth.domain.hypothesis import HypothesisPortfolio, HypothesisPortfolioV3
 from thoth.domain.hypothesis_v4 import HypothesisPortfolioV4, HypothesisTableFillV4
+from thoth.domain.hypothesis_v5_wire import (
+    ReceivedHypothesisPortfolioV5,
+    ReceivedHypothesisTableFillV5,
+)
 from thoth.domain.model import ModelRequest
 
 
@@ -66,6 +70,12 @@ def hypothesis_output[T: BaseModel](
                     }
                     if typed_states:
                         row["knowledge_state"] = "PREDICTED"
+                    if issubclass(request.output_model, ReceivedHypothesisPortfolioV5):
+                        row["grounding"] = {
+                            "schema_version": "1.0.0",
+                            "derivation_role": "HYPOTHESIS_ONLY",
+                            "rationale": "",
+                        }
                     rows.append(row)
             tests.append({**test.model_dump(), "expected_by_hypothesis": rows})
         hypotheses.append(
@@ -90,7 +100,9 @@ def table_fill_output[T: BaseModel](request: ModelRequest[T]) -> T:
     """Reply only to requested open cells, retaining IDs and the requested v3/v4 schema."""
     context = _FillContext.model_validate(request.context_pack.research_context["table_filler"])
     korean = _korean(request)
-    typed_states = issubclass(request.output_model, HypothesisTableFillV4)
+    typed_states = issubclass(
+        request.output_model, (HypothesisTableFillV4, ReceivedHypothesisTableFillV5)
+    )
     tests: list[dict[str, object]] = []
     for test in context.tests:
         rows: list[dict[str, object]] = []
@@ -105,6 +117,12 @@ def table_fill_output[T: BaseModel](request: ModelRequest[T]) -> T:
             }
             if typed_states:
                 row["knowledge_state"] = "PREDICTED"
+            if issubclass(request.output_model, ReceivedHypothesisTableFillV5):
+                row["grounding"] = {
+                    "schema_version": "1.0.0",
+                    "derivation_role": "HYPOTHESIS_ONLY",
+                    "rationale": "",
+                }
             rows.append(row)
         tests.append({"designed_for": test.designed_for, "test_id": test.test_id, "rows": rows})
     return request.output_model.model_validate({"tests": tests})

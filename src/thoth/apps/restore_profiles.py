@@ -46,7 +46,8 @@ def restore_profiles() -> RestoreProfileRegistry:
                 EntityType.HYPOTHESIS,
                 "hypothesis_id",
                 display_name="가설",
-                supported_schema_versions=frozenset({"1.0.0", "1.1.0", "1.2.0"}),
+                supported_schema_versions=frozenset({"1.0.0", "1.1.0", "1.2.0", "1.3.0"}),
+                evidence_fields=("evidence_refs", "counterevidence_refs", "basis"),
             ),
             TypedRestoreProfile(
                 "hypothesis-portfolio.v1",
@@ -55,7 +56,7 @@ def restore_profiles() -> RestoreProfileRegistry:
                 "portfolio_id",
                 reference_fields=(("hypothesis_refs", "HYPOTHESIS"),),
                 display_name="가설 구성",
-                supported_schema_versions=frozenset({"1.0.0", "1.1.0", "1.2.0"}),
+                supported_schema_versions=frozenset({"1.0.0", "1.1.0", "1.2.0", "1.3.0"}),
             ),
             TypedRestoreProfile(
                 "action.v1",

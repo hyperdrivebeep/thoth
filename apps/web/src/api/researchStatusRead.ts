@@ -2,6 +2,7 @@ import { hashKey, type QueryClient } from "@tanstack/react-query";
 import type { ResearchStatus, WorkspaceReady } from "./research";
 import { rpc, type RpcResult } from "./rpcClient";
 import { isReadAccessDenied } from "./readAccess";
+import { expectedResultContract } from "./expectedResultContract";
 
 /**
  * Reads a thread's status. While the last read said the operation is running, polling asks for the
@@ -12,7 +13,8 @@ export async function readResearchStatus(
   client: QueryClient, queryKey: readonly unknown[], projectId: string, threadId: string, signal?: AbortSignal,
 ): Promise<RpcResult<ResearchStatus>> {
   const ready = client.getQueryData<RpcResult<WorkspaceReady>>(["workspace-ready"]);
-  const contract = ready?.value.response_language_scope === "REQUEST" ? { expected_result_contract: "v4" } : {};
+  const selected = expectedResultContract(ready?.value);
+  const contract = selected ? { expected_result_contract: selected } : {};
   const queryHash = hashKey(queryKey);
   // Same key contract as useReadAccessProtection; the query's real success releases it.
   const guardKey = ["read-access-blocked", queryHash];

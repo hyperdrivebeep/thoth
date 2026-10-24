@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from thoth.adapters.models.hypothesis_grounding_text import GROUNDING_V5
+
 V3_VERSION = "hypothesis_portfolio.v3.3"
 
 _V3 = (
@@ -79,11 +81,22 @@ _V3_OPENING = (
 
 def hypothesis_opening(prompt_version: str, default: str) -> str:
     """The generator's opening sentences: the v3 text for v3, the given text otherwise."""
-    return _V3_OPENING if prompt_version in (V3_VERSION, "hypothesis_portfolio.v4") else default
+    return (
+        _V3_OPENING
+        if prompt_version in (V3_VERSION, "hypothesis_portfolio.v4", "hypothesis_portfolio.v5")
+        else default
+    )
 
 
 def hypothesis_contract_addendum(prompt_version: str) -> str:
     """The extra text for this prompt version; empty for v2 and for every other version."""
+    if prompt_version == "hypothesis_portfolio.v5":
+        return (
+            hypothesis_contract_addendum("hypothesis_portfolio.v4").replace(
+                "CONTRACT_V4", "CONTRACT_V5"
+            )
+            + GROUNDING_V5
+        )
     if prompt_version == "hypothesis_portfolio.v4":
         return _V3.replace("language of the question", "accepted response language").replace(
             "for a Korean question", "when the response language is Korean"
@@ -138,6 +151,8 @@ _TABLE_FILLER = (
 
 
 def table_filler_contract(prompt_version: str = "") -> str:
+    if prompt_version == "hypothesis_table_filler.v6":
+        return table_filler_contract("hypothesis_table_filler.v5") + GROUNDING_V5
     if prompt_version == "hypothesis_table_filler.v5":
         return _TABLE_FILLER.replace(
             "language of the question", "accepted response language"

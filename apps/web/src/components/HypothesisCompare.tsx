@@ -12,6 +12,7 @@ import { RefutationConditionsPanel } from "./RefutationConditionsPanel";
 import { TestResultRecorder } from "./TestResultRecorder";
 import { TestOrderSection } from "./TestOrderSection";
 import { ExpectedResults } from "./ExpectedResults";
+import { GroundingRowsNotice } from "./GroundingNotice";
 import { LessonRecall } from "./LessonRecall";
 import type { LessonItem } from "../api/lessons";
 import { objectList, objectValue } from "../api/presentation";
@@ -31,7 +32,7 @@ const relationIntent = { SUPPORT: "success", COUNTER: "danger", NOT_APPLICABLE: 
 const standingOf = (items: DiscriminationItem[] | undefined, id: string) => items?.find(item => item.hypothesis_id === id)?.standing;
 
 /** Hypothesis cards and, when the answer's selected sources are known, a source-by-hypothesis relation table. */
-export function HypothesisCompare({ result, review, projectId, links, distribution, canDraft, discrimination, lessons, same }: {
+export function HypothesisCompare({ result, review, projectId, links, distribution, canDraft, discrimination, lessons, same, onOpenEvidence }: {
   result: Record<string, unknown>; review?: ReviewControls;
   /** Hypotheses that came from a trace row, with what happened to that row's verdict; only a hypothesis with a link gets a mark. */
   projectId?: string; links?: HypothesisLink[]; distribution?: ReasonDistribution;
@@ -43,16 +44,18 @@ export function HypothesisCompare({ result, review, projectId, links, distributi
   lessons?: LessonItem[];
   /** Hypotheses of other investigations a person marked as the same one; a reference only, never added to a count. */
   same?: SameView;
+  onOpenEvidence?: (spanId: string) => void;
 }) {
   const rows = hypothesisRows(result);
   const selected = selectedEvidence(result);
   const [onlyOpen, setOnlyOpen] = useState(true);
-  if (rows.length === 0) return <p>{t("hypotheses.empty")}</p>;
+  if (rows.length === 0) return <><GroundingRowsNotice result={result}/><p>{t("hypotheses.empty")}</p></>;
   const numbers = new Map(parseAnswer(typeof result.answer === "string" ? result.answer : "").citations.map(item => [item.spanId, item.n]));
   const table = selected ? matrixLines(rows, selected) : undefined;
   const counterNote = table ? noCounterNote(rows, table) : null;
   const shown = table?.filter(line => !onlyOpen || line.cells.some(cell => cell !== "SUPPORT"));
   return <>
+    <GroundingRowsNotice result={result}/>
     {causeUnconfirmed(result) && <CauseUnconfirmed/>}
     <TestOrderSection rows={rows} actions={objectList(objectValue(result.action_plan).alternatives)} discrimination={discrimination}/>
     <LessonRecall links={links} lessons={lessons} shownIds={rows.map(row => row.id)}/>
@@ -74,7 +77,7 @@ export function HypothesisCompare({ result, review, projectId, links, distributi
         <ul>{row.aiRefutation.map((line, j) => <li key={j}>{line}</li>)}</ul></div>}
       <h4>{t("hypotheses.tests")}</h4>{row.tests.map((test, j) => <div key={j}><p>{String(test.procedure_candidate ?? "")}</p>
         <p>{t("labels.ifTrue")}{" "}{String(test.expected_if_true ?? "")}<br/>{t("labels.alternative")}{" "}{String(test.expected_if_alternative ?? "")}</p>
-        <ExpectedResults test={test} rows={rows}/>
+        <ExpectedResults test={test} rows={rows} onOpenEvidence={onOpenEvidence}/>
         {canDraft && projectId && row.id && typeof test.test_id === "string" && test.test_id && <>
           <TestResultRecorder projectId={projectId} hypothesisId={row.id} testId={test.test_id}
             recorded={discrimination?.find(item => item.hypothesis_id === row.id)?.results.find(item => item.test_id === test.test_id)}/>

@@ -197,7 +197,9 @@ def cycle_result_payload(
         select_result_producers(
             work, result.commit.committed_revision_ids, result.commit.receipt.receipt_id
         )
-    return result.model_dump(mode="json")
+    from thoth.application.services.hypothesis_grounding_result import grounded_result_payload
+
+    return grounded_result_payload(result.model_dump(mode="json"), work)
 
 
 def result_basis(

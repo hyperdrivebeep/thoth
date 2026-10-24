@@ -4,6 +4,10 @@ from copy import deepcopy
 
 from pydantic import JsonValue
 
+from thoth.application.services.expected_result_v5_view import (
+    has_grounding_contract,
+    project_grounding_rows,
+)
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 
 
@@ -21,9 +25,14 @@ def base_read_params(value: dict[str, JsonValue]) -> dict[str, JsonValue]:
 def expected_result_view(
     payload: dict[str, JsonValue], requested: JsonValue
 ) -> dict[str, JsonValue]:
-    if requested == "v4":
+    if requested == "v4" and not any(
+        has_grounding_contract(result)
+        for name in ("current_result", "previous_result")
+        if isinstance(manifest := payload.get(name), dict)
+        and isinstance(result := manifest.get("result"), dict)
+    ):
         return payload
-    if requested is not None:
+    if requested is not None and (not isinstance(requested, str) or requested not in ("v4", "v5")):
         raise RpcApplicationError(RpcErrorCode.INVALID_PARAMS, "EXPECTED_RESULT_VIEW_UNSUPPORTED")
     projected = deepcopy(payload)
     changed = False
@@ -31,6 +40,14 @@ def expected_result_view(
         manifest = projected.get(name)
         result = manifest.get("result") if isinstance(manifest, dict) else None
         if not isinstance(result, dict):
+            continue
+        assert isinstance(manifest, dict)
+        if requested != "v5" and has_grounding_contract(result):
+            changed = True
+        changed |= project_grounding_rows(
+            result, requested, manifest.get("source_basis"), manifest.get("source_refs")
+        )
+        if requested is not None:
             continue
         portfolio = result.get("portfolio")
         hypotheses = portfolio.get("hypotheses") if isinstance(portfolio, dict) else None
@@ -46,7 +63,13 @@ def expected_result_view(
         if isinstance(filling, dict):
             changed |= _legacy_rows(filling.get("answers"))
     if changed:
-        projected["expected_result_view"] = "LEGACY_DISPLAY_PROJECTION"
+        projected["expected_result_view"] = (
+            "V5_LEGACY_PROJECTION"
+            if requested == "v5"
+            else "V4_COMPATIBILITY_PROJECTION"
+            if requested == "v4"
+            else "LEGACY_DISPLAY_PROJECTION"
+        )
     return projected
 
 
@@ -76,7 +99,13 @@ def result_read_view(payload: dict[str, JsonValue], requested: JsonValue) -> dic
     result = payload.get("result")
     if not isinstance(result, dict):
         return payload
-    projected = expected_result_view({"current_result": {"result": result}}, requested)
+    manifest = payload.get("manifest")
+    sources = manifest.get("source_basis") if isinstance(manifest, dict) else None
+    refs = manifest.get("source_refs") if isinstance(manifest, dict) else None
+    projected = expected_result_view(
+        {"current_result": {"result": result, "source_basis": sources, "source_refs": refs}},
+        requested,
+    )
     if "expected_result_view" not in projected:
         return payload
     manifest = projected["current_result"]

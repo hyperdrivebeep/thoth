@@ -33,6 +33,13 @@ it("requests typed expected-result views only from a server that advertises supp
   expect(calls[0].input).toEqual({project_id: "p", thread_id: "t", expected_result_contract: "v4"});
 });
 
+it("prefers v5 from cached workspace readiness instead of pinning a supported server to v4", async () => {
+  client.setQueryData(["workspace-ready"], {value: {response_language_scope: "REQUEST", expected_result_contracts: ["v4", "v5"]}});
+  replies.push(status({ current_result: { operation_id: "op" } }));
+  await readResearchStatus(client, key, "p", "t");
+  expect(calls[0].input.expected_result_contract).toBe("v5");
+});
+
 it("polls the light progress view while running and keeps the earlier full fields", async () => {
   client.setQueryData(key, { operation_id: "", state: "SUCCEEDED", value: status({ operation_state: "RUNNING", coverage_matrix: { rows: [1] }, usage: { total_tokens: 1 } }) });
   replies.push(status({ operation_state: "RUNNING", usage: { total_tokens: 99 } }));

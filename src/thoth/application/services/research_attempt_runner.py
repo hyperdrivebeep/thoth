@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, cast
 
 from pydantic import JsonValue
 
+from thoth.application.services.hypothesis_grounding_hold import model_hold_payload
 from thoth.application.services.model_outcomes import record_model_outcome
 from thoth.application.services.post_execution_resume import resume_post_execution_learning
 from thoth.application.services.reference_failure import reference_failure_cause
@@ -292,7 +293,7 @@ async def _execute_owned(
                 request,
                 work,
                 "HOLD",
-                {**work.context, **work.result_only},
+                model_hold_payload(work, reason),
                 (reason,),
                 terminal=reason,
                 check=False,

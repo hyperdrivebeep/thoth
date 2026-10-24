@@ -437,6 +437,7 @@ class ThreadAnalysisCommandHandlers:
                             final,
                             v3=is_v3(result.portfolio),
                             v4=isinstance(result.portfolio, HypothesisPortfolioV4),
+                            source=result.portfolio,
                         )
                     }
                 )

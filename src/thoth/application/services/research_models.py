@@ -18,6 +18,12 @@ class ResearchModel:
         self.delegate = delegate
 
     async def structured[T: BaseModel](self, request: ModelRequest[T]) -> ModelResult[T]:
+        from thoth.application.services.hypothesis_grounding_capture import grounding_capture_scope
+
+        with grounding_capture_scope(request):
+            return await self._structured(request)
+
+    async def _structured[T: BaseModel](self, request: ModelRequest[T]) -> ModelResult[T]:
         work = research_work.get()
         if work is not None:
             request = model_request_language(

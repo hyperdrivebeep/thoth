@@ -2,6 +2,7 @@ import { message as formatMessage } from "../i18n/formatMessages";
 import { UiError } from "../i18n/UiError";
 import { t } from "../i18n/locale";
 import { jsonRpcResponseSchema } from "./protocol";
+import { expectedResultContract } from "./expectedResultContract";
 
 export type RpcResult<T> = {
   operation_id: string;
@@ -59,7 +60,7 @@ function timeoutSignal(signal: AbortSignal | undefined, timeoutMs: number) {
 }
 
 const typedResultMethods = new Set(["thread/read", "operation/result/read", "thread/result/read"]);
-let typedResultsSupported = false;
+let resultContract: "v4" | "v5" | undefined;
 
 export async function rpc<T>(
   method: string,
@@ -69,8 +70,9 @@ export async function rpc<T>(
   options: { timeoutMs?: number } = {},
 ): Promise<RpcResult<T>> {
   const bounded = timeoutSignal(signal, options.timeoutMs ?? 15000);
-  const readInput = typedResultsSupported && typedResultMethods.has(method) && !("expected_result_contract" in input)
-    ? { ...input, expected_result_contract: "v4" } : input;
+  if (method === "workspace/ready") resultContract = undefined;
+  const readInput = resultContract && typedResultMethods.has(method) && !("expected_result_contract" in input)
+    ? { ...input, expected_result_contract: resultContract } : input;
   try {
     const response = await transportRead(() => fetch(readQueries.has(method) ? "/rpc/query" : "/rpc", {
       method: "POST",
@@ -93,7 +95,7 @@ export async function rpc<T>(
     }
     if (method === "workspace/ready") {
       const value = envelope.result?.value;
-      typedResultsSupported = Boolean(value && typeof value === "object" && "response_language_scope" in value && value.response_language_scope === "REQUEST");
+      resultContract = expectedResultContract(value);
     }
     return envelope.result as RpcResult<T>;
   } finally {

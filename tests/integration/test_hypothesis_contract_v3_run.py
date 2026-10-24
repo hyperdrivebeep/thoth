@@ -14,12 +14,14 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from tests.fixtures.legacy_hypothesis_contract import legacy_generation_contract
 from tests.integration.scoped_runtime import fixture_scope_policy
 from tests.integration.test_hypothesis_link import investigate
 from tests.integration.test_research_request_v2 import ControlledResearchModel
 from tests.integration.test_trace_origin import RAIN, Rpc, opened
 
 from thoth.application.services.hypothesis_projection import hypothesis_view
+from thoth.application.workflows import thread_cycle
 from thoth.apps.runtime import create_runtime
 from thoth.domain.canonical import model_digest
 from thoth.domain.enums import ModelRole
@@ -37,6 +39,12 @@ from thoth.ports.model import ModelExecutionHold
 CONTRACT_V2 = "hypothesis_portfolio.v2"
 CONTRACT_V3 = "hypothesis_portfolio.v3.3"
 SAID = "if both runs match, drop it"
+
+
+@pytest.fixture(autouse=True)
+def explicit_legacy_generator(monkeypatch: Any) -> None:
+    # Keep the old contract assertions exact; default-v5 normal entry has its own integration test.
+    monkeypatch.setattr(thread_cycle, "generator_contract_for_work", legacy_generation_contract)
 
 
 class GeneratorModel(ControlledResearchModel):

@@ -10,7 +10,10 @@
     "expected_result_contract": {
       "anyOf": [
         {
-          "const": "v4",
+          "enum": [
+            "v4",
+            "v5"
+          ],
           "type": "string"
         },
         {

@@ -7,6 +7,7 @@ from typing import Protocol, runtime_checkable
 
 from thoth.domain.cleanup import CleanupUsage
 from thoth.domain.evidence import EvidenceSpan
+from thoth.domain.hypothesis_grounding_result import GroundedPortfolioResult
 from thoth.domain.model import ContextPack
 from thoth.domain.model_dispatch import (
     ModelCallContext,
@@ -15,6 +16,7 @@ from thoth.domain.model_dispatch import (
 )
 from thoth.domain.model_settings import ResolvedModelSettings
 from thoth.domain.oauth_retry import OAuthRetryPolicy
+from thoth.domain.prediction_grounding import GroundingCallCapture, GroundingStage
 from thoth.domain.research_request import RevisionRef
 from thoth.domain.response_language import ResponseLanguage
 from thoth.domain.revision import StagedRevision
@@ -96,6 +98,8 @@ class ResearchWork:
     basis_reasons: list[str] = field(default_factory=list)
     consumed_sources: dict[str, EvidenceSpan] = field(default_factory=dict)
     observe_context: Callable[[ContextPack], None] | None = None
+    grounding_stages: dict[GroundingStage, GroundingCallCapture] = field(default_factory=dict)
+    hypothesis_grounding: GroundedPortfolioResult | None = None
 
 
 research_work: ContextVar[ResearchWork | None] = ContextVar("research_work", default=None)

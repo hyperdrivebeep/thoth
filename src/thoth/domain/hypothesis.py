@@ -222,9 +222,11 @@ def is_v3(portfolio: HypothesisPortfolio) -> bool:
 
 
 def portfolio_from_json(
-    value: dict[str, Any], *, v3: bool, v4: bool = False
+    value: dict[str, Any], *, v3: bool, v4: bool = False, source: HypothesisPortfolio | None = None
 ) -> HypothesisPortfolio:
     """A portfolio from its JSON, in the form the caller says it has (v2 or v3)."""
+    if source is not None:
+        return type(source).model_validate(value)
     if v4:
         from thoth.domain.hypothesis_v4 import HypothesisPortfolioV4
 

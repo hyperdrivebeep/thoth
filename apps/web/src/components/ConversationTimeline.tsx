@@ -59,6 +59,12 @@ export function ConversationTimeline({ projectId, threadId, status, sourceUris, 
   const unique = new Map<string, ConversationTurn>();
   for (const page of query.data?.pages ?? []) for (const turn of page.turns) unique.set(turn.input.request_revision_digest, turn);
   const turns = example ? [] : withCurrentCheckpoint([...unique.values()].sort((a,b) => a.input.request_epoch - b.input.request_epoch), status);
+  const savedBefore = new Set<string>();
+  let saved = false;
+  for (const turn of turns) {
+    if (saved) savedBefore.add(turn.input.request_revision_digest);
+    if (turn.result && !turn.unavailable) saved = true;
+  }
   const unavailableHistory = query.data?.pages[0]?.supported === false;
   const current = liveStatus?.current_result ?? liveStatus?.previous_result;
   const currentRequestResult = !liveStatus?.request || current?.operation_id === liveStatus.request.operation_id ? current : undefined;
@@ -78,6 +84,7 @@ export function ConversationTimeline({ projectId, threadId, status, sourceUris, 
     {turns.map(turn => <div className="conversation-turn" key={turn.input.request_revision_digest}>
       <article className="user-message"><header>{message("questionHeading", turn.input.edit_kind)}<time dateTime={turn.input.created_at}>{new Date(turn.input.created_at).toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")}</time></header><p>{turn.input.text}</p></article>
       <ResearchResultCard onOpenTrace={onOpenTrace} projectId={projectId} hypothesisLinks={linked.links} linkDistribution={linked.distribution} result={turn.result} state={turn.state} unavailable={turn.unavailable} error={turn.error} failure={turn.failure} terminalReason={turn.terminalReason} onDetail={onDetail} onRetry={onRetry ? () => onRetry(turn.input.text) : undefined} usageLine={resultUsageLine(liveStatus, turn.input.operation_id)}
+        hasSavedResult={savedBefore.has(turn.input.request_revision_digest) || Boolean(liveStatus?.request?.operation_id === turn.input.operation_id && liveStatus.previous_result)}
         currentness={turn.currentness} historySelection={{kind:"result",scope:{projectId,threadId,requestDigest:turn.input.request_revision_digest},operationId:turn.input.operation_id,
           resultDigest:currentResultDigest(status,{projectId,threadId,requestDigest:turn.input.request_revision_digest},turn.input.operation_id)}} {...followupFor(turn.input.request_revision_digest)} />
     </div>)}
@@ -87,6 +94,7 @@ export function ConversationTimeline({ projectId, threadId, status, sourceUris, 
       <ResearchLiveProgress status={liveStatus} sourceUris={liveSources} />
       {queuedInstruction && <Callout compact icon="time" className="queued-instruction-notice" role="status">{t("timeline.queued")}</Callout>}
       {!running && <ResearchResultCard onOpenTrace={onOpenTrace} hypothesisLinks={linked.links} linkDistribution={linked.distribution} result={currentRequestResult?.result ?? null} state={liveStatus && ["FAILED", "CANCELLED"].includes(liveStatus.operation_state ?? "") ? liveStatus.operation_state! : liveStatus?.current_result ? liveStatus.operation_state ?? "UNKNOWN" : "STALE"} error={liveStatus?.operation_error} failure={liveStatus?.failure} terminalReason={currentRequestResult?.terminal_reason} onDetail={onDetail} onRetry={onRetry && liveStatus?.request?.authored_text ? () => onRetry(liveStatus.request!.authored_text!) : undefined}
+        hasSavedResult={Boolean(liveStatus?.previous_result)}
         onResume={onResume && resumeOperation ? () => onResume(resumeOperation) : undefined} resumeCompleted={finishedStages} resuming={resuming} usageLine={resultUsageLine(liveStatus, currentRequestResult?.operation_id)}
         currentness={currentRequestResult ? liveStatus?.basis_currentness : undefined} executionHold={currentRequestResult ? liveStatus?.execution_hold : undefined} projectId={projectId} holdCauseRef={currentRequestResult?.request_ref?.revision_digest} historySelection={currentRequestResult?.request_ref?.revision_digest ? {kind:"result",scope:{projectId,threadId,requestDigest:currentRequestResult.request_ref.revision_digest},operationId:currentRequestResult.operation_id,
           resultDigest:currentResultDigest(liveStatus,{projectId,threadId,requestDigest:currentRequestResult.request_ref.revision_digest},currentRequestResult.operation_id)} : undefined} {...followupFor(currentRequestResult?.request_ref?.revision_digest)}/>}

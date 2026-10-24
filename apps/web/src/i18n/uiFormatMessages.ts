@@ -1,4 +1,6 @@
 export const uiFormats = {
+  openExpectedEvidence: {ko: (number: number) => `근거 ${number} 열기`, en: (number: number) => `Open evidence ${number}`},
+  openHypothesisEvidence: {ko: (hypothesis: number | string, number: number) => `가설 ${hypothesis}의 근거 ${number} 열기`, en: (hypothesis: number | string, number: number) => `Open evidence ${number} for Hypothesis ${hypothesis}`},
   filesSelected: {ko: (count: number) => `${count}개 선택`, en: (count: number) => `${count} ${count === 1 ? "file" : "files"} selected`},
   fileStaging: {ko: (name: string) => `${name} · 업로드 준비 / 구조 파싱`, en: (name: string) => `${name} · Preparing upload / parsing structure`},
   fileUploadProgress: {ko: (name: string, percent: number) => `${name} 보내는 중 (${percent}%)`, en: (name: string, percent: number) => `Uploading ${name} (${percent}%)`},

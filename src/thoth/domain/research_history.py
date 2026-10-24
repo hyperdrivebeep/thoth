@@ -131,7 +131,7 @@ class HistoryDiff(DomainModel):
 
 
 class HistoricalResultInput(DomainModel):
-    expected_result_contract: Literal["v4"] | None = None
+    expected_result_contract: Literal["v4", "v5"] | None = None
     project_id: str
     thread_id: str
     request_revision_digest: Sha256
@@ -176,6 +176,10 @@ class SelectedEvidencePage(DomainModel):
 
 class HistoricalResultView(DomainModel):
     contract_version: Literal[2] = 2
+    expected_result_view: (
+        Literal["LEGACY_DISPLAY_PROJECTION", "V4_COMPATIBILITY_PROJECTION", "V5_LEGACY_PROJECTION"]
+        | None
+    ) = None
     project_id: str
     thread_id: str
     request_revision_digest: Sha256

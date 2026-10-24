@@ -25,6 +25,7 @@ import asyncio
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 import pytest
 from tests.integration.repeat_probe import RepeatProbe
@@ -216,9 +217,7 @@ async def test_a_later_stop_keeps_the_verdict_of_an_investigation_that_already_e
 
 
 async def _thread_state(runtime: AppRuntime, scope: dict[str, object]) -> tuple[Any, Any]:
-    read = value(
-        await runtime.bus.dispatch(request("thread/read", "read-" + str(id(object())), scope))
-    )
+    read = value(await runtime.bus.dispatch(request("thread/read", "read-" + str(uuid4()), scope)))
     return read["execution_state"], read["revision"]
 
 

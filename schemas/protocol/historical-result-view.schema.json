@@ -598,6 +598,23 @@
       "title": "Execution Observation",
       "type": "string"
     },
+    "expected_result_view": {
+      "anyOf": [
+        {
+          "enum": [
+            "LEGACY_DISPLAY_PROJECTION",
+            "V4_COMPATIBILITY_PROJECTION",
+            "V5_LEGACY_PROJECTION"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Result View"
+    },
     "manifest": {
       "anyOf": [
         {

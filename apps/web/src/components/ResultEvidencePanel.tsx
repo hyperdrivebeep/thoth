@@ -9,8 +9,8 @@ import { useEffect, useMemo } from "react";
 import { consistentEvidencePages, useResultEvidenceProtection } from "./useResultEvidenceProtection";
 import { Disclosure } from "./Disclosure";
 
-export function ResultEvidencePanel({ selection, result, focusSpanId, citations }: {
-  selection: ResultSelection; result: Record<string, unknown>; focusSpanId?: string; citations?: Record<string, number>;
+export function ResultEvidencePanel({ selection, result, focusSpanId, citations, missingFocusMessage }: {
+  selection: ResultSelection; result: Record<string, unknown>; focusSpanId?: string; citations?: Record<string, number>; missingFocusMessage?: string;
 }) {
   const contentKey = useMemo(() => resultContentKey(result), [result]);
   const queryKey = ["result-evidence", selection.scope.projectId, selectionKey(selection), contentKey];
@@ -45,9 +45,10 @@ export function ResultEvidencePanel({ selection, result, focusSpanId, citations 
   return <section aria-label={t("evidence.selected")}>
     <h3>{formatMessage("answerSelectedEvidence", first.selected_count)}</h3>
     <p>{t("evidence.selectionNotice")}</p>
+    {first.selected_count === 0 && focusSpanId && missingFocusMessage && <p className="result-notice" role="status">{missingFocusMessage}</p>}
     {first.selected_count === 0 ? <p>{t("evidence.empty")}</p> : <>
       <p className="muted">{t("evidence.countNotice")}</p>
-      {focusSpanId && !focusLoaded && !query.hasNextPage && <p className="result-notice" role="status">{t("evidence.citationMissing")}</p>}
+      {focusSpanId && !focusLoaded && !query.hasNextPage && <p className="result-notice" role="status">{missingFocusMessage ?? t("evidence.citationMissing")}</p>}
       {focusSpanId && unavailable.some(item => item.span_id === focusSpanId) && <p className="result-notice" role="status">{t("evidence.unavailable")}</p>}
       {available.length > 0 && <EvidenceRail evidence={available} heading={formatMessage("availableSources", available.length)} focusSpanId={focusSpanId} citations={citations}/>}
       {unavailable.map(item => <p className="result-notice" key={item.span_id}>{item.availability === "BASIS_MISMATCH" ? t("evidence.mismatch")

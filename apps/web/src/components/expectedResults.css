@@ -1,0 +1,11 @@
+.expected-results { min-width: 0; margin-block: 12px; }
+.expected-results > summary { cursor: pointer; font-weight: 600; overflow-wrap: anywhere; }
+.expected-results > ul { list-style: none; padding: 0; margin: 8px 0; }
+.expected-result-row { padding-block: 10px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.expected-result-label { line-height: 1.5; }
+.expected-grounding-role { display: inline-block; max-width: 100%; margin-top: 6px; padding: 3px 7px;
+  border: 1px solid var(--line); border-radius: 4px; color: var(--muted); background: var(--surface-2); font-size: 12px; }
+.expected-rationale { margin: 6px 0; line-height: 1.5; }
+.expected-evidence-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.expected-basis-unavailable { margin: 6px 0; font-size: 12px; }
+.expected-unassessed { display: block; margin: 8px 0; color: var(--muted); }
