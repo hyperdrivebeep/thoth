@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-24T12:40:17.523721+00:00",
+  "created_at": "2026-10-24T17:16:01.492379+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -5898,8 +5898,8 @@
     },
     {
       "path": "src/thoth/application/services/research_retrieval.py",
-      "sha256": "bd9d7e6e58aacba8fec9c6f875bc6788393f01e44a42386cda2aaf1c096c27e2",
-      "bytes": 7915
+      "sha256": "9069614a88329fa963f1bf036c57ff6c8c1ad89f7ac9f23f90f40e0eeb42810a",
+      "bytes": 8917
     },
     {
       "path": "src/thoth/application/services/research_retrieval_policy.py",
@@ -7978,8 +7978,8 @@
     },
     {
       "path": "tests/ci/test_ci_typecheck.py",
-      "sha256": "ab9621ff060d0493614e4ba932e3aa632690d03d7d25cebecd90ca91cb10e951",
-      "bytes": 12867
+      "sha256": "b5a9a5c172f53c9e221ea7b4de9df61493a207a77b8ccb40db02bbfbbd556038",
+      "bytes": 12926
     },
     {
       "path": "tests/cli_contract_capture.py",
@@ -11620,6 +11620,11 @@
       "path": "tests/unit/test_journal_completion_gate.py",
       "sha256": "471f7cfebed4b6694007c79e90f2c565875bee8f537ad650046d480b9d6e7928",
       "bytes": 3179
+    },
+    {
+      "path": "tests/unit/test_korean_retrieval_terms.py",
+      "sha256": "cbf91c041c285b78303d5b5817f68d88a662fdbe8d961aca24133ed926efefdd",
+      "bytes": 5283
     },
     {
       "path": "tests/unit/test_lesson_recall_cases.py",

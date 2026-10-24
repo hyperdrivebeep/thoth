@@ -245,7 +245,11 @@ def test_cli_records_provenance_and_rejects_removal_after_adoption(
     (tmp_path / "pyproject.toml").write_text("[tool.basedpyright]\ntypeCheckingMode='strict'\n")
     (tmp_path / "uv.lock").write_text("version=1\n")
     monkeypatch.setattr(ci_typecheck, "__file__", str(tmp_path / "scripts/ci_typecheck.py"))
-    monkeypatch.setattr(ci_typecheck, "version", lambda _name: "1.39.10")
+
+    def fixed_version(_name: str) -> str:
+        return "1.39.10"
+
+    monkeypatch.setattr(ci_typecheck, "version", fixed_version)
     monkeypatch.setenv("TYPECHECK_BASE_SHA", "b" * 40)
     git_commands: list[list[str]] = []
 

@@ -14,6 +14,29 @@ from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
 from thoth.domain.research_execution import ResearchWork
 
 _MIN_TERM = 3
+_KOREAN_PAIR = re.compile(r"[가-힣]{2}")
+# Only the newly admitted two-syllable words are filtered. These grammatical/context
+# words add little topic information; no domain words or scenario-specific exceptions.
+_KOREAN_FUNCTION_WORDS = frozenset(
+    {
+        "경우",
+        "관련",
+        "때문",
+        "또는",
+        "대한",
+        "대해",
+        "따라",
+        "또한",
+        "위한",
+        "위해",
+        "이번",
+        "이런",
+        "저런",
+        "통해",
+        "에서",
+        "으로",
+    }
+)
 _MIN_SPAN_CHARS = 24
 # A block of short key-value lines is read together only while it stays small.
 _MAX_BLOCK_SPANS = 20
@@ -21,6 +44,20 @@ _MAX_BLOCK_SPANS = 20
 
 def tokens(text: str) -> set[str]:
     return set(re.findall(r"[\w]+(?:[-./][\w]+)*", unicodedata.normalize("NFKC", text).casefold()))
+
+
+def search_terms(text: str) -> set[str]:
+    """Keep legacy long tokens plus topic-bearing, whole two-syllable Korean tokens.
+
+    Memory recall's n-grams would also change long-token matching. Particle splitting
+    is intentionally not applied here, so a longer token still matches as written.
+    """
+    return {
+        token
+        for token in tokens(text)
+        if len(token) >= _MIN_TERM
+        or (_KOREAN_PAIR.fullmatch(token) and token not in _KOREAN_FUNCTION_WORDS)
+    }
 
 
 def _folded(text: str) -> str:
@@ -115,7 +152,7 @@ def lexical_candidates(
     pinned: tuple[str, ...] = (),
 ) -> tuple[EvidenceSpan, ...]:
     policy, started = retrieval_policy(), perf_counter_ns()
-    terms = {token for token in tokens(" ".join((question, *queries))) if len(token) >= _MIN_TERM}
+    terms = search_terms(" ".join((question, *queries)))
     eligible = connected_retrieval_spans(evidence)
     pool = tuple(span for span in eligible if not _is_chrome(span)) or eligible
     exact = {s.span_id for s in pool if s.span_id in question or s.artifact_id in question}
