@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-25T03:01:28.373930+00:00",
+  "created_at": "2026-10-25T05:09:26.319622+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -1503,13 +1503,13 @@
     },
     {
       "path": "apps/web/src/components/traceInvestigation.ts",
-      "sha256": "6aadfeebfb36729d4af4f02875b2563daf0725b14f92adfe67cb2b4a48115f7c",
-      "bytes": 3648
+      "sha256": "24dbeb45eef9e7c701494738923abd056d4de4cc68cc482993dc9f9b75089179",
+      "bytes": 3744
     },
     {
       "path": "apps/web/src/components/traceInvestigationLanguage.test.ts",
-      "sha256": "856a7ca79a4f0570fa638d3a50600ebb87d6b27977100b47354c9a23ae4e83d7",
-      "bytes": 1327
+      "sha256": "ae19bb97d29ca1b78997f9bad68d9c26e1e0f6b4537b337fcd7e4b75a47b3e79",
+      "bytes": 2504
     },
     {
       "path": "apps/web/src/components/traceReasonTags.test.ts",
