@@ -125,3 +125,11 @@ def _source_locator(
         bbox=bbox,
         json_pointer=pointer,
     )
+
+
+# Shared parser entry points; retain the existing private callables and their identities.
+located_segments = _located_segments
+segment_node_id = _segment_node_id
+source_locator = _source_locator
+text_coordinate_basis = _text_coordinate_basis
+validated_charspan = _validated_charspan

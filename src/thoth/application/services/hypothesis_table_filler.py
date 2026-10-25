@@ -450,3 +450,9 @@ async def accepted_portfolio(
     )
     record_english_check(accepted, context)
     return accepted
+
+
+# Shared by the grounded contract; old private imports remain compatible.
+open_ids = _open_ids
+request_context = _request_context
+noted = _noted

@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-24T17:46:47.244501+00:00",
+  "created_at": "2026-10-24T21:30:48.100001+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -1908,8 +1908,8 @@
     },
     {
       "path": "config/basedpyright-baseline.json",
-      "sha256": "0023c03237e54797dbd9db6012029d61163826629293f288c0b4bee788bc6545",
-      "bytes": 164586
+      "sha256": "af59ccf2c3511f2cf54b0df3ff9fe4d8c8e890f6bdb3c5c62214a47ddabfc283",
+      "bytes": 159516
     },
     {
       "path": "config/connectors/local-reference.yaml",
@@ -3873,8 +3873,8 @@
     },
     {
       "path": "src/thoth/adapters/parsers/docling_locations.py",
-      "sha256": "a8bb0c797895fb0f88a9d14df717f9cdccf8745d63b87dd3474118566f3fb076",
-      "bytes": 4550
+      "sha256": "6188309a53d6378a71d8a4b8f0b75afc29fa09be655c09aaea06e2f797b68bb2",
+      "bytes": 4835
     },
     {
       "path": "src/thoth/adapters/parsers/docling_pdf.py",
@@ -3883,8 +3883,8 @@
     },
     {
       "path": "src/thoth/adapters/parsers/docling_structure.py",
-      "sha256": "f8f68263c7cac797ac52e40d53adbc3eeb7ba187e7c1d958ddb6b667b45d1a87",
-      "bytes": 19561
+      "sha256": "6a68559f7cd1f6fb2d6d474e76c15f3b9e286e3768cfcd342924d91623f75b68",
+      "bytes": 19901
     },
     {
       "path": "src/thoth/adapters/parsers/docling_worker.py",
@@ -5188,13 +5188,13 @@
     },
     {
       "path": "src/thoth/application/services/expected_result_v5_view.py",
-      "sha256": "14dfb2b37072e229d090db2d877ec9b64910da3ea8ae43d4ccb316551d02a8b5",
-      "bytes": 3805
+      "sha256": "8b2d76fe994914721e5fcaeae149510c5d131947b7fa0b64988df591c489c327",
+      "bytes": 3922
     },
     {
       "path": "src/thoth/application/services/expected_result_view.py",
-      "sha256": "616298c42e258582fdd93cb8a5a981736a9cb446b5c4ff80293009b35ba1597f",
-      "bytes": 4715
+      "sha256": "d4ef6967a6dca199fd3e011896bb25875223119b7bcd01b910e31f2da5006894",
+      "bytes": 4857
     },
     {
       "path": "src/thoth/application/services/export_snapshot.py",
@@ -5273,8 +5273,8 @@
     },
     {
       "path": "src/thoth/application/services/hypothesis_grounding_fill.py",
-      "sha256": "b40860b8ba906585f041b6af385b8a3486cdd96b547637bab71316efd53e6e06",
-      "bytes": 6950
+      "sha256": "0b485fa5884f2e0832c069352c859abbd382baaa22e0a7396e3cd96319cfb33d",
+      "bytes": 7061
     },
     {
       "path": "src/thoth/application/services/hypothesis_grounding_hold.py",
@@ -5298,8 +5298,8 @@
     },
     {
       "path": "src/thoth/application/services/hypothesis_grounding_v5.py",
-      "sha256": "2527262075b797ecde541eecfd574eaad110c6c7c7b3e9a9e42503df31cdc196",
-      "bytes": 5336
+      "sha256": "4468dd1c389b2158a2b9a5b296155afa11ce60af0c49dc5dab1c7f38b97decb6",
+      "bytes": 5412
     },
     {
       "path": "src/thoth/application/services/hypothesis_link_recheck.py",
@@ -5318,8 +5318,8 @@
     },
     {
       "path": "src/thoth/application/services/hypothesis_projection.py",
-      "sha256": "0eff72865bc05520fbcca6afeddd623c920f8cb047dc8986491a71d504ea4679",
-      "bytes": 13431
+      "sha256": "4f2103e4f307df485aa4dfd5d452f02c6d7c305a6730a20bb4e229ad33c3b86d",
+      "bytes": 13450
     },
     {
       "path": "src/thoth/application/services/hypothesis_record_drafts.py",
@@ -5343,8 +5343,8 @@
     },
     {
       "path": "src/thoth/application/services/hypothesis_table_filler.py",
-      "sha256": "155278326b44bd014d6bd37f24d843789320891901aefb0a946af7325193dbf2",
-      "bytes": 18798
+      "sha256": "0c31906d6b145feda35f1efb3f0ab12339406b9ebc014c49b2a113de74bce686",
+      "bytes": 18945
     },
     {
       "path": "src/thoth/application/services/hypothesis_test_lifecycle.py",
@@ -5738,8 +5738,8 @@
     },
     {
       "path": "src/thoth/application/services/research_completion_view.py",
-      "sha256": "8123cf472f073574f99a785442ef576b3e4b35bdee8bedb7bb08e7cd05616de2",
-      "bytes": 7233
+      "sha256": "982a08ba424e2fea84471719043dd640d76a9a751388850f68ec5eab87e39f52",
+      "bytes": 7282
     },
     {
       "path": "src/thoth/application/services/research_conflicts.py",

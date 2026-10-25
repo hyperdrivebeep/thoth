@@ -76,7 +76,10 @@ def completion_view(
             )
     result = {} if manifest is None else manifest.result
     closed_loop = result.get("r2_closed_loop")
-    held_test = isinstance(closed_loop, dict) and closed_loop.get("terminal_state") == "HOLD"
+    held_test = (
+        isinstance(closed_loop, dict)
+        and cast(dict[str, object], closed_loop).get("terminal_state") == "HOLD"
+    )
     has_answer = isinstance(result.get("answer"), str) and bool(str(result["answer"]).strip())
     kind = "NOT_PRODUCED"
     if manifest is not None:

@@ -9,7 +9,12 @@ from thoth.application.services.hypothesis_grounding_rows import (
     accept_grounding_row,
     row_diagnostic,
 )
-from thoth.application.services.hypothesis_table_filler import _open_ids, _request_context
+from thoth.application.services.hypothesis_table_filler import (
+    open_ids as _open_ids,
+)
+from thoth.application.services.hypothesis_table_filler import (
+    request_context as _request_context,
+)
 from thoth.domain.hypothesis_grounding_result import GroundedPortfolioResult, PredictionCell
 from thoth.domain.hypothesis_v4 import TableFillAnswerV4, expected_is_unknown
 from thoth.domain.hypothesis_v5 import DiscriminatingTestV5, ExpectedResultV5, HypothesisV5
