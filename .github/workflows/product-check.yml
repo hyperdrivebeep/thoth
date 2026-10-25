@@ -235,7 +235,7 @@ jobs:
         run: |
           python -m venv --copies --without-pip .venv
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev --extra browser
+          uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev --extra browser --extra connectors --extra managed
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Report or enforce Python types
         run: .\.venv\Scripts\python.exe scripts/ci_typecheck.py --markdown-output "$env:GITHUB_STEP_SUMMARY"
