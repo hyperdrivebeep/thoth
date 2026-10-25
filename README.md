@@ -37,45 +37,43 @@ competing explanations and recorded results connected.** Inspect what supports a
 see what remains unresolved, and compare two saved results before deciding what comes next.
 
 > [!NOTE]
-> **Experimental source preview for personal/local use.** The interface supports Korean and English; real-model English quality has not yet been verified.
-> Focused feature checks passed; the latest repository-wide verification is not passing. See the verification limits below.
-> **2026-09-29 update:** isolated model authentication and restart recovery are included. Real-provider analysis and a current-source FULL pass remain unverified. Claude sign-in goes through the official Claude Code executable and has not been checked with a real account.
-> **2026-10-11:** one real model investigation on the synthetic radar demo ran end to end ([screens](#see-it-work)). Answer quality has not been evaluated.
-> See [status and limits](#status) before relying on a result.
+> **Experimental source preview for personal/local use.** The interface supports Korean and English.
+> GitHub Actions checks the Python suite, Web tests/build and a reviewed Python type-error baseline.
+> Recorded synthetic-demo investigations have completed with a real model; this does not establish research quality or usefulness on real data.
+> English question, answer and source-text captures are available; broader English quality, real-account coverage and physical PC restart coverage remain incomplete.
+> Read [status and limits](#status), [model usage and cost](#model-usage-and-cost), and the [draft security policy](SECURITY.md) before relying on a result.
 
 ## See it work
 
-A real run on the bundled [synthetic radar demo](examples/synthetic-radar-demo-v1): invented data, not measurements.
-One model investigation took about 9 minutes 40 seconds. Screens are from a 2026-10-11 development build, so a few
-labels may differ slightly from `main`.
+English captures from a 2026-10-25 investigation on the bundled
+[synthetic radar demo](examples/synthetic-radar-demo-v1), with an English synthetic completed-experiment
+source added. The question, answer and cited source text shown here are in English. These are invented
+records, not real measurements or evidence of engineering performance.
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/01-trace-verdict.png" alt="Trace table after importing rain results: Detection rate in rain changes from held to below the criterion."></td>
-    <td width="50%"><img src="docs/screenshots/02-question.png" alt="The investigation question is filled in from the failing trace row."></td>
+    <td width="50%"><img src="docs/screenshots/en/01-trace-verdict.png" alt="Trace table showing rain detection of 0.80 below the criterion of at least 0.90."></td>
+    <td width="50%"><img src="docs/screenshots/en/02-question.png" alt="An English investigation question filled from the failed rain-detection row, with English selected for the response."></td>
   </tr>
   <tr>
-    <td><b>1 · A result misses its criterion.</b> Import results into the trace table. Verdicts are computed by rules, not by the model: 0.80 against "0.90 or higher" becomes <i>below criterion</i>.</td>
-    <td><b>2 · Ask why, from that row.</b> "원인 조사" on the failing row writes the question with the measured value and the criterion.</td>
+    <td><b>1 · A result misses its criterion.</b> Rules compute the assessment: 0.80 does not meet a requirement of 0.90 or higher.</td>
+    <td><b>2 · Ask why, from that row.</b> “Investigate causes” fills in a question with the result and criterion. Sending it starts the investigation.</td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/03-progress.png" alt="Live progress: the model reports which connected file and line it is checking."></td>
-    <td><img src="docs/screenshots/04-answer.png" alt="Answer separating confirmed facts from a held judgment and listing discriminating tests."></td>
+    <td><img src="docs/screenshots/en/03-progress.png" alt="Progress while three proposed hypotheses are compared with the original sources."></td>
+    <td><img src="docs/screenshots/en/04-answer.png" alt="A partial English answer retains the failed criterion and proposes causes and tests that could distinguish them."></td>
   </tr>
   <tr>
-    <td><b>3 · Watch it read your material.</b> Progress names the connected file and line being checked.</td>
-    <td><b>4 · Get a held answer, not a guess.</b> Confirmed facts stay apart from the judgment that remains open; each candidate cause comes with a test that could tell it apart.</td>
+    <td><b>3 · Watch the source review.</b> The progress view names the three candidate explanations being compared with the source documents.</td>
+    <td><b>4 · Keep the unresolved judgment visible.</b> The partial answer retains the original assessment and separates possible causes from proposed tests.</td>
   </tr>
-  <tr>
-    <td><img src="docs/screenshots/05-hypotheses.png" alt="Hypothesis comparison showing what each hypothesis predicts for a test, marked as an AI suggestion."></td>
-    <td><img src="docs/screenshots/06-evidence.png" alt="Source evidence panel: searching 0.80 finds line 15 of the connected result file."></td>
-  </tr>
-  <tr>
-    <td><b>5 · Compare hypotheses.</b> For each test, see what every hypothesis would predict. These are marked as unconfirmed AI suggestions.</td>
-    <td><b>6 · Check the source line.</b> Search the evidence panel for "0.80" and land on the exact line of the connected file.</td>
-  </tr>
+  <tr><td colspan="2"><img src="docs/screenshots/en/05-hypotheses.png" alt="Hypothesis comparison showing an inference from data and hypothesis-only predictions, each marked as an AI proposal."></td></tr>
+  <tr><td colspan="2"><b>5 · Compare hypotheses.</b> Inspect what a test would predict under different explanations and how each prediction relates to the supplied evidence.</td></tr>
+  <tr><td colspan="2" align="center"><img src="docs/screenshots/en/07-inferred-evidence.png" width="600" alt="A hypothesis marked 'Inferred from the data · AI proposal' links to source line 7: wet cover 16/20 (0.80), dried cover 19/20 (0.95)."></td></tr>
+  <tr><td colspan="2"><b>6 · Follow an inference to its source.</b> Two captured detail views are arranged here to connect the AI proposal with synthetic experiment E1. The recorded comparison does not prove that a future test will reproduce it.</td></tr>
+  <tr><td colspan="2"><img src="docs/screenshots/en/06-evidence.png" alt="The English evidence card at line 7 shows synthetic experiment E1: detection was 16/20 with the wet cover and 19/20 after drying it."></td></tr>
+  <tr><td colspan="2"><b>7 · Read the evidence in context.</b> Open the source card and its neighboring lines. The synthetic record stays distinct from a verified real-world result.</td></tr>
 </table>
-
 
 ## What you can do
 
@@ -197,27 +195,38 @@ See [installation and credentials](docs/INSTALL.md).
 
 </details>
 
+## Model usage and cost
+
+Recorded synthetic-demo investigations used about **8–9 model calls and 330,000–450,000 tokens per
+investigation**, mostly input tokens. This is an observed range, not an estimate for every question;
+source volume, model behavior and follow-up work can change it.
+
+ChatGPT/Codex sign-in consumes the account's subscription usage allowance. An API-key connection is
+billed by its provider according to token usage and the applicable rates. THOTH does not quote a fixed
+price. Check the usage line beneath a saved result: missing or partial usage stays marked as such,
+and a displayed estimate is not a provider invoice. See [usage and cost details](docs/INSTALL.md#model-usage-and-cost).
+
 ## Status
 
-This is an **experimental reference implementation**, with evidence scoped to the checks below.
+This is an **experimental source preview**. Verification is tied to a source revision and a specific scenario.
 
-| Checked locally | Boundary |
+| Evidence | What it establishes |
 | :--- | :--- |
-| Input queue, strict input-version checking and exact-result comparison | Four selected integration tests passed; unchanged comparison UI retains recorded Chrome acceptance. |
-| Fresh frozen installation, doctor and Web build | Passed on the recorded Windows environment. |
-| Synthetic evidence interface | 36 focused Web tests passed. |
-| First-run Chrome/API smoke | Passed with no credentials or model calls. An unconfigured model was expected. |
-| 2026-09-28 authentication/restart r2 | Partial independent Chrome/RPC acceptance with synthetic providers; five saved results reopened in another process without model calls. Diagnostic failure and unrun scenarios are documented. |
-| Connection/restart Web acceptance after signed Python recovery | 247 Web tests and 8 doctor checks passed; actual Chrome/RPC with fake providers covered setup, saved results, drafts and workspace separation. Real OAuth and physical PC reboot remain unverified. |
+| Latest merged check reviewed here: [PR #25](https://github.com/hyperdrivebeep/thoth/pull/25), 2026-10-25 | Its [CI run](https://github.com/hyperdrivebeep/thoth/actions/runs/40156740267) finished with 5,828 Python tests passed, zero failures/errors and two skipped cases. Web tests, lint, type checks, build and the quick-start smoke check also passed. This run passed on its first attempt; it does not erase earlier failures on other revisions. |
+| Python static types | CI rejects diagnostics outside the reviewed baseline. Existing baseline entries are still known diagnostics; a passing job does not mean the code is free of type errors. |
+| Real-model synthetic demonstrations | Investigations have completed with saved answers, expected-result tables and evidence references. Synthetic inputs and a completed operation do not validate the scientific conclusions. |
+| Sign-in and recovery | Some connection and saved-result reopening paths have been checked. Claude and xAI real-account acceptance and physical PC reboot coverage remain incomplete; see [installation and restart notes](docs/INSTALL.md). |
+| Intermittent test failures | Some timing-sensitive tests fail under load. A later individual pass does not erase the original failure; stabilization work remains. |
 
-**The latest repository-wide verification is not passing.** These results are separate from the focused feature
-checks. No complete current-source regression pass is claimed. Some legacy assets are also omitted
-because their redistribution rights were not established.
+The Korean and English captures show completed synthetic investigations. The English capture used an
+explicit English response choice and an English source file. This demonstrates the recorded scenario,
+not broad English answer quality. Changing the display language does not translate your source documents.
 
-Real-provider answer quality, hosted multi-runtime readiness, broad platform portability and
-actual collaborator time savings have not been established by these checks.
+Answer quality, usefulness on real data, hosted multi-runtime readiness, broad platform portability and
+collaborator time savings have not been established. Some legacy assets are omitted because their
+redistribution rights were not established.
 
-[Verification record](docs/VERIFICATION.md) · [Exact known failures](docs/KNOWN_TEST_FAILURES.json) ·
+[Verification record](docs/VERIFICATION.md) · [Historical selected-failure ledger](docs/KNOWN_TEST_FAILURES.json) ·
 [Known limitations](docs/KNOWN_LIMITATIONS.md) · [Package boundary](docs/PACKAGING.md)
 
 ## Built to be inspected

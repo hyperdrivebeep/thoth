@@ -2,12 +2,47 @@
 
 Python type checking runs in GitHub CI: without a reviewed `config/basedpyright-baseline.json` it reports diagnostics and uploads a baseline candidate for review; once that file is added, only diagnostics not matched by the native baseline fail the check. Baseline reductions are artifacts for a separate reviewed update, never automatic commits. Local type checking blocked by host policy remains NOT_RUN; CI evidence is recorded separately. Native matching compares file/rule/column ranges, not messages, so a different error with the same shape can be suppressed. See the `python-typecheck` artifact and job summary; initial baseline creation is not a type-check pass.
 
-## Current merge gate (2026-10-03)
+## Current status (2026-10-25)
 
-The merge/publication gate is the product check defined in
-[verification policy](architecture/verification-profiles.md). The candidate retains an unresolved Python failure;
-no complete current-source product-check pass is claimed. Historical FULL results below are
-retained as historical evidence, not current merge requirements or a new pass.
+The latest merged source reviewed for this draft is [PR #25](https://github.com/hyperdrivebeep/thoth/pull/25),
+merge commit `02761190124eba9e027cf4a28d9f749fb574f8ff`. Its final
+[Product check run](https://github.com/hyperdrivebeep/thoth/actions/runs/40156740267) reports **5,828 Python
+passes, zero failures/errors and two skipped cases**. Web tests, lint, types, build and README quick-start
+smoke also passed on this first run attempt. Earlier failed checks on other revisions remain historical evidence.
+
+The workflow runs for pull requests and pushes to main. The Python type job enforces the reviewed
+baseline; it does not certify zero existing diagnostics. CI evidence applies to the linked revision,
+not automatically to later edits. The product check remains the merge gate described in the
+[verification policy](architecture/verification-profiles.md); it is distinct from the older FULL workflow.
+
+An earlier local integration run on the stabilization candidate completed with **1,947 passes, four
+failures, one skipped case and one expected failure**. The four failed cases passed in a later
+sequential check that also included the affected recovery file. Those results remain separate;
+the first run is not relabelled as a complete pass. Timing-sensitive failures remain follow-up work.
+
+Real-model investigations have completed on synthetic radar data, including saved expected-result
+tables and evidence references. This does not establish scientific answer quality or usefulness on
+real data. Korean and English question, answer and source-detail captures are available from the
+2026-10-25 synthetic investigations. The English run used an explicit English response choice and an
+English source file; broader English quality is not established. Earlier capture exposed a trace-question
+language fallback issue. Its focused correction passed 48 related Web tests, lint and type checking,
+but was not applied to the running capture bundle. Claude/xAI real-account acceptance, physical Windows
+reboot and broad platform portability remain unverified.
+
+## Historical evidence below
+
+The following sections record earlier snapshots and their limits. Dates, counts, failure ledgers and
+statements of unfinished verification describe those snapshots, not the current CI result above.
+Known product limitations are maintained separately in [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md).
+The [selected-failure ledger](KNOWN_TEST_FAILURES.json) is a historical 2026-09-25 list, not a current
+count of failing tests. Historical data and its original pass/fail claims have not been erased.
+
+## Historical merge gate (2026-10-03)
+
+At this 2026-10-03 checkpoint, the product check in the
+[verification policy](architecture/verification-profiles.md) retained an unresolved Python failure.
+No complete product-check pass was claimed for that snapshot. The FULL results below are
+historical evidence, not the current CI result or a new pass.
 
 ## Recorded product-check follow-up (2026-10-03)
 
@@ -111,7 +146,7 @@ Known limit (decision record 2026-10-03): if a sandboxed research test runs but 
 
 These scopes overlap. Their counts must not be added into an overall pass count.
 
-## Repository status
+## Historical repository status
 
 An earlier full run reached 1,501 backend passes and 86 failures. Its architecture, lint and type
 stages passed; Web and doctor were not reached. Under the existing active-environment policy,

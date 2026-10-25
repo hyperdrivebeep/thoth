@@ -108,6 +108,27 @@ After building, the local backend also serves the built UI on its own origin. Th
 used port 18765 to avoid an existing server and confirmed its HTML, JavaScript asset and first-run
 screen. No existing workspace is needed for that check.
 
+## Model usage and cost
+
+Recorded synthetic-demo investigations used roughly **8–9 model calls and 330,000–450,000 tokens per
+investigation**, mostly input. This is an observed range for those examples, not a per-question quote
+or an enforced spending cap. Source volume, model behavior and additional work can change usage.
+
+ChatGPT/Codex sign-in uses the connected account's subscription allowance. API-key connections incur
+provider charges according to token usage and the applicable rates. Check your provider's current
+terms and rates; this preview does not promise a fixed price or unlimited subscription use.
+OpenAI describes the distinction in its [authentication and usage guidance](https://learn.chatgpt.com/docs/auth#openai-authentication).
+
+The conversation shows a usage line beneath each saved result, using the server's figures for that
+operation. Missing usage is shown as unknown or absent, and partial observations are marked as such.
+These figures and any cost estimate are not a billing receipt. Reading a saved result or changing
+only the display language does not start another model call; sending a new question can.
+
+한국어: 합성 데모의 실측은 조사당 호출 약 8~9회·토큰 약 33만~45만 개이며 대부분 입력입니다.
+자료와 진행 과정에 따라 달라집니다. ChatGPT/Codex 로그인은 구독 사용량을 쓰고, API 키는
+공급자 요금에 따라 과금됩니다. 저장된 결과 아래 사용량을 확인하되, 일부 관측·미확인 표시를
+청구 금액이나 사용 한도로 해석하지 마세요.
+
 ## First run and credentials
 
 Use THOTH's setup/settings flow and keep the backend and connection commands on the same workspace.

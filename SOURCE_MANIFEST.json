@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-25T05:09:26.319622+00:00",
+  "created_at": "2026-10-25T06:43:09.884485+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -53,13 +53,18 @@
     },
     {
       "path": "README.ko.md",
-      "sha256": "6398580db8d526eb995377d437f1703fbf0dc250f430ab167764771be7e7a5f8",
-      "bytes": 16330
+      "sha256": "d80e101bf04502254cbc07386989541003042364030e7593d7f2dc736ef0d02c",
+      "bytes": 18017
     },
     {
       "path": "README.md",
-      "sha256": "2617a0c27e193ed5e190edb604c97954d7e7a658962dd5c44e51eef8aa4b9a4e",
-      "bytes": 14075
+      "sha256": "38d20f2d2fd89285b6e5812b6c5b1168dd386242fab0c472ec473a6721568f33",
+      "bytes": 15953
+    },
+    {
+      "path": "SECURITY.md",
+      "sha256": "00c05a688a5e1fdeb48939c54738bc2e22f7674b0b4bbdf0c1dce8d2b491371d",
+      "bytes": 2964
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -2023,8 +2028,8 @@
     },
     {
       "path": "docs/INSTALL.md",
-      "sha256": "b0afc44cc299a7e95af0f2da8afd8ab6843679bda22d3626b69dc3ce87206cca",
-      "bytes": 20549
+      "sha256": "e86883b35af41679737075609e53c5c20da3398c547dfff29bbc1cde93364a7e",
+      "bytes": 22131
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.ko.md",
@@ -2038,8 +2043,8 @@
     },
     {
       "path": "docs/KNOWN_TEST_FAILURES.json",
-      "sha256": "415f45b4e19e17c36e13923dce69ac3703fff27cbf43b425119c3b6730b66457",
-      "bytes": 3379
+      "sha256": "d35dc4083ee0e1d3e5ea9ce52922e34b031b763ad2fc1676602c26cc1a506b20",
+      "bytes": 3530
     },
     {
       "path": "docs/PACKAGING.md",
@@ -2053,8 +2058,8 @@
     },
     {
       "path": "docs/VERIFICATION.md",
-      "sha256": "4c15c01c70d2fd2d0104a37f43e5feb5e14bf6bf2e100ccf967fbc0383911c9e",
-      "bytes": 25996
+      "sha256": "ea2ad705020aa0f757246141b18c8c02969fb9fe952ba8aae1593ea775d872f8",
+      "bytes": 28598
     },
     {
       "path": "docs/architecture/agent-execution-rules.md",
@@ -2197,6 +2202,11 @@
       "bytes": 761446
     },
     {
+      "path": "docs/releases/v0.1.0-preview.md",
+      "sha256": "c31c219f604dce07610b9873d0bff6ebb04ae4cbf7b54353df003539eb59b115",
+      "bytes": 4975
+    },
+    {
       "path": "docs/screenshots/01-trace-verdict.png",
       "sha256": "800800b0e2bcfdd290d2f911618aab8a8e60e8e803d2400df9829cd61a351989",
       "bytes": 169161
@@ -2225,6 +2235,76 @@
       "path": "docs/screenshots/06-evidence.png",
       "sha256": "2cff40afec991c105b4813fd4b1bf1d9092f836b8cd55b1239511ef480a488c5",
       "bytes": 287062
+    },
+    {
+      "path": "docs/screenshots/en/01-trace-verdict.png",
+      "sha256": "63dec42925d7ea512c4caed1bc4c320caa5965e28b1c4a057342359d003c6003",
+      "bytes": 316500
+    },
+    {
+      "path": "docs/screenshots/en/02-question.png",
+      "sha256": "e411f84d3e5ea61d2594bd489bcc91dec03e09656d7d1805703435f463c0a534",
+      "bytes": 210351
+    },
+    {
+      "path": "docs/screenshots/en/03-progress.png",
+      "sha256": "b789eae6df3d7e27c16f0281ab577d4090b352cc86bcb2ed1f565335c8f362c9",
+      "bytes": 372412
+    },
+    {
+      "path": "docs/screenshots/en/04-answer.png",
+      "sha256": "bcbc8f0f623be67b0d0dc398feb0c9d72bc4de801dd717ac4563b04d0bf44ec4",
+      "bytes": 403713
+    },
+    {
+      "path": "docs/screenshots/en/05-hypotheses.png",
+      "sha256": "07a8d2e712cfb172168b02a439855ae012f3b51db7ffe8b1bbe65f4764130e8b",
+      "bytes": 638520
+    },
+    {
+      "path": "docs/screenshots/en/06-evidence.png",
+      "sha256": "2c75a384f76f9ac7decfcd0c6783c93bdb20845ea7cb6aa9326de47bb203da42",
+      "bytes": 587085
+    },
+    {
+      "path": "docs/screenshots/en/07-inferred-evidence.png",
+      "sha256": "e518b65a1e9b912ac4f7fdee821b9ffb8f07202f2eedf2140021f1f4923e1451",
+      "bytes": 327895
+    },
+    {
+      "path": "docs/screenshots/ko/01-trace-verdict.png",
+      "sha256": "127b0da5c371e3d2a2fdfb88951fd676b5831d7027effd92624ef81cc196e40f",
+      "bytes": 284179
+    },
+    {
+      "path": "docs/screenshots/ko/02-question.png",
+      "sha256": "d36f726fa03ccf2d9cb4d345ab0f1d92369f0bff786d2881df7a9dc61d3758d4",
+      "bytes": 181763
+    },
+    {
+      "path": "docs/screenshots/ko/03-progress.png",
+      "sha256": "c3e7414c59a3a08a47adad32dd6ff7edd5556b04dc5d94c51d439b972585f8e8",
+      "bytes": 374766
+    },
+    {
+      "path": "docs/screenshots/ko/04-answer.png",
+      "sha256": "e46affb3cd5409b146648bdd1ad6aa2ef7af8efed43f2431922440550b11ab27",
+      "bytes": 414714
+    },
+    {
+      "path": "docs/screenshots/ko/05-hypotheses.png",
+      "sha256": "93e2e1a87ec8bb6e25db4edb056afec1d24a3807ea63b15ae18f11667a3f97f1",
+      "bytes": 637091
+    },
+    {
+      "path": "docs/screenshots/ko/06-evidence.png",
+      "sha256": "c8e1463371de832e8e9806f88ac0d0d7e0ac667a98923025f9b4ccfaba01cb65",
+      "bytes": 558880
+    },
+    {
+      "path": "docs/screenshots/ko/07-inferred-evidence.png",
+      "sha256": "c9fec121d182637080b5f532fcf190c209d464abd511fe46f1fa1420bfa6bfa9",
+      "bytes": 247568
     },
     {
       "path": "examples/projectpacks/6g-sandbox-hero/criteria.json",
