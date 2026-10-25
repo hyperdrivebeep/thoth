@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-25T06:43:09.884485+00:00",
+  "created_at": "2026-10-25T11:18:47.542430+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -53,18 +53,18 @@
     },
     {
       "path": "README.ko.md",
-      "sha256": "d80e101bf04502254cbc07386989541003042364030e7593d7f2dc736ef0d02c",
-      "bytes": 18017
+      "sha256": "c1b7cf84c62560927618fae436c60e0cd70405d87b2d13c813f4d54d43898bc4",
+      "bytes": 18010
     },
     {
       "path": "README.md",
-      "sha256": "38d20f2d2fd89285b6e5812b6c5b1168dd386242fab0c472ec473a6721568f33",
-      "bytes": 15953
+      "sha256": "2403b553b41bd17772f4aa058523c3d84b3db29faa7d23b436ff0bca6206eecd",
+      "bytes": 15947
     },
     {
       "path": "SECURITY.md",
-      "sha256": "00c05a688a5e1fdeb48939c54738bc2e22f7674b0b4bbdf0c1dce8d2b491371d",
-      "bytes": 2964
+      "sha256": "48e715efa1a31a8810149f97202b4f7dc09521b60cd53079c8691371def25139",
+      "bytes": 2960
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -2058,8 +2058,8 @@
     },
     {
       "path": "docs/VERIFICATION.md",
-      "sha256": "ea2ad705020aa0f757246141b18c8c02969fb9fe952ba8aae1593ea775d872f8",
-      "bytes": 28598
+      "sha256": "687347a0fa8a093f9ab7650e67b33391d71c6f382546de6b5e2ac07dd6f1dd99",
+      "bytes": 28656
     },
     {
       "path": "docs/architecture/agent-execution-rules.md",
@@ -2158,7 +2158,7 @@
     },
     {
       "path": "docs/architecture/rpc-method-catalog.md",
-      "sha256": "6fab17355a11be14958d98a223d740e27d771d0b048522abc91b5e838ec17424",
+      "sha256": "9d85004b6b18d0576bdb0527028419a712bb68a9a76ef9cdf3e352cb40706d3d",
       "bytes": 18685
     },
     {
@@ -2203,8 +2203,8 @@
     },
     {
       "path": "docs/releases/v0.1.0-preview.md",
-      "sha256": "c31c219f604dce07610b9873d0bff6ebb04ae4cbf7b54353df003539eb59b115",
-      "bytes": 4975
+      "sha256": "1648f8dd66741982b2f4f502f8e56812957f2b5c5d61d5a447fb4383e263b39d",
+      "bytes": 4617
     },
     {
       "path": "docs/screenshots/01-trace-verdict.png",

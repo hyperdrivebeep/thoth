@@ -1,7 +1,7 @@
-# Security policy — draft
+# Security policy
 
-This policy is prepared for the **0.1.x preview line on the latest `main`**. It is not an announcement
-of a tagged release, a security certification or a promise of support for older snapshots.
+This policy covers the **0.1.x preview line** (first release `v0.1.0-preview`) and the latest `main`.
+It is not a security certification or a promise of support for older snapshots.
 
 ## Reporting a vulnerability
 
@@ -33,7 +33,7 @@ This preview does not promise a response deadline or a reward.
 
 ## 한국어 안내
 
-최신 `main`의 0.1.x 미리보기를 위한 보안 정책 초안입니다. 비공개 취약점 신고는 저장소의
+0.1.x 미리보기(첫 릴리즈 `v0.1.0-preview`)와 최신 `main`의 보안 정책입니다. 비공개 취약점 신고는 저장소의
 **Security → Report a vulnerability**를 사용하세요. 2026-10-25 기능을 켜고 저장소 설정을 확인했습니다.
 신고 화면에 접근할 수 없더라도 민감한 내용을 공개 이슈에 대신 올리지 마세요.
 공개 이슈에 취약점 세부 내용·자격 증명·개인 연구 자료를 올리지 마세요. 답변 기한이나 보상은 약속하지 않습니다.
