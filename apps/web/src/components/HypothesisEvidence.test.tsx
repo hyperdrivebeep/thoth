@@ -94,6 +94,26 @@ it("opens a v5 row through the existing protected result evidence reader", async
   expect(node.textContent).not.toContain("EVIDENCE_INFERENCE");
 });
 
+it.each(["ko", "en"] as const)("keeps the original source excerpt available through evidence opening (%s)", async language => {
+  setLocale(language);
+  const text = '# SYNTHETIC DEMO DATA - NOT MEASURED\n- {id: SAMPLE, unit: ratio}\n조건,분자,분모\n비,16,20';
+  const hash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text))))
+    .map(byte => byte.toString(16).padStart(2, "0")).join("");
+  const target = citations[0];
+  const result = resultWith([target.span_id], true);
+  const original = structuredClone(result);
+  replies(result, response => {
+    response.value.manifest.source_basis = { ...response.value.manifest.source_basis, [target.span_id]: `${target.source_version_id}:${hash}` };
+    const item = response.value.selected_evidence?.items.find(item => item.span_id === target.span_id);
+    if (item?.span) Object.assign(item.span, { exact_text: text, text_sha256: hash });
+  });
+  await render(result); await openBasis();
+  await settle(() => node.querySelector(".evidence-item.focused")?.getAttribute("data-span-id") === target.span_id);
+  expect(node.querySelector(".evidence-item.focused")?.textContent).toContain(text);
+  expect(result).toEqual(original);
+  expect(evidenceCalls()).toHaveLength(1);
+});
+
 it("does not offer an unavailable legacy binding as an openable source", async () => {
   const result = resultWith([citations[0].span_id], true);
   const row = firstExpected(result);

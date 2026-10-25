@@ -1,4 +1,8 @@
 export const countFormats = {
+  progressLocation:{ko:(n:number)=>`원문 위치 ${n}`,en:(n:number)=>`Source location ${n}`},
+  progressLineRange:{ko:(start:number,end:number)=>start===end?`${start}행`:`${start}~${end}행`,en:(start:number,end:number)=>start===end?`line ${start}`:`lines ${start}–${end}`},
+  progressLocationUnavailable:{ko:()=>"위치 미확인",en:()=>"Location unavailable"},
+  progressLocationCoverage:{ko:(shown:number,total:number)=>`전체 ${total}곳 중 ${shown}곳 표시`,en:(shown:number,total:number)=>`Showing ${shown} of ${total} source locations`},
   recordDisposition:{ko:(label:string)=>`${label} 처분 기록 남기기`,en:(label:string)=>`Record disposition for ${label}`},
   dispositionTitle:{ko:(title:string)=>`처분 기록 · ${title}`,en:(title:string)=>`Disposition record · ${title}`},
   evidenceTotal:{ko:(n:string)=>`전체 ${n}개 중 선택`,en:(n:string)=>`Selected from ${n} total evidence items`},

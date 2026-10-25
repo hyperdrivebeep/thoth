@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-25T06:43:09.884485+00:00",
+  "created_at": "2026-10-25T12:04:10.734426+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -53,18 +53,18 @@
     },
     {
       "path": "README.ko.md",
-      "sha256": "d80e101bf04502254cbc07386989541003042364030e7593d7f2dc736ef0d02c",
-      "bytes": 18017
+      "sha256": "c1b7cf84c62560927618fae436c60e0cd70405d87b2d13c813f4d54d43898bc4",
+      "bytes": 18010
     },
     {
       "path": "README.md",
-      "sha256": "38d20f2d2fd89285b6e5812b6c5b1168dd386242fab0c472ec473a6721568f33",
-      "bytes": 15953
+      "sha256": "2403b553b41bd17772f4aa058523c3d84b3db29faa7d23b436ff0bca6206eecd",
+      "bytes": 15947
     },
     {
       "path": "SECURITY.md",
-      "sha256": "00c05a688a5e1fdeb48939c54738bc2e22f7674b0b4bbdf0c1dce8d2b491371d",
-      "bytes": 2964
+      "sha256": "48e715efa1a31a8810149f97202b4f7dc09521b60cd53079c8691371def25139",
+      "bytes": 2960
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -297,6 +297,16 @@
       "bytes": 908
     },
     {
+      "path": "apps/web/src/api/progressEvidenceLocations.test.tsx",
+      "sha256": "9bcecca32cfa75bc2a242a190d37394066c34e450fadbd86a4d9266266c476ce",
+      "bytes": 8037
+    },
+    {
+      "path": "apps/web/src/api/progressEvidenceLocations.ts",
+      "sha256": "c957c55dc7a7f16a761544e2d7dcf36f544da7dbdc149956ca21135afdda4986",
+      "bytes": 3233
+    },
+    {
       "path": "apps/web/src/api/projectCreation.ts",
       "sha256": "f096ff7604b82a8e89012bdd78724845c081a4f172b118b4eeeb35f97479086b",
       "bytes": 375
@@ -343,18 +353,18 @@
     },
     {
       "path": "apps/web/src/api/researchProgress.test.tsx",
-      "sha256": "711ad9a63e857ea90039d91b40ece63d5fd3e3d06cdb77858c1f19ad44c4959f",
-      "bytes": 11860
+      "sha256": "db75a67c26734eac3ded00f5eeb9d2b8e230e6214734a07036e949a9e26f349d",
+      "bytes": 12050
     },
     {
       "path": "apps/web/src/api/researchProgress.ts",
-      "sha256": "0b7b6b7680ccb766e2cc53ff0d2a516c74dc5b88fc9df918aba25847190fd6fb",
-      "bytes": 15138
+      "sha256": "1b9803b8f96883c8b6096701ed3377e2043832c750d00eea8fb37a7db2b1127f",
+      "bytes": 14997
     },
     {
       "path": "apps/web/src/api/researchProgressCharacterization.test.ts",
-      "sha256": "e174366b6c1667718ec9fa26ff156bfbefcee05d490ef53c34dcd28cf6085051",
-      "bytes": 32595
+      "sha256": "e39a6c6ae9392d39f4981d68811d5f98a632455120d26ba8c5b8cd9286956134",
+      "bytes": 32390
     },
     {
       "path": "apps/web/src/api/researchProgressText.ts",
@@ -763,8 +773,8 @@
     },
     {
       "path": "apps/web/src/components/HypothesisEvidence.test.tsx",
-      "sha256": "668908b1ae921a298316e1cc5d44a574bc6e43906aba383147b1c2f1b0f52953",
-      "bytes": 12681
+      "sha256": "39ec43303ba37231722cb609424b1eb10fa1f417cc624dceb789a5ab37c87f05",
+      "bytes": 13956
     },
     {
       "path": "apps/web/src/components/HypothesisEvidencePanel.tsx",
@@ -1003,8 +1013,8 @@
     },
     {
       "path": "apps/web/src/components/ResearchLiveProgress.tsx",
-      "sha256": "0eccdbbd89f7d81cf4e83786a0684ec82ad85aef95cdbbf0308b16063217ad83",
-      "bytes": 3323
+      "sha256": "a0637762b7b36c88c602846bbc446900c6f7be2980f2d8c98709a5f0307457db",
+      "bytes": 3761
     },
     {
       "path": "apps/web/src/components/ResearchProgress.tsx",
@@ -1628,8 +1638,8 @@
     },
     {
       "path": "apps/web/src/i18n/countFormatMessages.ts",
-      "sha256": "67d1b1e45e520743077f51a6e7e49e36e0c773245573f1bb4cb2133af11c7438",
-      "bytes": 6016
+      "sha256": "70a5a8a4d47b5705bdd18f45472e54c5261193681908cd034b9dbed8bbf30e74",
+      "bytes": 6571
     },
     {
       "path": "apps/web/src/i18n/credentialMessages.ts",
@@ -2058,8 +2068,8 @@
     },
     {
       "path": "docs/VERIFICATION.md",
-      "sha256": "ea2ad705020aa0f757246141b18c8c02969fb9fe952ba8aae1593ea775d872f8",
-      "bytes": 28598
+      "sha256": "687347a0fa8a093f9ab7650e67b33391d71c6f382546de6b5e2ac07dd6f1dd99",
+      "bytes": 28656
     },
     {
       "path": "docs/architecture/agent-execution-rules.md",
@@ -2158,7 +2168,7 @@
     },
     {
       "path": "docs/architecture/rpc-method-catalog.md",
-      "sha256": "6fab17355a11be14958d98a223d740e27d771d0b048522abc91b5e838ec17424",
+      "sha256": "9d85004b6b18d0576bdb0527028419a712bb68a9a76ef9cdf3e352cb40706d3d",
       "bytes": 18685
     },
     {
@@ -2203,8 +2213,8 @@
     },
     {
       "path": "docs/releases/v0.1.0-preview.md",
-      "sha256": "c31c219f604dce07610b9873d0bff6ebb04ae4cbf7b54353df003539eb59b115",
-      "bytes": 4975
+      "sha256": "1648f8dd66741982b2f4f502f8e56812957f2b5c5d61d5a447fb4383e263b39d",
+      "bytes": 4617
     },
     {
       "path": "docs/screenshots/01-trace-verdict.png",

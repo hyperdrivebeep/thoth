@@ -112,10 +112,12 @@ describe("live research progress", () => {
     expect(notes[0]).toContain("표 3 발사 준비 조건 4개");
     expect(notes[0]).toContain("표 숫자만 인용");
     expect(notes[0]).toContain("추측 금지");
-    expect(notes[1]).toContain("p.6 70.6");
-    expect(notes[1]).toContain("GNC software verification complete");
+    expect(notes[1]).toBe("p.6과 관련된 문장을 다시 줄 세웠습니다");
+    expect(live?.evidenceLabels).toEqual(["p.6"]);
+    expect(notes.join(" ")).not.toContain("70.6");
+    expect(notes.join(" ")).not.toContain("GNC software verification complete");
     expect(notes[2]).toContain("표 3 발사 준비 조건 4개");
-    expect(notes[2]).toContain("p.6 70.6");
+    expect(notes[2]).toContain("p.6 원문");
     expect(notes[3]).toContain("일정만 늘리면 해결된다");
     expect(notes[3]).toContain("GNC 소프트웨어만 닫으면 된다");
     expect(notes.at(-1)).toContain("일정만 늘리면 해결된다");
@@ -164,7 +166,8 @@ describe("live research progress", () => {
     expect(html).toContain("표 3 발사 준비 조건 4개");
     expect(html).toContain("표 숫자만 인용");
     expect(html).toContain("추측 금지");
-    expect(html).toContain("p.6 70.6");
+    expect(html).toContain("p.6");
+    expect(html).not.toContain("70.6");
     expect(html).toContain("일정만 늘리면 해결된다");
     expect(html).toContain("GNC 소프트웨어만 닫으면 된다");
     expect(html).toContain("빠진 결정을 채우겠습니다");
