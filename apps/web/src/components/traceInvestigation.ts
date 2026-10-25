@@ -1,5 +1,6 @@
 import type { ResponseLanguage } from "../api/localWorkspacePersistence";
 import { investigationQuestion } from "../i18n/traceEnglish";
+import { getLocale } from "../i18n/locale";
 import type { TraceView, Verdict } from "../api/trace";
 import type { WorkThread } from "../types";
 import { titleOf } from "./traceRows";
@@ -24,12 +25,13 @@ export function investigationFor(projectId: string, kind: string, verdict: Verdi
   if (!canInvestigate(kind, verdict)) return null;
   const name = titleOf(view);
   const subject = kindOf(kind);
-  const reasons = verdict.reasons.computed.map(code => reasonSentence(code, name, verdict.conditions.condition, responseLanguage ?? "ko"));
+  const questionLanguage = responseLanguage ?? getLocale();
+  const reasons = verdict.reasons.computed.map(code => reasonSentence(code, name, verdict.conditions.condition, questionLanguage));
   const failed = !verdict.state.startsWith("HOLD");
   const what = subject === "CRITERION" ? "기준" : "요구사항";
   const ask = failed ? "원인 후보와 그것을 가를 시험을 찾아 주세요." : "판정하려면 무엇이 더 필요한지, 가능한 원인 후보와 그것을 가를 시험을 찾아 주세요.";
   const question = [`「${name(verdict.subject_id)}」 ${what}의 판정이 "${verdictLook(kind, verdict.state, "ko").text}"입니다.`, ...reasons, ask].join(" ");
-  const generated = responseLanguage === "en" ? investigationQuestion(name(verdict.subject_id), subject,
+  const generated = questionLanguage === "en" ? investigationQuestion(name(verdict.subject_id), subject,
     verdictLook(kind, verdict.state, "en").text, reasons, failed) : question;
   return { ...(responseLanguage !== undefined ? { responseLanguage,
     questionForLanguage: (language: ResponseLanguage | null) => investigationFor(projectId, kind, verdict, view, language)!.question } : {}), origin: { kind: "TRACE_VERDICT", project_id: projectId, subject_kind: subject, subject_id: verdict.subject_id, verdict_revision: verdict.revision_digest }, question: generated };
