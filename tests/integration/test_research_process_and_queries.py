@@ -40,13 +40,24 @@ async def test_query_polling_adds_no_operations_and_rejects_mutations(tmp_path: 
 
 @pytest.mark.asyncio
 async def test_real_process_exit_after_admission_replays_without_second_input(tmp_path: Path):
+    # Project provisioning is fixture setup. The child still opens the workspace,
+    # admits the request and crashes without cleanup within the original 25 seconds.
+    bootstrap_model = ControlledResearchModel()
+    bootstrap = await setup(tmp_path, bootstrap_model, source=False)
+    try:
+        assert not bootstrap_model.calls
+    finally:
+        bootstrap.close()
     code = """import asyncio, json, os, sys
 from pathlib import Path
-from tests.integration.test_research_request_v2 import setup, ControlledResearchModel
+from tests.integration.test_research_request_v2 import ControlledResearchModel
+from tests.integration.scoped_runtime import fixture_scope_policy
 from tests.integration.storage_coverage_helpers import request, value
+from thoth.apps.runtime import create_runtime
 async def main():
     workspace = Path(sys.argv[1])
-    runtime = await setup(workspace, ControlledResearchModel(), source=False)
+    runtime = create_runtime(workspace, model_resolver=ControlledResearchModel(),
+                             resource_scope_policy=fixture_scope_policy())
     admitted = value(await runtime.bus.dispatch(request("thread/start", "crash-key", {
         "project_id": "p", "problem": "Process restart", "contract_version": 2})))
     (workspace / "admission.json").write_text(json.dumps(admitted))

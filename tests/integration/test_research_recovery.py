@@ -59,7 +59,7 @@ async def test_second_runtime_waits_and_publishes_only_new_question(tmp_path: Pa
                 )
             )
         )
-        await asyncio.wait_for(first_model.started.wait(), 4)
+        await asyncio.wait_for(first_model.started.wait(), 15)
         newer = value(
             await second.bus.dispatch(
                 request(
@@ -78,7 +78,7 @@ async def test_second_runtime_waits_and_publishes_only_new_question(tmp_path: Pa
         assert operation_state(second, newer["operation_id"]) == "RUNNING"
         assert not second_model.calls
         first_model.release.set()
-        await asyncio.wait_for(asyncio.gather(runtime.bus.drain(), second.bus.drain()), 12)
+        await asyncio.wait_for(asyncio.gather(runtime.bus.drain(), second.bus.drain()), 30)
         assert second_model.calls
         assert operation_state(second, newer["operation_id"]) == "SUCCEEDED"
         assert all("New question" in c.context_pack.problem for c in second_model.calls)

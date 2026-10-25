@@ -378,7 +378,10 @@ def test_slow_down_and_wall_expiry_are_distinct(tmp_path: Path) -> None:
     broker.cancel_login(str(started["login_id"]))
 
     def short(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json={**_device(), "expires_in": 0.1})
+        if request.url.path.endswith("/device/code"):
+            return httpx.Response(200, json={**_device(), "expires_in": 0.1})
+        assert request.url.path.endswith("/token")
+        return httpx.Response(400, json={"error": "authorization_pending"})
 
     expired = XaiAuthBroker(tmp_path / "expired", transport=httpx.MockTransport(short))
     expired.start_login()

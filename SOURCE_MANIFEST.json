@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-25T01:22:56.850494+00:00",
+  "created_at": "2026-10-25T03:01:28.373930+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -3683,8 +3683,8 @@
     },
     {
       "path": "src/thoth/adapters/models/claude_profile.py",
-      "sha256": "f446e15c43b93813b2d79bff70421970c1cc8b64d9d9855b3da1120b37711023",
-      "bytes": 11111
+      "sha256": "bad83e63904deb894fc0cfd2048b19e8b9a9ee34f7d49a0172805f00b82dbeea",
+      "bytes": 11259
     },
     {
       "path": "src/thoth/adapters/models/codex_account_usage.py",
@@ -3843,8 +3843,8 @@
     },
     {
       "path": "src/thoth/adapters/models/xai_profile.py",
-      "sha256": "594010e9758790fd0455948a27aea38bb8277753095130c6a131ed46c12c343f",
-      "bytes": 8687
+      "sha256": "5a72125f022e3fc418bdb683bc4dfc2e45dcf45a0d192d591f0cdc4e0e0226d6",
+      "bytes": 8835
     },
     {
       "path": "src/thoth/adapters/models/xai_responses.py",
@@ -9803,8 +9803,8 @@
     },
     {
       "path": "tests/integration/test_research_process_and_queries.py",
-      "sha256": "65b9408ec7400e65fb0320b9349b84a843ef96d51088c233e4dfc51cbe8750cd",
-      "bytes": 3519
+      "sha256": "76f0da7441b929e2890577f1ac9ac30edf3ee0108be69e1314f1acfc6981afef",
+      "bytes": 4076
     },
     {
       "path": "tests/integration/test_research_publication_guards.py",
@@ -9828,8 +9828,8 @@
     },
     {
       "path": "tests/integration/test_research_recovery.py",
-      "sha256": "59dfd4f9a9cfc0872cbad7c42cd7a383a4ccf9494973584767065d37f394630c",
-      "bytes": 3449
+      "sha256": "188e434d7dd3327e17fa5d5de6216535d42645c5071fd451c330032786d7c989",
+      "bytes": 3450
     },
     {
       "path": "tests/integration/test_research_registered_web_route.py",
@@ -11137,14 +11137,19 @@
       "bytes": 7107
     },
     {
+      "path": "tests/unit/models/test_windows_profile_output_encoding.py",
+      "sha256": "a7e3df27ff4eb0a26c671fbc71acd96d7464acb08f9e021d30bd9d6d26f3e51f",
+      "bytes": 4212
+    },
+    {
       "path": "tests/unit/models/test_xai_responses.py",
       "sha256": "edf96d61a0f9e7a8d76a442d4abb55a8564aeb4ab056e399fc95c9cd4bb6ff4c",
       "bytes": 4415
     },
     {
       "path": "tests/unit/models/test_xai_workspace_oauth.py",
-      "sha256": "9e0fc52cda0ebbd6a7dad72f11a9d783827cedadaa3faac12789caae7694f137",
-      "bytes": 21315
+      "sha256": "542fc8dadf72ad589f890be3e92104343fb4e09f968a92c9015e9680514224e7",
+      "bytes": 21500
     },
     {
       "path": "tests/unit/reducers/test_authority_router.py",
