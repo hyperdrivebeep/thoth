@@ -1,7 +1,7 @@
 {
   "record_type": "KNOWN_SELECTED_REGRESSION_FAILURES",
   "observed_date": "2026-09-25",
-  "scope": "Original full-suite failing nodes followed up selectively; not a full run on this export",
+  "scope": "Historical 2026-09-25 selected follow-up of original full-suite failing nodes; not the current failing-test count or latest CI status",
   "count": 25,
   "nodeids": [
     "tests/integration/test_6g_full_backend_cycle.py::test_6g_reference_pack_reaches_full_backend_learning_cycle",
@@ -31,5 +31,7 @@
     "tests/integration/test_source_rpc.py::test_egress_preflight_blocks_driver_io_by_default"
   ],
   "full_suite_verified": false,
-  "additional_asset_unavailability_possible": true
+  "additional_asset_unavailability_possible": true,
+  "historical_record": true,
+  "current_status_reference": "VERIFICATION.md#current-status-2026-10-25"
 }
