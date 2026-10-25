@@ -41,7 +41,7 @@ see what remains unresolved, and compare two saved results before deciding what 
 > GitHub Actions checks the Python suite, Web tests/build and a reviewed Python type-error baseline.
 > Recorded synthetic-demo investigations have completed with a real model; this does not establish research quality or usefulness on real data.
 > English question, answer and source-text captures are available; broader English quality, real-account coverage and physical PC restart coverage remain incomplete.
-> Read [status and limits](#status), [model usage and cost](#model-usage-and-cost), and the [draft security policy](SECURITY.md) before relying on a result.
+> Read [status and limits](#status), [model usage and cost](#model-usage-and-cost), and the [security policy](SECURITY.md) before relying on a result.
 
 ## See it work
 

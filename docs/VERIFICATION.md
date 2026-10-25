@@ -4,11 +4,11 @@ Python type checking runs in GitHub CI: without a reviewed `config/basedpyright-
 
 ## Current status (2026-10-25)
 
-The latest merged source reviewed for this draft is [PR #25](https://github.com/hyperdrivebeep/thoth/pull/25),
-merge commit `02761190124eba9e027cf4a28d9f749fb574f8ff`. Its final
-[Product check run](https://github.com/hyperdrivebeep/thoth/actions/runs/40156740267) reports **5,828 Python
-passes, zero failures/errors and two skipped cases**. Web tests, lint, types, build and README quick-start
-smoke also passed on this first run attempt. Earlier failed checks on other revisions remain historical evidence.
+The first preview release, [v0.1.0-preview](https://github.com/hyperdrivebeep/thoth/releases/tag/v0.1.0-preview), is commit
+`24f96279ab6c94789d342f5035cc9a548a7de922` (PR #27). Its [CI run](https://github.com/hyperdrivebeep/thoth/actions/runs/40172873404)
+reports **5,828 Python passes, zero failures/errors and two skipped cases**; the other CI checks also passed.
+The earlier PR #25 run ([40156740267](https://github.com/hyperdrivebeep/thoth/actions/runs/40156740267)) reported the same counts.
+Earlier failed checks on other revisions remain historical evidence.
 
 The workflow runs for pull requests and pushes to main. The Python type job enforces the reviewed
 baseline; it does not certify zero existing diagnostics. CI evidence applies to the linked revision,
