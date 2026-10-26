@@ -14,6 +14,7 @@
 | Evaluator | evaluator contract + exposure ledger | evaluation registry | hidden-holdout content |
 | Evaluation executor | `EvaluationExecutionPort`, `EvaluationExecutorRegistryPort` | `default_execution_registry` in Improvement composition | executor identity branches and hidden expected outputs |
 | Behavior component | `BehaviorComponentHandlerPort`, `BehaviorComponentRegistryPort` | `default_behavior_components` in behavior runtime composition | provider/fixture names and unrestricted executable code |
+| Source arithmetic | `DocumentCalculatorPort` | `DocumentCalculatorRegistry` / `default_document_calculator`, injected by research entry composition | product/fixture names and concrete arithmetic adapters in application logic; see [numeric observations](numeric-observations.md) |
 
 N05 supplies an explicitly configured frozen case/scorer catalog and a bounded declarative subprocess
 executor. Separate workspaces receive only public inputs and independent initial memory copies.

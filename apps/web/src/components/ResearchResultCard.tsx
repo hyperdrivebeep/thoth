@@ -18,6 +18,7 @@ import { ResearchFollowupSummary } from "./ResearchFollowupSummary";
 import { AnswerBody } from "./AnswerBody";
 import { AnswerHold } from "./AnswerHold";
 import { ConfirmedFacts } from "./ConfirmedFacts";
+import { CheckedObservations } from "./CheckedObservations";
 import { TraceOriginLine } from "./TraceOriginLine";
 import { HypothesisLinkNotice } from "./HypothesisLinkNotice";
 import type { HypothesisLink } from "./hypothesisLinkText";
@@ -125,5 +126,6 @@ export function ResearchResultCard({ result, state, unavailable, error, failure,
       </nav>
       {usageLine && <p className="usage-line muted">{usageLine}</p>}
     </> : !unavailable && !interrupted && <p className="muted">{state === "RUNNING" ? t("result.checking") : t("result.noLinkedAnswer")}</p>}
+    {result && !unavailable && <CheckedObservations result={result} onCite={spanId=>onDetail({kind:"evidence",result,historySelection,focusSpanId:spanId})}/>}
   </article></ResponseLanguageContext.Provider>;
 }

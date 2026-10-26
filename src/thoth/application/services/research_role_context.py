@@ -89,8 +89,8 @@ _COMMON = {
 _EXTRA: dict[ModelRole, set[str]] = {
     ModelRole.RESEARCH_PLANNER: {"profiles", "source_overview"},
     ModelRole.EVIDENCE_RERANKER: {"ranking_candidate_refs"},
-    ModelRole.SEMANTIC_REVIEWER: set(),
-    ModelRole.REVIEW_ADJUDICATOR: {"candidate"},
+    ModelRole.SEMANTIC_REVIEWER: {"checked_observations"},
+    ModelRole.REVIEW_ADJUDICATOR: {"candidate", "checked_observations"},
 }
 
 
