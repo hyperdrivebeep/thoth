@@ -84,9 +84,7 @@ class _JobLoginChild:
         return self._job.poll()
 
     def kill_tree(self) -> bool:
-        with suppress(OSError):
-            self._job.kill()
-        return _confirm_exit(self.poll)
+        return self._job.stop_and_confirm(time.monotonic() + _KILL_CONFIRM_SECONDS)
 
 
 class _PosixLoginChild:

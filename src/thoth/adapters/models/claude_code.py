@@ -512,7 +512,7 @@ async def _stop_process_tree(process: ClaudeProcess) -> bool:
 
         if not isinstance(process, WindowsJobProcess):
             return False
-        process.kill()
+        return await process.stop_tree()
     else:
         with suppress(ProcessLookupError):
             os.killpg(process.pid, signal.SIGKILL)

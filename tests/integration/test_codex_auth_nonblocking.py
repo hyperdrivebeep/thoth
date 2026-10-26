@@ -23,10 +23,14 @@ async def test_slow_credential_status_keeps_health_and_saved_project_read_live(
 ) -> None:
     runtime = create_runtime(tmp_path)
     entered, release = threading.Event(), threading.Event()
+    event_loop_thread = threading.get_ident()
+    pending = None
 
     def slow(_self: LocalModelCredentials) -> list[dict[str, object]]:
+        assert threading.get_ident() != event_loop_thread, "credential I/O blocked the event loop"
         entered.set()
-        assert release.wait(3)
+        # The test releases this gate after the bounded probes, including on failure.
+        release.wait()
         return []
 
     try:
@@ -83,7 +87,11 @@ async def test_slow_credential_status_keeps_health_and_saved_project_read_live(
         assert value(listed)["accounts"] == []
     finally:
         release.set()
-        runtime.close()
+        try:
+            if pending is not None and not pending.done():
+                await asyncio.wait_for(pending, timeout=2)
+        finally:
+            runtime.close()
 
 
 @pytest.mark.asyncio

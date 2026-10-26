@@ -13,10 +13,20 @@ import msvcrt
 import os
 import subprocess
 import sys
+import threading
+import time
 from collections.abc import Callable, Mapping
+from contextlib import suppress
 from ctypes import wintypes
 from pathlib import Path
 from typing import Any, BinaryIO, cast
+
+from thoth.adapters.models.windows_job_completion import (
+    JobCompletionTracker,
+    associate_completion_port,
+    configure_completion_api,
+    duplicate_process_handle,
+)
 
 _CREATE_SUSPENDED = 0x00000004
 _CREATE_NO_WINDOW = 0x08000000
@@ -185,6 +195,7 @@ def _api() -> Any:
     kernel.GetExitCodeProcess.restype = wintypes.BOOL
     kernel.CloseHandle.argtypes = [wintypes.HANDLE]
     kernel.CloseHandle.restype = wintypes.BOOL
+    configure_completion_api(kernel)
     return kernel
 
 
@@ -209,12 +220,15 @@ class WindowsJobProcess:
         stdin: BinaryIO,
         stdout: BinaryIO,
         stderr: BinaryIO,
+        completion: JobCompletionTracker,
     ) -> None:
         self._kernel, self._job, self._process = kernel, job, process
         self._stdin, self._stdout, self._stderr = stdin, stdout, stderr
         self.pid = pid
         self._returncode: int | None = None
         self._closed = False
+        self._completion = completion
+        self._lock = threading.RLock()
 
     @property
     def returncode(self) -> int | None:
@@ -234,17 +248,20 @@ class WindowsJobProcess:
 
     def poll(self) -> int | None:
         """Exit code without blocking, or None while the child still runs."""
-        exited = (
-            self._returncode is None
-            and not self._closed
-            and self._kernel.WaitForSingleObject(self._process, 0) == _WAIT_OBJECT_0
-        )
-        if exited:
-            exit_code = wintypes.DWORD()
-            _check(self._kernel.GetExitCodeProcess(self._process, ctypes.byref(exit_code)), "EXIT")
-            self._returncode = int(exit_code.value)
-            self._close_handles()
-        return self._returncode
+        with self._lock:
+            exited = (
+                self._returncode is None
+                and not self._closed
+                and self._kernel.WaitForSingleObject(self._process, 0) == _WAIT_OBJECT_0
+            )
+            if exited:
+                exit_code = wintypes.DWORD()
+                _check(
+                    self._kernel.GetExitCodeProcess(self._process, ctypes.byref(exit_code)), "EXIT"
+                )
+                self._returncode = int(exit_code.value)
+                self._close_handles()
+            return self._returncode
 
     async def communicate(self, input: bytes | None = None) -> tuple[bytes, bytes]:
         def feed() -> None:
@@ -266,28 +283,73 @@ class WindowsJobProcess:
         return stdout, stderr
 
     def kill(self) -> None:
-        if not self._closed:
-            _check(self._kernel.TerminateJobObject(self._job, 1), "TERMINATE")
+        self._completion.request_stop(time.monotonic() + 3.0)
+
+    async def stop_tree(self) -> bool:
+        """Bound the blocking native confirmation by the same three-second deadline."""
+        deadline = time.monotonic() + 3.0
+        try:
+            return await asyncio.wait_for(
+                asyncio.to_thread(self.stop_and_confirm, deadline),
+                max(0.0, deadline - time.monotonic()),
+            )
+        except (TimeoutError, OSError):
+            return False
+
+    def stop_and_confirm(self, deadline: float) -> bool:
+        """Share one caller deadline across termination, membership and handle confirmation."""
+        # The tracker records uncertainty; closing its job still requests termination.
+        with suppress(OSError):
+            self._completion.request_stop(deadline)
+        confirmed = self._completion.wait(deadline)
+        try:
+            self.poll()
+        except OSError:
+            confirmed = False
+        finally:
+            self._close_handles()
+        for stream in (self._stdin, self._stdout, self._stderr):
+            try:
+                stream.close()
+            except (OSError, ValueError):
+                confirmed = confirmed and stream.closed
+        return (
+            confirmed
+            and all(s.closed for s in (self._stdin, self._stdout, self._stderr))
+            and time.monotonic() <= deadline
+        )
 
     async def wait(self) -> int:
-        if self._returncode is None:
-            result = await asyncio.to_thread(
-                self._kernel.WaitForSingleObject, self._process, _INFINITE
-            )
-            if result != _WAIT_OBJECT_0:
-                raise OSError(ctypes.get_last_error(), "WINDOWS_JOB_WAIT_FAILED")
-            exit_code = wintypes.DWORD()
-            _check(self._kernel.GetExitCodeProcess(self._process, ctypes.byref(exit_code)), "EXIT")
-            self._returncode = int(exit_code.value)
-            self._close_handles()
-        return self._returncode
+        def wait_parent() -> int:
+            with self._lock:
+                if self._returncode is not None:
+                    return self._returncode
+                if self._closed:
+                    raise OSError("WINDOWS_JOB_PROCESS_EXIT_UNCONFIRMED")
+                handle = duplicate_process_handle(self._kernel, self._process)
+            try:
+                if self._kernel.WaitForSingleObject(handle, _INFINITE) != _WAIT_OBJECT_0:
+                    raise OSError(ctypes.get_last_error(), "WINDOWS_JOB_WAIT_FAILED")
+                exit_code = wintypes.DWORD()
+                _check(self._kernel.GetExitCodeProcess(handle, ctypes.byref(exit_code)), "EXIT")
+            finally:
+                self._kernel.CloseHandle(handle)
+            with self._lock:
+                if self._returncode is None:
+                    self._returncode = int(exit_code.value)
+                self._close_handles()
+                return self._returncode
+
+        return await asyncio.to_thread(wait_parent)
 
     def _close_handles(self) -> None:
-        if self._closed:
-            return
-        self._closed = True
-        self._kernel.CloseHandle(self._job)  # KILL_ON_JOB_CLOSE covers descendants.
-        self._kernel.CloseHandle(self._process)
+        with self._lock:
+            if self._closed:
+                return
+            self._closed = True
+            with suppress(OSError):
+                self._completion.request_stop(time.monotonic() + 3.0)
+            self._kernel.CloseHandle(self._process)
 
 
 def spawn_windows_job(
@@ -313,6 +375,8 @@ def spawn_windows_job(
         return reader, writer
 
     job = wintypes.HANDLE()
+    completion_port = wintypes.HANDLE()
+    completion: JobCompletionTracker | None = None
     info = _ProcessInformation()
     attribute_list: wintypes.LPVOID | None = None
     attribute_initialized = False
@@ -336,6 +400,7 @@ def spawn_windows_job(
             ),
             "LIMIT",
         )
+        completion_port = associate_completion_port(kernel, job)
         list_size = ctypes.c_size_t(0)
         kernel.InitializeProcThreadAttributeList(None, 1, 0, ctypes.byref(list_size))
         if list_size.value == 0:
@@ -402,6 +467,9 @@ def spawn_windows_job(
         if _fault_at == "assign":
             raise RuntimeError("SYNTHETIC_ASSIGN_FAILURE")
         _check(kernel.AssignProcessToJobObject(job, info.hProcess), "ASSIGN")
+        completion = JobCompletionTracker(
+            kernel, job, completion_port, info.hProcess, int(info.dwProcessId)
+        )
         if _fault_at == "resume":
             raise RuntimeError("SYNTHETIC_RESUME_FAILURE")
         _check(kernel.ResumeThread(info.hThread) != _INFINITE, "RESUME")
@@ -426,13 +494,17 @@ def spawn_windows_job(
         stdout = adopt(output_read, os.O_RDONLY, "rb")
         stderr = adopt(error_read, os.O_RDONLY, "rb")
         result = WindowsJobProcess(
-            kernel, job, info.hProcess, int(info.dwProcessId), stdin, stdout, stderr
+            kernel, job, info.hProcess, int(info.dwProcessId), stdin, stdout, stderr, completion
         )
+        completion.start()
         job = wintypes.HANDLE()
+        completion_port = wintypes.HANDLE()
         info.hProcess = wintypes.HANDLE()
         return result
     except BaseException as failure:
         cleanup_failed = False
+        if completion is not None:
+            completion.abandon_before_start()
         if info.hProcess:
             kernel.TerminateProcess(info.hProcess, 1)
             cleanup_failed = kernel.WaitForSingleObject(info.hProcess, 3000) != _WAIT_OBJECT_0
@@ -441,6 +513,8 @@ def spawn_windows_job(
             kernel.CloseHandle(info.hThread)
         if job:
             kernel.CloseHandle(job)
+        if completion_port:
+            kernel.CloseHandle(completion_port)
         for stream in streams:
             stream.close()
         for handle in handles:

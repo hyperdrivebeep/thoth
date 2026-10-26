@@ -72,40 +72,41 @@ async def test_normal_evaluation_has_durable_request_and_no_open_write_transacti
             assert len(requests) == 1 and requests[0].state == "EVALUATING"
             assert requests[0].payload["candidate_digest"] == candidate_digest
             observed.append(requests[0].record_id)
+            assert peer_ready.is_set() and peer is not None
 
             async def peer_command() -> None:
-                peer = create_runtime(workspace)
-                try:
-                    current = value(
+                assert peer is not None
+                current = value(
+                    await peer.bus.dispatch(
+                        request(
+                            "project/read",
+                            "peer-read",
+                            {"project_id": project},
+                        )
+                    )
+                )
+                if change_context:
+                    value(
                         await peer.bus.dispatch(
                             request(
-                                "project/read",
-                                "peer-read",
+                                "project/metadata/update",
+                                "peer-update",
                                 {
                                     "project_id": project,
+                                    "expected_revision": current["revision"],
+                                    "name": "Peer updated evaluation basis",
                                 },
                             )
                         )
                     )
-                    if change_context:
-                        value(
-                            await peer.bus.dispatch(
-                                request(
-                                    "project/metadata/update",
-                                    "peer-update",
-                                    {
-                                        "project_id": project,
-                                        "expected_revision": current["revision"],
-                                        "name": "Peer updated evaluation basis",
-                                    },
-                                )
-                            )
-                        )
-                finally:
-                    peer.close()
 
-            with ThreadPoolExecutor(max_workers=1) as pool:
-                pool.submit(lambda: asyncio.run(peer_command())).result(timeout=10)
+            completed = Event()
+            pending = peer_pool.submit(lambda: asyncio.run(peer_command()))
+            pending.add_done_callback(lambda _future: completed.set())
+            assert completed.wait(10), (
+                "peer command did not complete outside the evaluator transaction"
+            )
+            pending.result()
             return super().evaluate(
                 baseline_digest=baseline_digest,
                 candidate_digest=candidate_digest,
@@ -129,7 +130,15 @@ async def test_normal_evaluation_has_durable_request_and_no_open_write_transacti
         improvement_evaluator=ProbeEvaluator(),
     )
     workspace = tmp_path / scenario
+    peer_pool = ThreadPoolExecutor(max_workers=1)
+    peer_ready = Event()
+    peer_preparation = peer_pool.submit(create_runtime, workspace)
+    peer_preparation.add_done_callback(lambda _future: peer_ready.set())
+    peer = None
     try:
+        # Runtime construction is fixture preparation, not the concurrent command being checked.
+        await asyncio.to_thread(peer_ready.wait)
+        peer = peer_preparation.result()
         value(
             await runtime.bus.dispatch(
                 request(
@@ -173,7 +182,12 @@ async def test_normal_evaluation_has_durable_request_and_no_open_write_transacti
                 is None
             )
     finally:
-        runtime.close()
+        try:
+            if peer is not None:
+                await asyncio.to_thread(peer_pool.submit(peer.close).result)
+        finally:
+            peer_pool.shutdown(wait=True)
+            runtime.close()
     reopened = create_runtime(workspace)
     try:
         stored = SqliteControlRecordStore(reopened.ledger.engine).read(

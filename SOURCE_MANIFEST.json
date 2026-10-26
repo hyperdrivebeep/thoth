@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-25T12:04:10.734426+00:00",
+  "created_at": "2026-10-26T02:54:00.505898+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -3748,13 +3748,13 @@
     },
     {
       "path": "src/thoth/adapters/models/claude_code.py",
-      "sha256": "387625ecbb9e8e3fe3bf53f877e177ae65d8aa577046e537a475e243e4fbb2b7",
-      "bytes": 31094
+      "sha256": "5a758e6100748969f7e7b4ec17f4c3ceab56bab7d63a791080f46f66dbd2f848",
+      "bytes": 31112
     },
     {
       "path": "src/thoth/adapters/models/claude_code_login.py",
-      "sha256": "b1f8505b858383a16b56f64c1f5ff47f6443d74fa50c56543028b9390c3bcd56",
-      "bytes": 15585
+      "sha256": "0cd9defce19ac9269fbbc8c5fd948d6aa89abfaf1fdf062e7871e08a86807c70",
+      "bytes": 15568
     },
     {
       "path": "src/thoth/adapters/models/claude_code_tooling.py",
@@ -3902,9 +3902,14 @@
       "bytes": 3721
     },
     {
+      "path": "src/thoth/adapters/models/windows_job_completion.py",
+      "sha256": "f38513c7508b2d87fcee3b4c7943d7653fad37d66f890b3d1993ecce05a028db",
+      "bytes": 9493
+    },
+    {
       "path": "src/thoth/adapters/models/windows_process_job.py",
-      "sha256": "909a061491d14bfffc1b4b08d17bc101157730a53a0e23383a4de01ac60ba573",
-      "bytes": 15920
+      "sha256": "9a2834cf675a8401584b248548b72cf402cb90b2ac614a750907d9deb0d749f0",
+      "bytes": 18758
     },
     {
       "path": "src/thoth/adapters/models/xai_account_usage.py",
@@ -8733,8 +8738,8 @@
     },
     {
       "path": "tests/integration/test_a08_storage_authority.py",
-      "sha256": "1a3c842f54e152ddc28b953a9e64bbcf0e54c3aeb60db1ce52d6b7b76745fcdf",
-      "bytes": 36465
+      "sha256": "610ab28d97d74e110fe662f95ca8c2d16a6be46456ebefceb654dcbe65a2eeef",
+      "bytes": 37093
     },
     {
       "path": "tests/integration/test_a08_workflow_candidate_canary.py",
@@ -8948,8 +8953,8 @@
     },
     {
       "path": "tests/integration/test_codex_auth_nonblocking.py",
-      "sha256": "23dde076406dad87aebf142cf3e1c38a0d0a51c263ec743b5573cb9091bb98b0",
-      "bytes": 6655
+      "sha256": "e4f275f0163618c10cda47fa0e131fa0ef9529c1ec54035ef89ec45ab919b9df",
+      "bytes": 7049
     },
     {
       "path": "tests/integration/test_confirmed_findings_result.py",
@@ -11222,9 +11227,14 @@
       "bytes": 1645
     },
     {
+      "path": "tests/unit/models/test_windows_job_completion.py",
+      "sha256": "4f0be0e75bdfe2c7c9976f6151d853b2a5e7b016bbd0860fbe5481531db56ad6",
+      "bytes": 7344
+    },
+    {
       "path": "tests/unit/models/test_windows_process_job.py",
-      "sha256": "c43376a60aec25945870ee67bcf684776ed55de2fb908aaeb95697c5c9b4947a",
-      "bytes": 7107
+      "sha256": "0abea34c55256439fb6c98956026b74f66dcd4002d29d0ee5ffe8a953b493a37",
+      "bytes": 8832
     },
     {
       "path": "tests/unit/models/test_windows_profile_output_encoding.py",
