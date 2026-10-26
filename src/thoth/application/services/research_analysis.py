@@ -14,17 +14,18 @@ from thoth.application.services.memory_query_expansion import ModelMemoryQueryEx
 from thoth.application.services.request_records import RequestRecords
 from thoth.application.services.requirement_compiler import compile_requirements
 from thoth.application.services.research_answer import answer_summary
-from thoth.application.services.research_context_assembler import assemble_context
+from thoth.application.services.research_assembly import assemble_research_context
 from thoth.application.services.research_coverage import assess_coverage
 from thoth.application.services.research_discovery import discover_sources
 from thoth.application.services.research_findings import adopt_confirmed_findings
 from thoth.application.services.research_gaps import gap_targets, validate_gaps
-from thoth.application.services.research_retrieval import pinned_first, work_candidates
-from thoth.application.services.research_retrieval_policy import record_selection, retrieval_policy
+from thoth.application.services.research_retrieval import work_candidates
 from thoth.application.services.research_role_context import bundle_view, role_context
+from thoth.application.services.research_source_digest import versioned_source_digest
 from thoth.application.services.research_stage_reuse import reuse_stage_if_exact
 from thoth.application.services.research_stages import persist_stage, read_stage
-from thoth.domain.canonical import canonical_payload, domain_digest, head_set_digest
+from thoth.application.services.retrieval_coverage_view import with_retrieval_coverage
+from thoth.domain.canonical import head_set_digest
 from thoth.domain.enums import CutoffState, EntityType, ModelRole
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.evidence_bundle import ContextAssembly
@@ -72,7 +73,7 @@ class ResearchAnalysis:
         # A stored structure does not change, so its digest is computed once per process; the scoped
         # metadata read that forms the key still checks access on every use.
         self._structure_summaries: dict[
-            tuple[str, str, str, str], tuple[dict[str, object] | None, str]
+            tuple[str, str, str, str], source_queries.StructureSummary
         ] = {}
 
     def assemble(
@@ -82,40 +83,9 @@ class ResearchAnalysis:
         candidates: tuple[EvidenceSpan, ...],
         source: tuple[EvidenceSpan, ...],
     ) -> ContextAssembly:
-        started = perf_counter_ns()
-        work.boundary.check()
-        ranking = pinned_first(ranking, candidates, work.pinned_spans)
-        # Re-read scoped structure and complete source identity before any cache reuse.
-        key = domain_digest(
-            "CONTEXT_ASSEMBLY_INPUT",
-            "1.0.0",
-            canonical_payload(
-                {
-                    "ranking": ranking,
-                    "candidates": candidates,
-                    "source": source,
-                    "structure_basis": self.source_structures(source),
-                    "policy": retrieval_policy(),
-                }
-            ),
+        return assemble_research_context(
+            work, ranking, candidates, source, self.artifacts, self.source_structures
         )
-        prior = work.preprocessing_cache.get(key)
-        if isinstance(prior, ContextAssembly):
-            record_selection("CONTEXT_PREPROCESSING_REUSE", {"basis": key}, prior.evidence, started)
-            return prior.model_copy(
-                update={
-                    "wave": prior.wave.model_copy(
-                        update={
-                            "cache_hit": True,
-                            "new_information_count": 0,
-                            "termination": "NO_NEW_INFORMATION",
-                        }
-                    )
-                }
-            )
-        result = assemble_context(ranking, candidates, source, self.artifacts)
-        work.preprocessing_cache[key] = result
-        return result
 
     def stage_record(
         self,
@@ -170,11 +140,9 @@ class ResearchAnalysis:
             self.artifacts, self._structure_summaries, project, artifact, version
         )
 
-    def source_digest(self, evidence: tuple[EvidenceSpan, ...], *, version: str = "2.1.0") -> str:
-        return domain_digest(
-            "SOURCE_CONTEXT",
-            version,
-            canonical_payload(self.source_packet(evidence, include_structure=version != "2.0.0")),
+    def source_digest(self, evidence: tuple[EvidenceSpan, ...], *, version: str = "2.2.0") -> str:
+        return versioned_source_digest(
+            self.source_packet(evidence, include_structure=version != "2.0.0"), version
         )
 
     def require_current_sources(
@@ -263,7 +231,7 @@ class ResearchAnalysis:
         )
         # Start with admissible connected source candidates; no fake evidence is needed.
         all_evidence = self.evidence(project.project_id)
-        shortlist = work_candidates(work, (), all_evidence)
+        shortlist = work_candidates(work, (), all_evidence, self.artifacts)
         if shortlist and all(span.cutoff_state == CutoffState.UNKNOWN_TIME for span in shortlist):
             work.context["source_time_limitation"] = "SOURCE_TIME_UNCONFIRMED"
         assembly = self.assemble(work, tuple(s.span_id for s in shortlist), shortlist, all_evidence)
@@ -413,11 +381,17 @@ class ResearchAnalysis:
         source: tuple[EvidenceSpan, ...],
     ) -> tuple[CoverageAssessment, str]:
         # Rank the original bounded candidates: expanding first spends the budget on prose.
-        candidates = work_candidates(work, proposal.expanded_queries, source)
+        candidates = work_candidates(work, proposal.expanded_queries, source, self.artifacts)
+        ranking_context = review_contexts.ranking_context(context, work, ref, candidates)
+        if work.retrieval_selection is not None and work.retrieval_selection.contextual_refs:
+            preview = self.assemble(work, tuple(s.span_id for s in candidates), candidates, source)
+            ranking_context = review_contexts.contextual_ranking(
+                ranking_context, candidates, preview
+            )
         ranked, _ = await self.ask(
             model,
             project,
-            review_contexts.ranking_context(context, work, ref, candidates),
+            ranking_context,
             ModelRole.EVIDENCE_RERANKER,
             EvidenceRanking,
         )
@@ -428,7 +402,7 @@ class ResearchAnalysis:
             *cast(list[object], work.context.get("internal_expansion_waves", [])),
             assembly.wave.model_dump(mode="json"),
         ]
-        work.context["source_context_version"] = "2.1.0"
+        work.context["source_context_version"] = "2.2.0"
         targets = gap_targets(ranked, ref, assembly.bundles, assembly.evidence)
         work.context["gap_targets"] = [g.model_dump(mode="json") for g in targets]
         work.context["source_packet"] = self.source_packet(work.evidence)
@@ -532,6 +506,10 @@ class ResearchAnalysis:
         codec: type[T],
     ) -> tuple[T, str]:
         work = research_work.get()
+        if work is not None and work.retrieval_selection is not None:
+            context = with_retrieval_coverage(context, role, work)
+            work.context["retrieval_coverage"] = context.research_context["retrieval_coverage"]
+            work.context["context_projection_version"] = "2.0.0"
         source_context_digest = self.source_digest(context.evidence)
         if work is not None:
             work.evidence = context.evidence
@@ -544,7 +522,7 @@ class ResearchAnalysis:
                     work.basis_reasons.append("BASIS_SOURCE_CHANGED_DURING_REQUEST")
                 work.consumed_sources.setdefault(span.span_id, span)
             work.context["source_context_digest"] = source_context_digest
-            work.context["source_context_version"] = "2.1.0"
+            work.context["source_context_version"] = "2.2.0"
         prepared = ModelRequest(
             role=role,
             project_id=project.project_id,

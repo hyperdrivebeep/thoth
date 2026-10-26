@@ -104,15 +104,16 @@ def stage_bases[T: BaseModel](work: ResearchWork, request: ModelRequest[T]) -> S
     if work.response_language is not None:
         common["response_language"] = work.response_language
         common["language_policy_version"] = LANGUAGE_POLICY_VERSION
+    contextual = context.research_context.get("context_projection_version") == "2.0.0"
     return StageBases(
         basis=domain_digest(
             "ROLE_INPUT_BASIS",
-            "2.1.0" if work.response_language is not None else "2.0.0",
+            "2.2.0" if contextual else "2.1.0" if work.response_language is not None else "2.0.0",
             canonical_payload({"request_ref": work.request_ref, **common}),
         ),
         reuse_basis=domain_digest(
             "ROLE_REUSE_BASIS",
-            "1.1.0" if work.response_language is not None else "1.0.0",
+            "1.2.0" if contextual else "1.1.0" if work.response_language is not None else "1.0.0",
             canonical_payload({**common, "context": _reuse_context(context, work.request_ref)}),
         ),
         schema=schema,

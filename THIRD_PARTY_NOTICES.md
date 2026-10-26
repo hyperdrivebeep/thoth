@@ -4,6 +4,11 @@ Installed dependency payloads, node_modules, Python virtual environments and com
 are not included in this source snapshot. Dependencies are installed separately under their own
 licenses; the project's selected license does not relicense them.
 
+The MD/TXT positional-context observer uses markdown-it-py 4.2.0 (MIT), pinned as a direct
+dependency. It parses source positions without rendering or executing source content. Preserve
+the upstream [MIT notice](https://github.com/executablebooks/markdown-it-py/blob/v4.2.0/LICENSE)
+when redistributing that dependency. Its installed payload is not included in this repository.
+
 [Direct dependency metadata](docs/DEPENDENCY_LICENSES.json) records declared constraints, resolved
 versions and available installed-package license metadata. It is not a complete transitive license
 audit. Preserve applicable upstream notices when redistributing a binary/dependency bundle.

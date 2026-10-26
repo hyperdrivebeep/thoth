@@ -104,7 +104,14 @@ class ControlledResearchModel:
             )
         elif req.role == ModelRole.EVIDENCE_RERANKER:
             output = EvidenceRanking(
-                ordered_span_ids=tuple(s.span_id for s in ctx.evidence),
+                ordered_span_ids=tuple(
+                    cast(
+                        tuple[str, ...] | list[str],
+                        ctx.research_context.get(
+                            "ranking_candidate_refs", tuple(s.span_id for s in ctx.evidence)
+                        ),
+                    )
+                ),
                 rationale="Controlled relevance ordering",
             )
         elif req.role == ModelRole.SEMANTIC_REVIEWER:

@@ -10,8 +10,16 @@ from thoth.application.services.research_retrieval_policy import (
     replay_retrieval_shadows,
     retrieval_policy,
 )
+from thoth.application.services.research_selection_context import (
+    CandidateContext,
+    candidate_context,
+)
+from thoth.domain.behavior_policy import RetrievalBehaviorPolicy
+from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
 from thoth.domain.research_execution import ResearchWork
+from thoth.domain.retrieval_coverage import RetrievalSelection
+from thoth.ports.artifact_ledger import ArtifactLedgerPort
 
 _MIN_TERM = 3
 _KOREAN_PAIR = re.compile(r"[가-힣]{2}")
@@ -145,16 +153,59 @@ def text_neighbors(
     return tuple(dict.fromkeys([*near, *block]))
 
 
+def _full_catalog(
+    eligible: tuple[EvidenceSpan, ...],
+    context: CandidateContext | None,
+    policy: RetrievalBehaviorPolicy,
+) -> tuple[tuple[EvidenceSpan, ...] | None, tuple[str, ...]]:
+    """One admission decision for selection and its coverage mode; None means fallback."""
+    if context is None or not context.all_observed:
+        return None, ()
+    by_id = {s.span_id: s for s in eligible}
+    if (
+        set(context.ordered_refs) != set(by_id)
+        or len(context.ordered_refs) != len(by_id)
+        or len(eligible) != len(by_id)
+    ):
+        return None, ("CONTEXT_ORDERED_REFS_MISMATCH",)
+    if (
+        len(eligible) > policy.max_spans
+        or context.structure_count > policy.max_spans
+        or sum(len(s.exact_text) for s in eligible) > policy.character_budget
+    ):
+        return None, ()
+    return tuple(by_id[k] for k in context.ordered_refs), ()
+
+
 def lexical_candidates(
     question: str,
     queries: tuple[str, ...],
     evidence: tuple[EvidenceSpan, ...],
     pinned: tuple[str, ...] = (),
+    *,
+    context: CandidateContext | None = None,
 ) -> tuple[EvidenceSpan, ...]:
     policy, started = retrieval_policy(), perf_counter_ns()
     terms = search_terms(" ".join((question, *queries)))
     eligible = connected_retrieval_spans(evidence)
-    pool = tuple(span for span in eligible if not _is_chrome(span)) or eligible
+    complete, _ = _full_catalog(eligible, context, policy)
+    if complete is not None:
+        result = complete
+        record_selection(
+            "FULL_ELIGIBLE_EXTRACTED_CATALOG",
+            {"question": question, "queries": queries, "evidence": evidence},
+            result,
+            started,
+        )
+        replay_retrieval_shadows(
+            lambda: lexical_candidates(question, queries, evidence, pinned, context=context)
+        )
+        return result
+    protected: frozenset[str] = frozenset() if context is None else context.protected_refs
+    pool = (
+        tuple(span for span in eligible if not _is_chrome(span) or span.span_id in protected)
+        or eligible
+    )
     exact = {s.span_id for s in pool if s.span_id in question or s.artifact_id in question}
     ranked = sorted(pool, key=lambda span: _rank_key(span, exact=exact, terms=terms))
     if any(span.span_id in exact or _term_hits(span.exact_text, terms) for span in ranked):
@@ -180,15 +231,43 @@ def lexical_candidates(
         result,
         started,
     )
-    replay_retrieval_shadows(lambda: lexical_candidates(question, queries, evidence, pinned))
+    replay_retrieval_shadows(
+        lambda: lexical_candidates(question, queries, evidence, pinned, context=context)
+    )
     return result
 
 
 def work_candidates(
-    work: ResearchWork, queries: tuple[str, ...], evidence: tuple[EvidenceSpan, ...]
+    work: ResearchWork,
+    queries: tuple[str, ...],
+    evidence: tuple[EvidenceSpan, ...],
+    artifacts: ArtifactLedgerPort | None = None,
 ) -> tuple[EvidenceSpan, ...]:
     """The shortlist for a request: its question, its queries and the spans its start row pins."""
-    return lexical_candidates(work.effective_question, queries, evidence, work.pinned_spans)
+    eligible = connected_retrieval_spans(evidence)
+    context = None if artifacts is None else candidate_context(eligible, artifacts)
+    result = lexical_candidates(
+        work.effective_question, queries, evidence, work.pinned_spans, context=context
+    )
+    policy = retrieval_policy()
+    complete, limitations = _full_catalog(eligible, context, policy)
+    work.retrieval_selection = RetrievalSelection(
+        evidence,
+        eligible,
+        tuple(s.span_id for s in result),
+        domain_digest("RETRIEVAL_SOURCE", "1.0.0", canonical_payload({"source": evidence}))
+        if context is None
+        else context.basis_digest,
+        domain_digest("RETRIEVAL_POLICY", "1.0.0", canonical_payload(policy)),
+        "FULL_ELIGIBLE_EXTRACTED_CATALOG"
+        if complete is not None
+        else "LEGACY"
+        if context is None or not context.all_observed
+        else "LEXICAL",
+        ("LEGACY_CONTEXT",) if context is None else (*context.limitations, *limitations),
+        contextual_refs=() if context is None else context.ordered_refs,
+    )
+    return result
 
 
 def pinned_first(

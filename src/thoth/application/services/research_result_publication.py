@@ -91,7 +91,7 @@ def publish_research_result(
             source_refs=tuple(s.span_id for s in work.evidence),
             resource_uses=tuple(u.model_dump(mode="python") for u in uses),
             source_context_digest=source_digest(work.evidence),
-            source_context_version="2.1.0",
+            source_context_version="2.2.0",
             source_basis={
                 s.span_id: f"{s.source_version_id}:{s.text_sha256}" for s in work.evidence
             },

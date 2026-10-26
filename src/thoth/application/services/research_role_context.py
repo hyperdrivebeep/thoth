@@ -24,6 +24,21 @@ def bundle_view(assembly: ContextAssembly) -> dict[str, object]:
             fields["warnings"] = node.warnings
         projected.append(fields)
     return {
+        **(
+            {
+                "schema_version": "2.0.0",
+                "context_regions": [
+                    r.model_dump(mode="json")
+                    for r in {
+                        r.region_id: r
+                        for bundle in assembly.bundles
+                        for r in bundle.context_regions
+                    }.values()
+                ],
+            }
+            if any(b.context_regions for b in assembly.bundles)
+            else {}
+        ),
         "bundles": [
             {
                 "bundle_id": b.bundle_id,
@@ -34,6 +49,11 @@ def bundle_view(assembly: ContextAssembly) -> dict[str, object]:
                 "basis_digest": b.basis_digest,
                 "structure_refs": tuple(n.node_id for n in b.structures),
                 "limitations": b.limitations,
+                **(
+                    {"context_refs": tuple(r.region_id for r in b.context_regions)}
+                    if b.context_regions
+                    else {}
+                ),
             }
             for b in assembly.bundles
         ],
@@ -63,11 +83,13 @@ _COMMON = {
     "preference_policy",
     "source_time_limitation",
     "entity_currentness",
+    "retrieval_coverage",
+    "context_projection_version",
 }
 _EXTRA: dict[ModelRole, set[str]] = {
     ModelRole.RESEARCH_PLANNER: {"profiles", "source_overview"},
-    ModelRole.EVIDENCE_RERANKER: set(),
-    ModelRole.SEMANTIC_REVIEWER: {"retrieval_limits"},
+    ModelRole.EVIDENCE_RERANKER: {"ranking_candidate_refs"},
+    ModelRole.SEMANTIC_REVIEWER: set(),
     ModelRole.REVIEW_ADJUDICATOR: {"candidate"},
 }
 

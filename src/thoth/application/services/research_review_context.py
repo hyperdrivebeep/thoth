@@ -1,6 +1,8 @@
 """Pure input views for ranking, semantic review and separate adjudication."""
 
+from thoth.application.services.research_role_context import bundle_view
 from thoth.domain.evidence import EvidenceSpan
+from thoth.domain.evidence_bundle import ContextAssembly
 from thoth.domain.evidence_requirements import EvidenceRanking, ReviewProposal
 from thoth.domain.model import ContextPack
 from thoth.domain.research_execution import ResearchWork
@@ -48,6 +50,24 @@ def semantic_review_context(
                 "authority or a citation alone is not support. Do not invent support edges. "
                 "BOUND exemptions require governing authority, never model discretion.",
                 "omitted_required_information": ranked.omitted_required_information,
+            },
+        }
+    )
+
+
+def contextual_ranking(
+    context: ContextPack, candidates: tuple[EvidenceSpan, ...], assembly: ContextAssembly
+) -> ContextPack:
+    admitted = {s.span_id for s in assembly.evidence}
+    return context.model_copy(
+        update={
+            "evidence": assembly.evidence,
+            "research_context": {
+                **context.research_context,
+                "context_bundle": bundle_view(assembly),
+                "ranking_candidate_refs": tuple(
+                    s.span_id for s in candidates if s.span_id in admitted
+                ),
             },
         }
     )

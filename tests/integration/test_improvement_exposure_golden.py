@@ -1,5 +1,8 @@
 """100-R original exposure-service results and effect-order golden.
 
+2026-10-26: text parser 1.2 metadata and dependent digests were refreshed after an exact
+1.1 parser control and unchanged call/result shapes. Equality checks remain exact.
+
 Public RPCs and real local comparisons prepare evidence; models are scripted. Fix only test
 IDs, clocks and measured elapsed timers. Preserve every record field and digest. Static methods
 retain their static binding, and all preexisting service methods remain observable after split.

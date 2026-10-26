@@ -1,5 +1,8 @@
 """99-R original handler outputs, notification keys and effect order.
 
+2026-10-26: text parser 1.2 metadata and dependent digests were refreshed after an exact
+1.1 parser control and unchanged call/result shapes. Equality checks remain exact.
+
 All public handler calls (including harness setup) are recorded. Real local pair execution and
 scripted exposure work prepare valid evidence; clocks, IDs and the pair elapsed timer are fixed
 before setup. No stored digest is normalized or discarded. These are local regression fixtures,

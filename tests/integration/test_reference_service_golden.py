@@ -1,5 +1,8 @@
 """ReferenceService golden (97): what the service returns and which ports it calls.
 
+2026-10-26: text parser 1.2 metadata and dependent digests were refreshed after an exact
+1.1 parser control and unchanged call/result shapes. Equality checks remain exact.
+
 Scenarios run on a real runtime through thread/input (the only public entry) with the scripted
 reference mapper, the local deterministic calculators, a deterministic id generator and clock. The
 trace holds the calls made while a ReferenceService method is running: method entries and exits with

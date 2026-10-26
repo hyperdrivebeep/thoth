@@ -101,6 +101,16 @@ async def test_local_gpu_log_does_not_block_registered_web_acquisition(tmp_path:
         assert PAPER_URI in uris
         assert LISTING_URI not in uris
         assert any(call.role == ModelRole.SOURCE_PLANNER for call in model.calls)
+        for call in model.calls:
+            if call.role == ModelRole.SOURCE_PLANNER:
+                coverage = call.context_pack.research_context["retrieval_coverage"]
+                assert isinstance(coverage, dict)
+                assert coverage["role"] == ModelRole.SOURCE_PLANNER.value
+                assert coverage["input_span_refs"] == [
+                    span.span_id for span in call.context_pack.evidence
+                ]
+                assert coverage["scope"] == "AUTHORIZED_CONNECTED_EXTRACTED_SOURCE"
+                assert call.context_pack.research_context["context_projection_version"] == "2.0.0"
     finally:
         runtime.close()
 

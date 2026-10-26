@@ -59,6 +59,11 @@ class SqliteArtifactLedger(ArtifactLedgerPort):
         evidence_candidates: tuple[EvidenceSpan, ...],
     ) -> None:
         artifact = document.artifact
+        if document.context_observation is not None and (
+            document.context_observation.binding != "VERSION_BOUND"
+            or document.context_observation.source_version_id != source_version_id
+        ):
+            raise ValueError("CONTEXT_OBSERVATION_VERSION_MISMATCH")
         with write_connection(self._engine) as connection:
             connection.execute(
                 insert(artifacts).values(
@@ -236,9 +241,15 @@ class SqliteArtifactLedger(ArtifactLedgerPort):
                 != hashlib.sha256(canonical_payload({"nodes": tuple(nodes)})).hexdigest()
             ):
                 raise ValueError("STRUCTURE_DIGEST_MISMATCH")
-            return StructuralDocument.model_validate(
+            document = StructuralDocument.model_validate(
                 {"artifact": self._artifact_from_row(source), "nodes": nodes, **metadata}
             )
+            if document.context_observation is not None and (
+                document.context_observation.binding != "VERSION_BOUND"
+                or document.context_observation.source_version_id != source_version_id
+            ):
+                raise ValueError("CONTEXT_OBSERVATION_VERSION_MISMATCH")
+            return document
 
     def read_structure_metadata_digest(
         self, project_id: str, artifact_id: str, source_version_id: str
@@ -497,15 +508,10 @@ class SqliteArtifactLedger(ArtifactLedgerPort):
                 )
             current = cast(dict[str, object] | None, metadata.get("source_time_assessment"))
             current_revision = (
-                0
-                if current is None
-                else int(cast(int | str | float, current.get("revision", 0)))
+                0 if current is None else int(cast(int | str | float, current.get("revision", 0)))
             )
             revision = 0 if current is None else current_revision + 1
-            if (
-                current is not None
-                and current_revision != basis.expected_assessment_revision
-            ):
+            if current is not None and current_revision != basis.expected_assessment_revision:
                 raise SourceTimeError(
                     SourceTimeMutationReason.SOURCE_TIME_BASIS_STALE.value,
                     "source time assessment revision changed",
@@ -519,9 +525,7 @@ class SqliteArtifactLedger(ArtifactLedgerPort):
                 cutoff_state=next_state,
                 mode=mode,
                 basis_observation_ids=tuple(
-                    cast(Iterable[str], current.get("basis_observation_ids", ()))
-                    if current
-                    else ()
+                    cast(Iterable[str], current.get("basis_observation_ids", ())) if current else ()
                 ),
                 reason_code=reason_code,
                 revision=revision,

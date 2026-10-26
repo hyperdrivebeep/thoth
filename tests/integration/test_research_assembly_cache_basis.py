@@ -6,7 +6,7 @@ from tests.integration.test_research_focus_basis import research_host
 from tests.integration.test_research_memory_basis import Boundary
 from tests.integration.test_research_request_v2 import ControlledResearchModel, setup
 
-import thoth.application.services.research_analysis as analysis_module
+import thoth.application.services.research_assembly as assembly_module
 from thoth.domain.artifact import StructuralDocument
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.enums import CutoffState
@@ -60,7 +60,7 @@ async def test_cache_tracks_its_actual_raw_structure_and_policy_inputs(
             calls.append((ranking, candidates, source, artifacts))
             return result
 
-        monkeypatch.setattr(analysis_module, "assemble_context", counted)
+        monkeypatch.setattr(assembly_module, "assemble_context", counted)
         mutations = [
             {"exact_text": source[0].exact_text + " changed"},
             {"text_sha256": "f" * 64},
@@ -120,10 +120,10 @@ async def test_cache_tracks_its_actual_raw_structure_and_policy_inputs(
         current = work()
         analysis.assemble(current, ranking, candidates, source)
         baseline = len(calls)
-        policy = analysis_module.retrieval_policy()
+        policy = assembly_module.retrieval_policy()
         with monkeypatch.context() as patch:
             patch.setattr(
-                analysis_module,
+                assembly_module,
                 "retrieval_policy",
                 lambda: policy.model_copy(update={"character_budget": policy.character_budget - 1}),
             )
@@ -165,7 +165,7 @@ async def test_selected_correction_changes_packet_digest_without_polluting_assem
             "SOURCE_CONTEXT", "2.0.0", canonical_payload(legacy)
         )
         assert analysis.source_digest(cached.evidence) == domain_digest(
-            "SOURCE_CONTEXT", "2.1.0", canonical_payload(packet)
+            "SOURCE_CONTEXT", "2.2.0", canonical_payload(packet)
         )
     finally:
         runtime.close()

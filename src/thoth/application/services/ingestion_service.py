@@ -167,9 +167,8 @@ class IngestionService:
             and project.revision != command.captured_project_revision
         ):
             raise ValueError("project revision changed before source ingestion")
-        if (
-            command.captured_cutoff_at is not None
-            and not same_stored_instant(project.cutoff_at, command.captured_cutoff_at)
+        if command.captured_cutoff_at is not None and not same_stored_instant(
+            project.cutoff_at, command.captured_cutoff_at
         ):
             raise ValueError("project cutoff changed before source ingestion")
         pending_cutoff = (
@@ -205,6 +204,10 @@ class IngestionService:
     ) -> IngestionResult:
         self._objects.put(command.raw, artifact.byte_sha256, operation_id=command.operation_id)
         source_version_id = self._ids.new("source-version")
+        if document.context_observation is not None:
+            document = document.model_copy(
+                update={"context_observation": document.context_observation.bind(source_version_id)}
+            )
         if document.capability_observation is not None:
             document = document.model_copy(
                 update={
@@ -221,9 +224,8 @@ class IngestionService:
             and project.revision != command.captured_project_revision
         ):
             raise ValueError("project revision changed before source ingestion")
-        if (
-            command.captured_cutoff_at is not None
-            and not same_stored_instant(project.cutoff_at, command.captured_cutoff_at)
+        if command.captured_cutoff_at is not None and not same_stored_instant(
+            project.cutoff_at, command.captured_cutoff_at
         ):
             raise ValueError("project cutoff changed before source ingestion")
         if command.classify_source_time:

@@ -4,6 +4,7 @@ import re
 from pathlib import PurePosixPath
 
 from thoth.adapters.parsers.common import coverage, node_id, parser_artifact, validate_byte_hash
+from thoth.adapters.parsers.text_context import observe_text_context
 from thoth.domain.artifact import (
     ArtifactEnvelope,
     SourceLocator,
@@ -50,7 +51,7 @@ class _KeyPath:
 
 class TextParser:
     name = "text"
-    version = "1.1.0"
+    version = "1.2.0"
     media_types = frozenset({"text/plain", "text/markdown"})
     # .yaml/.yml are read as plain lines of text. Nothing in them is interpreted or run.
     suffixes = frozenset({".txt", ".md", ".markdown", ".yaml", ".yml"})
@@ -90,4 +91,7 @@ class TextParser:
             artifact=parser_artifact(artifact, name=self.name, version=self.version),
             nodes=tuple(nodes),
             extraction_coverage=coverage(nodes),
+            context_observation=None
+            if _is_yaml(artifact)
+            else observe_text_context(artifact, text, tuple(nodes)),
         )

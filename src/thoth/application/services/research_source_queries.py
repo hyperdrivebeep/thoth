@@ -9,6 +9,8 @@ from thoth.ports.artifact_ledger import ArtifactLedgerPort
 from thoth.ports.evidence_graph import EvidenceGraphStorePort
 from thoth.ports.governance import GovernanceStorePort
 
+type StructureSummary = tuple[dict[str, object] | None, str, str | None]
+
 
 def evidence(
     artifacts: ArtifactLedgerPort, governance: GovernanceStorePort, project: str
@@ -111,7 +113,7 @@ def source_structures(
 
 def structure_summary(
     artifacts: ArtifactLedgerPort,
-    summaries: dict[tuple[str, str, str, str], tuple[dict[str, object] | None, str]],
+    summaries: dict[tuple[str, str, str, str], StructureSummary],
     project: str,
     artifact: str,
     version: str,
@@ -119,8 +121,12 @@ def structure_summary(
     metadata = artifacts.read_structure_metadata_digest(project, artifact, version)
     key = None if metadata is None else (project, artifact, version, metadata)
     if key is not None and key in summaries:
-        observation, digest = summaries[key]
-        return {"observation": observation, "nodes_digest": digest}
+        observation, digest, context_digest = summaries[key]
+        return {
+            "observation": observation,
+            "nodes_digest": digest,
+            **({"context_observation_digest": context_digest} if context_digest else {}),
+        }
     document = artifacts.read_structure(project, artifact, version)
     if document is None:
         return {"observation": None, "nodes_digest": None}
@@ -132,8 +138,19 @@ def structure_summary(
     digest = domain_digest(
         "SOURCE_STRUCTURE", "1.0.0", canonical_payload({"nodes": document.nodes})
     )
+    context_digest = (
+        None
+        if document.context_observation is None
+        else domain_digest(
+            "CONTEXT_OBSERVATION", "1.0.0", canonical_payload(document.context_observation)
+        )
+    )
     if key is not None:
         if len(summaries) >= 128:
             summaries.clear()
-        summaries[key] = (observation, digest)
-    return {"observation": observation, "nodes_digest": digest}
+        summaries[key] = (observation, digest, context_digest)
+    return {
+        "observation": observation,
+        "nodes_digest": digest,
+        **({"context_observation_digest": context_digest} if context_digest else {}),
+    }

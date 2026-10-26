@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from thoth.application.services.model_wait import await_current_model
 from thoth.application.services.request_language import model_request_language
+from thoth.application.services.retrieval_coverage_view import with_retrieval_coverage
 from thoth.domain.model import ModelRequest, ModelResult
 from thoth.domain.model_dispatch import ModelCallContext
 from thoth.domain.research_execution import ResearchUsageObserver, model_call, research_work
@@ -31,6 +32,7 @@ class ResearchModel:
                     request,
                     model_settings=work.model_settings,
                     response_language=work.response_language,
+                    context_pack=with_retrieval_coverage(request.context_pack, request.role, work),
                 ),
                 work.response_language,
             )
@@ -89,6 +91,9 @@ class ResearchModel:
                 model_call.reset(token)
         if work is not None:
             work.boundary.check()
+            coverage = request.context_pack.research_context.get("retrieval_coverage")
+            if coverage is not None:
+                work.result_only["retrieval_coverage"] = coverage
         return result
 
 
