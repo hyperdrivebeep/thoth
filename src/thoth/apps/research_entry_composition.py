@@ -6,6 +6,7 @@ from functools import partial
 from pathlib import Path
 from typing import cast
 
+from thoth.adapters.document_calculators import default_document_calculator
 from thoth.adapters.models.catalog import (
     CodexModelCatalog,
     CompositeModelCatalog,
@@ -55,6 +56,7 @@ from thoth.application.commands.research_threads import ResearchThreadHandlers
 from thoth.application.commands.threads import ThreadCommandHandlers
 from thoth.application.commands.workspace_setup import WorkspaceSetupHandlers
 from thoth.application.services.connector_service import ConnectorService
+from thoth.application.services.document_calculation import DocumentCalculationService
 from thoth.application.services.full_project_memory import FullProjectMemoryService
 from thoth.application.services.model_call_settings import ModelCallSettingsService
 from thoth.application.services.model_settings import ModelSettingsService
@@ -280,6 +282,7 @@ def create_research_entry(
             memory,
             evidence,
             task_profiles or default_task_profiles(),
+            DocumentCalculationService(default_document_calculator()),
         ),
         projects=stores.projects,
         threads=stores.threads,

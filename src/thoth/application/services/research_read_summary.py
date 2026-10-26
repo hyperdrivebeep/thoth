@@ -10,6 +10,8 @@ from typing import cast
 
 from pydantic import JsonValue
 
+from thoth.application.services.numeric_observation_view import summarize_checked_observations
+
 VIEWS = frozenset({"SUMMARY", "FULL", "PROGRESS"})
 
 # Result manifest fields that hold the evidence basis and resource records behind a result.
@@ -61,6 +63,10 @@ def summarize_thread_read(payload: dict[str, JsonValue]) -> dict[str, JsonValue]
         result = slim.get("result")
         if isinstance(result, dict):
             slim["result"] = {k: v for k, v in result.items() if k not in OMITTED_RESULT_KEYS}
+            if "checked_observations" in result:
+                slim["result"]["checked_observations"] = cast(
+                    JsonValue, summarize_checked_observations(result["checked_observations"])
+                )
         summary[key] = cast(JsonValue, slim)
     if summary.get("operation_state") in TERMINAL_OPERATION_STATES:
         # The activity log only drives the panel shown while research runs.

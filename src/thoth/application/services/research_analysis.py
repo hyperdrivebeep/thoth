@@ -9,8 +9,10 @@ from pydantic import BaseModel, ValidationError
 from thoth.application.services import research_review_context as review_contexts
 from thoth.application.services import research_source_queries as source_queries
 from thoth.application.services.connector_service import ConnectorService
+from thoth.application.services.document_calculation import DocumentCalculationService
 from thoth.application.services.full_project_memory import FullProjectMemoryService
 from thoth.application.services.memory_query_expansion import ModelMemoryQueryExpander, widen_query
+from thoth.application.services.numeric_observation_view import with_numeric_observations
 from thoth.application.services.request_records import RequestRecords
 from thoth.application.services.requirement_compiler import compile_requirements
 from thoth.application.services.research_answer import answer_summary
@@ -63,12 +65,14 @@ class ResearchAnalysis:
         memory: FullProjectMemoryService,
         evidence_graph: EvidenceGraphStorePort,
         profiles: TaskProfileCatalogPort,
+        calculations: DocumentCalculationService,
     ) -> None:
         self.records, self.artifacts, self.governance = records, artifacts, governance
         self.criteria, self.connectors = criteria, connectors
         self.memory = memory
         self.evidence_graph = evidence_graph
         self.profiles = profiles
+        self.calculations = calculations
         # (project, artifact, version, stored structure metadata) -> (observation, nodes digest).
         # A stored structure does not change, so its digest is computed once per process; the scoped
         # metadata read that forms the key still checks access on every use.
@@ -424,6 +428,10 @@ class ResearchAnalysis:
                 {"evidence_focus": evidence_focus_payload(work.evidence)},
             )
         review_context = review_contexts.semantic_review_context(context, work, ranked)
+        work.result_only.pop("checked_observations", None)
+        checked = self.calculations.observe(work.request_ref, work.evidence, self.artifacts)
+        if checked is not None:
+            work.result_only["checked_observations"] = checked.model_dump(mode="json")
         candidate, _ = await self.ask(
             model, project, review_context, ModelRole.SEMANTIC_REVIEWER, ReviewProposal
         )
@@ -510,6 +518,8 @@ class ResearchAnalysis:
             context = with_retrieval_coverage(context, role, work)
             work.context["retrieval_coverage"] = context.research_context["retrieval_coverage"]
             work.context["context_projection_version"] = "2.0.0"
+        if work is not None:
+            context = with_numeric_observations(context, role, work)
         source_context_digest = self.source_digest(context.evidence)
         if work is not None:
             work.evidence = context.evidence

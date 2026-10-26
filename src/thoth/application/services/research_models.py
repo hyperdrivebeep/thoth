@@ -5,6 +5,7 @@ from dataclasses import replace
 from pydantic import BaseModel
 
 from thoth.application.services.model_wait import await_current_model
+from thoth.application.services.numeric_observation_view import with_numeric_observations
 from thoth.application.services.request_language import model_request_language
 from thoth.application.services.retrieval_coverage_view import with_retrieval_coverage
 from thoth.domain.model import ModelRequest, ModelResult
@@ -21,6 +22,12 @@ class ResearchModel:
     async def structured[T: BaseModel](self, request: ModelRequest[T]) -> ModelResult[T]:
         from thoth.application.services.hypothesis_grounding_capture import grounding_capture_scope
 
+        work = research_work.get()
+        if work is not None:
+            request = replace(
+                request,
+                context_pack=with_numeric_observations(request.context_pack, request.role, work),
+            )
         with grounding_capture_scope(request):
             return await self._structured(request)
 

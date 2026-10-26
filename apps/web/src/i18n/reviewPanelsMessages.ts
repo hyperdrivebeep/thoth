@@ -1,4 +1,17 @@
 export const reviewPanelsMessages = {
+  "numeric.title": { "ko": "원문 숫자로 계산한 값", "en": "Values calculated from source numbers" },
+  "numeric.limitation": { "ko": "인과·복잡도 판정 아님. 원문에 적힌 숫자의 산술이며 측정 타당성이나 공식 기준 충족을 뜻하지 않습니다. 표시값은 소수 여섯 자리로 반올림했습니다.", "en": "Not a causal or computational-complexity determination. Arithmetic on printed values does not establish measurement validity or compliance with official criteria. Displayed values are rounded to six decimal places." },
+  "numeric.series": { "ko": "계열", "en": "Series" },
+  "numeric.interval": { "ko": "크기 구간", "en": "Size interval" },
+  "numeric.operation": { "ko": "계산", "en": "Operation" },
+  "numeric.value": { "ko": "계산값", "en": "Calculated value" },
+  "numeric.source": { "ko": "원문", "en": "Source" },
+  "numeric.ratio": { "ko": "값 비율", "en": "Value ratio" },
+  "numeric.difference": { "ko": "값 차이", "en": "Value difference" },
+  "numeric.slope": { "ko": "구간 log-log 기울기", "en": "Interval log-log slope" },
+  "numeric.notCalculated": { "ko": "계산하지 않음", "en": "Not calculated" },
+  "numeric.unsupported": { "ko": "구획·수치·단위가 명확하지 않아 계산하지 않은 항목이 있습니다.", "en": "Some entries were not calculated because their grouping, numbers or units were unclear." },
+  "numeric.notDelivered": { "ko": "일부 계산 기록은 모델 입력에 포함되지 않았습니다.", "en": "Some calculation records were not included in the model input." },
   "reviewDialog.required": {
     "ko": "이유를 하나 이상 고르세요.",
     "en": "Choose at least one reason."

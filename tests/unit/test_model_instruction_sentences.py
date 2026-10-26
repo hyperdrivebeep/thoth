@@ -13,6 +13,7 @@ import pytest
 
 from thoth.adapters.models.codex_oauth import role_contract
 from thoth.application.services.research_review_context import research_prompt_version
+from thoth.domain.derived_calculation import SOURCE_ARITHMETIC_CONTRACT
 from thoth.domain.enums import ModelRole
 
 SRC = Path(__file__).resolve().parents[2] / "src"
@@ -46,8 +47,11 @@ def task_texts() -> dict[str, str]:
 
 def contract_texts() -> dict[str, str]:
     return {
-        role.value: role_contract(role.value, research_prompt_version(role), None)
-        for role in ModelRole
+        "SOURCE_ARITHMETIC": SOURCE_ARITHMETIC_CONTRACT,
+        **{
+            role.value: role_contract(role.value, research_prompt_version(role), None)
+            for role in ModelRole
+        },
     }
 
 
@@ -84,3 +88,10 @@ def test_repaired_roles_have_new_prompt_version() -> None:
     assert research_prompt_version(ModelRole.REVIEW_ADJUDICATOR) == "review_adjudicator.v6"
     assert research_prompt_version(ModelRole.RESEARCH_PLANNER) == "research_planner.v5"
     assert research_prompt_version(ModelRole.EVIDENCE_RERANKER) == "evidence_reranker.v5"
+
+
+def test_numeric_instruction_is_in_the_sentence_integrity_inventory() -> None:
+    assert contract_texts()["SOURCE_ARITHMETIC"] == (
+        "Values calculated from source numbers; "
+        "not a causal or computational-complexity determination."
+    )

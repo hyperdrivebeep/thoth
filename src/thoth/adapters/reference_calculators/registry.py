@@ -32,6 +32,13 @@ class UnitRegistry:
         with localcontext(Context(prec=28, rounding=ROUND_HALF_EVEN, Emin=-1024, Emax=1024)):
             return value * left[1] / right[1]
 
+    def manifest(self) -> tuple[tuple[str, str, str], ...]:
+        """Stable read-only unit definitions; conversion behavior is unchanged."""
+        return tuple(
+            (name, dimension, str(scale))
+            for name, (dimension, scale) in sorted(self._units.items())
+        )
+
 
 def default_units() -> UnitRegistry:
     result = UnitRegistry()
