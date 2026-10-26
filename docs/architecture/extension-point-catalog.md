@@ -44,6 +44,10 @@ factory target. `PARTIAL` is permitted only with an explicit debt ID and owning 
 
 ## Evidence limits and executable binding (2026-09-05)
 
+The [positional context contract](evidence-context.md) describes text parser 1.2.0 observations,
+the shared selection/assembly consumers and v2 model projection. It is an additive artifact-version
+observation, not a new source truth store or a provider/file-name branch in application decisions.
+
 The manifest now names a fully qualified concrete factory, its existing factory protocol, and its
 actual composition function. Exact AST module/export resolution, protocol signature checks and
 registration checks reject unrelated same-name symbols and disconnected/missing registrations.

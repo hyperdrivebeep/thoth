@@ -22,7 +22,7 @@
     "authorize",
     "project:a02:allowed",
     "thread:project:a02:allowed",
-    "ReferenceAnswerRequest:babe6b59a49149aa"
+    "ReferenceAnswerRequest:f9acdc28c595c9d5"
    ],
    [
     "S",
@@ -448,7 +448,7 @@
     "S",
     "exit",
     "current",
-    "CriterionContractRecord:24eac972124eaa0c"
+    "CriterionContractRecord:757795940326895d"
    ],
    [
     "S",
@@ -900,7 +900,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -1068,7 +1068,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -1083,7 +1083,7 @@
     "project:a02:allowed",
     "thread:project:a02:allowed",
     "criterion:00000145",
-    "901fb8e656336eb90c9d2c6ca043491dbb433f7b31b1be3babc8bd65367a5087"
+    "5e5f0c1b5658d153d62758dc0840bf6cd7da95fa82c986c694021ea408c85b98"
    ],
    [
     "T",
@@ -1500,7 +1500,7 @@
     "S",
     "exit",
     "current",
-    "CriterionContractRecord:24eac972124eaa0c"
+    "CriterionContractRecord:757795940326895d"
    ],
    [
     "S",
@@ -1508,7 +1508,7 @@
     "answer",
     "project:a02:allowed",
     "thread:project:a02:allowed",
-    "ReferenceAnswerRequest:babe6b59a49149aa"
+    "ReferenceAnswerRequest:f9acdc28c595c9d5"
    ],
    [
     "S",
@@ -1517,7 +1517,7 @@
     "project:a02:allowed",
     "thread:project:a02:allowed",
     "criterion:00000145",
-    "901fb8e656336eb90c9d2c6ca043491dbb433f7b31b1be3babc8bd65367a5087"
+    "5e5f0c1b5658d153d62758dc0840bf6cd7da95fa82c986c694021ea408c85b98"
    ],
    [
     "T",
@@ -1934,12 +1934,12 @@
     "S",
     "exit",
     "current",
-    "CriterionContractRecord:24eac972124eaa0c"
+    "CriterionContractRecord:757795940326895d"
    ],
    [
     "S",
     "transaction",
-    "CriterionContractRecord:24eac972124eaa0c"
+    "CriterionContractRecord:757795940326895d"
    ],
    [
     "L",
@@ -2794,7 +2794,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "S",
@@ -3253,7 +3253,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -3421,7 +3421,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "A",
@@ -3589,7 +3589,7 @@
     "S",
     "exit",
     "source_digests",
-    "dict:53708c83a89153cd"
+    "dict:263ba7a81a4cba08"
    ],
    [
     "S",
@@ -3606,8 +3606,8 @@
     "reference",
     {
      "reference_commit": {
-      "after_head_set_digest": "e08b0c70473f660136c28224650c3e2356c874dae3e6105aec65a60d22395bc2",
-      "before_head_set_digest": "2e238a58ce5c8be068f44a484b62032c904186eb90985623a66147173154931c",
+      "after_head_set_digest": "0a1037b9f29efe8a5c4b91a586b5b907a7c8dee2901fd5a5af2d806608bd7fe8",
+      "before_head_set_digest": "465cf31e22ab318f2425211064c7ec9603441a34fba92fde966a841d53755080",
       "branch_revision_ids": [],
       "committed_revision_ids": [
        "criterion-revision:00000472"
@@ -3615,8 +3615,8 @@
       "disposition": "FAST_FORWARD",
       "receipt": {
        "actor_id": "local:operator",
-       "after_head_set_digest": "e08b0c70473f660136c28224650c3e2356c874dae3e6105aec65a60d22395bc2",
-       "before_head_set_digest": "2e238a58ce5c8be068f44a484b62032c904186eb90985623a66147173154931c",
+       "after_head_set_digest": "0a1037b9f29efe8a5c4b91a586b5b907a7c8dee2901fd5a5af2d806608bd7fe8",
+       "before_head_set_digest": "465cf31e22ab318f2425211064c7ec9603441a34fba92fde966a841d53755080",
        "claim_scopes": [
         "TRANSITION_RECORDED",
         "ARTIFACT_INTEGRITY",
@@ -3630,7 +3630,7 @@
        "previous_transition_digest": null,
        "project_id": "project:a02:allowed",
        "provenance_state": "COMPLETE",
-       "receipt_digest": "52496bbc66621cc5b68504b9ec98aa44804ec9ca6e2f0e1dfb9e89e1788e60e7",
+       "receipt_digest": "144da4ba808f513f7df599eb4b2d5b151d09660d6b46a4bea8f47858489868c4",
        "receipt_id": "receipt:00000477",
        "receipt_type": "TRANSITION",
        "recorded_at": "2026-10-15T00:00:00.413000Z",
@@ -3648,7 +3648,7 @@
        ]
       }
      },
-     "reference_criterion_revision": "901fb8e656336eb90c9d2c6ca043491dbb433f7b31b1be3babc8bd65367a5087",
+     "reference_criterion_revision": "5e5f0c1b5658d153d62758dc0840bf6cd7da95fa82c986c694021ea408c85b98",
      "reference_inquiry": {
       "actor_ref": "local:operator",
       "answers": [
@@ -3716,7 +3716,7 @@
       "criterion_id": "criterion:00000145",
       "evaluator_binding_digest": null,
       "evaluator_input_allowed": false,
-      "inquiry_digest": "f5ac14da3681015e8a8b5fde29256ba2d4bfd0239bf5ab5a61badf8b6e3c4198",
+      "inquiry_digest": "320a774912c79a01cd989c7fbfba67188cb4c12dfa7e940ef8f1b042f3d74a4e",
       "inquiry_id": "reference-inquiry:00000364",
       "lane": "REFERENCE_RANGE_CANDIDATE",
       "mapping_traces": [],
@@ -3812,24 +3812,24 @@
       "semantic_truth_certified": false,
       "session_ref": null,
       "source_digests": {
-       "span:00000082": "eda7681bc70d1ec1e11e673a907040f7cf208dd978555d74cfcbabb927d43d07",
-       "span:00000083": "ae2732f689f41dbb490b4e0e7413c8e08781523a2eb90b1231620a74b8abe6e5",
-       "span:00000084": "c3a9b15ded99c193f111b613ee24bad04b92e50eb004f7736b9e3e87bd6971f0",
-       "span:00000085": "3da9bac40ae59cfbb1543d90af10433a14fcc78fabcddd955f9bc60198ee750e",
-       "span:00000086": "c43792c8c00c97d9056c6edb7f46bc6b72d8ef01ca8c0439f48ef67913dd9ed3",
-       "span:00000087": "83d3d0f524d1ebde7602651f1e34cb1af958c06b390be7b92f9eb2abd5842de8",
-       "span:00000088": "065b9cbf255a0d737bd40be3b890c8062b73a99482c76d83d4e0f9b5a728f6ff",
-       "span:00000089": "18dad42abb62bf8d94874b29dc44066892f8c8c9950527474655ee0759bfa7d7",
-       "span:00000090": "35868c12ada2d5dad7a62090c7202f5620a680931e80520c70948cbd6f743f38",
-       "span:00000118": "9ebb411f27d5d4f6de22e977c38024bec7c8c9a1ec4a0ee5610c61bb08bf5d49",
-       "span:00000119": "9a3bf2c2f0db8aea3d75b13d363329b3476969e136167fde85b5139612b70543",
-       "span:00000120": "2798fa8c3e63da1cee4a35ed214d158b996765d215e837511857008f7206d04a",
-       "span:00000121": "5e810c83783803d2ca29caf8fcab399bb097b233bbf9ec747d30739245e83d2e",
-       "span:00000122": "86a29b0a5e4f4becebbcf727e92c17db41edc0a01530540e97826a0e8d50c524",
-       "span:00000123": "593af2655d6b4dd4884259b57fd71726121da8b2cc0d5d35a602b63b216e33be",
-       "span:00000124": "86509552bff99b76b413f2e2d193118b4c3213dba67cec699f977b87c726c79a",
-       "span:00000125": "2075dd1f71d3bdb07a12db075507a7bfb4936eb0a3ac3019b4fb001c08e16d26",
-       "span:00000126": "24487b6475903e4ecae7d5d6f78602aedac944be692675df5e04d7f3076b4fdf"
+       "span:00000082": "6e3686ef58be0938ebc631d215faa60816b47b7b7a2af554df6424e8c7d84aed",
+       "span:00000083": "137764de397d78fe6fb58e6a5a8df1c6bfa795f91a76d58a304ab795fb52ae56",
+       "span:00000084": "1bae647e0551cc23e5433150b966e1d5c68fb3db03625ee505e45c0f1f7fb51d",
+       "span:00000085": "55212b6c189f7ceb883bdb28515c929569f575fe342df0de599293375495f30e",
+       "span:00000086": "abf7c5ffbb8c92be0dcca3bee6d6c04f43a9df72fbe5a815eabf94697f359844",
+       "span:00000087": "9d95da1eb87f9a1056f8bfb1ed2fd8c7590dc14c5ecfbc3448af852721781db8",
+       "span:00000088": "16a42311a83e37022d52187c9da3405d1328a974435f92bd96e1d771ae503477",
+       "span:00000089": "591ce1b6c8ca00955b7cd671ca938133f74f6942763310411ffcec24c87403d1",
+       "span:00000090": "5352ff321966247221756726bbe94aa76cfc525c457150d0e76518dcf81b21ba",
+       "span:00000118": "eaa1ee7540b3a51b3e94fb3d5cc027f35a62a8710e151a93a38b7cdb67fd9946",
+       "span:00000119": "6a777859272c5a140cdf3748e283960b9fedcaec75b2c6a466e85c8374ca551d",
+       "span:00000120": "bf7bd6320d5a0ea079fc9ce53011dce50a533bab183052fd4afb1c0a8905ed3c",
+       "span:00000121": "997034c63f24ebeafd40a42596fad6b29b5126e65a800d8fa9941ea74e20817e",
+       "span:00000122": "7d672153b0b644ad19b7bb4b6c16cae077d82244e372db3ad1be1668533874ed",
+       "span:00000123": "28acb48ea48ceafc12c9a6488846325b1b93d75c5c505b945ea6361a505522a1",
+       "span:00000124": "bcec4d5e45092c3ffbc8ead045fc390ffa888933bd91747f1b9fa815d760d260",
+       "span:00000125": "34e91eb147922b1bfbd9f4f751e63a188942368a291def6ca4232d2c0c733977",
+       "span:00000126": "a2512e6716acef03f1f114f001769fa2a05021bd260be0b01805afc65ed1bae8"
       },
       "source_refs": [
        "span:00000090",
@@ -3875,7 +3875,7 @@
     "authorize",
     "project:a02:allowed",
     "thread:project:a02:allowed",
-    "ReferenceAnswerRequest:8b143f46b7ff04dc"
+    "ReferenceAnswerRequest:586eceaa68a86187"
    ],
    [
     "S",
@@ -4301,7 +4301,7 @@
     "S",
     "exit",
     "current",
-    "CriterionContractRecord:b97a78a30c58fffb"
+    "CriterionContractRecord:5fc2fb14ed091d9b"
    ],
    [
     "S",
@@ -4753,7 +4753,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -4921,7 +4921,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -4936,7 +4936,7 @@
     "project:a02:allowed",
     "thread:project:a02:allowed",
     "criterion:00000145",
-    "f8edd42c31114ad60ec6c8f3e97febc5afaf4efba861dee9ea7b709a4918cde8"
+    "dc2403bce56dd477bd3a04a0f68e891b27a1831edc72c989402eb3b8f5a383dc"
    ],
    [
     "T",
@@ -5353,7 +5353,7 @@
     "S",
     "exit",
     "current",
-    "CriterionContractRecord:b97a78a30c58fffb"
+    "CriterionContractRecord:5fc2fb14ed091d9b"
    ],
    [
     "S",
@@ -5361,7 +5361,7 @@
     "answer",
     "project:a02:allowed",
     "thread:project:a02:allowed",
-    "ReferenceAnswerRequest:8b143f46b7ff04dc"
+    "ReferenceAnswerRequest:586eceaa68a86187"
    ],
    [
     "S",
@@ -5370,7 +5370,7 @@
     "project:a02:allowed",
     "thread:project:a02:allowed",
     "criterion:00000145",
-    "f8edd42c31114ad60ec6c8f3e97febc5afaf4efba861dee9ea7b709a4918cde8"
+    "dc2403bce56dd477bd3a04a0f68e891b27a1831edc72c989402eb3b8f5a383dc"
    ],
    [
     "T",
@@ -5787,12 +5787,12 @@
     "S",
     "exit",
     "current",
-    "CriterionContractRecord:b97a78a30c58fffb"
+    "CriterionContractRecord:5fc2fb14ed091d9b"
    ],
    [
     "S",
     "transaction",
-    "CriterionContractRecord:b97a78a30c58fffb"
+    "CriterionContractRecord:5fc2fb14ed091d9b"
    ],
    [
     "L",
@@ -6647,7 +6647,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "S",
@@ -7106,7 +7106,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -7274,7 +7274,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "A",
@@ -7442,7 +7442,7 @@
     "S",
     "exit",
     "source_digests",
-    "dict:53708c83a89153cd"
+    "dict:263ba7a81a4cba08"
    ],
    [
     "clock"
@@ -7454,7 +7454,7 @@
     "S",
     "enter",
     "_evaluate",
-    "ReferenceInquiry:6365a87c9681888a"
+    "ReferenceInquiry:5f2fda9fe781b160"
    ],
    [
     "K",
@@ -7466,7 +7466,7 @@
     "S",
     "enter",
     "_grounded",
-    "ReferenceInquiry:6365a87c9681888a",
+    "ReferenceInquiry:5f2fda9fe781b160",
     2
    ],
    [
@@ -7912,7 +7912,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -7941,29 +7941,29 @@
    [
     "O",
     "calculate",
-    "ReferenceInquiry:6365a87c9681888a",
+    "ReferenceInquiry:5f2fda9fe781b160",
     null
    ],
    [
     "S",
     "exit",
     "_evaluate",
-    "ReferenceInquiry:c5d8bd8cd7ac100a"
+    "ReferenceInquiry:ad292c424ef814d6"
    ],
    [
     "S",
     "enter",
     "_persist",
-    "CriterionContractRecord:b97a78a30c58fffb",
-    "ReferenceInquiry:c5d8bd8cd7ac100a"
+    "CriterionContractRecord:5fc2fb14ed091d9b",
+    "ReferenceInquiry:ad292c424ef814d6"
    ],
    [
     "S",
     "revise",
-    "CriterionContractRecord:b97a78a30c58fffb",
+    "CriterionContractRecord:5fc2fb14ed091d9b",
     "actor=ActorRef:c293d54ce891020c",
     "event_type=criteria/referenceInquiryUpdated",
-    "updates=dict:a6b5e1533eaf59e9"
+    "updates=dict:920c7246f24ef03b"
    ],
    [
     "ids",
@@ -8393,7 +8393,7 @@
    [
     "R",
     "commit",
-    "RevisionChangeSet:f49a67419fc733a9"
+    "RevisionChangeSet:653422f541d7b02c"
    ],
    [
     "clock"
@@ -10777,7 +10777,7 @@
    [
     "C",
     "add_contract",
-    "CriterionContractRecord:24eac972124eaa0c"
+    "CriterionContractRecord:757795940326895d"
    ],
    [
     "clock"
@@ -10789,7 +10789,7 @@
    [
     "S",
     "transaction",
-    "CriterionContractRecord:24eac972124eaa0c"
+    "CriterionContractRecord:757795940326895d"
    ],
    [
     "L",
@@ -11204,7 +11204,7 @@
    [
     "C",
     "append_audit",
-    "CriterionAuditRecord:66fdbfee56f47e3a"
+    "CriterionAuditRecord:69b34b98024e714d"
    ],
    [
     "T",
@@ -11222,7 +11222,7 @@
    [
     "T",
     "update",
-    "WorkThread:d926b6c57ea373c4",
+    "WorkThread:d104c49c05ce5372",
     "expected_revision=5"
    ],
    [
@@ -11675,7 +11675,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -11843,7 +11843,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -11984,7 +11984,7 @@
      "calculator_version": "1.0.0",
      "criterion_id": "criterion:00000145",
      "evaluator_binding_digest": null,
-     "expected_revision_digest": "f8edd42c31114ad60ec6c8f3e97febc5afaf4efba861dee9ea7b709a4918cde8",
+     "expected_revision_digest": "dc2403bce56dd477bd3a04a0f68e891b27a1831edc72c989402eb3b8f5a383dc",
      "inquiry_id": "reference-inquiry:00000364",
      "lane": "REFERENCE_RANGE_CANDIDATE",
      "measurements": null,
@@ -12028,7 +12028,7 @@
      "calculator_version": "1.0.0",
      "criterion_id": "criterion:00000145",
      "evaluator_binding_digest": null,
-     "expected_revision_digest": "f8edd42c31114ad60ec6c8f3e97febc5afaf4efba861dee9ea7b709a4918cde8",
+     "expected_revision_digest": "dc2403bce56dd477bd3a04a0f68e891b27a1831edc72c989402eb3b8f5a383dc",
      "inquiry_id": "reference-inquiry:00000364",
      "lane": "REFERENCE_RANGE_CANDIDATE",
      "measurements": null,
@@ -14343,7 +14343,7 @@
     "S",
     "exit",
     "automatic_request",
-    "ReferenceRequest:94e504effb3ecf4d"
+    "ReferenceRequest:fda44b5f6d2d8874"
    ],
    [
     "S",
@@ -14767,7 +14767,7 @@
     "S",
     "exit",
     "automatic_request",
-    "ReferenceRequest:94e504effb3ecf4d"
+    "ReferenceRequest:fda44b5f6d2d8874"
    ]
   ]
  },
@@ -14777,7 +14777,7 @@
     "reference",
     {
      "reference_commit": {
-      "after_head_set_digest": "843820006222c207911db75aba62ec0370d514a5c87a939fc98f30f0c007bd34",
+      "after_head_set_digest": "d3ec0d0f2444ed88a246acb4faf0df2e21d03a6bd1ae6e677f0bff85d0e54ae9",
       "before_head_set_digest": "470c39520b1258fb39920c2c5d5f0560473d48d4a28771ce91371e671d690636",
       "branch_revision_ids": [],
       "committed_revision_ids": [
@@ -14786,7 +14786,7 @@
       "disposition": "FAST_FORWARD",
       "receipt": {
        "actor_id": "local:operator",
-       "after_head_set_digest": "843820006222c207911db75aba62ec0370d514a5c87a939fc98f30f0c007bd34",
+       "after_head_set_digest": "d3ec0d0f2444ed88a246acb4faf0df2e21d03a6bd1ae6e677f0bff85d0e54ae9",
        "before_head_set_digest": "470c39520b1258fb39920c2c5d5f0560473d48d4a28771ce91371e671d690636",
        "claim_scopes": [
         "TRANSITION_RECORDED",
@@ -14801,7 +14801,7 @@
        "previous_transition_digest": null,
        "project_id": "project:a02:allowed",
        "provenance_state": "COMPLETE",
-       "receipt_digest": "3c51a39baa5e168fc44590e905f95e64a3aa8036b5893849b4aafaf0c4187b5d",
+       "receipt_digest": "2ef468c6cf7b27e0e5e98d345915878992767ef8bc50c7a5d3faff1f45d083f8",
        "receipt_id": "receipt:00000399",
        "receipt_type": "TRANSITION",
        "recorded_at": "2026-10-15T00:00:00.341000Z",
@@ -14819,7 +14819,7 @@
        ]
       }
      },
-     "reference_criterion_revision": "bd4e071965c3653cc3dcd714a208331b655694206cbb603316947b5dbfad48a0",
+     "reference_criterion_revision": "c76aee5072dc3b8722d2fbe7191135b1e8d4f9a09e7feb017c0f048b31ebf1cf",
      "reference_inquiry": {
       "actor_ref": "local:operator",
       "answers": [],
@@ -14879,7 +14879,7 @@
       "criterion_id": "criterion:00000145",
       "evaluator_binding_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
       "evaluator_input_allowed": false,
-      "inquiry_digest": "c70a710417fe306fcaa5bc00543a7378e5cae58a8cd38e597cac45a723328651",
+      "inquiry_digest": "c50201cdad898d5bc5800b57c435d97e4013e1fed4078bea5f17bf7702bb2b5d",
       "inquiry_id": "reference-inquiry:00000393",
       "lane": "RECALCULATED_VALUE",
       "mapping_traces": [],
@@ -14968,24 +14968,24 @@
       "semantic_truth_certified": false,
       "session_ref": null,
       "source_digests": {
-       "span:00000082": "1c89c52471a1cb2d4a3624bc129a3e84ea989881a2d6bc30478433cf03c5d844",
-       "span:00000083": "d335c985a28f1b49925fa2ebc1f4061f66b8dfce058d3836be78887521d0497b",
-       "span:00000084": "d5adc394e41b30cdbdd2ea336736dd18681d57ea32ba016346e3c1e6d8896925",
-       "span:00000085": "e83705913ae6f7efea168079251bfc4a4c0f3a325264f2e4ae5529a2f02d2c4b",
-       "span:00000086": "399e499b03963443285db59586fdb0390b350e2c9ba04155a556ec277f50b29c",
-       "span:00000087": "ff59cc91b2c5bb20cfdf6dce6e18a5fb4c93ec514a72154f06dadc9c8588d13e",
-       "span:00000088": "2d48f531553dfde5be11a16aa98c8e05c613db6440ad64084da8484d9ba7b605",
-       "span:00000089": "1dec6e2fe859da1b22de920f966ae6bd764c3b0884b10411b7bf70e9c0085035",
-       "span:00000090": "f3fff4c0d5cd12fd06b8cdcb1e9867031e36cff78b3d408d978a9fd27e90d368",
-       "span:00000118": "eca41770d16efc2527fa2244bbc15906d1461049950e03afa496ff70febc5adb",
-       "span:00000119": "c824e35e8a5bb818544e2e209ed13545a18f231e4b0ee54a859babe3349f5ed1",
-       "span:00000120": "245879abd29db335bb9e0cd38c8bf660bd2f602b5d6a28fee0e264596bc7b940",
-       "span:00000121": "690e56660d6cae9a0cc9a2b57626f2e7826f401d9141d73e14069ca55e2228d1",
-       "span:00000122": "ad269af92f49d83e24f016438a0003fa86c2f0f32a8c7d284b09fe13983ff16d",
-       "span:00000123": "d38954f9937719c1cd77c04e068cbd9c21c522da1b379c9d6b7bec375ccb4c7e",
-       "span:00000124": "19ca4c9af8e45edd7f1cdc3b45950555fa877b1905dc746124099c81078279a1",
-       "span:00000125": "dadd850f04073793c5082f0012ceaa9065190557f96dce79e8a8d3015375b04f",
-       "span:00000126": "6bf21e87abec561937c81a4a0dee3768f2cdc4d293588ab0ee7a5343cce63129"
+       "span:00000082": "2dff3f4047eb687d5623be74b14a617c7ebfb09e129147c22e8680a6c8c83f55",
+       "span:00000083": "fe5063207e784587c0cf949511eea3a951d366057de730cb24dda5185a50d13f",
+       "span:00000084": "13b18cab893e680f5570ce247e9e884499d73a5e1b41bce03322007ca19e4f2d",
+       "span:00000085": "74cddf2ef295681b8042d2c0cb2ec07c221ffe7ca85ae308fdba5813f4c911b6",
+       "span:00000086": "17c699bb5d4b8afa064bf5bfd91ba2ded06218211f56ceb64f4317b27370967b",
+       "span:00000087": "a2b2c1860ce8ff1623b2c28f7262f3c6f9f58995a2f0c60b2d90fb5b854d905f",
+       "span:00000088": "c011002774caa00b0421d7c4e1e3ec72867bec0433dc8f7c02cab5489a4f92d9",
+       "span:00000089": "2f3185657cabd029801722ac9c7e24e7ef92e8390ec132072c9bfdabea5c7449",
+       "span:00000090": "ddfbaee71af50fa43a8506bed6f9d3f391d63d982377353ed66d5953d280b9df",
+       "span:00000118": "c48cd811393a156c9008c49c2736a292bd577990dfb1da03af2bf7f2966e5c30",
+       "span:00000119": "1fb925021a8d2fa176d530bbd53c8f6954156d22f7d5869e48c6b1d78c7e51d8",
+       "span:00000120": "38e86fbd82c8881ba6ecb098b06423431c6603801522911167f987684f228789",
+       "span:00000121": "ee7e3ec136afb295c828e6117421d534a209d4752abf619cd1548c02ad67097b",
+       "span:00000122": "6ccedc8aad0801db7fbde49817d76c41b0f6f7d4bae258d38575a904bff0029c",
+       "span:00000123": "bafa9a1743c6bc6adc26789f54f279dd1c7e8475fa0d0d646fb3b93b0f43da9c",
+       "span:00000124": "fd5d6e46a1615f887e7572552fada0abfd25ab27227420392d9d448c85d0d738",
+       "span:00000125": "dfbaff8df48748fa74b440abed05625d106d5ec760b2101bb0ab6dc3b0956dd8",
+       "span:00000126": "da40bdea5e0efa187a1d4219afdcffa2e1b719093a022466f783cba8e09a34da"
       },
       "source_refs": [
        "span:00000090",
@@ -15789,7 +15789,7 @@
     "S",
     "exit",
     "sources",
-    "dict:e42d1af49e3f9660"
+    "dict:54f8ba5303e2b176"
    ],
    [
     "A",
@@ -15957,7 +15957,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:e8fa84ee5404cd95"
+    "tuple:aa836f64bf368699"
    ],
    [
     "S",
@@ -17323,7 +17323,7 @@
     "S",
     "exit",
     "sources",
-    "dict:e42d1af49e3f9660"
+    "dict:54f8ba5303e2b176"
    ],
    [
     "clock"
@@ -17789,7 +17789,7 @@
     "S",
     "exit",
     "sources",
-    "dict:e42d1af49e3f9660"
+    "dict:54f8ba5303e2b176"
    ],
    [
     "A",
@@ -17957,7 +17957,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:e8fa84ee5404cd95"
+    "tuple:aa836f64bf368699"
    ],
    [
     "A",
@@ -18125,13 +18125,13 @@
     "S",
     "exit",
     "source_digests",
-    "dict:b8c8c8caea467813"
+    "dict:7aaef5d3e83f0f32"
    ],
    [
     "S",
     "enter",
     "_evaluate",
-    "ReferenceInquiry:178790794dfd0e4e"
+    "ReferenceInquiry:4ef609b8e3919f04"
    ],
    [
     "K",
@@ -18429,7 +18429,7 @@
     "S",
     "enter",
     "_grounded",
-    "ReferenceInquiry:178790794dfd0e4e",
+    "ReferenceInquiry:4ef609b8e3919f04",
     1
    ],
    [
@@ -18875,7 +18875,7 @@
     "S",
     "exit",
     "sources",
-    "dict:e42d1af49e3f9660"
+    "dict:54f8ba5303e2b176"
    ],
    [
     "A",
@@ -18904,21 +18904,21 @@
    [
     "F",
     "calculate",
-    "ReferenceInquiry:178790794dfd0e4e",
+    "ReferenceInquiry:4ef609b8e3919f04",
     "dict:f0f876c8e844ed2b"
    ],
    [
     "S",
     "exit",
     "_evaluate",
-    "ReferenceInquiry:0137e7a7fc741704"
+    "ReferenceInquiry:edeab4b726435638"
    ],
    [
     "S",
     "enter",
     "_persist",
     "CriterionContractRecord:45ddcc7d7d637960",
-    "ReferenceInquiry:0137e7a7fc741704"
+    "ReferenceInquiry:edeab4b726435638"
    ],
    [
     "S",
@@ -18926,7 +18926,7 @@
     "CriterionContractRecord:45ddcc7d7d637960",
     "actor=ActorRef:c293d54ce891020c",
     "event_type=criteria/referenceInquiryUpdated",
-    "updates=dict:5188c8bf73ffb3fc"
+    "updates=dict:b8159ebd34ef7b0a"
    ],
    [
     "ids",
@@ -19236,7 +19236,7 @@
    [
     "R",
     "commit",
-    "RevisionChangeSet:8cc5f16d23b8c6a1"
+    "RevisionChangeSet:a96867cdf0a36cfb"
    ],
    [
     "clock"
@@ -21620,7 +21620,7 @@
    [
     "C",
     "add_contract",
-    "CriterionContractRecord:3ac349e9d8dec303"
+    "CriterionContractRecord:489d975553397ba0"
    ],
    [
     "clock"
@@ -21632,7 +21632,7 @@
    [
     "S",
     "transaction",
-    "CriterionContractRecord:3ac349e9d8dec303"
+    "CriterionContractRecord:489d975553397ba0"
    ],
    [
     "L",
@@ -22047,7 +22047,7 @@
    [
     "C",
     "append_audit",
-    "CriterionAuditRecord:eaf688226129ad64"
+    "CriterionAuditRecord:68f071fbd304ae2b"
    ],
    [
     "T",
@@ -22065,7 +22065,7 @@
    [
     "T",
     "update",
-    "WorkThread:92d7112914e146c8",
+    "WorkThread:61738332d05db748",
     "expected_revision=2"
    ],
    [
@@ -22518,7 +22518,7 @@
     "S",
     "exit",
     "sources",
-    "dict:e42d1af49e3f9660"
+    "dict:54f8ba5303e2b176"
    ],
    [
     "A",
@@ -22686,7 +22686,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:e8fa84ee5404cd95"
+    "tuple:aa836f64bf368699"
    ],
    [
     "S",
@@ -22708,7 +22708,7 @@
     "reference",
     {
      "reference_commit": {
-      "after_head_set_digest": "f11a3187cbb6a84e5d33561b606c83625ae15ce780888fc0d90470f09c56d8eb",
+      "after_head_set_digest": "13b9ada7edb0b81f408927eda9681aa8fbb825e63b0d7d577782c95e25f04327",
       "before_head_set_digest": "bb5c7ab91c74aa380449c7c00140ec0a268f2f833baedb3151a7e7a50db7ad2e",
       "branch_revision_ids": [],
       "committed_revision_ids": [
@@ -22717,7 +22717,7 @@
       "disposition": "FAST_FORWARD",
       "receipt": {
        "actor_id": "local:operator",
-       "after_head_set_digest": "f11a3187cbb6a84e5d33561b606c83625ae15ce780888fc0d90470f09c56d8eb",
+       "after_head_set_digest": "13b9ada7edb0b81f408927eda9681aa8fbb825e63b0d7d577782c95e25f04327",
        "before_head_set_digest": "bb5c7ab91c74aa380449c7c00140ec0a268f2f833baedb3151a7e7a50db7ad2e",
        "claim_scopes": [
         "TRANSITION_RECORDED",
@@ -22732,7 +22732,7 @@
        "previous_transition_digest": null,
        "project_id": "project:a02:allowed",
        "provenance_state": "COMPLETE",
-       "receipt_digest": "3dd867926788dafecb0d7c55df6eb8dd1a5001a72006813fffddb3fc0ed445da",
+       "receipt_digest": "e420f1fe4651cd2b828cce15700525405835eba4cc1a40c176479eecae853863",
        "receipt_id": "receipt:00000371",
        "receipt_type": "TRANSITION",
        "recorded_at": "2026-10-15T00:00:00.312000Z",
@@ -22750,7 +22750,7 @@
        ]
       }
      },
-     "reference_criterion_revision": "f8edd42c31114ad60ec6c8f3e97febc5afaf4efba861dee9ea7b709a4918cde8",
+     "reference_criterion_revision": "dc2403bce56dd477bd3a04a0f68e891b27a1831edc72c989402eb3b8f5a383dc",
      "reference_inquiry": {
       "actor_ref": "local:operator",
       "answers": [],
@@ -22766,7 +22766,7 @@
       "criterion_id": "criterion:00000145",
       "evaluator_binding_digest": null,
       "evaluator_input_allowed": false,
-      "inquiry_digest": "61bdb3b0b6ee8927aa9a9d8acf4066e36417f5ba577d651de5b23e69c0177266",
+      "inquiry_digest": "cf5a127cbbb2c89fae1229d24e625928417a3430c8f148a636d1403be25d8b73",
       "inquiry_id": "reference-inquiry:00000364",
       "lane": "REFERENCE_RANGE_CANDIDATE",
       "mapping_traces": [],
@@ -22864,24 +22864,24 @@
       "semantic_truth_certified": false,
       "session_ref": null,
       "source_digests": {
-       "span:00000082": "eda7681bc70d1ec1e11e673a907040f7cf208dd978555d74cfcbabb927d43d07",
-       "span:00000083": "ae2732f689f41dbb490b4e0e7413c8e08781523a2eb90b1231620a74b8abe6e5",
-       "span:00000084": "c3a9b15ded99c193f111b613ee24bad04b92e50eb004f7736b9e3e87bd6971f0",
-       "span:00000085": "3da9bac40ae59cfbb1543d90af10433a14fcc78fabcddd955f9bc60198ee750e",
-       "span:00000086": "c43792c8c00c97d9056c6edb7f46bc6b72d8ef01ca8c0439f48ef67913dd9ed3",
-       "span:00000087": "83d3d0f524d1ebde7602651f1e34cb1af958c06b390be7b92f9eb2abd5842de8",
-       "span:00000088": "065b9cbf255a0d737bd40be3b890c8062b73a99482c76d83d4e0f9b5a728f6ff",
-       "span:00000089": "18dad42abb62bf8d94874b29dc44066892f8c8c9950527474655ee0759bfa7d7",
-       "span:00000090": "35868c12ada2d5dad7a62090c7202f5620a680931e80520c70948cbd6f743f38",
-       "span:00000118": "9ebb411f27d5d4f6de22e977c38024bec7c8c9a1ec4a0ee5610c61bb08bf5d49",
-       "span:00000119": "9a3bf2c2f0db8aea3d75b13d363329b3476969e136167fde85b5139612b70543",
-       "span:00000120": "2798fa8c3e63da1cee4a35ed214d158b996765d215e837511857008f7206d04a",
-       "span:00000121": "5e810c83783803d2ca29caf8fcab399bb097b233bbf9ec747d30739245e83d2e",
-       "span:00000122": "86a29b0a5e4f4becebbcf727e92c17db41edc0a01530540e97826a0e8d50c524",
-       "span:00000123": "593af2655d6b4dd4884259b57fd71726121da8b2cc0d5d35a602b63b216e33be",
-       "span:00000124": "86509552bff99b76b413f2e2d193118b4c3213dba67cec699f977b87c726c79a",
-       "span:00000125": "2075dd1f71d3bdb07a12db075507a7bfb4936eb0a3ac3019b4fb001c08e16d26",
-       "span:00000126": "24487b6475903e4ecae7d5d6f78602aedac944be692675df5e04d7f3076b4fdf"
+       "span:00000082": "6e3686ef58be0938ebc631d215faa60816b47b7b7a2af554df6424e8c7d84aed",
+       "span:00000083": "137764de397d78fe6fb58e6a5a8df1c6bfa795f91a76d58a304ab795fb52ae56",
+       "span:00000084": "1bae647e0551cc23e5433150b966e1d5c68fb3db03625ee505e45c0f1f7fb51d",
+       "span:00000085": "55212b6c189f7ceb883bdb28515c929569f575fe342df0de599293375495f30e",
+       "span:00000086": "abf7c5ffbb8c92be0dcca3bee6d6c04f43a9df72fbe5a815eabf94697f359844",
+       "span:00000087": "9d95da1eb87f9a1056f8bfb1ed2fd8c7590dc14c5ecfbc3448af852721781db8",
+       "span:00000088": "16a42311a83e37022d52187c9da3405d1328a974435f92bd96e1d771ae503477",
+       "span:00000089": "591ce1b6c8ca00955b7cd671ca938133f74f6942763310411ffcec24c87403d1",
+       "span:00000090": "5352ff321966247221756726bbe94aa76cfc525c457150d0e76518dcf81b21ba",
+       "span:00000118": "eaa1ee7540b3a51b3e94fb3d5cc027f35a62a8710e151a93a38b7cdb67fd9946",
+       "span:00000119": "6a777859272c5a140cdf3748e283960b9fedcaec75b2c6a466e85c8374ca551d",
+       "span:00000120": "bf7bd6320d5a0ea079fc9ce53011dce50a533bab183052fd4afb1c0a8905ed3c",
+       "span:00000121": "997034c63f24ebeafd40a42596fad6b29b5126e65a800d8fa9941ea74e20817e",
+       "span:00000122": "7d672153b0b644ad19b7bb4b6c16cae077d82244e372db3ad1be1668533874ed",
+       "span:00000123": "28acb48ea48ceafc12c9a6488846325b1b93d75c5c505b945ea6361a505522a1",
+       "span:00000124": "bcec4d5e45092c3ffbc8ead045fc390ffa888933bd91747f1b9fa815d760d260",
+       "span:00000125": "34e91eb147922b1bfbd9f4f751e63a188942368a291def6ca4232d2c0c733977",
+       "span:00000126": "a2512e6716acef03f1f114f001769fa2a05021bd260be0b01805afc65ed1bae8"
       },
       "source_refs": [
        "span:00000090",
@@ -23685,7 +23685,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -23853,7 +23853,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -25219,7 +25219,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "clock"
@@ -25685,7 +25685,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -25853,7 +25853,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "A",
@@ -26021,13 +26021,13 @@
     "S",
     "exit",
     "source_digests",
-    "dict:53708c83a89153cd"
+    "dict:263ba7a81a4cba08"
    ],
    [
     "S",
     "enter",
     "_evaluate",
-    "ReferenceInquiry:104f7512dd6e0a8a"
+    "ReferenceInquiry:49ec7276577df1ca"
    ],
    [
     "ids",
@@ -26037,14 +26037,14 @@
     "S",
     "exit",
     "_evaluate",
-    "ReferenceInquiry:ba09babfbab6df95"
+    "ReferenceInquiry:bcd554ac9c09194a"
    ],
    [
     "S",
     "enter",
     "_persist",
     "CriterionContractRecord:408295bbbdab04a7",
-    "ReferenceInquiry:ba09babfbab6df95"
+    "ReferenceInquiry:bcd554ac9c09194a"
    ],
    [
     "S",
@@ -26052,7 +26052,7 @@
     "CriterionContractRecord:408295bbbdab04a7",
     "actor=ActorRef:c293d54ce891020c",
     "event_type=criteria/referenceInquiryUpdated",
-    "updates=dict:75b8fc8253911031"
+    "updates=dict:d85d7df74584052f"
    ],
    [
     "ids",
@@ -26362,7 +26362,7 @@
    [
     "R",
     "commit",
-    "RevisionChangeSet:a19deb8071112845"
+    "RevisionChangeSet:457c4ba14f9bfd76"
    ],
    [
     "clock"
@@ -28746,7 +28746,7 @@
    [
     "C",
     "add_contract",
-    "CriterionContractRecord:b97a78a30c58fffb"
+    "CriterionContractRecord:5fc2fb14ed091d9b"
    ],
    [
     "clock"
@@ -28758,7 +28758,7 @@
    [
     "S",
     "transaction",
-    "CriterionContractRecord:b97a78a30c58fffb"
+    "CriterionContractRecord:5fc2fb14ed091d9b"
    ],
    [
     "L",
@@ -29173,7 +29173,7 @@
    [
     "C",
     "append_audit",
-    "CriterionAuditRecord:a67becef0fe6b292"
+    "CriterionAuditRecord:31f7e7add03a03fa"
    ],
    [
     "T",
@@ -29191,7 +29191,7 @@
    [
     "T",
     "update",
-    "WorkThread:6145f64b745ec568",
+    "WorkThread:f9e50bf5c74f2100",
     "expected_revision=2"
    ],
    [
@@ -29644,7 +29644,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -29812,7 +29812,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -29834,7 +29834,7 @@
     "reference",
     {
      "reference_commit": {
-      "after_head_set_digest": "1ce0aa706757d4db3132fe37efc87ac83992690dcb1351bcdd2cd0518a3d613b",
+      "after_head_set_digest": "2292e70319d9a5c25a52a30bcb5c4cc2c9aaa594ab14116a46625410e593fddd",
       "before_head_set_digest": "bb5c7ab91c74aa380449c7c00140ec0a268f2f833baedb3151a7e7a50db7ad2e",
       "branch_revision_ids": [],
       "committed_revision_ids": [
@@ -29843,7 +29843,7 @@
       "disposition": "FAST_FORWARD",
       "receipt": {
        "actor_id": "local:operator",
-       "after_head_set_digest": "1ce0aa706757d4db3132fe37efc87ac83992690dcb1351bcdd2cd0518a3d613b",
+       "after_head_set_digest": "2292e70319d9a5c25a52a30bcb5c4cc2c9aaa594ab14116a46625410e593fddd",
        "before_head_set_digest": "bb5c7ab91c74aa380449c7c00140ec0a268f2f833baedb3151a7e7a50db7ad2e",
        "claim_scopes": [
         "TRANSITION_RECORDED",
@@ -29858,7 +29858,7 @@
        "previous_transition_digest": null,
        "project_id": "project:a02:allowed",
        "provenance_state": "COMPLETE",
-       "receipt_digest": "96cd5daf51873d9810e5f28d8623296f7e11e0cafb1477eabeeb4522ffed1001",
+       "receipt_digest": "15fd578bbc90b6b44b3f8edd392c3498531c6e19fe262fb556bdbe37e4c9e622",
        "receipt_id": "receipt:00000370",
        "receipt_type": "TRANSITION",
        "recorded_at": "2026-10-15T00:00:00.312000Z",
@@ -29876,7 +29876,7 @@
        ]
       }
      },
-     "reference_criterion_revision": "08af8d2c7bfacc0df01ce7644c21bfb4334124e418d02f549400c06edab44c1e",
+     "reference_criterion_revision": "50a4cda63b7506a36bc410c5103f1af8be7ee3638808194819919186e9e728f1",
      "reference_inquiry": {
       "actor_ref": "local:operator",
       "answers": [],
@@ -29933,7 +29933,7 @@
       "criterion_id": "criterion:00000145",
       "evaluator_binding_digest": null,
       "evaluator_input_allowed": false,
-      "inquiry_digest": "744287b59a92a335672716eb0b6e5ea197d2be6c6e0f6e8d73ddd11c908a22ec",
+      "inquiry_digest": "71c4cf103476ba6fe0f7812026bb183e2fcf85be49420c458cc6cf93a86aebad",
       "inquiry_id": "reference-inquiry:00000364",
       "lane": "REFERENCE_RANGE_CANDIDATE",
       "mapping_traces": [],
@@ -30022,24 +30022,24 @@
       "semantic_truth_certified": false,
       "session_ref": null,
       "source_digests": {
-       "span:00000082": "eda7681bc70d1ec1e11e673a907040f7cf208dd978555d74cfcbabb927d43d07",
-       "span:00000083": "ae2732f689f41dbb490b4e0e7413c8e08781523a2eb90b1231620a74b8abe6e5",
-       "span:00000084": "c3a9b15ded99c193f111b613ee24bad04b92e50eb004f7736b9e3e87bd6971f0",
-       "span:00000085": "3da9bac40ae59cfbb1543d90af10433a14fcc78fabcddd955f9bc60198ee750e",
-       "span:00000086": "c43792c8c00c97d9056c6edb7f46bc6b72d8ef01ca8c0439f48ef67913dd9ed3",
-       "span:00000087": "83d3d0f524d1ebde7602651f1e34cb1af958c06b390be7b92f9eb2abd5842de8",
-       "span:00000088": "065b9cbf255a0d737bd40be3b890c8062b73a99482c76d83d4e0f9b5a728f6ff",
-       "span:00000089": "18dad42abb62bf8d94874b29dc44066892f8c8c9950527474655ee0759bfa7d7",
-       "span:00000090": "35868c12ada2d5dad7a62090c7202f5620a680931e80520c70948cbd6f743f38",
-       "span:00000118": "9ebb411f27d5d4f6de22e977c38024bec7c8c9a1ec4a0ee5610c61bb08bf5d49",
-       "span:00000119": "9a3bf2c2f0db8aea3d75b13d363329b3476969e136167fde85b5139612b70543",
-       "span:00000120": "2798fa8c3e63da1cee4a35ed214d158b996765d215e837511857008f7206d04a",
-       "span:00000121": "5e810c83783803d2ca29caf8fcab399bb097b233bbf9ec747d30739245e83d2e",
-       "span:00000122": "86a29b0a5e4f4becebbcf727e92c17db41edc0a01530540e97826a0e8d50c524",
-       "span:00000123": "593af2655d6b4dd4884259b57fd71726121da8b2cc0d5d35a602b63b216e33be",
-       "span:00000124": "86509552bff99b76b413f2e2d193118b4c3213dba67cec699f977b87c726c79a",
-       "span:00000125": "2075dd1f71d3bdb07a12db075507a7bfb4936eb0a3ac3019b4fb001c08e16d26",
-       "span:00000126": "24487b6475903e4ecae7d5d6f78602aedac944be692675df5e04d7f3076b4fdf"
+       "span:00000082": "6e3686ef58be0938ebc631d215faa60816b47b7b7a2af554df6424e8c7d84aed",
+       "span:00000083": "137764de397d78fe6fb58e6a5a8df1c6bfa795f91a76d58a304ab795fb52ae56",
+       "span:00000084": "1bae647e0551cc23e5433150b966e1d5c68fb3db03625ee505e45c0f1f7fb51d",
+       "span:00000085": "55212b6c189f7ceb883bdb28515c929569f575fe342df0de599293375495f30e",
+       "span:00000086": "abf7c5ffbb8c92be0dcca3bee6d6c04f43a9df72fbe5a815eabf94697f359844",
+       "span:00000087": "9d95da1eb87f9a1056f8bfb1ed2fd8c7590dc14c5ecfbc3448af852721781db8",
+       "span:00000088": "16a42311a83e37022d52187c9da3405d1328a974435f92bd96e1d771ae503477",
+       "span:00000089": "591ce1b6c8ca00955b7cd671ca938133f74f6942763310411ffcec24c87403d1",
+       "span:00000090": "5352ff321966247221756726bbe94aa76cfc525c457150d0e76518dcf81b21ba",
+       "span:00000118": "eaa1ee7540b3a51b3e94fb3d5cc027f35a62a8710e151a93a38b7cdb67fd9946",
+       "span:00000119": "6a777859272c5a140cdf3748e283960b9fedcaec75b2c6a466e85c8374ca551d",
+       "span:00000120": "bf7bd6320d5a0ea079fc9ce53011dce50a533bab183052fd4afb1c0a8905ed3c",
+       "span:00000121": "997034c63f24ebeafd40a42596fad6b29b5126e65a800d8fa9941ea74e20817e",
+       "span:00000122": "7d672153b0b644ad19b7bb4b6c16cae077d82244e372db3ad1be1668533874ed",
+       "span:00000123": "28acb48ea48ceafc12c9a6488846325b1b93d75c5c505b945ea6361a505522a1",
+       "span:00000124": "bcec4d5e45092c3ffbc8ead045fc390ffa888933bd91747f1b9fa815d760d260",
+       "span:00000125": "34e91eb147922b1bfbd9f4f751e63a188942368a291def6ca4232d2c0c733977",
+       "span:00000126": "a2512e6716acef03f1f114f001769fa2a05021bd260be0b01805afc65ed1bae8"
       },
       "source_refs": [
        "span:00000090",
@@ -30843,7 +30843,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -31011,7 +31011,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -32377,7 +32377,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "clock"
@@ -32843,7 +32843,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -33011,7 +33011,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "A",
@@ -33179,13 +33179,13 @@
     "S",
     "exit",
     "source_digests",
-    "dict:53708c83a89153cd"
+    "dict:263ba7a81a4cba08"
    ],
    [
     "S",
     "enter",
     "_evaluate",
-    "ReferenceInquiry:eca33849824134e7"
+    "ReferenceInquiry:b0cc259567cf3461"
    ],
    [
     "K",
@@ -33197,7 +33197,7 @@
     "S",
     "enter",
     "_grounded",
-    "ReferenceInquiry:eca33849824134e7",
+    "ReferenceInquiry:b0cc259567cf3461",
     2
    ],
    [
@@ -33643,7 +33643,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -33672,21 +33672,21 @@
    [
     "O",
     "calculate",
-    "ReferenceInquiry:eca33849824134e7",
+    "ReferenceInquiry:b0cc259567cf3461",
     null
    ],
    [
     "S",
     "exit",
     "_evaluate",
-    "ReferenceInquiry:7915214b4eac7059"
+    "ReferenceInquiry:d53ecc4d5c804644"
    ],
    [
     "S",
     "enter",
     "_persist",
     "CriterionContractRecord:408295bbbdab04a7",
-    "ReferenceInquiry:7915214b4eac7059"
+    "ReferenceInquiry:d53ecc4d5c804644"
    ],
    [
     "S",
@@ -33694,7 +33694,7 @@
     "CriterionContractRecord:408295bbbdab04a7",
     "actor=ActorRef:c293d54ce891020c",
     "event_type=criteria/referenceInquiryUpdated",
-    "updates=dict:a4782811e581b2d2"
+    "updates=dict:74f7f524a42ff7d3"
    ],
    [
     "ids",
@@ -34004,7 +34004,7 @@
    [
     "R",
     "commit",
-    "RevisionChangeSet:4cab2f15361e7325"
+    "RevisionChangeSet:17df8ad741fdf7a4"
    ],
    [
     "clock"
@@ -36388,7 +36388,7 @@
    [
     "C",
     "add_contract",
-    "CriterionContractRecord:db31d138d449bcae"
+    "CriterionContractRecord:cc2f6d628d74feae"
    ],
    [
     "clock"
@@ -36400,7 +36400,7 @@
    [
     "S",
     "transaction",
-    "CriterionContractRecord:db31d138d449bcae"
+    "CriterionContractRecord:cc2f6d628d74feae"
    ],
    [
     "L",
@@ -36815,7 +36815,7 @@
    [
     "C",
     "append_audit",
-    "CriterionAuditRecord:1978898ce56acb6a"
+    "CriterionAuditRecord:97141d83eeb3b8da"
    ],
    [
     "T",
@@ -36833,7 +36833,7 @@
    [
     "T",
     "update",
-    "WorkThread:fe1f6950278a8a40",
+    "WorkThread:bdcca1850f4af03b",
     "expected_revision=2"
    ],
    [
@@ -37286,7 +37286,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -37454,7 +37454,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -37476,7 +37476,7 @@
     "reference",
     {
      "reference_commit": {
-      "after_head_set_digest": "6b97e95a6e48758aac69f76bdc354d04b48d25826a19da32ef824dfc530ce988",
+      "after_head_set_digest": "2c4fbe1d8b263dadcd050ba0825efb34d461a0afa658aa3681cda3dc60534f3e",
       "before_head_set_digest": "25175cbdad35ce4faf7e1f197f154eb75f1887fcc2b038176e0e278b852a4440",
       "branch_revision_ids": [],
       "committed_revision_ids": [
@@ -37485,7 +37485,7 @@
       "disposition": "FAST_FORWARD",
       "receipt": {
        "actor_id": "local:operator",
-       "after_head_set_digest": "6b97e95a6e48758aac69f76bdc354d04b48d25826a19da32ef824dfc530ce988",
+       "after_head_set_digest": "2c4fbe1d8b263dadcd050ba0825efb34d461a0afa658aa3681cda3dc60534f3e",
        "before_head_set_digest": "25175cbdad35ce4faf7e1f197f154eb75f1887fcc2b038176e0e278b852a4440",
        "claim_scopes": [
         "TRANSITION_RECORDED",
@@ -37500,7 +37500,7 @@
        "previous_transition_digest": null,
        "project_id": "project:a02:allowed",
        "provenance_state": "COMPLETE",
-       "receipt_digest": "d9ecc5303620cc6fa56e646f2963b1a6c3673fee190eb3b57bf3710494406aac",
+       "receipt_digest": "b5fd79d7797eebee7eb26c2199c3211328926bf019c999ac5ded1203eefe8d85",
        "receipt_id": "receipt:00000406",
        "receipt_type": "TRANSITION",
        "recorded_at": "2026-10-15T00:00:00.340000Z",
@@ -37518,7 +37518,7 @@
        ]
       }
      },
-     "reference_criterion_revision": "c55af92aa1a7c2f74207a18d1a09c35cfdd4eab89fd009e2f59e33fb1edce44a",
+     "reference_criterion_revision": "dd7b3fff62ec64b1ae21d4801dae2fa39b26e46cc972987b5fb3d71c37448be9",
      "reference_inquiry": {
       "actor_ref": "local:operator",
       "answers": [],
@@ -37585,7 +37585,7 @@
       "criterion_id": "criterion:00000181",
       "evaluator_binding_digest": null,
       "evaluator_input_allowed": false,
-      "inquiry_digest": "ed908f5453fa3f7530f341812a00287ae44c1d5f4ce3534cf451015c762738af",
+      "inquiry_digest": "6796ec62db8aef87f3d1126dd10c5e52ee6ff75ea78e8d9e5f3226b53fe160cb",
       "inquiry_id": "reference-inquiry:00000400",
       "lane": "REFERENCE_RANGE_CANDIDATE",
       "mapping_traces": [],
@@ -37886,33 +37886,33 @@
       "semantic_truth_certified": false,
       "session_ref": null,
       "source_digests": {
-       "span:00000082": "272f49bea9f105dd40c823d1ef0da809ca6aba7918733947b12cb173d143d80d",
-       "span:00000083": "6f84d48b601d6285788a42cdf6c69f2b7edf260dc87c30abb41b7eabe0a6705c",
-       "span:00000084": "3781ac0eb3bbb8cdbd6a6ee147cf6f24d199720691558e41add2cd20afc368c0",
-       "span:00000085": "e6491bd0ef3a5f27243dd417ba96a1629fcfd32bd5757384f10fb03b9b67c805",
-       "span:00000086": "f4b36f01ca9359aa4a7537bdcbb93415431c1f10f5e041d7de85f51c7b3dd730",
-       "span:00000087": "ee7348ac2be230c5e332883fdb8a8c1ccb1af79f838070c9757f16ac542aef5f",
-       "span:00000088": "0aa10b530c274f12a327caca715ee29714eda8884c0f7bfed45bd32de3e0d23d",
-       "span:00000089": "46e12fdb5eb768ef5f3be8fdbc7df6040eab28b7134a6448ac5979ab3b15bbb0",
-       "span:00000090": "155d388ad2f776a4e67784988db2b832ae8498172bf24216ea0bf99737992f90",
-       "span:00000118": "88c1dba7f90eaa515797db4cb2bc712d4ac0e6608d18cb9576e9189ffc71eb7e",
-       "span:00000119": "43fb130ed2b8a0e0e5436abe9c6214957e87c9fe679210d3868db94c815433f1",
-       "span:00000120": "d11a18d40ea4b969bb529686b94e3377f7bda76f4b842d7fbc4fc274480210ab",
-       "span:00000121": "728333452922bb37ed3e6af3d19e06a4b6aa165b4c745a5e15ae662dbeb4e4ae",
-       "span:00000122": "2f1bb32a4ed4efc7ad6f6b55fb7fd24ae8d0c2c54cea4b4afb66ed211b954d92",
-       "span:00000123": "23d09901b9bf75922ab01162b70f453c766e9cf72eb41cb5ea41111b14543a23",
-       "span:00000124": "967c6391f4c5877f9e59beb36f19aed8b17433e676b60d29b91e7d628c93f0f1",
-       "span:00000125": "540f6e77d027b8b30f2317de1b55a567c9e1ddcb0d66fa8510caae72d2c5392e",
-       "span:00000126": "5836a4daf9411c8aac4b5481815daae9ec610ee46a6623132c9841e2b5965190",
-       "span:00000154": "0f1dc4147a8d42e5d9176261aaeb230aa55f9dd657c1fe374afc5f87be27ffca",
-       "span:00000155": "f44d28d7fec1af02be9ee6fe4598775e1c92e045553d31238917526cf05d7723",
-       "span:00000156": "3d116bceb1ca2b27c0b115539154cdb261c2cdb66f2276e3f2a7539557b2c651",
-       "span:00000157": "2970cdcffc1f6d796fb911ccb5c7530a26ce3c34df3a63cee1a37fe731951b74",
-       "span:00000158": "c20abfef38c06e9936143044d23c5dba9c749a7a8bb93da8b553a9e19a5d1c4b",
-       "span:00000159": "3adfd4fca3ac9ae99105913d03a39e9659898950ec1a277f15a47291ec1b4933",
-       "span:00000160": "0ed34af6bba72ea315a057fd4af1f9bfbfe74c918b17f64b87b59b867542c51b",
-       "span:00000161": "3b45a553e596c1401173ac30d7e1124caebc63bf65669b67d2b205d4c4d93a18",
-       "span:00000162": "f771ce7d00c6e3c516f28052f3d650aaa11a2986f4f1f20c4748574a00aeba42"
+       "span:00000082": "b065bdbf3e4c05a30f50f84e32baa6431182628ac8286a804d0b28a395cd4162",
+       "span:00000083": "9fb1cb422dc6c180a01825f7b5850a44dcb6bfb7c64885e513565a27154b4c7d",
+       "span:00000084": "b75ee354f1c740e1e407fcf034700ce56393ed84ccbbac5c3c7fdeeb5c35a265",
+       "span:00000085": "7008db0ef9c5fea16b1d8f551fa210224f26a7482c133b1c9d98e667c8c769ab",
+       "span:00000086": "ffd200b7e2a8833fedb529fc69792c7dad36b5c4173cc11b0c8630e8817271e3",
+       "span:00000087": "fcd06a96849804c891db594ab5cc5093d82d426f99664775a3e156c5cad0c965",
+       "span:00000088": "fd002f09f1759f1f0ad195c1e8711234b89fd370841203f86984e86cfb116db5",
+       "span:00000089": "bf87672273576324dfd880f39663c61eb0ec39bfa6379540901ff32fcdfd1237",
+       "span:00000090": "0b7799254db82d064b17436fbecc5d8fcdb3b02704f966e8570778a6843ec45f",
+       "span:00000118": "70f8a671da23b01c73af7ba7a7bf95503a72d38e781bbe16b8ed4e14acab60ec",
+       "span:00000119": "086b094a2ec1278224ef726b2fe00d580dc26244ef169a8303f1ed60138297a0",
+       "span:00000120": "b21755092ce9a0059702b7d50c949ea70fe4d5e06e3dadf923eaa63b26981ef9",
+       "span:00000121": "0911e6ab7df73c80c35ff443930e3f81d0e67d07189a3f36bc0648ebc377af9e",
+       "span:00000122": "d177c103fa512dc4ca3d7acc71a1df6dda5edf92246685230e4ffa0949339f3f",
+       "span:00000123": "6c7616daca8c8f3a217ce36ed99ed3d1d1c63f23179e06f0c7c7aaba9c96ad5b",
+       "span:00000124": "34646f84699fab76fdf757d286b714ad3879d7dfb230e00b2e523aa6eb5a68ff",
+       "span:00000125": "ba959ca427317f799b52c7a5efb0e4663d86431fa122632539ac4c0613da7d87",
+       "span:00000126": "1eaba8c4aafaa73fef1c9adf59d94530631c338752ab9a757cd27f94490e4fb1",
+       "span:00000154": "bf44e9522b03658cca0a3fa7c268ed4b9ada1c3d652da14bf8c46272693e15f3",
+       "span:00000155": "7339c7de05d077c2a611e72d91af068fbb7b91a549c4ba17f5df613bba291fde",
+       "span:00000156": "09a699ee79cf55452e3bfb6c50c2c4d5a6b0ca0e91f93c0e2dd3d6f3a1cc59f2",
+       "span:00000157": "39882c6a22b031447c0ac427e2e937704e9b37c5ab6f882c5456263e5a2b8178",
+       "span:00000158": "71866a3431e6df0377d7421c7525cfa6018cdf1d0d9d4a709e6c1c4619d7dd58",
+       "span:00000159": "f4bda61f0b20794e26c467779bb76efcb1e53bb7611de1396ebfc0e83c1908ea",
+       "span:00000160": "5e21f08b11ebdc36eb5cfb1dd9c48c6762e550e8b4884688ae11251e2675a7c1",
+       "span:00000161": "02074d6584e4c95fb67cf6f74769a670862ba13eff39fa855cddcc3b0e5febbc",
+       "span:00000162": "801a33095b71d7251730711453285952620f5054fb95ddf3571ace51a4325425"
       },
       "source_refs": [
        "span:00000090",
@@ -39076,7 +39076,7 @@
     "S",
     "exit",
     "sources",
-    "dict:eab4b0317cc3584f"
+    "dict:118000e55c1ae470"
    ],
    [
     "A",
@@ -39325,7 +39325,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:623fd6e83d69ec4a"
+    "tuple:463d62d3bc3b8934"
    ],
    [
     "S",
@@ -41312,7 +41312,7 @@
     "S",
     "exit",
     "sources",
-    "dict:eab4b0317cc3584f"
+    "dict:118000e55c1ae470"
    ],
    [
     "clock"
@@ -41994,7 +41994,7 @@
     "S",
     "exit",
     "sources",
-    "dict:eab4b0317cc3584f"
+    "dict:118000e55c1ae470"
    ],
    [
     "A",
@@ -42243,7 +42243,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:623fd6e83d69ec4a"
+    "tuple:463d62d3bc3b8934"
    ],
    [
     "A",
@@ -42492,13 +42492,13 @@
     "S",
     "exit",
     "source_digests",
-    "dict:d6d2e3127f3c7bc4"
+    "dict:8231591477eed52a"
    ],
    [
     "S",
     "enter",
     "_evaluate",
-    "ReferenceInquiry:8f88f2b09bc695c5"
+    "ReferenceInquiry:6a138b39036be3bc"
    ],
    [
     "K",
@@ -42510,7 +42510,7 @@
     "S",
     "enter",
     "_grounded",
-    "ReferenceInquiry:8f88f2b09bc695c5",
+    "ReferenceInquiry:6a138b39036be3bc",
     2
    ],
    [
@@ -43172,7 +43172,7 @@
     "S",
     "exit",
     "sources",
-    "dict:eab4b0317cc3584f"
+    "dict:118000e55c1ae470"
    ],
    [
     "A",
@@ -43210,14 +43210,14 @@
    [
     "O",
     "calculate",
-    "ReferenceInquiry:8f88f2b09bc695c5",
+    "ReferenceInquiry:6a138b39036be3bc",
     null
    ],
    [
     "S",
     "enter",
     "_scenarios",
-    "ReferenceInquiry:8f88f2b09bc695c5"
+    "ReferenceInquiry:6a138b39036be3bc"
    ],
    [
     "K",
@@ -43228,13 +43228,13 @@
    [
     "O",
     "calculate",
-    "ReferenceInquiry:8f88f2b09bc695c5"
+    "ReferenceInquiry:6a138b39036be3bc"
    ],
    [
     "S",
     "enter",
     "_grounded",
-    "ReferenceInquiry:ce160ec1478cf239",
+    "ReferenceInquiry:0f835a6efed54e28",
     2
    ],
    [
@@ -43896,7 +43896,7 @@
     "S",
     "exit",
     "sources",
-    "dict:eab4b0317cc3584f"
+    "dict:118000e55c1ae470"
    ],
    [
     "A",
@@ -43925,13 +43925,13 @@
    [
     "O",
     "calculate",
-    "ReferenceInquiry:ce160ec1478cf239"
+    "ReferenceInquiry:0f835a6efed54e28"
    ],
    [
     "S",
     "enter",
     "_grounded",
-    "ReferenceInquiry:eb60a3ceb9909ef1",
+    "ReferenceInquiry:374b897bc0310f41",
     2
    ],
    [
@@ -44593,7 +44593,7 @@
     "S",
     "exit",
     "sources",
-    "dict:eab4b0317cc3584f"
+    "dict:118000e55c1ae470"
    ],
    [
     "A",
@@ -44622,13 +44622,13 @@
    [
     "O",
     "calculate",
-    "ReferenceInquiry:eb60a3ceb9909ef1"
+    "ReferenceInquiry:374b897bc0310f41"
    ],
    [
     "S",
     "enter",
     "_grounded",
-    "ReferenceInquiry:8bf38b99778a6b1c",
+    "ReferenceInquiry:d2c50e006c547503",
     2
    ],
    [
@@ -45290,7 +45290,7 @@
     "S",
     "exit",
     "sources",
-    "dict:eab4b0317cc3584f"
+    "dict:118000e55c1ae470"
    ],
    [
     "A",
@@ -45318,14 +45318,14 @@
     "S",
     "exit",
     "_evaluate",
-    "ReferenceInquiry:8895d437e6e627d9"
+    "ReferenceInquiry:a8e5ee6824d4d0e6"
    ],
    [
     "S",
     "enter",
     "_persist",
     "CriterionContractRecord:3a98ae68030be3ff",
-    "ReferenceInquiry:8895d437e6e627d9"
+    "ReferenceInquiry:a8e5ee6824d4d0e6"
    ],
    [
     "S",
@@ -45333,7 +45333,7 @@
     "CriterionContractRecord:3a98ae68030be3ff",
     "actor=ActorRef:c293d54ce891020c",
     "event_type=criteria/referenceInquiryUpdated",
-    "updates=dict:364f347a3c72bbf1"
+    "updates=dict:7c56ffe60f0234c2"
    ],
    [
     "ids",
@@ -45778,7 +45778,7 @@
    [
     "R",
     "commit",
-    "RevisionChangeSet:1ae57932a0f4855c"
+    "RevisionChangeSet:869a137a60f3da3a"
    ],
    [
     "clock"
@@ -49062,7 +49062,7 @@
    [
     "C",
     "add_contract",
-    "CriterionContractRecord:639e400a55ac6fc2"
+    "CriterionContractRecord:8c8d895354c312c7"
    ],
    [
     "clock"
@@ -49074,7 +49074,7 @@
    [
     "S",
     "transaction",
-    "CriterionContractRecord:639e400a55ac6fc2"
+    "CriterionContractRecord:8c8d895354c312c7"
    ],
    [
     "L",
@@ -49639,7 +49639,7 @@
    [
     "C",
     "append_audit",
-    "CriterionAuditRecord:9e77589b10521d4a"
+    "CriterionAuditRecord:72d87dbf939f3856"
    ],
    [
     "T",
@@ -49657,7 +49657,7 @@
    [
     "T",
     "update",
-    "WorkThread:40c108c76e736d39",
+    "WorkThread:4f767a46f4c5035e",
     "expected_revision=2"
    ],
    [
@@ -50326,7 +50326,7 @@
     "S",
     "exit",
     "sources",
-    "dict:eab4b0317cc3584f"
+    "dict:118000e55c1ae470"
    ],
    [
     "A",
@@ -50575,7 +50575,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:623fd6e83d69ec4a"
+    "tuple:463d62d3bc3b8934"
    ],
    [
     "S",
@@ -51371,7 +51371,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -51539,7 +51539,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -51928,7 +51928,7 @@
     "reference",
     {
      "reference_commit": {
-      "after_head_set_digest": "72cebb8969a8f61c6ab91aad2822a68a2c247122e0cc0f3d747aceff90d0d147",
+      "after_head_set_digest": "6a0351299e505a2f642e6b8436ed25595a46cb345584e4306fd1a98d70221f96",
       "before_head_set_digest": "bb5c7ab91c74aa380449c7c00140ec0a268f2f833baedb3151a7e7a50db7ad2e",
       "branch_revision_ids": [],
       "committed_revision_ids": [
@@ -51937,7 +51937,7 @@
       "disposition": "FAST_FORWARD",
       "receipt": {
        "actor_id": "local:operator",
-       "after_head_set_digest": "72cebb8969a8f61c6ab91aad2822a68a2c247122e0cc0f3d747aceff90d0d147",
+       "after_head_set_digest": "6a0351299e505a2f642e6b8436ed25595a46cb345584e4306fd1a98d70221f96",
        "before_head_set_digest": "bb5c7ab91c74aa380449c7c00140ec0a268f2f833baedb3151a7e7a50db7ad2e",
        "claim_scopes": [
         "TRANSITION_RECORDED",
@@ -51952,7 +51952,7 @@
        "previous_transition_digest": null,
        "project_id": "project:a02:allowed",
        "provenance_state": "COMPLETE",
-       "receipt_digest": "db6519a05138478ef38ac1e3a6e3971458f361754e990c3c3bbf56f9a1dce0f5",
+       "receipt_digest": "20b4ebfd2af9da9178fca553addd046b907d06fda271eb35aba242985004658a",
        "receipt_id": "receipt:00000370",
        "receipt_type": "TRANSITION",
        "recorded_at": "2026-10-15T00:00:00.312000Z",
@@ -51970,7 +51970,7 @@
        ]
       }
      },
-     "reference_criterion_revision": "c89e61b19c81c4bd18db891cc02332a3a9757ef2cac1132f7335281e80f8fc23",
+     "reference_criterion_revision": "9702fff2776061b67f7baf2d3bf0b72af7a6644f076cc04ca915b69d8be97cb4",
      "reference_inquiry": {
       "actor_ref": "local:operator",
       "answers": [],
@@ -51986,7 +51986,7 @@
       "criterion_id": "criterion:00000145",
       "evaluator_binding_digest": null,
       "evaluator_input_allowed": false,
-      "inquiry_digest": "ac2bc3fe7b4bce6c44e6993d7483a8f5453be84d2278d27762bf9b18ff9adbcd",
+      "inquiry_digest": "37655aed3f70afebaa7e093ef5719fb14f733ed98633bbf78b686530395b36b0",
       "inquiry_id": "reference-inquiry:00000364",
       "lane": "REFERENCE_RANGE_CANDIDATE",
       "mapping_traces": [],
@@ -52004,24 +52004,24 @@
       "semantic_truth_certified": false,
       "session_ref": null,
       "source_digests": {
-       "span:00000082": "eda7681bc70d1ec1e11e673a907040f7cf208dd978555d74cfcbabb927d43d07",
-       "span:00000083": "ae2732f689f41dbb490b4e0e7413c8e08781523a2eb90b1231620a74b8abe6e5",
-       "span:00000084": "c3a9b15ded99c193f111b613ee24bad04b92e50eb004f7736b9e3e87bd6971f0",
-       "span:00000085": "3da9bac40ae59cfbb1543d90af10433a14fcc78fabcddd955f9bc60198ee750e",
-       "span:00000086": "c43792c8c00c97d9056c6edb7f46bc6b72d8ef01ca8c0439f48ef67913dd9ed3",
-       "span:00000087": "83d3d0f524d1ebde7602651f1e34cb1af958c06b390be7b92f9eb2abd5842de8",
-       "span:00000088": "065b9cbf255a0d737bd40be3b890c8062b73a99482c76d83d4e0f9b5a728f6ff",
-       "span:00000089": "18dad42abb62bf8d94874b29dc44066892f8c8c9950527474655ee0759bfa7d7",
-       "span:00000090": "35868c12ada2d5dad7a62090c7202f5620a680931e80520c70948cbd6f743f38",
-       "span:00000118": "9ebb411f27d5d4f6de22e977c38024bec7c8c9a1ec4a0ee5610c61bb08bf5d49",
-       "span:00000119": "9a3bf2c2f0db8aea3d75b13d363329b3476969e136167fde85b5139612b70543",
-       "span:00000120": "2798fa8c3e63da1cee4a35ed214d158b996765d215e837511857008f7206d04a",
-       "span:00000121": "5e810c83783803d2ca29caf8fcab399bb097b233bbf9ec747d30739245e83d2e",
-       "span:00000122": "86a29b0a5e4f4becebbcf727e92c17db41edc0a01530540e97826a0e8d50c524",
-       "span:00000123": "593af2655d6b4dd4884259b57fd71726121da8b2cc0d5d35a602b63b216e33be",
-       "span:00000124": "86509552bff99b76b413f2e2d193118b4c3213dba67cec699f977b87c726c79a",
-       "span:00000125": "2075dd1f71d3bdb07a12db075507a7bfb4936eb0a3ac3019b4fb001c08e16d26",
-       "span:00000126": "24487b6475903e4ecae7d5d6f78602aedac944be692675df5e04d7f3076b4fdf"
+       "span:00000082": "6e3686ef58be0938ebc631d215faa60816b47b7b7a2af554df6424e8c7d84aed",
+       "span:00000083": "137764de397d78fe6fb58e6a5a8df1c6bfa795f91a76d58a304ab795fb52ae56",
+       "span:00000084": "1bae647e0551cc23e5433150b966e1d5c68fb3db03625ee505e45c0f1f7fb51d",
+       "span:00000085": "55212b6c189f7ceb883bdb28515c929569f575fe342df0de599293375495f30e",
+       "span:00000086": "abf7c5ffbb8c92be0dcca3bee6d6c04f43a9df72fbe5a815eabf94697f359844",
+       "span:00000087": "9d95da1eb87f9a1056f8bfb1ed2fd8c7590dc14c5ecfbc3448af852721781db8",
+       "span:00000088": "16a42311a83e37022d52187c9da3405d1328a974435f92bd96e1d771ae503477",
+       "span:00000089": "591ce1b6c8ca00955b7cd671ca938133f74f6942763310411ffcec24c87403d1",
+       "span:00000090": "5352ff321966247221756726bbe94aa76cfc525c457150d0e76518dcf81b21ba",
+       "span:00000118": "eaa1ee7540b3a51b3e94fb3d5cc027f35a62a8710e151a93a38b7cdb67fd9946",
+       "span:00000119": "6a777859272c5a140cdf3748e283960b9fedcaec75b2c6a466e85c8374ca551d",
+       "span:00000120": "bf7bd6320d5a0ea079fc9ce53011dce50a533bab183052fd4afb1c0a8905ed3c",
+       "span:00000121": "997034c63f24ebeafd40a42596fad6b29b5126e65a800d8fa9941ea74e20817e",
+       "span:00000122": "7d672153b0b644ad19b7bb4b6c16cae077d82244e372db3ad1be1668533874ed",
+       "span:00000123": "28acb48ea48ceafc12c9a6488846325b1b93d75c5c505b945ea6361a505522a1",
+       "span:00000124": "bcec4d5e45092c3ffbc8ead045fc390ffa888933bd91747f1b9fa815d760d260",
+       "span:00000125": "34e91eb147922b1bfbd9f4f751e63a188942368a291def6ca4232d2c0c733977",
+       "span:00000126": "a2512e6716acef03f1f114f001769fa2a05021bd260be0b01805afc65ed1bae8"
       },
       "source_refs": [
        "span:00000090",
@@ -52825,7 +52825,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -52993,7 +52993,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -54359,7 +54359,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "clock"
@@ -54825,7 +54825,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -54993,7 +54993,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "A",
@@ -55161,26 +55161,26 @@
     "S",
     "exit",
     "source_digests",
-    "dict:53708c83a89153cd"
+    "dict:263ba7a81a4cba08"
    ],
    [
     "S",
     "enter",
     "_evaluate",
-    "ReferenceInquiry:f96678496adfc5dd"
+    "ReferenceInquiry:155ae9a73173dcf0"
    ],
    [
     "S",
     "exit",
     "_evaluate",
-    "ReferenceInquiry:b2df2b199af285c4"
+    "ReferenceInquiry:764fd25b4e72ccad"
    ],
    [
     "S",
     "enter",
     "_persist",
     "CriterionContractRecord:408295bbbdab04a7",
-    "ReferenceInquiry:b2df2b199af285c4"
+    "ReferenceInquiry:764fd25b4e72ccad"
    ],
    [
     "S",
@@ -55188,7 +55188,7 @@
     "CriterionContractRecord:408295bbbdab04a7",
     "actor=ActorRef:c293d54ce891020c",
     "event_type=criteria/referenceInquiryUpdated",
-    "updates=dict:c6f2c4be8436c8e3"
+    "updates=dict:711700f49f72b0d2"
    ],
    [
     "ids",
@@ -55498,7 +55498,7 @@
    [
     "R",
     "commit",
-    "RevisionChangeSet:8aa9a2569059c8c6"
+    "RevisionChangeSet:82b3081c87024e47"
    ],
    [
     "clock"
@@ -57882,7 +57882,7 @@
    [
     "C",
     "add_contract",
-    "CriterionContractRecord:14708ee832d8fa3a"
+    "CriterionContractRecord:2336669bfe1a1878"
    ],
    [
     "clock"
@@ -57894,7 +57894,7 @@
    [
     "S",
     "transaction",
-    "CriterionContractRecord:14708ee832d8fa3a"
+    "CriterionContractRecord:2336669bfe1a1878"
    ],
    [
     "L",
@@ -58309,7 +58309,7 @@
    [
     "C",
     "append_audit",
-    "CriterionAuditRecord:1b7179c20886acc2"
+    "CriterionAuditRecord:1d7843cd1cc1cf23"
    ],
    [
     "T",
@@ -58327,7 +58327,7 @@
    [
     "T",
     "update",
-    "WorkThread:2f069aa0ccc34e5b",
+    "WorkThread:a998c1e0a19bc011",
     "expected_revision=2"
    ],
    [
@@ -58780,7 +58780,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -58948,7 +58948,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -58970,8 +58970,8 @@
     "reference",
     {
      "reference_commit": {
-      "after_head_set_digest": "fcfe71a98d8e45e13e1a1bd4907c8378a77ad33a764cdddd0c5b086fbd117f39",
-      "before_head_set_digest": "eedd98e1efcb6ece176f1b9d43459ac48bf72b09c3760274b87480c43f34d3ce",
+      "after_head_set_digest": "b0996078a619651007026fbf16392b91f81e2ac70278287ac234d1b48056958d",
+      "before_head_set_digest": "c2ec20e9cfa1c45f8f2d59a17b31049c28f5873c2a5c5db8084d2df10ac9f0f1",
       "branch_revision_ids": [],
       "committed_revision_ids": [
        "criterion-revision:00000484"
@@ -58979,8 +58979,8 @@
       "disposition": "FAST_FORWARD",
       "receipt": {
        "actor_id": "local:operator",
-       "after_head_set_digest": "fcfe71a98d8e45e13e1a1bd4907c8378a77ad33a764cdddd0c5b086fbd117f39",
-       "before_head_set_digest": "eedd98e1efcb6ece176f1b9d43459ac48bf72b09c3760274b87480c43f34d3ce",
+       "after_head_set_digest": "b0996078a619651007026fbf16392b91f81e2ac70278287ac234d1b48056958d",
+       "before_head_set_digest": "c2ec20e9cfa1c45f8f2d59a17b31049c28f5873c2a5c5db8084d2df10ac9f0f1",
        "claim_scopes": [
         "TRANSITION_RECORDED",
         "ARTIFACT_INTEGRITY",
@@ -58994,7 +58994,7 @@
        "previous_transition_digest": null,
        "project_id": "project:a02:allowed",
        "provenance_state": "COMPLETE",
-       "receipt_digest": "88f41985abc0f3f916ff0219d8cfbb3bf5c728dec7840f2992ace995eec668aa",
+       "receipt_digest": "9c287049089df696b4a890be8b39f0b38f7f591068203385a86324020c15355b",
        "receipt_id": "receipt:00000489",
        "receipt_type": "TRANSITION",
        "recorded_at": "2026-10-15T00:00:00.425000Z",
@@ -59012,7 +59012,7 @@
        ]
       }
      },
-     "reference_criterion_revision": "bb73abcf6d0a85208e64a9771ca2193dcbac9308e40adb31cf7cd3522ae45221",
+     "reference_criterion_revision": "36997fe87edb51fc18903d91dd0b16d4abfe5d9210fb51d9a9e7f93ab187518f",
      "reference_inquiry": {
       "actor_ref": "local:operator",
       "answers": [
@@ -59090,12 +59090,12 @@
       "criterion_id": "criterion:00000145",
       "evaluator_binding_digest": null,
       "evaluator_input_allowed": false,
-      "inquiry_digest": "f00532ab126cf8638f6a0adaee1db02982bc6999f8b0c37875784c255c422376",
+      "inquiry_digest": "34680bca0e3b4390c8374aef6f9f6c5f00d2a8759b47c23fe01351a32bee06aa",
       "inquiry_id": "reference-inquiry:00000365",
       "lane": "REFERENCE_RANGE_CANDIDATE",
       "mapping_traces": [
        {
-        "input_digest": "28c8778c9c6e66c5cd0b06365d2d5da926d02a209e045c35a69028381f4dc6a6",
+        "input_digest": "d1296ef60505787b26014c750a0571c4ff528cb4f4f4108680dde481ac866294",
         "input_head_set_digest": "aae05c85a6d9506a31291fa2f429691c00c6a2e5f61d733ccb01d582aa47770a",
         "model_id": "SCRIPTED_REFERENCE_MAPPER",
         "output_digest": "a4775aec3ba500ab082600da6a801a11a820163bacd956fe1d4f253d86b73de7",
@@ -59105,8 +59105,8 @@
         "scripted": true
        },
        {
-        "input_digest": "d37ea6ef624a1bac37e0ca477fbc5f5cb9dea4ee429073e6856bd364fca253f5",
-        "input_head_set_digest": "971746a7d58c55bc40836fc6a3426c46b0560ef374b98fdf61a679862b5ce550",
+        "input_digest": "1748fdad5d42dc5705e8b712c831331df2241144737ce51d1ff71759005c1ca8",
+        "input_head_set_digest": "84666d4a5bdaa5fc857374702d91e4111e412909d04b6bd40e33fc03f90a5808",
         "model_id": "SCRIPTED_REFERENCE_MAPPER",
         "output_digest": "ac2bd47f498076e244f4f75460ecb77a37c821ea9cde5cfc5fbc1efb55a91e31",
         "policy_ref": "policy:00000010",
@@ -59216,24 +59216,24 @@
       "semantic_truth_certified": false,
       "session_ref": null,
       "source_digests": {
-       "span:00000082": "eda7681bc70d1ec1e11e673a907040f7cf208dd978555d74cfcbabb927d43d07",
-       "span:00000083": "ae2732f689f41dbb490b4e0e7413c8e08781523a2eb90b1231620a74b8abe6e5",
-       "span:00000084": "c3a9b15ded99c193f111b613ee24bad04b92e50eb004f7736b9e3e87bd6971f0",
-       "span:00000085": "3da9bac40ae59cfbb1543d90af10433a14fcc78fabcddd955f9bc60198ee750e",
-       "span:00000086": "c43792c8c00c97d9056c6edb7f46bc6b72d8ef01ca8c0439f48ef67913dd9ed3",
-       "span:00000087": "83d3d0f524d1ebde7602651f1e34cb1af958c06b390be7b92f9eb2abd5842de8",
-       "span:00000088": "065b9cbf255a0d737bd40be3b890c8062b73a99482c76d83d4e0f9b5a728f6ff",
-       "span:00000089": "18dad42abb62bf8d94874b29dc44066892f8c8c9950527474655ee0759bfa7d7",
-       "span:00000090": "35868c12ada2d5dad7a62090c7202f5620a680931e80520c70948cbd6f743f38",
-       "span:00000118": "9ebb411f27d5d4f6de22e977c38024bec7c8c9a1ec4a0ee5610c61bb08bf5d49",
-       "span:00000119": "9a3bf2c2f0db8aea3d75b13d363329b3476969e136167fde85b5139612b70543",
-       "span:00000120": "2798fa8c3e63da1cee4a35ed214d158b996765d215e837511857008f7206d04a",
-       "span:00000121": "5e810c83783803d2ca29caf8fcab399bb097b233bbf9ec747d30739245e83d2e",
-       "span:00000122": "86a29b0a5e4f4becebbcf727e92c17db41edc0a01530540e97826a0e8d50c524",
-       "span:00000123": "593af2655d6b4dd4884259b57fd71726121da8b2cc0d5d35a602b63b216e33be",
-       "span:00000124": "86509552bff99b76b413f2e2d193118b4c3213dba67cec699f977b87c726c79a",
-       "span:00000125": "2075dd1f71d3bdb07a12db075507a7bfb4936eb0a3ac3019b4fb001c08e16d26",
-       "span:00000126": "24487b6475903e4ecae7d5d6f78602aedac944be692675df5e04d7f3076b4fdf"
+       "span:00000082": "6e3686ef58be0938ebc631d215faa60816b47b7b7a2af554df6424e8c7d84aed",
+       "span:00000083": "137764de397d78fe6fb58e6a5a8df1c6bfa795f91a76d58a304ab795fb52ae56",
+       "span:00000084": "1bae647e0551cc23e5433150b966e1d5c68fb3db03625ee505e45c0f1f7fb51d",
+       "span:00000085": "55212b6c189f7ceb883bdb28515c929569f575fe342df0de599293375495f30e",
+       "span:00000086": "abf7c5ffbb8c92be0dcca3bee6d6c04f43a9df72fbe5a815eabf94697f359844",
+       "span:00000087": "9d95da1eb87f9a1056f8bfb1ed2fd8c7590dc14c5ecfbc3448af852721781db8",
+       "span:00000088": "16a42311a83e37022d52187c9da3405d1328a974435f92bd96e1d771ae503477",
+       "span:00000089": "591ce1b6c8ca00955b7cd671ca938133f74f6942763310411ffcec24c87403d1",
+       "span:00000090": "5352ff321966247221756726bbe94aa76cfc525c457150d0e76518dcf81b21ba",
+       "span:00000118": "eaa1ee7540b3a51b3e94fb3d5cc027f35a62a8710e151a93a38b7cdb67fd9946",
+       "span:00000119": "6a777859272c5a140cdf3748e283960b9fedcaec75b2c6a466e85c8374ca551d",
+       "span:00000120": "bf7bd6320d5a0ea079fc9ce53011dce50a533bab183052fd4afb1c0a8905ed3c",
+       "span:00000121": "997034c63f24ebeafd40a42596fad6b29b5126e65a800d8fa9941ea74e20817e",
+       "span:00000122": "7d672153b0b644ad19b7bb4b6c16cae077d82244e372db3ad1be1668533874ed",
+       "span:00000123": "28acb48ea48ceafc12c9a6488846325b1b93d75c5c505b945ea6361a505522a1",
+       "span:00000124": "bcec4d5e45092c3ffbc8ead045fc390ffa888933bd91747f1b9fa815d760d260",
+       "span:00000125": "34e91eb147922b1bfbd9f4f751e63a188942368a291def6ca4232d2c0c733977",
+       "span:00000126": "a2512e6716acef03f1f114f001769fa2a05021bd260be0b01805afc65ed1bae8"
       },
       "source_refs": [
        "span:00000090",
@@ -59693,7 +59693,7 @@
     "S",
     "exit",
     "automatic_request",
-    "ReferenceRequest:2cf11a57bb191f85"
+    "ReferenceRequest:bf99d88c14ef0c47"
    ],
    [
     "S",
@@ -59701,7 +59701,7 @@
     "authorize",
     "project:a02:allowed",
     "thread:project:a02:allowed",
-    "ReferenceRequest:2cf11a57bb191f85"
+    "ReferenceRequest:bf99d88c14ef0c47"
    ],
    [
     "S",
@@ -60127,7 +60127,7 @@
     "S",
     "exit",
     "current",
-    "CriterionContractRecord:09f2dc2e6564ec9d"
+    "CriterionContractRecord:657903d0ec1275c2"
    ],
    [
     "S",
@@ -60579,7 +60579,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -60747,7 +60747,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -61175,7 +61175,7 @@
     "S",
     "exit",
     "automatic_request",
-    "ReferenceRequest:2cf11a57bb191f85"
+    "ReferenceRequest:bf99d88c14ef0c47"
    ],
    [
     "S",
@@ -61184,7 +61184,7 @@
     "project:a02:allowed",
     "thread:project:a02:allowed",
     "criterion:00000145",
-    "5b9a591540ec481e0f9a8f048c6feb323b8bf8c7ecc9f8f51794fd75f7f6b730"
+    "0a5841e04b62dad898e9f187b50cb685c2c93c2b790cbc91902ebe2ed413f859"
    ],
    [
     "T",
@@ -61601,7 +61601,7 @@
     "S",
     "exit",
     "current",
-    "CriterionContractRecord:09f2dc2e6564ec9d"
+    "CriterionContractRecord:657903d0ec1275c2"
    ],
    [
     "S",
@@ -62053,7 +62053,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -62221,7 +62221,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -62680,7 +62680,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -62848,7 +62848,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "A",
@@ -63016,7 +63016,7 @@
     "S",
     "exit",
     "source_digests",
-    "dict:53708c83a89153cd"
+    "dict:263ba7a81a4cba08"
    ],
    [
     "S",
@@ -63025,7 +63025,7 @@
     "project:a02:allowed",
     "thread:project:a02:allowed",
     "criterion:00000145",
-    "5b9a591540ec481e0f9a8f048c6feb323b8bf8c7ecc9f8f51794fd75f7f6b730"
+    "0a5841e04b62dad898e9f187b50cb685c2c93c2b790cbc91902ebe2ed413f859"
    ],
    [
     "T",
@@ -63442,7 +63442,7 @@
     "S",
     "exit",
     "current",
-    "CriterionContractRecord:09f2dc2e6564ec9d"
+    "CriterionContractRecord:657903d0ec1275c2"
    ],
    [
     "S",
@@ -63901,7 +63901,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -64069,7 +64069,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "A",
@@ -64237,18 +64237,18 @@
     "S",
     "exit",
     "source_digests",
-    "dict:53708c83a89153cd"
+    "dict:263ba7a81a4cba08"
    ],
    [
     "S",
     "enter",
     "transaction",
-    "CriterionContractRecord:09f2dc2e6564ec9d"
+    "CriterionContractRecord:657903d0ec1275c2"
    ],
    [
     "S",
     "transaction",
-    "CriterionContractRecord:09f2dc2e6564ec9d"
+    "CriterionContractRecord:657903d0ec1275c2"
    ],
    [
     "S",
@@ -64262,8 +64262,8 @@
     "answer",
     "project:a02:allowed",
     "thread:project:a02:allowed",
-    "ReferenceAnswerRequest:3fc43daa8269b407",
-    "mapping_trace=ReferenceMappingTrace:c8a87e2edd7bcc69"
+    "ReferenceAnswerRequest:a9202b6e378b4a3c",
+    "mapping_trace=ReferenceMappingTrace:883d2bbca690b12f"
    ],
    [
     "S",
@@ -64272,7 +64272,7 @@
     "project:a02:allowed",
     "thread:project:a02:allowed",
     "criterion:00000145",
-    "5b9a591540ec481e0f9a8f048c6feb323b8bf8c7ecc9f8f51794fd75f7f6b730"
+    "0a5841e04b62dad898e9f187b50cb685c2c93c2b790cbc91902ebe2ed413f859"
    ],
    [
     "T",
@@ -64689,12 +64689,12 @@
     "S",
     "exit",
     "current",
-    "CriterionContractRecord:09f2dc2e6564ec9d"
+    "CriterionContractRecord:657903d0ec1275c2"
    ],
    [
     "S",
     "transaction",
-    "CriterionContractRecord:09f2dc2e6564ec9d"
+    "CriterionContractRecord:657903d0ec1275c2"
    ],
    [
     "L",
@@ -65549,7 +65549,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "S",
@@ -66008,7 +66008,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -66176,7 +66176,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "A",
@@ -66344,7 +66344,7 @@
     "S",
     "exit",
     "source_digests",
-    "dict:53708c83a89153cd"
+    "dict:263ba7a81a4cba08"
    ],
    [
     "clock"
@@ -66356,28 +66356,28 @@
     "S",
     "enter",
     "_evaluate",
-    "ReferenceInquiry:2884536a5be27995"
+    "ReferenceInquiry:a563b7d3dd7c2105"
    ],
    [
     "S",
     "exit",
     "_evaluate",
-    "ReferenceInquiry:12d97ca9429ce607"
+    "ReferenceInquiry:de63a7e7dfac2341"
    ],
    [
     "S",
     "enter",
     "_persist",
-    "CriterionContractRecord:09f2dc2e6564ec9d",
-    "ReferenceInquiry:12d97ca9429ce607"
+    "CriterionContractRecord:657903d0ec1275c2",
+    "ReferenceInquiry:de63a7e7dfac2341"
    ],
    [
     "S",
     "revise",
-    "CriterionContractRecord:09f2dc2e6564ec9d",
+    "CriterionContractRecord:657903d0ec1275c2",
     "actor=ActorRef:c293d54ce891020c",
     "event_type=criteria/referenceInquiryUpdated",
-    "updates=dict:b89ab81ac26f2387"
+    "updates=dict:8a1808269f04d11d"
    ],
    [
     "ids",
@@ -66807,7 +66807,7 @@
    [
     "R",
     "commit",
-    "RevisionChangeSet:44425001edb88908"
+    "RevisionChangeSet:ae3f3175c13f011c"
    ],
    [
     "clock"
@@ -69191,7 +69191,7 @@
    [
     "C",
     "add_contract",
-    "CriterionContractRecord:64149636577d4fa8"
+    "CriterionContractRecord:42671fc11dc7d2ad"
    ],
    [
     "clock"
@@ -69203,7 +69203,7 @@
    [
     "S",
     "transaction",
-    "CriterionContractRecord:64149636577d4fa8"
+    "CriterionContractRecord:42671fc11dc7d2ad"
    ],
    [
     "L",
@@ -69618,7 +69618,7 @@
    [
     "C",
     "append_audit",
-    "CriterionAuditRecord:00ca60fccc53d4f0"
+    "CriterionAuditRecord:a84023781899b7c7"
    ],
    [
     "T",
@@ -69636,7 +69636,7 @@
    [
     "T",
     "update",
-    "WorkThread:72b304baa5307645",
+    "WorkThread:4575a8ea8299c595",
     "expected_revision=5"
    ],
    [
@@ -70089,7 +70089,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -70257,7 +70257,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -70277,8 +70277,8 @@
     "answer",
     "project:a02:allowed",
     "thread:project:a02:allowed",
-    "ReferenceAnswerRequest:3cd9aa2aee73815c",
-    "mapping_trace=ReferenceMappingTrace:c8a87e2edd7bcc69"
+    "ReferenceAnswerRequest:f0205cc6b7ef70f2",
+    "mapping_trace=ReferenceMappingTrace:883d2bbca690b12f"
    ],
    [
     "S",
@@ -70287,7 +70287,7 @@
     "project:a02:allowed",
     "thread:project:a02:allowed",
     "criterion:00000145",
-    "41dc1e891d782b966409f8ab46ec1c9edc77b57e9ad581e7a7c29ea727dae80c"
+    "61dfd9811f24a5ee695820af9b66e75c41e6c5900cfc5ceeadbcdd21a34ecc5e"
    ],
    [
     "T",
@@ -70704,12 +70704,12 @@
     "S",
     "exit",
     "current",
-    "CriterionContractRecord:64149636577d4fa8"
+    "CriterionContractRecord:42671fc11dc7d2ad"
    ],
    [
     "S",
     "transaction",
-    "CriterionContractRecord:64149636577d4fa8"
+    "CriterionContractRecord:42671fc11dc7d2ad"
    ],
    [
     "L",
@@ -71564,7 +71564,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "S",
@@ -72023,7 +72023,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -72191,7 +72191,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "A",
@@ -72359,7 +72359,7 @@
     "S",
     "exit",
     "source_digests",
-    "dict:53708c83a89153cd"
+    "dict:263ba7a81a4cba08"
    ],
    [
     "clock"
@@ -72371,7 +72371,7 @@
     "S",
     "enter",
     "_evaluate",
-    "ReferenceInquiry:087d92c1f66d9c83"
+    "ReferenceInquiry:93aa689219a9417f"
    ],
    [
     "K",
@@ -72383,7 +72383,7 @@
     "S",
     "enter",
     "_grounded",
-    "ReferenceInquiry:087d92c1f66d9c83",
+    "ReferenceInquiry:93aa689219a9417f",
     2
    ],
    [
@@ -72829,7 +72829,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -72858,29 +72858,29 @@
    [
     "O",
     "calculate",
-    "ReferenceInquiry:087d92c1f66d9c83",
+    "ReferenceInquiry:93aa689219a9417f",
     null
    ],
    [
     "S",
     "exit",
     "_evaluate",
-    "ReferenceInquiry:66abb80a4575e4b3"
+    "ReferenceInquiry:1c364bfa0a15b245"
    ],
    [
     "S",
     "enter",
     "_persist",
-    "CriterionContractRecord:64149636577d4fa8",
-    "ReferenceInquiry:66abb80a4575e4b3"
+    "CriterionContractRecord:42671fc11dc7d2ad",
+    "ReferenceInquiry:1c364bfa0a15b245"
    ],
    [
     "S",
     "revise",
-    "CriterionContractRecord:64149636577d4fa8",
+    "CriterionContractRecord:42671fc11dc7d2ad",
     "actor=ActorRef:c293d54ce891020c",
     "event_type=criteria/referenceInquiryUpdated",
-    "updates=dict:a7c2cd1981efc710"
+    "updates=dict:db55ec7c02221296"
    ],
    [
     "ids",
@@ -73310,7 +73310,7 @@
    [
     "R",
     "commit",
-    "RevisionChangeSet:4c7269aaf5184929"
+    "RevisionChangeSet:617d4a074f8ceb0e"
    ],
    [
     "clock"
@@ -75694,7 +75694,7 @@
    [
     "C",
     "add_contract",
-    "CriterionContractRecord:29d845b7586f829d"
+    "CriterionContractRecord:3af700e8f5699d22"
    ],
    [
     "clock"
@@ -75706,7 +75706,7 @@
    [
     "S",
     "transaction",
-    "CriterionContractRecord:29d845b7586f829d"
+    "CriterionContractRecord:3af700e8f5699d22"
    ],
    [
     "L",
@@ -76121,7 +76121,7 @@
    [
     "C",
     "append_audit",
-    "CriterionAuditRecord:adcc3cc4bf18a65e"
+    "CriterionAuditRecord:f5473a3d332576ba"
    ],
    [
     "T",
@@ -76139,7 +76139,7 @@
    [
     "T",
     "update",
-    "WorkThread:b58982187f972eb0",
+    "WorkThread:8f9bf8d238a4a6ea",
     "expected_revision=6"
    ],
    [
@@ -76592,7 +76592,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -76760,7 +76760,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -76782,7 +76782,7 @@
     "reference",
     {
      "reference_commit": {
-      "after_head_set_digest": "e07ab5d0892042ae65003748ed1cbba55d5f45ce1defebef639483b9fb213a44",
+      "after_head_set_digest": "dc1e316531970603aeb2bd6649abaa7faefb6bca788d27c2e77b2f238009fda4",
       "before_head_set_digest": "aae05c85a6d9506a31291fa2f429691c00c6a2e5f61d733ccb01d582aa47770a",
       "branch_revision_ids": [],
       "committed_revision_ids": [
@@ -76791,7 +76791,7 @@
       "disposition": "FAST_FORWARD",
       "receipt": {
        "actor_id": "local:operator",
-       "after_head_set_digest": "e07ab5d0892042ae65003748ed1cbba55d5f45ce1defebef639483b9fb213a44",
+       "after_head_set_digest": "dc1e316531970603aeb2bd6649abaa7faefb6bca788d27c2e77b2f238009fda4",
        "before_head_set_digest": "aae05c85a6d9506a31291fa2f429691c00c6a2e5f61d733ccb01d582aa47770a",
        "claim_scopes": [
         "TRANSITION_RECORDED",
@@ -76806,7 +76806,7 @@
        "previous_transition_digest": null,
        "project_id": "project:a02:allowed",
        "provenance_state": "COMPLETE",
-       "receipt_digest": "758fdd89da35496c8775784f16a9fe6717d7ef10418f740c1b0d7f6ab7e00bb5",
+       "receipt_digest": "53d75efc3ddc5db5754fe5840907a1669e25af434eda8b3053a907e12c39f70b",
        "receipt_id": "receipt:00000373",
        "receipt_type": "TRANSITION",
        "recorded_at": "2026-10-15T00:00:00.313000Z",
@@ -76824,7 +76824,7 @@
        ]
       }
      },
-     "reference_criterion_revision": "5b9a591540ec481e0f9a8f048c6feb323b8bf8c7ecc9f8f51794fd75f7f6b730",
+     "reference_criterion_revision": "0a5841e04b62dad898e9f187b50cb685c2c93c2b790cbc91902ebe2ed413f859",
      "reference_inquiry": {
       "actor_ref": "local:operator",
       "answers": [],
@@ -76840,12 +76840,12 @@
       "criterion_id": "criterion:00000145",
       "evaluator_binding_digest": null,
       "evaluator_input_allowed": false,
-      "inquiry_digest": "0ffa01006123dc868dc1cf185423082f94f5075638a28c0b12c99109240cd825",
+      "inquiry_digest": "495ed5933e5067aecaa22dbc0b69a41f68d339fa51e834cb8e5f21a369eec4a2",
       "inquiry_id": "reference-inquiry:00000365",
       "lane": "REFERENCE_RANGE_CANDIDATE",
       "mapping_traces": [
        {
-        "input_digest": "28c8778c9c6e66c5cd0b06365d2d5da926d02a209e045c35a69028381f4dc6a6",
+        "input_digest": "d1296ef60505787b26014c750a0571c4ff528cb4f4f4108680dde481ac866294",
         "input_head_set_digest": "aae05c85a6d9506a31291fa2f429691c00c6a2e5f61d733ccb01d582aa47770a",
         "model_id": "SCRIPTED_REFERENCE_MAPPER",
         "output_digest": "a4775aec3ba500ab082600da6a801a11a820163bacd956fe1d4f253d86b73de7",
@@ -76958,24 +76958,24 @@
       "semantic_truth_certified": false,
       "session_ref": null,
       "source_digests": {
-       "span:00000082": "eda7681bc70d1ec1e11e673a907040f7cf208dd978555d74cfcbabb927d43d07",
-       "span:00000083": "ae2732f689f41dbb490b4e0e7413c8e08781523a2eb90b1231620a74b8abe6e5",
-       "span:00000084": "c3a9b15ded99c193f111b613ee24bad04b92e50eb004f7736b9e3e87bd6971f0",
-       "span:00000085": "3da9bac40ae59cfbb1543d90af10433a14fcc78fabcddd955f9bc60198ee750e",
-       "span:00000086": "c43792c8c00c97d9056c6edb7f46bc6b72d8ef01ca8c0439f48ef67913dd9ed3",
-       "span:00000087": "83d3d0f524d1ebde7602651f1e34cb1af958c06b390be7b92f9eb2abd5842de8",
-       "span:00000088": "065b9cbf255a0d737bd40be3b890c8062b73a99482c76d83d4e0f9b5a728f6ff",
-       "span:00000089": "18dad42abb62bf8d94874b29dc44066892f8c8c9950527474655ee0759bfa7d7",
-       "span:00000090": "35868c12ada2d5dad7a62090c7202f5620a680931e80520c70948cbd6f743f38",
-       "span:00000118": "9ebb411f27d5d4f6de22e977c38024bec7c8c9a1ec4a0ee5610c61bb08bf5d49",
-       "span:00000119": "9a3bf2c2f0db8aea3d75b13d363329b3476969e136167fde85b5139612b70543",
-       "span:00000120": "2798fa8c3e63da1cee4a35ed214d158b996765d215e837511857008f7206d04a",
-       "span:00000121": "5e810c83783803d2ca29caf8fcab399bb097b233bbf9ec747d30739245e83d2e",
-       "span:00000122": "86a29b0a5e4f4becebbcf727e92c17db41edc0a01530540e97826a0e8d50c524",
-       "span:00000123": "593af2655d6b4dd4884259b57fd71726121da8b2cc0d5d35a602b63b216e33be",
-       "span:00000124": "86509552bff99b76b413f2e2d193118b4c3213dba67cec699f977b87c726c79a",
-       "span:00000125": "2075dd1f71d3bdb07a12db075507a7bfb4936eb0a3ac3019b4fb001c08e16d26",
-       "span:00000126": "24487b6475903e4ecae7d5d6f78602aedac944be692675df5e04d7f3076b4fdf"
+       "span:00000082": "6e3686ef58be0938ebc631d215faa60816b47b7b7a2af554df6424e8c7d84aed",
+       "span:00000083": "137764de397d78fe6fb58e6a5a8df1c6bfa795f91a76d58a304ab795fb52ae56",
+       "span:00000084": "1bae647e0551cc23e5433150b966e1d5c68fb3db03625ee505e45c0f1f7fb51d",
+       "span:00000085": "55212b6c189f7ceb883bdb28515c929569f575fe342df0de599293375495f30e",
+       "span:00000086": "abf7c5ffbb8c92be0dcca3bee6d6c04f43a9df72fbe5a815eabf94697f359844",
+       "span:00000087": "9d95da1eb87f9a1056f8bfb1ed2fd8c7590dc14c5ecfbc3448af852721781db8",
+       "span:00000088": "16a42311a83e37022d52187c9da3405d1328a974435f92bd96e1d771ae503477",
+       "span:00000089": "591ce1b6c8ca00955b7cd671ca938133f74f6942763310411ffcec24c87403d1",
+       "span:00000090": "5352ff321966247221756726bbe94aa76cfc525c457150d0e76518dcf81b21ba",
+       "span:00000118": "eaa1ee7540b3a51b3e94fb3d5cc027f35a62a8710e151a93a38b7cdb67fd9946",
+       "span:00000119": "6a777859272c5a140cdf3748e283960b9fedcaec75b2c6a466e85c8374ca551d",
+       "span:00000120": "bf7bd6320d5a0ea079fc9ce53011dce50a533bab183052fd4afb1c0a8905ed3c",
+       "span:00000121": "997034c63f24ebeafd40a42596fad6b29b5126e65a800d8fa9941ea74e20817e",
+       "span:00000122": "7d672153b0b644ad19b7bb4b6c16cae077d82244e372db3ad1be1668533874ed",
+       "span:00000123": "28acb48ea48ceafc12c9a6488846325b1b93d75c5c505b945ea6361a505522a1",
+       "span:00000124": "bcec4d5e45092c3ffbc8ead045fc390ffa888933bd91747f1b9fa815d760d260",
+       "span:00000125": "34e91eb147922b1bfbd9f4f751e63a188942368a291def6ca4232d2c0c733977",
+       "span:00000126": "a2512e6716acef03f1f114f001769fa2a05021bd260be0b01805afc65ed1bae8"
       },
       "source_refs": [
        "span:00000090",
@@ -77779,7 +77779,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -77947,7 +77947,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -79017,7 +79017,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -79185,7 +79185,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",
@@ -79644,7 +79644,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -79812,7 +79812,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "A",
@@ -79980,7 +79980,7 @@
     "S",
     "exit",
     "source_digests",
-    "dict:53708c83a89153cd"
+    "dict:263ba7a81a4cba08"
    ],
    [
     "S",
@@ -80745,7 +80745,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -80913,7 +80913,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "A",
@@ -81081,7 +81081,7 @@
     "S",
     "exit",
     "source_digests",
-    "dict:53708c83a89153cd"
+    "dict:263ba7a81a4cba08"
    ],
    [
     "S",
@@ -81090,7 +81090,7 @@
     "project:a02:allowed",
     "thread:project:a02:allowed",
     "ReferenceRequest:1d4203dfd9da2d01",
-    "mapping_trace=ReferenceMappingTrace:567ba1a132a3af78",
+    "mapping_trace=ReferenceMappingTrace:13e18bf4b5ee1d56",
     "question_order=tuple:a91c78d5ad6c520c"
    ],
    [
@@ -82137,7 +82137,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "clock"
@@ -82603,7 +82603,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -82771,7 +82771,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "A",
@@ -82939,13 +82939,13 @@
     "S",
     "exit",
     "source_digests",
-    "dict:53708c83a89153cd"
+    "dict:263ba7a81a4cba08"
    ],
    [
     "S",
     "enter",
     "_evaluate",
-    "ReferenceInquiry:fa085b54ec30aadb"
+    "ReferenceInquiry:84bfc35a7c66530b"
    ],
    [
     "ids",
@@ -82959,14 +82959,14 @@
     "S",
     "exit",
     "_evaluate",
-    "ReferenceInquiry:04d2ed986ce97fa6"
+    "ReferenceInquiry:72dd4e3ad815024e"
    ],
    [
     "S",
     "enter",
     "_persist",
     "CriterionContractRecord:408295bbbdab04a7",
-    "ReferenceInquiry:04d2ed986ce97fa6"
+    "ReferenceInquiry:72dd4e3ad815024e"
    ],
    [
     "S",
@@ -82974,7 +82974,7 @@
     "CriterionContractRecord:408295bbbdab04a7",
     "actor=ActorRef:c293d54ce891020c",
     "event_type=criteria/referenceInquiryUpdated",
-    "updates=dict:abe8f3f94523ed8f"
+    "updates=dict:412f61e06e51d5c9"
    ],
    [
     "ids",
@@ -83284,7 +83284,7 @@
    [
     "R",
     "commit",
-    "RevisionChangeSet:d128e2dc33898ea2"
+    "RevisionChangeSet:bbfc5ef9fb680cdd"
    ],
    [
     "clock"
@@ -85668,7 +85668,7 @@
    [
     "C",
     "add_contract",
-    "CriterionContractRecord:09f2dc2e6564ec9d"
+    "CriterionContractRecord:657903d0ec1275c2"
    ],
    [
     "clock"
@@ -85680,7 +85680,7 @@
    [
     "S",
     "transaction",
-    "CriterionContractRecord:09f2dc2e6564ec9d"
+    "CriterionContractRecord:657903d0ec1275c2"
    ],
    [
     "L",
@@ -86095,7 +86095,7 @@
    [
     "C",
     "append_audit",
-    "CriterionAuditRecord:9d02961d6c069b75"
+    "CriterionAuditRecord:b77e78b6fb48c393"
    ],
    [
     "T",
@@ -86113,7 +86113,7 @@
    [
     "T",
     "update",
-    "WorkThread:7bdb04296de17ef2",
+    "WorkThread:dec786a27f5a8bd4",
     "expected_revision=2"
    ],
    [
@@ -86566,7 +86566,7 @@
     "S",
     "exit",
     "sources",
-    "dict:6f0bcc545bd6754b"
+    "dict:c863d84f451fbbee"
    ],
    [
     "A",
@@ -86734,7 +86734,7 @@
     "S",
     "exit",
     "mapping_sources",
-    "tuple:d49513bd52678833"
+    "tuple:31827f2a6f5fec73"
    ],
    [
     "S",

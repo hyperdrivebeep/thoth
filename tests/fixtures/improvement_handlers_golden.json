@@ -11283,7 +11283,7 @@
       "namespace": "IMPROVEMENT",
       "payload": {
        "assessment_digests": {
-        "improvement-evaluation_plan:00000017": "f816f6f9bde8abd35147ca04e4f653a8f8f59858e34a83f0a4d3a18ee14d2504"
+        "improvement-evaluation_plan:00000017": "f183b1806f9ac95521d120059f14b19bdd4fc82a6487d3c74d2a3e88b9ad66ff"
        },
        "assessment_refs": [
         "improvement-evaluation_plan:00000017"
@@ -11301,7 +11301,7 @@
        "required_roles": [
         "improvement-owner"
        ],
-       "runtime_exposure_digest": "3a46daee87ce597728771968cc764804975f9a72d522594c1cbfa07469975fa6",
+       "runtime_exposure_digest": "df26232699d8bdf21e2c14ee2bbeb3b539d05f18c6051a406b38ed3e5d413cc2",
        "runtime_exposure_ref": "behavior-exposure:00000142",
        "runtime_scope": {
         "baseline_artifact_ref": "behavior:paired-baseline",
@@ -11336,7 +11336,7 @@
        "target_scope": "offline:pair"
       },
       "project_id": "project:paired-execution",
-      "record_digest": "67dd5e6f1659e4581c65ce31a5ced4bd74a1c790225e41f1921bc4a21f5b0f84",
+      "record_digest": "07d281cc44635911ef59eb80ae419b7efc38cd8cc426657197e2bac490994d67",
       "record_id": "improvement-promotion:00000271",
       "record_type": "PROMOTION",
       "schema_version": "1.0.0",
@@ -11376,7 +11376,7 @@
       "payload": {
        "actor_ref": "human:policy-owner",
        "assessment_digests": {
-        "improvement-evaluation_plan:00000017": "f816f6f9bde8abd35147ca04e4f653a8f8f59858e34a83f0a4d3a18ee14d2504"
+        "improvement-evaluation_plan:00000017": "f183b1806f9ac95521d120059f14b19bdd4fc82a6487d3c74d2a3e88b9ad66ff"
        },
        "assessment_refs": [
         "improvement-evaluation_plan:00000017"
@@ -11397,7 +11397,7 @@
         "improvement-owner"
        ],
        "role_assignment_ref": "role-assignment:00000120",
-       "runtime_exposure_digest": "3a46daee87ce597728771968cc764804975f9a72d522594c1cbfa07469975fa6",
+       "runtime_exposure_digest": "df26232699d8bdf21e2c14ee2bbeb3b539d05f18c6051a406b38ed3e5d413cc2",
        "runtime_exposure_ref": "behavior-exposure:00000142",
        "runtime_scope": {
         "baseline_artifact_ref": "behavior:paired-baseline",
@@ -11432,12 +11432,12 @@
        "target_scope": "offline:pair"
       },
       "project_id": "project:paired-execution",
-      "record_digest": "4989b89c7b5773d2776a6206d916e72da7bdc6d9a9bc7c70d8be2c524ae5563a",
+      "record_digest": "317e7d696126529ff47d2aaa103d0d9745ba7483a322caade9cfc63e2204db61",
       "record_id": "improvement-promotion:00000271",
       "record_type": "PROMOTION",
       "schema_version": "1.0.0",
       "state": "APPROVED",
-      "supersedes_digest": "67dd5e6f1659e4581c65ce31a5ced4bd74a1c790225e41f1921bc4a21f5b0f84",
+      "supersedes_digest": "07d281cc44635911ef59eb80ae419b7efc38cd8cc426657197e2bac490994d67",
       "version": 2
      },
      "revision_baseline_change_set_proposal": {
@@ -12515,7 +12515,7 @@
     "ImprovementExposureService",
     "promotion_payload",
     [
-     "e2bc00793895f60d8afb484472533f61ada1508548ffdd2612ca81fc47af115f",
+     "7b213aa6136d6478bf7ecfdc499030a85295460ebe6d77a21f6d8c792e37d893",
      "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
     ],
     {}
@@ -12563,7 +12563,7 @@
     [],
     {
      "namespace": "IMPROVEMENT",
-     "payload": "0f18b2d853adbb0bb2efcd3251d60e0232c0783c2c4653245f7d761cea6ab766",
+     "payload": "f560d9f859d48a84ad7657d0d7e8976088ecd96370b5c157ceb7a5d8e2f213ce",
      "project_id": "project:paired-execution",
      "record_type": "PROMOTION",
      "state": "PENDING"
@@ -12575,7 +12575,7 @@
     [],
     {
      "namespace": "IMPROVEMENT",
-     "payload": "0f18b2d853adbb0bb2efcd3251d60e0232c0783c2c4653245f7d761cea6ab766",
+     "payload": "f560d9f859d48a84ad7657d0d7e8976088ecd96370b5c157ceb7a5d8e2f213ce",
      "project_id": "project:paired-execution",
      "record_id": null,
      "record_type": "PROMOTION",
@@ -12607,7 +12607,7 @@
     "SqliteControlRecordStore",
     "append",
     [
-     "31f4867c092e7cd97d2ea0a0efbaffaee12e877540e0ab3e789624bd6d1601d4"
+     "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
     ],
     {}
    ],
@@ -12618,13 +12618,13 @@
    [
     "return",
     "promotion_prepare",
-    "f71261fe98c4e7815b90d200f87770d7c11fa3230d9bc20be25675979bf73adb"
+    "6d05f553ad0b091d0c6adc60398b293cd6aea655bcbbec2bb3f9726551d44ff5"
    ],
    [
     "ImprovementHandlers",
     "promotion_decide",
     [
-     "820e386c7dd1d47296cd22ee306b984d1b8411c7c78065c98179266dcbae0685"
+     "f36adfbf50f4d55fe5f1fcf17570c5c55b5e5cd7c900a4e32431cd5458242c72"
     ],
     {}
    ],
@@ -12642,7 +12642,7 @@
     [
      "project:paired-execution",
      "improvement-promotion:00000271",
-     "67dd5e6f1659e4581c65ce31a5ced4bd74a1c790225e41f1921bc4a21f5b0f84"
+     "07d281cc44635911ef59eb80ae419b7efc38cd8cc426657197e2bac490994d67"
     ],
     {}
    ],
@@ -12660,7 +12660,7 @@
     "ImprovementThreadScope",
     "require_record",
     [
-     "31f4867c092e7cd97d2ea0a0efbaffaee12e877540e0ab3e789624bd6d1601d4"
+     "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
     ],
     {}
    ],
@@ -12889,7 +12889,7 @@
     "ImprovementThreadScope",
     "require_record",
     [
-     "31f4867c092e7cd97d2ea0a0efbaffaee12e877540e0ab3e789624bd6d1601d4"
+     "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
     ],
     {}
    ],
@@ -12924,7 +12924,7 @@
    [
     "return",
     "_record",
-    "31f4867c092e7cd97d2ea0a0efbaffaee12e877540e0ab3e789624bd6d1601d4"
+    "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
    ],
    [
     "SqliteGovernanceStore",
@@ -12960,7 +12960,7 @@
     [],
     {
      "namespace": "IMPROVEMENT",
-     "payload": "efceeca6d375bf612bb4df179ba3f2c719d1a2335443621ac9c39ebd1836d414",
+     "payload": "e36bb4905c7e08d2ced149320a7e90a672bfa3820bb61adaedb27a8d1a37ec98",
      "project_id": "project:paired-execution",
      "record_id": "improvement-promotion:00000271",
      "record_type": "PROMOTION",
@@ -12973,7 +12973,7 @@
     [],
     {
      "namespace": "IMPROVEMENT",
-     "payload": "efceeca6d375bf612bb4df179ba3f2c719d1a2335443621ac9c39ebd1836d414",
+     "payload": "e36bb4905c7e08d2ced149320a7e90a672bfa3820bb61adaedb27a8d1a37ec98",
      "project_id": "project:paired-execution",
      "record_id": "improvement-promotion:00000271",
      "record_type": "PROMOTION",
@@ -13001,7 +13001,7 @@
     "SqliteControlRecordStore",
     "append",
     [
-     "a02ce7aa454d1f5bf7e380b3cf399100f8c243b6bdec340f8c0e3cb9c07d9081"
+     "08245f536ba5f1134d09052fd805c1089bd85e328ca6dd1a3aab65e6d9f6845d"
     ],
     {}
    ],
@@ -13009,7 +13009,7 @@
     "ImprovementExposureService",
     "apply_promotion",
     [
-     "a02ce7aa454d1f5bf7e380b3cf399100f8c243b6bdec340f8c0e3cb9c07d9081",
+     "08245f536ba5f1134d09052fd805c1089bd85e328ca6dd1a3aab65e6d9f6845d",
      "1c6951655e8e6b68763db96ef2308617ed850eb5596541edfb4642fa882267cf"
     ],
     {}
@@ -13241,7 +13241,7 @@
    [
     "return",
     "promotion_decide",
-    "3f11cf5eafc0a68033000d479080e2fd34d036ebd4ae50e89b5f9b4b81ea4157"
+    "7f1b91b5b701d7f658cddde5beb4ecbc26cae36f3b05b3bb95a65fa8ce1cbf4a"
    ]
   ]
  },
@@ -13592,7 +13592,7 @@
       "namespace": "IMPROVEMENT",
       "payload": {
        "assessment_digests": {
-        "improvement-evaluation_plan:00000017": "f816f6f9bde8abd35147ca04e4f653a8f8f59858e34a83f0a4d3a18ee14d2504"
+        "improvement-evaluation_plan:00000017": "f183b1806f9ac95521d120059f14b19bdd4fc82a6487d3c74d2a3e88b9ad66ff"
        },
        "assessment_refs": [
         "improvement-evaluation_plan:00000017"
@@ -13610,7 +13610,7 @@
        "required_roles": [
         "improvement-owner"
        ],
-       "runtime_exposure_digest": "3a46daee87ce597728771968cc764804975f9a72d522594c1cbfa07469975fa6",
+       "runtime_exposure_digest": "df26232699d8bdf21e2c14ee2bbeb3b539d05f18c6051a406b38ed3e5d413cc2",
        "runtime_exposure_ref": "behavior-exposure:00000142",
        "runtime_scope": {
         "baseline_artifact_ref": "behavior:paired-baseline",
@@ -13645,7 +13645,7 @@
        "target_scope": "offline:pair"
       },
       "project_id": "project:paired-execution",
-      "record_digest": "67dd5e6f1659e4581c65ce31a5ced4bd74a1c790225e41f1921bc4a21f5b0f84",
+      "record_digest": "07d281cc44635911ef59eb80ae419b7efc38cd8cc426657197e2bac490994d67",
       "record_id": "improvement-promotion:00000271",
       "record_type": "PROMOTION",
       "schema_version": "1.0.0",
@@ -13668,7 +13668,7 @@
       "payload": {
        "actor_ref": "human:policy-owner",
        "assessment_digests": {
-        "improvement-evaluation_plan:00000017": "f816f6f9bde8abd35147ca04e4f653a8f8f59858e34a83f0a4d3a18ee14d2504"
+        "improvement-evaluation_plan:00000017": "f183b1806f9ac95521d120059f14b19bdd4fc82a6487d3c74d2a3e88b9ad66ff"
        },
        "assessment_refs": [
         "improvement-evaluation_plan:00000017"
@@ -13689,7 +13689,7 @@
         "improvement-owner"
        ],
        "role_assignment_ref": "role-assignment:00000120",
-       "runtime_exposure_digest": "3a46daee87ce597728771968cc764804975f9a72d522594c1cbfa07469975fa6",
+       "runtime_exposure_digest": "df26232699d8bdf21e2c14ee2bbeb3b539d05f18c6051a406b38ed3e5d413cc2",
        "runtime_exposure_ref": "behavior-exposure:00000142",
        "runtime_scope": {
         "baseline_artifact_ref": "behavior:paired-baseline",
@@ -13724,12 +13724,12 @@
        "target_scope": "offline:pair"
       },
       "project_id": "project:paired-execution",
-      "record_digest": "e82f3dc1203e4a254333242b798a70ac6e23391b7c47816ec5cb8bbf80d0489f",
+      "record_digest": "1aa8fac8147444c0786855adc6700d8f1d95f64045414887ae8744cf18ff1f16",
       "record_id": "improvement-promotion:00000271",
       "record_type": "PROMOTION",
       "schema_version": "1.0.0",
       "state": "REJECTED",
-      "supersedes_digest": "67dd5e6f1659e4581c65ce31a5ced4bd74a1c790225e41f1921bc4a21f5b0f84",
+      "supersedes_digest": "07d281cc44635911ef59eb80ae419b7efc38cd8cc426657197e2bac490994d67",
       "version": 2
      },
      "revision_baseline_change_set_proposal": {
@@ -14807,7 +14807,7 @@
     "ImprovementExposureService",
     "promotion_payload",
     [
-     "e2bc00793895f60d8afb484472533f61ada1508548ffdd2612ca81fc47af115f",
+     "7b213aa6136d6478bf7ecfdc499030a85295460ebe6d77a21f6d8c792e37d893",
      "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
     ],
     {}
@@ -14855,7 +14855,7 @@
     [],
     {
      "namespace": "IMPROVEMENT",
-     "payload": "0f18b2d853adbb0bb2efcd3251d60e0232c0783c2c4653245f7d761cea6ab766",
+     "payload": "f560d9f859d48a84ad7657d0d7e8976088ecd96370b5c157ceb7a5d8e2f213ce",
      "project_id": "project:paired-execution",
      "record_type": "PROMOTION",
      "state": "PENDING"
@@ -14867,7 +14867,7 @@
     [],
     {
      "namespace": "IMPROVEMENT",
-     "payload": "0f18b2d853adbb0bb2efcd3251d60e0232c0783c2c4653245f7d761cea6ab766",
+     "payload": "f560d9f859d48a84ad7657d0d7e8976088ecd96370b5c157ceb7a5d8e2f213ce",
      "project_id": "project:paired-execution",
      "record_id": null,
      "record_type": "PROMOTION",
@@ -14899,7 +14899,7 @@
     "SqliteControlRecordStore",
     "append",
     [
-     "31f4867c092e7cd97d2ea0a0efbaffaee12e877540e0ab3e789624bd6d1601d4"
+     "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
     ],
     {}
    ],
@@ -14910,13 +14910,13 @@
    [
     "return",
     "promotion_prepare",
-    "f71261fe98c4e7815b90d200f87770d7c11fa3230d9bc20be25675979bf73adb"
+    "6d05f553ad0b091d0c6adc60398b293cd6aea655bcbbec2bb3f9726551d44ff5"
    ],
    [
     "ImprovementHandlers",
     "promotion_decide",
     [
-     "be972258aa7713f804c347865c56c86b049653f1bba9037ab8aa6053be8d6b09"
+     "c85d25c811833193cdad53de302ddb176d8a737fcc823c653499de2035171fd6"
     ],
     {}
    ],
@@ -14963,7 +14963,7 @@
     "ImprovementThreadScope",
     "require_record",
     [
-     "31f4867c092e7cd97d2ea0a0efbaffaee12e877540e0ab3e789624bd6d1601d4"
+     "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
     ],
     {}
    ],
@@ -14998,7 +14998,7 @@
    [
     "return",
     "_record",
-    "31f4867c092e7cd97d2ea0a0efbaffaee12e877540e0ab3e789624bd6d1601d4"
+    "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
    ],
    [
     "SqliteGovernanceStore",
@@ -15034,7 +15034,7 @@
     [],
     {
      "namespace": "IMPROVEMENT",
-     "payload": "808bda778c92765236778f161ca47719e054320d4d3992dcdd1ac7223292a492",
+     "payload": "4fb227ab4c052381644a4104153ec91fe7ac51663e01e9d2ab75e954bcedd96f",
      "project_id": "project:paired-execution",
      "record_id": "improvement-promotion:00000271",
      "record_type": "PROMOTION",
@@ -15047,7 +15047,7 @@
     [],
     {
      "namespace": "IMPROVEMENT",
-     "payload": "808bda778c92765236778f161ca47719e054320d4d3992dcdd1ac7223292a492",
+     "payload": "4fb227ab4c052381644a4104153ec91fe7ac51663e01e9d2ab75e954bcedd96f",
      "project_id": "project:paired-execution",
      "record_id": "improvement-promotion:00000271",
      "record_type": "PROMOTION",
@@ -15075,7 +15075,7 @@
     "SqliteControlRecordStore",
     "append",
     [
-     "3eb7e5a15a4da7d214fa075de1e5f2888b139d17e1e86ea30767b9b820b50cf6"
+     "bb4c569d82913a2d538783f7acfbe6ea1213fcb77d5e3a17707e46c3cabae204"
     ],
     {}
    ],
@@ -15140,7 +15140,7 @@
    [
     "return",
     "promotion_decide",
-    "eff262ec02c4fc7b50babb73d152edd02c70b85afce4802ed67798162393f2e8"
+    "2e34c831fe6e1456ff53f452542860fc8ff0bafc724ed2ade593f446bebca8d0"
    ]
   ]
  },
@@ -15491,7 +15491,7 @@
       "namespace": "IMPROVEMENT",
       "payload": {
        "assessment_digests": {
-        "improvement-evaluation_plan:00000017": "f816f6f9bde8abd35147ca04e4f653a8f8f59858e34a83f0a4d3a18ee14d2504"
+        "improvement-evaluation_plan:00000017": "f183b1806f9ac95521d120059f14b19bdd4fc82a6487d3c74d2a3e88b9ad66ff"
        },
        "assessment_refs": [
         "improvement-evaluation_plan:00000017"
@@ -15509,7 +15509,7 @@
        "required_roles": [
         "improvement-owner"
        ],
-       "runtime_exposure_digest": "3a46daee87ce597728771968cc764804975f9a72d522594c1cbfa07469975fa6",
+       "runtime_exposure_digest": "df26232699d8bdf21e2c14ee2bbeb3b539d05f18c6051a406b38ed3e5d413cc2",
        "runtime_exposure_ref": "behavior-exposure:00000142",
        "runtime_scope": {
         "baseline_artifact_ref": "behavior:paired-baseline",
@@ -15544,7 +15544,7 @@
        "target_scope": "offline:pair"
       },
       "project_id": "project:paired-execution",
-      "record_digest": "67dd5e6f1659e4581c65ce31a5ced4bd74a1c790225e41f1921bc4a21f5b0f84",
+      "record_digest": "07d281cc44635911ef59eb80ae419b7efc38cd8cc426657197e2bac490994d67",
       "record_id": "improvement-promotion:00000271",
       "record_type": "PROMOTION",
       "schema_version": "1.0.0",
@@ -16626,7 +16626,7 @@
     "ImprovementExposureService",
     "promotion_payload",
     [
-     "e2bc00793895f60d8afb484472533f61ada1508548ffdd2612ca81fc47af115f",
+     "7b213aa6136d6478bf7ecfdc499030a85295460ebe6d77a21f6d8c792e37d893",
      "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
     ],
     {}
@@ -16674,7 +16674,7 @@
     [],
     {
      "namespace": "IMPROVEMENT",
-     "payload": "0f18b2d853adbb0bb2efcd3251d60e0232c0783c2c4653245f7d761cea6ab766",
+     "payload": "f560d9f859d48a84ad7657d0d7e8976088ecd96370b5c157ceb7a5d8e2f213ce",
      "project_id": "project:paired-execution",
      "record_type": "PROMOTION",
      "state": "PENDING"
@@ -16686,7 +16686,7 @@
     [],
     {
      "namespace": "IMPROVEMENT",
-     "payload": "0f18b2d853adbb0bb2efcd3251d60e0232c0783c2c4653245f7d761cea6ab766",
+     "payload": "f560d9f859d48a84ad7657d0d7e8976088ecd96370b5c157ceb7a5d8e2f213ce",
      "project_id": "project:paired-execution",
      "record_id": null,
      "record_type": "PROMOTION",
@@ -16718,7 +16718,7 @@
     "SqliteControlRecordStore",
     "append",
     [
-     "31f4867c092e7cd97d2ea0a0efbaffaee12e877540e0ab3e789624bd6d1601d4"
+     "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
     ],
     {}
    ],
@@ -16729,7 +16729,7 @@
    [
     "return",
     "promotion_prepare",
-    "f71261fe98c4e7815b90d200f87770d7c11fa3230d9bc20be25675979bf73adb"
+    "6d05f553ad0b091d0c6adc60398b293cd6aea655bcbbec2bb3f9726551d44ff5"
    ],
    [
     "ImprovementHandlers",
@@ -16771,7 +16771,7 @@
     "ImprovementThreadScope",
     "require_record",
     [
-     "31f4867c092e7cd97d2ea0a0efbaffaee12e877540e0ab3e789624bd6d1601d4"
+     "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
     ],
     {}
    ],
@@ -16812,7 +16812,7 @@
     "ImprovementHandlers",
     "promotion_decide",
     [
-     "4ddc68c1292c79e45af07b2ba3e25ce757cfea912fd5b9ac9fbcb1457d87848d"
+     "90dc6df90479095d443dded045c92efc851d88dc03cc8c4af9bee8738187cbbb"
     ],
     {}
    ],
@@ -16830,7 +16830,7 @@
     [
      "project:paired-execution",
      "improvement-promotion:00000271",
-     "67dd5e6f1659e4581c65ce31a5ced4bd74a1c790225e41f1921bc4a21f5b0f84"
+     "07d281cc44635911ef59eb80ae419b7efc38cd8cc426657197e2bac490994d67"
     ],
     {}
    ],
@@ -16848,7 +16848,7 @@
     "ImprovementThreadScope",
     "require_record",
     [
-     "31f4867c092e7cd97d2ea0a0efbaffaee12e877540e0ab3e789624bd6d1601d4"
+     "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
     ],
     {}
    ],
@@ -17077,7 +17077,7 @@
     "ImprovementThreadScope",
     "require_record",
     [
-     "31f4867c092e7cd97d2ea0a0efbaffaee12e877540e0ab3e789624bd6d1601d4"
+     "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
     ],
     {}
    ],
@@ -17112,7 +17112,7 @@
    [
     "return",
     "_record",
-    "31f4867c092e7cd97d2ea0a0efbaffaee12e877540e0ab3e789624bd6d1601d4"
+    "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
    ],
    [
     "SqliteGovernanceStore",

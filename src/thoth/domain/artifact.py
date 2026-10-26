@@ -6,6 +6,7 @@ from typing import Any, Literal
 from pydantic import AwareDatetime, Field, model_serializer, model_validator
 
 from thoth.domain.base import DomainModel
+from thoth.domain.context_observation import ContextObservation
 from thoth.domain.enums import (
     AuthorityState,
     CutoffState,
@@ -131,6 +132,14 @@ class StructuralDocument(DomainModel):
     capability_observation: ParserCapabilityObservation | None = None
     document_time_observations: tuple[DocumentTimeObservation, ...] = ()
     source_time_assessment: SourceTimeAssessment | None = None
+    context_observation: ContextObservation | None = Field(default=None, repr=False)
+
+    @model_serializer(mode="wrap")
+    def serialize_document(self, handler: Any) -> dict[str, Any]:
+        data = handler(self)
+        if self.context_observation is None:
+            data.pop("context_observation", None)
+        return data
 
     @model_validator(mode="after")
     def exact_structure(self) -> StructuralDocument:
@@ -138,6 +147,25 @@ class StructuralDocument(DomainModel):
         parents = {node.node_id: node.parent_id for node in self.nodes}
         if len(ids) != len(self.nodes):
             raise ValueError("STRUCTURE_NODE_ID_DUPLICATED")
+        observed = self.context_observation
+        if observed is not None:
+            node_by_id = {node.node_id: node for node in self.nodes}
+            if (observed.project_id, observed.artifact_id, observed.byte_sha256) != (
+                self.artifact.project_id,
+                self.artifact.artifact_id,
+                self.artifact.byte_sha256,
+            ):
+                raise ValueError("CONTEXT_OBSERVATION_SOURCE_MISMATCH")
+            for region in observed.regions:
+                if not set(region.node_refs) <= ids:
+                    raise ValueError("CONTEXT_OBSERVATION_MEMBER_MISSING")
+                for identifier in region.node_refs:
+                    node = node_by_id[identifier]
+                    if (
+                        node.locator.line is None
+                        or not region.line_start <= node.locator.line < region.line_end
+                    ):
+                        raise ValueError("CONTEXT_OBSERVATION_MEMBER_RANGE_INVALID")
         for node in self.nodes:
             if node.artifact_id != self.artifact.artifact_id:
                 raise ValueError("STRUCTURE_ARTIFACT_MISMATCH")

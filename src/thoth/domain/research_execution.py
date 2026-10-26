@@ -19,6 +19,7 @@ from thoth.domain.oauth_retry import OAuthRetryPolicy
 from thoth.domain.prediction_grounding import GroundingCallCapture, GroundingStage
 from thoth.domain.research_request import RevisionRef
 from thoth.domain.response_language import ResponseLanguage
+from thoth.domain.retrieval_coverage import RetrievalSelection
 from thoth.domain.revision import StagedRevision
 
 
@@ -100,6 +101,7 @@ class ResearchWork:
     observe_context: Callable[[ContextPack], None] | None = None
     grounding_stages: dict[GroundingStage, GroundingCallCapture] = field(default_factory=dict)
     hypothesis_grounding: GroundedPortfolioResult | None = None
+    retrieval_selection: RetrievalSelection | None = None
 
 
 research_work: ContextVar[ResearchWork | None] = ContextVar("research_work", default=None)

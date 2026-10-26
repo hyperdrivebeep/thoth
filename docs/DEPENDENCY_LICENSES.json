@@ -51,6 +51,14 @@
       "license_metadata": "BSD-3-Clause"
     },
     {
+      "name": "markdown-it-py",
+      "group": "base",
+      "constraint": "==4.2.0",
+      "locked_version": "4.2.0",
+      "license_metadata": "MIT",
+      "license_source": "https://github.com/executablebooks/markdown-it-py/blob/v4.2.0/LICENSE"
+    },
+    {
       "name": "openai",
       "group": "base",
       "constraint": ">=1.60,<3",

@@ -37,12 +37,20 @@ def constrain_span_references(
                     if isinstance(field, dict):
                         array = cast(dict[str, object], field)
                         if array.get("type") == "array":
+                            allowed = span_ids
+                            candidate_refs = context.get("ranking_candidate_refs")
+                            if key == "ordered_span_ids" and candidate_refs is not None:
+                                if not isinstance(candidate_refs, (tuple, list)) or not all(
+                                    isinstance(x, str) and x in span_ids for x in candidate_refs
+                                ):
+                                    raise ValueError("RANKING_CANDIDATE_SCOPE_INVALID")
+                                allowed = tuple(cast(list[str] | tuple[str, ...], candidate_refs))
                             array["items"] = (
-                                {"type": "string", "enum": list(span_ids)}
-                                if span_ids
+                                {"type": "string", "enum": list(allowed)}
+                                if allowed
                                 else {"type": "string"}
                             )
-                            if not span_ids:
+                            if not allowed:
                                 array["maxItems"] = 0
                 if ids:
                     for name in ("requirement_id", "requirement_ids"):

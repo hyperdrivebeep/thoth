@@ -1,9 +1,12 @@
 """Derived context views over existing versioned source/evidence, not new source truth."""
 
-from typing import Literal
+from typing import Any, Literal
+
+from pydantic import model_serializer
 
 from thoth.domain.artifact import SourceLocator, StructuralRelation
 from thoth.domain.base import DomainModel
+from thoth.domain.context_observation import ContextRegion
 from thoth.domain.evidence import EvidenceSpan
 
 
@@ -18,7 +21,7 @@ class ContextStructureRef(DomainModel):
 
 
 class EvidenceContextBundle(DomainModel):
-    schema_version: Literal["1.0.0"] = "1.0.0"
+    schema_version: Literal["1.0.0", "2.0.0"] = "1.0.0"
     bundle_id: str
     project_id: str
     artifact_id: str
@@ -30,6 +33,14 @@ class EvidenceContextBundle(DomainModel):
     structures: tuple[ContextStructureRef, ...]
     basis_digest: str
     limitations: tuple[str, ...] = ()
+    context_regions: tuple[ContextRegion, ...] = ()
+
+    @model_serializer(mode="wrap")
+    def serialize_bundle(self, handler: Any) -> dict[str, Any]:
+        data = handler(self)
+        if self.schema_version == "1.0.0":
+            data.pop("context_regions", None)
+        return data
 
 
 class InternalExpansionWave(DomainModel):

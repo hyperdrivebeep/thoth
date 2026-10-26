@@ -5,6 +5,7 @@ from time import perf_counter_ns
 
 from thoth.application.services.research_retrieval import text_neighbors
 from thoth.application.services.research_retrieval_policy import record_selection, retrieval_policy
+from thoth.application.services.research_text_context import text_envelope
 from thoth.domain.artifact import StructuralDocument, StructuralNode
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.enums import CutoffState
@@ -117,15 +118,43 @@ def assemble_context(
                 (nodes[n] for n, s in by_node.items() if s.span_id == identifier), None
             )
 
-        group_nodes, material, container, limitations = _expand_anchor(
-            anchor, anchor_node, nodes, by_node, version_spans
-        )
+        text_group = text_envelope(anchor, document, version_spans)
+        context_regions = () if text_group is None else text_group.regions
+        if text_group is None:
+            group_nodes, material, container, limitations = _expand_anchor(
+                anchor, anchor_node, nodes, by_node, version_spans
+            )
+        else:
+            group_nodes = {}
+            material = {s.span_id: s for s in text_group.required}
+            container, limitations = text_group.container, list(text_group.limitations)
+            if "CONTEXT_MEMBER_NOT_ELIGIBLE" in limitations:
+                omitted.append(identifier)
+                continue
+            if anchor.cutoff_state == CutoffState.UNKNOWN_TIME:
+                limitations.append("SOURCE_TIME_UNCONFIRMED")
+            for span in text_group.optional:
+                proposed = {**material, span.span_id: span}
+                fresh = [s for k, s in proposed.items() if k not in selected]
+                if (
+                    len(selected) + len(fresh) <= policy.max_spans
+                    and characters + sum(len(s.exact_text) for s in fresh)
+                    <= policy.character_budget
+                ):
+                    material = proposed
+                else:
+                    limitations.append("OPTIONAL_CONTEXT_POLICY_LIMIT")
         if anchor_node is None:
             missing.append(identifier)
         needed = [s for k, s in material.items() if k not in selected]
+        if text_group is not None and any(
+            (n := nodes.get(s.locator.structural_node_id or "")) is None or n.text != s.exact_text
+            for s in needed
+        ):
+            raise ValueError("CONTEXT_NODE_TEXT_MISMATCH")
         if any(hashlib.sha256(s.exact_text.encode()).hexdigest() != s.text_sha256 for s in needed):
             raise ValueError("CONTEXT_TEXT_DIGEST_MISMATCH")
-        new_nodes = set(group_nodes) - structure_ids
+        new_nodes = (set(group_nodes) | {r.region_id for r in context_regions}) - structure_ids
         cost = sum(len(s.exact_text) for s in needed)
         if (
             len(selected) + len(needed) > policy.max_spans
@@ -135,7 +164,7 @@ def assemble_context(
             omitted.append(identifier)
             continue
         selected.update(material)
-        structure_ids.update(group_nodes)
+        structure_ids.update(new_nodes)
         characters += cost
         refs = tuple(
             ContextStructureRef(
@@ -153,11 +182,17 @@ def assemble_context(
             "EVIDENCE_CONTEXT_BUNDLE",
             "1.0.0",
             canonical_payload(
-                {"source": key, "spans": tuple(material.values()), "structures": refs}
+                {
+                    "source": key,
+                    "spans": tuple(material.values()),
+                    "structures": refs,
+                    **({"context_regions": context_regions} if context_regions else {}),
+                }
             ),
         )
         bundles.append(
             EvidenceContextBundle(
+                schema_version="2.0.0" if context_regions else "1.0.0",
                 bundle_id=f"bundle:{basis}",
                 project_id=key[0],
                 artifact_id=key[1],
@@ -169,40 +204,10 @@ def assemble_context(
                 structures=refs,
                 basis_digest=basis,
                 limitations=tuple(sorted(set(limitations))),
+                context_regions=context_regions,
             )
         )
-    merged: dict[tuple[str, str, str], EvidenceContextBundle] = {}
-    for bundle in bundles:
-        key = (bundle.artifact_id, bundle.source_version_id, bundle.container_id)
-        previous = merged.get(key)
-        if previous is None:
-            merged[key] = bundle
-            continue
-        structures = {node.node_id: node for node in (*previous.structures, *bundle.structures)}
-        span_refs = tuple(dict.fromkeys((*previous.span_refs, *bundle.span_refs)))
-        anchors = tuple(dict.fromkeys((*previous.anchor_span_refs, *bundle.anchor_span_refs)))
-        digest = domain_digest(
-            "EVIDENCE_CONTEXT_BUNDLE",
-            "1.0.0",
-            canonical_payload(
-                {
-                    "source": key,
-                    "spans": tuple(selected[ref] for ref in span_refs),
-                    "structures": tuple(structures.values()),
-                }
-            ),
-        )
-        merged[key] = bundle.model_copy(
-            update={
-                "bundle_id": f"bundle:{digest}",
-                "basis_digest": digest,
-                "anchor_span_refs": anchors,
-                "span_refs": span_refs,
-                "span_digests": {ref: selected[ref].text_sha256 for ref in span_refs},
-                "structures": tuple(structures.values()),
-                "limitations": tuple(sorted(set((*previous.limitations, *bundle.limitations)))),
-            }
-        )
+    merged = _merge_bundles(bundles, selected)
     result = tuple(selected.values())
     wave_basis = domain_digest(
         "INTERNAL_EXPANSION", "1.0.0", canonical_payload({"ranking": ranking, "source": source})
@@ -213,7 +218,7 @@ def assemble_context(
     new_count = len(set(selected) - set(ranking))
     return ContextAssembly(
         evidence=result,
-        bundles=tuple(merged.values()),
+        bundles=merged,
         wave=InternalExpansionWave(
             basis_digest=wave_basis,
             anchor_count=len(ranking),
@@ -331,3 +336,56 @@ def _expand_anchor(
     if identifier not in material:
         material[identifier] = anchor
     return group_nodes, material, container, limitations
+
+
+def _merge_bundles(
+    bundles: list[EvidenceContextBundle], selected: dict[str, EvidenceSpan]
+) -> tuple[EvidenceContextBundle, ...]:
+    merged: dict[tuple[str, str, str], EvidenceContextBundle] = {}
+    for bundle in bundles:
+        key = (bundle.artifact_id, bundle.source_version_id, bundle.container_id)
+        previous = merged.get(key)
+        if previous is None:
+            merged[key] = bundle
+            continue
+        structures = {node.node_id: node for node in (*previous.structures, *bundle.structures)}
+        regions = {r.region_id: r for r in (*previous.context_regions, *bundle.context_regions)}
+        span_refs = tuple(dict.fromkeys((*previous.span_refs, *bundle.span_refs)))
+        anchors = tuple(dict.fromkeys((*previous.anchor_span_refs, *bundle.anchor_span_refs)))
+        digest = domain_digest(
+            "EVIDENCE_CONTEXT_BUNDLE",
+            "1.0.0",
+            canonical_payload(
+                {
+                    "source": key,
+                    "spans": tuple(selected[ref] for ref in span_refs),
+                    "structures": tuple(structures.values()),
+                    **({"context_regions": tuple(regions.values())} if regions else {}),
+                }
+            ),
+        )
+        merged[key] = bundle.model_copy(
+            update={
+                "bundle_id": f"bundle:{digest}",
+                "basis_digest": digest,
+                "anchor_span_refs": anchors,
+                "span_refs": span_refs,
+                "span_digests": {ref: selected[ref].text_sha256 for ref in span_refs},
+                "structures": tuple(structures.values()),
+                "context_regions": tuple(regions.values()),
+                "limitations": tuple(sorted(set((*previous.limitations, *bundle.limitations)))),
+            }
+        )
+    for key, bundle in tuple(merged.items()):
+        if bundle.context_regions:
+            nodes_seen = {selected[s].locator.structural_node_id for s in bundle.span_refs}
+            region = next(r for r in bundle.context_regions if r.region_id == bundle.container_id)
+            if not set(region.node_refs) <= nodes_seen:
+                merged[key] = bundle.model_copy(
+                    update={
+                        "limitations": tuple(
+                            sorted(set((*bundle.limitations, "CONTEXT_BODY_PARTIAL")))
+                        )
+                    }
+                )
+    return tuple(merged.values())

@@ -22,6 +22,8 @@ OMITTED_RESULT_KEYS = frozenset(
         "authorized_project_memory",
         "behavior_execution",
         "context_bundle",
+        "retrieval_coverage",
+        "context_projection_version",
         "coverage",
         "criterion_profile_decision",
         "full_memory",

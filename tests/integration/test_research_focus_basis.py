@@ -146,9 +146,7 @@ async def test_selected_progress_basis_is_consistent_and_reaches_semantic_review
         original = host.records.journal
         observed: list[set[str]] = []
 
-        def journal(
-            project: str, key: str, payload: BaseModel, state: str = "RUNNING"
-        ) -> None:
+        def journal(project: str, key: str, payload: BaseModel, state: str = "RUNNING") -> None:
             if isinstance(payload, ResearchAttempt) and payload.phase == "EVIDENCE_FOCUS":
                 work = research_work.get()
                 assert work is not None
@@ -169,7 +167,7 @@ async def test_selected_progress_basis_is_consistent_and_reaches_semantic_review
                 retrieval = _record(work.context["retrieval"])
                 assert _integer(retrieval["candidate_count"]) == 160
                 assert _integer(retrieval["selected_count"]) == 118
-                assert work.context["source_context_version"] == "2.1.0"
+                assert work.context["source_context_version"] == "2.2.0"
                 assert "gap_targets" in work.context
                 observed.append(ids)
             return original(project, key, payload, state)
@@ -196,9 +194,7 @@ async def test_real_source_change_after_reranker_still_fences_before_focus(
         reasons: list[str] = []
         original_check = analysis.require_current_sources
 
-        def checked(
-            evidence: tuple[EvidenceSpan, ...], expected_digest: object = None
-        ) -> None:
+        def checked(evidence: tuple[EvidenceSpan, ...], expected_digest: object = None) -> None:
             try:
                 return original_check(evidence, expected_digest)
             except ResearchFence as exc:
@@ -234,6 +230,7 @@ async def test_real_source_change_after_reranker_still_fences_before_focus(
                     )
                 )
                 original_evidence = analysis.evidence
+
                 def changed_evidence(project: str) -> tuple[EvidenceSpan, ...]:
                     return tuple(
                         changed if s.span_id == target.span_id else s

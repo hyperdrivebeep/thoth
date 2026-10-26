@@ -16,6 +16,12 @@ from thoth.adapters.models.codex_oauth import (
     strict_output_schema,
     user_visible_language_contract,
 )
+from thoth.adapters.models.context_projection import (
+    PROJECTION_GUIDE,
+    compact_model_context,
+    project_context_fields,
+    uses_compact_context,
+)
 from thoth.adapters.models.language_contract_text import language_for
 from thoth.adapters.models.reference_schema import constrain_span_references
 from thoth.domain.canonical import canonical_payload, domain_digest, model_digest
@@ -255,26 +261,7 @@ class OpenAIResponsesModel(ModelPort):
     @staticmethod
     def input_envelope(request: ModelRequest[BaseModel]) -> str:
         context = request.context_pack
-        project_context = {
-            "case_id": context.case_id,
-            "project_id": context.project_id,
-            "object_id": context.object_id,
-            "problem": context.problem,
-            "criteria": context.criteria,
-            "sufficiency": context.sufficiency,
-            "input_head_set_digest": context.input_head_set_digest,
-            "policy_hints": context.policy_hints,
-            "previous_portfolio": context.previous_portfolio,
-            "previous_action_plan": context.previous_action_plan,
-            "candidate_portfolio": context.candidate_portfolio,
-            "canonical_hypotheses": context.canonical_hypotheses,
-            "canonical_portfolio": context.canonical_portfolio,
-            "canonical_actions": context.canonical_actions,
-            "canonical_action_plan": context.canonical_action_plan,
-            "canonical_test_assessments": context.canonical_test_assessments,
-            "unresolved_research_refs": context.unresolved_research_refs,
-            "research_context": context.research_context,
-        }
+        project_context = project_context_fields(context)
         evidence = tuple(
             {
                 "span_id": span.span_id,
@@ -290,11 +277,17 @@ class OpenAIResponsesModel(ModelPort):
             }
             for span in context.evidence
         )
+        compact = compact_model_context(context) if uses_compact_context(context) else None
         return (
-            "PROJECT_CONTEXT\n"
-            + canonical_payload(project_context).decode()
+            (PROJECTION_GUIDE if compact is not None else "")
+            + "PROJECT_CONTEXT\n"
+            + (compact[0] if compact is not None else canonical_payload(project_context).decode())
             + "\n\nUNTRUSTED_EVIDENCE_SPANS\n"
-            + canonical_payload({"spans": evidence}).decode()
+            + (
+                compact[1]
+                if compact is not None
+                else canonical_payload({"spans": evidence}).decode()
+            )
             + "\n\nTASK\n"
             + request.role.value
             + "\nTASK_CONTRACT\n"
