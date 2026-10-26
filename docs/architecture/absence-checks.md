@@ -38,6 +38,16 @@ when the outcome is unchanged. Historical 1.0.0 envelopes retain their original 
 and remain readable alongside 1.1.0. Scope identity and the result envelope schema stay at 1.0.0;
 old outcomes are not recomputed or relabelled during reading.
 
+Learning-only recovery restores the saved scope and checked-source bindings before publishing
+the recovered checkpoint. It does not start a new investigation, enlarge the original pool,
+re-run matching on unchanged inputs or offer witnesses again. Unchanged assessments and delivery
+receipts remain identical, including a record with no declared claims.
+If a previously checked source, policy or cutoff no longer matches, the affected scope is marked
+incomplete and its outcomes become NOT_CHECKED with `ABSENCE_RECOVERY_SCOPE_BASIS_CHANGED`.
+The new checkpoint records a partial basis and removes only affected absence cards; the original
+checkpoint, answer and unrelated cards remain intact. Request, stage, digest, committed-outcome
+and authorization guards are still enforced. This fallback never authorizes repeating an external effect.
+
 At most twelve declared claims are searched, with at most eight hundred characters in a target
 or statement. Excess claims remain NOT_CHECKED with explicit reason/count. A claim must bind to
 its exact stored statement before it can produce a warning. These checks do not cover undeclared

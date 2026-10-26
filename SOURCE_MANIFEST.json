@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-26T20:58:16.154285+00:00",
+  "created_at": "2026-10-26T22:39:24.345850+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -2093,8 +2093,8 @@
     },
     {
       "path": "docs/architecture/absence-checks.md",
-      "sha256": "4240665cc55072e11efc252569ae036b875fbc1392beb4386fa879265dbfcf00",
-      "bytes": 7603
+      "sha256": "0a0af2a72a858020de6088518c0e41b83f135d0582d9237edee77f4a5d58dad3",
+      "bytes": 8446
     },
     {
       "path": "docs/architecture/agent-execution-rules.md",
@@ -5128,8 +5128,8 @@
     },
     {
       "path": "src/thoth/application/services/committed_learning_recovery.py",
-      "sha256": "81d77e447efd7bb71d0f96f72d60f6515b4412458a3c1f109c66fcca95d3cc67",
-      "bytes": 7093
+      "sha256": "b06933cb5fbdda866d4862c8c909e7eaa3cf03fab8caedde7ff42ee9fe254050",
+      "bytes": 7610
     },
     {
       "path": "src/thoth/application/services/connector_catalog.py",
@@ -5875,6 +5875,11 @@
       "path": "src/thoth/application/services/research_absence_publication.py",
       "sha256": "2b1cce8b4bd15895fb0d3549447834ef7fb154a4850872b757e4e3db7991b4b7",
       "bytes": 3829
+    },
+    {
+      "path": "src/thoth/application/services/research_absence_recovery.py",
+      "sha256": "6a91d8f5ba3c8fc8ae1b0d3a89fb0d229ada62f3912955b8078a90be07c289d3",
+      "bytes": 7182
     },
     {
       "path": "src/thoth/application/services/research_absence_runtime.py",
@@ -11755,6 +11760,11 @@
       "path": "tests/unit/test_absence_hangul_boundary.py",
       "sha256": "cd5f61da946d9b82b13a793a7428c2ee0ecb7f2c12b1fbe0aa6a32325a878c2d",
       "bytes": 5423
+    },
+    {
+      "path": "tests/unit/test_absence_recovery.py",
+      "sha256": "6c28896b62000d4e39aae501d6f4e99dd47642209697b48ec82e9b80078ca8c8",
+      "bytes": 8198
     },
     {
       "path": "tests/unit/test_absence_witness_delivery.py",

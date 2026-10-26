@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import TYPE_CHECKING
 
+from thoth.application.services.research_absence_recovery import restore_absence_recovery
 from thoth.domain.canonical import canonical_payload, head_set_digest
 from thoth.domain.enums import EntityType, ThreadExecutionState
 from thoth.domain.outcome import OutcomeRecord
@@ -113,7 +115,16 @@ def finish_learning_recovery(
                 work.basis_reasons.extend(manifest.research_basis.reasons)
             else:
                 work.basis_reasons.append("LEGACY_BASIS_UNKNOWN")
-            work.context.update(manifest.result)
+            restored = manifest.result
+            if "absence_assessments" in restored:
+                restored = restore_absence_recovery(
+                    work,
+                    restored,
+                    host.analysis.evidence(request.project_id),
+                    policy_ref=request.policy_ref,
+                    cutoff_at=datetime.fromisoformat(request.cutoff_at),
+                )
+            work.context.update(restored)
             work.record_refs.extend(
                 ref for ref in manifest.record_refs if ref not in work.record_refs
             )
