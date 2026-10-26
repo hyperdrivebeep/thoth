@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-26T14:19:56.070015+00:00",
+  "created_at": "2026-10-26T14:41:26.079295+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -10348,8 +10348,8 @@
     },
     {
       "path": "tests/integration/test_text_context_pipeline.py",
-      "sha256": "5294916eb459286d901580830498e958d0d3bd9699644951d9d7b355611bfd06",
-      "bytes": 4958
+      "sha256": "d8f06ff35a53b9f57ef1848fab2b17bba0d239c09e667823ed21d2efa0fc8ac3",
+      "bytes": 4977
     },
     {
       "path": "tests/integration/test_thread_analysis_failure_diagnostics.py",
@@ -11683,8 +11683,8 @@
     },
     {
       "path": "tests/unit/test_contextual_retrieval.py",
-      "sha256": "9d56bcb66fa54298de6ab5aeaa52f8f21d2bbb22fc9cff59f8c4f63be0386e55",
-      "bytes": 15852
+      "sha256": "917826efd0344c8115a3300caf461b25bd15c4d0e7583b260c5f6874216a7676",
+      "bytes": 16030
     },
     {
       "path": "tests/unit/test_criterion_delta.py",
@@ -12023,8 +12023,8 @@
     },
     {
       "path": "tests/unit/test_text_context_observation.py",
-      "sha256": "2dd622c63404d0df6496026c46f4549631108a12064a04dad10b8e3d0325b12c",
-      "bytes": 7203
+      "sha256": "dca00e149a4c7a9e10cbe14e48c1eebf45d685fa5c9a0ada206a8a6f4992e7e4",
+      "bytes": 7274
     },
     {
       "path": "tests/unit/test_text_parser_key_paths.py",

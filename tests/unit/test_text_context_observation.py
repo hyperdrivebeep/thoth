@@ -154,7 +154,11 @@ def test_unsupported_observer_version_preserves_leaf_parsing(
 ) -> None:
     text = "\ufeff# Header\r\n\r\nLabel\r\n```\r\n  value = 3\r\n```\r\n"
     expected = parse_text(text, name=name)
-    monkeypatch.setattr(text_context, "version", lambda _package: "99.0.0")
+
+    def unsupported_version(_package: str) -> str:
+        return "99.0.0"
+
+    monkeypatch.setattr(text_context, "version", unsupported_version)
     actual = parse_text(text, name=name)
     assert actual.artifact == expected.artifact and actual.nodes == expected.nodes
     assert actual.extraction_coverage == expected.extraction_coverage

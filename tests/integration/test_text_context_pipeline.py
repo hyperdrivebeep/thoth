@@ -36,7 +36,7 @@ async def test_new_lineage_observation_coverage_and_cycle_consumers(tmp_path: Pa
             "latency count=100 value=1.557 seconds\n```\n",
             encoding="utf-8",
         )
-        inputs = {
+        inputs: dict[str, object] = {
             "project_id": "p",
             "relative_path": "measurements.md",
             "media_type": "text/markdown",

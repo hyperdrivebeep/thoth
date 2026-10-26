@@ -15,7 +15,10 @@ from thoth.application.services.research_assembly import assemble_research_conte
 from thoth.application.services.research_context_assembler import assemble_context
 from thoth.application.services.research_retrieval import lexical_candidates, work_candidates
 from thoth.application.services.research_role_context import bundle_view, role_context
-from thoth.application.services.research_selection_context import candidate_context
+from thoth.application.services.research_selection_context import (
+    CandidateContext,
+    candidate_context,
+)
 from thoth.application.services.research_source_digest import versioned_source_digest
 from thoth.application.services.retrieval_coverage_view import with_retrieval_coverage
 from thoth.domain.artifact import StructuralDocument
@@ -121,7 +124,11 @@ def test_inconsistent_context_order_falls_back_with_model_limitation(
         else (*refs, "span:not-eligible" if corruption == "extra" else refs[0])
     )
     broken = replace(observed, ordered_refs=broken_refs)
-    monkeypatch.setattr(research_retrieval, "candidate_context", lambda *_args: broken)
+
+    def broken_context(*_args: object) -> CandidateContext:
+        return broken
+
+    monkeypatch.setattr(research_retrieval, "candidate_context", broken_context)
     w = work()
     selected = work_candidates(w, (), source, reader)
     assert selected == lexical_candidates(w.effective_question, (), source, context=broken)
@@ -193,7 +200,7 @@ def test_scope_corruption_and_legacy_digest_are_not_silently_repaired() -> None:
     bad_span = source[0].model_copy(update={"exact_text": "changed"})
     with pytest.raises(ValueError, match="CONTEXT_SOURCE_MEMBER_INVALID"):
         candidate_context((bad_span, *source[1:]), cast(ArtifactLedgerPort, Reader(doc)))
-    packet = {
+    packet: dict[str, object] = {
         "artifacts": [],
         "structures": [{"nodes_digest": "a", "context_observation_digest": "b"}],
     }
@@ -363,5 +370,6 @@ def test_unpinned_required_context_omission_survives_cache_and_reaches_model() -
         coverage = received.research_context["retrieval_coverage"]
         assert isinstance(coverage, dict)
         assert coverage["omitted_anchor_refs"] == [anchor.span_id]
-        assert {"POLICY_LIMIT", "REQUIRED_CONTEXT_NOT_ADMITTED"} <= set(coverage["limitations"])
+        limitations = cast(list[str], coverage["limitations"])
+        assert {"POLICY_LIMIT", "REQUIRED_CONTEXT_NOT_ADMITTED"} <= set(limitations)
         assert coverage["input_span_count"] == 0 and coverage["coverage_state"] == "PARTIAL"
