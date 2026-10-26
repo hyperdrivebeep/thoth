@@ -11,7 +11,10 @@ MAX_STATEMENT_CHARS = 800
 
 
 def adopt_confirmed_findings(
-    findings: Iterable[ConfirmedFinding], supplied_span_ids: set[str]
+    findings: Iterable[ConfirmedFinding],
+    supplied_span_ids: set[str],
+    *,
+    blocked_indexes: frozenset[int] = frozenset(),
 ) -> tuple[list[dict[str, object]], int]:
     """Return the adopted findings as stored result entries and how many were dropped.
 
@@ -20,11 +23,12 @@ def adopt_confirmed_findings(
     """
     adopted: list[dict[str, object]] = []
     dropped = 0
-    for item in findings:
+    for index, item in enumerate(findings):
         statement = item.statement.strip()
         refs = item.evidence_refs
         valid = (
-            0 < len(statement) <= MAX_STATEMENT_CHARS
+            index not in blocked_indexes
+            and 0 < len(statement) <= MAX_STATEMENT_CHARS
             and bool(refs)
             and all(ref in supplied_span_ids for ref in refs)
             and len(adopted) < MAX_CONFIRMED_FINDINGS

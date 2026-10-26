@@ -10,9 +10,10 @@ import pytest
 from tests.integration.storage_coverage_helpers import request, value
 from tests.integration.test_research_request_v2 import ControlledResearchModel, setup
 
+from thoth.domain.absence_claim import ReviewProposalE2
 from thoth.domain.canonical import model_digest
 from thoth.domain.enums import ModelRole
-from thoth.domain.evidence_requirements import ConfirmedFinding, ReviewProposal
+from thoth.domain.evidence_requirements import ConfirmedFinding
 from thoth.domain.model import ModelRequest, ModelResult
 
 
@@ -22,7 +23,7 @@ class FindingModel(ControlledResearchModel):
         if request.role != ModelRole.SEMANTIC_REVIEWER:
             return result
         spans = [s.span_id for s in request.context_pack.evidence]
-        proposal = ReviewProposal.model_validate(result.output.model_dump()).model_copy(
+        proposal = ReviewProposalE2.model_validate(result.output.model_dump()).model_copy(
             update={
                 "confirmed_findings": (
                     ConfirmedFinding(

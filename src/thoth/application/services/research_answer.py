@@ -6,10 +6,16 @@ from thoth.domain.evidence_requirements import CoverageAssessment
 
 
 def answer_summary(
-    coverage: CoverageAssessment, answer: str, language: str | None
+    coverage: CoverageAssessment,
+    answer: str,
+    language: str | None,
+    *,
+    absence_hold: bool = False,
 ) -> dict[str, str]:
-    state = answer_assessment_state(coverage)
+    state = "PARTIAL_HOLD" if absence_hold else answer_assessment_state(coverage)
     return {
         "answer_status": state,
-        "answer": partial_answer(answer, language) if state == "PARTIAL_HOLD" else answer,
+        "answer": partial_answer(answer, language)
+        if state == "PARTIAL_HOLD" and not absence_hold
+        else answer,
     }

@@ -65,6 +65,8 @@ Historical 2.0.0/2.1.0 hashing stays on its original algorithm. Assembly cache a
 bases distinguish the new projection, so old input outputs are not reused as new-context results.
 Historical selected-evidence queries remain pinned to their original result/version/hash/ACL.
 
-Claim validation, numeric calculations, semantic retrieval and interpretation reconciliation are
-not supplied by this feature. Compact JSON byte measurements are not provider-token or answer-
-quality guarantees. No model permissions, retry policy or research limits are raised.
+This positional-context feature alone does not supply claim validation, numeric calculations,
+semantic retrieval or interpretation reconciliation. The separate [numeric observations](numeric-observations.md)
+and [declared absence checks](absence-checks.md) consume its scoped input without certifying semantic truth.
+Compact JSON byte measurements are not provider-token or answer-quality guarantees.
+No model permissions, retry policy or research limits are raised.

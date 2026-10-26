@@ -8,6 +8,7 @@ from pydantic import JsonValue
 from thoth.application.services.numeric_observation_view import validate_numeric_publication
 from thoth.application.services.request_language import with_result_language
 from thoth.application.services.request_records import RequestRecords
+from thoth.application.services.research_absence_publication import validate_absence_publication
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.enums import EntityType
 from thoth.domain.evidence import EvidenceSpan
@@ -46,6 +47,7 @@ def publish_research_result(
 
             raise ResearchLeaseLost("ATTEMPT_LEASE_FENCED")
         validate_numeric_publication(result, attempt.request_ref, work.evidence)
+        validate_absence_publication(result, work, records)
         # Recheck request even on budget/transport HOLD; stale work cannot become current.
         head = records.read(request.project_id, EntityType.THREAD, f"request:{request.thread_id}")
         if head is None or head[0] != attempt.request_ref:

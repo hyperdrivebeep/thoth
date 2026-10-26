@@ -5,6 +5,7 @@ from contextvars import ContextVar
 from dataclasses import dataclass, field
 from typing import Protocol, runtime_checkable
 
+from thoth.domain.absence_claim import AbsenceRun
 from thoth.domain.cleanup import CleanupUsage
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.hypothesis_grounding_result import GroundedPortfolioResult
@@ -102,6 +103,7 @@ class ResearchWork:
     grounding_stages: dict[GroundingStage, GroundingCallCapture] = field(default_factory=dict)
     hypothesis_grounding: GroundedPortfolioResult | None = None
     retrieval_selection: RetrievalSelection | None = None
+    absence: AbsenceRun | None = None
 
 
 research_work: ContextVar[ResearchWork | None] = ContextVar("research_work", default=None)

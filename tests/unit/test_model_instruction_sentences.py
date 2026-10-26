@@ -13,6 +13,7 @@ import pytest
 
 from thoth.adapters.models.codex_oauth import role_contract
 from thoth.application.services.research_review_context import research_prompt_version
+from thoth.domain.absence_claim import ABSENCE_INSTRUCTION, ABSENCE_RESULT_CONTRACT, AbsenceClaim
 from thoth.domain.derived_calculation import SOURCE_ARITHMETIC_CONTRACT
 from thoth.domain.enums import ModelRole
 
@@ -48,6 +49,9 @@ def task_texts() -> dict[str, str]:
 def contract_texts() -> dict[str, str]:
     return {
         "SOURCE_ARITHMETIC": SOURCE_ARITHMETIC_CONTRACT,
+        "ABSENCE_INSTRUCTION": ABSENCE_INSTRUCTION,
+        "ABSENCE_RESULT_CONTRACT": ABSENCE_RESULT_CONTRACT,
+        "ABSENCE_TARGET": AbsenceClaim.model_fields["target"].description or "",
         **{
             role.value: role_contract(role.value, research_prompt_version(role), None)
             for role in ModelRole

@@ -11,6 +11,7 @@ from typing import cast
 from pydantic import JsonValue
 
 from thoth.application.services.numeric_observation_view import summarize_checked_observations
+from thoth.application.services.research_absence_publication import summarize_absence_assessments
 
 VIEWS = frozenset({"SUMMARY", "FULL", "PROGRESS"})
 
@@ -66,6 +67,10 @@ def summarize_thread_read(payload: dict[str, JsonValue]) -> dict[str, JsonValue]
             if "checked_observations" in result:
                 slim["result"]["checked_observations"] = cast(
                     JsonValue, summarize_checked_observations(result["checked_observations"])
+                )
+            if "absence_assessments" in result:
+                slim["result"]["absence_assessments"] = cast(
+                    JsonValue, summarize_absence_assessments(result["absence_assessments"])
                 )
         summary[key] = cast(JsonValue, slim)
     if summary.get("operation_state") in TERMINAL_OPERATION_STATES:

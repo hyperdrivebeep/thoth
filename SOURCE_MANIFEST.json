@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-26T20:01:16.227256+00:00",
+  "created_at": "2026-10-26T20:58:16.154285+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -485,6 +485,16 @@
       "path": "apps/web/src/api/trace.ts",
       "sha256": "39f426e38364313f5fcf028abd542a7fd2e397cdea797fb5eb2e079c80d70636",
       "bytes": 5312
+    },
+    {
+      "path": "apps/web/src/components/AbsenceChecks.test.tsx",
+      "sha256": "1c653dab4036dfcd6ad4b26b1d4803bd8986ecf89497f75ff6de3845b6839170",
+      "bytes": 3921
+    },
+    {
+      "path": "apps/web/src/components/AbsenceChecks.tsx",
+      "sha256": "aeae6af6da7f9493430df897c91910f9a0a664c4366fbfba554210da095bf879",
+      "bytes": 2420
     },
     {
       "path": "apps/web/src/components/ActionCompare.test.tsx",
@@ -1038,8 +1048,8 @@
     },
     {
       "path": "apps/web/src/components/ResearchResultCard.tsx",
-      "sha256": "87b7088d777ae85b060e4caab4e7fcf6a37cef14c666557e6a3dc4d1d2210d9b",
-      "bytes": 13103
+      "sha256": "c0d5d7ae80742a84b7b96eb182eac82838b4fc7cd5dd3af9180b256cc75f047b",
+      "bytes": 13217
     },
     {
       "path": "apps/web/src/components/ResearchSidePanel.tsx",
@@ -1778,8 +1788,8 @@
     },
     {
       "path": "apps/web/src/i18n/reviewPanelsMessages.ts",
-      "sha256": "b242cb36096616748c0ffdd9631e89bc30cf4e63ced3aca4cb7c1f4664614765",
-      "bytes": 10189
+      "sha256": "58768d41c5549f59bf6ac000d239ecbcf434156eb9a4328332c797c1480f23ac",
+      "bytes": 12234
     },
     {
       "path": "apps/web/src/i18n/setupMessages.ts",
@@ -2082,6 +2092,11 @@
       "bytes": 28656
     },
     {
+      "path": "docs/architecture/absence-checks.md",
+      "sha256": "4240665cc55072e11efc252569ae036b875fbc1392beb4386fa879265dbfcf00",
+      "bytes": 7603
+    },
+    {
       "path": "docs/architecture/agent-execution-rules.md",
       "sha256": "6606f08e4a86f6696e21240a97dbfee1946869991aba44985f98f6d386658bf8",
       "bytes": 4594
@@ -2113,8 +2128,8 @@
     },
     {
       "path": "docs/architecture/evidence-context.md",
-      "sha256": "65aa68b21a0b7dd0aaa5f059d1a369771be2d772229e9020c84efe692797e625",
-      "bytes": 4867
+      "sha256": "bb34668fd2d936fa8b8933fbbc4aff245e76123a072a72e5fbea2fcf5560b516",
+      "bytes": 5056
     },
     {
       "path": "docs/architecture/extension-point-catalog.md",
@@ -5847,14 +5862,34 @@
       "bytes": 4383
     },
     {
+      "path": "src/thoth/application/services/research_absence_checks.py",
+      "sha256": "c3162289fabff78d5523612aaa2da952ffd049f9c25c519e8fc8e6e570272a0e",
+      "bytes": 8739
+    },
+    {
+      "path": "src/thoth/application/services/research_absence_delivery.py",
+      "sha256": "61f35694c2e6a4c2c2732cb6e6da76d1352c63980e68e654272ca7810493ac8a",
+      "bytes": 6552
+    },
+    {
+      "path": "src/thoth/application/services/research_absence_publication.py",
+      "sha256": "2b1cce8b4bd15895fb0d3549447834ef7fb154a4850872b757e4e3db7991b4b7",
+      "bytes": 3829
+    },
+    {
+      "path": "src/thoth/application/services/research_absence_runtime.py",
+      "sha256": "e1ac4eb2366e29d86367b2845021c983d2ace3be0f5f8eb1684c71db47446368",
+      "bytes": 7021
+    },
+    {
       "path": "src/thoth/application/services/research_analysis.py",
-      "sha256": "3a5ca6b710064ee2e150ea9af5ae62b4dd4fac142a703468905563cee760eb9f",
-      "bytes": 25714
+      "sha256": "35b40d90868908cd493fbe2b3b5cf7512a42df9cf8b0d0799d2777b8dcd43b4c",
+      "bytes": 26557
     },
     {
       "path": "src/thoth/application/services/research_answer.py",
-      "sha256": "553446952d8e12e5bff7153b2adf0bf16875e76e271b1e72a05fa0181f9624dc",
-      "bytes": 607
+      "sha256": "28eabc826fe778e42c15026a206417f6743998aa5944d321b58e19aa3ce1ff3b",
+      "bytes": 728
     },
     {
       "path": "src/thoth/application/services/research_assembly.py",
@@ -5868,8 +5903,8 @@
     },
     {
       "path": "src/thoth/application/services/research_attempt_runner.py",
-      "sha256": "8415dd402c7416cf152e26df85e04574cbfd9e9649df2238c44216c9add083fe",
-      "bytes": 19039
+      "sha256": "b047ea1a80c5cbd367fae65f5cba6fbb52894ad9ab0deb60d1c8f04dc60ff0f4",
+      "bytes": 19590
     },
     {
       "path": "src/thoth/application/services/research_basis_capture.py",
@@ -5953,8 +5988,8 @@
     },
     {
       "path": "src/thoth/application/services/research_findings.py",
-      "sha256": "a45f73deb8419f0e361a9ed9af28e01f07e1e864ccabca0b7254b0a340b3fb87",
-      "bytes": 1436
+      "sha256": "4da14128f3a338252d31ec1f9978af46f6596b12a21924827baf960729fe1ec1",
+      "bytes": 1562
     },
     {
       "path": "src/thoth/application/services/research_followup_calculations.py",
@@ -6033,8 +6068,8 @@
     },
     {
       "path": "src/thoth/application/services/research_read_summary.py",
-      "sha256": "b20f15ca6582629171e1a246d20806ebabce9432bc3ee74b2c3aa1486247734a",
-      "bytes": 2994
+      "sha256": "1faaa4f26664e9547dc82e01dfde8bf2d937d3bc93431587ea680d303381d16c",
+      "bytes": 3312
     },
     {
       "path": "src/thoth/application/services/research_read_view.py",
@@ -6048,8 +6083,8 @@
     },
     {
       "path": "src/thoth/application/services/research_result_publication.py",
-      "sha256": "1d34ce5d5de770b10196f182426239c7e7d2fa6c9e6ed9f89836d0b1aa0fbc8b",
-      "bytes": 7676
+      "sha256": "fa14da1c700564984e9284e1123c50e624ef7ae7876f4aa0672cde018c4c9ac4",
+      "bytes": 7833
     },
     {
       "path": "src/thoth/application/services/research_retrieval.py",
@@ -6063,13 +6098,13 @@
     },
     {
       "path": "src/thoth/application/services/research_review_context.py",
-      "sha256": "5ae590346d151c07cda7568ec77ed43162f2636c8183a0ef0975f465d727ada4",
-      "bytes": 4612
+      "sha256": "c3dda9b108c72447206718edc698438c1250e6a5523647915c76c7437a25fad0",
+      "bytes": 4731
     },
     {
       "path": "src/thoth/application/services/research_role_context.py",
-      "sha256": "c47de5a3f35c1f34783b884a2a6844344384edea865b83ac34ef5403a6705dec",
-      "bytes": 3731
+      "sha256": "0f512a3af79104d9cfed6919fac291f85415d451077db091997b59e9445cdb8f",
+      "bytes": 3772
     },
     {
       "path": "src/thoth/application/services/research_selection_context.py",
@@ -6662,6 +6697,11 @@
       "bytes": 960
     },
     {
+      "path": "src/thoth/domain/absence_claim.py",
+      "sha256": "7b25b914555916b60bb3dd358a77ef2527b0a142360878aea944c0a2593263cd",
+      "bytes": 11456
+    },
+    {
       "path": "src/thoth/domain/account_usage.py",
       "sha256": "c72587945a0eed7620fbba1248b4ec552419bd9b5fc175815f1fda6b9d8616f2",
       "bytes": 773
@@ -7173,8 +7213,8 @@
     },
     {
       "path": "src/thoth/domain/research_execution.py",
-      "sha256": "bda0e2b8ee8c31849918468b30b30f8eaf3724484bcfdae9b4ade54af828346e",
-      "bytes": 5654
+      "sha256": "d9b5211e84f87957d67f0511efd9cce50238eb3f671a1b0aa8fd1f8a9e88ed35",
+      "bytes": 5742
     },
     {
       "path": "src/thoth/domain/research_failure.py",
@@ -7223,8 +7263,8 @@
     },
     {
       "path": "src/thoth/domain/research_stage.py",
-      "sha256": "b37d0ac980303418e142ced9edb19c4a9d8e14fcacac7bfdfdf2a3b4597a6515",
-      "bytes": 2711
+      "sha256": "558fa878660541fa5721d64566991b31eff4c5f4aff5511d5221f545ac3ad317",
+      "bytes": 2793
     },
     {
       "path": "src/thoth/domain/resource_scope.py",
@@ -8932,6 +8972,11 @@
       "bytes": 10370
     },
     {
+      "path": "tests/integration/test_absence_result_payload.py",
+      "sha256": "19830ac81ddecd67acd2c302287fef7375ced2392afbca5b8dde0f07c8d0cb30",
+      "bytes": 15289
+    },
+    {
       "path": "tests/integration/test_acquisition_io_transaction_boundary.py",
       "sha256": "08274918b2c74e79dcc23f944713cd3f66412f929b207db18933f3edcfc4b311",
       "bytes": 2581
@@ -9058,8 +9103,8 @@
     },
     {
       "path": "tests/integration/test_confirmed_findings_result.py",
-      "sha256": "4f7bbca356396549e83648d8c13d485ba8032672cd0361166c4533b506be55b3",
-      "bytes": 4348
+      "sha256": "c42033246d0f183974717856a81628a2a71f1248152559104f391cd2fa4123c8",
+      "bytes": 4390
     },
     {
       "path": "tests/integration/test_connector_sandbox_cycle.py",
@@ -10043,8 +10088,8 @@
     },
     {
       "path": "tests/integration/test_research_request_v2.py",
-      "sha256": "72c3a4de399106a61f871c2533c11ddbd25eabaaeb7de093bf11ad405cd78f2f",
-      "bytes": 21591
+      "sha256": "71e91b602c1ccc66eae3d5716fc53f2402ccef8cc501ca69b0a1ab29b65a0aa1",
+      "bytes": 21679
     },
     {
       "path": "tests/integration/test_research_review_order.py",
@@ -11702,6 +11747,21 @@
       "bytes": 2329
     },
     {
+      "path": "tests/unit/test_absence_claim_checks.py",
+      "sha256": "0de1686f2e5ef0454e2dc12dccd3311277f4fbaf7f31ad4b7eeecec3d9499b9f",
+      "bytes": 12568
+    },
+    {
+      "path": "tests/unit/test_absence_hangul_boundary.py",
+      "sha256": "cd5f61da946d9b82b13a793a7428c2ee0ecb7f2c12b1fbe0aa6a32325a878c2d",
+      "bytes": 5423
+    },
+    {
+      "path": "tests/unit/test_absence_witness_delivery.py",
+      "sha256": "cea72b64bf3024de71588ba3babbfa3ba6d686a0ac4693d3a3f5dcd32e5de904",
+      "bytes": 6103
+    },
+    {
       "path": "tests/unit/test_anonymous_browser_lifecycle.py",
       "sha256": "0536771653420b5493b4efc8e02b1d11cd0a1068f89f16989068254f24193a18",
       "bytes": 7348
@@ -11918,8 +11978,8 @@
     },
     {
       "path": "tests/unit/test_model_instruction_sentences.py",
-      "sha256": "66e843281e3702e86e0f5cecc1c12e3b49e5c2bab5d68495c775571113377c49",
-      "bytes": 3758
+      "sha256": "f8e6152441a71737a700b471e95ee2b22eb49d16f902fde85ad7a7cdee78d35b",
+      "bytes": 4049
     },
     {
       "path": "tests/unit/test_numeric_observation_projection.py",
