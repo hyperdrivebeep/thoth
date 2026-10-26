@@ -41,7 +41,8 @@ def constrain_span_references(
                             candidate_refs = context.get("ranking_candidate_refs")
                             if key == "ordered_span_ids" and candidate_refs is not None:
                                 if not isinstance(candidate_refs, (tuple, list)) or not all(
-                                    isinstance(x, str) and x in span_ids for x in candidate_refs
+                                    isinstance(x, str) and x in span_ids
+                                    for x in cast(list[object] | tuple[object, ...], candidate_refs)
                                 ):
                                     raise ValueError("RANKING_CANDIDATE_SCOPE_INVALID")
                                 allowed = tuple(cast(list[str] | tuple[str, ...], candidate_refs))

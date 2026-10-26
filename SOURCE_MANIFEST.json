@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-26T13:40:24.334525+00:00",
+  "created_at": "2026-10-26T14:19:56.070015+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -3823,8 +3823,8 @@
     },
     {
       "path": "src/thoth/adapters/models/context_projection.py",
-      "sha256": "147fcc99d7dd3356852ac30a78a82547c26dada140139b5d704989f8c5d86220",
-      "bytes": 7332
+      "sha256": "b143d705007ffd353b0f28cb3f43fff08cabfa1f3e5d9e06fcd66b0539c5c69a",
+      "bytes": 8106
     },
     {
       "path": "src/thoth/adapters/models/credential_auth_projection.py",
@@ -3868,8 +3868,8 @@
     },
     {
       "path": "src/thoth/adapters/models/reference_schema.py",
-      "sha256": "64804a291c76fdc6f110be828c46aab559d140279a8d26244ce8859a12cfdf8d",
-      "bytes": 5568
+      "sha256": "e035569281392ceec411e493bca1d470258440c75a9bbd6bf20fc479492dad6d",
+      "bytes": 5645
     },
     {
       "path": "src/thoth/adapters/models/registry.py",
@@ -6018,8 +6018,8 @@
     },
     {
       "path": "src/thoth/application/services/research_retrieval.py",
-      "sha256": "40226eabeee8e0968f804ea85399ed6d58ac05cae2c85ab4183f8ef094326ce0",
-      "bytes": 11918
+      "sha256": "e1a33787da33fd6c158cc0a41eb2fae32869e56c800086241e164c963027dd0c",
+      "bytes": 11934
     },
     {
       "path": "src/thoth/application/services/research_retrieval_policy.py",
@@ -6068,8 +6068,8 @@
     },
     {
       "path": "src/thoth/application/services/research_text_context.py",
-      "sha256": "ddd09d70237c9e877d29b6c3c402684eb3d81cedde8b87dc428ad962f480be73",
-      "bytes": 2117
+      "sha256": "2d64723817866b8f47b58b0f534e7d0a46060fbef86d07a710980d19b51b765c",
+      "bytes": 2128
     },
     {
       "path": "src/thoth/application/services/research_thread_read_snapshot.py",

@@ -32,7 +32,7 @@ def text_envelope(
     context_ids = tuple(dict.fromkeys((*region.heading_refs, *region.leading_refs)))
     envelope = (region, *(regions[k] for k in context_ids))
     required: dict[str, EvidenceSpan] = {anchor.span_id: anchor}
-    limitations = []
+    limitations: list[str] = []
     for related in envelope[1:]:
         for node in related.node_refs:
             if node in by_node:

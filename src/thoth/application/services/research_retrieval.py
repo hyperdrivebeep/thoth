@@ -201,7 +201,7 @@ def lexical_candidates(
             lambda: lexical_candidates(question, queries, evidence, pinned, context=context)
         )
         return result
-    protected = frozenset() if context is None else context.protected_refs
+    protected: frozenset[str] = frozenset() if context is None else context.protected_refs
     pool = (
         tuple(span for span in eligible if not _is_chrome(span) or span.span_id in protected)
         or eligible
