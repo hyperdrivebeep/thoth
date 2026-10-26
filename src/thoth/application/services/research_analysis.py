@@ -529,7 +529,7 @@ class ResearchAnalysis:
             cutoff_at=project.cutoff_at,
             context_pack=role_context(context, role),
             output_model=codec,
-            prompt_version=f"{role.value.lower()}.v5",
+            prompt_version=review_contexts.research_prompt_version(role),
             model_policy_ref=project.policy_binding_ref,
             max_output_tokens=6000,
             model_settings=None if work is None else work.model_settings,

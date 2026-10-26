@@ -1,12 +1,23 @@
 """Pure input views for ranking, semantic review and separate adjudication."""
 
 from thoth.application.services.research_role_context import bundle_view
+from thoth.domain.enums import ModelRole
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.evidence_bundle import ContextAssembly
 from thoth.domain.evidence_requirements import EvidenceRanking, ReviewProposal
 from thoth.domain.model import ContextPack
 from thoth.domain.research_execution import ResearchWork
 from thoth.domain.research_request import RevisionRef
+
+# v6 marks the repaired review and adjudication task sentences; the rules are unchanged.
+_PROMPT_VERSIONS = {
+    ModelRole.SEMANTIC_REVIEWER: "semantic_reviewer.v6",
+    ModelRole.REVIEW_ADJUDICATOR: "review_adjudicator.v6",
+}
+
+
+def research_prompt_version(role: ModelRole) -> str:
+    return _PROMPT_VERSIONS.get(role, f"{role.value.lower()}.v5")
 
 
 def ranking_context(
@@ -37,11 +48,11 @@ def semantic_review_context(
             "evidence": work.evidence,
             "research_context": {
                 **work.context,
-                "task": "Review each exact requirement against "
-                "conflicts using scoped_conflicts with exact requirement_ids and span IDs; "
+                "task": "Review each exact requirement against target, conditions, time, "
+                "contrary evidence and adjacent original context. "
+                "Record conflicts in scoped_conflicts with exact requirement_ids and span IDs; "
                 "leave legacy conflicts empty. Distinguish current targets "
                 "from optional checks. "
-                "target, conditions, time, contrary evidence and adjacent original context. "
                 "Use only supplied span IDs in evidence_refs and applicability_basis; "
                 "put prose in explanation. For record-summary requests, assess what the record "
                 "states rather than treating the statement as independently proven "
@@ -82,11 +93,12 @@ def adjudication_context(
                 **review_context.research_context,
                 "candidate": candidate.model_dump(mode="json"),
                 "requirement_set_ref": ref.model_dump(mode="json"),
-                "task": "Separately adjudicate this candidate and the completeness "
-                "including each scoped conflict's relevance and resolution. Bind each "
+                "task": "Separately adjudicate this candidate and the completeness of "
+                "question decomposition, including each scoped conflict's relevance and "
+                "resolution. Bind each "
                 "conflict decision to requirement_set_ref.revision_digest and supplied "
                 "evidence basis_refs. Unproven scope/resolution is INCONCLUSIVE. "
-                "of question decomposition. Check exact evidence and conditions. "
+                "Check exact evidence and conditions. "
                 "N/A research checks need request-bound source basis. "
                 "You have no authority to waive a BOUND rule. "
                 "Missing or uncertain means INCONCLUSIVE.",

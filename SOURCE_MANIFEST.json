@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-26T14:41:26.079295+00:00",
+  "created_at": "2026-10-26T16:51:26.681516+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -5813,8 +5813,8 @@
     },
     {
       "path": "src/thoth/application/services/research_analysis.py",
-      "sha256": "682ae2377315ff60d03456ccd5329b24723f8d11c81bb4617716c409f86dc8d5",
-      "bytes": 25058
+      "sha256": "d47fb386fbe88d6c6d9d6987b774c19deed38605fe384b6682924eb8e61cb3b4",
+      "bytes": 25077
     },
     {
       "path": "src/thoth/application/services/research_answer.py",
@@ -6028,8 +6028,8 @@
     },
     {
       "path": "src/thoth/application/services/research_review_context.py",
-      "sha256": "5891b8948c88fc7d133f42403de4d0a11e7fbb5d5d1d1eaca97d3601f33d6061",
-      "bytes": 4198
+      "sha256": "5ae590346d151c07cda7568ec77ed43162f2636c8183a0ef0975f465d727ada4",
+      "bytes": 4612
     },
     {
       "path": "src/thoth/application/services/research_role_context.py",
@@ -11860,6 +11860,11 @@
       "path": "tests/unit/test_memory_terms.py",
       "sha256": "11edc80dabe3d3cb9a210613ea22428052e1be8cb0143c66e1914b355d8a6269",
       "bytes": 2321
+    },
+    {
+      "path": "tests/unit/test_model_instruction_sentences.py",
+      "sha256": "e680447ef79ac33f82904e0421218b83d3f5f4b060b0f89fb819a5f91d72ffb4",
+      "bytes": 3341
     },
     {
       "path": "tests/unit/test_operation_host_identity.py",
