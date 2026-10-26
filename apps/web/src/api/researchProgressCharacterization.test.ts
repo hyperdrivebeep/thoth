@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import { composerActivity, evidenceLabels, formatDuration, liveResearchProgress } from "./researchProgress";
 import type { ResearchStatus } from "./research";
+import { sceneFor, type WorkFacts } from "../i18n/progressKo";
 
 /**
  * Pins the wording that researchProgress produces today (Korean particles, durations, sizes, scene
  * sentences, one-line texts), so that moving the text code into its own file changes nothing.
- * Only the public exports are used; the expected values were taken from the code before the move.
+ * Progress locations now omit excerpts. Grammar-only cases exercise the sentence formatter directly
+ * so the existing particle coverage is preserved independently of the safe-location input boundary.
  */
 
 function status(overrides: Record<string, unknown> = {}): ResearchStatus {
@@ -85,12 +87,12 @@ describe("scene sentences", () => {
         "RESEARCH_PLANNER SUCCEEDED: 표 3 발사 준비 조건 4개, 표 숫자만 인용, 추측 금지를 고정했습니다 // 아직 답을 쓰지 않았습니다. // null",
         "REQUIREMENTS RUNNING: 표 3 발사 준비 조건 4개, 표 숫자만 인용, 추측 금지를 고정하고 있습니다 // 아직 답을 쓰지 않았습니다. // null",
         "REQUIREMENTS SUCCEEDED: 표 3 발사 준비 조건 4개, 표 숫자만 인용, 추측 금지를 고정했습니다 // 아직 답을 쓰지 않았습니다. // null",
-        "EVIDENCE_RERANKER RUNNING: p.6 70.6, p.8 GNC와 관련된 문장을 다시 줄 세우고 있습니다 // 순위만 매겼고, 지지 여부는 아직 판단하지 않았습니다. // null",
-        "EVIDENCE_RERANKER SUCCEEDED: p.6 70.6, p.8 GNC와 관련된 문장을 다시 줄 세웠습니다 // 순위만 매겼고, 지지 여부는 아직 판단하지 않았습니다. // null",
-        "SEMANTIC_REVIEWER RUNNING: 표 3 발사 준비 조건 4개가 p.6 70.6, p.8 GNC 원문에 있는지 대조하고 있습니다 // 관련 있다고 해서 지지하는 것은 아닙니다. // null",
-        "SEMANTIC_REVIEWER SUCCEEDED: 표 3 발사 준비 조건 4개가 p.6 70.6, p.8 GNC 원문에 있는지 대조했습니다 // 관련 있다고 해서 지지하는 것은 아닙니다. // null",
-        "EVIDENCE_REVIEW RUNNING: 표 3 발사 준비 조건 4개가 p.6 70.6, p.8 GNC 원문에 있는지 대조하고 있습니다 // 관련 있다고 해서 지지하는 것은 아닙니다. // null",
-        "EVIDENCE_REVIEW SUCCEEDED: 표 3 발사 준비 조건 4개가 p.6 70.6, p.8 GNC 원문에 있는지 대조했습니다 // 관련 있다고 해서 지지하는 것은 아닙니다. // null",
+        "EVIDENCE_RERANKER RUNNING: p.6, p.8과 관련된 문장을 다시 줄 세우고 있습니다 // 순위만 매겼고, 지지 여부는 아직 판단하지 않았습니다. // null",
+        "EVIDENCE_RERANKER SUCCEEDED: p.6, p.8과 관련된 문장을 다시 줄 세웠습니다 // 순위만 매겼고, 지지 여부는 아직 판단하지 않았습니다. // null",
+        "SEMANTIC_REVIEWER RUNNING: 표 3 발사 준비 조건 4개가 p.6, p.8 원문에 있는지 대조하고 있습니다 // 관련 있다고 해서 지지하는 것은 아닙니다. // null",
+        "SEMANTIC_REVIEWER SUCCEEDED: 표 3 발사 준비 조건 4개가 p.6, p.8 원문에 있는지 대조했습니다 // 관련 있다고 해서 지지하는 것은 아닙니다. // null",
+        "EVIDENCE_REVIEW RUNNING: 표 3 발사 준비 조건 4개가 p.6, p.8 원문에 있는지 대조하고 있습니다 // 관련 있다고 해서 지지하는 것은 아닙니다. // null",
+        "EVIDENCE_REVIEW SUCCEEDED: 표 3 발사 준비 조건 4개가 p.6, p.8 원문에 있는지 대조했습니다 // 관련 있다고 해서 지지하는 것은 아닙니다. // null",
         "REVIEW_ADJUDICATOR RUNNING: Psyche 표 3 발사 준비 조건 중 빠진 항목과 충돌을 판정하고 있습니다 // 애매한 항목은 보류로 남깁니다. // null",
         "REVIEW_ADJUDICATOR SUCCEEDED: Psyche 표 3 발사 준비 조건 중 빠진 항목과 충돌을 판정했습니다 // 애매한 항목은 보류로 남깁니다. // null",
         "SOURCE_PLANNER RUNNING: psyche-irb-2022.pdf, gao-23-106021.pdf 외에 더 열 주소를 고르고 있습니다 // 인터넷 전체를 검색하지 않습니다. // null",
@@ -107,18 +109,18 @@ describe("scene sentences", () => {
         "ACTION_PLANNER SUCCEEDED: Psyche 표 3 발사 준비 조건을 확인하려면 다음에 할 작업을 골랐습니다 // 실행 전 초안입니다. // null",
         "ACTION_COMPARISON RUNNING: Psyche 표 3 발사 준비 조건을 확인하려면 다음에 할 작업을 고르고 있습니다 // 실행 전 초안입니다. // null",
         "ACTION_COMPARISON SUCCEEDED: Psyche 표 3 발사 준비 조건을 확인하려면 다음에 할 작업을 골랐습니다 // 실행 전 초안입니다. // null",
-        "EVIDENCE_EXTRACTOR RUNNING: p.6 70.6, p.8 GNC 위치를 확인하고 있습니다 // 실제로 집어넣을 칸과 문장을 찾습니다. // null",
-        "EVIDENCE_EXTRACTOR SUCCEEDED: p.6 70.6, p.8 GNC 구절을 골랐습니다 // 실제로 집어넣을 칸과 문장을 찾습니다. // null",
-        "EVIDENCE_FOCUS RUNNING: p.6 70.6, p.8 GNC 위치를 확인하고 있습니다 // 실제로 집어넣을 칸과 문장을 찾습니다. p.6 70.6, p.8 GNC 2곳을 확인했습니다 · 전체 5곳 중 일부. // p.6 70.6, p.8 GNC 2곳을 확인했습니다 · 전체 5곳 중 일부.",
-        "EVIDENCE_FOCUS SUCCEEDED: p.6 70.6, p.8 GNC 구절을 골랐습니다 // 실제로 집어넣을 칸과 문장을 찾습니다. p.6 70.6, p.8 GNC 2곳을 확인했습니다 · 전체 5곳 중 일부. // p.6 70.6, p.8 GNC 2곳을 확인했습니다 · 전체 5곳 중 일부.",
+        "EVIDENCE_EXTRACTOR RUNNING: p.6, p.8 위치를 확인하고 있습니다 // 실제로 집어넣을 칸과 문장을 찾습니다. // null",
+        "EVIDENCE_EXTRACTOR SUCCEEDED: p.6, p.8 구절을 골랐습니다 // 실제로 집어넣을 칸과 문장을 찾습니다. // null",
+        "EVIDENCE_FOCUS RUNNING: p.6, p.8 위치를 확인하고 있습니다 // 실제로 집어넣을 칸과 문장을 찾습니다. p.6, p.8 2곳을 확인했습니다 · 전체 5곳 중 일부. // p.6, p.8 2곳을 확인했습니다 · 전체 5곳 중 일부.",
+        "EVIDENCE_FOCUS SUCCEEDED: p.6, p.8 구절을 골랐습니다 // 실제로 집어넣을 칸과 문장을 찾습니다. p.6, p.8 2곳을 확인했습니다 · 전체 5곳 중 일부. // p.6, p.8 2곳을 확인했습니다 · 전체 5곳 중 일부.",
         "SUFFICIENCY_EXPLAINER RUNNING: Psyche 표 3 발사 준비 조건을 지금 근거로 답할 수 있는지 설명하고 있습니다 // 부족한 항목은 보류 이유로 남깁니다. // null",
         "SUFFICIENCY_EXPLAINER SUCCEEDED: Psyche 표 3 발사 준비 조건을 지금 근거로 답할 수 있는지 설명했습니다 // 부족한 항목은 보류 이유로 남깁니다. // null",
         "COUNTEREVIDENCE_CHALLENGER RUNNING: 「일정만 늘리면 해결된다」, 「GNC 소프트웨어만 닫으면 된다」, 「인력 공백」을 뒤집을 근거를 찾고 있습니다 // 지지 문장만 보지 않습니다. // null",
         "COUNTEREVIDENCE_CHALLENGER SUCCEEDED: 「일정만 늘리면 해결된다」, 「GNC 소프트웨어만 닫으면 된다」, 「인력 공백」을 뒤집을 근거를 찾았습니다 // 지지 문장만 보지 않습니다. // null",
         "USER_EXPLAINER RUNNING: Psyche 표 3 발사 준비 조건을 사람이 읽게 정리하고 있습니다 // 내부 코드명이 아니라 질문 기준으로 설명합니다. // null",
         "USER_EXPLAINER SUCCEEDED: Psyche 표 3 발사 준비 조건을 사람이 읽게 정리했습니다 // 내부 코드명이 아니라 질문 기준으로 설명합니다. // null",
-        "REFERENCE_MAPPER RUNNING: p.6 70.6, p.8 GNC 인용을 원문 위치에 맞추고 있습니다 // 표 번호와 셀 위치를 자료에 연결합니다. // null",
-        "REFERENCE_MAPPER SUCCEEDED: p.6 70.6, p.8 GNC 인용을 원문 위치에 맞춰 두었습니다 // 표 번호와 셀 위치를 자료에 연결합니다. // null",
+        "REFERENCE_MAPPER RUNNING: p.6, p.8 인용을 원문 위치에 맞추고 있습니다 // 표 번호와 셀 위치를 자료에 연결합니다. // null",
+        "REFERENCE_MAPPER SUCCEEDED: p.6, p.8 인용을 원문 위치에 맞춰 두었습니다 // 표 번호와 셀 위치를 자료에 연결합니다. // null",
         "CONNECTED_SOURCES RUNNING: psyche-irb-2022.pdf, gao-23-106021.pdf만 열고 있습니다 // 웹 검색을 시작했다는 뜻이 아닙니다. psyche-irb-2022.pdf, gao-23-106021.pdf 목록을 여는 중이며, 답을 쓰기 전입니다. // psyche-irb-2022.pdf, gao-23-106021.pdf 목록을 여는 중이며, 답을 쓰기 전입니다.",
         "CONNECTED_SOURCES SUCCEEDED: psyche-irb-2022.pdf, gao-23-106021.pdf만 열고 있습니다 // 웹 검색을 시작했다는 뜻이 아닙니다. psyche-irb-2022.pdf, gao-23-106021.pdf 목록을 여는 중이며, 답을 쓰기 전입니다. // psyche-irb-2022.pdf, gao-23-106021.pdf 목록을 여는 중이며, 답을 쓰기 전입니다.",
         "SOURCE_SHORTLIST RUNNING: psyche-irb-2022.pdf, gao-23-106021.pdf에서 질문과 맞는 원문 구간을 고르고 있습니다 // 시간 미확인 자료는 확정 근거가 아니라 후보입니다. psyche-irb-2022.pdf, gao-23-106021.pdf에서 원문 구간을 고르는 중이며, 답을 쓰기 전입니다. // psyche-irb-2022.pdf, gao-23-106021.pdf에서 원문 구간을 고르는 중이며, 답을 쓰기 전입니다.",
@@ -153,7 +155,7 @@ describe("scene sentences", () => {
         "ACTION_PLANNER: 다음에 할 확인 작업을 고르고 있습니다 // 실행 전 초안입니다. // null",
         "ACTION_COMPARISON: 다음에 할 확인 작업을 고르고 있습니다 // 실행 전 초안입니다. // null",
         "EVIDENCE_EXTRACTOR: 표와 원문 위치를 확인하고 있습니다 // 실제로 집어넣을 칸과 문장을 찾습니다. // null",
-        "EVIDENCE_FOCUS: 표와 원문 위치를 확인하고 있습니다 // 실제로 집어넣을 칸과 문장을 찾습니다. 질문에 집어넣을 표·문장이 아직 0곳입니다. 붙인 로컬 원문이 없어 웹 검색은 이 단계에서 시작하지 않습니다. // 질문에 집어넣을 표·문장이 아직 0곳입니다. 붙인 로컬 원문이 없어 웹 검색은 이 단계에서 시작하지 않습니다.",
+        "EVIDENCE_FOCUS: 표와 원문 위치를 확인하고 있습니다 // 실제로 집어넣을 칸과 문장을 찾습니다. 위치 미확인 // 위치 미확인",
         "SUFFICIENCY_EXPLAINER: 질문을 지금 근거로 답할 수 있는지 설명하고 있습니다 // 부족한 항목은 보류 이유로 남깁니다. // null",
         "COUNTEREVIDENCE_CHALLENGER: 질문을 뒤집을 근거를 찾고 있습니다 // 지지 문장만 보지 않습니다. // null",
         "USER_EXPLAINER: 현재 판단을 사람이 읽게 정리하고 있습니다 // 내부 코드명이 아니라 질문 기준으로 설명합니다. // null",
@@ -172,10 +174,10 @@ describe("scene sentences", () => {
       return `${problem}: ${live?.headline}`;
     });
     const withLocators = ["책", "사과", "A3", "표 3", "ABC"].map((label) => {
-      const draft = { evidence_focus: { locators: [{ exact_text: label }] } };
-      const reranked = liveResearchProgress(inPhase("EVIDENCE_RERANKER", {}, draft));
-      const reviewed = liveResearchProgress(inPhase("SEMANTIC_REVIEWER", { problem: "발사 조건" }, draft));
-      return `${label}: ${reranked?.headline} | ${reviewed?.headline}`;
+      const facts: WorkFacts = { focus: null, constraints: [], locators: [label], hypotheses: [], pendingHypotheses: [], decidedHypotheses: [], sources: [] };
+      const reranked = sceneFor("EVIDENCE_RERANKER", facts, true);
+      const reviewed = sceneFor("SEMANTIC_REVIEWER", { ...facts, focus: "발사 조건" }, true);
+      return `${label}: ${reranked.title} | ${reviewed.title}`;
     });
     expect([...lines, ...withLocators]).toMatchInlineSnapshot(`
       [
@@ -288,8 +290,8 @@ describe("one-line texts", () => {
       {
         "published": [
           "action|단계 완료|2초 · 맥락 2.0KB · 모델 2회|false",
-          "action|원문 위치|p.3 · 표 3|false",
-          "action|원문 위치||false",
+          "action|원문 위치|p.3|false",
+          "action|원문 위치|원문 위치 2|false",
           "action|가설 검토|가설 4개 · 검토 4개|false",
           "action|가설 검토|가설 4개 중 1개만 결정|false",
           "action|가설 검토|가설 4개 · 결정은 아직 없습니다|false",
@@ -362,8 +364,8 @@ describe("one-line texts", () => {
     expect({ reasons, labels: evidenceLabels(inPhase("EVIDENCE_FOCUS", {}, RICH_DRAFT)) }).toMatchInlineSnapshot(`
       {
         "labels": [
-          "p.6 70.6",
-          "p.8 GNC",
+          "p.6",
+          "p.8",
         ],
         "reasons": [
           "HTTP 429: 계정 사용 한도로 모델 호출이 거절됐습니다.",

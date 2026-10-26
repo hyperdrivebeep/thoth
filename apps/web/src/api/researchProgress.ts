@@ -3,6 +3,7 @@ import { message as formatMessage } from "../i18n/formatMessages";
 import { getLocale } from "../i18n/locale";
 import type { ResearchStatus } from "./research";
 import { sourceCardTitle } from "../sourceDisplay";
+import { progressEvidenceLabels, progressSourceActionLocation } from "./progressEvidenceLocations";
 import {
   formatDuration,
   ACTION_COPY,
@@ -10,7 +11,6 @@ import {
   compactPayload,
   formatBytes,
   hypothesisActionPayload,
-  locatorPayload,
   missingFor,
   modelActionPayload,
   sceneFor,
@@ -146,7 +146,7 @@ function workFacts(status: ResearchStatus, sourceUris: string[] = []): WorkFacts
   return {
     focus: extractFocus(status),
     constraints: extractConstraints(status),
-    locators: evidenceLabels(status).map((label) => label.replace(/\s+/g, " ").trim()),
+    locators: evidenceLabels(status).slice(0, 2),
     hypotheses,
     pendingHypotheses: unique(pending),
     decidedHypotheses: unique(decided),
@@ -155,24 +155,13 @@ function workFacts(status: ResearchStatus, sourceUris: string[] = []): WorkFacts
 }
 
 export function evidenceLabels(status?: ResearchStatus): string[] {
-  const draft = asRecord(status?.attempt?.draft_progress);
-  const focus = asRecord(draft?.evidence_focus);
-  return asList(focus?.locators)
-    .map((item) => {
-      const locator = asRecord(item);
-      if (!locator) {
-        return "";
-      }
-      const page = locator.page == null ? "" : `p.${locator.page} `;
-      const text = locator.exact_text == null ? "" : String(locator.exact_text);
-      return `${page}${text}`.trim();
-    })
-    .filter((label) => label.length > 0);
+  return progressEvidenceLabels(status);
 }
 
 function evidenceTotal(status?: ResearchStatus): number | null {
   const focus = asRecord(asRecord(status?.attempt?.draft_progress)?.evidence_focus);
-  return numberOrNull(focus?.total);
+  const total = numberOrNull(focus?.total);
+  return total !== null && Number.isSafeInteger(total) && total >= 0 ? total : null;
 }
 
 function hypothesisCount(status?: ResearchStatus): number | null {
@@ -260,6 +249,7 @@ function timelineFromPublished(status: ResearchStatus, sourceUris: string[], fac
   }
   const events: TimelineEvent[] = [];
   let insertedSources = false;
+  let sourceReadIndex = 0;
   published.forEach((event, index) => {
     const live = event.live === true;
     if (live && !insertedSources) {
@@ -303,7 +293,7 @@ function timelineFromPublished(status: ResearchStatus, sourceUris: string[], fac
         actionEvent(
           `event-action-${event.seq ?? index}`,
           "source_read",
-          locatorPayload(payload.page, payload.exact_text),
+          progressSourceActionLocation(status, payload, sourceReadIndex++),
           live,
         ),
       );
@@ -401,7 +391,9 @@ export function liveResearchProgress(
   const reviews = reviewCount(status);
   const facts = workFacts(status, sourceUris);
   const current = sceneFor(phase, facts, running);
-  const missing = missingFor(status, facts, labels, total, hypotheses, reviews);
+  const missing = phase === "EVIDENCE_FOCUS" && labels.length === 0 && total === null
+    ? formatMessage("progressLocationUnavailable")
+    : missingFor(status, facts, labels, total, hypotheses, reviews);
   const liveText = missing ? `${current.title} ${missing}` : current.title;
   let events =
     timelineFromPublished(status, sourceUris, facts) ?? timelineFromStages(status, sourceUris, facts);

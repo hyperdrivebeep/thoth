@@ -20,9 +20,19 @@ export function ResearchLiveProgress({
   }
   const notes = progress.events.filter(event => event.kind === "note" && !event.live).map(event=>event.text);
   const contextNotes = [...new Set([notes[0],notes.at(-1)])].filter((note):note is string=>Boolean(note)&&note!==progress.current.title);
-  const evidenceScope = progress.evidenceLabels.length>0
-    ? `${progress.evidenceLabels.slice(0,2).join(" · ")}${progress.evidenceLabels.length>2?formatMessage("moreLocations", progress.evidenceLabels.length-2):""}`
-    : progress.evidenceTotal===0 ? t("liveProgress.noCandidates") : null;
+  const shown = progress.evidenceLabels.length;
+  const coverage = progress.evidenceTotal != null && progress.evidenceTotal > shown
+    ? formatMessage("progressLocationCoverage", shown, progress.evidenceTotal) : null;
+  let evidenceScope: string | null = null;
+  if (shown > 0) {
+    const locations = progress.evidenceLabels.slice(0, 2).join(" · ");
+    const remaining = shown > 2 ? formatMessage("moreLocations", shown - 2) : "";
+    evidenceScope = [locations + remaining, coverage].filter(Boolean).join(" · ");
+  } else if (progress.evidenceTotal === 0) {
+    evidenceScope = t("liveProgress.noCandidates");
+  } else if (coverage) {
+    evidenceScope = `${formatMessage("progressLocationUnavailable")} · ${coverage}`;
+  }
   const judgement = progress.hypothesisCount==null ? progress.missing
     : formatMessage("hypothesesReviewed", progress.hypothesisCount, progress.reviewCount??0);
   return (
