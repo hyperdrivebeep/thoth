@@ -152,9 +152,50 @@ async def test_job_termination_also_ends_synthetic_grandchild(tmp_path: Path) ->
         assert marker.exists()
         grandchild_pid = int(marker.read_text())
     finally:
+        deadline = time.monotonic() + 3.0
         child.kill()
-        await asyncio.wait_for(child.wait(), 3.0)
+        await asyncio.wait_for(child.wait(), max(0.0, deadline - time.monotonic()))
+        assert await asyncio.wait_for(
+            asyncio.to_thread(child.stop_and_confirm, deadline),
+            max(0.0, deadline - time.monotonic()),
+        )
     assert _is_gone(grandchild_pid)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("consumer", ["model", "login"])
+async def test_stop_tracks_grandchild_created_immediately_before_stop(
+    tmp_path: Path, consumer: str
+) -> None:
+    from thoth.adapters.models.claude_code import (
+        _stop_process_tree,  # pyright: ignore[reportPrivateUsage]
+    )
+    from thoth.adapters.models.claude_code_login import (
+        _JobLoginChild,  # pyright: ignore[reportPrivateUsage]
+    )
+    from thoth.adapters.models.windows_process_job import spawn_windows_job
+
+    code = (
+        "import subprocess,sys,time; "
+        "p=subprocess.Popen([sys.executable,'-c','import time; time.sleep(30)']); "
+        "print(p.pid,flush=True); time.sleep(30)"
+    )
+    child = spawn_windows_job((sys.executable, "-c", code), _synthetic_env(), tmp_path)
+    try:
+        # A complete line signals creation; no sleep waits for the grandchild to initialize.
+        marker = await asyncio.wait_for(asyncio.to_thread(child.stdout.readline), 5)
+        grandchild_pid = int(marker)
+        stopped = (
+            await _stop_process_tree(child)
+            if consumer == "model"
+            else await asyncio.to_thread(_JobLoginChild(child).kill_tree)
+        )
+        assert stopped
+        assert child.returncode is not None and _is_gone(grandchild_pid)
+        assert child.stdin.closed and child.stdout.closed and child.stderr.closed
+    finally:
+        if child.returncode is None:
+            await _stop_process_tree(child)
 
 
 @pytest.mark.asyncio
