@@ -41,6 +41,9 @@ class ReceiveStats:
     last_transport_phase: str | None = None
     local_cancel_requested: bool = False
     transport_closed: bool | None = None
+    # Whether the response's own close finished; kept for the observation's transport_closed, which
+    # also needs the client's close. Not a field of the stored observation.
+    response_closed: bool | None = None
     last_receive_at: float | None = None
     terminal_at: float | None = None
     diagnostic_fields: dict[str, object] = field(default_factory=dict, repr=False)

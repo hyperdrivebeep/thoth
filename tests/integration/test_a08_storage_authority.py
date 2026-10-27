@@ -729,7 +729,10 @@ async def test_http_session_expiry_during_evaluation_holds_activation(
             tokens=SecureSessionTokenIssuer(),
             clock=SystemClock(),
             ids=UuidIdGenerator(),
-            lifetime=timedelta(seconds=30),
+            # The session must not expire from wall time: the second request runs a whole
+            # evaluation, and how long that takes depends on the machine. Expiry is injected
+            # below by moving the clock.
+            lifetime=timedelta(hours=1),
         )
         issued = await auth.issue_http_session(
             actor_id="human:evaluation-owner",

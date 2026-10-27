@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import threading
 import time
 from dataclasses import replace
 from pathlib import Path
@@ -9,7 +10,7 @@ from pathlib import Path
 import httpx
 import pytest
 from tests.unit.models.test_oauth_http_rejection import CountingBoundary
-from tests.unit.models.test_oauth_receive_observation import model_request
+from tests.unit.models.test_oauth_receive_observation import Deadlines, model_request
 
 from thoth.adapters.models.claude_messages import ClaudeMessagesHold, ClaudeMessagesModel
 from thoth.adapters.models.claude_oauth import ClaudeOAuthBroker, ClaudeOAuthHold
@@ -302,9 +303,12 @@ async def test_auth_preparation_consumes_whole_call_deadline_without_model_post(
     broker = ready_broker(tmp_path)
     calls: list[httpx.Request] = []
     original = broker.execution_session
+    entered, release = threading.Event(), threading.Event()
 
     def slow_session():
-        time.sleep(0.22)
+        # The credential read blocks until the test releases it; the deadline is moved, not waited.
+        entered.set()
+        assert release.wait(10)
         return original()
 
     monkeypatch.setattr(broker, "execution_session", slow_session)
@@ -314,7 +318,8 @@ async def test_auth_preparation_consumes_whole_call_deadline_without_model_post(
         return reply()
 
     model = ClaudeMessagesModel(broker, model=MODEL, transport=httpx.MockTransport(handler))
-    boundary = CountingBoundary()
+    boundary = BoundedBoundary()
+    clock = Deadlines(monkeypatch)
     work = ResearchWork(
         RevisionRef(
             project_id="test",
@@ -329,9 +334,17 @@ async def test_auth_preparation_consumes_whole_call_deadline_without_model_post(
     )
     token = research_work.set(work)
     try:
+        task = asyncio.create_task(
+            model.structured(replace(model_request(), model_settings=settings(None)))
+        )
+        assert await asyncio.to_thread(entered.wait, 10)
+        # The call's 5 s deadline passes while the credential read is still running.
+        clock.expire(6)
+        release.set()
         with pytest.raises(ClaudeMessagesHold, match="CLAUDE_AUTH_PREPARATION_DEADLINE"):
-            await model.structured(replace(model_request(), model_settings=settings(None)))
+            await task
     finally:
+        release.set()
         research_work.reset(token)
     assert calls == [] and boundary.reservations == 0
 

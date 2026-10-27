@@ -7,6 +7,10 @@ from typing import cast
 
 import pytest
 from pydantic import BaseModel
+from tests.integration.progress_wait import (
+    wait_for_event_while_progressing,
+    wait_while_progressing,
+)
 from tests.integration.storage_coverage_helpers import request, value
 from tests.integration.test_research_focus_basis import research_host
 from tests.integration.test_research_request_v2 import ControlledResearchModel, setup
@@ -212,8 +216,14 @@ async def test_normal_model_phase_preserves_repair_authority_draft_and_terminal_
         )
         operation_id, thread_id = accepted["operation_id"], accepted["thread_id"]
         assert isinstance(operation_id, str) and isinstance(thread_id, str)
+
+        def moved() -> object:
+            return len(model.requests), len(model.calls)
+
         if mode.endswith("-cancel"):
-            await asyncio.wait_for(model.blocked.wait(), timeout=15)
+            await wait_for_event_while_progressing(
+                model.blocked, moved, label="the research run reaches the cancelled model phase"
+            )
             cancelled = value(
                 await runtime.bus.dispatch(
                     request(
@@ -224,7 +234,7 @@ async def test_normal_model_phase_preserves_repair_authority_draft_and_terminal_
                 )
             )
             assert cancelled["cancelled"] is True
-        await asyncio.wait_for(runtime.bus.drain(), timeout=30)
+        await wait_while_progressing(runtime.bus.drain(), moved, label="drain after the request")
         operation = runtime.bus.read_operation(operation_id)
         assert operation is not None
         expected_state = (
