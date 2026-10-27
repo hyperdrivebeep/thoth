@@ -1,6 +1,6 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +27,8 @@ class PolicyTestModel(DynamicA02Model):
         self.metered = metered
         self.fail = False
         self.guidance: list[str | None] = []
+        # The span ids each model call was given, in call order.
+        self.evidence: list[tuple[str, ...]] = []
 
     def quote_max_cost_microunits[T: BaseModel](self, request: ModelRequest[T]) -> int | None:
         del request
@@ -35,6 +37,7 @@ class PolicyTestModel(DynamicA02Model):
     async def structured[T: BaseModel](self, request: ModelRequest[T]) -> ModelResult[T]:
         guidance = request.context_pack.policy_hints.get("behavior_guidance")
         self.guidance.append(guidance if isinstance(guidance, str) else None)
+        self.evidence.append(tuple(span.span_id for span in request.context_pack.evidence))
         if self.fail:
             raise ModelExecutionHold("injected policy regression")
         return await super().structured(request)
@@ -48,6 +51,8 @@ class ExposureHarness:
     thread: str
     role: str
     connector: A02Connector
+    # The pair result the exposure rests on, as the evaluation run returned it.
+    pair_result: dict[str, Any] = field(default_factory=lambda: {})
 
     async def call(self, method: str, key: str, payload: dict[str, object]) -> JsonRpcResponse:
         return await self.pair.runtime.bus.dispatch(
@@ -134,6 +139,83 @@ class ExposureHarness:
         )
 
 
+async def prepare_exposure(
+    h: PairHarness,
+    *,
+    stage: str,
+    scope: dict[str, str],
+    duration: int = 300,
+    requests: int = 3,
+) -> tuple[dict[str, Any], str, dict[str, Any]]:
+    """Assign the owner, run the evaluation pair, assess it and prepare one exposure.
+
+    Returns the prepared exposure, the owner's role assignment and the pair result it rests on.
+    """
+    project = value(
+        await h.runtime.bus.dispatch(
+            request("project/read", "project-before-role", {"project_id": h.project})
+        )
+    )
+    role = value(
+        await h.runtime.bus.dispatch(
+            request(
+                "project/role/assign",
+                "role",
+                {
+                    "project_id": h.project,
+                    "expected_revision": project["revision"],
+                    "actor_id": "human:policy-owner",
+                    "role": "improvement-owner",
+                    "scope": "PROJECT",
+                    "authority_tags": ["CAP_READ", "CAP_WRITE"],
+                },
+            )
+        )
+    )["role"]["role_assignment_id"]
+    result = (await h.run())["pair"]["result"]
+    value(
+        await h.runtime.bus.dispatch(
+            request(
+                "improvement/evaluation/assess",
+                "assess",
+                {
+                    "project_id": h.project,
+                    "evaluation_plan_id": h.plan["record_id"],
+                    "expected_evaluation_revision": 1,
+                    "result_refs": [result["pair_id"]],
+                    "evaluator_result_refs": [result["result_digest"]],
+                    "exposure_ledger_ref": result["exposure_id"],
+                },
+            )
+        )
+    )
+    exposure = value(
+        await h.runtime.bus.dispatch(
+            request(
+                "improvement/exposure/prepare",
+                "prepare",
+                {
+                    "project_id": h.project,
+                    "improvement_revision_id": h.proposal["record_id"],
+                    "evaluation_plan_id": h.plan["record_id"],
+                    "requested_exposure_state": stage,
+                    "scope": scope,
+                    "duration_budget": {
+                        "duration_seconds": duration,
+                        "max_requests": requests,
+                        "max_model_calls": 24,
+                        "max_billed_cost_microunits": 0,
+                    },
+                    "stop_rollback_contract": {
+                        "rollback_target_digest": h.plan["payload"]["baseline_digest"]
+                    },
+                },
+            )
+        )
+    )["runtime_exposure"]
+    return exposure, role, result
+
+
 @asynccontextmanager
 async def exposure_harness(
     workspace: Path,
@@ -142,27 +224,33 @@ async def exposure_harness(
     metered: bool = True,
     duration: int = 300,
     requests: int = 3,
+    policies: tuple[dict[str, object], dict[str, object]] | None = None,
+    cases: list[dict[str, object]] | None = None,
+    component: BehaviorArtifactKind = BehaviorArtifactKind.PROMPT_BUNDLE,
+    target_component: str = "PROMPT",
 ) -> AsyncGenerator[ExposureHarness]:
     model, connector = PolicyTestModel(metered=metered), A02Connector()
-    policies = (
-        {"kind": "PROMPT_BUNDLE", "version": "2.0.0", "task_guidance": "baseline-guidance"},
-        {"kind": "PROMPT_BUNDLE", "version": "2.0.0", "task_guidance": "candidate-guidance"},
-    )
-    cases: list[dict[str, object]] = [
-        {
-            "public": {"case_id": "prompt", "payload": {}},
-            "expected_output": {"behavior_guidance": "candidate-guidance"},
-            "axis": "quality",
-        }
-    ]
+    if policies is None:
+        policies = (
+            {"kind": "PROMPT_BUNDLE", "version": "2.0.0", "task_guidance": "baseline-guidance"},
+            {"kind": "PROMPT_BUNDLE", "version": "2.0.0", "task_guidance": "candidate-guidance"},
+        )
+    if cases is None:
+        cases = [
+            {
+                "public": {"case_id": "prompt", "payload": {}},
+                "expected_output": {"behavior_guidance": "candidate-guidance"},
+                "axis": "quality",
+            }
+        ]
     async with pair_harness(
         workspace,
         {},
         {},
         cases,
         policy_pair=policies,
-        component=BehaviorArtifactKind.PROMPT_BUNDLE,
-        target_component="PROMPT",
+        component=component,
+        target_component=target_component,
         executor_id="BEHAVIOR_COMPONENT_SUBPROCESS_V1",
         runtime_options={
             "model_resolver": StaticModelResolver(model),
@@ -220,66 +308,11 @@ async def exposure_harness(
                 )
             )
         )
-        project = value(
-            await h.runtime.bus.dispatch(
-                request("project/read", "project-before-role", {"project_id": h.project})
-            )
+        exposure, role, result = await prepare_exposure(
+            h,
+            stage=stage,
+            scope={"environment": "LOCAL", "thread_id": thread},
+            duration=duration,
+            requests=requests,
         )
-        role = value(
-            await h.runtime.bus.dispatch(
-                request(
-                    "project/role/assign",
-                    "role",
-                    {
-                        "project_id": h.project,
-                        "expected_revision": project["revision"],
-                        "actor_id": "human:policy-owner",
-                        "role": "improvement-owner",
-                        "scope": "PROJECT",
-                        "authority_tags": ["CAP_READ", "CAP_WRITE"],
-                    },
-                )
-            )
-        )["role"]["role_assignment_id"]
-        result = (await h.run())["pair"]["result"]
-        value(
-            await h.runtime.bus.dispatch(
-                request(
-                    "improvement/evaluation/assess",
-                    "assess",
-                    {
-                        "project_id": h.project,
-                        "evaluation_plan_id": h.plan["record_id"],
-                        "expected_evaluation_revision": 1,
-                        "result_refs": [result["pair_id"]],
-                        "evaluator_result_refs": [result["result_digest"]],
-                        "exposure_ledger_ref": result["exposure_id"],
-                    },
-                )
-            )
-        )
-        exposure = value(
-            await h.runtime.bus.dispatch(
-                request(
-                    "improvement/exposure/prepare",
-                    "prepare",
-                    {
-                        "project_id": h.project,
-                        "improvement_revision_id": h.proposal["record_id"],
-                        "evaluation_plan_id": h.plan["record_id"],
-                        "requested_exposure_state": stage,
-                        "scope": {"environment": "LOCAL", "thread_id": thread},
-                        "duration_budget": {
-                            "duration_seconds": duration,
-                            "max_requests": requests,
-                            "max_model_calls": 24,
-                            "max_billed_cost_microunits": 0,
-                        },
-                        "stop_rollback_contract": {
-                            "rollback_target_digest": h.plan["payload"]["baseline_digest"]
-                        },
-                    },
-                )
-            )
-        )["runtime_exposure"]
-        yield ExposureHarness(h, model, exposure, thread, role, connector)
+        yield ExposureHarness(h, model, exposure, thread, role, connector, result)

@@ -16,8 +16,30 @@ from typing import Literal
 from thoth.domain.behavior_artifact import BehaviorArtifactKind
 from thoth.domain.behavior_policy import RetrievalLanePolicy, RetrievalPolicy
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
+from thoth.domain.lane_scoring import (
+    BIGRAM_VERSION,
+    BM25_VERSION,
+    bigram_terms,
+    bm25_scores,
+    identifier_terms,
+)
+from thoth.domain.query_identifiers import (
+    SCANNER_VERSION,
+    QueryIdentifier,
+    fold,
+    occurs,
+    scan_query,
+)
+from thoth.domain.retrieval_terms import KOREAN_FUNCTION_WORDS as KOREAN_FUNCTION_WORDS
+from thoth.domain.retrieval_terms import KOREAN_PAIR as KOREAN_PAIR
+from thoth.domain.retrieval_terms import MIN_TERM as MIN_TERM
+from thoth.domain.structure_groups import GROUPING_VERSION, CatalogGroup
+from thoth.domain.structure_groups import block_key as pointer_block_key
 
 LEXICAL_SUBSTRING_V1 = "LEXICAL_SUBSTRING_V1"
+PROTECTED_EXACT = "PROTECTED_EXACT"
+GROUPED_BM25 = "GROUPED_BM25"
+CHAR_BIGRAM = "CHAR_BIGRAM"
 # The algorithm that evaluates a retrieval policy. It is recorded in every evaluation output and
 # is part of the identity of a retrieval comparison, so a result made by another algorithm is
 # never taken for this one.
@@ -29,30 +51,6 @@ def evaluation_algorithm(component: BehaviorArtifactKind) -> str | None:
     return RETRIEVAL_EVALUATOR_ID if component == BehaviorArtifactKind.RETRIEVAL_POLICY else None
 
 
-MIN_TERM = 3
-KOREAN_PAIR = re.compile(r"[가-힣]{2}")
-# Only the newly admitted two-syllable words are filtered. These grammatical/context
-# words add little topic information; no domain words or scenario-specific exceptions.
-KOREAN_FUNCTION_WORDS = frozenset(
-    {
-        "경우",
-        "관련",
-        "때문",
-        "또는",
-        "대한",
-        "대해",
-        "따라",
-        "또한",
-        "위한",
-        "위해",
-        "이번",
-        "이런",
-        "저런",
-        "통해",
-        "에서",
-        "으로",
-    }
-)
 MIN_SPAN_CHARS = 24
 # A block of short key-value lines is read together only while it stays small.
 MAX_BLOCK_SPANS = 20
@@ -68,6 +66,8 @@ class CatalogContext:
     protected_refs: frozenset[str]
     all_observed: bool
     structure_count: int
+    # Structure groups of the sources the request may read; only GROUPED_BM25 reads them.
+    groups: tuple[CatalogGroup, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -86,6 +86,9 @@ class LaneSelection:
     eligible: tuple[EvidenceSpan, ...]
     # Why the whole-catalog mode was refused when that is more than "not applicable".
     limitations: tuple[str, ...] = ()
+    # Which lane version (and which rule set under it) ranked this selection; empty for the
+    # original lane, whose records are unchanged.
+    provenance: tuple[tuple[str, str], ...] = ()
 
 
 type Lane = Callable[[RetrievalRequest, tuple[EvidenceSpan, ...]], tuple[EvidenceSpan, ...]]
@@ -120,11 +123,7 @@ def _term_hits(text: str, terms: set[str]) -> int:
 
 def block_key(span: EvidenceSpan) -> str | None:
     """The key path that groups a structured line with the lines under the same parent key."""
-    pointer = span.locator.json_pointer
-    if not pointer or not pointer.startswith("/"):
-        return None
-    parent, _, _ = pointer.rpartition("/")
-    return parent or pointer
+    return pointer_block_key(span.locator.json_pointer)
 
 
 def _is_chrome(span: EvidenceSpan) -> bool:
@@ -214,7 +213,176 @@ def lexical_substring_v1(
     return tuple(_interleave_artifacts([span for span in ranked if span.span_id not in pinned]))
 
 
-LANES: dict[str, Lane] = {LEXICAL_SUBSTRING_V1: lexical_substring_v1}
+def _hits(text: str, identifiers: tuple[QueryIdentifier, ...]) -> int:
+    """Specificity-weighted identifier matches: the written form counts 2, a shorter form 1."""
+    score = 0
+    for identifier in identifiers:
+        for rank, needle in enumerate(identifier.needles):
+            if occurs(text, needle, identifier.kind):
+                score += 2 if rank == 0 else 1
+                break
+    return score
+
+
+def protected_exact_v1(
+    request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
+) -> tuple[EvidenceSpan, ...]:
+    """Spans that hold the question's identifiers, found by grammar and matched at identifier edges.
+
+    The question is scanned before anything is split; the Latin and digit pieces that remain are
+    matched at the same edges, and Hangul pieces by substring under the earlier two-syllable rule.
+    A span with no match is not returned: this lane is for exactness and is meant to be combined.
+    """
+    fields = [scan_query(text) for text in (request.question, *request.queries)]
+    identifiers = tuple({(i.kind, i.needles): i for f in fields for i in f.identifiers}.values())
+    latin = tuple(
+        dict.fromkeys(
+            fold(token.text)
+            for f in fields
+            for token in f.split_tokens
+            if token.script != "HANGUL" and len(token.text) >= MIN_TERM
+        )
+    )
+    hangul = tuple(
+        dict.fromkeys(
+            fold(token.text)
+            for f in fields
+            for token in f.split_tokens
+            if token.script == "HANGUL"
+            and (
+                len(token.text) >= MIN_TERM
+                or (KOREAN_PAIR.fullmatch(token.text) and token.text not in KOREAN_FUNCTION_WORDS)
+            )
+        )
+    )
+    pinned = set(request.pinned_refs)
+    exact = {
+        s.span_id
+        for s in eligible
+        if s.span_id in request.question or s.artifact_id in request.question
+    }
+    scored: list[tuple[tuple[object, ...], EvidenceSpan]] = []
+    for span in eligible:
+        if span.span_id in pinned:
+            continue
+        folded = _folded(span.exact_text)
+        found = (
+            _hits(folded, identifiers),
+            sum(1 for word in latin if occurs(folded, word, "MIXED")),
+            sum(1 for word in hangul if word in folded),
+        )
+        if not any(found) and span.span_id not in exact:
+            continue
+        key = (
+            span.span_id not in exact,
+            *(-count for count in found),
+            span.artifact_id,
+            span.locator.page or 0,
+            span.locator.line or 0,
+            span.span_id,
+        )
+        scored.append((key, span))
+    scored.sort(key=lambda item: item[0])
+    return tuple(_interleave_artifacts([span for _, span in scored]))
+
+
+def _position(span: EvidenceSpan) -> tuple[object, ...]:
+    return (span.artifact_id, span.locator.page or 0, span.locator.line or 0, span.span_id)
+
+
+def _ranked_units(
+    units: list[tuple[tuple[EvidenceSpan, ...], tuple[EvidenceSpan, ...]]],
+    docs: list[list[str]],
+    terms: list[str],
+    pinned: set[str],
+) -> tuple[EvidenceSpan, ...]:
+    """Units best first: score, then where the unit starts, then its number. Each unit gives its
+    title spans and then its body spans; a span already given or pinned is skipped."""
+    scores = bm25_scores(docs, terms)
+    order = sorted(
+        (index for index, score in enumerate(scores) if score > 0),
+        key=lambda i: (-scores[i], _position(units[i][1][0]), i),
+    )
+    given: set[str] = set(pinned)
+    out: list[EvidenceSpan] = []
+    for index in order:
+        title, body = units[index]
+        for span in (*title, *body):
+            if span.span_id not in given:
+                given.add(span.span_id)
+                out.append(span)
+    return tuple(out)
+
+
+def grouped_bm25_v1(
+    request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
+) -> tuple[EvidenceSpan, ...]:
+    """Structure groups ranked by BM25 over their title and body; a span with no group is a unit.
+
+    N and the document frequencies are those of the units of this request's eligible spans. A
+    group scores with the title above it, so a row of numbers is found through its version title,
+    table head or heading. Spans come back in the order title first, then body in document order.
+    """
+    by_id = {s.span_id: s for s in eligible}
+    groups = () if request.catalog is None else request.catalog.groups
+    units: list[tuple[tuple[EvidenceSpan, ...], tuple[EvidenceSpan, ...]]] = []
+    taken: set[str] = set()
+    for group in groups:
+        body = tuple(by_id[r] for r in group.body_refs if r in by_id and r not in taken)
+        if not body:
+            continue
+        taken.update(s.span_id for s in body)
+        title = tuple(by_id[r] for r in group.title_refs if r in by_id)
+        units.append((title, body))
+    units.extend(((), (s,)) for s in eligible if s.span_id not in taken)
+    docs = [
+        [
+            term
+            for span in {s.span_id: s for s in (*title, *body)}.values()
+            for term in identifier_terms(span.exact_text)
+        ]
+        for title, body in units
+    ]
+    terms = [t for text in (request.question, *request.queries) for t in identifier_terms(text)]
+    return _ranked_units(units, docs, terms, set(request.pinned_refs))
+
+
+def char_bigram_v1(
+    request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
+) -> tuple[EvidenceSpan, ...]:
+    """Single spans ranked by BM25 over Hangul syllable bigrams and symbol-preserving words."""
+    units = [((), (s,)) for s in eligible]
+    docs = [list(bigram_terms(s.exact_text)) for s in eligible]
+    terms = [t for text in (request.question, *request.queries) for t in bigram_terms(text)]
+    return _ranked_units(units, docs, terms, set(request.pinned_refs))
+
+
+LANES: dict[str, Lane] = {}
+# A lane is its id and its version together: a policy names both, and a lane whose rules change
+# is registered under a new version, so the same policy payload can never select differently.
+LANE_VERSIONS: dict[str, str] = {}
+LANE_PROVENANCE: dict[str, tuple[tuple[str, str], ...]] = {}
+
+
+def register_lane(
+    lane_id: str, version: str, lane: Lane, provenance: tuple[tuple[str, str], ...] = ()
+) -> None:
+    LANES[lane_id] = lane
+    LANE_VERSIONS[lane_id] = version
+    LANE_PROVENANCE[lane_id] = provenance
+
+
+register_lane(LEXICAL_SUBSTRING_V1, "1.0.0", lexical_substring_v1)
+register_lane(PROTECTED_EXACT, "1.0.0", protected_exact_v1, (("scanner", SCANNER_VERSION),))
+register_lane(
+    GROUPED_BM25,
+    "1.0.0",
+    grouped_bm25_v1,
+    (("grouping", GROUPING_VERSION), ("scoring", BM25_VERSION), ("scanner", SCANNER_VERSION)),
+)
+register_lane(
+    CHAR_BIGRAM, "1.0.0", char_bigram_v1, (("scoring", BM25_VERSION), ("terms", BIGRAM_VERSION))
+)
 
 
 def select_retrieval_context(
@@ -231,6 +399,13 @@ def select_retrieval_context(
     lane = LANES.get(lane_id)
     if lane is None:
         raise ValueError("RETRIEVAL_LANE_UNKNOWN")
+    named = policy.lanes[0] if isinstance(policy, RetrievalLanePolicy) else None
+    if (
+        named is not None
+        and named.lane_id == lane_id
+        and LANE_VERSIONS.get(lane_id) != named.lane_version
+    ):
+        raise ValueError("RETRIEVAL_LANE_VERSION_UNKNOWN")
     eligible = connected_retrieval_spans(request.evidence)
     complete, limitations = full_catalog(eligible, request.catalog, policy)
     if complete is not None:
@@ -249,6 +424,13 @@ def select_retrieval_context(
         selected.append(span)
         size += len(span.exact_text)
     observed = request.catalog is not None and request.catalog.all_observed
+    extra = LANE_PROVENANCE.get(lane_id, ())
+    version = LANE_VERSIONS.get(lane_id, "")
+    provenance = (("lane_id", lane_id), ("lane_version", version), *extra)
     return LaneSelection(
-        tuple(selected), "LEXICAL" if observed else "LEGACY", eligible, limitations
+        tuple(selected),
+        "LEXICAL" if observed else "LEGACY",
+        eligible,
+        limitations,
+        provenance if extra else (),
     )

@@ -1,9 +1,16 @@
 """Bounded executable policies; fixed authority and scientific guards stay outside them."""
 
 import re
-from typing import Annotated, Literal, cast
+from typing import Annotated, Any, Literal, cast
 
-from pydantic import Discriminator, Field, Tag, model_validator
+from pydantic import (
+    Discriminator,
+    Field,
+    SerializerFunctionWrapHandler,
+    Tag,
+    model_serializer,
+    model_validator,
+)
 
 from thoth.domain.base import DomainModel
 from thoth.domain.enums import AuthorityState, CutoffState
@@ -24,10 +31,16 @@ class RetrievalBehaviorPolicy(DomainModel):
 
 
 class RetrievalLaneSpec(DomainModel):
-    """One named ranking rule of a retrieval policy. Only the rule the research path has always
-    used exists so far; further rules are added to this set when they are implemented."""
+    """One named ranking rule of a retrieval policy.
 
-    lane_id: Literal["LEXICAL_SUBSTRING_V1"] = "LEXICAL_SUBSTRING_V1"
+    The rule the research path has always used is the default, so a stored policy that names it
+    keeps its serialization and digest. The lane version is part of the policy: a lane whose rules
+    change is registered under a new version, and a policy naming a version the code does not
+    register is refused at selection."""
+
+    lane_id: Literal["LEXICAL_SUBSTRING_V1", "PROTECTED_EXACT", "GROUPED_BM25", "CHAR_BIGRAM"] = (
+        "LEXICAL_SUBSTRING_V1"
+    )
     lane_version: Literal["1.0.0"] = "1.0.0"
 
 
@@ -196,13 +209,34 @@ def workflow_repair_decision(policy: WorkflowBehaviorPolicy, needs_repair: bool)
     return "REPAIR" if policy.max_semantic_repairs else "HELD"
 
 
+class RetrievalGroupInput(DomainModel):
+    """One structure group of an evaluation case: span ids that title it and span ids it holds."""
+
+    kind: Literal["SECTION", "FENCE", "LIST", "BLOCK"]
+    title_refs: tuple[str, ...] = Field(default=(), max_length=200)
+    body_refs: tuple[str, ...] = Field(min_length=1, max_length=200)
+
+
 class RetrievalCatalogInput(DomainModel):
-    """What the structure observation says about the spans of an evaluation case."""
+    """What the structure observation says about the spans of an evaluation case.
+
+    The field "groups" is written only when a comparison uses GROUPED_BM25. When it is empty it is
+    not serialized, so a case that never named groups has the bytes, the digest and the comparison
+    identity it always had.
+    """
 
     ordered_refs: tuple[str, ...] = Field(default=(), max_length=20_000)
     protected_refs: tuple[str, ...] = Field(default=(), max_length=20_000)
     all_observed: bool = False
     structure_count: int = Field(default=0, ge=0)
+    groups: tuple[RetrievalGroupInput, ...] = Field(default=(), max_length=20_000)
+
+    @model_serializer(mode="wrap")
+    def _omit_empty_groups(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        data = cast(dict[str, Any], handler(self))
+        if not self.groups:
+            data.pop("groups", None)
+        return data
 
 
 class RetrievalBehaviorInput(DomainModel):

@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-27T09:17:34.240551+00:00",
+  "created_at": "2026-10-27T17:40:03.252982+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -2128,13 +2128,13 @@
     },
     {
       "path": "docs/architecture/evidence-context.md",
-      "sha256": "bb34668fd2d936fa8b8933fbbc4aff245e76123a072a72e5fbea2fcf5560b516",
-      "bytes": 5056
+      "sha256": "4c16d858f32d18876704afe05502297504162226cde64969ea91ed4f5c4bc9b0",
+      "bytes": 5238
     },
     {
       "path": "docs/architecture/extension-point-catalog.md",
-      "sha256": "531669f121dedf742f8025642f81b80c306bbc605169904aeec51842dbcba584",
-      "bytes": 6383
+      "sha256": "aef9cc76ce0f79476ee5b360ee0fa7676aa534801bfb5771070e6f64f52cc72f",
+      "bytes": 6858
     },
     {
       "path": "docs/architecture/governance-history.md",
@@ -2205,6 +2205,11 @@
       "path": "docs/architecture/research-result-producer-selection.md",
       "sha256": "7d0e527db936204b9d97b1a5d1b9e08e6ae794fde3147752d6ccf4a931a2e5a0",
       "bytes": 3411
+    },
+    {
+      "path": "docs/architecture/retrieval-lanes.md",
+      "sha256": "01e02695d153d0b62ec853894ce51f267a3e180eb78f9e92090f150dd3fdb113",
+      "bytes": 15706
     },
     {
       "path": "docs/architecture/rpc-method-catalog.md",
@@ -3488,8 +3493,8 @@
     },
     {
       "path": "src/thoth/adapters/behavior/registry.py",
-      "sha256": "10a0293e7dd5f111b34e505dfa36dd6b7ec8988f20022ddf46a7343be614482f",
-      "bytes": 7840
+      "sha256": "4b05fd7256d07f2a20ad513b1e748d7af72bdf61b9b8d92fdb18009b12c8e9f2",
+      "bytes": 8114
     },
     {
       "path": "src/thoth/adapters/behavior_catalog.py",
@@ -5113,8 +5118,8 @@
     },
     {
       "path": "src/thoth/application/services/behavior_context.py",
-      "sha256": "01bf3602248f26b1ef27ebc9331f4dac8f00c77676d268c798b0ca1abff61a4b",
-      "bytes": 7907
+      "sha256": "0c79887b96dd7ab5933f6da7963a993432ee92c95ce05497fd0407f3068c0f10",
+      "bytes": 7915
     },
     {
       "path": "src/thoth/application/services/behavior_exposure_runtime.py",
@@ -6118,13 +6123,13 @@
     },
     {
       "path": "src/thoth/application/services/research_retrieval.py",
-      "sha256": "29f4fc0332eb671191f3ac456e3350809844998de04a3c3b359f07c6e462b34a",
-      "bytes": 6590
+      "sha256": "7583dcce24d4a9c7fb1678c25b307103239edc75a225104a5ad24b5608235dac",
+      "bytes": 7989
     },
     {
       "path": "src/thoth/application/services/research_retrieval_policy.py",
-      "sha256": "3ed90d8e4c678c0ef6c3178cc039fa445c901e35bc878ff4ced507b816182bcf",
-      "bytes": 2427
+      "sha256": "a654cefc90281a2305f930c02e3f42dc51b70006e2bee9791d4ba1cd981610ee",
+      "bytes": 5022
     },
     {
       "path": "src/thoth/application/services/research_review_context.py",
@@ -6138,8 +6143,8 @@
     },
     {
       "path": "src/thoth/application/services/research_selection_context.py",
-      "sha256": "ae4bb68702d693f07b43debbcf6bb5f6006114fdf81e59b4e4203d683f7ca3a7",
-      "bytes": 4280
+      "sha256": "7d99de2660ef491849bc19968efd0d64f263bf94f23c9a2a7af933944cbd94ea",
+      "bytes": 5905
     },
     {
       "path": "src/thoth/application/services/research_source_digest.py",
@@ -6793,8 +6798,8 @@
     },
     {
       "path": "src/thoth/domain/behavior_policy.py",
-      "sha256": "0884278b33ed94eb2d465b8e5e1ad35d1315d5c8fe6e247f4f7258e6f820d5fa",
-      "bytes": 7815
+      "sha256": "4e5d372964b257fc50f6087124df88dd61f54731de890de676210ba9477f415d",
+      "bytes": 9075
     },
     {
       "path": "src/thoth/domain/canonical.py",
@@ -7062,6 +7067,11 @@
       "bytes": 4361
     },
     {
+      "path": "src/thoth/domain/lane_scoring.py",
+      "sha256": "aee00e5daf4991ba39b23b3e8e820369277d29e331cc88addbf364dcad9464a9",
+      "bytes": 3416
+    },
+    {
       "path": "src/thoth/domain/language_validation.py",
       "sha256": "d20df6d6065ac49e51a505bdb3e88cb9b19a7f3959c4060ebe54556997a7966d",
       "bytes": 681
@@ -7202,6 +7212,11 @@
       "bytes": 2778
     },
     {
+      "path": "src/thoth/domain/query_identifiers.py",
+      "sha256": "7c4f430fb49b7448141809f111ff39ec8d9f034b6d70037c197e75b895cf0285",
+      "bytes": 9505
+    },
+    {
       "path": "src/thoth/domain/r2_loop.py",
       "sha256": "258f0d2a6ab4493097cfbf98ae5a38d3da31499fac0e14fc2e16bbf49562d828",
       "bytes": 1207
@@ -7323,8 +7338,13 @@
     },
     {
       "path": "src/thoth/domain/retrieval_lane.py",
-      "sha256": "ad50c3c272abe9ea03740b8a593bf254802e513782b6a0a4ed11462775f8908a",
-      "bytes": 9098
+      "sha256": "f0d258919b3bb884c80b91a004ff0f06038706a97c38edb1880e70e0dd9f537a",
+      "bytes": 16643
+    },
+    {
+      "path": "src/thoth/domain/retrieval_terms.py",
+      "sha256": "853570cd6601e85f9d2b64bce5f4b49b8c15112854810378c27c242ee91daa79",
+      "bytes": 662
     },
     {
       "path": "src/thoth/domain/revision.py",
@@ -7350,6 +7370,11 @@
       "path": "src/thoth/domain/storage_context.py",
       "sha256": "609055ac9f97efa3416be462f2ae81bd62c26973788e19aff0997dc7bc07d298",
       "bytes": 682
+    },
+    {
+      "path": "src/thoth/domain/structure_groups.py",
+      "sha256": "054c2e74c65da39419bd2f844decb649d0b9809082be2808904325bb06b7a528",
+      "bytes": 7333
     },
     {
       "path": "src/thoth/domain/task_profile.py",
@@ -8688,8 +8713,8 @@
     },
     {
       "path": "tests/integration/behavior_exposure_helpers.py",
-      "sha256": "d7c52e1e7afe3d5158318473cd8fb00d72b25aea6a0230357662d33786038eff",
-      "bytes": 10566
+      "sha256": "b0346dfcc0ea05c568f7d0e30c71ab480d6501f09155731f7c36339680556134",
+      "bytes": 11588
     },
     {
       "path": "tests/integration/counter_clock_observation.py",
@@ -10337,6 +10362,11 @@
       "bytes": 2989
     },
     {
+      "path": "tests/integration/test_retrieval_shadow_normal_entry.py",
+      "sha256": "11f377f9ab1bbdc8c80d293d253d7125ae0abf77cd60ebb1cbc57cff137f762c",
+      "bytes": 12727
+    },
+    {
       "path": "tests/integration/test_revision_command_golden.py",
       "sha256": "78510786df1777239bda066e48642f6b9a499072bb961a6402471f7afcd3652f",
       "bytes": 13023
@@ -11117,6 +11147,11 @@
       "bytes": 6239
     },
     {
+      "path": "tests/unit/domain/test_lane_scoring.py",
+      "sha256": "8426d3b5a9a89e4900077f94167ae5444d6ba6e99d725666923159ceb33fe2fc",
+      "bytes": 2442
+    },
+    {
       "path": "tests/unit/domain/test_models.py",
       "sha256": "fc8f7cc8d4faedf4d0b8131973cace06ea0a649632e55f6f5a488e6b8eedc132",
       "bytes": 7314
@@ -11135,6 +11170,11 @@
       "path": "tests/unit/domain/test_protected_payload.py",
       "sha256": "7ec2375aebd2054f33fc57e9c0b8904c65912ef3a30c3dbf648a56a3479c111e",
       "bytes": 5391
+    },
+    {
+      "path": "tests/unit/domain/test_query_identifiers.py",
+      "sha256": "f534a93bb15409043e83ffb7088c0970641a5d8df06f9e6db77d0e912d69889e",
+      "bytes": 6085
     },
     {
       "path": "tests/unit/domain/test_receipt_evidence.py",
@@ -11162,9 +11202,19 @@
       "bytes": 5273
     },
     {
+      "path": "tests/unit/domain/test_retrieval_policy_3_0_0_digests.py",
+      "sha256": "eb8d67144785dd88e509eb4ba4f623d1054af6d2fc2e7f68f9a3d62a776eeafd",
+      "bytes": 1928
+    },
+    {
       "path": "tests/unit/domain/test_retrieval_policy_versions.py",
-      "sha256": "ff95dc7c458d0d24bad0bd0671cdb1682a421526256ad98f5ff126b4876907f0",
-      "bytes": 7757
+      "sha256": "4dbc7ec93fb77041b42d63483a27b6e572fabd8ef9c830a64b56763c36029823",
+      "bytes": 7776
+    },
+    {
+      "path": "tests/unit/domain/test_structure_groups.py",
+      "sha256": "6bc5d2efa545f2469a753779a768bc1b2b429e9fe04fb7ae04eb5d8c7e23df76",
+      "bytes": 5659
     },
     {
       "path": "tests/unit/domain/test_trace_closure.py",
@@ -11185,6 +11235,11 @@
       "path": "tests/unit/evaluators/test_evaluator_registry.py",
       "sha256": "1d3bc615622bdb37e97f0a1d85f6412caefd1b2ffc35079058e918495747ca38",
       "bytes": 4462
+    },
+    {
+      "path": "tests/unit/group_fixtures.py",
+      "sha256": "a30e4593791752bdd3d6971842790bdcc0e70e7fe71c9c35fd7b28003e72da42",
+      "bytes": 3068
     },
     {
       "path": "tests/unit/improvement/test_evaluation_integrity.py",
@@ -12112,6 +12167,11 @@
       "bytes": 5115
     },
     {
+      "path": "tests/unit/test_protected_exact_lane.py",
+      "sha256": "38a5ee31fc23d75141b97a77a4f6c25bf83723b114f76b23daaa399a3b12bc9c",
+      "bytes": 8617
+    },
+    {
       "path": "tests/unit/test_public_web_policy_reconciliation.py",
       "sha256": "253c3edb373575a0df148fbea5442ce27f75111fb4f447a18a8e4964a53dcc25",
       "bytes": 6665
@@ -12130,6 +12190,11 @@
       "path": "tests/unit/test_r2_context_preflight_contract.py",
       "sha256": "fa68a3fd92f711c96f74559a602ccdd588a403013e83fe211d3fcda81fe369de",
       "bytes": 9246
+    },
+    {
+      "path": "tests/unit/test_ranked_lanes.py",
+      "sha256": "0f30c4f3f2dae000383eb9625497ecb4e6a77face4a028647c16d8733d47ee59",
+      "bytes": 10427
     },
     {
       "path": "tests/unit/test_reference_arithmetic.py",
@@ -12202,6 +12267,11 @@
       "bytes": 6337
     },
     {
+      "path": "tests/unit/test_retrieval_evaluation_pins.py",
+      "sha256": "4226b87d844e4964a8ed78f56b058c7f40941c43ad21caece547e6fd8742ff2c",
+      "bytes": 4619
+    },
+    {
       "path": "tests/unit/test_retrieval_lane_port.py",
       "sha256": "daca53dd9cbff90cd232eff1b369d89ec62a42f6cca2f2fec77c5329a3944f4c",
       "bytes": 4771
@@ -12215,6 +12285,21 @@
       "path": "tests/unit/test_retrieval_selection_oracle.py",
       "sha256": "4f855b3c2b5b70c66682c772e5afc7df49899713350e2c9e1811879da0736471",
       "bytes": 30212
+    },
+    {
+      "path": "tests/unit/test_retrieval_shadow_held.py",
+      "sha256": "92cb3dbe19993313cc50df8463b4ca609f91c162d365665114d7675ed8baac2f",
+      "bytes": 5013
+    },
+    {
+      "path": "tests/unit/test_retrieval_shadow_replay.py",
+      "sha256": "79175eb5d4b8e7a8e2d695b1f82c88f0c0748ea7cfa99603473a21df79d42a1e",
+      "bytes": 5998
+    },
+    {
+      "path": "tests/unit/test_retrieval_source_digests.py",
+      "sha256": "baaf1cd3e9ecebbc2b5a60d78be4933e0a6524bc7203399175af3409cd422d30",
+      "bytes": 7773
     },
     {
       "path": "tests/unit/test_running_research.py",
@@ -12290,6 +12375,11 @@
       "path": "tests/unit/test_validate_synthetic_radar_demo.py",
       "sha256": "97e85877dccd5159a0285f53c31cd8b3032249dda33aedc9f5a2f389564c3324",
       "bytes": 5092
+    },
+    {
+      "path": "tests/unit/test_work_candidates_record.py",
+      "sha256": "3b370e57c621b6e994c43b9e498bf1a18e1827b5ccfdcb420e533ac260d54832",
+      "bytes": 4615
     },
     {
       "path": "tests/unit/test_workspace_location.py",
