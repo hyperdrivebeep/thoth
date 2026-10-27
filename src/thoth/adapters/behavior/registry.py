@@ -7,19 +7,16 @@ from thoth.domain.behavior_policy import (
     PromptBehaviorPolicy,
     RetrievalBehaviorInput,
     RetrievalBehaviorPolicy,
+    RetrievalFusionPolicy,
     RetrievalLanePolicy,
+    RetrievalPolicy,
     WorkflowBehaviorInput,
     WorkflowBehaviorPolicy,
     render_prompt_policy,
     workflow_repair_decision,
 )
-from thoth.domain.retrieval_lane import (
-    RETRIEVAL_EVALUATOR_ID,
-    CatalogContext,
-    RetrievalRequest,
-    select_retrieval_context,
-)
-from thoth.domain.structure_groups import CatalogGroup
+from thoth.domain.retrieval_case import request_of_case
+from thoth.domain.retrieval_lane import RETRIEVAL_EVALUATOR_ID, select_retrieval_context
 from thoth.ports.behavior_resolver import BehaviorComponentHandlerPort
 
 
@@ -32,6 +29,7 @@ class TypedBehaviorHandler:
         policy_type: type[PromptBehaviorPolicy]
         | type[RetrievalBehaviorPolicy]
         | type[RetrievalLanePolicy]
+        | type[RetrievalFusionPolicy]
         | type[WorkflowBehaviorPolicy],
         version: str = "2.0.0",
     ) -> None:
@@ -44,7 +42,11 @@ class TypedBehaviorHandler:
             raise BehaviorPolicyError("BEHAVIOR_POLICY_INVALID") from None
 
     def default_policy(self) -> BehaviorPolicy:
-        return self._policy_type()
+        policy_type = self._policy_type
+        if issubclass(policy_type, RetrievalFusionPolicy):
+            # No lane combination is a default. The baseline is always 2.0.0, so nothing asks.
+            raise BehaviorPolicyError("BEHAVIOR_POLICY_INVALID")
+        return policy_type()
 
     def evaluate(
         self, policy: BehaviorPolicy, payload: dict[str, JsonValue]
@@ -81,29 +83,11 @@ class PromptBehaviorHandler(TypedBehaviorHandler):
 
 
 def evaluate_retrieval(
-    policy: RetrievalBehaviorPolicy | RetrievalLanePolicy, payload: dict[str, JsonValue]
+    policy: RetrievalPolicy, payload: dict[str, JsonValue]
 ) -> dict[str, JsonValue]:
     """Evaluate a retrieval policy with the function the research path itself calls."""
     request = RetrievalBehaviorInput.model_validate(payload)
-    catalog = request.catalog
-    selection = select_retrieval_context(
-        RetrievalRequest(
-            request.problem,
-            request.queries,
-            request.evidence,
-            tuple(dict.fromkeys((*request.forced_refs, *request.pinned_refs))),
-            None
-            if catalog is None
-            else CatalogContext(
-                catalog.ordered_refs,
-                frozenset(catalog.protected_refs),
-                catalog.all_observed,
-                catalog.structure_count,
-                tuple(CatalogGroup(g.kind, g.title_refs, g.body_refs) for g in catalog.groups),
-            ),
-        ),
-        policy,
-    )
+    selection = select_retrieval_context(request_of_case(request), policy)
     output: dict[str, JsonValue] = {
         "selected_refs": [span.span_id for span in selection.selected],
         "excluded_count": len(request.evidence) - len(selection.selected),
@@ -113,10 +97,27 @@ def evaluate_retrieval(
     }
     if selection.provenance:
         output["lane"] = dict(selection.provenance)
+    if isinstance(policy, RetrievalFusionPolicy):
+        # Only a fused policy writes these keys, so the output of 2.0.0 and 3.0.0 keeps its bytes.
+        # `groups` shows whether the case carried structure groups: with none, a grouped lane ranks
+        # single spans.
+        output["groups"] = 0 if request.catalog is None else len(request.catalog.groups)
+        if selection.contributions:
+            output["lanes"] = [
+                {
+                    "lane_id": c.lane_id,
+                    "lane_version": c.lane_version,
+                    "depth": c.depth,
+                    "ranked": c.ranked,
+                    "credited_refs": list(c.credited_refs),
+                    "also_refs": list(c.also_refs),
+                }
+                for c in selection.contributions
+            ]
     return output
 
 
-def _wider_retrieval_budget(policy: RetrievalBehaviorPolicy | RetrievalLanePolicy) -> int:
+def _wider_retrieval_budget(policy: RetrievalPolicy) -> int:
     return min(160, policy.max_spans * 2) if policy.max_spans < 160 else 80
 
 
@@ -154,6 +155,23 @@ class RetrievalLaneHandler(TypedBehaviorHandler):
         if not isinstance(policy, RetrievalLanePolicy) or failure_class != "SEMANTIC":
             return ()
         return (policy.model_copy(update={"max_spans": _wider_retrieval_budget(policy)}),)
+
+
+class RetrievalFusionHandler(TypedBehaviorHandler):
+    """Retrieval policy 4.0.0: lanes merged by a fixed method; evaluated by the same function."""
+
+    def __init__(self) -> None:
+        super().__init__(BehaviorArtifactKind.RETRIEVAL_POLICY, RetrievalFusionPolicy, "4.0.0")
+
+    def evaluate(
+        self, policy: BehaviorPolicy, payload: dict[str, JsonValue]
+    ) -> dict[str, JsonValue]:
+        if not isinstance(policy, RetrievalFusionPolicy):
+            raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
+        return evaluate_retrieval(policy, payload)
+
+    # default_policy() is refused by the base class, and propose() keeps the base answer (no
+    # variants): lane depths are chosen by measurement.
 
 
 class WorkflowBehaviorHandler(TypedBehaviorHandler):
@@ -201,5 +219,6 @@ def default_behavior_components() -> BehaviorComponentRegistry:
     registry.register(PromptBehaviorHandler())
     registry.register(RetrievalBehaviorHandler())
     registry.register(RetrievalLaneHandler())
+    registry.register(RetrievalFusionHandler())
     registry.register(WorkflowBehaviorHandler())
     return registry

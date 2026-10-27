@@ -15,14 +15,19 @@ from thoth.domain.behavior_artifact import BehaviorArtifactKind
 from thoth.domain.behavior_execution import ActiveBehaviorSnapshot, BehaviorUse
 from thoth.domain.behavior_policy import (
     BehaviorPolicyError,
-    RetrievalBehaviorPolicy,
-    RetrievalLanePolicy,
     WorkflowBehaviorPolicy,
+    is_retrieval_policy,
     workflow_repair_decision,
 )
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.evidence import EvidenceSpan
 from thoth.ports.behavior_execution import BehaviorWorkControlPort
+
+# Why a shadow selection was held. A shadow never fails its request: a selection that is refused
+# (a ValueError) and one that breaks for another reason are both journaled as held, under
+# different reason codes. The active selection is never caught.
+SHADOW_SELECTION_HELD = "SHADOW_SELECTION_HELD"
+SHADOW_SELECTION_FAILED = "SHADOW_SELECTION_FAILED"
 
 
 @dataclass
@@ -67,7 +72,7 @@ def select_evidence_for_behavior(
         return select_evidence_context(problem=problem, evidence=evidence, forced_refs=forced_refs)
     snapshot = context.snapshot(BehaviorArtifactKind.RETRIEVAL_POLICY)
     policy = snapshot.policy
-    if not isinstance(policy, RetrievalBehaviorPolicy | RetrievalLanePolicy):
+    if not is_retrieval_policy(policy):
         raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
     started = perf_counter_ns()
     result = select_evidence_context(
@@ -106,9 +111,8 @@ def select_evidence_for_behavior(
             continue
         shadow_policy = shadow.policy
         started = perf_counter_ns()
-        operation = "EVIDENCE_SELECTION"
         try:
-            if not isinstance(shadow_policy, RetrievalBehaviorPolicy | RetrievalLanePolicy):
+            if not is_retrieval_policy(shadow_policy):
                 raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
             shadow_result = select_evidence_context(
                 problem=problem,
@@ -120,13 +124,11 @@ def select_evidence_for_behavior(
             output = domain_digest(
                 "BEHAVIOR_SELECTION_OUTPUT", "1.0.0", canonical_payload(shadow_result)
             )
+            operation = "EVIDENCE_SELECTION"
         except ValueError:
-            operation = "POLICY_HELD"
-            output = domain_digest(
-                "BEHAVIOR_POLICY_HELD",
-                "1.0.0",
-                canonical_payload({"reason_code": "SHADOW_SELECTION_HELD"}),
-            )
+            operation, output = "POLICY_HELD", _held_digest(SHADOW_SELECTION_HELD)
+        except Exception:
+            operation, output = "POLICY_HELD", _held_digest(SHADOW_SELECTION_FAILED)
         context.uses.append(
             BehaviorUse(
                 component=shadow.component,
@@ -211,3 +213,9 @@ def require_compiled_behavior_plan(plan: ActionPlan | None) -> ActionPlan:
     if plan is None:
         raise BehaviorPolicyError("BEHAVIOR_ACTION_PLAN_HELD")
     return plan
+
+
+def _held_digest(reason_code: str) -> str:
+    return domain_digest(
+        "BEHAVIOR_POLICY_HELD", "1.0.0", canonical_payload({"reason_code": reason_code})
+    )

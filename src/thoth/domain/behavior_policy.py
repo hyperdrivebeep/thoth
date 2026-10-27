@@ -1,7 +1,7 @@
 """Bounded executable policies; fixed authority and scientific guards stay outside them."""
 
 import re
-from typing import Annotated, Any, Literal, cast
+from typing import Annotated, Any, Literal, TypeGuard, cast
 
 from pydantic import (
     Discriminator,
@@ -30,6 +30,9 @@ class RetrievalBehaviorPolicy(DomainModel):
     character_budget: int = Field(default=50000, ge=1, le=50000)
 
 
+type LaneId = Literal["LEXICAL_SUBSTRING_V1", "PROTECTED_EXACT", "GROUPED_BM25", "CHAR_BIGRAM"]
+
+
 class RetrievalLaneSpec(DomainModel):
     """One named ranking rule of a retrieval policy.
 
@@ -38,9 +41,7 @@ class RetrievalLaneSpec(DomainModel):
     change is registered under a new version, and a policy naming a version the code does not
     register is refused at selection."""
 
-    lane_id: Literal["LEXICAL_SUBSTRING_V1", "PROTECTED_EXACT", "GROUPED_BM25", "CHAR_BIGRAM"] = (
-        "LEXICAL_SUBSTRING_V1"
-    )
+    lane_id: LaneId = "LEXICAL_SUBSTRING_V1"
     lane_version: Literal["1.0.0"] = "1.0.0"
 
 
@@ -65,13 +66,59 @@ class RetrievalLanePolicy(DomainModel):
         return self
 
 
+class FusedLaneSpec(DomainModel):
+    """One lane of a fused retrieval policy and the fixed number of ranked chunks it contributes.
+
+    A chunk is one ranked span for a span lane and one structure group for GROUPED_BM25; the depth
+    cuts the lane's own ranking before the lanes are merged, so it does not depend on the others.
+    """
+
+    lane_id: LaneId
+    lane_version: Literal["1.0.0"] = "1.0.0"
+    depth: int = Field(ge=1, le=160)
+
+
+class FusionMethodSpec(DomainModel):
+    """How the lanes of a fused policy are merged; a new method is a new id or version."""
+
+    method_id: Literal["ROUND_ROBIN_DEDUP"] = "ROUND_ROBIN_DEDUP"
+    method_version: Literal["1.0.0"] = "1.0.0"
+
+
+class RetrievalFusionPolicy(DomainModel):
+    """Retrieval policy 4.0.0: two to four lanes, each with a fixed depth, merged by one method.
+
+    The lanes are required and have no default, so no combination is blessed before it is measured.
+    The order of the lanes is part of the policy. 2.0.0 and 3.0.0 are not changed. Like 3.0.0 it
+    reaches a run only through shadow and canary exposure.
+    """
+
+    kind: Literal["RETRIEVAL_POLICY"] = "RETRIEVAL_POLICY"
+    version: Literal["4.0.0"] = "4.0.0"
+    max_spans: int = Field(default=160, ge=1, le=160)
+    character_budget: int = Field(default=50000, ge=1, le=50000)
+    lanes: tuple[FusedLaneSpec, ...] = Field(min_length=2, max_length=4)
+    fusion: FusionMethodSpec = FusionMethodSpec()
+
+    @model_validator(mode="after")
+    def _distinct_lanes(self) -> "RetrievalFusionPolicy":
+        if len({lane.lane_id for lane in self.lanes}) != len(self.lanes):
+            raise ValueError("RETRIEVAL_POLICY_LANE_DUPLICATED")
+        return self
+
+
 class WorkflowBehaviorPolicy(DomainModel):
     kind: Literal["WORKFLOW_DEFINITION"] = "WORKFLOW_DEFINITION"
     version: Literal["2.0.0"] = "2.0.0"
     max_semantic_repairs: Literal[0, 1] = 1
 
 
-RetrievalPolicy = RetrievalBehaviorPolicy | RetrievalLanePolicy
+RetrievalPolicy = RetrievalBehaviorPolicy | RetrievalLanePolicy | RetrievalFusionPolicy
+
+
+def is_retrieval_policy(value: object) -> TypeGuard[RetrievalPolicy]:
+    """The one place that says which policy classes are retrieval policies."""
+    return isinstance(value, RetrievalBehaviorPolicy | RetrievalLanePolicy | RetrievalFusionPolicy)
 
 
 def _policy_tag(value: object) -> str | None:
@@ -88,6 +135,7 @@ BehaviorPolicy = Annotated[
     Annotated[PromptBehaviorPolicy, Tag("PROMPT_BUNDLE:2.0.0")]
     | Annotated[RetrievalBehaviorPolicy, Tag("RETRIEVAL_POLICY:2.0.0")]
     | Annotated[RetrievalLanePolicy, Tag("RETRIEVAL_POLICY:3.0.0")]
+    | Annotated[RetrievalFusionPolicy, Tag("RETRIEVAL_POLICY:4.0.0")]
     | Annotated[WorkflowBehaviorPolicy, Tag("WORKFLOW_DEFINITION:2.0.0")],
     Discriminator(_policy_tag),
 ]
@@ -252,6 +300,21 @@ class RetrievalBehaviorInput(DomainModel):
     pinned_refs: tuple[str, ...] = Field(default=(), max_length=160)
     queries: tuple[str, ...] = Field(default=(), max_length=32)
     catalog: RetrievalCatalogInput | None = None
+
+    @model_validator(mode="after")
+    def _groups_name_known_spans_once(self) -> "RetrievalBehaviorInput":
+        """A case that names groups must name spans of its own evidence, each in one body only."""
+        if self.catalog is None or not self.catalog.groups:
+            return self
+        known = {span.span_id for span in self.evidence}
+        given: set[str] = set()
+        for group in self.catalog.groups:
+            if not {*group.title_refs, *group.body_refs} <= known:
+                raise ValueError("RETRIEVAL_CASE_GROUP_SPAN_UNKNOWN")
+            if given & set(group.body_refs) or len(set(group.body_refs)) != len(group.body_refs):
+                raise ValueError("RETRIEVAL_CASE_GROUP_BODY_DUPLICATED")
+            given.update(group.body_refs)
+        return self
 
 
 class WorkflowBehaviorInput(DomainModel):

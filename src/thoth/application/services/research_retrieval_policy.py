@@ -4,14 +4,19 @@ from collections.abc import Callable
 from dataclasses import replace
 from time import perf_counter_ns
 
-from thoth.application.services.behavior_context import behavior_work_scope, current_behavior_work
+from thoth.application.services.behavior_context import (
+    SHADOW_SELECTION_FAILED,
+    SHADOW_SELECTION_HELD,
+    behavior_work_scope,
+    current_behavior_work,
+)
 from thoth.domain.behavior_artifact import BehaviorArtifactKind
 from thoth.domain.behavior_execution import ActiveBehaviorSnapshot, BehaviorUse
 from thoth.domain.behavior_policy import (
     BehaviorPolicyError,
     RetrievalBehaviorPolicy,
-    RetrievalLanePolicy,
     RetrievalPolicy,
+    is_retrieval_policy,
 )
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.evidence import EvidenceSpan
@@ -39,6 +44,10 @@ def replay_retrieval_shadows(selection: Callable[[], object], inputs: object = N
                 selection()
         except ValueError:
             record_held_selection("CONTEXT_PACKET", inputs, started, shadow)
+        except Exception:
+            record_held_selection(
+                "CONTEXT_PACKET", inputs, started, shadow, SHADOW_SELECTION_FAILED
+            )
 
 
 def retrieval_policy() -> RetrievalPolicy:
@@ -46,7 +55,7 @@ def retrieval_policy() -> RetrievalPolicy:
     if work is None:
         return RetrievalBehaviorPolicy()
     policy = work.snapshot(BehaviorArtifactKind.RETRIEVAL_POLICY).policy
-    if not isinstance(policy, RetrievalBehaviorPolicy | RetrievalLanePolicy):
+    if not is_retrieval_policy(policy):
         raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
     return policy
 
@@ -64,19 +73,16 @@ def retrieval_shadows() -> tuple[tuple[ActiveBehaviorSnapshot, RetrievalPolicy |
         if shadow.component != BehaviorArtifactKind.RETRIEVAL_POLICY:
             continue
         policy = shadow.policy
-        shadows.append(
-            (
-                shadow,
-                policy
-                if isinstance(policy, RetrievalBehaviorPolicy | RetrievalLanePolicy)
-                else None,
-            )
-        )
+        shadows.append((shadow, policy if is_retrieval_policy(policy) else None))
     return tuple(shadows)
 
 
 def record_held_selection(
-    stage: str, inputs: object, started: int, snapshot: ActiveBehaviorSnapshot
+    stage: str,
+    inputs: object,
+    started: int,
+    snapshot: ActiveBehaviorSnapshot,
+    reason_code: str = SHADOW_SELECTION_HELD,
 ) -> None:
     """Journal a shadow selection that could not be made, the way the analysis path does."""
     work = current_behavior_work()
@@ -93,7 +99,7 @@ def record_held_selection(
             output_digest=domain_digest(
                 "BEHAVIOR_POLICY_HELD",
                 "1.0.0",
-                canonical_payload({"reason_code": "SHADOW_SELECTION_HELD"}),
+                canonical_payload({"reason_code": reason_code}),
             ),
             elapsed_ns=perf_counter_ns() - started,
             billed_cost_microunits=0,

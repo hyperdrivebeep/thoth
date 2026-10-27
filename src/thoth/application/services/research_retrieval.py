@@ -2,6 +2,7 @@
 
 from time import perf_counter_ns
 
+from thoth.application.services.behavior_context import SHADOW_SELECTION_FAILED
 from thoth.application.services.research_retrieval_policy import (
     record_held_selection,
     record_selection,
@@ -89,6 +90,17 @@ def lexical_selection(
         except ValueError:
             # A shadow that cannot select is held; the request goes on with the active result.
             record_held_selection(_stage(selection), _inputs(request, selection), started, shadow)
+            continue
+        except Exception:
+            # A shadow that breaks is held under its own reason; it never fails its request. The
+            # active selection above is not caught, so a defect there still surfaces.
+            record_held_selection(
+                _stage(selection),
+                _inputs(request, selection),
+                started,
+                shadow,
+                SHADOW_SELECTION_FAILED,
+            )
             continue
         record_selection(
             _stage(replayed), _inputs(request, replayed), replayed.selected, started, shadow
