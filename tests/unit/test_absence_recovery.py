@@ -8,6 +8,7 @@ from tests.unit.test_contextual_retrieval import work
 
 from thoth.application.services.research_absence_recovery import (
     RECOVERY_SCOPE_CHANGED,
+    actual_scope,
 )
 from thoth.application.services.research_absence_recovery import (
     restore_absence_recovery as restore_with_reader,
@@ -192,3 +193,13 @@ def test_legacy_absence_missing_is_not_backfilled_and_foreign_request_stays_reje
             cutoff_at=NOW,
         )
     assert current.absence is None and not current.consumed_sources
+
+
+def test_a_missing_actual_input_scope_is_a_named_error_not_stop_iteration() -> None:
+    data = source()
+    observed = assessed(proposal(), data, data)
+    # AbsenceAssessments validation normally rejects this shape; model_copy skips validation.
+    broken = observed.model_copy(update={"active_stage_ref": observed.request_ref})
+    with pytest.raises(ValueError, match="ABSENCE_RECOVERY_ACTUAL_SCOPE_MISSING"):
+        actual_scope(broken)
+    assert actual_scope(observed).stage_ref == observed.active_stage_ref

@@ -14,6 +14,11 @@ CALCULATION_VERSION = "adjacent-series:1.0.0"
 SOURCE_ARITHMETIC_CONTRACT = (
     "Values calculated from source numbers; not a causal or computational-complexity determination."
 )
+NUMERIC_CITATION_INSTRUCTION = (
+    "When checked_observations are present, cite the step ratios and log-log slopes of the series "
+    "that bear on the question as observed arithmetic with their operand refs, and compare slopes "
+    "between series where relevant; do not state a cause or a complexity class from them."
+)
 
 
 def calculation_input_digest(

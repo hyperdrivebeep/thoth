@@ -66,6 +66,7 @@ _COMMON = {
     "request_ref",
     "source_overview",
     "interpretation_open_items",
+    "model_interpretations",
     "requirements",
     "requirement_set_ref",
     "connected_sources_only",
@@ -89,7 +90,11 @@ _COMMON = {
 _EXTRA: dict[ModelRole, set[str]] = {
     ModelRole.RESEARCH_PLANNER: {"profiles", "source_overview"},
     ModelRole.EVIDENCE_RERANKER: {"ranking_candidate_refs"},
-    ModelRole.SEMANTIC_REVIEWER: {"checked_observations", "absence_instruction"},
+    ModelRole.SEMANTIC_REVIEWER: {
+        "checked_observations",
+        "numeric_instruction",
+        "absence_instruction",
+    },
     ModelRole.REVIEW_ADJUDICATOR: {"candidate", "checked_observations", "absence_checks"},
 }
 

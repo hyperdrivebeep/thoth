@@ -12,6 +12,7 @@ from thoth.application.services.connector_service import ConnectorService
 from thoth.application.services.document_calculation import DocumentCalculationService
 from thoth.application.services.full_project_memory import FullProjectMemoryService
 from thoth.application.services.memory_query_expansion import ModelMemoryQueryExpander, widen_query
+from thoth.application.services.model_interpretation_view import with_model_interpretation_labels
 from thoth.application.services.numeric_observation_view import with_numeric_observations
 from thoth.application.services.request_records import RequestRecords
 from thoth.application.services.requirement_compiler import compile_requirements
@@ -543,7 +544,7 @@ class ResearchAnalysis:
             work.context["context_projection_version"] = "2.0.0"
         if work is not None:
             context = with_numeric_observations(context, role, work)
-            context = with_absence_checks(context, role, work)
+            context = with_model_interpretation_labels(with_absence_checks(context, role, work))
         source_context_digest = self.source_digest(context.evidence)
         if work is not None:
             work.evidence = context.evidence

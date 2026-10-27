@@ -1,9 +1,10 @@
 # Declared absence claims and literal checks
 
 `ReviewProposalE2` adds typed `absence_claims` to the unchanged `ReviewProposal` contract.
-Both codecs remain registered for reading historical stages. The semantic reviewer keeps
-`semantic_reviewer.v6`; its new output codec/schema and separate absence instruction change the
-existing stage input/reuse basis. The v6 task sentences and the adjudicator output codec are unchanged.
+Both codecs remain registered for reading historical stages. The semantic reviewer used
+`semantic_reviewer.v6` for this change; its new output codec/schema and separate absence instruction
+changed the existing stage input/reuse basis. The reviewer is now `semantic_reviewer.v7` (see
+`model-interpretation-labels.md`). The v6 task sentences and the adjudicator output codec are unchanged.
 
 ## What is checked
 

@@ -58,6 +58,15 @@ only the remainder of the existing retrieval character budget; omitted calculati
 are recorded per role. Existing span and structural limits remain unchanged. No extra model call
 is introduced. Compact byte counts are not token or billed-cost measurements.
 
+SEMANTIC_REVIEWER and HYPOTHESIS_GENERATOR, and only when the compact view was actually
+delivered to them, also receive one fixed instruction in a separate `numeric_instruction` field:
+
+> When checked_observations are present, cite the step ratios and log-log slopes of the series that bear on the question as observed arithmetic with their operand refs, and compare slopes between series where relevant; do not state a cause or a complexity class from them.
+
+The adjudicator receives the view without the instruction. A run without a delivered view carries
+neither the view nor the instruction. The instruction is a fixed sentence outside the character budget, like the other fixed
+instructions; the view alone is admitted within the budget.
+
 Model views share series labels and carry raw operand span references. The derived record's
 calculation ID is not added to the original evidence-ID enum. The model input includes the fixed
 contract, precision, calculator/grammar/unit versions and grouping/measurement limitations.
@@ -78,4 +87,5 @@ evidence-detail route. It also remains available when arithmetic was saved but n
 Unknown units, unsupported groups and undelivered rows are not presented as successful checks.
 
 Relevant tests: `test_numeric_series`, `test_numeric_series_pipeline`,
-`test_model_instruction_sentences` and `CheckedObservations.test.tsx`.
+`test_numeric_citation_instruction`, `test_model_instruction_sentences` and
+`CheckedObservations.test.tsx`.

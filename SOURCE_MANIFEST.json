@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-27T03:30:14.520353+00:00",
+  "created_at": "2026-10-27T06:55:16.301409+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -638,8 +638,8 @@
     },
     {
       "path": "apps/web/src/components/ConfirmedFacts.test.tsx",
-      "sha256": "f85bb81dcf6c91774d76eda5193e34f3752653debed2140c990cdeb52694ebda",
-      "bytes": 3649
+      "sha256": "d1b4a7884932a6a38a90a288c29d7e5d8f7b383bf0ca1a5c4baac042a70ce0a4",
+      "bytes": 4611
     },
     {
       "path": "apps/web/src/components/ConfirmedFacts.tsx",
@@ -1043,8 +1043,8 @@
     },
     {
       "path": "apps/web/src/components/ResearchResultCard.test.tsx",
-      "sha256": "0bd9adaf182852dad6612a32420f58966cb3396252ef4b871cc32cf1f7f2d71f",
-      "bytes": 8807
+      "sha256": "9c6784e23bd9a36d718c237e042afcd0215c5873e6f8eb2c2fc4eedbb4c50545",
+      "bytes": 8842
     },
     {
       "path": "apps/web/src/components/ResearchResultCard.tsx",
@@ -1778,8 +1778,8 @@
     },
     {
       "path": "apps/web/src/i18n/researchMessages.ts",
-      "sha256": "41630f25c3a8452c0d3f033de3b98a4d6e4b63f59ef711bbc12332133707ba16",
-      "bytes": 9656
+      "sha256": "5cf9cbb18b033ced68c96f88a6e439a26e453d1540afebda0f5c6b2ca75e4fc5",
+      "bytes": 9728
     },
     {
       "path": "apps/web/src/i18n/researchPanelsMessages.ts",
@@ -1788,8 +1788,8 @@
     },
     {
       "path": "apps/web/src/i18n/reviewPanelsMessages.ts",
-      "sha256": "58768d41c5549f59bf6ac000d239ecbcf434156eb9a4328332c797c1480f23ac",
-      "bytes": 12234
+      "sha256": "924b93d2380c0000a9245eff8376e7cad442867404ad3922d5e5df93658f06be",
+      "bytes": 12454
     },
     {
       "path": "apps/web/src/i18n/setupMessages.ts",
@@ -2093,8 +2093,8 @@
     },
     {
       "path": "docs/architecture/absence-checks.md",
-      "sha256": "c81cc36942b6c4aaa6b4e66eefd0a2ab0610eee0ec9dfcdc62f0d1c3811811a9",
-      "bytes": 10729
+      "sha256": "a347266537ce26d19eb2934f17a5a2c60f9cbd8f8e6b05e0fe903f563bf2eab7",
+      "bytes": 10828
     },
     {
       "path": "docs/architecture/agent-execution-rules.md",
@@ -2157,6 +2157,11 @@
       "bytes": 14409
     },
     {
+      "path": "docs/architecture/model-interpretation-labels.md",
+      "sha256": "fb07cd7ddc67104d2e99785dc61e1a32977cf28331b1db3e79a3c02545541870",
+      "bytes": 2491
+    },
+    {
       "path": "docs/architecture/model-settings.md",
       "sha256": "3fcfd2d374f746f30bc9d0d96660d944417dc332f16c4f9e356ab21c7c23ec51",
       "bytes": 11703
@@ -2168,8 +2173,8 @@
     },
     {
       "path": "docs/architecture/numeric-observations.md",
-      "sha256": "c8f5e661a7542b0529280ed30e3cfa6a7c231183cd255b4369a8f77705fcf1ff",
-      "bytes": 5777
+      "sha256": "75a29fab41dab3942ddfbeef78dd6efd9fb47fe599fadc9522f47819cf67b630",
+      "bytes": 6558
     },
     {
       "path": "docs/architecture/post-execution-learning.md",
@@ -5682,6 +5687,11 @@
       "bytes": 2608
     },
     {
+      "path": "src/thoth/application/services/model_interpretation_view.py",
+      "sha256": "1a9a837680c87e5e157d87c1d09695f01cbf94f57302f52e134f7ebcb9ab7685",
+      "bytes": 2970
+    },
+    {
       "path": "src/thoth/application/services/model_outcomes.py",
       "sha256": "a2ed2630d1dc52e1566606913b8b6dad97e76d65b9e8b9c87acdc42fecd29b43",
       "bytes": 1337
@@ -5703,8 +5713,8 @@
     },
     {
       "path": "src/thoth/application/services/numeric_observation_view.py",
-      "sha256": "edc3c99b5954e4f00e2b6a5f4501d09ac18e54743bd193adb99b11490081e341",
-      "bytes": 8808
+      "sha256": "6002d74cd5b87591d5ae4ed7bcf989bbcc22376167cb6da336ba38e30e26f7e4",
+      "bytes": 9240
     },
     {
       "path": "src/thoth/application/services/numeric_series_observation.py",
@@ -5888,8 +5898,8 @@
     },
     {
       "path": "src/thoth/application/services/research_absence_recovery.py",
-      "sha256": "ca22657392f286d52bb10c649d817c95926ac31db0da366a5d67f1b41628a978",
-      "bytes": 8950
+      "sha256": "fc086fde26faee160f7467f51655fdc4bb0b0cf63abe28abbc4c31b361aa6ab6",
+      "bytes": 9242
     },
     {
       "path": "src/thoth/application/services/research_absence_runtime.py",
@@ -5903,8 +5913,8 @@
     },
     {
       "path": "src/thoth/application/services/research_analysis.py",
-      "sha256": "b62e4b137d4069e39336710192d94ff707149a746b1f2e1a85330bc1cc3af184",
-      "bytes": 26595
+      "sha256": "0241c540c516a7081b809104da6a689c65e4ed26d48c04cdd74edeebc2c758fe",
+      "bytes": 26727
     },
     {
       "path": "src/thoth/application/services/research_answer.py",
@@ -6068,8 +6078,8 @@
     },
     {
       "path": "src/thoth/application/services/research_models.py",
-      "sha256": "53da6baceca8d3a7d575161913cb61ca8fc2b887385bda24437d053537bb92e2",
-      "bytes": 5009
+      "sha256": "e05fadbf3c101b9e0c8dd3a70ac6725f8914a8c597b665a3be967494378b1888",
+      "bytes": 5179
     },
     {
       "path": "src/thoth/application/services/research_operation_access.py",
@@ -6118,13 +6128,13 @@
     },
     {
       "path": "src/thoth/application/services/research_review_context.py",
-      "sha256": "c3dda9b108c72447206718edc698438c1250e6a5523647915c76c7437a25fad0",
-      "bytes": 4731
+      "sha256": "2d7d8af748a7b641c6b8efc964355273ea927a90f35509f4d21c7fe80274efdf",
+      "bytes": 4918
     },
     {
       "path": "src/thoth/application/services/research_role_context.py",
-      "sha256": "0f512a3af79104d9cfed6919fac291f85415d451077db091997b59e9445cdb8f",
-      "bytes": 3772
+      "sha256": "2d0e95fdb8d3ba622097958b423aa0bd1f356e6dcb94b2fe4e23911b85851a6d",
+      "bytes": 3860
     },
     {
       "path": "src/thoth/application/services/research_selection_context.py",
@@ -6858,8 +6868,8 @@
     },
     {
       "path": "src/thoth/domain/derived_calculation.py",
-      "sha256": "0ac72756bc51c7d5fd38b0bc07c6f45f2800d50c3e67821b40df6d90e7c21f84",
-      "bytes": 5582
+      "sha256": "9735939f30bfcf7203ddbf8ace915c991aaed3ed2dd3207601af4eb80f3acdbb",
+      "bytes": 5908
     },
     {
       "path": "src/thoth/domain/discrimination.py",
@@ -7115,6 +7125,11 @@
       "path": "src/thoth/domain/model_dispatch.py",
       "sha256": "157b754b73560ce9c1af44e55395d1092898a085ff7b2a67b940745763d94418",
       "bytes": 8640
+    },
+    {
+      "path": "src/thoth/domain/model_interpretation.py",
+      "sha256": "ca060c2aec77180d01f00a2783983ef4896d964e56cbaec9454533ed6dbf2965",
+      "bytes": 2099
     },
     {
       "path": "src/thoth/domain/model_settings.py",
@@ -9662,6 +9677,11 @@
       "bytes": 9771
     },
     {
+      "path": "tests/integration/test_model_interpretation_labels.py",
+      "sha256": "ce38a9f76c6aed425ee1e1aeb37352130052f6df768a226becd20395d061fc5a",
+      "bytes": 8680
+    },
+    {
       "path": "tests/integration/test_model_settings.py",
       "sha256": "6c507257d81c1e387eb63795d2fd00cfe722d221eae3e920eb6fd9473c9c20da",
       "bytes": 9089
@@ -11788,8 +11808,8 @@
     },
     {
       "path": "tests/unit/test_absence_recovery.py",
-      "sha256": "fc903fa37089f19dd327b67e9ae1d5c25e7bd580ed138f09978c997a91d00f3d",
-      "bytes": 8879
+      "sha256": "3fa2bca0a0a45579b05d37a173829a21e519618042bd98dd82c8fa625ecb0cb0",
+      "bytes": 9415
     },
     {
       "path": "tests/unit/test_absence_usage.py",
@@ -12018,8 +12038,18 @@
     },
     {
       "path": "tests/unit/test_model_instruction_sentences.py",
-      "sha256": "f8e6152441a71737a700b471e95ee2b22eb49d16f902fde85ad7a7cdee78d35b",
-      "bytes": 4049
+      "sha256": "dde89b2db86bdaf2fe9c97852d64517e8fe044a375a9dfbe2c1eb501a40a47e8",
+      "bytes": 4450
+    },
+    {
+      "path": "tests/unit/test_model_interpretation_view.py",
+      "sha256": "314fa9cd50d222e787e38f7b254f1dd58d0a2e93dfe04e37ed397428e2c3157d",
+      "bytes": 4900
+    },
+    {
+      "path": "tests/unit/test_numeric_citation_instruction.py",
+      "sha256": "b5f7a4582d43f0073f3db018f7af5be7c55a7747b0f197f7e351a5e19b58a578",
+      "bytes": 3379
     },
     {
       "path": "tests/unit/test_numeric_observation_projection.py",

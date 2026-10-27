@@ -11,8 +11,10 @@ from thoth.domain.research_execution import ResearchWork
 from thoth.domain.research_request import RevisionRef
 
 # v6 marks the repaired review and adjudication task sentences; the rules are unchanged.
+# The reviewer is v7: it may now be told to cite the checked arithmetic, and it receives earlier
+# roles' statements as labelled interpretations, so a stage saved under v6 is not reused.
 _PROMPT_VERSIONS = {
-    ModelRole.SEMANTIC_REVIEWER: "semantic_reviewer.v6",
+    ModelRole.SEMANTIC_REVIEWER: "semantic_reviewer.v7",
     ModelRole.REVIEW_ADJUDICATOR: "review_adjudicator.v6",
 }
 

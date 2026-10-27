@@ -60,7 +60,7 @@ it('does not show a retry or the cut-off wording for an ordinary evidence hold',
 it('labels facts confirmed before the interruption',()=>{
   const spanId='span:aaaa1111-0000-0000-0000-000000000000';
   const html=renderToStaticMarkup(<ResearchResultCard state="SUCCEEDED" result={{confirmed_findings:[{statement:'문서에 적힌 사실',evidence_refs:[spanId],requirement_id:null,kind:'DOCUMENT_FACT'}]}} terminalReason="OAUTH_TRANSPORT_FAILURE" onDetail={()=>{}}/>);
-  expect(html).toContain('중단 전까지 확인한 사실');expect(html).toContain('문서에 적힌 사실');
+  expect(html).toContain('중단 전까지 정리된 AI 검토 요약(인용 위치만 확인)');expect(html).toContain('문서에 적힌 사실');
 });
 it('names a stalled, over-long or never-ending call as a cut-off and offers to resume from where it stopped',()=>{
   for(const [code,label] of [['OAUTH_STALLED_STREAM_REMOTE_STOP_UNKNOWN','응답이 매우 느려짐'],['OAUTH_DISPATCH_DEADLINE_REMOTE_STOP_UNKNOWN','호출 시간 초과'],['OAUTH_RUNAWAY_OUTPUT_REMOTE_STOP_UNKNOWN','응답이 끝나지 않고 계속 생성됨']]){
