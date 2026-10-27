@@ -133,7 +133,7 @@ def test_each_handler_refuses_the_other_versions_policy() -> None:
         RetrievalLaneHandler().evaluate(RetrievalBehaviorPolicy(), {"problem": "q", "evidence": []})
 
 
-def test_both_handlers_are_registered_and_the_baseline_version_is_still_2_0_0() -> None:
+def test_the_handlers_are_registered_and_the_baseline_version_is_still_2_0_0() -> None:
     registry = default_behavior_components()
     kind = BehaviorArtifactKind.RETRIEVAL_POLICY
     assert registry.resolve(kind, "2.0.0").default_policy() == RetrievalBehaviorPolicy()
@@ -141,8 +141,10 @@ def test_both_handlers_are_registered_and_the_baseline_version_is_still_2_0_0() 
     assert registry.components() == tuple(
         sorted({BehaviorArtifactKind.PROMPT_BUNDLE, kind, BehaviorArtifactKind.WORKFLOW_DEFINITION})
     )
+    # 4.0.0 is registered since G3 1c (it was the first version the registry did not know).
+    assert registry.resolve(kind, "4.0.0").version == "4.0.0"
     with pytest.raises(BehaviorPolicyError, match="BEHAVIOR_COMPONENT_NOT_CONFIGURED"):
-        registry.resolve(kind, "4.0.0")
+        registry.resolve(kind, "5.0.0")
 
 
 def test_a_wider_budget_is_proposed_for_either_version_after_a_semantic_failure() -> None:

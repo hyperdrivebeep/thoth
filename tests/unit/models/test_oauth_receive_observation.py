@@ -2,7 +2,7 @@
 
 import asyncio
 import json
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Sequence
 from datetime import UTC, datetime
 
 import httpx
@@ -52,11 +52,14 @@ class StalledStream(httpx.AsyncByteStream):
 
 
 class Boundary:
-    def __init__(self) -> None:
+    def __init__(self, call_timeouts: Sequence[float] = (60.0, 120.0)) -> None:
         self.observations: list[ModelReceiveObservation] = []
         self.remote_stops: list[str] = []
         self.response_ids: list[str | None] = []
         self.reservations = 0
+        # The first call is the outermost deadline; every later call gets the last value, so the
+        # attempt's own deadline is longer than the one around it.
+        self._call_timeouts = list(call_timeouts)
 
     def check(self) -> None:
         pass
@@ -68,7 +71,9 @@ class Boundary:
         pass
 
     def call_timeout(self) -> float:
-        return 0.15
+        return (
+            self._call_timeouts.pop(0) if len(self._call_timeouts) > 1 else self._call_timeouts[0]
+        )
 
     def owns_attempt(self) -> bool:
         return True
@@ -107,6 +112,26 @@ class Boundary:
         self.response_ids.append(response_id)
 
 
+class Deadlines:
+    """Deadlines run on the loop's clock, so the test moves that clock instead of waiting for it.
+
+    A deadline that counts wall time from the call starts before the connection exists. On a slow
+    runner it can expire before any stream was opened, and then there is nothing to close or record.
+    Here the deadlines are far away until the test has seen the stream's frames and expires them.
+    """
+
+    def __init__(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        self.loop = asyncio.get_running_loop()
+        self.offset = 0.0
+        real = self.loop.time
+        monkeypatch.setattr(self.loop, "time", lambda: real() + self.offset)
+
+    def expire(self, seconds: float) -> None:
+        self.offset += seconds
+        # The loop may be asleep until a timer computed on the old clock; give it work now.
+        self.loop.call_soon(lambda: None)
+
+
 def model_request() -> ModelRequest[Ping]:
     return ModelRequest(
         role=ModelRole.USER_EXPLAINER,
@@ -131,8 +156,11 @@ def model_request() -> ModelRequest[Ping]:
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("mode", ["direct-deadline", "outer-deadline", "caller-cancel"])
-async def test_received_metadata_survives_deadline_and_cancel(mode: str) -> None:
+async def test_received_metadata_survives_deadline_and_cancel(
+    mode: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     stream, boundary = StalledStream(), Boundary()
+    clock = Deadlines(monkeypatch)
     executor = CodexHttpExecutor(
         Session(), transport=httpx.MockTransport(lambda request: httpx.Response(200, stream=stream))
     )
@@ -148,15 +176,16 @@ async def test_received_metadata_survives_deadline_and_cancel(mode: str) -> None
     )
     token = research_work.set(ResearchWork(ref, "Ping", boundary))
     try:
+        task = asyncio.create_task(model.structured(model_request()))
+        await asyncio.wait_for(stream.received.wait(), 5)
         if mode == "caller-cancel":
-            task = asyncio.create_task(model.structured(model_request()))
-            await asyncio.wait_for(stream.received.wait(), 1)
             task.cancel()
             with pytest.raises(asyncio.CancelledError):
                 await task
         else:
+            clock.expire(90)
             with pytest.raises(ModelExecutionHold) as raised:
-                await model.structured(model_request())
+                await task
             if mode == "outer-deadline":
                 assert str(raised.value) == "MODEL_CALL_TIME_BUDGET_EXHAUSTED"
             else:
@@ -189,16 +218,19 @@ def test_old_observation_still_decodes() -> None:
 
 
 @pytest.mark.asyncio
-async def test_outer_deadline_reports_exhausted_attempt_without_resetting_budget() -> None:
+async def test_outer_deadline_reports_exhausted_attempt_without_resetting_budget(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     class ExpiringBoundary(Boundary):
         expired = False
 
         def call_timeout(self) -> float:
             if self.expired:
                 raise ModelExecutionHold("TOTAL_RESEARCH_BUDGET_EXHAUSTED")
-            return 0.03
+            return super().call_timeout()
 
     boundary = ExpiringBoundary()
+    clock = Deadlines(monkeypatch)
 
     class ClosingStream(StalledStream):
         async def aclose(self) -> None:
@@ -219,8 +251,13 @@ async def test_outer_deadline_reports_exhausted_attempt_without_resetting_budget
     )
     token = research_work.set(ResearchWork(ref, "Ping", boundary))
     try:
+        task = asyncio.create_task(
+            ResearchModel(CodexOAuthModel(executor)).structured(model_request())
+        )
+        await asyncio.wait_for(stream.received.wait(), 5)
+        clock.expire(90)
         with pytest.raises(ModelExecutionHold, match="TOTAL_RESEARCH_BUDGET_EXHAUSTED"):
-            await ResearchModel(CodexOAuthModel(executor)).structured(model_request())
+            await task
         assert boundary.reservations == 1 and len(boundary.observations) == 1
         assert stream.closed
     finally:

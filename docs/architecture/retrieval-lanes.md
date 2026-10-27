@@ -117,25 +117,66 @@ Markdown pipe tables are not observed as regions (the parser reads them as parag
 made for a table as such; the rules above cover a table inside a fence and a list. The parser is not
 changed for this.
 
-## Policies 2.0.0 and 3.0.0
+## Policies 2.0.0, 3.0.0 and 4.0.0
 
 | Policy | Class | Fields |
 |---|---|---|
 | 2.0.0 | `RetrievalBehaviorPolicy` | `max_spans` (at most 160), `character_budget` (at most 50000) |
 | 3.0.0 | `RetrievalLanePolicy` | the same two budgets plus `lanes` |
+| 4.0.0 | `RetrievalFusionPolicy` | the same two budgets plus two to four `lanes`, each with a `depth`, and a `fusion` method (see Fusing lanes) |
 
 - 2.0.0 is unchanged and always uses `LEXICAL_SUBSTRING_V1`. Adding a field to it would change the
   serialization, and so the digest, of every stored 2.0.0 policy, which is why 3.0.0 is a separate class.
 - `lanes` holds exactly one entry for now. Its `lane_id` is `LEXICAL_SUBSTRING_V1` (the default),
   `PROTECTED_EXACT`, `GROUPED_BM25` or `CHAR_BIGRAM`, and its `lane_version` must be the registered version, 1.0.0 for both. A stored
   policy that names the original lane keeps its serialization and digest. With that lane, 3.0.0
-  selects exactly what 2.0.0 selects for the same budgets. A policy with more than one lane, and
-  lane fusion, belong to a later policy version, not to 3.0.0.
+  selects exactly what 2.0.0 selects for the same budgets. A policy with more than one lane is
+  4.0.0, not 3.0.0, which stays as it is.
 - The behavior policy union is discriminated by the pair (`kind`, `version`). A stored policy without
   a `version` is read as 2.0.0. An unknown version is invalid and compiles to
   `BEHAVIOR_POLICY_INVALID`.
 - The baseline stays 2.0.0. A 3.0.0 policy reaches a run only through the existing exposure flow
   (shadow, then approved canary), never by default.
+
+## Fusing lanes (policy 4.0.0)
+
+A 4.0.0 policy lists two to four distinct lanes. Each entry names the lane, its version and a fixed
+`depth`; the order of the entries is part of the policy and is the only tie-break. `lanes` is required
+and has no default: no combination is treated as a recommended one before it is measured, so the
+4.0.0 handler refuses `default_policy()` (`BEHAVIOR_POLICY_INVALID`). Nothing asks it for one, because
+the baseline of every request is 2.0.0.
+
+The frame is unchanged. The eligible spans, the whole-catalog mode and the pinned spans are decided
+first. A lane that is not registered, or whose registered version differs, refuses the whole
+selection exactly as in 3.0.0. A `lane_id` argument passed together with a 4.0.0 policy is refused.
+
+The merge is `ROUND_ROBIN_DEDUP` 1.0.0:
+
+1. Each lane ranks the same eligible spans and returns **chunks**: one span for a span lane, one
+   structure group (title spans, then body) for `GROUPED_BM25`. The flat ranking of `GROUPED_BM25`
+   is unchanged; a 3.0.0 policy still receives it.
+2. A lane keeps the first `depth` chunks of its own ranking. The depth does not depend on any other
+   lane. Depth 3 on `GROUPED_BM25` means three groups; on `PROTECTED_EXACT` three spans.
+3. The lanes take turns in policy order, one chunk each, rank by rank. A lane with nothing left is
+   skipped. Nothing is summed, so there are no ties.
+4. The merged order is admitted under the span and character budget. A span already admitted (a pin,
+   or from an earlier chunk) is skipped. The first span of a chunk that does not fit ends that
+   chunk: a group is admitted with its titles first and its body in document order, and never with a
+   hole in the middle. The next chunk is still tried, so one large group does not keep out a small
+   chunk that follows it. A chunk of one span is simply skipped, as in the single-lane frame. This
+   cut rule belongs to 4.0.0; the 3.0.0 frame skips a span that does not fit and goes on.
+
+RRF and score combination are not part of 1.0.0.
+
+Provenance and attribution. A fused selection carries provenance with the method and version and,
+per lane, `lane0`, `lane1`, ... as `id:version:depth=N` plus that lane's own rule versions
+(`lane0.scanner`, `lane0.grouping`, ...). It is part of what the journaled selection is a function of.
+The evaluation output of a 4.0.0 policy adds `groups` (how many groups the case carried; a grouped
+lane on a case with none ranks single spans) and, when lanes ran, `lanes`: per lane its id, version,
+depth, how many chunks it ranked, `credited_refs` (selected spans it gave first) and `also_refs`
+(selected spans it also ranked within its depth that an earlier lane had given). Those two keys
+are written only for 4.0.0, so the outputs of 2.0.0 and 3.0.0 keep their bytes and the evaluator id
+stays `retrieval-lane-dispatch:1.0.0`.
 
 ## Shadow replay
 
@@ -149,6 +190,11 @@ retrieval request to `select_retrieval_context` again with the shadow's own poli
   policy that is not a retrieval policy) is journaled as `POLICY_HELD` and the request goes on with
   the active result; a shadow never fails its request. The older analysis path does the same, and an
   exposure whose shadow was held is not observed as successful.
+- Held has two reason codes. A selection that is refused (a `ValueError`) is journaled under
+  `SHADOW_SELECTION_HELD`. A selection that breaks for another reason (any other `Exception`;
+  cancellation is not caught) is journaled under `SHADOW_SELECTION_FAILED`. This applies to the
+  candidate stage, the adjacent-packet replay and the older analysis path, and only to shadows: the
+  active selection, and a lane run on its own, still raise.
 - The result never reaches the request. The order and content of what the models receive are exactly
   what the active policy chose; a shadow has no model calls (its observation records zero).
 - The adjacent-packet stage has no shared selection function and differs only by budget, so it is
@@ -168,7 +214,15 @@ policy versions delegate to one function, which builds a retrieval request from 
   ignored, as in the research path; the earlier evaluator treated it as an error.
 - `catalog.groups` (kind, title and body span ids) may be named by a case only for a comparison that uses
   `GROUPED_BM25`; when it is empty the field is not serialized, so the input, its digest and the
-  comparison identity of every other comparison are unchanged.
+  comparison identity of every other comparison are unchanged. A case that names groups is refused
+  when a group names a span the case does not hold (`RETRIEVAL_CASE_GROUP_SPAN_UNKNOWN`) or when a
+  span is in the body of more than one group (`RETRIEVAL_CASE_GROUP_BODY_DUPLICATED`); a title
+  may head several groups.
+- No product code freezes evaluation cases; a case is a host-configured payload.
+  `evaluation_case_payload(request)` in `thoth.domain.retrieval_case` is the one way to make it from
+  the request the research path builds, groups included, and `request_of_case` is its inverse, used by
+  the evaluator. Evaluating that payload selects what the request itself selects, for 2.0.0, 3.0.0
+  and 4.0.0; a test pins it.
 - Output keys: `selected_refs`, `excluded_count`, `selected_characters`, `mode` and `evaluator`; a
   lane that declares provenance adds `lane` (lane id, lane version and, for `PROTECTED_EXACT`, the
   scanner version).
@@ -199,8 +253,8 @@ hash of its stored output.
 ## Not part of this contract
 
 - None of the lanes other than `LEXICAL_SUBSTRING_V1` is a default: the active policy stays 2.0.0 and the
-  new lanes are used only through shadow replay and evaluation. A policy with more than one lane, and
-  fusion of lanes, are a later policy version.
+  new lanes and the 4.0.0 policy are used only through shadow replay and evaluation. No lane
+  combination or depth is recommended here.
 - The reranking model, the adjacent-packet expansion and the context assembly are separate stages
   that consume the shortlist (see [positional evidence context](evidence-context.md)).
 - Nothing here changes an authority, cutoff or access check, a stored policy, or the 2.0.0 baseline.
@@ -222,3 +276,12 @@ and the two ranked lanes; `test_retrieval_source_digests` and `test_retrieval_ev
 source basis, the journal of the original lane and the evaluation inputs and outputs of the existing
 policies did not move. `test_retrieval_policy_3_0_0_digests` pins the serialization and digests of a 3.0.0 policy that names the
 original lane.
+
+4.0.0 is covered by `test_retrieval_fusion` (merge, depth, dedupe, budget, no hole, attribution),
+`test_fused_selection` (the policy through the frame, provenance, whole catalog, pins, refusals),
+`test_retrieval_fusion_policy` (serialization, digests, validation, the handler and the paths that
+enumerate handlers), `test_retrieval_case` (payload equals direct selection, output keys,
+groups validation), `test_retrieval_lane_flat_pins` (3.0.0 selections and outputs did not move),
+`test_retrieval_shadow_failed` (a broken shadow is held, the active path is not caught),
+`test_block_groups_context` (groups of an unobserved source reach the lane) and
+`test_retrieval_fusion_shadow_normal_entry` (the whole chain through the normal request entry).

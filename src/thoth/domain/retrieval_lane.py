@@ -14,7 +14,11 @@ from dataclasses import dataclass
 from typing import Literal
 
 from thoth.domain.behavior_artifact import BehaviorArtifactKind
-from thoth.domain.behavior_policy import RetrievalLanePolicy, RetrievalPolicy
+from thoth.domain.behavior_policy import (
+    RetrievalFusionPolicy,
+    RetrievalLanePolicy,
+    RetrievalPolicy,
+)
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
 from thoth.domain.lane_scoring import (
     BIGRAM_VERSION,
@@ -29,6 +33,16 @@ from thoth.domain.query_identifiers import (
     fold,
     occurs,
     scan_query,
+)
+from thoth.domain.retrieval_fusion import (
+    FUSION_METHOD,
+    FUSION_VERSION,
+    Chunk,
+    LaneContribution,
+    RankedLane,
+    admit_chunks,
+    lane_contributions,
+    merge_round_robin,
 )
 from thoth.domain.retrieval_terms import KOREAN_FUNCTION_WORDS as KOREAN_FUNCTION_WORDS
 from thoth.domain.retrieval_terms import KOREAN_PAIR as KOREAN_PAIR
@@ -89,6 +103,8 @@ class LaneSelection:
     # Which lane version (and which rule set under it) ranked this selection; empty for the
     # original lane, whose records are unchanged.
     provenance: tuple[tuple[str, str], ...] = ()
+    # Per lane, what a fused (4.0.0) selection took from it; empty for a single lane.
+    contributions: tuple[LaneContribution, ...] = ()
 
 
 type Lane = Callable[[RetrievalRequest, tuple[EvidenceSpan, ...]], tuple[EvidenceSpan, ...]]
@@ -290,33 +306,40 @@ def _position(span: EvidenceSpan) -> tuple[object, ...]:
     return (span.artifact_id, span.locator.page or 0, span.locator.line or 0, span.span_id)
 
 
-def _ranked_units(
+def _ranked_chunks(
     units: list[tuple[tuple[EvidenceSpan, ...], tuple[EvidenceSpan, ...]]],
     docs: list[list[str]],
     terms: list[str],
     pinned: set[str],
-) -> tuple[EvidenceSpan, ...]:
-    """Units best first: score, then where the unit starts, then its number. Each unit gives its
-    title spans and then its body spans; a span already given or pinned is skipped."""
+) -> tuple[Chunk, ...]:
+    """Units best first: score, then where the unit starts, then its number. Each unit is one chunk:
+    its title spans and then its body spans, minus any span already given or pinned."""
     scores = bm25_scores(docs, terms)
     order = sorted(
         (index for index, score in enumerate(scores) if score > 0),
         key=lambda i: (-scores[i], _position(units[i][1][0]), i),
     )
     given: set[str] = set(pinned)
-    out: list[EvidenceSpan] = []
+    out: list[Chunk] = []
     for index in order:
         title, body = units[index]
+        chunk: list[EvidenceSpan] = []
         for span in (*title, *body):
             if span.span_id not in given:
                 given.add(span.span_id)
-                out.append(span)
+                chunk.append(span)
+        if chunk:
+            out.append(tuple(chunk))
     return tuple(out)
 
 
-def grouped_bm25_v1(
+def _flat(chunks: tuple[Chunk, ...]) -> tuple[EvidenceSpan, ...]:
+    return tuple(span for chunk in chunks for span in chunk)
+
+
+def grouped_bm25_chunks_v1(
     request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
-) -> tuple[EvidenceSpan, ...]:
+) -> tuple[Chunk, ...]:
     """Structure groups ranked by BM25 over their title and body; a span with no group is a unit.
 
     N and the document frequencies are those of the units of this request's eligible spans. A
@@ -344,7 +367,14 @@ def grouped_bm25_v1(
         for title, body in units
     ]
     terms = [t for text in (request.question, *request.queries) for t in identifier_terms(text)]
-    return _ranked_units(units, docs, terms, set(request.pinned_refs))
+    return _ranked_chunks(units, docs, terms, set(request.pinned_refs))
+
+
+def grouped_bm25_v1(
+    request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
+) -> tuple[EvidenceSpan, ...]:
+    """The same ranking as one list of spans: each group's title first, then its body."""
+    return _flat(grouped_bm25_chunks_v1(request, eligible))
 
 
 def char_bigram_v1(
@@ -354,10 +384,14 @@ def char_bigram_v1(
     units = [((), (s,)) for s in eligible]
     docs = [list(bigram_terms(s.exact_text)) for s in eligible]
     terms = [t for text in (request.question, *request.queries) for t in bigram_terms(text)]
-    return _ranked_units(units, docs, terms, set(request.pinned_refs))
+    return _flat(_ranked_chunks(units, docs, terms, set(request.pinned_refs)))
 
 
 LANES: dict[str, Lane] = {}
+# A lane whose natural unit is bigger than one span also registers its ranking as chunks; the other
+# lanes are ranked chunks of one span each. A fused policy counts depth in these chunks.
+type ChunkLane = Callable[[RetrievalRequest, tuple[EvidenceSpan, ...]], tuple[Chunk, ...]]
+CHUNK_LANES: dict[str, ChunkLane] = {}
 # A lane is its id and its version together: a policy names both, and a lane whose rules change
 # is registered under a new version, so the same policy payload can never select differently.
 LANE_VERSIONS: dict[str, str] = {}
@@ -365,11 +399,28 @@ LANE_PROVENANCE: dict[str, tuple[tuple[str, str], ...]] = {}
 
 
 def register_lane(
-    lane_id: str, version: str, lane: Lane, provenance: tuple[tuple[str, str], ...] = ()
+    lane_id: str,
+    version: str,
+    lane: Lane,
+    provenance: tuple[tuple[str, str], ...] = (),
+    chunks: ChunkLane | None = None,
 ) -> None:
     LANES[lane_id] = lane
     LANE_VERSIONS[lane_id] = version
     LANE_PROVENANCE[lane_id] = provenance
+    if chunks is None:
+        CHUNK_LANES.pop(lane_id, None)
+    else:
+        CHUNK_LANES[lane_id] = chunks
+
+
+def lane_chunks(
+    lane_id: str, request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
+) -> tuple[Chunk, ...]:
+    chunked = CHUNK_LANES.get(lane_id)
+    if chunked is not None:
+        return chunked(request, eligible)
+    return tuple((span,) for span in LANES[lane_id](request, eligible))
 
 
 register_lane(LEXICAL_SUBSTRING_V1, "1.0.0", lexical_substring_v1)
@@ -379,6 +430,7 @@ register_lane(
     "1.0.0",
     grouped_bm25_v1,
     (("grouping", GROUPING_VERSION), ("scoring", BM25_VERSION), ("scanner", SCANNER_VERSION)),
+    grouped_bm25_chunks_v1,
 )
 register_lane(
     CHAR_BIGRAM, "1.0.0", char_bigram_v1, (("scoring", BM25_VERSION), ("terms", BIGRAM_VERSION))
@@ -390,6 +442,10 @@ def select_retrieval_context(
     policy: RetrievalPolicy,
     lane_id: str | None = None,
 ) -> LaneSelection:
+    if isinstance(policy, RetrievalFusionPolicy):
+        if lane_id is not None:
+            raise ValueError("RETRIEVAL_LANE_ID_NOT_ALLOWED_FOR_FUSION")
+        return _select_fused(request, policy)
     if lane_id is None:
         lane_id = (
             policy.lanes[0].lane_id
@@ -433,4 +489,51 @@ def select_retrieval_context(
         eligible,
         limitations,
         provenance if extra else (),
+    )
+
+
+def _select_fused(request: RetrievalRequest, policy: RetrievalFusionPolicy) -> LaneSelection:
+    """Policy 4.0.0: each lane ranks the same eligible spans, then the merge and the frame admit."""
+    for spec in policy.lanes:
+        if spec.lane_id not in LANES:
+            raise ValueError("RETRIEVAL_LANE_UNKNOWN")
+        if LANE_VERSIONS.get(spec.lane_id) != spec.lane_version:
+            raise ValueError("RETRIEVAL_LANE_VERSION_UNKNOWN")
+    eligible = connected_retrieval_spans(request.evidence)
+    complete, limitations = full_catalog(eligible, request.catalog, policy)
+    if complete is not None:
+        return LaneSelection(complete, "FULL_ELIGIBLE_EXTRACTED_CATALOG", eligible, limitations)
+    pinned = set(request.pinned_refs)
+    selected = [span for span in eligible if span.span_id in pinned][: policy.max_spans]
+    ranked = [
+        RankedLane(
+            spec.lane_id,
+            spec.lane_version,
+            spec.depth,
+            lane_chunks(spec.lane_id, request, eligible),
+        )
+        for spec in policy.lanes
+    ]
+    credited = admit_chunks(
+        merge_round_robin(ranked), selected, policy.max_spans, policy.character_budget
+    )
+    provenance: list[tuple[str, str]] = [
+        ("fusion", FUSION_METHOD),
+        ("fusion_version", FUSION_VERSION),
+    ]
+    for index, lane in enumerate(ranked):
+        provenance.append(
+            (f"lane{index}", f"{lane.lane_id}:{lane.lane_version}:depth={lane.depth}")
+        )
+        provenance.extend(
+            (f"lane{index}.{key}", value) for key, value in LANE_PROVENANCE.get(lane.lane_id, ())
+        )
+    observed = request.catalog is not None and request.catalog.all_observed
+    return LaneSelection(
+        tuple(selected),
+        "LEXICAL" if observed else "LEGACY",
+        eligible,
+        limitations,
+        tuple(provenance),
+        lane_contributions(ranked, selected, credited),
     )
