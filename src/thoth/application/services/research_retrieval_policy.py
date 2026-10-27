@@ -7,7 +7,12 @@ from time import perf_counter_ns
 from thoth.application.services.behavior_context import behavior_work_scope, current_behavior_work
 from thoth.domain.behavior_artifact import BehaviorArtifactKind
 from thoth.domain.behavior_execution import BehaviorUse
-from thoth.domain.behavior_policy import BehaviorPolicyError, RetrievalBehaviorPolicy
+from thoth.domain.behavior_policy import (
+    BehaviorPolicyError,
+    RetrievalBehaviorPolicy,
+    RetrievalLanePolicy,
+    RetrievalPolicy,
+)
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.evidence import EvidenceSpan
 
@@ -26,12 +31,12 @@ def replay_retrieval_shadows(selection: Callable[[], object]) -> None:
             selection()
 
 
-def retrieval_policy() -> RetrievalBehaviorPolicy:
+def retrieval_policy() -> RetrievalPolicy:
     work = current_behavior_work()
     if work is None:
         return RetrievalBehaviorPolicy()
     policy = work.snapshot(BehaviorArtifactKind.RETRIEVAL_POLICY).policy
-    if not isinstance(policy, RetrievalBehaviorPolicy):
+    if not isinstance(policy, RetrievalBehaviorPolicy | RetrievalLanePolicy):
         raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
     return policy
 

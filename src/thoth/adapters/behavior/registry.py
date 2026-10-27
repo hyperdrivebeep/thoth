@@ -7,11 +7,17 @@ from thoth.domain.behavior_policy import (
     PromptBehaviorPolicy,
     RetrievalBehaviorInput,
     RetrievalBehaviorPolicy,
+    RetrievalLanePolicy,
     WorkflowBehaviorInput,
     WorkflowBehaviorPolicy,
     render_prompt_policy,
-    select_evidence_context,
     workflow_repair_decision,
+)
+from thoth.domain.retrieval_lane import (
+    RETRIEVAL_EVALUATOR_ID,
+    CatalogContext,
+    RetrievalRequest,
+    select_retrieval_context,
 )
 from thoth.ports.behavior_resolver import BehaviorComponentHandlerPort
 
@@ -24,9 +30,11 @@ class TypedBehaviorHandler:
         kind: BehaviorArtifactKind,
         policy_type: type[PromptBehaviorPolicy]
         | type[RetrievalBehaviorPolicy]
+        | type[RetrievalLanePolicy]
         | type[WorkflowBehaviorPolicy],
+        version: str = "2.0.0",
     ) -> None:
-        self.kind, self._policy_type = kind, policy_type
+        self.kind, self._policy_type, self.version = kind, policy_type, version
 
     def compile(self, content: dict[str, object]) -> BehaviorPolicy:
         try:
@@ -71,6 +79,42 @@ class PromptBehaviorHandler(TypedBehaviorHandler):
         )
 
 
+def evaluate_retrieval(
+    policy: RetrievalBehaviorPolicy | RetrievalLanePolicy, payload: dict[str, JsonValue]
+) -> dict[str, JsonValue]:
+    """Evaluate a retrieval policy with the function the research path itself calls."""
+    request = RetrievalBehaviorInput.model_validate(payload)
+    catalog = request.catalog
+    selection = select_retrieval_context(
+        RetrievalRequest(
+            request.problem,
+            request.queries,
+            request.evidence,
+            tuple(dict.fromkeys((*request.forced_refs, *request.pinned_refs))),
+            None
+            if catalog is None
+            else CatalogContext(
+                catalog.ordered_refs,
+                frozenset(catalog.protected_refs),
+                catalog.all_observed,
+                catalog.structure_count,
+            ),
+        ),
+        policy,
+    )
+    return {
+        "selected_refs": [span.span_id for span in selection.selected],
+        "excluded_count": len(request.evidence) - len(selection.selected),
+        "selected_characters": sum(len(span.exact_text) for span in selection.selected),
+        "mode": selection.mode,
+        "evaluator": RETRIEVAL_EVALUATOR_ID,
+    }
+
+
+def _wider_retrieval_budget(policy: RetrievalBehaviorPolicy | RetrievalLanePolicy) -> int:
+    return min(160, policy.max_spans * 2) if policy.max_spans < 160 else 80
+
+
 class RetrievalBehaviorHandler(TypedBehaviorHandler):
     def __init__(self) -> None:
         super().__init__(BehaviorArtifactKind.RETRIEVAL_POLICY, RetrievalBehaviorPolicy)
@@ -80,25 +124,31 @@ class RetrievalBehaviorHandler(TypedBehaviorHandler):
     ) -> dict[str, JsonValue]:
         if not isinstance(policy, RetrievalBehaviorPolicy):
             raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
-        request = RetrievalBehaviorInput.model_validate(payload)
-        result = select_evidence_context(
-            problem=request.problem,
-            evidence=request.evidence,
-            forced_refs=request.forced_refs,
-            max_spans=policy.max_spans,
-            character_budget=policy.character_budget,
-        )
-        return {
-            "selected_refs": [span.span_id for span in result.selected],
-            "excluded_count": result.excluded_count,
-            "selected_characters": result.selected_characters,
-        }
+        return evaluate_retrieval(policy, payload)
 
     def propose(self, policy: BehaviorPolicy, failure_class: str) -> tuple[BehaviorPolicy, ...]:
         if not isinstance(policy, RetrievalBehaviorPolicy) or failure_class != "SEMANTIC":
             return ()
-        spans = min(160, policy.max_spans * 2) if policy.max_spans < 160 else 80
-        return (policy.model_copy(update={"max_spans": spans}),)
+        return (policy.model_copy(update={"max_spans": _wider_retrieval_budget(policy)}),)
+
+
+class RetrievalLaneHandler(TypedBehaviorHandler):
+    """Retrieval policy 3.0.0; it is evaluated by the same function as 2.0.0."""
+
+    def __init__(self) -> None:
+        super().__init__(BehaviorArtifactKind.RETRIEVAL_POLICY, RetrievalLanePolicy, "3.0.0")
+
+    def evaluate(
+        self, policy: BehaviorPolicy, payload: dict[str, JsonValue]
+    ) -> dict[str, JsonValue]:
+        if not isinstance(policy, RetrievalLanePolicy):
+            raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
+        return evaluate_retrieval(policy, payload)
+
+    def propose(self, policy: BehaviorPolicy, failure_class: str) -> tuple[BehaviorPolicy, ...]:
+        if not isinstance(policy, RetrievalLanePolicy) or failure_class != "SEMANTIC":
+            return ()
+        return (policy.model_copy(update={"max_spans": _wider_retrieval_budget(policy)}),)
 
 
 class WorkflowBehaviorHandler(TypedBehaviorHandler):
@@ -145,5 +195,6 @@ def default_behavior_components() -> BehaviorComponentRegistry:
     registry = BehaviorComponentRegistry()
     registry.register(PromptBehaviorHandler())
     registry.register(RetrievalBehaviorHandler())
+    registry.register(RetrievalLaneHandler())
     registry.register(WorkflowBehaviorHandler())
     return registry

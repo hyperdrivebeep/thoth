@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 from collections.abc import Callable
 from typing import cast
 
@@ -15,6 +16,7 @@ from thoth.domain.evaluation_run import (
     sealed_payload,
 )
 from thoth.domain.resource_scope import ResourceScopeError
+from thoth.domain.retrieval_lane import evaluation_algorithm
 from thoth.ports.evaluation_runner import (
     EvaluationExecutorRegistryPort,
     EvaluationRunStorePort,
@@ -102,6 +104,7 @@ class PairedEvaluationService:
         public_inputs = tuple(case.public for case in binding.case_pack.cases)
         memory = cast(dict[str, object], binding.case_pack.initial_memory)
         try:
+            self._require_same_algorithm(record)
             if record.baseline is None:
                 self._inputs.validate_current(spec)
                 record = self._set(record, active_arm="BASELINE")
@@ -143,6 +146,19 @@ class PairedEvaluationService:
         except Exception:
             self._failure(record, "EVALUATION_INTERRUPTED")
             raise
+
+    def _require_same_algorithm(self, record: PairedRunRecord) -> None:
+        """A resumed pair never mixes arms made by different evaluation algorithms."""
+        expected = evaluation_algorithm(record.spec.component)
+        if expected is None:
+            return
+        for receipt in (record.baseline, record.candidate):
+            if receipt is None or receipt.state != "SUCCEEDED":
+                continue
+            parsed = json.loads(self._objects.read(receipt.output_blob_digest))
+            outputs = cast(list[dict[str, object]], parsed.get("outputs", []))
+            if {item.get("evaluator") for item in outputs} != {expected}:
+                raise EvaluationRunError("EVALUATION_ALGORITHM_CHANGED")
 
     def read(self, project_id: str, pair_id: str) -> PairedRunRecord:
         record = self._store.read(project_id, pair_id)

@@ -16,6 +16,7 @@ from thoth.domain.behavior_execution import ActiveBehaviorSnapshot, BehaviorUse
 from thoth.domain.behavior_policy import (
     BehaviorPolicyError,
     RetrievalBehaviorPolicy,
+    RetrievalLanePolicy,
     WorkflowBehaviorPolicy,
     workflow_repair_decision,
 )
@@ -66,7 +67,7 @@ def select_evidence_for_behavior(
         return select_evidence_context(problem=problem, evidence=evidence, forced_refs=forced_refs)
     snapshot = context.snapshot(BehaviorArtifactKind.RETRIEVAL_POLICY)
     policy = snapshot.policy
-    if not isinstance(policy, RetrievalBehaviorPolicy):
+    if not isinstance(policy, RetrievalBehaviorPolicy | RetrievalLanePolicy):
         raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
     started = perf_counter_ns()
     result = select_evidence_context(
@@ -104,7 +105,7 @@ def select_evidence_for_behavior(
         if shadow.component != BehaviorArtifactKind.RETRIEVAL_POLICY:
             continue
         shadow_policy = shadow.policy
-        if not isinstance(shadow_policy, RetrievalBehaviorPolicy):
+        if not isinstance(shadow_policy, RetrievalBehaviorPolicy | RetrievalLanePolicy):
             raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
         started = perf_counter_ns()
         operation = "EVIDENCE_SELECTION"
