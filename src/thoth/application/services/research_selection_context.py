@@ -7,6 +7,7 @@ from thoth.domain.artifact import StructuralDocument
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.context_observation import ContextObservation
 from thoth.domain.evidence import EvidenceSpan
+from thoth.domain.retrieval_lane import CatalogContext
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
 
 
@@ -18,6 +19,11 @@ class CandidateContext:
     structure_count: int
     basis_digest: str
     limitations: tuple[str, ...]
+
+    def to_catalog(self) -> CatalogContext:
+        return CatalogContext(
+            self.ordered_refs, self.protected_refs, self.all_observed, self.structure_count
+        )
 
 
 def source_observation(
