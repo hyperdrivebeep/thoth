@@ -126,7 +126,12 @@ class Armed:
 
 
 @asynccontextmanager
-async def armed_shadow(tmp_path: Path, model: ControlledResearchModel) -> AsyncGenerator[Armed]:
+async def armed_shadow(
+    tmp_path: Path,
+    model: ControlledResearchModel,
+    candidate: dict[str, object] = CANDIDATE,
+    cases: list[dict[str, object]] = CASES,
+) -> AsyncGenerator[Armed]:
     """A project with a source, one plain request, the evaluation pair, and the armed shadow."""
     (tmp_path / "inbox").mkdir(exist_ok=True)
     (tmp_path / "inbox" / "records.html").write_text(SOURCE, encoding="utf-8")
@@ -134,8 +139,8 @@ async def armed_shadow(tmp_path: Path, model: ControlledResearchModel) -> AsyncG
         tmp_path,
         {},
         {},
-        CASES,
-        policy_pair=(BASELINE, CANDIDATE),
+        cases,
+        policy_pair=(BASELINE, candidate),
         component=BehaviorArtifactKind.RETRIEVAL_POLICY,
         target_component="RETRIEVAL_QUERY_ROUTING",
         executor_id="BEHAVIOR_COMPONENT_SUBPROCESS_V1",

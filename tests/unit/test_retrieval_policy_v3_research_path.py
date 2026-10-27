@@ -13,15 +13,14 @@ from thoth.domain.behavior_execution import ActiveBehaviorSnapshot
 from thoth.domain.behavior_policy import (
     RetrievalBehaviorPolicy,
     RetrievalLanePolicy,
+    RetrievalPolicy,
 )
 from thoth.domain.evaluation_run import sealed_payload
 
 POLICIES = (RetrievalBehaviorPolicy, RetrievalLanePolicy)
 
 
-def snapshot(
-    policy: RetrievalBehaviorPolicy | RetrievalLanePolicy, origin: str = "BASELINE"
-) -> ActiveBehaviorSnapshot:
+def snapshot(policy: RetrievalPolicy, origin: str = "BASELINE") -> ActiveBehaviorSnapshot:
     return ActiveBehaviorSnapshot.model_validate(
         sealed_payload(
             "ACTIVE_BEHAVIOR_SNAPSHOT",
