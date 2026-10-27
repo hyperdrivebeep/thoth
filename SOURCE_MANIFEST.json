@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-27T09:17:34.240551+00:00",
+  "created_at": "2026-10-27T14:51:38.857095+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -2128,8 +2128,8 @@
     },
     {
       "path": "docs/architecture/evidence-context.md",
-      "sha256": "bb34668fd2d936fa8b8933fbbc4aff245e76123a072a72e5fbea2fcf5560b516",
-      "bytes": 5056
+      "sha256": "4c16d858f32d18876704afe05502297504162226cde64969ea91ed4f5c4bc9b0",
+      "bytes": 5238
     },
     {
       "path": "docs/architecture/extension-point-catalog.md",
@@ -2205,6 +2205,11 @@
       "path": "docs/architecture/research-result-producer-selection.md",
       "sha256": "7d0e527db936204b9d97b1a5d1b9e08e6ae794fde3147752d6ccf4a931a2e5a0",
       "bytes": 3411
+    },
+    {
+      "path": "docs/architecture/retrieval-lanes.md",
+      "sha256": "a3bbb7e5ded912bbfdbf5c3d433527905f93d89f5281a4b05bf870e055e5599e",
+      "bytes": 8291
     },
     {
       "path": "docs/architecture/rpc-method-catalog.md",
@@ -6118,13 +6123,13 @@
     },
     {
       "path": "src/thoth/application/services/research_retrieval.py",
-      "sha256": "29f4fc0332eb671191f3ac456e3350809844998de04a3c3b359f07c6e462b34a",
-      "bytes": 6590
+      "sha256": "325362ee0468c4a160a048a8df9a2fb1b1b9f757ed7962fdb92600710f0b1004",
+      "bytes": 7044
     },
     {
       "path": "src/thoth/application/services/research_retrieval_policy.py",
-      "sha256": "3ed90d8e4c678c0ef6c3178cc039fa445c901e35bc878ff4ced507b816182bcf",
-      "bytes": 2427
+      "sha256": "1e916d7c61b4302e1503a5525ac1784acc3e143b65b4a88af3f72fb06fe114d4",
+      "bytes": 3596
     },
     {
       "path": "src/thoth/application/services/research_review_context.py",
@@ -8688,8 +8693,8 @@
     },
     {
       "path": "tests/integration/behavior_exposure_helpers.py",
-      "sha256": "d7c52e1e7afe3d5158318473cd8fb00d72b25aea6a0230357662d33786038eff",
-      "bytes": 10566
+      "sha256": "b0346dfcc0ea05c568f7d0e30c71ab480d6501f09155731f7c36339680556134",
+      "bytes": 11588
     },
     {
       "path": "tests/integration/counter_clock_observation.py",
@@ -10335,6 +10340,11 @@
       "path": "tests/integration/test_retrieval_gap_reassessment.py",
       "sha256": "ca222a34a891dc5286f4abbe3b6cc89d3af5d5a9e8eff2850dbc4c5e24ba412b",
       "bytes": 2989
+    },
+    {
+      "path": "tests/integration/test_retrieval_shadow_normal_entry.py",
+      "sha256": "8668bfe130f726148d31807e2249bb9fad61366fbfae443797c6e253a160b601",
+      "bytes": 10221
     },
     {
       "path": "tests/integration/test_revision_command_golden.py",
@@ -12217,6 +12227,11 @@
       "bytes": 30212
     },
     {
+      "path": "tests/unit/test_retrieval_shadow_replay.py",
+      "sha256": "79175eb5d4b8e7a8e2d695b1f82c88f0c0748ea7cfa99603473a21df79d42a1e",
+      "bytes": 5998
+    },
+    {
       "path": "tests/unit/test_running_research.py",
       "sha256": "01a57e036610112afb6b0c2b1dac47dc1ade4a7b1070a2d2d736d283dbf8fca4",
       "bytes": 1940
@@ -12290,6 +12305,11 @@
       "path": "tests/unit/test_validate_synthetic_radar_demo.py",
       "sha256": "97e85877dccd5159a0285f53c31cd8b3032249dda33aedc9f5a2f389564c3324",
       "bytes": 5092
+    },
+    {
+      "path": "tests/unit/test_work_candidates_record.py",
+      "sha256": "3b370e57c621b6e994c43b9e498bf1a18e1827b5ccfdcb420e533ac260d54832",
+      "bytes": 4615
     },
     {
       "path": "tests/unit/test_workspace_location.py",

@@ -37,6 +37,9 @@ Selection and coverage use one full-catalog admission decision. The observed ord
 match the eligible IDs exactly, without duplicates; otherwise lexical selection is used and
 coverage records CONTEXT_ORDERED_REFS_MISMATCH.
 
+The shortlist is chosen by one selection function whose ranking rule is a registered lane; see
+[retrieval lanes](retrieval-lanes.md) for the policies, shadow replay and evaluation.
+
 Mixed or legacy catalogs retain lexical selection; supported short headings and leading
 paragraphs are protected without globally removing the length/noise filter. CSV/XLSX selection
 and their legacy assembly behavior are retained. Spreadsheet sheet-boundary improvements are

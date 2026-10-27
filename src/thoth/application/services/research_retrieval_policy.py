@@ -6,7 +6,7 @@ from time import perf_counter_ns
 
 from thoth.application.services.behavior_context import behavior_work_scope, current_behavior_work
 from thoth.domain.behavior_artifact import BehaviorArtifactKind
-from thoth.domain.behavior_execution import BehaviorUse
+from thoth.domain.behavior_execution import ActiveBehaviorSnapshot, BehaviorUse
 from thoth.domain.behavior_policy import (
     BehaviorPolicyError,
     RetrievalBehaviorPolicy,
@@ -18,6 +18,11 @@ from thoth.domain.evidence import EvidenceSpan
 
 
 def replay_retrieval_shadows(selection: Callable[[], object]) -> None:
+    """Run a stage again under each retrieval shadow, for stages with no shared selection function.
+
+    The candidate stage does not use this: it hands the same request and the shadow's own policy to
+    the selection function itself (see lexical_selection).
+    """
     work = current_behavior_work()
     if work is None:
         return
@@ -41,13 +46,34 @@ def retrieval_policy() -> RetrievalPolicy:
     return policy
 
 
+def retrieval_shadows() -> tuple[tuple[ActiveBehaviorSnapshot, RetrievalPolicy], ...]:
+    """Each retrieval shadow of this request with its policy, in the order they were armed."""
+    work = current_behavior_work()
+    if work is None:
+        return ()
+    shadows: list[tuple[ActiveBehaviorSnapshot, RetrievalPolicy]] = []
+    for shadow in work.shadows:
+        if shadow.component != BehaviorArtifactKind.RETRIEVAL_POLICY:
+            continue
+        if not isinstance(shadow.policy, RetrievalBehaviorPolicy | RetrievalLanePolicy):
+            raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
+        shadows.append((shadow, shadow.policy))
+    return tuple(shadows)
+
+
 def record_selection(
-    stage: str, inputs: object, result: tuple[EvidenceSpan, ...], started: int
+    stage: str,
+    inputs: object,
+    result: tuple[EvidenceSpan, ...],
+    started: int,
+    snapshot: ActiveBehaviorSnapshot | None = None,
 ) -> None:
+    """Journal one selection against the active policy, or against the shadow snapshot given."""
     work = current_behavior_work()
     if work is None:
         return
-    snapshot = work.snapshot(BehaviorArtifactKind.RETRIEVAL_POLICY)
+    if snapshot is None:
+        snapshot = work.snapshot(BehaviorArtifactKind.RETRIEVAL_POLICY)
     work.uses.append(
         BehaviorUse(
             component=snapshot.component,

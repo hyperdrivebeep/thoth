@@ -6,6 +6,7 @@ from thoth.application.services.research_retrieval_policy import (
     record_selection,
     replay_retrieval_shadows,
     retrieval_policy,
+    retrieval_shadows,
 )
 from thoth.application.services.research_selection_context import (
     CandidateContext,
@@ -17,9 +18,9 @@ from thoth.domain.research_execution import ResearchWork
 from thoth.domain.retrieval_coverage import RetrievalSelection
 from thoth.domain.retrieval_lane import (
     MAX_BLOCK_SPANS,
+    LaneSelection,
     RetrievalRequest,
     block_key,
-    full_catalog,
     select_retrieval_context,
 )
 
@@ -59,6 +60,40 @@ def text_neighbors(
     return tuple(dict.fromkeys([*near, *block]))
 
 
+def lexical_selection(
+    question: str,
+    queries: tuple[str, ...],
+    evidence: tuple[EvidenceSpan, ...],
+    pinned: tuple[str, ...] = (),
+    *,
+    context: CandidateContext | None = None,
+) -> LaneSelection:
+    """Select the shortlist with the active policy, then run each shadow policy on the same request.
+
+    A shadow is journaled as if it had been the active policy; its result never reaches the caller.
+    """
+    request = RetrievalRequest(
+        question, queries, evidence, pinned, None if context is None else context.to_catalog()
+    )
+    inputs = {"question": question, "queries": queries, "evidence": evidence}
+    started = perf_counter_ns()
+    selection = select_retrieval_context(request, retrieval_policy())
+    record_selection(_stage(selection), inputs, selection.selected, started)
+    for shadow, shadow_policy in retrieval_shadows():
+        started = perf_counter_ns()
+        replayed = select_retrieval_context(request, shadow_policy)
+        record_selection(_stage(replayed), inputs, replayed.selected, started, shadow)
+    return selection
+
+
+def _stage(selection: LaneSelection) -> str:
+    return (
+        "FULL_ELIGIBLE_EXTRACTED_CATALOG"
+        if selection.mode == "FULL_ELIGIBLE_EXTRACTED_CATALOG"
+        else "LEXICAL_CANDIDATES"
+    )
+
+
 def lexical_candidates(
     question: str,
     queries: tuple[str, ...],
@@ -67,25 +102,7 @@ def lexical_candidates(
     *,
     context: CandidateContext | None = None,
 ) -> tuple[EvidenceSpan, ...]:
-    policy, started = retrieval_policy(), perf_counter_ns()
-    selection = select_retrieval_context(
-        RetrievalRequest(
-            question, queries, evidence, pinned, None if context is None else context.to_catalog()
-        ),
-        policy,
-    )
-    record_selection(
-        "FULL_ELIGIBLE_EXTRACTED_CATALOG"
-        if selection.mode == "FULL_ELIGIBLE_EXTRACTED_CATALOG"
-        else "LEXICAL_CANDIDATES",
-        {"question": question, "queries": queries, "evidence": evidence},
-        selection.selected,
-        started,
-    )
-    replay_retrieval_shadows(
-        lambda: lexical_candidates(question, queries, evidence, pinned, context=context)
-    )
-    return selection.selected
+    return lexical_selection(question, queries, evidence, pinned, context=context).selected
 
 
 def work_candidates(
@@ -97,13 +114,10 @@ def work_candidates(
     """The shortlist for a request: its question, its queries and the spans its start row pins."""
     eligible = connected_retrieval_spans(evidence)
     context = None if artifacts is None else candidate_context(eligible, artifacts)
-    result = lexical_candidates(
+    selection = lexical_selection(
         work.effective_question, queries, evidence, work.pinned_spans, context=context
     )
-    policy = retrieval_policy()
-    complete, limitations = full_catalog(
-        eligible, None if context is None else context.to_catalog(), policy
-    )
+    result = selection.selected
     work.retrieval_selection = RetrievalSelection(
         evidence,
         eligible,
@@ -111,13 +125,9 @@ def work_candidates(
         domain_digest("RETRIEVAL_SOURCE", "1.0.0", canonical_payload({"source": evidence}))
         if context is None
         else context.basis_digest,
-        domain_digest("RETRIEVAL_POLICY", "1.0.0", canonical_payload(policy)),
-        "FULL_ELIGIBLE_EXTRACTED_CATALOG"
-        if complete is not None
-        else "LEGACY"
-        if context is None or not context.all_observed
-        else "LEXICAL",
-        ("LEGACY_CONTEXT",) if context is None else (*context.limitations, *limitations),
+        domain_digest("RETRIEVAL_POLICY", "1.0.0", canonical_payload(retrieval_policy())),
+        selection.mode,
+        ("LEGACY_CONTEXT",) if context is None else (*context.limitations, *selection.limitations),
         contextual_refs=() if context is None else context.ordered_refs,
     )
     return result
