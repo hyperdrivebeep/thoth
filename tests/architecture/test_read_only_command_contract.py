@@ -5,10 +5,13 @@ import os
 import shutil
 import subprocess
 import sys
+from collections.abc import Callable
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
+from scripts import read_only_command_contract
 from scripts.architecture_gate_contract import (
     archive_receipt,
     calculate_preflight_receipt_id,
@@ -19,6 +22,32 @@ from scripts.read_only_command_contract import analyze_command
 from tests.architecture.owner_helpers import bind_owner
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+@pytest.fixture(autouse=True)
+def shell_parse_without_a_time_limit(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Parse commands in this file without the hook's 8 s PowerShell limit.
+
+    The hook parses a command with a PowerShell subprocess and fails closed (UNCLASSIFIED) when that
+    takes longer than 8 s. On a loaded machine PowerShell alone can take that long, so a test that
+    expects READ_ONLY, WRITE or one exact refusal reason would fail without the code under test
+    having changed. These tests check what is classified, not how fast PowerShell starts. The
+    parser is still the real one; only the limit is left out, and the hook run as its own process
+    (see `hook`) keeps it.
+    """
+    real_run: Callable[..., subprocess.CompletedProcess[Any]] = subprocess.run
+
+    def run_unbounded(*args: Any, **kwargs: Any) -> subprocess.CompletedProcess[Any]:
+        kwargs.pop("timeout", None)
+        return real_run(*args, **kwargs)
+
+    monkeypatch.setattr(
+        read_only_command_contract,
+        "subprocess",
+        SimpleNamespace(run=run_unbounded, TimeoutExpired=subprocess.TimeoutExpired),
+    )
+
+
 HASH_AND_SEARCH = (
     '.venv/Scripts/python.exe -c "from pathlib import Path; import hashlib; '
     "print(hashlib.sha256(Path('src/thoth/apps/runtime.py').read_bytes()).hexdigest())\"; "

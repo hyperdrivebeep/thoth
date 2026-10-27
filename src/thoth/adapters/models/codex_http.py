@@ -8,9 +8,9 @@ import asyncio
 import json
 import time
 import weakref
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from contextlib import suppress
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from decimal import Decimal
 from pathlib import Path
 from typing import cast
@@ -33,6 +33,58 @@ from thoth.domain.model_dispatch import (
 from thoth.domain.model_settings import ResolvedModelSettings
 from thoth.ports.model import ModelExecutionHold, ModelTransportCancelled, ModelTransportHold
 from thoth.ports.model_transport import OAuthSessionPort
+
+# Each close (the response, then the client) may take this long once the attempt is over. Past it
+# the close is given up, the observation says so, and the attempt's own outcome is raised as it
+# was. The two closes together stay inside the 2 s the caller waits for a cancelled attempt.
+CLEANUP_SECONDS = 1.0
+
+_UNFINISHED_CLOSES: set[asyncio.Future[None]] = set()
+
+
+@dataclass(frozen=True)
+class _CloseResult:
+    finished: bool
+    # A cancellation that arrived while the close ran. It is handed back, never dropped.
+    cancelled: asyncio.CancelledError | None
+
+
+async def _close_within(close: Awaitable[None], limit: float) -> _CloseResult:
+    """Let a close run to its end although this task is cancelled again, but only for `limit`.
+
+    The close runs as its own task behind a shield, so a cancel that lands while it runs (the
+    attempt's deadline expiring during cleanup, a second caller cancel) cannot cut it. This task
+    keeps waiting for it. A cancel that arrived is returned for the caller to raise once the close
+    is over; it is not swallowed. A close that has not finished at `limit` is cancelled and reported
+    as unfinished, so cleanup never keeps an attempt alive longer than `limit`.
+    """
+    task = asyncio.ensure_future(close)
+    loop = asyncio.get_running_loop()
+    end = loop.time() + limit
+    cancelled: asyncio.CancelledError | None = None
+    try:
+        while not task.done():
+            remaining = end - loop.time()
+            if remaining <= 0:
+                break
+            try:
+                await asyncio.wait_for(asyncio.shield(task), remaining)
+            except TimeoutError:
+                break
+            except asyncio.CancelledError as exc:
+                cancelled = exc
+            except Exception:
+                if cancelled is not None:
+                    raise cancelled from None
+                raise
+    finally:
+        if not task.done():
+            task.cancel()
+            # A close that ignores its cancel stays referenced until it ends.
+            _UNFINISHED_CLOSES.add(task)
+            task.add_done_callback(_UNFINISHED_CLOSES.discard)
+    return _CloseResult(task.done() and not task.cancelled(), cancelled)
+
 
 OAUTH_LOCAL_CONTROL = ModelControlCapability(
     capability_id="codex-oauth-http-local-bounds",
@@ -329,9 +381,15 @@ class CodexHttpExecutor:
         finally:
             stats.freeze_terminal()
             stats.transport_closed = False
-            with suppress(TimeoutError, httpx.HTTPError):
-                await asyncio.wait_for(client.aclose(), 2)
-                stats.transport_closed = True
+            closed = False
+            with suppress(httpx.HTTPError):
+                result = await _close_within(client.aclose(), CLEANUP_SECONDS)
+                closed = result.finished
+                if result.cancelled is not None:
+                    # A cancel during cleanup wins over the outcome the attempt had reached.
+                    stats.local_cancel_requested = True
+                    cause, reason = result.cancelled, ""
+            stats.transport_closed = closed and stats.response_closed is not False
         if isinstance(cause, asyncio.CancelledError):
             raise ModelTransportCancelled(stats.snapshot(request)) from cause
         if cause is not None:
@@ -398,4 +456,8 @@ class CodexHttpExecutor:
                 raise ModelExecutionHold(f"OAUTH_{reason}_{response.status_code}")
             return await parse_responses_sse(response, request, stats, reason_prefix="OAUTH")
         finally:
-            await response.aclose()
+            closed = await _close_within(response.aclose(), CLEANUP_SECONDS)
+            if not closed.finished:
+                stats.response_closed = False
+            if closed.cancelled is not None:
+                raise closed.cancelled

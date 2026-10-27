@@ -28,6 +28,10 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
+from tests.integration.progress_wait import (
+    wait_for_event_while_progressing,
+    wait_while_progressing,
+)
 from tests.integration.repeat_probe import RepeatProbe
 from tests.integration.scoped_runtime import create_runtime
 from tests.integration.storage_coverage_helpers import domain_snapshot, request, value
@@ -304,20 +308,32 @@ async def _research_calls(tmp_path: Path, *, resumes: int) -> tuple[int, str, An
                 )
             )
         )
-        await asyncio.wait_for(model.started.wait(), 8)
+
+        def moved() -> object:
+            return len(model.calls)
+
+        await wait_for_event_while_progressing(
+            model.started, moved, label="the research request reaches its first model call"
+        )
         scope: dict[str, object] = {"project_id": "p", "thread_id": accepted["thread_id"]}
         value(await runtime.bus.dispatch(request("thread/pause", "pause", scope)))
         model.release.set()
-        await asyncio.wait_for(runtime.bus.drain(), 12)
+        await wait_while_progressing(runtime.bus.drain(), moved, label="drain after the pause")
         model.release.clear()  # the resumed run blocks again, so the next resume meets it running
+        model.started.clear()
         last: dict[str, Any] = {}
         for index in range(resumes):
             last = value(
                 await runtime.bus.dispatch(request("thread/resume", f"resume-{index}", scope))
             )
-            await asyncio.sleep(0.5)
+            if index == 0:
+                # The first resume starts a run. Once it is blocked at the model, a later resume
+                # meets it running; no wall-clock wait stands in for that.
+                await wait_for_event_while_progressing(
+                    model.started, moved, label="the resumed run reaches the model"
+                )
         model.release.set()
-        await asyncio.wait_for(runtime.bus.drain(), 12)
+        await wait_while_progressing(runtime.bus.drain(), moved, label="drain after the resumes")
         operation = runtime.bus.read_operation(str(accepted["operation_id"]))
         assert operation is not None
         state = await _thread_state(runtime, scope)
