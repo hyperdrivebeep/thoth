@@ -14,8 +14,12 @@ import pytest
 from thoth.adapters.models.codex_oauth import role_contract
 from thoth.application.services.research_review_context import research_prompt_version
 from thoth.domain.absence_claim import ABSENCE_INSTRUCTION, ABSENCE_RESULT_CONTRACT, AbsenceClaim
-from thoth.domain.derived_calculation import SOURCE_ARITHMETIC_CONTRACT
+from thoth.domain.derived_calculation import (
+    NUMERIC_CITATION_INSTRUCTION,
+    SOURCE_ARITHMETIC_CONTRACT,
+)
 from thoth.domain.enums import ModelRole
+from thoth.domain.model_interpretation import MODEL_INTERPRETATION_CONTRACT
 
 SRC = Path(__file__).resolve().parents[2] / "src"
 # Sentences may open with an output field name that the contract is describing.
@@ -49,6 +53,8 @@ def task_texts() -> dict[str, str]:
 def contract_texts() -> dict[str, str]:
     return {
         "SOURCE_ARITHMETIC": SOURCE_ARITHMETIC_CONTRACT,
+        "NUMERIC_CITATION_INSTRUCTION": NUMERIC_CITATION_INSTRUCTION,
+        "MODEL_INTERPRETATION": MODEL_INTERPRETATION_CONTRACT,
         "ABSENCE_INSTRUCTION": ABSENCE_INSTRUCTION,
         "ABSENCE_RESULT_CONTRACT": ABSENCE_RESULT_CONTRACT,
         "ABSENCE_TARGET": AbsenceClaim.model_fields["target"].description or "",
@@ -88,7 +94,9 @@ def test_orphan_fragment_is_detected() -> None:
 
 
 def test_repaired_roles_have_new_prompt_version() -> None:
-    assert research_prompt_version(ModelRole.SEMANTIC_REVIEWER) == "semantic_reviewer.v6"
+    # v7: the reviewer may be told to cite checked arithmetic and receives labelled earlier-role
+    # statements; v6 stages are no longer reusable.
+    assert research_prompt_version(ModelRole.SEMANTIC_REVIEWER) == "semantic_reviewer.v7"
     assert research_prompt_version(ModelRole.REVIEW_ADJUDICATOR) == "review_adjudicator.v6"
     assert research_prompt_version(ModelRole.RESEARCH_PLANNER) == "research_planner.v5"
     assert research_prompt_version(ModelRole.EVIDENCE_RERANKER) == "evidence_reranker.v5"

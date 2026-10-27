@@ -94,24 +94,24 @@ export const reviewPanelsMessages = {
     "en": "Request review"
   },
   "facts.title": {
-    "ko": "확인된 사실",
-    "en": "Verified facts"
+    "ko": "AI 검토 요약(인용 위치만 확인)",
+    "en": "AI review summary (citation locations checked only)"
   },
   "facts.documentOnly": {
-    "ko": "· 문서에 적힌 내용이며 기준 충족을 뜻하지 않습니다",
-    "en": "· Reported in the document; this does not establish that a criterion is met"
+    "ko": "· AI 검토자가 정리한 문장입니다. 인용한 위치만 확인했고, 내용이 사실인지와 기준 충족은 확인하지 않았습니다",
+    "en": "· Written by an AI reviewer; only the cited locations were checked, not whether the statements are true or a criterion is met"
   },
   "facts.legacy": {
-    "ko": "이 결과에는 정리된 확인 사실이 없습니다(이전 형식).",
-    "en": "This older result format has no structured verified-fact section."
+    "ko": "이 결과에는 정리된 AI 검토 요약이 없습니다(이전 형식).",
+    "en": "This older result format has no structured AI review summary."
   },
   "facts.empty": {
-    "ko": "정리된 확인 사실 없음",
-    "en": "No structured verified facts"
+    "ko": "정리된 AI 검토 요약 없음",
+    "en": "No structured AI review summary"
   },
   "facts.notFound": {
-    "ko": "찾아봤지만 없음",
-    "en": "Searched but not found"
+    "ko": "AI가 찾아봤지만 없다고 함",
+    "en": "AI searched and reports not found"
   },
   "sourceTime.correctReason": {
     "ko": "날짜 근거 정정",

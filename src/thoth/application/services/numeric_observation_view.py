@@ -5,6 +5,7 @@ from collections import defaultdict
 from thoth.application.services.research_retrieval_policy import retrieval_policy
 from thoth.domain.canonical import canonical_payload
 from thoth.domain.derived_calculation import (
+    NUMERIC_CITATION_INSTRUCTION,
     CheckedObservations,
     DerivedCalculation,
     NumericDelivery,
@@ -23,6 +24,10 @@ NUMERIC_ROLES = frozenset(
         ModelRole.HYPOTHESIS_GENERATOR,
     }
 )
+# Only the roles that write the answer's reading of the numbers are told to cite them.
+CITATION_ROLES = frozenset({ModelRole.SEMANTIC_REVIEWER, ModelRole.HYPOTHESIS_GENERATOR})
+INSTRUCTION_KEY = "numeric_instruction"
+_NUMERIC_KEYS = frozenset({"checked_observations", INSTRUCTION_KEY})
 
 
 def _in_input(series: NumericSeriesObservation, source: dict[str, EvidenceSpan]) -> bool:
@@ -73,11 +78,11 @@ def observation_rows(
 def with_numeric_observations(
     context: ContextPack, role: ModelRole, work: ResearchWork
 ) -> ContextPack:
-    if "checked_observations" in context.research_context:
+    if _NUMERIC_KEYS & context.research_context.keys():
         context = context.model_copy(
             update={
                 "research_context": {
-                    k: v for k, v in context.research_context.items() if k != "checked_observations"
+                    k: v for k, v in context.research_context.items() if k not in _NUMERIC_KEYS
                 }
             }
         )
@@ -104,9 +109,10 @@ def with_numeric_observations(
     ).model_dump(mode="json")
     if view is None:
         return context
-    return context.model_copy(
-        update={"research_context": {**context.research_context, "checked_observations": view}}
-    )
+    added: dict[str, object] = {"checked_observations": view}
+    if role in CITATION_ROLES:
+        added[INSTRUCTION_KEY] = NUMERIC_CITATION_INSTRUCTION
+    return context.model_copy(update={"research_context": {**context.research_context, **added}})
 
 
 def _interval_rows(

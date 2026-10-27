@@ -140,8 +140,8 @@ export const researchMessages = {
     "en": "It is unknown whether the remote model stopped. It will not restart automatically."
   },
   "result.beforeInterruption": {
-    "ko": "중단 전까지 확인한 사실",
-    "en": "Facts verified before interruption"
+    "ko": "중단 전까지 정리된 AI 검토 요약(인용 위치만 확인)",
+    "en": "AI review summary before interruption (citation locations checked only)"
   },
   "result.retryQuestion": {
     "ko": "같은 질문으로 다시 조사",

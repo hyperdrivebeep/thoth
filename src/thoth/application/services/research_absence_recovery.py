@@ -107,6 +107,14 @@ def _restore_item(
     return AbsenceClaimAssessment.model_validate(fields)
 
 
+def actual_scope(assessments: AbsenceAssessments) -> AbsenceScope:
+    """The scope recorded for the active stage; none is a named error, not StopIteration."""
+    for scope in assessments.scope_sets:
+        if scope.stage_ref == assessments.active_stage_ref:
+            return scope
+    raise ValueError("ABSENCE_RECOVERY_ACTUAL_SCOPE_MISSING")
+
+
 def restore_absence_recovery(
     work: ResearchWork,
     result: dict[str, object],
@@ -172,9 +180,9 @@ def restore_absence_recovery(
     allowed = next(
         (s for s in restored.scope_sets if s.kind == "ALLOWED_EXTRACTED_AT_REQUEST"), None
     )
-    actual = next(s for s in restored.scope_sets if s.stage_ref == restored.active_stage_ref)
     if allowed is None:
         raise ValueError("ABSENCE_RECOVERY_ALLOWED_SCOPE_MISSING")
+    actual = actual_scope(restored)
     checked = {ref: available[ref] for s in restored.scope_sets for ref in s.checked_refs}
     work.absence = AbsenceRun(
         allowed_scope=allowed,

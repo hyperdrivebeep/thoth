@@ -1,7 +1,10 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { expect, it } from "vitest";
+import { afterEach, expect, it } from "vitest";
 import excerpt from "../api/fixtures/iris-judgment-excerpt.json";
+import { setLocale } from "../i18n/locale";
 import { ResearchResultCard } from "./ResearchResultCard";
+
+afterEach(() => setLocale("ko"));
 
 const held = { ...excerpt, answer_status: "PARTIAL_HOLD" } as Record<string, unknown>;
 const spanA = (excerpt.answer.match(/span:[0-9A-Za-z][0-9A-Za-z_-]*/) ?? [""])[0];
@@ -12,8 +15,8 @@ const fact = (statement: string, refs: string[], kind = "DOCUMENT_FACT") => ({ s
 it("says the result predates confirmed facts instead of pulling facts out of the answer text", () => {
   expect(held.answer).toContain("FACT");
   const html = render(held);
-  expect(html).toContain("확인된 사실");
-  expect(html).toContain("이 결과에는 정리된 확인 사실이 없습니다(이전 형식)");
+  expect(html).toContain("AI 검토 요약(인용 위치만 확인)");
+  expect(html).toContain("이 결과에는 정리된 AI 검토 요약이 없습니다(이전 형식)");
 });
 
 it("lists the stored facts with their source numbers and marks a valid negative finding", () => {
@@ -23,7 +26,7 @@ it("lists the stored facts with their source numbers and marks a valid negative 
     fact("1세부 발췌에서 센서 조합의 필수 지정을 찾아봤지만 없다", [spanA, "span:not-cited-in-answer"], "VALID_NEGATIVE_FINDING"),
   ]));
   expect(html).toContain("RFP p.36에 1세부 과제명이 적혀 있다");
-  expect(html).toContain("찾아봤지만 없음");
+  expect(html).toContain("AI가 찾아봤지만 없다고 함");
   expect(html).toMatch(/RFP p\.36에 1세부 과제명이 적혀 있다[\s\S]{0,300}\[1\]/);
   expect(html).not.toContain("이전 형식");
   // a source the answer never cited still gets its own number after the answer's
@@ -34,14 +37,14 @@ it("keeps facts visible on a held answer, directly under the conclusion status",
   const html = render(withFindings([fact("문서에 적힌 사실", [spanA])]));
   const at = (text: string) => html.lastIndexOf(text);
   expect(html.indexOf("결론 상태: <strong>판단 보류</strong>")).toBeGreaterThan(-1);
-  expect(html.indexOf("결론 상태: <strong>판단 보류</strong>")).toBeLessThan(html.indexOf("확인된 사실"));
-  expect(html.indexOf("확인된 사실")).toBeLessThan(html.indexOf("문서에 적힌 사실"));
+  expect(html.indexOf("결론 상태: <strong>판단 보류</strong>")).toBeLessThan(html.indexOf("AI 검토 요약(인용 위치만 확인)"));
+  expect(html.indexOf("AI 검토 요약(인용 위치만 확인)")).toBeLessThan(html.indexOf("문서에 적힌 사실"));
   expect(at("문서에 적힌 사실")).toBeGreaterThan(-1);
 });
 
 it("tells an empty list apart from an old result, and reports dropped findings without listing them", () => {
   const html = render(withFindings([], { confirmed_findings_dropped: 2 }));
-  expect(html).toContain("정리된 확인 사실 없음");
+  expect(html).toContain("정리된 AI 검토 요약 없음");
   expect(html).not.toContain("이전 형식");
   expect(html).toContain("근거를 확인하지 못해 제외된 항목 2개");
 });
@@ -55,6 +58,21 @@ it("ignores a stored entry that has no source or an unknown kind rather than sho
 
 it("does not turn a stored fact into a claim that criteria are fulfilled", () => {
   const html = render(withFindings([fact("문서에 적힌 사실", [spanA])]));
-  expect(html).toContain("문서에 적힌 내용이며 기준 충족을 뜻하지 않습니다");
+  expect(html).toContain("인용한 위치만 확인했고, 내용이 사실인지와 기준 충족은 확인하지 않았습니다");
 });
 
+const card = (html: string) => html.match(/<section class="confirmed-facts"[\s\S]*?<\/section>/)?.[0] ?? "";
+
+it("labels stored findings as an AI summary in both languages, for old and new results alike, with no verified wording", () => {
+  const results = [held, withFindings([fact("문서에 적힌 사실", [spanA])]), withFindings([])];
+  for (const result of results) {
+    setLocale("ko");
+    const ko = card(render(result));
+    expect(ko).toContain("AI 검토 요약(인용 위치만 확인)");
+    expect(ko).not.toContain("확인된 사실");
+    setLocale("en");
+    const en = card(render(result));
+    expect(en).toContain("AI review summary (citation locations checked only)");
+    expect(en).not.toMatch(/verified/i);
+  }
+});
