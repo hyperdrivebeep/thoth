@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-27T16:14:41.359849+00:00",
+  "created_at": "2026-10-27T17:40:03.252982+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -2208,8 +2208,8 @@
     },
     {
       "path": "docs/architecture/retrieval-lanes.md",
-      "sha256": "30d0723cb3e9434d1a6c1ff656bd08eb4b5844506f500a19ac99834c55bd69ed",
-      "bytes": 11455
+      "sha256": "01e02695d153d0b62ec853894ce51f267a3e180eb78f9e92090f150dd3fdb113",
+      "bytes": 15706
     },
     {
       "path": "docs/architecture/rpc-method-catalog.md",
@@ -3493,8 +3493,8 @@
     },
     {
       "path": "src/thoth/adapters/behavior/registry.py",
-      "sha256": "58af826fd1c8a8cbad05066361c10984560b6d1a64f6add9112a5bbb9a6bac40",
-      "bytes": 7963
+      "sha256": "4b05fd7256d07f2a20ad513b1e748d7af72bdf61b9b8d92fdb18009b12c8e9f2",
+      "bytes": 8114
     },
     {
       "path": "src/thoth/adapters/behavior_catalog.py",
@@ -6143,8 +6143,8 @@
     },
     {
       "path": "src/thoth/application/services/research_selection_context.py",
-      "sha256": "ae4bb68702d693f07b43debbcf6bb5f6006114fdf81e59b4e4203d683f7ca3a7",
-      "bytes": 4280
+      "sha256": "7d99de2660ef491849bc19968efd0d64f263bf94f23c9a2a7af933944cbd94ea",
+      "bytes": 5905
     },
     {
       "path": "src/thoth/application/services/research_source_digest.py",
@@ -6798,8 +6798,8 @@
     },
     {
       "path": "src/thoth/domain/behavior_policy.py",
-      "sha256": "66188ab9d19567813c79a5b3e83c2c2e502f7fdd1f2035c0af77d5c239398234",
-      "bytes": 8032
+      "sha256": "4e5d372964b257fc50f6087124df88dd61f54731de890de676210ba9477f415d",
+      "bytes": 9075
     },
     {
       "path": "src/thoth/domain/canonical.py",
@@ -7065,6 +7065,11 @@
       "path": "src/thoth/domain/judgment_review.py",
       "sha256": "c082f19952443923aafd5638e1be152bb61e4c01b11c5095dcfd9e648c0ee98e",
       "bytes": 4361
+    },
+    {
+      "path": "src/thoth/domain/lane_scoring.py",
+      "sha256": "aee00e5daf4991ba39b23b3e8e820369277d29e331cc88addbf364dcad9464a9",
+      "bytes": 3416
     },
     {
       "path": "src/thoth/domain/language_validation.py",
@@ -7333,8 +7338,13 @@
     },
     {
       "path": "src/thoth/domain/retrieval_lane.py",
-      "sha256": "df52d09e7793ebdb66197d8a456d1296a92e5d998e20afd5a33e1b4243cffec0",
-      "bytes": 13335
+      "sha256": "f0d258919b3bb884c80b91a004ff0f06038706a97c38edb1880e70e0dd9f537a",
+      "bytes": 16643
+    },
+    {
+      "path": "src/thoth/domain/retrieval_terms.py",
+      "sha256": "853570cd6601e85f9d2b64bce5f4b49b8c15112854810378c27c242ee91daa79",
+      "bytes": 662
     },
     {
       "path": "src/thoth/domain/revision.py",
@@ -7360,6 +7370,11 @@
       "path": "src/thoth/domain/storage_context.py",
       "sha256": "609055ac9f97efa3416be462f2ae81bd62c26973788e19aff0997dc7bc07d298",
       "bytes": 682
+    },
+    {
+      "path": "src/thoth/domain/structure_groups.py",
+      "sha256": "054c2e74c65da39419bd2f844decb649d0b9809082be2808904325bb06b7a528",
+      "bytes": 7333
     },
     {
       "path": "src/thoth/domain/task_profile.py",
@@ -11132,6 +11147,11 @@
       "bytes": 6239
     },
     {
+      "path": "tests/unit/domain/test_lane_scoring.py",
+      "sha256": "8426d3b5a9a89e4900077f94167ae5444d6ba6e99d725666923159ceb33fe2fc",
+      "bytes": 2442
+    },
+    {
       "path": "tests/unit/domain/test_models.py",
       "sha256": "fc8f7cc8d4faedf4d0b8131973cace06ea0a649632e55f6f5a488e6b8eedc132",
       "bytes": 7314
@@ -11192,6 +11212,11 @@
       "bytes": 7776
     },
     {
+      "path": "tests/unit/domain/test_structure_groups.py",
+      "sha256": "6bc5d2efa545f2469a753779a768bc1b2b429e9fe04fb7ae04eb5d8c7e23df76",
+      "bytes": 5659
+    },
+    {
       "path": "tests/unit/domain/test_trace_closure.py",
       "sha256": "dbf728995dbadf1462e1a9d9536a9ebd0df3958f4467abfcd6e77c0e533cbfc9",
       "bytes": 3536
@@ -11210,6 +11235,11 @@
       "path": "tests/unit/evaluators/test_evaluator_registry.py",
       "sha256": "1d3bc615622bdb37e97f0a1d85f6412caefd1b2ffc35079058e918495747ca38",
       "bytes": 4462
+    },
+    {
+      "path": "tests/unit/group_fixtures.py",
+      "sha256": "a30e4593791752bdd3d6971842790bdcc0e70e7fe71c9c35fd7b28003e72da42",
+      "bytes": 3068
     },
     {
       "path": "tests/unit/improvement/test_evaluation_integrity.py",
@@ -12138,8 +12168,8 @@
     },
     {
       "path": "tests/unit/test_protected_exact_lane.py",
-      "sha256": "f316357c8ec7eb1352f19f83f48a9edfda8e454e70189eb4438cbf22a338313d",
-      "bytes": 8410
+      "sha256": "38a5ee31fc23d75141b97a77a4f6c25bf83723b114f76b23daaa399a3b12bc9c",
+      "bytes": 8617
     },
     {
       "path": "tests/unit/test_public_web_policy_reconciliation.py",
@@ -12160,6 +12190,11 @@
       "path": "tests/unit/test_r2_context_preflight_contract.py",
       "sha256": "fa68a3fd92f711c96f74559a602ccdd588a403013e83fe211d3fcda81fe369de",
       "bytes": 9246
+    },
+    {
+      "path": "tests/unit/test_ranked_lanes.py",
+      "sha256": "0f30c4f3f2dae000383eb9625497ecb4e6a77face4a028647c16d8733d47ee59",
+      "bytes": 10427
     },
     {
       "path": "tests/unit/test_reference_arithmetic.py",
@@ -12232,6 +12267,11 @@
       "bytes": 6337
     },
     {
+      "path": "tests/unit/test_retrieval_evaluation_pins.py",
+      "sha256": "4226b87d844e4964a8ed78f56b058c7f40941c43ad21caece547e6fd8742ff2c",
+      "bytes": 4619
+    },
+    {
       "path": "tests/unit/test_retrieval_lane_port.py",
       "sha256": "daca53dd9cbff90cd232eff1b369d89ec62a42f6cca2f2fec77c5329a3944f4c",
       "bytes": 4771
@@ -12255,6 +12295,11 @@
       "path": "tests/unit/test_retrieval_shadow_replay.py",
       "sha256": "79175eb5d4b8e7a8e2d695b1f82c88f0c0748ea7cfa99603473a21df79d42a1e",
       "bytes": 5998
+    },
+    {
+      "path": "tests/unit/test_retrieval_source_digests.py",
+      "sha256": "baaf1cd3e9ecebbc2b5a60d78be4933e0a6524bc7203399175af3409cd422d30",
+      "bytes": 7773
     },
     {
       "path": "tests/unit/test_running_research.py",

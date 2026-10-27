@@ -43,7 +43,7 @@ rule, versioned as `SCANNER_VERSION`), registers the lane under a new version.**
 provenance (for `PROTECTED_EXACT`: the scanner version); a ranked selection by such a lane carries
 it, and it is part of what the journaled selection is a function of and of the evaluation output.
 
-Two lanes exist. `LEXICAL_SUBSTRING_V1` is the rule the research path has always used:
+Four lanes exist. `LEXICAL_SUBSTRING_V1` is the rule the research path has always used:
 
 - Search terms are the question's and the planner's queries' tokens of at least three characters,
   plus whole two-syllable Korean words that are not on a short function-word list. Particles are not
@@ -67,6 +67,56 @@ the two-syllable rule above. Spans with a longer identifier match come first; th
 the short-line filter, so a short title that holds an identifier is kept, and a span with no match is
 not returned, so it is meant to be combined with other lanes rather than used alone.
 
+`GROUPED_BM25` (1.0.0) ranks structure groups, not single lines, by BM25 over the group's title and
+body (see below), so a row of numbers is found through the version title, table head or heading
+above it. The terms are the scanner's identifiers (every form of each) and its leftover pieces, with
+Hangul by the two-syllable rule. A span that no group names is a group of its own, and a source with
+no structure observation has no groups, so the lane then ranks single spans. It returns the groups in
+score order, each as its title spans first and then its body in document order, skipping a span it has
+already given. The frame's span and character budget are unchanged, so a budget that ends inside a
+group keeps the group's titles and cuts its rows. It returns every group with a matching term, so
+the budget decides how many are read.
+
+`CHAR_BIGRAM` (1.0.0) ranks single spans by BM25 over Hangul syllable bigrams (a bigram that is a
+function word is dropped) and symbol-preserving Latin and digit words, after NFKC and case folding.
+It finds Korean text without a shared stem, for example a question word that carries a different
+particle than the source.
+
+### BM25
+
+Both ranked lanes use one formula; its constants are part of the lane version, not policy fields.
+`score(unit, term) = idf * tf * (k1 + 1) / (tf + k1 * (1 - b + b * length / average length))` with
+`k1 = 1.2`, `b = 0.75` and `idf = ln(1 + (N - n + 0.5) / (n + 0.5))`, which is never negative. **N is the
+number of units of the request's eligible spans (its eligible groups for `GROUPED_BM25`, its eligible
+spans for `CHAR_BIGRAM`) and n the number of those units that hold the term**; spans the request may
+not read take no part. Each query term counts once. Units without a matching term score 0 and are not
+ranked; equal scores keep the document order of the units' first spans.
+
+### Structure groups
+
+A group is a title (spans that name it) and a body (the spans it holds), derived per source version
+from its context observation by `thoth.domain.structure_groups` and carried in `CatalogContext.groups`.
+They are never part of the source basis digest, of a stored record or of the journaled selection of
+another lane. Every span of an observed source is in exactly one group's body and only once (titles
+may repeat), and a group never holds spans of two sources.
+
+- **FENCE:** one fenced code region. Each separator line inside it (`===`, `---` or `###` followed by text,
+  such as `=== v1.5.5 ...`) starts a sub-group, and that line is part of the sub-group's title as well
+  as its body. The title also holds the nearest heading and the paragraph that leads into the fence.
+  A code comment that starts with `###` and text splits a fence in the same way.
+- **LIST:** the spans of one top-level list; a top-level item that holds a nested list is a sub-group of
+  its own. The title is the nearest heading.
+- **SECTION:** a heading and the plain paragraphs under it; paragraphs before the first heading and
+  spans no region claims form untitled sections.
+- **BLOCK:** for a source with no observation, spans under the same parent pointer.
+- A group is cut after 24 spans or 3000 characters, in document order, and every piece keeps the title
+  of the group it was cut from. These limits and the rules are constants of the grouping version
+  (`structure-groups:1.0.0`); changing one changes that version and the version of the lane using it.
+
+Markdown pipe tables are not observed as regions (the parser reads them as paragraphs), so no group is
+made for a table as such; the rules above cover a table inside a fence and a list. The parser is not
+changed for this.
+
 ## Policies 2.0.0 and 3.0.0
 
 | Policy | Class | Fields |
@@ -76,8 +126,8 @@ not returned, so it is meant to be combined with other lanes rather than used al
 
 - 2.0.0 is unchanged and always uses `LEXICAL_SUBSTRING_V1`. Adding a field to it would change the
   serialization, and so the digest, of every stored 2.0.0 policy, which is why 3.0.0 is a separate class.
-- `lanes` holds exactly one entry for now. Its `lane_id` is `LEXICAL_SUBSTRING_V1` (the default) or
-  `PROTECTED_EXACT`, and its `lane_version` must be the registered version, 1.0.0 for both. A stored
+- `lanes` holds exactly one entry for now. Its `lane_id` is `LEXICAL_SUBSTRING_V1` (the default),
+  `PROTECTED_EXACT`, `GROUPED_BM25` or `CHAR_BIGRAM`, and its `lane_version` must be the registered version, 1.0.0 for both. A stored
   policy that names the original lane keeps its serialization and digest. With that lane, 3.0.0
   selects exactly what 2.0.0 selects for the same budgets. A policy with more than one lane, and
   lane fusion, belong to a later policy version, not to 3.0.0.
@@ -116,6 +166,9 @@ policy versions delegate to one function, which builds a retrieval request from 
 - Case payload: `problem`, `evidence`, and optionally `queries`, `pinned_refs` and `catalog`.
   `forced_refs` keeps its old name and means the same as `pinned_refs`. A pin that is not eligible is
   ignored, as in the research path; the earlier evaluator treated it as an error.
+- `catalog.groups` (kind, title and body span ids) may be named by a case only for a comparison that uses
+  `GROUPED_BM25`; when it is empty the field is not serialized, so the input, its digest and the
+  comparison identity of every other comparison are unchanged.
 - Output keys: `selected_refs`, `excluded_count`, `selected_characters`, `mode` and `evaluator`; a
   lane that declares provenance adds `lane` (lane id, lane version and, for `PROTECTED_EXACT`, the
   scanner version).
@@ -145,9 +198,9 @@ hash of its stored output.
 
 ## Not part of this contract
 
-- Only `LEXICAL_SUBSTRING_V1` and `PROTECTED_EXACT` exist, and neither is the default: the active policy
-  stays 2.0.0 and the new lane is used only through shadow replay and evaluation. A lane for character
-  bigrams or grouped scoring would register in `LANES` and bring its own evaluation evidence.
+- None of the lanes other than `LEXICAL_SUBSTRING_V1` is a default: the active policy stays 2.0.0 and the
+  new lanes are used only through shadow replay and evaluation. A policy with more than one lane, and
+  fusion of lanes, are a later policy version.
 - The reranking model, the adjacent-packet expansion and the context assembly are separate stages
   that consume the shortlist (see [positional evidence context](evidence-context.md)).
 - Nothing here changes an authority, cutoff or access check, a stored policy, or the 2.0.0 baseline.
@@ -164,5 +217,8 @@ evaluation pair, an exposure that rests on it, a research request, and the repla
 `test_query_identifiers` and `test_protected_exact_lane` pin the scanner, the matching edges, the lane and
 its version and provenance. `test_retrieval_shadow_held` and the second case of
 `test_retrieval_shadow_normal_entry` pin that a shadow which cannot select is held and its request succeeds.
-`test_retrieval_policy_3_0_0_digests` pins the serialization and digests of a 3.0.0 policy that names the
+`test_structure_groups`, `test_lane_scoring` and `test_ranked_lanes` pin the group rules and their invariants, the BM25 formula
+and the two ranked lanes; `test_retrieval_source_digests` and `test_retrieval_evaluation_pins` pin that the
+source basis, the journal of the original lane and the evaluation inputs and outputs of the existing
+policies did not move. `test_retrieval_policy_3_0_0_digests` pins the serialization and digests of a 3.0.0 policy that names the
 original lane.

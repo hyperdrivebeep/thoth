@@ -19,6 +19,7 @@ from thoth.domain.retrieval_lane import (
     RetrievalRequest,
     select_retrieval_context,
 )
+from thoth.domain.structure_groups import CatalogGroup
 from thoth.ports.behavior_resolver import BehaviorComponentHandlerPort
 
 
@@ -98,6 +99,7 @@ def evaluate_retrieval(
                 frozenset(catalog.protected_refs),
                 catalog.all_observed,
                 catalog.structure_count,
+                tuple(CatalogGroup(g.kind, g.title_refs, g.body_refs) for g in catalog.groups),
             ),
         ),
         policy,

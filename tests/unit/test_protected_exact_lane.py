@@ -42,7 +42,10 @@ def ids(request: RetrievalRequest, policy: Policy = EXACT) -> list[str]:
 
 
 def test_both_lanes_are_registered_with_a_version_and_only_the_new_one_adds_provenance() -> None:
-    assert set(LANES) == set(LANE_VERSIONS) == {LEXICAL_SUBSTRING_V1, PROTECTED_EXACT}
+    # 1b adds lanes to the registry, so the set is no longer exactly these two; each lane still has
+    # a registered version and the registry and the version table never drift apart.
+    assert {LEXICAL_SUBSTRING_V1, PROTECTED_EXACT} <= set(LANES)
+    assert set(LANES) == set(LANE_VERSIONS)
     assert set(LANE_VERSIONS.values()) == {"1.0.0"}
     assert LANE_PROVENANCE[LEXICAL_SUBSTRING_V1] == ()
     assert LANE_PROVENANCE[PROTECTED_EXACT] == (("scanner", SCANNER_VERSION),)
