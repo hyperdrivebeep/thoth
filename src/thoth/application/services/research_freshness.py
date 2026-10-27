@@ -1,16 +1,23 @@
 """One dependency eligibility calculation for history and live consumers."""
 
+import hashlib
+
+from thoth.application.services.absence_catalog_currentness import catalog_only_dependencies
 from thoth.application.services.hypothesis_link_view import HypothesisLinkReader
 from thoth.application.services.memory_supersession import superseded_memory_digests
+from thoth.domain.absence_claim import AbsenceSourceRef
 from thoth.domain.canonical import same_stored_instant
 from thoth.domain.enums import ImpactStatus
+from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.research_basis import BasisCurrentness, ResearchResultBasis
+from thoth.domain.research_request import CurrentResultPayload
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
 from thoth.ports.governance import GovernanceStorePort
 from thoth.ports.ledger import LedgerPort
 from thoth.ports.memory import FullMemoryStorePort
 from thoth.ports.operation import OperationStorePort
 from thoth.ports.project import ProjectStorePort
+from thoth.ports.source_version_catalog import SourceVersionCatalogPort
 
 
 class ResearchFreshnessService:
@@ -22,11 +29,13 @@ class ResearchFreshnessService:
         artifacts: ArtifactLedgerPort | None = None,
         operations: OperationStorePort | None = None,
         memory: FullMemoryStorePort | None = None,
+        catalogs: SourceVersionCatalogPort | None = None,
     ) -> None:
         self.ledger = ledger
         self.memory = memory
         self.projects, self.governance, self.artifacts = projects, governance, artifacts
         self.operations = operations
+        self.catalogs = catalogs
 
     def evaluate_entity(self, project_id: str, key: str, digest: str) -> BasisCurrentness:
         head = self.ledger.read_heads(project_id).get(key)
@@ -48,6 +57,7 @@ class ResearchFreshnessService:
         *,
         operation_id: str | None = None,
         completion: str | None = None,
+        manifest: CurrentResultPayload | None = None,
     ) -> BasisCurrentness:
         if basis is None:
             return BasisCurrentness(state="UNKNOWN_BASIS", reasons=("LEGACY_BASIS_UNKNOWN",))
@@ -96,15 +106,37 @@ class ResearchFreshnessService:
                 if binding.state == "ACTIVE"
             }
             if self.artifacts is not None:
+                grouped = catalog_only_dependencies(basis, manifest) if self.catalogs else {}
+                catalogs: dict[tuple[str, str], dict[str, EvidenceSpan]] = {}
                 for ref in basis.source_basis:
-                    span = (
-                        None if ref.span_id is None else self.artifacts.read_evidence(ref.span_id)
-                    )
+                    catalog_ref = grouped.get(ref.span_id or "")
+                    if catalog_ref is not None and self.catalogs is not None:
+                        key = (ref.artifact_id, ref.source_version_id)
+                        if key not in catalogs:
+                            catalogs[key] = {
+                                s.span_id: s
+                                for s in self.catalogs.read_evidence_version(project_id, *key)
+                            }
+                        span = catalogs[key].get(catalog_ref.span_id)
+                    else:
+                        span = (
+                            None
+                            if ref.span_id is None
+                            else self.artifacts.read_evidence(ref.span_id)
+                        )
                     if (
                         span is None
                         or span.artifact_id not in active
                         or span.source_version_id != ref.source_version_id
                         or span.text_sha256 != ref.text_sha256
+                        or (
+                            catalog_ref is not None
+                            and (
+                                AbsenceSourceRef.from_span(span) != catalog_ref
+                                or hashlib.sha256(span.exact_text.encode()).hexdigest()
+                                != span.text_sha256
+                            )
+                        )
                     ):
                         issues.append(
                             BasisCurrentness(

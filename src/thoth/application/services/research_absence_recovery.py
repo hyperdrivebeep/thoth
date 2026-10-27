@@ -1,9 +1,14 @@
 """Restore saved literal-check bindings for learning-only recovery, without re-running a model."""
 
 import hashlib
+from collections.abc import Callable
 from datetime import datetime
 from typing import cast
 
+from thoth.application.services.research_absence_usage import (
+    ABSENCE_SCOPE_USAGE_LIMIT,
+    admit_absence_catalog,
+)
 from thoth.domain.absence_claim import (
     AbsenceAssessments,
     AbsenceClaimAssessment,
@@ -16,6 +21,7 @@ from thoth.domain.absence_claim import (
 from thoth.domain.canonical import canonical_payload, domain_digest, same_stored_instant
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.research_execution import ResearchWork
+from thoth.ports.source_version_catalog import SourceVersionCatalogPort
 
 RECOVERY_SCOPE_CHANGED = "ABSENCE_RECOVERY_SCOPE_BASIS_CHANGED"
 
@@ -25,12 +31,15 @@ def _restore_scope(
     current: dict[str, EvidenceSpan],
     policy_ref: str,
     cutoff_at: datetime,
+    admitted_refs: frozenset[str] | None = None,
+    admission_reasons: tuple[str, ...] = (),
 ) -> AbsenceScope:
     members = {s.span_id: s for s in scope.members}
     valid = tuple(
         ref
         for ref in scope.checked_refs
-        if (span := current.get(ref)) is not None
+        if (admitted_refs is None or ref in admitted_refs)
+        and (span := current.get(ref)) is not None
         and AbsenceSourceRef.from_span(span) == members[ref]
         and hashlib.sha256(span.exact_text.encode()).hexdigest() == span.text_sha256
     )
@@ -43,7 +52,9 @@ def _restore_scope(
         **scope.model_dump(exclude={"scope_digest"}),
         "checked_refs": valid if policy_matches else (),
         "scan_complete": False,
-        "reasons": tuple(dict.fromkeys((*scope.reasons, RECOVERY_SCOPE_CHANGED))),
+        "reasons": tuple(
+            dict.fromkeys((*scope.reasons, RECOVERY_SCOPE_CHANGED, *admission_reasons))
+        ),
     }
     return AbsenceScope.model_validate(
         {
@@ -66,7 +77,9 @@ def _restore_item(
                 "scope_digest": new_a.scope_digest,
                 "outcome": "NOT_CHECKED",
                 "witness_refs": (),
-                "reason": RECOVERY_SCOPE_CHANGED,
+                "reason": ABSENCE_SCOPE_USAGE_LIMIT
+                if ABSENCE_SCOPE_USAGE_LIMIT in new_a.reasons
+                else RECOVERY_SCOPE_CHANGED,
             }
         )
     if b.scope_digest != new_b.scope_digest:
@@ -75,7 +88,9 @@ def _restore_item(
                 "scope_digest": new_b.scope_digest,
                 "outcome": "NOT_CHECKED",
                 "witness_refs": (),
-                "reason": RECOVERY_SCOPE_CHANGED,
+                "reason": ABSENCE_SCOPE_USAGE_LIMIT
+                if ABSENCE_SCOPE_USAGE_LIMIT in new_b.reasons
+                else RECOVERY_SCOPE_CHANGED,
             }
         )
     effective = effective_absence(a.outcome, b.outcome)
@@ -99,6 +114,8 @@ def restore_absence_recovery(
     *,
     policy_ref: str,
     cutoff_at: datetime,
+    read_evidence: Callable[[str], EvidenceSpan | None],
+    catalog: SourceVersionCatalogPort | None = None,
 ) -> dict[str, object]:
     raw = result.get("absence_assessments")
     if raw is None:
@@ -108,8 +125,26 @@ def restore_absence_recovery(
         raise ValueError("ABSENCE_RECOVERY_REQUEST_MISMATCH")
     # Revalidate the recorded members, not a newly selected pool. New sources cannot enlarge b.
     available = {s.span_id: s for s in current if s.project_id == work.request_ref.project_id}
+    b_scopes = tuple(s for s in observed.scope_sets if s.kind == "ALLOWED_EXTRACTED_AT_REQUEST")
+    if not b_scopes:
+        raise ValueError("ABSENCE_RECOVERY_ALLOWED_SCOPE_MISSING")
+    old_checked = set(ref for s in b_scopes for ref in s.checked_refs)
+    candidates = tuple(
+        available[ref.span_id]
+        for ref in b_scopes[0].members
+        if ref.span_id in old_checked and ref.span_id in available
+    )
+    admission = AbsenceRun(b_scopes[0], candidates)
+    b_admitted, b_reasons = admit_absence_catalog(admission, candidates, read_evidence, catalog)
     scopes = {
-        s.scope_digest: _restore_scope(s, available, policy_ref, cutoff_at)
+        s.scope_digest: _restore_scope(
+            s,
+            available,
+            policy_ref,
+            cutoff_at,
+            b_admitted if s.kind == "ALLOWED_EXTRACTED_AT_REQUEST" else None,
+            b_reasons if s.kind == "ALLOWED_EXTRACTED_AT_REQUEST" else (),
+        )
         for s in observed.scope_sets
     }
     changed = any(key != scope.scope_digest for key, scope in scopes.items())
@@ -125,7 +160,11 @@ def restore_absence_recovery(
             ),
             "reason_codes": tuple(
                 dict.fromkeys(
-                    (*observed.reason_codes, *((RECOVERY_SCOPE_CHANGED,) if changed else ()))
+                    (
+                        *observed.reason_codes,
+                        *b_reasons,
+                        *((RECOVERY_SCOPE_CHANGED,) if changed else ()),
+                    )
                 )
             ),
         }
@@ -144,6 +183,7 @@ def restore_absence_recovery(
         actual_captured_at=actual.captured_at,
         checked_spans=checked,
         witness_attempted=any(i.injection_state != "NOT_NEEDED" for i in observed.items),
+        catalog_usage_refs=admission.catalog_usage_refs,
     )
     work.consumed_sources.update(checked)
     payload = restored.model_dump(mode="json") if changed else raw
@@ -163,7 +203,10 @@ def restore_absence_recovery(
     affected = {
         i.claim.statement.strip()
         for i in active
-        if any(r.reason == RECOVERY_SCOPE_CHANGED for r in (i.a_result, i.b_result))
+        if any(
+            r.reason in {RECOVERY_SCOPE_CHANGED, ABSENCE_SCOPE_USAGE_LIMIT}
+            for r in (i.a_result, i.b_result)
+        )
     }
     findings = updated.get("confirmed_findings")
     if isinstance(findings, list):

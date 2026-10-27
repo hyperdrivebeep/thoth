@@ -1,6 +1,6 @@
 """Learning-only recovery restores evidence bindings, not a new investigation or witness call."""
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import pytest
 from tests.unit.test_absence_claim_checks import NOW, assessed, proposal, source
@@ -8,11 +8,30 @@ from tests.unit.test_contextual_retrieval import work
 
 from thoth.application.services.research_absence_recovery import (
     RECOVERY_SCOPE_CHANGED,
-    restore_absence_recovery,
+)
+from thoth.application.services.research_absence_recovery import (
+    restore_absence_recovery as restore_with_reader,
 )
 from thoth.domain.absence_claim import AbsenceAssessments, ReviewProposalE2, absence_check_digest
 from thoth.domain.canonical import canonical_payload
 from thoth.domain.enums import AuthorityState
+from thoth.domain.evidence import EvidenceSpan
+from thoth.domain.research_execution import ResearchWork
+
+
+def restore_absence_recovery(
+    current: ResearchWork,
+    saved: dict[str, object],
+    data: tuple[EvidenceSpan, ...],
+    *,
+    policy_ref: str,
+    cutoff_at: datetime,
+) -> dict[str, object]:
+    # The product now requires an explicitly scoped read port; this fixture supplies its store.
+    by_id = {s.span_id: s for s in data}
+    return restore_with_reader(
+        current, saved, data, policy_ref=policy_ref, cutoff_at=cutoff_at, read_evidence=by_id.get
+    )
 
 
 @pytest.mark.parametrize("empty", [False, True])

@@ -228,6 +228,7 @@ class HistoryProjection:
             manifest.research_basis if isinstance(manifest, CurrentResultManifestV21) else None,
             operation_id=manifest.operation_id,
             completion=manifest.completion,
+            manifest=manifest,
         )
         if self.ledger.read_heads(project).get(key) != digest:
             currentness = currentness.model_copy(

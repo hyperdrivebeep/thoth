@@ -37,6 +37,7 @@ def make_absence_scope(
     current: tuple[EvidenceSpan, ...] | None = None,
     stage_ref: RevisionRef | None = None,
     reasons: tuple[str, ...] = (),
+    admitted_refs: frozenset[str] | None = None,
 ) -> AbsenceScope:
     available = (
         {s.span_id: s for s in source if current is None}
@@ -46,7 +47,8 @@ def make_absence_scope(
     valid = tuple(
         s.span_id
         for s in source
-        if available.get(s.span_id) == s
+        if (admitted_refs is None or s.span_id in admitted_refs)
+        and available.get(s.span_id) == s
         and hashlib.sha256(s.exact_text.encode()).hexdigest() == s.text_sha256
     )
     issues = tuple(
@@ -54,7 +56,12 @@ def make_absence_scope(
             (
                 *reasons,
                 *(("ABSENCE_EMPTY_SCOPE",) if not source else ()),
-                *(("ABSENCE_SOURCE_BASIS_CHANGED",) if len(valid) != len(source) else ()),
+                *(
+                    ("ABSENCE_SOURCE_BASIS_CHANGED",)
+                    if len(valid)
+                    != sum(admitted_refs is None or s.span_id in admitted_refs for s in source)
+                    else ()
+                ),
             )
         )
     )
@@ -70,7 +77,7 @@ def make_absence_scope(
         "retrieval_policy_digest": policy_digest,
         "members": tuple(AbsenceSourceRef.from_span(s) for s in source),
         "checked_refs": valid,
-        "scan_complete": not issues,
+        "scan_complete": not issues and len(valid) == len(source),
         "reasons": issues,
     }
     return AbsenceScope.model_validate(
@@ -134,11 +141,16 @@ def _check(
             scope_digest=scope.scope_digest, outcome="UNSUPPORTED", reason=unsupported
         )
     permitted = set(scope.checked_refs)
-    witnesses = tuple(
-        s.span_id
-        for s in source
-        if s.span_id in permitted and literal_present(claim.target, s.exact_text)
+    # Presence needs one exact witness; do not turn every repeated occurrence into a source use.
+    witness = next(
+        (
+            s.span_id
+            for s in source
+            if s.span_id in permitted and literal_present(claim.target, s.exact_text)
+        ),
+        None,
     )
+    witnesses = () if witness is None else (witness,)
     if witnesses:
         return AbsenceScopeResult(
             scope_digest=scope.scope_digest, outcome="FOUND", witness_refs=witnesses
@@ -176,6 +188,15 @@ def claim_origin(proposal: ReviewProposalE2, claim: AbsenceClaim) -> tuple[str, 
     )
 
 
+def has_checkable_absence_claims(proposal: ReviewProposalE2) -> bool:
+    return any(
+        max(len(claim.target), len(claim.statement)) <= MAX_ABSENCE_CHARS
+        and claim_origin(proposal, claim)[1]
+        and _unsupported(claim) is None
+        for claim in proposal.absence_claims[:MAX_ABSENCE_CLAIMS]
+    )
+
+
 def assess_absence_claims(
     request: RevisionRef,
     proposal: ReviewProposalE2,
@@ -203,7 +224,11 @@ def assess_absence_claims(
             _check(claim, b, b_spans, reason or b_error),
         )
         effective = effective_absence(ar.outcome, br.outcome)
-        missing = set(br.witness_refs) - {s.span_id for s in a_spans}
+        missing = (
+            set[str]()
+            if ar.outcome == "FOUND"
+            else set(br.witness_refs) - {s.span_id for s in a_spans}
+        )
         fields: dict[str, object] = {
             "claim_id": f"{stage.revision_id}:{index}",
             "claim": claim,
@@ -232,6 +257,12 @@ def assess_absence_claims(
             for i in items
         ),
         reason_codes=tuple(
-            sorted({r.reason for i in items for r in (i.a_result, i.b_result) if r.reason})
+            sorted(
+                {
+                    *a.reasons,
+                    *b.reasons,
+                    *(r.reason for i in items for r in (i.a_result, i.b_result) if r.reason),
+                }
+            )
         ),
     )

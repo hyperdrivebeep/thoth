@@ -17,15 +17,22 @@ from thoth.domain.source_time import (
 )
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
 from thoth.ports.ledger import LedgerPort
+from thoth.ports.resource_scope import ResourceScopeStorePort
+from thoth.ports.source_version_catalog import SourceVersionCatalogPort
 
 
 class ScopedArtifactLedger(ArtifactLedgerPort):
     def __init__(
-        self, raw: ArtifactLedgerPort, scopes: ResourceScopeService, ledger: LedgerPort
+        self,
+        raw: ArtifactLedgerPort,
+        scopes: ResourceScopeService,
+        ledger: LedgerPort,
+        scope_store: ResourceScopeStorePort | None = None,
     ) -> None:
         self.raw = raw
         self.scopes = scopes
         self._ledger = ledger
+        self._scope_store = scope_store
 
     def persist_ingestion(
         self,
@@ -51,6 +58,28 @@ class ScopedArtifactLedger(ArtifactLedgerPort):
         if value is not None:
             self.scopes.require_read(value.project_id, span_id)
         return value
+
+    def read_evidence_version(
+        self, project_id: str, artifact_id: str, source_version_id: str
+    ) -> tuple[EvidenceSpan, ...]:
+        if self._scope_store is None or not isinstance(self.raw, SourceVersionCatalogPort):
+            raise ResourceScopeError("RESOURCE_CATALOG_READ_UNSUPPORTED")
+        with self._ledger.transaction():
+            artifact = self.raw.read_artifact(artifact_id)
+            if artifact is None or artifact.project_id != project_id:
+                raise ResourceScopeError("RESOURCE_SCOPE_PROJECT_MISMATCH")
+            self.scopes.require_read(project_id, artifact_id)
+            values = self.raw.read_evidence_version(project_id, artifact_id, source_version_id)
+            if any(
+                (s.project_id, s.artifact_id, s.source_version_id)
+                != (project_id, artifact_id, source_version_id)
+                for s in values
+            ):
+                raise ResourceScopeError("RESOURCE_CATALOG_BINDING_MISMATCH")
+            if any(self._scope_store.read(project_id, s.span_id) is not None for s in values):
+                # Independent span scopes cannot be represented by the artifact's single READ.
+                raise ResourceScopeError("RESOURCE_CATALOG_SCOPE_NOT_UNIFORM")
+            return values
 
     def list_source_versions(self, project_id: str, artifact_id: str) -> tuple[str, ...]:
         artifact = self.read_artifact(artifact_id)

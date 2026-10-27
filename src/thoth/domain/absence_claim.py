@@ -300,3 +300,4 @@ class AbsenceRun:
     actual_captured_at: datetime | None = None
     checked_spans: dict[str, EvidenceSpan] = field(default_factory=dict)
     witness_attempted: bool = False
+    catalog_usage_refs: set[str] = field(default_factory=set)

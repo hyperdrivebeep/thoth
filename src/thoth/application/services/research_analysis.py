@@ -452,7 +452,9 @@ class ResearchAnalysis:
             model, project, review_context, ModelRole.SEMANTIC_REVIEWER, ReviewProposalE2
         )
         reviewer_evidence = work.evidence
-        assess_review_absence(work, candidate, self.records, self.evidence(project.project_id))
+        assess_review_absence(
+            work, candidate, self.records, self.evidence(project.project_id), self.artifacts
+        )
         # Facts are shown to the user as confirmed, so a finding citing a span the reviewer was
         # not given is discarded here (and counted) instead of being trusted.
         adopt_absence_checked_findings(candidate, work, reviewer_evidence)

@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-26T22:39:24.345850+00:00",
+  "created_at": "2026-10-27T03:30:14.520353+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -2093,8 +2093,8 @@
     },
     {
       "path": "docs/architecture/absence-checks.md",
-      "sha256": "0a0af2a72a858020de6088518c0e41b83f135d0582d9237edee77f4a5d58dad3",
-      "bytes": 8446
+      "sha256": "c81cc36942b6c4aaa6b4e66eefd0a2ab0610eee0ec9dfcdc62f0d1c3811811a9",
+      "bytes": 10729
     },
     {
       "path": "docs/architecture/agent-execution-rules.md",
@@ -4197,6 +4197,11 @@
       "bytes": 7295
     },
     {
+      "path": "src/thoth/adapters/storage/artifact_catalog_rows.py",
+      "sha256": "b2f8ec4dcfbb1bed0fbfff5226d7cfa3f09e9837764ce46c20b6374b60bd880b",
+      "bytes": 1028
+    },
+    {
       "path": "src/thoth/adapters/storage/artifact_rows.py",
       "sha256": "5c18ac3054c794de1ceff0be2d15dcbfd0d5a68f72ce8d4d8342d19892e56442",
       "bytes": 2029
@@ -4208,8 +4213,8 @@
     },
     {
       "path": "src/thoth/adapters/storage/artifacts.py",
-      "sha256": "f04bf7b5870ea8a6842e0aff0f71b056ee17997a3ea91f708d358f5a30fd8a3b",
-      "bytes": 26180
+      "sha256": "57b188e4032da4af344fa44ada8883f2c0834da54deb47a8cf5fde426a9072a9",
+      "bytes": 26499
     },
     {
       "path": "src/thoth/adapters/storage/auth.py",
@@ -5007,6 +5012,11 @@
       "bytes": 5173
     },
     {
+      "path": "src/thoth/application/services/absence_catalog_currentness.py",
+      "sha256": "145d1557a6f7ea7a5091ae90a16c3448f1710a8d7759e4fdb568895cc2ac2d51",
+      "bytes": 2410
+    },
+    {
       "path": "src/thoth/application/services/acquisition_coordinator.py",
       "sha256": "578d1957373f7f35f402aaadc1ce002b964dee4057440886d0f51558362d9d8f",
       "bytes": 15312
@@ -5128,8 +5138,8 @@
     },
     {
       "path": "src/thoth/application/services/committed_learning_recovery.py",
-      "sha256": "b06933cb5fbdda866d4862c8c909e7eaa3cf03fab8caedde7ff42ee9fe254050",
-      "bytes": 7610
+      "sha256": "eef33e081c37571c5c43e1e8fcc5a61b28949126f58f70fbb4d9f201ffb4cf8b",
+      "bytes": 7923
     },
     {
       "path": "src/thoth/application/services/connector_catalog.py",
@@ -5393,8 +5403,8 @@
     },
     {
       "path": "src/thoth/application/services/history_projection.py",
-      "sha256": "1d7f4be8aa4bae5f61b4d1f07bb8e439bf4d0d3a2cff340960e4fc7a40b57eff",
-      "bytes": 12791
+      "sha256": "89f036ee4497298517e729dfe596ee7c29c700927d817480e7c55f6050d0db58",
+      "bytes": 12822
     },
     {
       "path": "src/thoth/application/services/human_actor.py",
@@ -5863,8 +5873,8 @@
     },
     {
       "path": "src/thoth/application/services/research_absence_checks.py",
-      "sha256": "c3162289fabff78d5523612aaa2da952ffd049f9c25c519e8fc8e6e570272a0e",
-      "bytes": 8739
+      "sha256": "7e6c106ffe3c8b300044d5c31067783853df4e68f552b3f25a03424b0c81de8d",
+      "bytes": 9782
     },
     {
       "path": "src/thoth/application/services/research_absence_delivery.py",
@@ -5878,18 +5888,23 @@
     },
     {
       "path": "src/thoth/application/services/research_absence_recovery.py",
-      "sha256": "6a91d8f5ba3c8fc8ae1b0d3a89fb0d229ada62f3912955b8078a90be07c289d3",
-      "bytes": 7182
+      "sha256": "ca22657392f286d52bb10c649d817c95926ac31db0da366a5d67f1b41628a978",
+      "bytes": 8950
     },
     {
       "path": "src/thoth/application/services/research_absence_runtime.py",
-      "sha256": "e1ac4eb2366e29d86367b2845021c983d2ace3be0f5f8eb1684c71db47446368",
-      "bytes": 7021
+      "sha256": "60cc2e1a2b62185e0d7f434309a50c14a0bf9287c96e31c8b947ed5326b6f9b4",
+      "bytes": 8283
+    },
+    {
+      "path": "src/thoth/application/services/research_absence_usage.py",
+      "sha256": "f8e1efcf5cbda0d5423cdb4d74ca9e7e201b03bd52e0bf19e68d3f1d02655ab2",
+      "bytes": 4830
     },
     {
       "path": "src/thoth/application/services/research_analysis.py",
-      "sha256": "35b40d90868908cd493fbe2b3b5cf7512a42df9cf8b0d0799d2777b8dcd43b4c",
-      "bytes": 26557
+      "sha256": "b62e4b137d4069e39336710192d94ff707149a746b1f2e1a85330bc1cc3af184",
+      "bytes": 26595
     },
     {
       "path": "src/thoth/application/services/research_answer.py",
@@ -6003,13 +6018,13 @@
     },
     {
       "path": "src/thoth/application/services/research_followup_projection.py",
-      "sha256": "a13dec7a94ad22997c87df5f3a16153cf85f2dd23ea563c7f391169a7a270c55",
-      "bytes": 11701
+      "sha256": "d1b01692db79955f793dd97367e40e13ed49522892ad61f71a571d41b9e480ec",
+      "bytes": 11732
     },
     {
       "path": "src/thoth/application/services/research_freshness.py",
-      "sha256": "6751ea0cb5388c6a347b1db3935249b9149f44bb0edb97d3793aa65b8b31a36b",
-      "bytes": 8526
+      "sha256": "6dfd932c558c60cc4ea4cb416d23f301578c2fb0ab1461bd8a70edbb15415473",
+      "bytes": 10255
     },
     {
       "path": "src/thoth/application/services/research_gaps.py",
@@ -6148,8 +6163,8 @@
     },
     {
       "path": "src/thoth/application/services/research_thread_read_snapshot.py",
-      "sha256": "1e80e63cd7cbcb1b1a5e927249de5413b9cb06abb47efc83a0e7f551820a7218",
-      "bytes": 8280
+      "sha256": "34c61bbb9b50d068f0abee7e281da2ea572da338dc7e67528ba434435e640bcf",
+      "bytes": 8528
     },
     {
       "path": "src/thoth/application/services/research_usage.py",
@@ -6268,8 +6283,8 @@
     },
     {
       "path": "src/thoth/application/services/scoped_artifacts.py",
-      "sha256": "0cd5d442562508fbc8bb55ad4315a5b95f4b4e8a3187f8768b5f2c957bd75718",
-      "bytes": 6108
+      "sha256": "165b7e815cc2a73dca7fe5910f13e4acb19676b6f68654417e2d17fb542d9668",
+      "bytes": 7700
     },
     {
       "path": "src/thoth/application/services/scoped_evidence.py",
@@ -6583,8 +6598,8 @@
     },
     {
       "path": "src/thoth/apps/research_history_composition.py",
-      "sha256": "0d4d439729d1686573f279a653baa0bab3e206ffe041dcf1457558bd2c87061d",
-      "bytes": 7915
+      "sha256": "11ea981444059db81d896826a77a069f8e6cc3a1564bae781d9224a3e23eec15",
+      "bytes": 8062
     },
     {
       "path": "src/thoth/apps/research_runtime.py",
@@ -6593,8 +6608,8 @@
     },
     {
       "path": "src/thoth/apps/resource_scope_composition.py",
-      "sha256": "478622520453bed77125dcd5da84133618a442550ac87cdc9fc80bc9b3a7f92a",
-      "bytes": 7372
+      "sha256": "8039ede37efadff976b258b6e1e6e146c889a48865bc17dee5268ab1749798a5",
+      "bytes": 7396
     },
     {
       "path": "src/thoth/apps/restore_profiles.py",
@@ -6703,8 +6718,8 @@
     },
     {
       "path": "src/thoth/domain/absence_claim.py",
-      "sha256": "7b25b914555916b60bb3dd358a77ef2527b0a142360878aea944c0a2593263cd",
-      "bytes": 11456
+      "sha256": "6ef3d42a1a312c1978b95ba838509feba2fdaac9811521f834522de69c59d8d5",
+      "bytes": 11518
     },
     {
       "path": "src/thoth/domain/account_usage.py",
@@ -7273,8 +7288,8 @@
     },
     {
       "path": "src/thoth/domain/resource_scope.py",
-      "sha256": "c6faca5cd2db9c24058c80bc3bcea22865a12c4d88ba26232c8b00bb5d9ca52a",
-      "bytes": 10680
+      "sha256": "55e2b1b496746068352c571a8b8b24cda3cef1cc09bd683518da488dbdc640b4",
+      "bytes": 10768
     },
     {
       "path": "src/thoth/domain/response_language.py",
@@ -7665,6 +7680,11 @@
       "path": "src/thoth/ports/sandbox_capability.py",
       "sha256": "03163a74def651a30bfabe95156123336b8c46658608711d396629d7975b84a7",
       "bytes": 387
+    },
+    {
+      "path": "src/thoth/ports/source_version_catalog.py",
+      "sha256": "c4a95f10e67f9cb6fcde95567147b9dd4ecf6d53c255f94e872ba0b9e7b35404",
+      "bytes": 396
     },
     {
       "path": "src/thoth/ports/store_bundle.py",
@@ -8975,6 +8995,11 @@
       "path": "tests/integration/test_a13_security_boundaries.py",
       "sha256": "e245293ecb4c541cd96be2219ce815e989e7cd130b62ab0d922ad3e1fbf3f76f",
       "bytes": 10370
+    },
+    {
+      "path": "tests/integration/test_absence_catalog_usage.py",
+      "sha256": "d4217e7119365a266c4bc819f8e5022be293b1d5d8aa3cb239cc7a8e213a343d",
+      "bytes": 9185
     },
     {
       "path": "tests/integration/test_absence_result_payload.py",
@@ -11763,8 +11788,13 @@
     },
     {
       "path": "tests/unit/test_absence_recovery.py",
-      "sha256": "6c28896b62000d4e39aae501d6f4e99dd47642209697b48ec82e9b80078ca8c8",
-      "bytes": 8198
+      "sha256": "fc903fa37089f19dd327b67e9ae1d5c25e7bd580ed138f09978c997a91d00f3d",
+      "bytes": 8879
+    },
+    {
+      "path": "tests/unit/test_absence_usage.py",
+      "sha256": "b000f167d770fd06a4e2fe00a52e83fcfb044b83db59667b3fe0051aa7a422a6",
+      "bytes": 5339
     },
     {
       "path": "tests/unit/test_absence_witness_delivery.py",

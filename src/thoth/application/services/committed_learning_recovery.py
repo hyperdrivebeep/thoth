@@ -15,6 +15,7 @@ from thoth.domain.research_request import (
     ResearchAttempt,
     ThreadRequestRevision,
 )
+from thoth.ports.source_version_catalog import SourceVersionCatalogPort
 
 if TYPE_CHECKING:
     from thoth.application.commands.research_threads import ResearchThreadHandlers
@@ -123,6 +124,10 @@ def finish_learning_recovery(
                     host.analysis.evidence(request.project_id),
                     policy_ref=request.policy_ref,
                     cutoff_at=datetime.fromisoformat(request.cutoff_at),
+                    read_evidence=host.analysis.artifacts.read_evidence,
+                    catalog=host.analysis.artifacts
+                    if isinstance(host.analysis.artifacts, SourceVersionCatalogPort)
+                    else None,
                 )
             work.context.update(restored)
             work.record_refs.extend(

@@ -5,8 +5,10 @@ from datetime import datetime
 from thoth.application.services.request_records import RequestRecords
 from thoth.application.services.research_absence_checks import (
     assess_absence_claims,
+    has_checkable_absence_claims,
     make_absence_scope,
 )
+from thoth.application.services.research_absence_usage import admit_absence_catalog
 from thoth.application.services.research_findings import adopt_confirmed_findings
 from thoth.application.services.research_retrieval_policy import retrieval_policy
 from thoth.application.services.research_stages import read_stage
@@ -22,6 +24,8 @@ from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
 from thoth.domain.model import ContextPack
 from thoth.domain.project import Project
 from thoth.domain.research_execution import ResearchWork
+from thoth.ports.artifact_ledger import ArtifactLedgerPort
+from thoth.ports.source_version_catalog import SourceVersionCatalogPort
 
 
 def initialize_absence(
@@ -42,6 +46,8 @@ def initialize_absence(
             policy_digest=domain_digest(
                 "ABSENCE_RETRIEVAL_POLICY", "1.0.0", canonical_payload(retrieval_policy())
             ),
+            admitted_refs=frozenset(),
+            reasons=("ABSENCE_SCOPE_NOT_CHECKED_YET",),
         ),
         source,
     )
@@ -60,6 +66,7 @@ def assess_review_absence(
     proposal: ReviewProposalE2,
     records: RequestRecords,
     current: tuple[EvidenceSpan, ...],
+    artifacts: ArtifactLedgerPort,
 ) -> None:
     state = work.absence
     if state is None:
@@ -73,6 +80,17 @@ def assess_review_absence(
         raise ValueError("ABSENCE_ACTUAL_INPUT_MISMATCH")
     allowed = state.allowed_scope
     current = connected_retrieval_spans(current)
+    checkable = has_checkable_absence_claims(proposal)
+    b_admitted, b_reasons = (
+        admit_absence_catalog(
+            state,
+            state.allowed_spans,
+            artifacts.read_evidence,
+            artifacts if isinstance(artifacts, SourceVersionCatalogPort) else None,
+        )
+        if checkable
+        else (frozenset[str](), ("ABSENCE_NO_CHECKABLE_CLAIMS",))
+    )
     a = make_absence_scope(
         work.request_ref,
         "ACTUAL_ROLE_INPUT",
@@ -84,7 +102,9 @@ def assess_review_absence(
         policy_digest=allowed.retrieval_policy_digest,
         current=current,
         stage_ref=stage_ref,
-        reasons=() if state.actual_captured_at else ("ABSENCE_ACTUAL_INPUT_UNAVAILABLE",),
+        reasons=(() if checkable else ("ABSENCE_NO_CHECKABLE_CLAIMS",))
+        + (() if state.actual_captured_at else ("ABSENCE_ACTUAL_INPUT_UNAVAILABLE",)),
+        admitted_refs=None if checkable else frozenset(),
     )
     b = make_absence_scope(
         work.request_ref,
@@ -96,6 +116,8 @@ def assess_review_absence(
         cutoff_at=allowed.cutoff_at,
         policy_digest=allowed.retrieval_policy_digest,
         current=current,
+        admitted_refs=b_admitted,
+        reasons=b_reasons,
     )
     checked = set((*a.checked_refs, *b.checked_refs))
     for span in (*state.actual_spans, *state.allowed_spans):
@@ -108,6 +130,14 @@ def assess_review_absence(
     result = assess_absence_claims(
         work.request_ref, proposal, stage_ref, a, state.actual_spans, b, state.allowed_spans
     )
+    for ref in dict.fromkeys(
+        r
+        for item in result.items
+        for outcome in (item.a_result, item.b_result)
+        for r in outcome.witness_refs
+    ):
+        if artifacts.read_evidence(ref) != state.checked_spans[ref]:
+            raise ValueError("ABSENCE_WITNESS_SOURCE_CHANGED")
     work.boundary.check()
     raw = work.result_only.get("absence_assessments")
     if raw is not None:

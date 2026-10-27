@@ -9,6 +9,7 @@ import orjson
 from sqlalchemy import Engine, insert, select, update
 from sqlalchemy.engine import RowMapping
 
+from thoth.adapters.storage.artifact_catalog_rows import read_evidence_version
 from thoth.adapters.storage.artifact_rows import artifact_from_row, evidence_from_row
 from thoth.adapters.storage.schema import (
     artifact_versions,
@@ -357,6 +358,11 @@ class SqliteArtifactLedger(ArtifactLedgerPort):
                 .first()
             )
         return None if row is None else self._evidence_from_row(row)
+
+    def read_evidence_version(
+        self, project_id: str, artifact_id: str, source_version_id: str
+    ) -> tuple[EvidenceSpan, ...]:
+        return read_evidence_version(self._engine, project_id, artifact_id, source_version_id)
 
     def update_evidence(self, span: EvidenceSpan) -> None:
         with write_connection(self._engine) as connection:

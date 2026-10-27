@@ -31,6 +31,7 @@ def register_research_history(
 ) -> None:
     ledger = stores.scoped_ledger(access)
     memory = stores.full_memory()
+    catalogs = ScopedArtifactLedger(stores.artifacts, access, ledger, stores.resource_scopes)
     projection = HistoryProjection(
         ledger,
         stores.research_history,
@@ -42,13 +43,20 @@ def register_research_history(
             stores.artifacts,
             stores.operations,
             memory,
+            catalogs=catalogs,
         ),
         restore_profiles(),
         RESTORE_APPLY_READY,
     )
     scopes = HistoryScopeValidator(ledger, access, stores.projects, stores.threads)
     freshness = ResearchFreshnessService(
-        ledger, stores.projects, stores.governance, stores.artifacts, stores.operations, memory
+        ledger,
+        stores.projects,
+        stores.governance,
+        stores.artifacts,
+        stores.operations,
+        memory,
+        catalogs=catalogs,
     )
     handlers = ResearchHistoryHandlers(
         ResearchHistoryService(projection, scopes, OpaqueHistoryCursors()),
@@ -57,7 +65,7 @@ def register_research_history(
             scopes,
             stores.operations,
             stores.controls,
-            SelectedEvidenceReader(ScopedArtifactLedger(stores.artifacts, access, ledger)),
+            SelectedEvidenceReader(catalogs),
         ),
     )
     registry.register("revision/timeline/read", handlers.timeline_read)

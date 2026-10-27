@@ -72,6 +72,36 @@ Cancellation/authority/currentness failures at the existing execution boundary s
 Checked source spans enter the existing consumed-source basis and are rechecked at later boundaries;
 spans never shown to a model are not added to the result's model-input `source_refs`.
 
+### Catalog resource accounting
+
+When claims need a literal check, a supported `SourceVersionCatalogPort` reads one exact
+project/artifact/source-version catalog. The scoped implementation requires the artifact READ
+and rejects catalogs containing independent span scope records before returning their text.
+SQLite selects that version directly; it does not read span corrections or raw source objects.
+The absence checker compares the frozen stored spans against that authorized catalog. No
+checkable claims means no catalog check or additional consumed-source dependency.
+
+Access accounting and data provenance have different granularity. A uniform source owner costs
+one artifact READ, but every checked span keeps its source version, hash, locator and states in
+the assessment and existing `ResearchResultBasis.source_basis`. No basis schema or historical
+hash changes. A found claim needs one exact witness; actual witnesses and model inputs still
+record individual span READs. An already supplied positive witness needs no additional offer.
+
+Currentness groups only catalog-only dependencies proven by the typed assessment, matching
+per-span basis and a sealed artifact READ. Model inputs, individually recorded resources and
+witnesses remain on the existing span-read path. Thread reads, history projection and project
+review use the same grouped check, comparing the full recorded source binding against current
+version-local rows. Changed hashes/states cause review; revoked owner access is denied. Revision
+and receipt lineage already retain READ parents, so artifact permission changes remain binding.
+
+Unsupported stores or independent span scopes use bounded individual reads. The global 4,096
+resource-use guard is unchanged. Optional checks may reserve at most one quarter of its keys per
+request and leave half for subsequent work. A uniform 4,200-span catalog consumes one owner key;
+it is not truncated to 1,024 spans. If resource admission cannot complete, checked refs are kept
+separate from all members, `scan_complete=false`, and missing literals become NOT_CHECKED with
+`ABSENCE_SCOPE_USAGE_LIMIT`. A valid positive witness in the admitted part is still FOUND.
+These limits apply during learning-only recovery too. No quota reset or hidden-use scope is used.
+
 ## Results and authority
 
 `result.absence_assessments` 1.0.0 is a typed payload in the existing result owner, beside
