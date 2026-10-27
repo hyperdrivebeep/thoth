@@ -1,9 +1,9 @@
 """Bounded executable policies; fixed authority and scientific guards stay outside them."""
 
 import re
-from typing import Annotated, Literal
+from typing import Annotated, Literal, cast
 
-from pydantic import Field
+from pydantic import Discriminator, Field, Tag, model_validator
 
 from thoth.domain.base import DomainModel
 from thoth.domain.enums import AuthorityState, CutoffState
@@ -23,15 +23,60 @@ class RetrievalBehaviorPolicy(DomainModel):
     character_budget: int = Field(default=50000, ge=1, le=50000)
 
 
+class RetrievalLaneSpec(DomainModel):
+    """One named ranking rule of a retrieval policy. Only the rule the research path has always
+    used exists so far; further rules are added to this set when they are implemented."""
+
+    lane_id: Literal["LEXICAL_SUBSTRING_V1"] = "LEXICAL_SUBSTRING_V1"
+    lane_version: Literal["1.0.0"] = "1.0.0"
+
+
+class RetrievalLanePolicy(DomainModel):
+    """Retrieval policy 3.0.0: the 2.0.0 budgets plus the lane that ranks candidates.
+
+    RetrievalBehaviorPolicy 2.0.0 is not changed: adding a field to it would change the digest of
+    every stored 2.0.0 policy. Version 3.0.0 reaches a run only through the existing shadow and
+    canary exposure; the baseline stays 2.0.0.
+    """
+
+    kind: Literal["RETRIEVAL_POLICY"] = "RETRIEVAL_POLICY"
+    version: Literal["3.0.0"] = "3.0.0"
+    max_spans: int = Field(default=160, ge=1, le=160)
+    character_budget: int = Field(default=50000, ge=1, le=50000)
+    lanes: tuple[RetrievalLaneSpec, ...] = (RetrievalLaneSpec(),)
+
+    @model_validator(mode="after")
+    def _one_lane_for_now(self) -> "RetrievalLanePolicy":
+        if len(self.lanes) != 1:
+            raise ValueError("RETRIEVAL_POLICY_ONE_LANE_SUPPORTED")
+        return self
+
+
 class WorkflowBehaviorPolicy(DomainModel):
     kind: Literal["WORKFLOW_DEFINITION"] = "WORKFLOW_DEFINITION"
     version: Literal["2.0.0"] = "2.0.0"
     max_semantic_repairs: Literal[0, 1] = 1
 
 
+RetrievalPolicy = RetrievalBehaviorPolicy | RetrievalLanePolicy
+
+
+def _policy_tag(value: object) -> str | None:
+    """Pick the policy class by (kind, version). Stored 2.0.0 policies may omit the version."""
+    if isinstance(value, dict):
+        data = cast(dict[str, object], value)
+        kind, version = data.get("kind"), data.get("version", "2.0.0")
+    else:
+        kind, version = getattr(value, "kind", None), getattr(value, "version", None)
+    return f"{kind}:{version}" if isinstance(kind, str) and isinstance(version, str) else None
+
+
 BehaviorPolicy = Annotated[
-    PromptBehaviorPolicy | RetrievalBehaviorPolicy | WorkflowBehaviorPolicy,
-    Field(discriminator="kind"),
+    Annotated[PromptBehaviorPolicy, Tag("PROMPT_BUNDLE:2.0.0")]
+    | Annotated[RetrievalBehaviorPolicy, Tag("RETRIEVAL_POLICY:2.0.0")]
+    | Annotated[RetrievalLanePolicy, Tag("RETRIEVAL_POLICY:3.0.0")]
+    | Annotated[WorkflowBehaviorPolicy, Tag("WORKFLOW_DEFINITION:2.0.0")],
+    Discriminator(_policy_tag),
 ]
 
 
@@ -151,10 +196,28 @@ def workflow_repair_decision(policy: WorkflowBehaviorPolicy, needs_repair: bool)
     return "REPAIR" if policy.max_semantic_repairs else "HELD"
 
 
+class RetrievalCatalogInput(DomainModel):
+    """What the structure observation says about the spans of an evaluation case."""
+
+    ordered_refs: tuple[str, ...] = Field(default=(), max_length=20_000)
+    protected_refs: tuple[str, ...] = Field(default=(), max_length=20_000)
+    all_observed: bool = False
+    structure_count: int = Field(default=0, ge=0)
+
+
 class RetrievalBehaviorInput(DomainModel):
+    """An evaluation case. The optional fields carry what the research path also receives.
+
+    forced_refs keeps its old name and means the same as pinned_refs: the research path's rule is
+    that a pinned span is read first when it is eligible and is otherwise ignored.
+    """
+
     problem: str
     evidence: tuple[EvidenceSpan, ...] = Field(max_length=20_000)
     forced_refs: tuple[str, ...] = Field(default=(), max_length=160)
+    pinned_refs: tuple[str, ...] = Field(default=(), max_length=160)
+    queries: tuple[str, ...] = Field(default=(), max_length=32)
+    catalog: RetrievalCatalogInput | None = None
 
 
 class WorkflowBehaviorInput(DomainModel):

@@ -16,12 +16,13 @@ from dataclasses import dataclass, field
 from typing import cast
 
 import pytest
+from pydantic import JsonValue
 
 from thoth.adapters.behavior.registry import RetrievalBehaviorHandler
 from thoth.application.services import research_retrieval
 from thoth.application.services.research_selection_context import CandidateContext
 from thoth.domain.artifact import SourceLocator
-from thoth.domain.behavior_policy import RetrievalBehaviorPolicy
+from thoth.domain.behavior_policy import RetrievalBehaviorPolicy, select_evidence_context
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.enums import (
     AuthorityState,
@@ -725,22 +726,39 @@ def test_the_random_corpora_exercise_each_branch() -> None:
 
 
 # ---------------------------------------------------------------------------------------------
-# What the self-improvement evaluation selects today for the same inputs. S3 replaces this
-# function with the shared one, so these expectations change then, on purpose.
+# Evaluation. Until S3 the self-improvement evaluation selected with an older scoring function
+# and picked other spans than the research path for the same input; S1 pinned seven of those
+# differences and asserted that they differed. S3 sends the evaluation through the function the
+# research path calls, so those seven tests now assert the opposite on purpose (a specification
+# change, not a loosened expectation): the evaluation selects what the research path selects.
+# The older scoring function still serves the older analysis path and is pinned unchanged below.
 # ---------------------------------------------------------------------------------------------
-def evaluation_today(sc: Scenario) -> list[str]:
+def evaluation_payload(sc: Scenario) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "problem": sc.question,
+        "evidence": [s.model_dump(mode="json") for s in sc.evidence],
+        "queries": list(sc.queries),
+        "pinned_refs": list(sc.pinned),
+    }
+    if sc.context is not None:
+        catalog: dict[str, object] = {
+            "ordered_refs": list(sc.context.ordered_refs),
+            "protected_refs": sorted(sc.context.protected_refs),
+            "all_observed": sc.context.all_observed,
+            "structure_count": sc.context.structure_count,
+        }
+        payload["catalog"] = catalog
+    return payload
+
+
+def evaluation_select(sc: Scenario) -> list[str]:
     result = RetrievalBehaviorHandler().evaluate(
-        sc.policy,
-        {
-            "problem": sc.question,
-            "evidence": [s.model_dump(mode="json") for s in sc.evidence],
-            "forced_refs": [],
-        },
+        sc.policy, cast(dict[str, JsonValue], evaluation_payload(sc))
     )
     return cast(list[str], result["selected_refs"])
 
 
-EVALUATION_TODAY: dict[str, list[str]] = {
+FORMER_EVALUATION_SCORER: dict[str, list[str]] = {
     "no_context_uses_the_ranked_path": ids("m143", "m144", "title143", "title144", "note"),
     "short_title_survives_when_protected": ids("m143", "m144"),
     "artifacts_are_interleaved": ids("x1", "x2", "x3", "y1", "y2"),
@@ -751,8 +769,20 @@ EVALUATION_TODAY: dict[str, list[str]] = {
 }
 
 
-@pytest.mark.parametrize("name", list(EVALUATION_TODAY))
-def test_the_evaluation_selects_differently_from_the_research_path_today(name: str) -> None:
+@pytest.mark.parametrize("name", list(FORMER_EVALUATION_SCORER))
+def test_the_evaluation_now_selects_what_the_research_path_selects(name: str) -> None:
     sc = build_scenarios()[name]
-    assert evaluation_today(sc) == EVALUATION_TODAY[name]
-    assert evaluation_today(sc) != EXPECTED[name]
+    assert evaluation_select(sc) == EXPECTED[name]
+    assert evaluation_select(sc) != FORMER_EVALUATION_SCORER[name]
+
+
+@pytest.mark.parametrize("name", list(FORMER_EVALUATION_SCORER))
+def test_the_older_scoring_function_is_unchanged_for_the_older_analysis_path(name: str) -> None:
+    sc = build_scenarios()[name]
+    older = select_evidence_context(
+        problem=sc.question,
+        evidence=sc.evidence,
+        max_spans=sc.policy.max_spans,
+        character_budget=sc.policy.character_budget,
+    )
+    assert [s.span_id for s in older.selected] == FORMER_EVALUATION_SCORER[name]

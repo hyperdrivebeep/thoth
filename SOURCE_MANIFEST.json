@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-27T08:13:06.358087+00:00",
+  "created_at": "2026-10-27T09:17:34.240551+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -3488,8 +3488,8 @@
     },
     {
       "path": "src/thoth/adapters/behavior/registry.py",
-      "sha256": "fc96d1a48aa5467dfccb61f24d30fc42e76ad26f8995f9ed1cc52022f6643c05",
-      "bytes": 5906
+      "sha256": "10a0293e7dd5f111b34e505dfa36dd6b7ec8988f20022ddf46a7343be614482f",
+      "bytes": 7840
     },
     {
       "path": "src/thoth/adapters/behavior_catalog.py",
@@ -5113,8 +5113,8 @@
     },
     {
       "path": "src/thoth/application/services/behavior_context.py",
-      "sha256": "3c1edb6e041cc83626b8bf820d76b78a18bad6fdace8b1a7f615cc1e93bf4ab1",
-      "bytes": 7838
+      "sha256": "01bf3602248f26b1ef27ebc9331f4dac8f00c77676d268c798b0ca1abff61a4b",
+      "bytes": 7907
     },
     {
       "path": "src/thoth/application/services/behavior_exposure_runtime.py",
@@ -5288,8 +5288,8 @@
     },
     {
       "path": "src/thoth/application/services/evaluation_inputs.py",
-      "sha256": "406ab2bc36431d6e71fad3e3ffd581c7cf413df91555d905b7af46413f13e91c",
-      "bytes": 14974
+      "sha256": "b51f6730ff017b2a16480b4cc5c4384af57b2c98aacbf3eeb7cb9ca08045ca8e",
+      "bytes": 15395
     },
     {
       "path": "src/thoth/application/services/evaluation_producer.py",
@@ -5748,8 +5748,8 @@
     },
     {
       "path": "src/thoth/application/services/paired_evaluation_service.py",
-      "sha256": "0ff7f6b18e52a6c9d1f0a18f1f2b9406cc96b5c8e6b7d1327dd667a3a31d25d6",
-      "bytes": 8404
+      "sha256": "923d9a0c7cdb0094f56d8a33c429dcca987f024154e07e85a5737dcd5e8140d0",
+      "bytes": 9252
     },
     {
       "path": "src/thoth/application/services/policy_gate.py",
@@ -6123,8 +6123,8 @@
     },
     {
       "path": "src/thoth/application/services/research_retrieval_policy.py",
-      "sha256": "ddedc366746646857680794573382108461c8751f63a77db026516f287208873",
-      "bytes": 2354
+      "sha256": "3ed90d8e4c678c0ef6c3178cc039fa445c901e35bc878ff4ced507b816182bcf",
+      "bytes": 2427
     },
     {
       "path": "src/thoth/application/services/research_review_context.py",
@@ -6793,8 +6793,8 @@
     },
     {
       "path": "src/thoth/domain/behavior_policy.py",
-      "sha256": "c3ca664b56edb0159ee4db683bfbebf2695ad2ccacdeadc5f9864f740922ee32",
-      "bytes": 4978
+      "sha256": "0884278b33ed94eb2d465b8e5e1ad35d1315d5c8fe6e247f4f7258e6f820d5fa",
+      "bytes": 7815
     },
     {
       "path": "src/thoth/domain/canonical.py",
@@ -7323,8 +7323,8 @@
     },
     {
       "path": "src/thoth/domain/retrieval_lane.py",
-      "sha256": "77015b3a596d1ae4a337e05be97e6df6f4e92ac58ac55c842b73f012bf35fe68",
-      "bytes": 8321
+      "sha256": "ad50c3c272abe9ea03740b8a593bf254802e513782b6a0a4ed11462775f8908a",
+      "bytes": 9098
     },
     {
       "path": "src/thoth/domain/revision.py",
@@ -10327,6 +10327,11 @@
       "bytes": 17235
     },
     {
+      "path": "tests/integration/test_retrieval_evaluation_pair.py",
+      "sha256": "8a2f1dfaaf016c2b6e0bcc3d9c96be1b3913f7782c33b241957cb95b0df2f780",
+      "bytes": 8731
+    },
+    {
       "path": "tests/integration/test_retrieval_gap_reassessment.py",
       "sha256": "ca222a34a891dc5286f4abbe3b6cc89d3af5d5a9e8eff2850dbc4c5e24ba412b",
       "bytes": 2989
@@ -11155,6 +11160,11 @@
       "path": "tests/unit/domain/test_research_history_contracts.py",
       "sha256": "a8e08cc6c2ca08d4072a3b3e1342279414cb7fe6ce2ed7249de2a44e0779dba1",
       "bytes": 5273
+    },
+    {
+      "path": "tests/unit/domain/test_retrieval_policy_versions.py",
+      "sha256": "ff95dc7c458d0d24bad0bd0671cdb1682a421526256ad98f5ff126b4876907f0",
+      "bytes": 7757
     },
     {
       "path": "tests/unit/domain/test_trace_closure.py",
@@ -12187,14 +12197,24 @@
       "bytes": 1747
     },
     {
+      "path": "tests/unit/test_retrieval_evaluation_dispatch.py",
+      "sha256": "60916b5eccc9265cc418cd78cfa7acf3c7c6e00ab5f4feee8b8e84236d6cd4a5",
+      "bytes": 6337
+    },
+    {
       "path": "tests/unit/test_retrieval_lane_port.py",
       "sha256": "daca53dd9cbff90cd232eff1b369d89ec62a42f6cca2f2fec77c5329a3944f4c",
       "bytes": 4771
     },
     {
+      "path": "tests/unit/test_retrieval_policy_v3_research_path.py",
+      "sha256": "1f90179a821af82023a8da74077c91ed3fd94384fd59ea293e1c8d2ea74e28d4",
+      "bytes": 3706
+    },
+    {
       "path": "tests/unit/test_retrieval_selection_oracle.py",
-      "sha256": "596babab050477741991b70d51857ab05a9bbda01d9e21a68f4f9743cf42392e",
-      "bytes": 28720
+      "sha256": "4f855b3c2b5b70c66682c772e5afc7df49899713350e2c9e1811879da0736471",
+      "bytes": 30212
     },
     {
       "path": "tests/unit/test_running_research.py",

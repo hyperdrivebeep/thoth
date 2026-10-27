@@ -13,10 +13,21 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Literal
 
-from thoth.domain.behavior_policy import RetrievalBehaviorPolicy
+from thoth.domain.behavior_artifact import BehaviorArtifactKind
+from thoth.domain.behavior_policy import RetrievalLanePolicy, RetrievalPolicy
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
 
 LEXICAL_SUBSTRING_V1 = "LEXICAL_SUBSTRING_V1"
+# The algorithm that evaluates a retrieval policy. It is recorded in every evaluation output and
+# is part of the identity of a retrieval comparison, so a result made by another algorithm is
+# never taken for this one.
+RETRIEVAL_EVALUATOR_ID = "retrieval-lane-dispatch:1.0.0"
+
+
+def evaluation_algorithm(component: BehaviorArtifactKind) -> str | None:
+    """The evaluation algorithm id a component's comparisons must record, if it has one."""
+    return RETRIEVAL_EVALUATOR_ID if component == BehaviorArtifactKind.RETRIEVAL_POLICY else None
+
 
 MIN_TERM = 3
 KOREAN_PAIR = re.compile(r"[가-힣]{2}")
@@ -156,7 +167,7 @@ def _interleave_artifacts(ranked: list[EvidenceSpan]) -> list[EvidenceSpan]:
 def full_catalog(
     eligible: tuple[EvidenceSpan, ...],
     catalog: CatalogContext | None,
-    policy: RetrievalBehaviorPolicy,
+    policy: RetrievalPolicy,
 ) -> tuple[tuple[EvidenceSpan, ...] | None, tuple[str, ...]]:
     """One admission decision for selection and its coverage mode; None means fallback."""
     if catalog is None or not catalog.all_observed:
@@ -208,9 +219,15 @@ LANES: dict[str, Lane] = {LEXICAL_SUBSTRING_V1: lexical_substring_v1}
 
 def select_retrieval_context(
     request: RetrievalRequest,
-    policy: RetrievalBehaviorPolicy,
-    lane_id: str = LEXICAL_SUBSTRING_V1,
+    policy: RetrievalPolicy,
+    lane_id: str | None = None,
 ) -> LaneSelection:
+    if lane_id is None:
+        lane_id = (
+            policy.lanes[0].lane_id
+            if isinstance(policy, RetrievalLanePolicy)
+            else LEXICAL_SUBSTRING_V1
+        )
     lane = LANES.get(lane_id)
     if lane is None:
         raise ValueError("RETRIEVAL_LANE_UNKNOWN")

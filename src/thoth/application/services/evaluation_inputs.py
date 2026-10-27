@@ -23,6 +23,7 @@ from thoth.domain.evaluation_run import (
     ExecutableArtifact,
     sealed_payload,
 )
+from thoth.domain.retrieval_lane import evaluation_algorithm
 from thoth.ports.behavior_artifact import BehaviorArtifactStorePort
 from thoth.ports.behavior_resolver import BehaviorComponentRegistryPort
 from thoth.ports.control_record import ControlRecordStorePort
@@ -211,6 +212,10 @@ class EvaluationInputResolver:
             "max_output_bytes": binding.max_output_bytes,
             "timeout_seconds": binding.timeout_seconds,
         }
+        # A comparison made by another evaluation algorithm is a different comparison. The id enters
+        # only this digest: a spec field would change the sealed digest of every stored spec.
+        algorithm = evaluation_algorithm(binding.component)
+        dedupe_identity = identity if algorithm is None else {**identity, "evaluator": algorithm}
         now = self._clock.now()
         spec = EvaluationRunSpec.model_validate(
             sealed_payload(
@@ -222,7 +227,7 @@ class EvaluationInputResolver:
                     "created_at": now,
                     "deadline_at": now + timedelta(seconds=binding.timeout_seconds),
                     "dedupe_digest": domain_digest(
-                        "EVALUATION_DEDUPE", "1.0.0", canonical_payload(identity)
+                        "EVALUATION_DEDUPE", "1.0.0", canonical_payload(dedupe_identity)
                     ),
                 },
             )
