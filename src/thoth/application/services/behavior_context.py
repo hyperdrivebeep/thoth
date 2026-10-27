@@ -105,11 +105,11 @@ def select_evidence_for_behavior(
         if shadow.component != BehaviorArtifactKind.RETRIEVAL_POLICY:
             continue
         shadow_policy = shadow.policy
-        if not isinstance(shadow_policy, RetrievalBehaviorPolicy | RetrievalLanePolicy):
-            raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
         started = perf_counter_ns()
         operation = "EVIDENCE_SELECTION"
         try:
+            if not isinstance(shadow_policy, RetrievalBehaviorPolicy | RetrievalLanePolicy):
+                raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
             shadow_result = select_evidence_context(
                 problem=problem,
                 evidence=evidence,

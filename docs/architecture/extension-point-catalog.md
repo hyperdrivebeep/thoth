@@ -15,6 +15,7 @@
 | Evaluation executor | `EvaluationExecutionPort`, `EvaluationExecutorRegistryPort` | `default_execution_registry` in Improvement composition | executor identity branches and hidden expected outputs |
 | Behavior component | `BehaviorComponentHandlerPort`, `BehaviorComponentRegistryPort` | `default_behavior_components` in behavior runtime composition | provider/fixture names and unrestricted executable code |
 | Source arithmetic | `DocumentCalculatorPort` | `DocumentCalculatorRegistry` / `default_document_calculator`, injected by research entry composition | product/fixture names and concrete arithmetic adapters in application logic; see [numeric observations](numeric-observations.md) |
+| Retrieval lane | ranking function (request, eligible spans) to ordered spans | \`register_lane(lane_id, version, lane, provenance)\` in \`thoth.domain.retrieval_lane\` fills the \`LANES\` registry; consumed by \`select_retrieval_context\` for research candidates, shadow replay and retrieval-policy evaluation | lane ids, lane versions and scanner rules in the selection frame (eligibility, pinning, whole-catalog mode, budget); see [retrieval lanes](retrieval-lanes.md) |
 
 N05 supplies an explicitly configured frozen case/scorer catalog and a bounded declarative subprocess
 executor. Separate workspaces receive only public inputs and independent initial memory copies.
