@@ -6,6 +6,7 @@ from typing import Literal
 
 from pydantic import AwareDatetime, model_validator
 
+from thoth.domain.absence_claim import ReviewProposalE2
 from thoth.domain.base import DomainModel
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.evidence_requirements import (
@@ -24,6 +25,7 @@ OUTPUT_CODECS = {
         RequirementProposal,
         EvidenceRanking,
         ReviewProposal,
+        ReviewProposalE2,
         ReviewAdjudication,
         ResearchSourcePlan,
     )

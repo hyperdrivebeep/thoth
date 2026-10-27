@@ -208,6 +208,7 @@ class ProjectReviewReader:
             basis,
             operation_id=None if manifest is None else manifest.operation_id,
             completion=None if manifest is None else manifest.completion,
+            manifest=manifest,
         )
         records = _related_records(self.ledger, self.access, thread.project_id, manifest)
         matrix = _coverage_matrix(current[0], records)

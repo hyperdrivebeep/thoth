@@ -15,11 +15,22 @@ from thoth.application.services.memory_query_expansion import ModelMemoryQueryEx
 from thoth.application.services.numeric_observation_view import with_numeric_observations
 from thoth.application.services.request_records import RequestRecords
 from thoth.application.services.requirement_compiler import compile_requirements
+from thoth.application.services.research_absence_delivery import (
+    complete_absence_witness,
+    prepare_absence_witness,
+    with_absence_checks,
+)
+from thoth.application.services.research_absence_runtime import (
+    adopt_absence_checked_findings,
+    assess_review_absence,
+    capture_absence_input,
+    has_absence_hold,
+    initialize_absence,
+)
 from thoth.application.services.research_answer import answer_summary
 from thoth.application.services.research_assembly import assemble_research_context
 from thoth.application.services.research_coverage import assess_coverage
 from thoth.application.services.research_discovery import discover_sources
-from thoth.application.services.research_findings import adopt_confirmed_findings
 from thoth.application.services.research_gaps import gap_targets, validate_gaps
 from thoth.application.services.research_retrieval import work_candidates
 from thoth.application.services.research_role_context import bundle_view, role_context
@@ -27,6 +38,7 @@ from thoth.application.services.research_source_digest import versioned_source_d
 from thoth.application.services.research_stage_reuse import reuse_stage_if_exact
 from thoth.application.services.research_stages import persist_stage, read_stage
 from thoth.application.services.retrieval_coverage_view import with_retrieval_coverage
+from thoth.domain.absence_claim import ReviewProposalE2
 from thoth.domain.canonical import head_set_digest
 from thoth.domain.enums import CutoffState, EntityType, ModelRole
 from thoth.domain.evidence import EvidenceSpan
@@ -37,7 +49,6 @@ from thoth.domain.evidence_requirements import (
     RequirementProposal,
     RequirementSetRevision,
     ReviewAdjudication,
-    ReviewProposal,
 )
 from thoth.domain.memory_expansion import MemoryExpansionOutcome
 from thoth.domain.model import ContextPack, ModelRequest
@@ -187,6 +198,9 @@ class ResearchAnalysis:
         model: ModelPort,
         progress: Progress,
     ) -> dict[str, object]:
+        initialize_absence(
+            work, project, self.evidence(project.project_id), self.records.clock.now()
+        )
         expansion = await self.widen_memory_question(work, project, model)
         try:
             memory_context = self.memory.build_context(
@@ -359,7 +373,9 @@ class ResearchAnalysis:
             {
                 "coverage": coverage.model_dump(mode="json"),
                 "discovery": discovery,
-                **answer_summary(coverage, answer, work.response_language),
+                **answer_summary(
+                    coverage, answer, work.response_language, absence_hold=has_absence_hold(work)
+                ),
             }
         )
         work.record_refs.append(
@@ -433,22 +449,29 @@ class ResearchAnalysis:
         if checked is not None:
             work.result_only["checked_observations"] = checked.model_dump(mode="json")
         candidate, _ = await self.ask(
-            model, project, review_context, ModelRole.SEMANTIC_REVIEWER, ReviewProposal
+            model, project, review_context, ModelRole.SEMANTIC_REVIEWER, ReviewProposalE2
+        )
+        reviewer_evidence = work.evidence
+        assess_review_absence(
+            work, candidate, self.records, self.evidence(project.project_id), self.artifacts
         )
         # Facts are shown to the user as confirmed, so a finding citing a span the reviewer was
         # not given is discarded here (and counted) instead of being trusted.
-        findings, findings_dropped = adopt_confirmed_findings(
-            candidate.confirmed_findings, {span.span_id for span in work.evidence}
+        adopt_absence_checked_findings(candidate, work, reviewer_evidence)
+        adjudicator_context = prepare_absence_witness(
+            review_contexts.adjudication_context(review_context, candidate, ref),
+            work,
+            self.assemble,
+            self.source_packet,
         )
-        work.context["confirmed_findings"] = findings
-        work.context["confirmed_findings_dropped"] = findings_dropped
         adjudication, run = await self.ask(
             model,
             project,
-            review_contexts.adjudication_context(review_context, candidate, ref),
+            adjudicator_context,
             ModelRole.REVIEW_ADJUDICATOR,
             ReviewAdjudication,
         )
+        complete_absence_witness(work, adjudicator_context)
         explicit = proposal.explicit_public_search and not proposal.connected_sources_only
         gap_validation = validate_gaps(
             targets,
@@ -456,7 +479,7 @@ class ResearchAnalysis:
             ref,
             candidate,
             adjudication,
-            work.evidence,
+            reviewer_evidence,
             assembly.bundles,
             run,
         )
@@ -465,7 +488,7 @@ class ResearchAnalysis:
             ref,
             candidate,
             adjudication,
-            work.evidence,
+            reviewer_evidence,
             run,
             explicit,
             gap_validations=gap_validation,
@@ -520,6 +543,7 @@ class ResearchAnalysis:
             work.context["context_projection_version"] = "2.0.0"
         if work is not None:
             context = with_numeric_observations(context, role, work)
+            context = with_absence_checks(context, role, work)
         source_context_digest = self.source_digest(context.evidence)
         if work is not None:
             work.evidence = context.evidence
@@ -544,6 +568,7 @@ class ResearchAnalysis:
             max_output_tokens=6000,
             model_settings=None if work is None else work.model_settings,
         )
+        capture_absence_input(work, role, prepared.context_pack, self.records.clock.now())
         if work is not None and work.resume_from_operation_id is not None:
             # Only a user-requested resume reuses a stage, and only on an exactly equal input.
             work.boundary.check()

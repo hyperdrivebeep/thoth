@@ -1,6 +1,7 @@
 """Pure input views for ranking, semantic review and separate adjudication."""
 
 from thoth.application.services.research_role_context import bundle_view
+from thoth.domain.absence_claim import ABSENCE_INSTRUCTION
 from thoth.domain.enums import ModelRole
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.evidence_bundle import ContextAssembly
@@ -61,6 +62,7 @@ def semantic_review_context(
                 "authority or a citation alone is not support. Do not invent support edges. "
                 "BOUND exemptions require governing authority, never model discretion.",
                 "omitted_required_information": ranked.omitted_required_information,
+                "absence_instruction": ABSENCE_INSTRUCTION,
             },
         }
     )

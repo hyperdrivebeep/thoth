@@ -32,6 +32,7 @@ from thoth.domain.research_request import (
     ThreadRequestRevision,
     decode_thread_request,
 )
+from thoth.ports.source_version_catalog import SourceVersionCatalogPort
 
 if TYPE_CHECKING:
     from thoth.application.commands.research_threads import ResearchThreadHandlers
@@ -70,11 +71,15 @@ def read_research_snapshot(
             host.analysis.artifacts,
             host.operations,
             host.analysis.memory.store,
+            catalogs=host.analysis.artifacts
+            if isinstance(host.analysis.artifacts, SourceVersionCatalogPort)
+            else None,
         ).evaluate_result(
             project_id,
             manifest.research_basis if isinstance(manifest, CurrentResultManifestV21) else None,
             operation_id=None if manifest is None else manifest.operation_id,
             completion=None if manifest is None else manifest.completion,
+            manifest=manifest,
         )
         fresh = manifest is not None and manifest.request_ref == current[0]
         project, policy = host.projects.read(project_id), host.governance.read_policy(project_id)

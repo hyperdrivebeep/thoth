@@ -73,7 +73,7 @@ def create_resources(
     )
     ledger.register_projection("resource-lineage", ResearchResourceLineage(scopes))
     ledger.register_receipt_projection("resource-lineage", ReceiptResourceLineage(ledger, scopes))
-    return ScopedArtifactLedger(raw, scopes, ledger)
+    return ScopedArtifactLedger(raw, scopes, ledger, stores.resource_scopes)
 
 
 def create_evidence_access(

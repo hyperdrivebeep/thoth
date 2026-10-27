@@ -13,6 +13,7 @@ from thoth.application.services.model_outcomes import record_model_outcome
 from thoth.application.services.post_execution_resume import resume_post_execution_learning
 from thoth.application.services.reference_failure import reference_failure_cause
 from thoth.application.services.request_language import apply_request_language
+from thoth.application.services.research_absence_runtime import attach_absence_result
 from thoth.application.services.research_boundary import RequestBoundary
 from thoth.application.services.research_termination import ResearchTerminationService
 from thoth.domain.enums import EntityType, OperationState, ThreadExecutionState
@@ -153,6 +154,20 @@ def _after_published(
         logging.getLogger(__name__).exception("judgment review resolution failed")
 
 
+def _combined_result(work: ResearchWork, result: dict[str, JsonValue]) -> dict[str, object]:
+    return attach_absence_result(
+        {
+            **work.context,
+            **work.result_only,
+            **result,
+            "cleanup_usage": [
+                usage.model_dump(mode="json") for usage in work.cleanup_usage.values()
+            ],
+        },
+        work,
+    )
+
+
 async def _execute_owned(
     host: ResearchThreadHandlers,
     attempt: ResearchAttempt,
@@ -166,6 +181,7 @@ async def _execute_owned(
     def publish_result(
         phase: str, result: dict[str, object], gaps: tuple[str, ...], terminal: str | None = None
     ) -> None:
+        result = attach_absence_result(result, work)
         try:
             ref = host.publish(attempt, request, work, phase, result, gaps, terminal=terminal)
         except (ResearchFence, ResearchLeaseLost, ResearchPaused, ModelExecutionHold):
@@ -255,14 +271,7 @@ async def _execute_owned(
         boundary.check()
         if result.get("queued") is True:
             return host.pending(attempt, "WAITING_FOR_LEGACY_THREAD")
-        combined = {
-            **work.context,
-            **work.result_only,
-            **result,
-            "cleanup_usage": [
-                usage.model_dump(mode="json") for usage in work.cleanup_usage.values()
-            ],
-        }
+        combined = _combined_result(work, result)
         publish_result(
             "COMPLETE",
             combined,
@@ -408,9 +417,15 @@ def _prepare_work(
     calls = host.call_settings
     if calls is not None and calls.hypothesis_contract_v3(request.project_id):
         work.hypothesis_contract_v3 = True  # effective project choice, including its default
-    boundary.validate_sources = lambda: host.analysis.require_current_sources(
-        work.evidence, work.context.get("source_context_digest")
-    )
+
+    def current_sources() -> None:
+        host.analysis.require_current_sources(
+            work.evidence, work.context.get("source_context_digest")
+        )
+        if work.absence is not None and work.absence.checked_spans:
+            host.analysis.require_current_sources(tuple(work.absence.checked_spans.values()))
+
+    boundary.validate_sources = current_sources
 
     def show_draft(phase: str, content: dict[str, object]) -> None:
         boundary.check()

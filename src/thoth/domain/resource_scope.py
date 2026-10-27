@@ -198,6 +198,7 @@ _RESOURCE_USES: ContextVar[dict[tuple[str, str, str], ResourceUse] | None] = Con
     default=None,
 )
 _RESOURCE_PROJECT: ContextVar[str | None] = ContextVar("resource_project", default=None)
+RESOURCE_SCOPE_USE_LIMIT = 4096
 
 
 def record_resource_use(
@@ -208,7 +209,10 @@ def record_resource_use(
         raise ResourceScopeError("RESOURCE_SCOPE_PROJECT_MISMATCH")
     uses = _RESOURCE_USES.get()
     if uses is not None:
-        if len(uses) >= 4096 and (project_id, resource_ref, capability) not in uses:
+        if (
+            len(uses) >= RESOURCE_SCOPE_USE_LIMIT
+            and (project_id, resource_ref, capability) not in uses
+        ):
             raise ResourceScopeError("RESOURCE_SCOPE_USAGE_LIMIT")
         uses[(project_id, resource_ref, capability)] = ResourceUse(
             project_id=project_id,

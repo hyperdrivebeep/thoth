@@ -17,6 +17,7 @@ from thoth.application.services.conversation_router import ConversationRouter
 from thoth.application.services.tui_session_service import TuiSessionService
 from thoth.apps.conversation_dispatch import BusConversationDispatcher
 from thoth.apps.runtime import create_runtime
+from thoth.domain.absence_claim import ReviewProposalE2
 from thoth.domain.action import (
     ActionDraft,
     ActionPlanDraft,
@@ -139,7 +140,9 @@ class ControlledResearchModel:
                 answer="A bounded answer with explicit evidence limits",
             )
         elif req.role == ModelRole.REVIEW_ADJUDICATOR:
-            candidates = ReviewProposal.model_validate(ctx.research_context["candidate"]).candidates
+            candidates = ReviewProposalE2.model_validate(
+                ctx.research_context["candidate"]
+            ).candidates
             output = ReviewAdjudication(
                 decisions=tuple(
                     SemanticReviewDecision(
