@@ -80,9 +80,11 @@ def test_policy_3_0_0_adds_the_lane_and_keeps_the_budgets() -> None:
 
 @pytest.mark.parametrize(
     "lanes",
-    [[], [{}, {}], [{"lane_id": "PROTECTED_EXACT"}], [{"lane_version": "2.0.0"}]],
+    [[], [{}, {}], [{"lane_id": "PROTECTED_EXACT"}, {}], [{"lane_version": "2.0.0"}]],
 )
-def test_policy_3_0_0_accepts_only_the_one_lane_that_exists(lanes: list[dict[str, str]]) -> None:
+def test_policy_3_0_0_accepts_exactly_one_lane_with_a_known_version(
+    lanes: list[dict[str, str]],
+) -> None:
     with pytest.raises(ValidationError):
         RetrievalLanePolicy.model_validate({"lanes": lanes})
 

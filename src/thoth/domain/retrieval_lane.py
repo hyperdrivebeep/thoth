@@ -16,8 +16,16 @@ from typing import Literal
 from thoth.domain.behavior_artifact import BehaviorArtifactKind
 from thoth.domain.behavior_policy import RetrievalLanePolicy, RetrievalPolicy
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
+from thoth.domain.query_identifiers import (
+    SCANNER_VERSION,
+    QueryIdentifier,
+    fold,
+    occurs,
+    scan_query,
+)
 
 LEXICAL_SUBSTRING_V1 = "LEXICAL_SUBSTRING_V1"
+PROTECTED_EXACT = "PROTECTED_EXACT"
 # The algorithm that evaluates a retrieval policy. It is recorded in every evaluation output and
 # is part of the identity of a retrieval comparison, so a result made by another algorithm is
 # never taken for this one.
@@ -86,6 +94,9 @@ class LaneSelection:
     eligible: tuple[EvidenceSpan, ...]
     # Why the whole-catalog mode was refused when that is more than "not applicable".
     limitations: tuple[str, ...] = ()
+    # Which lane version (and which rule set under it) ranked this selection; empty for the
+    # original lane, whose records are unchanged.
+    provenance: tuple[tuple[str, str], ...] = ()
 
 
 type Lane = Callable[[RetrievalRequest, tuple[EvidenceSpan, ...]], tuple[EvidenceSpan, ...]]
@@ -214,7 +225,96 @@ def lexical_substring_v1(
     return tuple(_interleave_artifacts([span for span in ranked if span.span_id not in pinned]))
 
 
-LANES: dict[str, Lane] = {LEXICAL_SUBSTRING_V1: lexical_substring_v1}
+def _hits(text: str, identifiers: tuple[QueryIdentifier, ...]) -> int:
+    """Specificity-weighted identifier matches: the written form counts 2, a shorter form 1."""
+    score = 0
+    for identifier in identifiers:
+        for rank, needle in enumerate(identifier.needles):
+            if occurs(text, needle, identifier.kind):
+                score += 2 if rank == 0 else 1
+                break
+    return score
+
+
+def protected_exact_v1(
+    request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
+) -> tuple[EvidenceSpan, ...]:
+    """Spans that hold the question's identifiers, found by grammar and matched at identifier edges.
+
+    The question is scanned before anything is split; the Latin and digit pieces that remain are
+    matched at the same edges, and Hangul pieces by substring under the earlier two-syllable rule.
+    A span with no match is not returned: this lane is for exactness and is meant to be combined.
+    """
+    fields = [scan_query(text) for text in (request.question, *request.queries)]
+    identifiers = tuple({(i.kind, i.needles): i for f in fields for i in f.identifiers}.values())
+    latin = tuple(
+        dict.fromkeys(
+            fold(token.text)
+            for f in fields
+            for token in f.split_tokens
+            if token.script != "HANGUL" and len(token.text) >= MIN_TERM
+        )
+    )
+    hangul = tuple(
+        dict.fromkeys(
+            fold(token.text)
+            for f in fields
+            for token in f.split_tokens
+            if token.script == "HANGUL"
+            and (
+                len(token.text) >= MIN_TERM
+                or (KOREAN_PAIR.fullmatch(token.text) and token.text not in KOREAN_FUNCTION_WORDS)
+            )
+        )
+    )
+    pinned = set(request.pinned_refs)
+    exact = {
+        s.span_id
+        for s in eligible
+        if s.span_id in request.question or s.artifact_id in request.question
+    }
+    scored: list[tuple[tuple[object, ...], EvidenceSpan]] = []
+    for span in eligible:
+        if span.span_id in pinned:
+            continue
+        folded = _folded(span.exact_text)
+        found = (
+            _hits(folded, identifiers),
+            sum(1 for word in latin if occurs(folded, word, "MIXED")),
+            sum(1 for word in hangul if word in folded),
+        )
+        if not any(found) and span.span_id not in exact:
+            continue
+        key = (
+            span.span_id not in exact,
+            *(-count for count in found),
+            span.artifact_id,
+            span.locator.page or 0,
+            span.locator.line or 0,
+            span.span_id,
+        )
+        scored.append((key, span))
+    scored.sort(key=lambda item: item[0])
+    return tuple(_interleave_artifacts([span for _, span in scored]))
+
+
+LANES: dict[str, Lane] = {}
+# A lane is its id and its version together: a policy names both, and a lane whose rules change
+# is registered under a new version, so the same policy payload can never select differently.
+LANE_VERSIONS: dict[str, str] = {}
+LANE_PROVENANCE: dict[str, tuple[tuple[str, str], ...]] = {}
+
+
+def register_lane(
+    lane_id: str, version: str, lane: Lane, provenance: tuple[tuple[str, str], ...] = ()
+) -> None:
+    LANES[lane_id] = lane
+    LANE_VERSIONS[lane_id] = version
+    LANE_PROVENANCE[lane_id] = provenance
+
+
+register_lane(LEXICAL_SUBSTRING_V1, "1.0.0", lexical_substring_v1)
+register_lane(PROTECTED_EXACT, "1.0.0", protected_exact_v1, (("scanner", SCANNER_VERSION),))
 
 
 def select_retrieval_context(
@@ -231,6 +331,13 @@ def select_retrieval_context(
     lane = LANES.get(lane_id)
     if lane is None:
         raise ValueError("RETRIEVAL_LANE_UNKNOWN")
+    named = policy.lanes[0] if isinstance(policy, RetrievalLanePolicy) else None
+    if (
+        named is not None
+        and named.lane_id == lane_id
+        and LANE_VERSIONS.get(lane_id) != named.lane_version
+    ):
+        raise ValueError("RETRIEVAL_LANE_VERSION_UNKNOWN")
     eligible = connected_retrieval_spans(request.evidence)
     complete, limitations = full_catalog(eligible, request.catalog, policy)
     if complete is not None:
@@ -249,6 +356,13 @@ def select_retrieval_context(
         selected.append(span)
         size += len(span.exact_text)
     observed = request.catalog is not None and request.catalog.all_observed
+    extra = LANE_PROVENANCE.get(lane_id, ())
+    version = LANE_VERSIONS.get(lane_id, "")
+    provenance = (("lane_id", lane_id), ("lane_version", version), *extra)
     return LaneSelection(
-        tuple(selected), "LEXICAL" if observed else "LEGACY", eligible, limitations
+        tuple(selected),
+        "LEXICAL" if observed else "LEGACY",
+        eligible,
+        limitations,
+        provenance if extra else (),
     )

@@ -24,10 +24,14 @@ class RetrievalBehaviorPolicy(DomainModel):
 
 
 class RetrievalLaneSpec(DomainModel):
-    """One named ranking rule of a retrieval policy. Only the rule the research path has always
-    used exists so far; further rules are added to this set when they are implemented."""
+    """One named ranking rule of a retrieval policy.
 
-    lane_id: Literal["LEXICAL_SUBSTRING_V1"] = "LEXICAL_SUBSTRING_V1"
+    The rule the research path has always used is the default, so a stored policy that names it
+    keeps its serialization and digest. The lane version is part of the policy: a lane whose rules
+    change is registered under a new version, and a policy naming a version the code does not
+    register is refused at selection."""
+
+    lane_id: Literal["LEXICAL_SUBSTRING_V1", "PROTECTED_EXACT"] = "LEXICAL_SUBSTRING_V1"
     lane_version: Literal["1.0.0"] = "1.0.0"
 
 

@@ -102,13 +102,16 @@ def evaluate_retrieval(
         ),
         policy,
     )
-    return {
+    output: dict[str, JsonValue] = {
         "selected_refs": [span.span_id for span in selection.selected],
         "excluded_count": len(request.evidence) - len(selection.selected),
         "selected_characters": sum(len(span.exact_text) for span in selection.selected),
         "mode": selection.mode,
         "evaluator": RETRIEVAL_EVALUATOR_ID,
     }
+    if selection.provenance:
+        output["lane"] = dict(selection.provenance)
+    return output
 
 
 def _wider_retrieval_budget(policy: RetrievalBehaviorPolicy | RetrievalLanePolicy) -> int:
