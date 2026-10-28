@@ -18,6 +18,8 @@ from typing import cast
 import httpx
 from openai import DEFAULT_TIMEOUT
 
+from thoth.adapters.models.close_within import CLEANUP_SECONDS as CLEANUP_SECONDS
+from thoth.adapters.models.close_within import close_within
 from thoth.adapters.models.codex_broker import CodexAuthBroker, broker_for_workspace
 from thoth.adapters.models.http_rejection import read_rejection_metadata
 from thoth.adapters.models.receive_stats import ReceiveStats
@@ -329,9 +331,15 @@ class CodexHttpExecutor:
         finally:
             stats.freeze_terminal()
             stats.transport_closed = False
-            with suppress(TimeoutError, httpx.HTTPError):
-                await asyncio.wait_for(client.aclose(), 2)
-                stats.transport_closed = True
+            closed = False
+            with suppress(httpx.HTTPError):
+                result = await close_within(client.aclose(), CLEANUP_SECONDS)
+                closed = result.finished
+                if result.cancelled is not None:
+                    # A cancel during cleanup wins over the outcome the attempt had reached.
+                    stats.local_cancel_requested = True
+                    cause, reason = result.cancelled, ""
+            stats.transport_closed = closed and stats.response_closed is not False
         if isinstance(cause, asyncio.CancelledError):
             raise ModelTransportCancelled(stats.snapshot(request)) from cause
         if cause is not None:
@@ -398,4 +406,8 @@ class CodexHttpExecutor:
                 raise ModelExecutionHold(f"OAUTH_{reason}_{response.status_code}")
             return await parse_responses_sse(response, request, stats, reason_prefix="OAUTH")
         finally:
-            await response.aclose()
+            closed = await close_within(response.aclose(), CLEANUP_SECONDS)
+            if not closed.finished:
+                stats.response_closed = False
+            if closed.cancelled is not None:
+                raise closed.cancelled

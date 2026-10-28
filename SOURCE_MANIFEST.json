@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-27T19:11:45.797449+00:00",
+  "created_at": "2026-10-27T22:55:47.116623+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -3827,6 +3827,11 @@
       "bytes": 11259
     },
     {
+      "path": "src/thoth/adapters/models/close_within.py",
+      "sha256": "581a6aa273a45da9644b1ec5951114ebd21e7988774a41a126ae7b47fb856f6f",
+      "bytes": 2849
+    },
+    {
       "path": "src/thoth/adapters/models/codex_account_usage.py",
       "sha256": "04e8e210b34b0975de68f646d325ca0652ef70764444a752ff381bdd08596a51",
       "bytes": 4036
@@ -3843,8 +3848,8 @@
     },
     {
       "path": "src/thoth/adapters/models/codex_http.py",
-      "sha256": "ea1eec498ac53c8d7076ad8ef543b5dd89d11d7b23303ab86c6a1a5f1712ee7f",
-      "bytes": 16754
+      "sha256": "284cc013497789b3919a9d6179739ea049cbce5fe03245e9fa7029c2462d4f31",
+      "bytes": 17467
     },
     {
       "path": "src/thoth/adapters/models/codex_oauth.py",
@@ -3908,8 +3913,8 @@
     },
     {
       "path": "src/thoth/adapters/models/receive_stats.py",
-      "sha256": "73aa11c07a33fd7e30f189a273e7362efdebde6ccf057a33c56aa3d0dab6b1b1",
-      "bytes": 5599
+      "sha256": "d1896ddd98277629a9852e4c0a2a3bb6361d7c8cdbb95169347f51e6d8dccf78",
+      "bytes": 5815
     },
     {
       "path": "src/thoth/adapters/models/reference_schema.py",
@@ -3998,8 +4003,8 @@
     },
     {
       "path": "src/thoth/adapters/models/xai_responses.py",
-      "sha256": "3600657f686c6f21b351205969dfdfd6e5dca7bc5413d738b4d762c1d25479df",
-      "bytes": 9429
+      "sha256": "334a63ba71fc7c6b4b86bb818ca5a999a3aaadd97b3dead4e66146ef7f66cb56",
+      "bytes": 10077
     },
     {
       "path": "src/thoth/adapters/operation_host_identity.py",
@@ -8023,8 +8028,8 @@
     },
     {
       "path": "tests/architecture/test_read_only_command_contract.py",
-      "sha256": "2d943c9aaa403ecbcc97ece8896e3c77622bfc6f5961dad36806795e09aeadfe",
-      "bytes": 9965
+      "sha256": "f3cf7e5416a59c183247d53d3392a5ea290aadfd0ea91cdb4acafb0fb0bb5e1c",
+      "bytes": 11215
     },
     {
       "path": "tests/architecture/test_reevaluated_guards.py",
@@ -8762,6 +8767,11 @@
       "bytes": 3506
     },
     {
+      "path": "tests/integration/progress_wait.py",
+      "sha256": "586cc80040b5b10fa48b67ae96acceecee26ac753cb7c6f50b62d35d333a70c6",
+      "bytes": 1954
+    },
+    {
       "path": "tests/integration/psyche_workspace_snapshot.py",
       "sha256": "ee95395de51aa12d2e14c4f9cbf8d77cb57570d6ac8f7e55c803de0b31aa5985",
       "bytes": 1038
@@ -8958,8 +8968,8 @@
     },
     {
       "path": "tests/integration/test_a08_storage_authority.py",
-      "sha256": "610ab28d97d74e110fe662f95ca8c2d16a6be46456ebefceb654dcbe65a2eeef",
-      "bytes": 37093
+      "sha256": "5e02997a6ad8dbe373a2669d080fad5f418b9d295b4054ddca803404fb6cc971",
+      "bytes": 37317
     },
     {
       "path": "tests/integration/test_a08_workflow_candidate_canary.py",
@@ -9238,8 +9248,8 @@
     },
     {
       "path": "tests/integration/test_cycle_model_phase_contract.py",
-      "sha256": "0fc8cd612e34d11c677e8108a905fa3bd3c7c8d7097a6e7d459e845368d8caed",
-      "bytes": 11687
+      "sha256": "0d313fbecd02de3c48f6f3c775771674d0bed8ff6d94b991789bdd802338153d",
+      "bytes": 12019
     },
     {
       "path": "tests/integration/test_d1_object_followup_atomicity.py",
@@ -10523,8 +10533,8 @@
     },
     {
       "path": "tests/integration/test_state_transition_repeat_current_behavior.py",
-      "sha256": "7aadc1fb9b886ae7c9ac612ccad684a42f578efc14d8197d62558e9603c3ad41",
-      "bytes": 18130
+      "sha256": "62622b00d89ac659e3afab6a5f9ef6d1ac9f055f5244c192095c761b1b702d9e",
+      "bytes": 18839
     },
     {
       "path": "tests/integration/test_storage_clock_currentness.py",
@@ -11343,8 +11353,8 @@
     },
     {
       "path": "tests/unit/models/test_claude_messages.py",
-      "sha256": "19bb73a31cadda0b9551933d32adf5bdc0f9b76bab42829a745c1c2cc5410f2b",
-      "bytes": 13436
+      "sha256": "e343aff24c329373a3a71fcc05826c089df9f067fe5f01961d15af63e9aab36c",
+      "bytes": 13960
     },
     {
       "path": "tests/unit/models/test_claude_oauth.py",
@@ -11453,8 +11463,8 @@
     },
     {
       "path": "tests/unit/models/test_oauth_receive_observation.py",
-      "sha256": "5897fdf62991c0898a9ef7e5068494921e50f021055fb66a8212217fcd77fff7",
-      "bytes": 7648
+      "sha256": "094dad3ddd509b83f13cad3303dfe5ba7c697d73389241ecd264e9a5a610f70f",
+      "bytes": 14957
     },
     {
       "path": "tests/unit/models/test_oauth_wire_controls.py",
@@ -11545,6 +11555,11 @@
       "path": "tests/unit/models/test_windows_profile_output_encoding.py",
       "sha256": "a7e3df27ff4eb0a26c671fbc71acd96d7464acb08f9e021d30bd9d6d26f3e51f",
       "bytes": 4212
+    },
+    {
+      "path": "tests/unit/models/test_xai_cleanup.py",
+      "sha256": "3c6ad7f103d4b0720ebf7db74eb11c3b66087281bf7fb2ca93f5b4426d9cc86f",
+      "bytes": 3569
     },
     {
       "path": "tests/unit/models/test_xai_responses.py",
