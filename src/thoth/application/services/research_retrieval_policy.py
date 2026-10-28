@@ -15,11 +15,13 @@ from thoth.domain.behavior_execution import ActiveBehaviorSnapshot, BehaviorUse
 from thoth.domain.behavior_policy import (
     BehaviorPolicyError,
     RetrievalBehaviorPolicy,
+    RetrievalFusionPolicy,
     RetrievalPolicy,
     is_retrieval_policy,
 )
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.evidence import EvidenceSpan
+from thoth.domain.glossary import Glossary
 
 
 def replay_retrieval_shadows(selection: Callable[[], object], inputs: object = None) -> None:
@@ -48,6 +50,27 @@ def replay_retrieval_shadows(selection: Callable[[], object], inputs: object = N
             record_held_selection(
                 "CONTEXT_PACKET", inputs, started, shadow, SHADOW_SELECTION_FAILED
             )
+
+
+def current_glossary() -> Glossary | None:
+    """The term list for this request, read only when one of its retrieval policies names one.
+
+    A list that is missing or cannot be read is no list: a policy that names one is then refused
+    with RETRIEVAL_GLOSSARY_UNAVAILABLE, which a shadow records as held.
+    """
+    work = current_behavior_work()
+    if work is None or work.glossary_reader is None:
+        return None
+    policies = [retrieval_policy(), *(p for _, p in retrieval_shadows() if p is not None)]
+    if not any(
+        isinstance(p, RetrievalFusionPolicy) and any(lane.glossary for lane in p.lanes)
+        for p in policies
+    ):
+        return None
+    try:
+        return work.glossary_reader()
+    except Exception:
+        return None
 
 
 def retrieval_policy() -> RetrievalPolicy:

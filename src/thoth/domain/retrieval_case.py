@@ -12,9 +12,12 @@ from pydantic import JsonValue
 from thoth.domain.behavior_policy import (
     RetrievalBehaviorInput,
     RetrievalCatalogInput,
+    RetrievalGlossaryEntryInput,
+    RetrievalGlossaryInput,
     RetrievalGroupInput,
 )
-from thoth.domain.retrieval_lane import CatalogContext, RetrievalRequest
+from thoth.domain.glossary import Glossary, entries_that_can_matter
+from thoth.domain.retrieval_lane import CatalogContext, RetrievalRequest, glossary_texts
 from thoth.domain.structure_groups import CatalogGroup
 
 
@@ -41,6 +44,22 @@ def catalog_context(catalog: RetrievalCatalogInput) -> CatalogContext:
     )
 
 
+def glossary_input(request: RetrievalRequest) -> RetrievalGlossaryInput | None:
+    """The digest of the glossary and only the entries that can matter for this request's texts."""
+    glossary = request.glossary
+    if glossary is None:
+        return None
+    return RetrievalGlossaryInput(
+        digest=glossary.digest,
+        entries=tuple(
+            RetrievalGlossaryEntryInput(
+                entry_id=e.entry_id, ko=e.ko, en=e.en, domain=e.domain, confidence=e.confidence
+            )
+            for e in entries_that_can_matter(glossary_texts(request), glossary)
+        ),
+    )
+
+
 def evaluation_case_payload(request: RetrievalRequest) -> dict[str, JsonValue]:
     """The case payload of a request; evaluating it selects what the request itself selects."""
     case = RetrievalBehaviorInput(
@@ -49,6 +68,7 @@ def evaluation_case_payload(request: RetrievalRequest) -> dict[str, JsonValue]:
         pinned_refs=request.pinned_refs,
         queries=request.queries,
         catalog=None if request.catalog is None else catalog_input(request.catalog),
+        glossary=None if request.glossary is None else glossary_input(request),
     )
     return case.model_dump(mode="json")
 
@@ -61,4 +81,9 @@ def request_of_case(case: RetrievalBehaviorInput) -> RetrievalRequest:
         case.evidence,
         tuple(dict.fromkeys((*case.forced_refs, *case.pinned_refs))),
         None if case.catalog is None else catalog_context(case.catalog),
+        None
+        if case.glossary is None
+        else Glossary(
+            tuple(e.entry() for e in case.glossary.entries), case.glossary.digest, verified=False
+        ),
     )

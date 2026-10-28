@@ -244,7 +244,7 @@ def create_runtime(
         acquisition_trace_store = stores.acquisition_trace
         memory_store = create_memory_access(ledger, stores, artifact_ledger.scopes)
         baseline_service = shared.baselines
-        behavior_runtime = create_behavior_runtime(ledger, stores, control_store, clock, ids)
+        behavior_runtime = create_behavior_runtime(ledger, stores, clock, ids, workspace)
         behavior_store, behavior_candidates, improvement_runner = behavior_runtime.legacy()
         full_memory_store, full_memory_service = create_memory_components(
             stores=stores,

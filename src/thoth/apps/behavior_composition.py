@@ -4,6 +4,7 @@ from pathlib import Path
 
 from thoth.adapters.behavior.registry import default_behavior_components
 from thoth.adapters.behavior_catalog import FilesystemBehaviorArtifactCatalog
+from thoth.adapters.retrieval_glossary import GLOSSARY_RELATIVE_PATH, GlossaryFileReader
 from thoth.application.commands.behavior_execution import BehaviorThreadEntry
 from thoth.application.services.behavior_candidate_service import BehaviorCandidateService
 from thoth.application.services.behavior_exposure_runtime import BehaviorExposureRuntime
@@ -14,7 +15,6 @@ from thoth.application.services.improvement_exposure_service import ImprovementE
 from thoth.application.services.improvement_runner import ImprovementRunner
 from thoth.ports.behavior_artifact import BehaviorArtifactStorePort
 from thoth.ports.behavior_resolver import BehaviorComponentRegistryPort
-from thoth.ports.control_record import ControlRecordStorePort
 from thoth.ports.ledger import ManagedLedgerPort
 from thoth.ports.model import ModelResolverPort
 from thoth.ports.runtime import ClockPort, IdGeneratorPort
@@ -28,11 +28,12 @@ class BehaviorRuntime:
         self,
         ledger: ManagedLedgerPort,
         stores: StoreBundlePort,
-        records: ControlRecordStorePort,
         clock: ClockPort,
         ids: IdGeneratorPort,
         components: BehaviorComponentRegistryPort,
+        glossary_path: Path | None = None,
     ) -> None:
+        self._glossary_reader = None if glossary_path is None else GlossaryFileReader(glossary_path)
         self._stores = stores
         self.store = stores.behaviors
         self.candidates = BehaviorCandidateService(
@@ -45,7 +46,7 @@ class BehaviorRuntime:
         )
         self.runner = ImprovementRunner(store=self.store, clock=clock)
         self.snapshots = BehaviorSnapshotService(self.store, components)
-        self._controls = ControlRecordService(store=records, clock=clock, ids=ids)
+        self._controls = ControlRecordService(store=stores.controls, clock=clock, ids=ids)
         self._ledger, self._clock, self._ids = ledger, clock, ids
 
     def wrap_models(self, models: ModelResolverPort) -> ModelResolverPort:
@@ -78,6 +79,7 @@ class BehaviorRuntime:
             self._stores.projects,
             self._stores.threads,
             self._stores.governance,
+            self._glossary_reader,
         )
         registry.register("thread/input", entry.analyze)
 
@@ -85,8 +87,15 @@ class BehaviorRuntime:
 def create_behavior_runtime(
     ledger: ManagedLedgerPort,
     stores: StoreBundlePort,
-    records: ControlRecordStorePort,
     clock: ClockPort,
     ids: IdGeneratorPort,
+    workspace: Path,
 ) -> BehaviorRuntime:
-    return BehaviorRuntime(ledger, stores, records, clock, ids, default_behavior_components())
+    return BehaviorRuntime(
+        ledger,
+        stores,
+        clock,
+        ids,
+        default_behavior_components(),
+        workspace / GLOSSARY_RELATIVE_PATH,
+    )

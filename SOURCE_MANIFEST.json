@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-28T02:49:59.290099+00:00",
+  "created_at": "2026-10-28T08:56:26.081025+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -2208,8 +2208,8 @@
     },
     {
       "path": "docs/architecture/retrieval-lanes.md",
-      "sha256": "a45491e9756ec3be6843d2d2142fe3c30ebedf0854e0b82b7b98e7b85d03e10b",
-      "bytes": 20546
+      "sha256": "b9d94de2927e4d768ed505fbc8397ea2497fe4eddd0ad33f82b2eb876f37a04f",
+      "bytes": 26992
     },
     {
       "path": "docs/architecture/rpc-method-catalog.md",
@@ -3493,8 +3493,8 @@
     },
     {
       "path": "src/thoth/adapters/behavior/registry.py",
-      "sha256": "b571294ef8c9def89667e0324b1ec27f879980bf803efae0dce9d18ae9ed8f47",
-      "bytes": 9345
+      "sha256": "56a0d98e7dc8120b5ceeda4d28d0578ba0ed3e486de4ade4b04c0f8de47acfc7",
+      "bytes": 10646
     },
     {
       "path": "src/thoth/adapters/behavior_catalog.py",
@@ -4147,6 +4147,11 @@
       "bytes": 8776
     },
     {
+      "path": "src/thoth/adapters/retrieval_glossary.py",
+      "sha256": "dbb3fef14268868753f766462c0f7805d45f1a2c01ac59dfb86b75915c39d4e1",
+      "bytes": 3568
+    },
+    {
       "path": "src/thoth/adapters/runtime.py",
       "sha256": "dcadb15ea148f7ee7881957700657456fb08198433f54170f71eb5db5212b03b",
       "bytes": 340
@@ -4623,8 +4628,8 @@
     },
     {
       "path": "src/thoth/application/commands/behavior_execution.py",
-      "sha256": "9b50158bc42fe4e9e2dee89c82c10beef1ba270a977345ad963ee0c7ea433aad",
-      "bytes": 10473
+      "sha256": "905bb065e2ad9944a4438a4ebe87a8a3fb23f01364e2a952512f81618cd1ec8c",
+      "bytes": 10689
     },
     {
       "path": "src/thoth/application/commands/closure_full.py",
@@ -5133,8 +5138,8 @@
     },
     {
       "path": "src/thoth/application/services/behavior_context.py",
-      "sha256": "1ba5e5b25d8a02b8e603051f2d8c7dd1e6a306cb81f0d613f426bf79e1b69201",
-      "bytes": 8296
+      "sha256": "afa53e6d884dc1c2ea36e37fe49721ef0b273d567bce951e994ad865617a4c18",
+      "bytes": 8509
     },
     {
       "path": "src/thoth/application/services/behavior_exposure_runtime.py",
@@ -6138,13 +6143,13 @@
     },
     {
       "path": "src/thoth/application/services/research_retrieval.py",
-      "sha256": "d5bb493167f50af211bd6c7bf1611e65dded60ff0f65dae5990d69f93ca7cfd3",
-      "bytes": 8518
+      "sha256": "6a6b8e797456a628859f38c1942efb2f65c4c56ff357b6209fb67bcce77c2b6c",
+      "bytes": 8601
     },
     {
       "path": "src/thoth/application/services/research_retrieval_policy.py",
-      "sha256": "16f304f34f82f8496a0ede89a8f5c8769970ed855053f71ba60a03bafac2e5b3",
-      "bytes": 5119
+      "sha256": "258691ede7b444d1d84f9f0238ad4711b256444d3bbac7fee195451415c57a1e",
+      "bytes": 5953
     },
     {
       "path": "src/thoth/application/services/research_review_context.py",
@@ -6493,8 +6498,8 @@
     },
     {
       "path": "src/thoth/apps/behavior_composition.py",
-      "sha256": "cb6d45099e0a2d2f13863cc7b7a111fb77b367d6ec068d926e4e675f767ca1ab",
-      "bytes": 3829
+      "sha256": "7226d9c4f31e6b9f746e619b1c7372d12ec5a394abe618c5850c0e40da7b2f41",
+      "bytes": 4068
     },
     {
       "path": "src/thoth/apps/conversation_dispatch.py",
@@ -6653,8 +6658,8 @@
     },
     {
       "path": "src/thoth/apps/runtime.py",
-      "sha256": "38f7a8206fa4a66d51cd267d7ac50092154ba3ce002ba7e27e1ba07cd75598d5",
-      "bytes": 23406
+      "sha256": "27441013367197384b0ac6af24592569ca9f7e757a704381fea411fc6e2b5dad",
+      "bytes": 23402
     },
     {
       "path": "src/thoth/apps/runtime_entry.py",
@@ -6813,8 +6818,8 @@
     },
     {
       "path": "src/thoth/domain/behavior_policy.py",
-      "sha256": "618ffda77bc0341ba2e259cf4108272c119e80e3ce8d0fcc419680bb38b444c1",
-      "bytes": 11919
+      "sha256": "ab23a5f5a2ad38143863a5604a3138f3ec725e0d437d8a9675833e407e4a70ee",
+      "bytes": 15017
     },
     {
       "path": "src/thoth/domain/canonical.py",
@@ -6980,6 +6985,16 @@
       "path": "src/thoth/domain/field_measurement.py",
       "sha256": "682e4acbe353dfa024807ab1b1cf2c2a4723b73cae7a67b7c96fbee654408ce2",
       "bytes": 6172
+    },
+    {
+      "path": "src/thoth/domain/glossary.py",
+      "sha256": "1dc3f9ff865b028fa22f6fa6c13875f4c6103d2c6f8d5daa6ddf60d70b77e541",
+      "bytes": 8178
+    },
+    {
+      "path": "src/thoth/domain/glossary_lane.py",
+      "sha256": "f1499650007101399453e914c63caff5b172093a16f2ec4f979038150d2f7324",
+      "bytes": 2963
     },
     {
       "path": "src/thoth/domain/governance.py",
@@ -7348,8 +7363,8 @@
     },
     {
       "path": "src/thoth/domain/retrieval_case.py",
-      "sha256": "c4e09c4af77d8b31bf7bf7a79ef2516b877bf9432b21f4a8b1e9110b95593227",
-      "bytes": 2526
+      "sha256": "e7567aa1f43c810b292db374961e252cb8285d3190ed77ed18590bbb7d484a39",
+      "bytes": 3526
     },
     {
       "path": "src/thoth/domain/retrieval_coverage.py",
@@ -7363,8 +7378,8 @@
     },
     {
       "path": "src/thoth/domain/retrieval_lane.py",
-      "sha256": "e1de31f2681d0012a08c7da6f5a63ae89d260165438059ddec76a45ece415ad8",
-      "bytes": 20438
+      "sha256": "2208450abefd079e8c0ac02cce839e59ab306b78614cbe922f13cae46f60f408",
+      "bytes": 22870
     },
     {
       "path": "src/thoth/domain/retrieval_terms.py",
@@ -10397,6 +10412,11 @@
       "bytes": 2989
     },
     {
+      "path": "tests/integration/test_retrieval_glossary_shadow_normal_entry.py",
+      "sha256": "bccb1d4ef9d17066668b221abdf4e119967c96110242f3014e8db9e8602c03cd",
+      "bytes": 7244
+    },
+    {
       "path": "tests/integration/test_retrieval_shadow_normal_entry.py",
       "sha256": "d1985abb1d18256d53402e731720be5946c1319529741d8076215616cf3a14db",
       "bytes": 12828
@@ -11145,6 +11165,11 @@
       "path": "tests/unit/domain/test_f6_lifecycle_notifications.py",
       "sha256": "b8f455152bf36ec5d5ab4395b98ba620d0a5b06d29ee487edb3c554c4d44b4a7",
       "bytes": 2710
+    },
+    {
+      "path": "tests/unit/domain/test_glossary_matcher.py",
+      "sha256": "2f071a12c3793e3fe2b1fdaf01ef1037d0f58cdf657c36a0f3564583ab024fa9",
+      "bytes": 9267
     },
     {
       "path": "tests/unit/domain/test_hypothesis_contract_v3.py",
@@ -12047,6 +12072,21 @@
       "bytes": 8883
     },
     {
+      "path": "tests/unit/test_glossary_evaluation.py",
+      "sha256": "00ee4ea0af08b342670cd6a4b10f64683814bb92819f8fc8247e4a2499723ddb",
+      "bytes": 8214
+    },
+    {
+      "path": "tests/unit/test_glossary_lane.py",
+      "sha256": "61ea73a35eb3ab61409201136f3e7e6dbd4d16c622dfa9591e74ff712baefaa4",
+      "bytes": 9540
+    },
+    {
+      "path": "tests/unit/test_glossary_shadow.py",
+      "sha256": "6c9e944e6977a8eaacc0a84578701f1811b871172b8d82b7fd6538493dbaa1f6",
+      "bytes": 4447
+    },
+    {
       "path": "tests/unit/test_historical_query_context.py",
       "sha256": "0f04415b1ed3499989f262513d926ebb735392973cfa8ed971f8e0ddc2bf62bb",
       "bytes": 2471
@@ -12345,6 +12385,11 @@
       "path": "tests/unit/test_retrieval_evaluation_pins.py",
       "sha256": "4226b87d844e4964a8ed78f56b058c7f40941c43ad21caece547e6fd8742ff2c",
       "bytes": 4619
+    },
+    {
+      "path": "tests/unit/test_retrieval_glossary_loader.py",
+      "sha256": "8a0610c72464c4bdbba8d63f9660f58a7543a479c4d5a8915c4f8dd7d83c8f05",
+      "bytes": 6043
     },
     {
       "path": "tests/unit/test_retrieval_lane_flat_pins.py",

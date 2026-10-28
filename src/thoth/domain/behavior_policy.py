@@ -15,6 +15,8 @@ from pydantic import (
 from thoth.domain.base import DomainModel
 from thoth.domain.enums import AuthorityState, CutoffState
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
+from thoth.domain.glossary import GlossaryConfidence, GlossaryEntry, entry_matches_its_id
+from thoth.domain.ids import Sha256
 
 
 class PromptBehaviorPolicy(DomainModel):
@@ -31,6 +33,8 @@ class RetrievalBehaviorPolicy(DomainModel):
 
 
 type LaneId = Literal["LEXICAL_SUBSTRING_V1", "PROTECTED_EXACT", "GROUPED_BM25", "CHAR_BIGRAM"]
+# A fused policy may also name the glossary lane. 3.0.0 does not: its lanes stay as they were.
+type FusedLaneId = LaneId | Literal["GLOSSARY_BM25"]
 
 
 class RetrievalLaneSpec(DomainModel):
@@ -66,6 +70,17 @@ class RetrievalLanePolicy(DomainModel):
         return self
 
 
+class GlossaryPin(DomainModel):
+    """The glossary a lane is pinned to, and how sure an entry must be to be used.
+
+    The digest is over every entry of the list; a selection made with a list of another digest is
+    refused. There is no default confidence: neither floor is blessed before it is measured.
+    """
+
+    digest: Sha256
+    min_confidence: GlossaryConfidence
+
+
 class FusedLaneSpec(DomainModel):
     """One lane of a fused retrieval policy and the fixed number of ranked chunks it contributes.
 
@@ -73,9 +88,24 @@ class FusedLaneSpec(DomainModel):
     cuts the lane's own ranking before the lanes are merged, so it does not depend on the others.
     """
 
-    lane_id: LaneId
+    lane_id: FusedLaneId
     lane_version: Literal["1.0.0"] = "1.0.0"
     depth: int = Field(ge=1, le=160)
+    # Only the glossary lane has it, and it must: the glossary the lane was made for.
+    glossary: GlossaryPin | None = None
+
+    @model_validator(mode="after")
+    def _glossary_belongs_to_its_lane(self) -> "FusedLaneSpec":
+        if (self.lane_id == "GLOSSARY_BM25") != (self.glossary is not None):
+            raise ValueError("RETRIEVAL_POLICY_GLOSSARY_LANE_NEEDS_A_GLOSSARY")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _omit_no_glossary(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        data = cast(dict[str, Any], handler(self))
+        if self.glossary is None:
+            data.pop("glossary", None)
+        return data
 
 
 class FusionMethodSpec(DomainModel):
@@ -287,6 +317,38 @@ class RetrievalCatalogInput(DomainModel):
         return data
 
 
+class RetrievalGlossaryEntryInput(DomainModel):
+    entry_id: str = Field(min_length=16, max_length=16)
+    ko: str = Field(min_length=1, max_length=200)
+    en: str = Field(min_length=1, max_length=200)
+    domain: str = Field(min_length=1, max_length=200)
+    confidence: GlossaryConfidence
+
+    @model_validator(mode="after")
+    def _id_is_the_content_hash(self) -> "RetrievalGlossaryEntryInput":
+        if not entry_matches_its_id(self.entry()):
+            raise ValueError("RETRIEVAL_CASE_GLOSSARY_ENTRY_INVALID")
+        return self
+
+    def entry(self) -> GlossaryEntry:
+        return GlossaryEntry(self.entry_id, self.ko, self.en, self.domain, self.confidence)
+
+
+class RetrievalGlossaryInput(DomainModel):
+    """The glossary of an evaluation case: the digest of the whole list it was made from and only
+    the entries that can matter for the case. Each entry is checked against its own id; the digest
+    is claimed, not recomputed, and the evaluation output says so."""
+
+    digest: Sha256
+    entries: tuple[RetrievalGlossaryEntryInput, ...] = Field(max_length=500)
+
+    @model_validator(mode="after")
+    def _entries_are_distinct(self) -> "RetrievalGlossaryInput":
+        if len({e.entry_id for e in self.entries}) != len(self.entries):
+            raise ValueError("RETRIEVAL_CASE_GLOSSARY_ENTRY_DUPLICATED")
+        return self
+
+
 class RetrievalBehaviorInput(DomainModel):
     """An evaluation case. The optional fields carry what the research path also receives.
 
@@ -300,6 +362,15 @@ class RetrievalBehaviorInput(DomainModel):
     pinned_refs: tuple[str, ...] = Field(default=(), max_length=160)
     queries: tuple[str, ...] = Field(default=(), max_length=32)
     catalog: RetrievalCatalogInput | None = None
+    glossary: RetrievalGlossaryInput | None = None
+
+    @model_serializer(mode="wrap")
+    def _omit_no_glossary(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        # Written only when a case uses the glossary lane, so every other case keeps its bytes.
+        data = cast(dict[str, Any], handler(self))
+        if self.glossary is None:
+            data.pop("glossary", None)
+        return data
 
     @model_validator(mode="after")
     def _groups_name_known_spans_once(self) -> "RetrievalBehaviorInput":

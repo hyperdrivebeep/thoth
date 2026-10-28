@@ -20,6 +20,7 @@ from thoth.domain.behavior_policy import BehaviorPolicyError
 from thoth.domain.canonical import head_set_digest
 from thoth.domain.enums import ThreadExecutionState
 from thoth.domain.evaluation_run import EvaluationRunError, sealed_payload
+from thoth.domain.glossary import Glossary
 from thoth.domain.research_execution import research_work
 from thoth.ports.governance import GovernanceStorePort
 from thoth.ports.ledger import LedgerPort
@@ -41,7 +42,9 @@ class BehaviorThreadEntry:
         projects: ProjectStorePort,
         threads: ThreadStorePort,
         governance: GovernanceStorePort,
+        glossary_reader: Callable[[], Glossary | None] | None = None,
     ) -> None:
+        self._glossary_reader = glossary_reader
         self._delegate, self._snapshots, self._controls = delegate, snapshots, controls
         self._ledger, self._clock, self._ids = ledger, clock, ids
         self._projects, self._threads = projects, threads
@@ -100,6 +103,7 @@ class BehaviorThreadEntry:
                 selection.snapshots,
                 shadows=selection.shadows,
                 control=self._snapshots.control,
+                glossary_reader=self._glossary_reader,
             )
             record = BehaviorExecutionRecord.model_validate(
                 sealed_payload(
