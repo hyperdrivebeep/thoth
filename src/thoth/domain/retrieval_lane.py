@@ -10,7 +10,7 @@ import re
 import unicodedata
 from collections import defaultdict, deque
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Literal
 
 from thoth.domain.behavior_artifact import BehaviorArtifactKind
@@ -20,6 +20,13 @@ from thoth.domain.behavior_policy import (
     RetrievalPolicy,
 )
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
+from thoth.domain.glossary import Glossary, GlossaryConfidence, GlossaryDetail
+from thoth.domain.glossary_lane import (
+    GLOSSARY_LANE_PROVENANCE,
+    check_glossary_pin,
+    expansion_terms,
+    glossary_detail,
+)
 from thoth.domain.lane_scoring import (
     BIGRAM_VERSION,
     BM25_VERSION,
@@ -54,6 +61,7 @@ LEXICAL_SUBSTRING_V1 = "LEXICAL_SUBSTRING_V1"
 PROTECTED_EXACT = "PROTECTED_EXACT"
 GROUPED_BM25 = "GROUPED_BM25"
 CHAR_BIGRAM = "CHAR_BIGRAM"
+GLOSSARY_BM25 = "GLOSSARY_BM25"
 # The algorithm that evaluates a retrieval policy. It is recorded in every evaluation output and
 # is part of the identity of a retrieval comparison, so a result made by another algorithm is
 # never taken for this one.
@@ -91,6 +99,10 @@ class RetrievalRequest:
     evidence: tuple[EvidenceSpan, ...]
     pinned_refs: tuple[str, ...] = ()
     catalog: CatalogContext | None = None
+    # The Korean-to-English term list, for the glossary lane only. The frame checks it against the
+    # digest the policy names before any lane runs and hands the lane the policy's confidence floor.
+    glossary: Glossary | None = None
+    glossary_min_confidence: GlossaryConfidence | None = None
 
 
 @dataclass(frozen=True)
@@ -105,6 +117,8 @@ class LaneSelection:
     provenance: tuple[tuple[str, str], ...] = ()
     # Per lane, what a fused (4.0.0) selection took from it; empty for a single lane.
     contributions: tuple[LaneContribution, ...] = ()
+    # What the glossary lane found and held back, when a fused policy has one and it ran.
+    glossary: GlossaryDetail | None = None
 
 
 type Lane = Callable[[RetrievalRequest, tuple[EvidenceSpan, ...]], tuple[EvidenceSpan, ...]]
@@ -337,15 +351,10 @@ def _flat(chunks: tuple[Chunk, ...]) -> tuple[EvidenceSpan, ...]:
     return tuple(span for chunk in chunks for span in chunk)
 
 
-def grouped_bm25_chunks_v1(
-    request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
+def _grouped_chunks(
+    request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...], terms: list[str]
 ) -> tuple[Chunk, ...]:
-    """Structure groups ranked by BM25 over their title and body; a span with no group is a unit.
-
-    N and the document frequencies are those of the units of this request's eligible spans. A
-    group scores with the title above it, so a row of numbers is found through its version title,
-    table head or heading. Spans come back in the order title first, then body in document order.
-    """
+    """Structure groups ranked by BM25 over their title and body for the given query terms."""
     by_id = {s.span_id: s for s in eligible}
     groups = () if request.catalog is None else request.catalog.groups
     units: list[tuple[tuple[EvidenceSpan, ...], tuple[EvidenceSpan, ...]]] = []
@@ -366,8 +375,45 @@ def grouped_bm25_chunks_v1(
         ]
         for title, body in units
     ]
-    terms = [t for text in (request.question, *request.queries) for t in identifier_terms(text)]
     return _ranked_chunks(units, docs, terms, set(request.pinned_refs))
+
+
+def grouped_bm25_chunks_v1(
+    request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
+) -> tuple[Chunk, ...]:
+    """Structure groups ranked by BM25 over their title and body; a span with no group is a unit.
+
+    N and the document frequencies are those of the units of this request's eligible spans. A
+    group scores with the title above it, so a row of numbers is found through its version title,
+    table head or heading. Spans come back in the order title first, then body in document order.
+    """
+    terms = [t for text in (request.question, *request.queries) for t in identifier_terms(text)]
+    return _grouped_chunks(request, eligible, terms)
+
+
+def glossary_texts(request: RetrievalRequest) -> tuple[str, ...]:
+    return (request.question, *request.queries)
+
+
+def glossary_bm25_chunks_v1(
+    request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
+) -> tuple[Chunk, ...]:
+    """Structure groups ranked by the English terms the question's Korean terms stand for.
+
+    The query is the expansion alone; the question itself is not part of it, so this lane adds
+    what the other lanes cannot find and can be told apart from them. With no term to expand, or
+    only ambiguous ones, the lane gives nothing.
+    """
+    terms = expansion_terms(
+        glossary_texts(request), request.glossary, request.glossary_min_confidence
+    )
+    return _grouped_chunks(request, eligible, terms) if terms else ()
+
+
+def glossary_bm25_v1(
+    request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
+) -> tuple[EvidenceSpan, ...]:
+    return _flat(glossary_bm25_chunks_v1(request, eligible))
 
 
 def grouped_bm25_v1(
@@ -435,6 +481,9 @@ register_lane(
 register_lane(
     CHAR_BIGRAM, "1.0.0", char_bigram_v1, (("scoring", BM25_VERSION), ("terms", BIGRAM_VERSION))
 )
+register_lane(
+    GLOSSARY_BM25, "1.0.0", glossary_bm25_v1, GLOSSARY_LANE_PROVENANCE, glossary_bm25_chunks_v1
+)
 
 
 def select_retrieval_context(
@@ -499,6 +548,7 @@ def _select_fused(request: RetrievalRequest, policy: RetrievalFusionPolicy) -> L
             raise ValueError("RETRIEVAL_LANE_UNKNOWN")
         if LANE_VERSIONS.get(spec.lane_id) != spec.lane_version:
             raise ValueError("RETRIEVAL_LANE_VERSION_UNKNOWN")
+        check_glossary_pin(spec, request.glossary)
     eligible = connected_retrieval_spans(request.evidence)
     complete, limitations = full_catalog(eligible, request.catalog, policy)
     if complete is not None:
@@ -510,7 +560,13 @@ def _select_fused(request: RetrievalRequest, policy: RetrievalFusionPolicy) -> L
             spec.lane_id,
             spec.lane_version,
             spec.depth,
-            lane_chunks(spec.lane_id, request, eligible),
+            lane_chunks(
+                spec.lane_id,
+                request
+                if spec.glossary is None
+                else replace(request, glossary_min_confidence=spec.glossary.min_confidence),
+                eligible,
+            ),
         )
         for spec in policy.lanes
     ]
@@ -528,6 +584,8 @@ def _select_fused(request: RetrievalRequest, policy: RetrievalFusionPolicy) -> L
         provenance.extend(
             (f"lane{index}.{key}", value) for key, value in LANE_PROVENANCE.get(lane.lane_id, ())
         )
+    detail, glossary_keys = glossary_detail(policy.lanes, request.glossary, glossary_texts(request))
+    provenance.extend(glossary_keys)
     observed = request.catalog is not None and request.catalog.all_observed
     return LaneSelection(
         tuple(selected),
@@ -536,4 +594,5 @@ def _select_fused(request: RetrievalRequest, policy: RetrievalFusionPolicy) -> L
         limitations,
         tuple(provenance),
         lane_contributions(ranked, selected, credited),
+        detail,
     )

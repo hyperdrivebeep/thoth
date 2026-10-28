@@ -4,6 +4,7 @@ from time import perf_counter_ns
 
 from thoth.application.services.behavior_context import SHADOW_SELECTION_FAILED
 from thoth.application.services.research_retrieval_policy import (
+    current_glossary,
     record_held_selection,
     record_selection,
     replay_retrieval_shadows,
@@ -76,7 +77,12 @@ def lexical_selection(
     A shadow is journaled as if it had been the active policy; its result never reaches the caller.
     """
     request = RetrievalRequest(
-        question, queries, evidence, pinned, None if context is None else context.to_catalog()
+        question,
+        queries,
+        evidence,
+        pinned,
+        None if context is None else context.to_catalog(),
+        current_glossary(),
     )
     started = perf_counter_ns()
     selection = select_retrieval_context(request, retrieval_policy())

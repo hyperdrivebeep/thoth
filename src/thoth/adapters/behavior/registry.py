@@ -15,8 +15,13 @@ from thoth.domain.behavior_policy import (
     render_prompt_policy,
     workflow_repair_decision,
 )
+from thoth.domain.glossary import GlossaryDetail
 from thoth.domain.retrieval_case import request_of_case
-from thoth.domain.retrieval_lane import RETRIEVAL_EVALUATOR_ID, select_retrieval_context
+from thoth.domain.retrieval_lane import (
+    GLOSSARY_BM25,
+    RETRIEVAL_EVALUATOR_ID,
+    select_retrieval_context,
+)
 from thoth.ports.behavior_resolver import BehaviorComponentHandlerPort
 
 
@@ -103,8 +108,9 @@ def evaluate_retrieval(
         # single spans.
         output["groups"] = 0 if request.catalog is None else len(request.catalog.groups)
         if selection.contributions:
-            output["lanes"] = [
-                {
+            lanes: list[JsonValue] = []
+            for c in selection.contributions:
+                lane: dict[str, JsonValue] = {
                     "lane_id": c.lane_id,
                     "lane_version": c.lane_version,
                     "depth": c.depth,
@@ -112,9 +118,34 @@ def evaluate_retrieval(
                     "credited_refs": list(c.credited_refs),
                     "also_refs": list(c.also_refs),
                 }
-                for c in selection.contributions
-            ]
+                if c.lane_id == GLOSSARY_BM25 and selection.glossary is not None:
+                    lane["glossary"] = _glossary_record(selection.glossary)
+                lanes.append(lane)
+            output["lanes"] = lanes
     return output
+
+
+def _glossary_record(detail: GlossaryDetail) -> dict[str, JsonValue]:
+    """What the glossary lane found, beside its contribution.
+
+    `entries_carried` and `digest_verified` say how far the glossary can be trusted: a case carries
+    only the entries that can matter for it with the digest of the whole list, and that digest is
+    claimed, not recomputed, so `digest_verified` is false for an evaluation case.
+    """
+    matches = detail.matches
+    return {
+        "digest": detail.digest,
+        "min_confidence": detail.min_confidence,
+        "entries_carried": detail.entries_carried,
+        "digest_verified": detail.verified,
+        "expansions": list(matches.expansions),
+        "dropped": matches.dropped,
+        "fired": [
+            {"matched": f.matched, "en": f.en, "entry_ids": list(f.entry_ids)}
+            for f in matches.fired
+        ],
+        "abstained": [{"matched": a.matched, "reason": a.reason} for a in matches.abstained],
+    }
 
 
 def _wider_retrieval_budget(policy: RetrievalPolicy) -> int:

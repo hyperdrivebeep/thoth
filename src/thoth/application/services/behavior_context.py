@@ -1,6 +1,6 @@
 """Request-local immutable policy selection and measured use collection."""
 
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
@@ -21,6 +21,7 @@ from thoth.domain.behavior_policy import (
 )
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.evidence import EvidenceSpan
+from thoth.domain.glossary import Glossary
 from thoth.ports.behavior_execution import BehaviorWorkControlPort
 
 # Why a shadow selection was held. A shadow never fails its request: a selection that is refused
@@ -37,6 +38,8 @@ class BehaviorWorkContext:
     uses: list[BehaviorUse] = field(default_factory=list)
     shadows: tuple[ActiveBehaviorSnapshot, ...] = ()
     control: BehaviorWorkControlPort | None = None
+    # Reads the Korean-to-English term list when a retrieval policy of this request names one.
+    glossary_reader: Callable[[], Glossary | None] | None = None
 
     def snapshot(self, component: BehaviorArtifactKind) -> ActiveBehaviorSnapshot:
         matches = [item for item in self.snapshots if item.component == component]
