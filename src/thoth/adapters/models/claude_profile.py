@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-import csv
 import hashlib
-import io
 import json
 import os
 import subprocess
@@ -17,6 +15,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import BinaryIO, cast
 
+from thoth.adapters.models.windows_user_sid import UserSidUnavailable, current_user_sid
 from thoth.ports.model import ModelExecutionHold
 
 
@@ -69,22 +68,9 @@ class ClaudeProfile:
     def _private(self, path: Path, *, directory: bool = False) -> None:
         if os.name == "nt":
             try:
-                who = subprocess.run(
-                    ["whoami", "/user", "/fo", "csv", "/nh"],
-                    capture_output=True,
-                    text=True,
-                    encoding="oem",
-                    errors="replace",
-                    timeout=3,
-                    check=False,
-                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-                )
-            except (OSError, subprocess.SubprocessError) as exc:
+                sid = current_user_sid()
+            except UserSidUnavailable as exc:
                 raise ClaudeProfileHold("CLAUDE_PROFILE_PERMISSION_UNAVAILABLE") from exc
-            rows = list(csv.reader(io.StringIO(who.stdout)))
-            sid = rows[0][1] if who.returncode == 0 and len(rows) == 1 and len(rows[0]) == 2 else ""
-            if not sid.startswith("S-1-"):
-                raise ClaudeProfileHold("CLAUDE_PROFILE_PERMISSION_UNAVAILABLE")
             try:
                 result = subprocess.run(
                     [

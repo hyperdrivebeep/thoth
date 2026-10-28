@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-27T22:55:47.116623+00:00",
+  "created_at": "2026-10-28T02:49:59.290099+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -3643,8 +3643,13 @@
     },
     {
       "path": "src/thoth/adapters/evaluators/isolated_runner.py",
-      "sha256": "53ca774544463966176a076add2275fac92ff84d3cc87b587fedcbd462d2f52a",
-      "bytes": 9799
+      "sha256": "93f9ba540e70b21b57da5996d2b1554e3b8a57543bb8a5ac4ecaf756ca9817ce",
+      "bytes": 14316
+    },
+    {
+      "path": "src/thoth/adapters/evaluators/process_tree.py",
+      "sha256": "05da23e68993c8a005e88043f76bba2225b5f23a23a3b094619e23b1ced96a3a",
+      "bytes": 3415
     },
     {
       "path": "src/thoth/adapters/evaluators/registry.py",
@@ -3823,8 +3828,8 @@
     },
     {
       "path": "src/thoth/adapters/models/claude_profile.py",
-      "sha256": "bad83e63904deb894fc0cfd2048b19e8b9a9ee34f7d49a0172805f00b82dbeea",
-      "bytes": 11259
+      "sha256": "e5a2d87425556edc274d15b0683cd2daecf3002642ca7ea33db8625fde0f409d",
+      "bytes": 10656
     },
     {
       "path": "src/thoth/adapters/models/close_within.py",
@@ -3972,6 +3977,11 @@
       "bytes": 18758
     },
     {
+      "path": "src/thoth/adapters/models/windows_user_sid.py",
+      "sha256": "343ff862d23a6dcd58350d342455dd92d7ed4b570ba640423b0f5ccc8f01cac3",
+      "bytes": 2031
+    },
+    {
       "path": "src/thoth/adapters/models/xai_account_usage.py",
       "sha256": "993ab7e3b11143b6fafa2f52185a11ee474b1bb572ec9c915893f7b902f7b195",
       "bytes": 515
@@ -3998,8 +4008,8 @@
     },
     {
       "path": "src/thoth/adapters/models/xai_profile.py",
-      "sha256": "5a72125f022e3fc418bdb683bc4dfc2e45dcf45a0d192d591f0cdc4e0e0226d6",
-      "bytes": 8835
+      "sha256": "16b354e306dc952f1f1986b779beed72ca44e290003fc8bf0534c096ca686586",
+      "bytes": 8238
     },
     {
       "path": "src/thoth/adapters/models/xai_responses.py",
@@ -11272,6 +11282,11 @@
       "bytes": 4462
     },
     {
+      "path": "tests/unit/evaluators/test_isolated_runner_cleanup.py",
+      "sha256": "14e7f17717f51a06153f70506d18a5e5e61748be00ac94d93e9eb6cc0e328e2b",
+      "bytes": 10687
+    },
+    {
       "path": "tests/unit/group_fixtures.py",
       "sha256": "a30e4593791752bdd3d6971842790bdcc0e70e7fe71c9c35fd7b28003e72da42",
       "bytes": 3068
@@ -11553,8 +11568,13 @@
     },
     {
       "path": "tests/unit/models/test_windows_profile_output_encoding.py",
-      "sha256": "a7e3df27ff4eb0a26c671fbc71acd96d7464acb08f9e021d30bd9d6d26f3e51f",
-      "bytes": 4212
+      "sha256": "65ec063c8e601dc47bec076089e39eee35730dc5304895ea6ce9930305fbe08a",
+      "bytes": 4523
+    },
+    {
+      "path": "tests/unit/models/test_windows_user_sid.py",
+      "sha256": "fd02481a828d0186eded6f877e128d288e557c98a255149bd3cad033562d8667",
+      "bytes": 5131
     },
     {
       "path": "tests/unit/models/test_xai_cleanup.py",

@@ -3,16 +3,25 @@
 import io
 import subprocess
 import threading
+from collections.abc import Generator
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Literal
 
 import pytest
 
-from thoth.adapters.models import claude_profile, xai_profile
+from thoth.adapters.models import claude_profile, windows_user_sid, xai_profile
 from thoth.ports.model import ModelExecutionHold
 
 SID = "S-1-5-21-100-200-300-1001"
+
+
+@pytest.fixture(autouse=True)
+def forget_sid() -> Generator[None]:
+    """The SID is kept for the process; these tests stand in for whoami, so start without one."""
+    windows_user_sid.forget_user_sid()
+    yield
+    windows_user_sid.forget_user_sid()
 
 
 def exercise(

@@ -13,6 +13,7 @@ from pathlib import Path
 from time import perf_counter_ns
 from typing import Literal, cast
 
+from thoth.adapters.evaluators.process_tree import ProcessTree
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.evaluation_run import (
     BehaviorEvaluationProgram,
@@ -26,6 +27,17 @@ from thoth.domain.evaluation_run import (
 from thoth.ports.object_store import ObjectStorePort
 from thoth.ports.runtime import ClockPort, IdGeneratorPort
 
+# How long the worker's cleanup (end the process, wait for it, close and empty its pipes) may take
+# once the run is over. It is milliseconds in practice: the worker is a fixed program with no
+# children. 5 s is far above a loaded machine's worst case yet well under the 30 s default run
+# limit, and under the workspace removal's own retries that follow. Past it the whole process tree
+# is terminated, the workspace folder is left, and the receipt says the cleanup did not finish.
+CLEANUP_SECONDS = 5.0
+# After the tree is terminated the cleanup gets this long to finish before it is given up.
+FORCE_GRACE_SECONDS = 1.0
+
+_UNFINISHED_CLEANUPS: set[asyncio.Task[None]] = set()
+
 
 class IsolatedProgramExecutor:
     executor_id = "PURE_TRANSFORM_SUBPROCESS_V1"
@@ -36,6 +48,10 @@ class IsolatedProgramExecutor:
         self._objects = objects
         self._clock = clock
         self._ids = ids
+
+    def worker_argv(self) -> tuple[str, ...]:
+        """The command that runs the worker; the one place it is named."""
+        return (sys.executable, "-m", "thoth.adapters.evaluators.worker")
 
     async def execute(
         self,
@@ -81,8 +97,12 @@ class IsolatedProgramExecutor:
         workspace_id = self._ids.new("evaluation-workspace")
         state: Literal["SUCCEEDED", "FAILED", "TIMEOUT", "CANCELLED", "OUTPUT_LIMIT"] = "FAILED"
         output = b'{"error_code":"EVALUATION_EXECUTION_FAILED"}'
-        directory = tempfile.TemporaryDirectory(prefix="thoth-evaluation-")
+        # delete=False: the folder is removed only by the explicit cleanup below, so a run whose
+        # cleanup did not finish leaves it in place instead of the finalizer removing it later.
+        directory = tempfile.TemporaryDirectory(prefix="thoth-evaluation-", delete=False)
         workspace = directory.name
+        tree: ProcessTree | None = None
+        overran = False
         try:
             environment = {
                 "PYTHONPATH": str(Path(__file__).resolve().parents[3]),
@@ -94,21 +114,21 @@ class IsolatedProgramExecutor:
                 environment["SYSTEMROOT"] = os.environ["SYSTEMROOT"]
             creation = asyncio.create_task(
                 asyncio.create_subprocess_exec(
-                    sys.executable,
-                    "-m",
-                    "thoth.adapters.evaluators.worker",
+                    *self.worker_argv(),
                     cwd=workspace,
                     env=environment,
                     stdin=asyncio.subprocess.PIPE,
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.DEVNULL,
                     creationflags=0x08000000 if sys.platform == "win32" else 0,
+                    start_new_session=sys.platform != "win32",
                 )
             )
             process = None
             try:
                 async with asyncio.timeout(timeout):
                     process = await asyncio.shield(creation)
+                    tree = ProcessTree(process.pid)
                     assert process.stdin is not None
                     process.stdin.write(envelope)
                     await process.stdin.drain()
@@ -125,21 +145,23 @@ class IsolatedProgramExecutor:
                 state, output = "OUTPUT_LIMIT", b'{"error_code":"EVALUATION_OUTPUT_LIMIT"}'
             finally:
                 cleanup = asyncio.create_task(self._cleanup_process(creation))
+                overran, cancelled, tree = await self._finish_cleanup(cleanup, creation, tree)
+                if cancelled:
+                    state, output = "CANCELLED", b'{"error_code":"EVALUATION_CANCELLED"}'
+        finally:
+            if overran:
+                # The workspace is left for inspection, never removed by a run that did not finish.
+                state, output = self._incomplete(state, output, Path(workspace).name)
+            else:
+                cleanup_workspace = asyncio.create_task(self._cleanup_workspace(directory))
                 while True:
                     try:
-                        await asyncio.shield(cleanup)
+                        await asyncio.shield(cleanup_workspace)
                         break
                     except asyncio.CancelledError:
-                        # Repeated cancellation cannot abandon a child or its workspace.
                         state, output = "CANCELLED", b'{"error_code":"EVALUATION_CANCELLED"}'
-        finally:
-            cleanup_workspace = asyncio.create_task(self._cleanup_workspace(directory))
-            while True:
-                try:
-                    await asyncio.shield(cleanup_workspace)
-                    break
-                except asyncio.CancelledError:
-                    state, output = "CANCELLED", b'{"error_code":"EVALUATION_CANCELLED"}'
+            if tree is not None:
+                tree.close()
         elapsed = perf_counter_ns() - stopwatch
         output_digest = hashlib.sha256(output).hexdigest()
         self._objects.put(output, output_digest, operation_id=execution_id)
@@ -179,6 +201,74 @@ class IsolatedProgramExecutor:
                 },
             )
         )
+
+    @staticmethod
+    def _incomplete(
+        state: Literal["SUCCEEDED", "FAILED", "TIMEOUT", "CANCELLED", "OUTPUT_LIMIT"],
+        output: bytes,
+        workspace_name: str,
+    ) -> tuple[Literal["SUCCEEDED", "FAILED", "TIMEOUT", "CANCELLED", "OUTPUT_LIMIT"], bytes]:
+        """The outcome of a run whose cleanup went past its bound.
+
+        A cancel stays the outcome (the caller cancelled it). Any other outcome becomes FAILED, so
+        a result from a run that left residue is never scored; the outcome it had is kept in the
+        output, with the name of the workspace folder that was left.
+        """
+        recorded: dict[str, object] = {"cleanup": "INCOMPLETE", "workspace": workspace_name}
+        if state == "CANCELLED":
+            recorded["error_code"] = "EVALUATION_CANCELLED"
+            return "CANCELLED", json.dumps(recorded, sort_keys=True, separators=(",", ":")).encode()
+        recorded["error_code"] = "EVALUATION_CLEANUP_INCOMPLETE"
+        recorded["outcome"] = state
+        return "FAILED", json.dumps(recorded, sort_keys=True, separators=(",", ":")).encode()
+
+    @staticmethod
+    async def _finish_cleanup(
+        cleanup: asyncio.Task[None],
+        creation: asyncio.Task[asyncio.subprocess.Process],
+        tree: ProcessTree | None,
+    ) -> tuple[bool, bool, ProcessTree | None]:
+        """Wait for the cleanup, protected from cancellation, for at most CLEANUP_SECONDS.
+
+        Returns (overran, cancelled, tree). A cancel that arrives is not lost: `cancelled` says so
+        and the caller makes it the outcome. Past the bound the process tree is terminated and the
+        cleanup gets FORCE_GRACE_SECONDS more; a cleanup that is still not done is cancelled.
+        """
+        loop = asyncio.get_running_loop()
+        end = loop.time() + CLEANUP_SECONDS
+        overran = cancelled = False
+        while True:
+            remaining = end - loop.time()
+            if remaining <= 0:
+                if overran:
+                    break
+                overran = True
+                if (
+                    tree is None
+                    and creation.done()
+                    and not creation.cancelled()
+                    and creation.exception() is None
+                ):
+                    tree = ProcessTree(creation.result().pid)
+                if tree is not None:
+                    tree.terminate()
+                end = loop.time() + FORCE_GRACE_SECONDS
+                continue
+            try:
+                await asyncio.wait_for(asyncio.shield(cleanup), remaining)
+                return overran, cancelled, tree
+            except TimeoutError:
+                continue
+            except asyncio.CancelledError:
+                # Repeated cancellation cannot abandon a child, but it cannot extend the bound.
+                cancelled = True
+        if not cleanup.done():
+            cleanup.cancel()
+            _UNFINISHED_CLEANUPS.add(cleanup)
+            cleanup.add_done_callback(_UNFINISHED_CLEANUPS.discard)
+        elif not cleanup.cancelled():
+            cleanup.exception()
+        return True, cancelled, tree
 
     @staticmethod
     async def _cleanup_workspace(directory: tempfile.TemporaryDirectory[str]) -> None:

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import csv
-import io
 import json
 import os
 import subprocess
@@ -16,6 +14,7 @@ from pathlib import Path
 from typing import cast
 
 from thoth.adapters.models.async_file_lock import async_file_lock
+from thoth.adapters.models.windows_user_sid import UserSidUnavailable, current_user_sid
 from thoth.ports.model import ModelExecutionHold
 
 
@@ -46,22 +45,9 @@ class XaiProfile:
     def _private(self, path: Path, *, directory: bool = False) -> None:
         if os.name == "nt":
             try:
-                who = subprocess.run(
-                    ["whoami", "/user", "/fo", "csv", "/nh"],
-                    capture_output=True,
-                    text=True,
-                    encoding="oem",
-                    errors="replace",
-                    timeout=3,
-                    check=False,
-                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-                )
-            except (OSError, subprocess.SubprocessError) as exc:
+                sid = current_user_sid()
+            except UserSidUnavailable as exc:
                 raise XaiProfileHold("XAI_PROFILE_PERMISSION_UNAVAILABLE") from exc
-            rows = list(csv.reader(io.StringIO(who.stdout)))
-            sid = rows[0][1] if who.returncode == 0 and len(rows) == 1 and len(rows[0]) == 2 else ""
-            if not sid.startswith("S-1-"):
-                raise XaiProfileHold("XAI_PROFILE_PERMISSION_UNAVAILABLE")
             try:
                 result = subprocess.run(
                     [
