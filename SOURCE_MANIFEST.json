@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-27T22:55:47.116623+00:00",
+  "created_at": "2026-10-28T02:25:09.345995+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -3643,8 +3643,13 @@
     },
     {
       "path": "src/thoth/adapters/evaluators/isolated_runner.py",
-      "sha256": "53ca774544463966176a076add2275fac92ff84d3cc87b587fedcbd462d2f52a",
-      "bytes": 9799
+      "sha256": "93f9ba540e70b21b57da5996d2b1554e3b8a57543bb8a5ac4ecaf756ca9817ce",
+      "bytes": 14316
+    },
+    {
+      "path": "src/thoth/adapters/evaluators/process_tree.py",
+      "sha256": "05da23e68993c8a005e88043f76bba2225b5f23a23a3b094619e23b1ced96a3a",
+      "bytes": 3415
     },
     {
       "path": "src/thoth/adapters/evaluators/registry.py",
@@ -11270,6 +11275,11 @@
       "path": "tests/unit/evaluators/test_evaluator_registry.py",
       "sha256": "1d3bc615622bdb37e97f0a1d85f6412caefd1b2ffc35079058e918495747ca38",
       "bytes": 4462
+    },
+    {
+      "path": "tests/unit/evaluators/test_isolated_runner_cleanup.py",
+      "sha256": "14e7f17717f51a06153f70506d18a5e5e61748be00ac94d93e9eb6cc0e328e2b",
+      "bytes": 10687
     },
     {
       "path": "tests/unit/group_fixtures.py",
