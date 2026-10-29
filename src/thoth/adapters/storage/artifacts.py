@@ -11,6 +11,7 @@ from sqlalchemy.engine import RowMapping
 
 from thoth.adapters.storage.artifact_catalog_rows import read_evidence_version
 from thoth.adapters.storage.artifact_rows import artifact_from_row, evidence_from_row
+from thoth.adapters.storage.embedding_source import IngestionProjection
 from thoth.adapters.storage.schema import (
     artifact_versions,
     artifacts,
@@ -50,8 +51,11 @@ def _json_dump(value: object) -> str:
 
 
 class SqliteArtifactLedger(ArtifactLedgerPort):
-    def __init__(self, engine: Engine) -> None:
+    def __init__(
+        self, engine: Engine, *, ingestion_projection: IngestionProjection | None = None
+    ) -> None:
         self._engine = engine
+        self._ingestion_projection = ingestion_projection
 
     def persist_ingestion(
         self,
@@ -128,6 +132,11 @@ class SqliteArtifactLedger(ArtifactLedgerPort):
                         verification_state=span.verification_state.value,
                         cutoff_state=span.cutoff_state.value,
                     )
+                )
+
+            if self._ingestion_projection is not None:
+                self._ingestion_projection(
+                    connection, document, source_version_id, evidence_candidates
                 )
 
     def list_source_versions(self, project_id: str, artifact_id: str) -> tuple[str, ...]:

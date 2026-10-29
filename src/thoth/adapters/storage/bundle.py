@@ -19,6 +19,8 @@ from thoth.adapters.storage.control_record import SqliteControlRecordStore
 from thoth.adapters.storage.criterion_contract import SqliteCriterionContractStore
 from thoth.adapters.storage.decision_object import SqliteDecisionObjectStore
 from thoth.adapters.storage.dependency import SqliteDependencyGraph
+from thoth.adapters.storage.embedding_index import SqliteEmbeddingIndex
+from thoth.adapters.storage.embedding_source import binding_changed, project_ingestion
 from thoth.adapters.storage.evaluation_run import SqliteEvaluationRunStore
 from thoth.adapters.storage.events import SqliteEventStore
 from thoth.adapters.storage.evidence_graph import SqliteEvidenceGraphStore
@@ -66,8 +68,9 @@ class SqliteStoreBundle:
         self.research_history = SqliteResearchHistoryReader(ledger.engine)
         self.operations = SqliteOperationStore(ledger.engine)
         self.projects = SqliteProjectStore(ledger.engine)
-        self.governance = SqliteGovernanceStore(ledger.engine)
-        self.artifacts = SqliteArtifactLedger(ledger.engine)
+        self.embedding_index = SqliteEmbeddingIndex(ledger.engine)
+        self.governance = SqliteGovernanceStore(ledger.engine, binding_projection=binding_changed)
+        self.artifacts = SqliteArtifactLedger(ledger.engine, ingestion_projection=project_ingestion)
         self.resource_scopes = SqliteResourceScopeStore(ledger.engine)
         self.auth = SqliteAuthSessionStore(ledger.engine)
         self.evidence = SqliteEvidenceGraphStore(ledger.engine)
@@ -124,7 +127,10 @@ class SqliteStoreBundle:
         fault_injector: Callable[[str], None] | None = None,
     ) -> SqliteAcquisitionUnitOfWork:
         return SqliteAcquisitionUnitOfWork(
-            self.ledger.engine, resource_scopes=resource_scopes, fault_injector=fault_injector
+            self.ledger.engine,
+            resource_scopes=resource_scopes,
+            fault_injector=fault_injector,
+            ingestion_projection=project_ingestion,
         )
 
     def evidence_uow(

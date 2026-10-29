@@ -89,6 +89,7 @@ from thoth.apps.decision_chain_routes import (
     register_decision_chain_methods as register_decision_chain_methods,
 )
 from thoth.apps.decision_command_composition import create_decision_command_components
+from thoth.apps.embedding_composition import attach_embedding
 from thoth.apps.evidence_composition import create_evidence_components
 from thoth.apps.export_composition import create_export_handlers
 from thoth.apps.export_composition import create_lifecycle_handlers as create_lifecycle_handlers
@@ -160,6 +161,7 @@ from thoth.domain.public_web_access import (
     PROJECT_PUBLIC_WEB_CONNECTOR_ID as PROJECT_PUBLIC_WEB_CONNECTOR_ID,
 )
 from thoth.domain.resource_scope import ResourceScopePolicy
+from thoth.ports.embedding_index import BoundedEmbeddingWorkerPort
 from thoth.ports.evaluation_runner import EvaluationCatalogPort
 from thoth.ports.improvement import ImprovementEvaluatorPort
 from thoth.ports.ledger import ManagedLedgerPort
@@ -206,18 +208,10 @@ def create_runtime(
     task_profiles: TaskProfileCatalogPort | None = None,
     model_catalog: ModelCatalogPort | None = None,
     deployment_mode: DeploymentMode | None = None,
+    embedding_worker: BoundedEmbeddingWorkerPort | None = None,
 ) -> RuntimeWithLedger[ManagedLedgerPort]:
     mode = deployment_mode or parse_deployment_mode()
-    if mode is DeploymentMode.HOSTED_REVIEW:
-        from thoth.apps.hosted_review_composition import (
-            hosted_openai_resolver,
-            hosted_review_catalog,
-        )
-
-        if model_catalog is None:
-            model_catalog = hosted_review_catalog()
-        if model_resolver is None:
-            model_resolver = hosted_openai_resolver()
+    model_catalog, model_resolver = _hosted_model_options(mode, model_catalog, model_resolver)
     stores = open_stores(workspace, storage_factory, deployment_mode=mode)
     ledger = stores.ledger
     try:
@@ -521,7 +515,7 @@ def create_runtime(
             thread_handlers=thread_handlers,
             thread_store=thread_store,
         )
-        return assemble_runtime_entry(
+        runtime = assemble_runtime_entry(
             registration=registration,
             artifact_ledger=artifact_ledger,
             clock=clock,
@@ -543,6 +537,34 @@ def create_runtime(
             thread_handlers=thread_handlers,
             workspace=workspace,
         )
-    except BaseException:
+        return attach_embedding(runtime, stores, artifact_ledger, clock, ids, embedding_worker)
+    except BaseException as original:
+        _release_embedding(embedding_worker, original)
         stores.close()
         raise
+
+
+def _hosted_model_options(
+    mode: DeploymentMode,
+    catalog: ModelCatalogPort | None,
+    resolver: ModelResolverPort | None,
+) -> tuple[ModelCatalogPort | None, ModelResolverPort | None]:
+    if mode is DeploymentMode.HOSTED_REVIEW:
+        from thoth.apps.hosted_review_composition import (
+            hosted_openai_resolver,
+            hosted_review_catalog,
+        )
+
+        if catalog is None:
+            catalog = hosted_review_catalog()
+        if resolver is None:
+            resolver = hosted_openai_resolver()
+    return catalog, resolver
+
+
+def _release_embedding(worker: BoundedEmbeddingWorkerPort | None, original: BaseException) -> None:
+    if worker is not None:
+        try:
+            worker.close()
+        except BaseException as error:
+            original.add_note(f"startup cleanup failed: embedding: {type(error).__name__}")

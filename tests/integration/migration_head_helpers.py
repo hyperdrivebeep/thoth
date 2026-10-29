@@ -6,8 +6,8 @@ from alembic.config import Config
 from alembic.script import ScriptDirectory
 
 ROOT = Path(__file__).resolve().parents[2]
-CURRENT_HEAD = "4c17f5089ea3"
-PREVIOUS_HEAD = "3b06e4f87d92"
+CURRENT_HEAD = "5d28a619afb4"
+PREVIOUS_HEAD = "4c17f5089ea3"
 
 
 def current_single_head() -> str:

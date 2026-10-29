@@ -237,6 +237,6 @@
     }
   },
   "watched_long_functions": {
-    "src/thoth/apps/runtime.py::create_runtime": 361
+    "src/thoth/apps/runtime.py::create_runtime": 355
   }
 }

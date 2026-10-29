@@ -24,6 +24,7 @@ ENTRY_POINTS = (
     "thoth.adapters.storage.test_validity_schema",
     "thoth.adapters.storage.governance_history_schema",
     "thoth.adapters.storage.operation_owner_schema",
+    "thoth.adapters.storage.embedding_schema",
     "thoth.apps.runtime",
 )
 EXTENSIONS = (
@@ -34,6 +35,7 @@ EXTENSIONS = (
     "test_validity_schema",
     "governance_history_schema",
     "operation_owner_schema",
+    "embedding_schema",
 )
 
 

@@ -6,6 +6,7 @@ from typing import cast
 import orjson
 from sqlalchemy import Engine, insert, select, update
 
+from thoth.adapters.storage.embedding_source import BindingProjection
 from thoth.adapters.storage.governance_history import SqliteGovernanceHistory
 from thoth.adapters.storage.schema import (
     organizations,
@@ -40,8 +41,11 @@ def _object(value: str) -> dict[str, object]:
 
 
 class SqliteGovernanceStore(GovernanceStorePort):
-    def __init__(self, engine: Engine) -> None:
+    def __init__(
+        self, engine: Engine, *, binding_projection: BindingProjection | None = None
+    ) -> None:
         self._engine = engine
+        self._binding_projection = binding_projection
 
     def create_organization(self, value: Organization) -> None:
         with write_connection(self._engine) as connection:
@@ -347,6 +351,8 @@ class SqliteGovernanceStore(GovernanceStorePort):
             SqliteGovernanceHistory.stage(
                 connection, "SOURCE_BINDING", dict(row), before=dict(before)
             )
+            if self._binding_projection is not None:
+                self._binding_projection(connection, project_id, str(row["artifact_id"]))
             return self._binding(row)
 
     @staticmethod
