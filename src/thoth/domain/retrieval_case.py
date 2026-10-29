@@ -69,6 +69,7 @@ def evaluation_case_payload(request: RetrievalRequest) -> dict[str, JsonValue]:
         queries=request.queries,
         catalog=None if request.catalog is None else catalog_input(request.catalog),
         glossary=None if request.glossary is None else glossary_input(request),
+        dense=request.dense,
     )
     return case.model_dump(mode="json")
 
@@ -86,4 +87,5 @@ def request_of_case(case: RetrievalBehaviorInput) -> RetrievalRequest:
         else Glossary(
             tuple(e.entry() for e in case.glossary.entries), case.glossary.digest, verified=False
         ),
+        dense=case.dense,
     )

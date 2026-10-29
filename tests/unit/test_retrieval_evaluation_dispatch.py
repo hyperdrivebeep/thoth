@@ -143,8 +143,11 @@ def test_the_handlers_are_registered_and_the_baseline_version_is_still_2_0_0() -
     )
     # 4.0.0 is registered since G3 1c (it was the first version the registry did not know).
     assert registry.resolve(kind, "4.0.0").version == "4.0.0"
+    assert registry.resolve(kind, "5.0.0").version == "5.0.0"
+    with pytest.raises(BehaviorPolicyError, match="BEHAVIOR_POLICY_INVALID"):
+        registry.resolve(kind, "5.0.0").default_policy()
     with pytest.raises(BehaviorPolicyError, match="BEHAVIOR_COMPONENT_NOT_CONFIGURED"):
-        registry.resolve(kind, "5.0.0")
+        registry.resolve(kind, "6.0.0")
 
 
 def test_a_wider_budget_is_proposed_for_either_version_after_a_semantic_failure() -> None:

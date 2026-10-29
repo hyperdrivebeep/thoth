@@ -10,6 +10,7 @@ from thoth.domain.behavior_policy import (
     RetrievalFusionPolicy,
     RetrievalLanePolicy,
     RetrievalPolicy,
+    RetrievalRoutingPolicy,
     WorkflowBehaviorInput,
     WorkflowBehaviorPolicy,
     render_prompt_policy,
@@ -35,6 +36,7 @@ class TypedBehaviorHandler:
         | type[RetrievalBehaviorPolicy]
         | type[RetrievalLanePolicy]
         | type[RetrievalFusionPolicy]
+        | type[RetrievalRoutingPolicy]
         | type[WorkflowBehaviorPolicy],
         version: str = "2.0.0",
     ) -> None:
@@ -48,7 +50,7 @@ class TypedBehaviorHandler:
 
     def default_policy(self) -> BehaviorPolicy:
         policy_type = self._policy_type
-        if issubclass(policy_type, RetrievalFusionPolicy):
+        if issubclass(policy_type, (RetrievalFusionPolicy, RetrievalRoutingPolicy)):
             # No lane combination is a default. The baseline is always 2.0.0, so nothing asks.
             raise BehaviorPolicyError("BEHAVIOR_POLICY_INVALID")
         return policy_type()
@@ -100,6 +102,8 @@ def evaluate_retrieval(
         "mode": selection.mode,
         "evaluator": RETRIEVAL_EVALUATOR_ID,
     }
+    if isinstance(policy, RetrievalRoutingPolicy) and selection.routing is not None:
+        output["routing"] = selection.routing.model_dump(mode="json")
     if selection.provenance:
         output["lane"] = dict(selection.provenance)
     if isinstance(policy, RetrievalFusionPolicy):
@@ -205,6 +209,20 @@ class RetrievalFusionHandler(TypedBehaviorHandler):
     # variants): lane depths are chosen by measurement.
 
 
+class RetrievalRoutingHandler(TypedBehaviorHandler):
+    """Policy 5 is registered for evaluation/shadow only, never a default."""
+
+    def __init__(self) -> None:
+        super().__init__(BehaviorArtifactKind.RETRIEVAL_POLICY, RetrievalRoutingPolicy, "5.0.0")
+
+    def evaluate(
+        self, policy: BehaviorPolicy, payload: dict[str, JsonValue]
+    ) -> dict[str, JsonValue]:
+        if not isinstance(policy, RetrievalRoutingPolicy):
+            raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
+        return evaluate_retrieval(policy, payload)
+
+
 class WorkflowBehaviorHandler(TypedBehaviorHandler):
     def __init__(self) -> None:
         super().__init__(BehaviorArtifactKind.WORKFLOW_DEFINITION, WorkflowBehaviorPolicy)
@@ -251,5 +269,6 @@ def default_behavior_components() -> BehaviorComponentRegistry:
     registry.register(RetrievalBehaviorHandler())
     registry.register(RetrievalLaneHandler())
     registry.register(RetrievalFusionHandler())
+    registry.register(RetrievalRoutingHandler())
     registry.register(WorkflowBehaviorHandler())
     return registry

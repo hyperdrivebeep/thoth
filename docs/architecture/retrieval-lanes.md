@@ -328,6 +328,39 @@ hash of its stored output.
   that consume the shortlist (see [positional evidence context](evidence-context.md)).
 - Nothing here changes an authority, cutoff or access check, a stored policy, or the 2.0.0 baseline.
 
+## Experimental artifact-count routing (5.0.0, shadow only)
+
+`RetrievalRoutingPolicy` has no default handler policy and cannot prepare or reconstruct a
+CANARY exposure. The baseline remains 2.0.0. Version 4.0.0 still permits only its existing
+ROUND_ROBIN_DEDUP method; RRF is a separate, fixed method used by 5.0.0.
+
+The route counts distinct artifact IDs **after** `connected_retrieval_spans` has chosen the
+eligible frame. Zero or one artifact delegates to the unchanged baseline frame and lane.
+Multiple artifacts use equal-weight span RRF (k=60, ranks from one, first occurrence of an ID
+per lane, ID-ascending ties) over LEXICAL_SUBSTRING_V1, GROUPED_BM25 and DENSE. Whole-catalog,
+pin and budget admission remain shared. Structure groups are flattened in their existing order
+before RRF; they are not the depth-limited chunks of the 4.0.0 merger.
+
+DENSE consumes a `DenseMaterial` of precomputed decimal cosine scores, never an encoder or I/O.
+The material binds project, the **original question only**, exact eligible source/version/span
+and text digests, and the fixed Granite INT8 model/preprocessing identity. Expanded queries
+continue to affect LEXICAL and GROUPED_BM25; they never change the dense question binding.
+Incomplete, stale, unavailable or incompatible dense material selects RRF(LEX, GB) and carries
+an explicit routing/fallback observation. A wrong project is a scope error, not a fallback.
+The full-catalog and one-artifact paths do not need dense material.
+
+The evaluation codec carries optional dense material, omitted entirely for earlier cases.
+The evaluator checks its binding but does not certify that a host actually ran a model.
+Only 5.0.0 adds a `routing` output. Runtime journals also record the routing observation and
+material digest; earlier policies preserve their input/output bytes. The dispatcher algorithm
+ID stays version 1: the distinct policy content/version identifies this new rule. The older
+analysis entry cannot execute this route and records a held shadow instead of pretending to
+run it with the old analysis scorer.
+
+This first slice provides domain contracts, a local single-text encoder port, evaluation and
+shadow behavior only. It does not provide indexing, workers, model loading, installation or UI.
+Those capabilities remain unavailable until their separately reviewed implementation slices.
+
 ## Tests
 
 The research selection is pinned by an equivalence suite against a preserved copy of the earlier

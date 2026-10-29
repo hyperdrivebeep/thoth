@@ -10,7 +10,7 @@ import re
 import unicodedata
 from collections import defaultdict, deque
 from collections.abc import Callable
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Literal
 
 from thoth.domain.behavior_artifact import BehaviorArtifactKind
@@ -18,14 +18,13 @@ from thoth.domain.behavior_policy import (
     RetrievalFusionPolicy,
     RetrievalLanePolicy,
     RetrievalPolicy,
+    RetrievalRoutingPolicy,
 )
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
 from thoth.domain.glossary import Glossary, GlossaryConfidence, GlossaryDetail
 from thoth.domain.glossary_lane import (
     GLOSSARY_LANE_PROVENANCE,
-    check_glossary_pin,
     expansion_terms,
-    glossary_detail,
 )
 from thoth.domain.lane_scoring import (
     BIGRAM_VERSION,
@@ -41,15 +40,11 @@ from thoth.domain.query_identifiers import (
     occurs,
     scan_query,
 )
+from thoth.domain.retrieval_embedding import DenseMaterial, RoutingObservation, dense_rank
+from thoth.domain.retrieval_fused_selection import select_fused as _select_fused
 from thoth.domain.retrieval_fusion import (
-    FUSION_METHOD,
-    FUSION_VERSION,
     Chunk,
     LaneContribution,
-    RankedLane,
-    admit_chunks,
-    lane_contributions,
-    merge_round_robin,
 )
 from thoth.domain.retrieval_terms import KOREAN_FUNCTION_WORDS as KOREAN_FUNCTION_WORDS
 from thoth.domain.retrieval_terms import KOREAN_PAIR as KOREAN_PAIR
@@ -103,6 +98,7 @@ class RetrievalRequest:
     # digest the policy names before any lane runs and hands the lane the policy's confidence floor.
     glossary: Glossary | None = None
     glossary_min_confidence: GlossaryConfidence | None = None
+    dense: DenseMaterial | None = None
 
 
 @dataclass(frozen=True)
@@ -119,6 +115,7 @@ class LaneSelection:
     contributions: tuple[LaneContribution, ...] = ()
     # What the glossary lane found and held back, when a fused policy has one and it ran.
     glossary: GlossaryDetail | None = None
+    routing: RoutingObservation | None = None
 
 
 type Lane = Callable[[RetrievalRequest, tuple[EvidenceSpan, ...]], tuple[EvidenceSpan, ...]]
@@ -469,6 +466,14 @@ def lane_chunks(
     return tuple((span,) for span in LANES[lane_id](request, eligible))
 
 
+def dense_v1(
+    request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
+) -> tuple[EvidenceSpan, ...]:
+    return dense_rank(request.question, eligible, request.dense)
+
+
+register_lane("DENSE", "1.0.0", dense_v1)
+
 register_lane(LEXICAL_SUBSTRING_V1, "1.0.0", lexical_substring_v1)
 register_lane(PROTECTED_EXACT, "1.0.0", protected_exact_v1, (("scanner", SCANNER_VERSION),))
 register_lane(
@@ -491,6 +496,12 @@ def select_retrieval_context(
     policy: RetrievalPolicy,
     lane_id: str | None = None,
 ) -> LaneSelection:
+    if isinstance(policy, RetrievalRoutingPolicy):
+        if lane_id is not None:
+            raise ValueError("RETRIEVAL_LANE_ID_NOT_ALLOWED_FOR_ROUTING")
+        from thoth.domain.retrieval_routing import select_routed
+
+        return select_routed(request, policy)
     if isinstance(policy, RetrievalFusionPolicy):
         if lane_id is not None:
             raise ValueError("RETRIEVAL_LANE_ID_NOT_ALLOWED_FOR_FUSION")
@@ -538,61 +549,4 @@ def select_retrieval_context(
         eligible,
         limitations,
         provenance if extra else (),
-    )
-
-
-def _select_fused(request: RetrievalRequest, policy: RetrievalFusionPolicy) -> LaneSelection:
-    """Policy 4.0.0: each lane ranks the same eligible spans, then the merge and the frame admit."""
-    for spec in policy.lanes:
-        if spec.lane_id not in LANES:
-            raise ValueError("RETRIEVAL_LANE_UNKNOWN")
-        if LANE_VERSIONS.get(spec.lane_id) != spec.lane_version:
-            raise ValueError("RETRIEVAL_LANE_VERSION_UNKNOWN")
-        check_glossary_pin(spec, request.glossary)
-    eligible = connected_retrieval_spans(request.evidence)
-    complete, limitations = full_catalog(eligible, request.catalog, policy)
-    if complete is not None:
-        return LaneSelection(complete, "FULL_ELIGIBLE_EXTRACTED_CATALOG", eligible, limitations)
-    pinned = set(request.pinned_refs)
-    selected = [span for span in eligible if span.span_id in pinned][: policy.max_spans]
-    ranked = [
-        RankedLane(
-            spec.lane_id,
-            spec.lane_version,
-            spec.depth,
-            lane_chunks(
-                spec.lane_id,
-                request
-                if spec.glossary is None
-                else replace(request, glossary_min_confidence=spec.glossary.min_confidence),
-                eligible,
-            ),
-        )
-        for spec in policy.lanes
-    ]
-    credited = admit_chunks(
-        merge_round_robin(ranked), selected, policy.max_spans, policy.character_budget
-    )
-    provenance: list[tuple[str, str]] = [
-        ("fusion", FUSION_METHOD),
-        ("fusion_version", FUSION_VERSION),
-    ]
-    for index, lane in enumerate(ranked):
-        provenance.append(
-            (f"lane{index}", f"{lane.lane_id}:{lane.lane_version}:depth={lane.depth}")
-        )
-        provenance.extend(
-            (f"lane{index}.{key}", value) for key, value in LANE_PROVENANCE.get(lane.lane_id, ())
-        )
-    detail, glossary_keys = glossary_detail(policy.lanes, request.glossary, glossary_texts(request))
-    provenance.extend(glossary_keys)
-    observed = request.catalog is not None and request.catalog.all_observed
-    return LaneSelection(
-        tuple(selected),
-        "LEXICAL" if observed else "LEGACY",
-        eligible,
-        limitations,
-        tuple(provenance),
-        lane_contributions(ranked, selected, credited),
-        detail,
     )

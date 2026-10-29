@@ -123,6 +123,8 @@ def _inputs(request: RetrievalRequest, selection: LaneSelection) -> dict[str, ob
     }
     if selection.provenance:
         inputs["lane"] = dict(selection.provenance)
+    if selection.routing is not None:
+        inputs["routing"] = selection.routing.model_dump(mode="json")
     return inputs
 
 
