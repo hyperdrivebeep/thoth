@@ -42,6 +42,11 @@ _AMBIENT: ContextVar[_Transaction | None] = ContextVar(
 )
 
 
+def has_ambient_transaction() -> bool:
+    """Workers must not inherit an uncommitted or ended source transaction context."""
+    return _AMBIENT.get() is not None
+
+
 @contextmanager
 def read_connection(engine: Engine) -> Generator[Connection, None, None]:
     ambient = _AMBIENT.get()

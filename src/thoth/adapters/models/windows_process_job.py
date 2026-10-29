@@ -357,6 +357,7 @@ def spawn_windows_job(
     env: Mapping[str, str],
     cwd: Path,
     *,
+    memory_limit_bytes: int | None = None,
     _fault_at: str | None = None,
     _on_created: Callable[[int], None] | None = None,
 ) -> WindowsJobProcess:
@@ -391,6 +392,13 @@ def spawn_windows_job(
         _check(job, "CREATE")
         limits = _ExtendedLimitInformation()
         limits.BasicLimitInformation.LimitFlags = _KILL_ON_JOB_CLOSE
+        if memory_limit_bytes is not None:
+            if memory_limit_bytes <= 0:
+                raise ValueError("WINDOWS_JOB_MEMORY_LIMIT_INVALID")
+            # Bound both the encoder and its complete owned process tree's committed memory.
+            limits.BasicLimitInformation.LimitFlags |= 0x100 | 0x200
+            limits.ProcessMemoryLimit = memory_limit_bytes
+            limits.JobMemoryLimit = memory_limit_bytes
         _check(
             kernel.SetInformationJobObject(
                 job,

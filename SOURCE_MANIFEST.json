@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-10-29T02:32:20.468368+00:00",
+  "created_at": "2026-10-29T15:52:16.026392+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -2013,7 +2013,7 @@
     },
     {
       "path": "config/module-responsibility-budget.json",
-      "sha256": "bf5247b05c62ed4fa034c02a600a1a896327fc8d1643a9a8cca67e5a4c104c03",
+      "sha256": "58100f014f4dfe0e1f6e55931b9a0327248a821f8c48b94eca4f1d5460393bc9",
       "bytes": 8580
     },
     {
@@ -2123,8 +2123,8 @@
     },
     {
       "path": "docs/architecture/backend-runtime-boundaries.md",
-      "sha256": "b1252121ebdfdb82876d98786234c4cc80dd4a0dd2a6dcba459e43dcb0b35cd0",
-      "bytes": 3754
+      "sha256": "214a55d6865d5d78ae92ba0f8535e75b09fea5b97038fae628deb8f390cd0ccd",
+      "bytes": 6267
     },
     {
       "path": "docs/architecture/canonical-owner-matrix.md",
@@ -2743,8 +2743,8 @@
     },
     {
       "path": "migrations/env.py",
-      "sha256": "34cf2a8e8da9eeecd7771517a2a8f4cb828404710abea66e502a491e065e4396",
-      "bytes": 1904
+      "sha256": "5d83532a852d75a9586f62847bfe970b60ec5a2910a544027086ce40e18c48e6",
+      "bytes": 1976
     },
     {
       "path": "migrations/script.py.mako",
@@ -2810,6 +2810,11 @@
       "path": "migrations/versions/5a02d4c8f1b7_a02_acquisition_trace.py",
       "sha256": "d8c7a8e0038c562c910fa16d48446db2ac94d123a6bb3547d0ddee0c83680c24",
       "bytes": 2765
+    },
+    {
+      "path": "migrations/versions/5d28a619afb4_embedding_index.py",
+      "sha256": "e887b139a640fe935cfb425416e9561395149a12fe04a3a8a9071b8f11e275d1",
+      "bytes": 2086
     },
     {
       "path": "migrations/versions/6a10d4f9c2e8_a10_receipt_dag.py",
@@ -3642,6 +3647,21 @@
       "bytes": 5535
     },
     {
+      "path": "src/thoth/adapters/embeddings/__init__.py",
+      "sha256": "a11d71a84ef233cdd208b1350d2fb1385f1199bab4dba50fb0c73f40cfafc94a",
+      "bytes": 81
+    },
+    {
+      "path": "src/thoth/adapters/embeddings/process_worker.py",
+      "sha256": "c2b1450ec7d7c27388afa7e9c5c055f7a19b499ff7947fb8e8443f894ea1eaa2",
+      "bytes": 10654
+    },
+    {
+      "path": "src/thoth/adapters/embeddings/worker_main.py",
+      "sha256": "2be097a69f49688f10c32165947b482b1aefa92e1a52bf94f6bda446686182df",
+      "bytes": 2367
+    },
+    {
       "path": "src/thoth/adapters/environment.py",
       "sha256": "2226474541393b0becca5a81ecc5df889b99ed5d4dc38e9c46c36c19ac2be84b",
       "bytes": 551
@@ -3993,8 +4013,8 @@
     },
     {
       "path": "src/thoth/adapters/models/windows_process_job.py",
-      "sha256": "9a2834cf675a8401584b248548b72cf402cb90b2ac614a750907d9deb0d749f0",
-      "bytes": 18758
+      "sha256": "3458b5bd6a693e7e439785c5d97e5164acc568ea261625947f82843af3fa88c7",
+      "bytes": 19229
     },
     {
       "path": "src/thoth/adapters/models/windows_user_sid.py",
@@ -4223,8 +4243,8 @@
     },
     {
       "path": "src/thoth/adapters/storage/acquisition.py",
-      "sha256": "da150f088e637e5c18c8c7debbdd9e2230e5866b40ab13a8b6eb81dfad05e075",
-      "bytes": 12161
+      "sha256": "d7ab53bd4ee0dcdd0661dbd4d4e97419c09b3bb82d4ecc339d2159dc73c1cde3",
+      "bytes": 12663
     },
     {
       "path": "src/thoth/adapters/storage/acquisition_trace.py",
@@ -4263,8 +4283,8 @@
     },
     {
       "path": "src/thoth/adapters/storage/artifacts.py",
-      "sha256": "57b188e4032da4af344fa44ada8883f2c0834da54deb47a8cf5fde426a9072a9",
-      "bytes": 26499
+      "sha256": "7a468196d9a97775a8e607570168a2f37367cb5f232fe7304ce276f511f3bcaa",
+      "bytes": 26911
     },
     {
       "path": "src/thoth/adapters/storage/auth.py",
@@ -4303,8 +4323,8 @@
     },
     {
       "path": "src/thoth/adapters/storage/bundle.py",
-      "sha256": "f598436adb56e55ff0716587949f2d1915db959088d8f59499c42f1932611a05",
-      "bytes": 9239
+      "sha256": "1b676e3ed7fc322e23673a88f4b94dacebe329a4be9f75b9f2d07135a528ca38",
+      "bytes": 9618
     },
     {
       "path": "src/thoth/adapters/storage/control_record.py",
@@ -4340,6 +4360,21 @@
       "path": "src/thoth/adapters/storage/dependency.py",
       "sha256": "d1ea2e0a88a526558ec45180e479693e0ffcb5de20e247c0c794772e1013998f",
       "bytes": 4306
+    },
+    {
+      "path": "src/thoth/adapters/storage/embedding_index.py",
+      "sha256": "6eecebe6e6af589df6b995a49c55e1da7efd27c31149264b2b771bac9c904b3a",
+      "bytes": 19542
+    },
+    {
+      "path": "src/thoth/adapters/storage/embedding_schema.py",
+      "sha256": "a30a79b5b6e850fc8bdeb38c4f9ab2cbebff73d6bf4f3fd956778b2e102ed4e3",
+      "bytes": 1488
+    },
+    {
+      "path": "src/thoth/adapters/storage/embedding_source.py",
+      "sha256": "df0072a650f1a344ea737edbc1ca9520ef675a16e0248f34c54bbfb912e354a1",
+      "bytes": 6001
     },
     {
       "path": "src/thoth/adapters/storage/evaluation_run.py",
@@ -4383,8 +4418,8 @@
     },
     {
       "path": "src/thoth/adapters/storage/governance.py",
-      "sha256": "0de8b19bdc596c518606be25916a08f683d1da58d1927d7bb37c99bd0113bfa7",
-      "bytes": 15337
+      "sha256": "1b0b257e69becf711c1b5ba74b04feb8d9b61cf25cd75048ce6b035c8182336e",
+      "bytes": 15674
     },
     {
       "path": "src/thoth/adapters/storage/governance_history.py",
@@ -4548,8 +4583,8 @@
     },
     {
       "path": "src/thoth/adapters/storage/transaction.py",
-      "sha256": "1873bb91ae61570a71ebc7a3510de7063e0c44d96374578a6e532c5cca156183",
-      "bytes": 3077
+      "sha256": "58f0ab73efd0e91c7f2e14f3d9863966d62b17d71e720c6eb240d4cbfba3ac4d",
+      "bytes": 3243
     },
     {
       "path": "src/thoth/adapters/storage/workspace_location.py",
@@ -5330,6 +5365,11 @@
       "path": "src/thoth/application/services/domain_reference_memory.py",
       "sha256": "1fd0f1a6f872c4d24eff55fe6a3a576c7ba85e190f586a245399a9c0b03ea780",
       "bytes": 1725
+    },
+    {
+      "path": "src/thoth/application/services/embedding_index_service.py",
+      "sha256": "92069a696a3074c1717b2ed6f37e458daebbb4d80bc2dcc6f28878a94547ddd6",
+      "bytes": 12978
     },
     {
       "path": "src/thoth/application/services/english_prose.py",
@@ -6552,6 +6592,11 @@
       "bytes": 7463
     },
     {
+      "path": "src/thoth/apps/embedding_composition.py",
+      "sha256": "0bd8ee7fb8bcaa9d09a8f820882b11d3d0939f116e856ab662c8fcb143cb9156",
+      "bytes": 1495
+    },
+    {
       "path": "src/thoth/apps/evidence_composition.py",
       "sha256": "3fec2f5d9c86212a0747673b93f9006b2025d2ceaf65c20c6781d396038a55d2",
       "bytes": 1228
@@ -6683,8 +6728,8 @@
     },
     {
       "path": "src/thoth/apps/runtime.py",
-      "sha256": "27441013367197384b0ac6af24592569ca9f7e757a704381fea411fc6e2b5dad",
-      "bytes": 23402
+      "sha256": "63a0588a49f15d947ef968d197ae18e9d0f2a9c0d008e13f16cc8b2b0519c2bb",
+      "bytes": 24357
     },
     {
       "path": "src/thoth/apps/runtime_entry.py",
@@ -6698,8 +6743,8 @@
     },
     {
       "path": "src/thoth/apps/runtime_types.py",
-      "sha256": "3df5f0c1afd7642a96dfdf7799162b8a37bd6813a25e3acc2620ab6c40dcadf7",
-      "bytes": 2268
+      "sha256": "8177cadda44418152b8a4049a86974c2982740f0be9f0244c9b8fb1b8269a68c",
+      "bytes": 2677
     },
     {
       "path": "src/thoth/apps/sandbox_composition.py",
@@ -6930,6 +6975,11 @@
       "path": "src/thoth/domain/effort_bands.py",
       "sha256": "54dd1d958f0e5429eefd4b81aba12137f4649cab618b5a3b51b59c735cb0c623",
       "bytes": 6911
+    },
+    {
+      "path": "src/thoth/domain/embedding_index.py",
+      "sha256": "101abdbfbb98089b4caf1a90278a341b03363c74499b54f05c5b99def23a4447",
+      "bytes": 5282
     },
     {
       "path": "src/thoth/domain/enums.py",
@@ -7625,6 +7675,11 @@
       "path": "src/thoth/ports/embedding.py",
       "sha256": "a7f609c80406a086e5915c225bd4423ce2ecc34644d6ca36e57d56d65c5b5282",
       "bytes": 398
+    },
+    {
+      "path": "src/thoth/ports/embedding_index.py",
+      "sha256": "e414c3cf58f6734b03276689a0c8b1e549f12f6c2fa02196b184a062768c471c",
+      "bytes": 2072
     },
     {
       "path": "src/thoth/ports/evaluation_runner.py",
@@ -8472,6 +8527,11 @@
       "bytes": 10208
     },
     {
+      "path": "tests/embedding_fixtures.py",
+      "sha256": "69d26bace097ab849ca3785e7b24130c6b088b468df9a8a8e901e3dbc8c04813",
+      "bytes": 6022
+    },
+    {
       "path": "tests/fixtures/action_response_golden.json",
       "sha256": "8e4a2731fc944cca24939b05b56b06c142f96db58d7b66736d0c0856c9cc3d22",
       "bytes": 90983
@@ -8708,13 +8768,13 @@
     },
     {
       "path": "tests/fixtures/storage_migration_ddl.json",
-      "sha256": "7650d89b2e3d13106ab50fc4cebc691ddbfbc8c059d4871490b6057ef51d6b6d",
-      "bytes": 109872
+      "sha256": "c02114cda6046430a2aab6e313cd284a06e36838e8af981a70f7c480f9fcc8b1",
+      "bytes": 111764
     },
     {
       "path": "tests/fixtures/storage_schema_contract.json",
-      "sha256": "7352456044287d3c14955aa29fb7bcb3141fa95a545a3eba9890e8d54623adfa",
-      "bytes": 1560992
+      "sha256": "9122f262d4b978cd875fb8166d447b30fc93fa20dd9469bd87cd845f69a331bd",
+      "bytes": 1751566
     },
     {
       "path": "tests/fixtures/structured_source_fixture.py",
@@ -8823,7 +8883,7 @@
     },
     {
       "path": "tests/integration/migration_head_helpers.py",
-      "sha256": "558317d21741346f81c115e2d2c60ea461d0831b60319593509756f470db7998",
+      "sha256": "6373d5645e3756b5d3219937854d5b25552a9035b23a933753e213919c50aeb4",
       "bytes": 698
     },
     {
@@ -8883,8 +8943,8 @@
     },
     {
       "path": "tests/integration/schema_contract_probe.py",
-      "sha256": "c7dd94899f25b7fbdc4f793019ed87cd05a53acbc9bb06275caea145083ad987",
-      "bytes": 5808
+      "sha256": "5728079a2fe26c6ea4f598d339ba82ae1361518054d3b9b8f5e62a4e031dde15",
+      "bytes": 5879
     },
     {
       "path": "tests/integration/scoped_runtime.py",
@@ -9345,6 +9405,36 @@
       "path": "tests/integration/test_discovery_cleanup_cancel.py",
       "sha256": "917484cc5159f8f3a75929714f286b8e6a7fda6cef4b5161f01e00138abbdabe",
       "bytes": 4817
+    },
+    {
+      "path": "tests/integration/test_embedding_index.py",
+      "sha256": "1035d21385def50c8988dcc87e34d2db9046fb84c3be10fbfd6039641db68298",
+      "bytes": 8693
+    },
+    {
+      "path": "tests/integration/test_embedding_migration.py",
+      "sha256": "1c6684891a7b9cd602549b946dc95945eac2b2d21e1a72c0d0b5466c5f5e5dfc",
+      "bytes": 1776
+    },
+    {
+      "path": "tests/integration/test_embedding_publication_paths.py",
+      "sha256": "de207bdf4e6c8bb505da978b07fc7d1dd99e76c5baa914d3e1885a4484a24663",
+      "bytes": 2692
+    },
+    {
+      "path": "tests/integration/test_embedding_recovery.py",
+      "sha256": "24f6ed03b6bfaa73d3df37354ad28344116875bea004585bb0014fc5e112c6f4",
+      "bytes": 10432
+    },
+    {
+      "path": "tests/integration/test_embedding_runtime.py",
+      "sha256": "949559a9839990beb4e3a39d5750ed678ccca948d145a23a36d60a594c500e4e",
+      "bytes": 5588
+    },
+    {
+      "path": "tests/integration/test_embedding_runtime_process.py",
+      "sha256": "b96dd308a1e340bc938d8bd1c7a8b71da4a1f8579c19fcba4f5ecd37737d28a6",
+      "bytes": 2879
     },
     {
       "path": "tests/integration/test_evaluation_execution_limits.py",
@@ -12110,6 +12200,11 @@
       "path": "tests/unit/test_docling_table_relations.py",
       "sha256": "937b85e198deb56f0ba9d0af34608f60616d981cf7939ab1ecbf8a97d3f65f47",
       "bytes": 4242
+    },
+    {
+      "path": "tests/unit/test_embedding_worker.py",
+      "sha256": "23465d66bd360b91d9da73249f1fb12b74a40b1d7dd0bc047f31791a891a1923",
+      "bytes": 4585
     },
     {
       "path": "tests/unit/test_fused_selection.py",

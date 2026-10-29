@@ -1,7 +1,7 @@
 {
   "contract": {
     "heads": [
-      "4c17f5089ea3"
+      "5d28a619afb4"
     ],
     "schema_rows": [
       [
@@ -249,6 +249,18 @@
         "ix_decision_objects_thread_id",
         "decision_objects",
         "CREATE INDEX ix_decision_objects_thread_id ON decision_objects (thread_id)"
+      ],
+      [
+        "index",
+        "ix_embedding_jobs_artifact_id",
+        "embedding_jobs",
+        "CREATE INDEX ix_embedding_jobs_artifact_id ON embedding_jobs (artifact_id)"
+      ],
+      [
+        "index",
+        "ix_embedding_jobs_project_id",
+        "embedding_jobs",
+        "CREATE INDEX ix_embedding_jobs_project_id ON embedding_jobs (project_id)"
       ],
       [
         "index",
@@ -1284,6 +1296,24 @@
       ],
       [
         "index",
+        "sqlite_autoindex_embedding_configs_1",
+        "embedding_configs",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_embedding_jobs_1",
+        "embedding_jobs",
+        null
+      ],
+      [
+        "index",
+        "sqlite_autoindex_embedding_vectors_1",
+        "embedding_vectors",
+        null
+      ],
+      [
+        "index",
         "sqlite_autoindex_entity_snapshots_1",
         "entity_snapshots",
         null
@@ -2277,6 +2307,24 @@
         "dependency_states",
         "dependency_states",
         "CREATE TABLE dependency_states (\n\tproject_id VARCHAR(160) NOT NULL, \n\tentity_ref VARCHAR(260) NOT NULL, \n\tstatus VARCHAR(60) NOT NULL, \n\tcaused_by_revision VARCHAR(64) NOT NULL, \n\tupdated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (project_id, entity_ref)\n)"
+      ],
+      [
+        "table",
+        "embedding_configs",
+        "embedding_configs",
+        "CREATE TABLE embedding_configs (\n\tproject_id VARCHAR(160) NOT NULL, \n\tgeneration INTEGER NOT NULL, \n\tenabled INTEGER NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)"
+      ],
+      [
+        "table",
+        "embedding_jobs",
+        "embedding_jobs",
+        "CREATE TABLE embedding_jobs (\n\tjob_id VARCHAR(64) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tartifact_id VARCHAR(160) NOT NULL, \n\tsource_version_id VARCHAR(160) NOT NULL, \n\tintent_json TEXT NOT NULL, \n\tstate VARCHAR(20) NOT NULL, \n\tgeneration INTEGER NOT NULL, \n\towner VARCHAR(160), \n\tlease_until_ms INTEGER, \n\tdeadline_ms INTEGER, \n\treason VARCHAR(100), \n\tmanifest_digest VARCHAR(64), \n\tPRIMARY KEY (job_id)\n)"
+      ],
+      [
+        "table",
+        "embedding_vectors",
+        "embedding_vectors",
+        "CREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)"
       ],
       [
         "table",

@@ -7,9 +7,11 @@ from typing import TypedDict
 
 from thoth.adapters.connectors import ConnectorRegistry
 from thoth.adapters.storage.sqlite import SqliteLedger
+from thoth.application.services.embedding_index_service import EmbeddingIndexService
 from thoth.domain.deployment_mode import DeploymentMode
 from thoth.domain.environment import EnvironmentProfile
 from thoth.domain.resource_scope import ResourceScopePolicy
+from thoth.ports.embedding_index import BoundedEmbeddingWorkerPort
 from thoth.ports.evaluation_runner import EvaluationCatalogPort
 from thoth.ports.improvement import ImprovementEvaluatorPort
 from thoth.ports.ledger import ManagedLedgerPort
@@ -27,19 +29,25 @@ class RuntimeWithLedger[LedgerT: ManagedLedgerPort]:
     bus: CommandBus
     ledger: LedgerT
     close_storage: Callable[[], None] | None = None
+    embedding_index: EmbeddingIndexService | None = None
 
     def close(self) -> None:
-        self.bus.close_tasks()
-        if self.close_storage is None:
-            self.ledger.close()
-        else:
-            self.close_storage()
+        try:
+            if self.embedding_index is not None:
+                self.embedding_index.close()
+        finally:
+            self.bus.close_tasks()
+            if self.close_storage is None:
+                self.ledger.close()
+            else:
+                self.close_storage()
 
 
 AppRuntime = RuntimeWithLedger[SqliteLedger]
 
 
 class RuntimeOptions(TypedDict, total=False):
+    embedding_worker: BoundedEmbeddingWorkerPort | None
     deployment_mode: DeploymentMode | None
     model_catalog: ModelCatalogPort | None
     task_profiles: TaskProfileCatalogPort

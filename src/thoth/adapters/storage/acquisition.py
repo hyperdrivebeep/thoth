@@ -6,6 +6,7 @@ import orjson
 from sqlalchemy import Engine, insert, select, update
 from sqlalchemy.engine import Connection
 
+from thoth.adapters.storage.embedding_source import IngestionProjection
 from thoth.adapters.storage.governance_history import SqliteGovernanceHistory
 from thoth.adapters.storage.schema import (
     artifact_versions,
@@ -40,10 +41,12 @@ class SqliteAcquisitionUnitOfWork(AcquisitionUnitOfWorkPort):
         *,
         fault_injector: Callable[[str], None] | None = None,
         resource_scopes: ResourceScopeAdmissionPort | None = None,
+        ingestion_projection: IngestionProjection | None = None,
     ) -> None:
         self._engine = engine
         self._fault_injector = fault_injector
         self._resource_scopes = resource_scopes
+        self._ingestion_projection = ingestion_projection
 
     def commit(self, value: AcquisitionCommit) -> None:
         with (
@@ -86,6 +89,13 @@ class SqliteAcquisitionUnitOfWork(AcquisitionUnitOfWorkPort):
                 self._resource_scopes.admit(staged)
                 self._fault("after_resource_scope")
             self._insert_ingestion(connection, value)
+            if self._ingestion_projection is not None:
+                self._ingestion_projection(
+                    connection,
+                    value.ingestion.document,
+                    value.ingestion.source_version_id,
+                    value.ingestion.evidence_candidates,
+                )
             self._fault("after_ingestion")
             binding = value.source_binding
             connection.execute(

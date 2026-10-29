@@ -59,3 +59,36 @@ Domain failures use stable reason codes. Protocol errors, domain HOLD/ABSTAIN, a
 ## External effects
 
 R0-R2 stay reversible/read-only/isolated as defined by policy. R3 uses an exact-digest authorization, final preflight, idempotent dispatch and ambiguous-result reconciliation. R4 has no executor. No connector or sandbox writes canonical state directly.
+
+## Optional derived embedding index
+
+The embedding index is a project-local, rebuildable projection, never a source of research truth.
+Normal runtime construction has no embedding worker and project indexing defaults to disabled.
+An explicitly injected `BoundedEmbeddingWorkerPort` exposes the managed `embedding_index` service;
+this capability does not change retrieval policy or permit CANARY exposure. Model installation,
+ORT execution and UI activation are separate integration stages.
+
+Source publication stages only an immutable intent in the existing SQLite UoW. This includes
+connector acquisition and the shared artifact publication used by upload, ProjectPack and sandbox.
+Encoding is explicitly drained after commit, outside any ambient transaction. Each checkpoint
+uses a short transaction and a generation/owner lease. READY is a compare-and-swap publication of
+the complete manifest after checking current source identity, active binding, configuration,
+individual span access, text hashes and every immutable vector. Readers recheck current scope and
+manifest integrity; partial staging is never a ready index.
+
+Content keys include the text SHA, pinned model/revision and preprocessing contract, with project
+namespaces and separate source links. Changed, removed or detached sources cannot be read through
+an old READY manifest. Explicit reconciliation invalidates obsolete links and stages missing current
+ones. Expired leases become FAILED; there is no automatic retry. A generation-fenced manual retry
+can reuse validated partial blobs. Orphan collection only removes unreferenced derived vectors.
+Export/ProjectPack continue to carry canonical source data, not these tables.
+
+The typed `EmbeddingBudget` bounds one batch-1 worker, query wait plus encoding to 2 seconds,
+each span to 10 seconds, a job and one cumulative project drain to 10 minutes, leases to 60 seconds,
+and queued queries to 16. A drain passes its remaining deadline to each source job; starting the
+next source cannot reset the request budget.
+Foreground queries run before waiting background spans. Timeout and cancellation stop the owned
+process tree and check termination. Windows uses a Job Object with a 512 MiB committed-memory cap;
+this is not an RSS measurement or proof of retrieval latency/quality. Runtime close and failed
+startup release the optional worker. The child factory is trusted application configuration;
+Python socket denial is a defensive guard, not an operating-system sandbox for untrusted code.
