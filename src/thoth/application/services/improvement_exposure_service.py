@@ -5,6 +5,7 @@ from typing import Literal, cast
 
 from pydantic import JsonValue
 
+from thoth.application.services import behavior_exposure_compilation as compilation
 from thoth.application.services import improvement_exposure_records as records
 from thoth.application.services.behavior_candidate_service import BehaviorCandidateService
 from thoth.application.services.control_record_service import ControlRecordService
@@ -99,10 +100,7 @@ class ImprovementExposureService:
 
     @staticmethod
     def _budget(values: dict[str, JsonValue], name: str) -> int:
-        value = values.get(name)
-        if type(value) is not int:
-            raise BehaviorPolicyError("BEHAVIOR_EXPOSURE_BUDGET_REQUIRED")
-        return value
+        return compilation.budget_value(values, name)
 
     def _target(
         self, project: str, proposal: ControlRecord, scope: dict[str, str]
@@ -161,7 +159,7 @@ class ImprovementExposureService:
         content = cast(dict[str, object], content)
         component = pair.spec.component
         handler = self._components.resolve(component, str(content.get("version")))
-        policy = handler.compile(content)
+        policy = compilation.compile_exposure_policy(handler, content, stage)
         if rollback.get("rollback_target_digest") != pair.spec.baseline_digest:
             raise BehaviorPolicyError("BEHAVIOR_ROLLBACK_TARGET_REQUIRED")
         governance = self._governance.read_policy(project)

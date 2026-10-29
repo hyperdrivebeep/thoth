@@ -15,6 +15,7 @@ from thoth.domain.behavior_artifact import BehaviorArtifactKind
 from thoth.domain.behavior_execution import ActiveBehaviorSnapshot, BehaviorUse
 from thoth.domain.behavior_policy import (
     BehaviorPolicyError,
+    RetrievalRoutingPolicy,
     WorkflowBehaviorPolicy,
     is_retrieval_policy,
     workflow_repair_decision,
@@ -77,6 +78,8 @@ def select_evidence_for_behavior(
     policy = snapshot.policy
     if not is_retrieval_policy(policy):
         raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
+    if isinstance(policy, RetrievalRoutingPolicy):
+        raise BehaviorPolicyError("RETRIEVAL_ROUTING_UNSUPPORTED_ENTRY")
     started = perf_counter_ns()
     result = select_evidence_context(
         problem=problem,
@@ -117,6 +120,8 @@ def select_evidence_for_behavior(
         try:
             if not is_retrieval_policy(shadow_policy):
                 raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
+            if isinstance(shadow_policy, RetrievalRoutingPolicy):
+                raise BehaviorPolicyError("RETRIEVAL_ROUTING_UNSUPPORTED_ENTRY")
             shadow_result = select_evidence_context(
                 problem=problem,
                 evidence=evidence,

@@ -347,24 +347,19 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 .conversation-synthetic-notice{flex:none;margin:0 0 8px;padding:4px 10px;min-height:0;background:#3a2a10 !important;font-size:12px}
 .archived-project-row{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px}
 
-/* Display language is a browser preference; this bar leaves the research subtree mounted. */
-.language-settings { height:36px; display:flex; justify-content:flex-end; align-items:center; padding:0 18px; background:var(--surface-1); border-bottom:1px solid var(--line-soft); color:var(--muted); font-size:12px; }
-.language-settings label,.reply-language-control { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
-.language-settings select,.reply-language-control select { max-width:100%; border:1px solid var(--line); border-radius:4px; background:var(--surface-1); color:var(--text); padding:4px 7px; font:inherit; }
-.reply-language-control { font-size:12px; color:var(--muted); margin:8px 0 4px; }
+/* Languages are chosen in Settings; the question box only shows a fixed response language. */
+.language-card .language-row { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; margin:8px 0 2px; }
+.language-card .language-row label { min-width:150px; font-size:12px; color:var(--muted); }
+.language-card select { max-width:100%; border:1px solid var(--line); border-radius:4px; background:var(--surface-1); color:var(--text); padding:4px 7px; font:inherit; font-size:12px; }
+.language-card p { margin:4px 0; font-size:12px; }
 .language-help { display:block; font-size:11px; line-height:1.5; color:var(--muted); }
-.language-settings + .first-run-shell { min-height:calc(100dvh - 36px); }
-@media(min-width:761px) {
-  .language-settings + .conversation-workstation { height:calc(100dvh - 36px); min-height:0; }
-  .language-settings + .conversation-workstation .navigation-rail { height:calc(100dvh - 36px); }
-}
 
 /* Keep the question primary; persistent defaults and explanations live in Settings. */
 .workstation .composer-dock .prompt-composer { padding:10px 12px; }
 .workstation .composer-dock .prompt-composer textarea { margin:0;width:100%;min-height:48px;line-height:1.5; }
 .composer-tools { gap:6px;margin-top:6px; }
-.composer-tools .reply-language-control { margin:0;gap:4px;flex-wrap:nowrap;font-size:11px; }
-.composer-tools .reply-language-control select { height:28px;max-width:155px;font-size:11px; }
+.language-fixed { display:inline-flex;align-items:center;gap:2px;font-size:11px;color:var(--muted);white-space:nowrap; }
+.language-fixed .language-fixed-link { font-size:11px;min-height:0;padding:0 4px; }
 .language-current { font-size:10px;color:var(--muted);white-space:nowrap; }
 .model-settings.compact .model-control-label { position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%); }
 .model-settings.compact label:last-of-type select { min-width:68px;max-width:82px; }

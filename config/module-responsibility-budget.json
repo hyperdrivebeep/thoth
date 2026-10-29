@@ -181,7 +181,7 @@
       "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     },
     "src/thoth/application/services/improvement_exposure_service.py": {
-      "baseline_lines": 631,
+      "baseline_lines": 629,
       "top_level_symbols": [
         "ImprovementExposureService"
       ],

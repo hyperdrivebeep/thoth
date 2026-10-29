@@ -4,7 +4,7 @@ import { act, useRef, type ReactElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { readDraft, writeDraft } from "../api/conversation";
-import { readDraftLanguage, writeDraftLanguage } from "../api/draftLanguage";
+import { readResponseLanguageDefault, writeResponseLanguageDefault } from "../api/responseLanguageDefault";
 import { readLocalPending, submissionSignature, writeLocalPending } from "../api/localWorkspacePersistence";
 import { saveWorkspaceContext } from "../api/research";
 import { readResearchStatus } from "../api/researchStatusRead";
@@ -72,7 +72,7 @@ async function mount(node: ReactElement) {
 }
 beforeEach(() => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true }); fixture.target = "research"; fixture.phase = "ok"; fixture.running = false; fixture.byteCase = false; fixture.calls = [];
-  localStorage.clear(); sessionStorage.clear(); setLocale("ko"); saveWorkspaceContext("p", "t", scope); writeDraft("p", "t", DRAFT, scope); writeDraftLanguage(scope, "p", "t", "en");
+  localStorage.clear(); sessionStorage.clear(); setLocale("ko"); saveWorkspaceContext("p", "t", scope); writeDraft("p", "t", DRAFT, scope); writeResponseLanguageDefault(scope, "en");
   expect(writeLocalPending({ version: 2, workspaceId: WORKSPACE, projectId: "p", threadId: "t", problem: DRAFT, selection: null, responseLanguage: "en", signature: submissionSignature("p", "t", DRAFT, null, null, "en"), key: PENDING_KEY, createdAt: 1 })).toBe("SAVED");
   vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
     if (String(input) !== "/healthz") throw new Error("REAL_FETCH_FORBIDDEN");
@@ -110,7 +110,7 @@ it.each(["sources", "research", "archive"] as const)("protects %s through denial
   expect(document.body.textContent).not.toContain(markers[target][0]);
   expect(stored()).toEqual(saved);
   expect(readDraft("p", "t", scope)).toBe(DRAFT);
-  expect(readDraftLanguage(scope, "p", "t")).toBe("en");
+  expect(readResponseLanguageDefault(scope)).toBe("en");
   const pending = readLocalPending(WORKSPACE, "p", "t"); expect(pending.kind).toBe("PENDING"); if (pending.kind === "PENDING") expect(pending.value.key).toBe(PENDING_KEY);
 });
 

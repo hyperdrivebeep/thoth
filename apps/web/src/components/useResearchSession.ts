@@ -5,9 +5,9 @@ import { rpc } from "../api/rpcClient";
 import { readResearchStatus } from "../api/researchStatusRead";
 import { useReadAccessProtection } from "./useReadAccessProtection";
 import { clearSubmission, hasSubmissionStore, readSubmission, submissionScopeId, writeSubmission } from "../api/submissionPersistence";
-import { readDraftLanguage, writeDraftLanguage } from "../api/draftLanguage";
+import { useResponseLanguageDefault } from "../api/responseLanguageDefault";
+import { useResponseLanguageSupport } from "./useResponseLanguageSupport";
 import type { ResponseLanguage } from "../api/localWorkspacePersistence";
-import type { WorkspaceReady } from "../api/research";
 import type { ResearchAdmission } from "../api/research";
 import type { ModelSelection } from "./ModelSettings";
 import { readDraft, writeDraft } from "../api/conversation";
@@ -27,9 +27,9 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   const active = useRef(true);
   useLayoutEffect(() => { active.current = true; return () => { active.current = false; }; }, []);
   const isCurrentScope = () => active.current && currentScope.current === scopeIdentity && epoch.current === scopeEpoch;
-  const [selectedLanguage, setSelectedLanguage] = useState<ResponseLanguage | null | undefined>(() => readDraftLanguage(storageScope, projectId, threadId));
-  const ready = useQuery({ queryKey: ["workspace-ready"], enabled: false, queryFn: ({signal}) => rpc<WorkspaceReady>("workspace/ready", {}, "ws-ready", signal) });
-  const languageSupported = hasSubmissionStore(storageScope) && ready.data?.value.response_language_scope === "REQUEST" && ready.data.value.response_languages?.includes("en") === true;
+  // The default set in Settings: null is automatic (the request names no language), otherwise ko or en on every new request.
+  const responseLanguage = useResponseLanguageDefault(storageScope);
+  const languageSupported = useResponseLanguageSupport(storageScope);
   const [problem, updateProblem] = useState(() => readDraft(projectId, threadId, storageScope));
   const problemRef = useRef(problem);
   const [draftSaveState, setDraftSaveState] = useState<DraftWriteResult>(() =>
@@ -44,18 +44,15 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   const [queuedNotice, setQueuedNotice] = useState(false);
   const setProblem = (text: string) => {
     if (origin && !text.trim()) onOriginDone?.();
-    let languageSaved = true;
-    if (text && !problemRef.current) { setSelectedLanguage(responseLanguage); languageSaved = writeDraftLanguage(storageScope, projectId, threadId, responseLanguage); }
     const saved = writeDraft(projectId, threadId, text, storageScope);
     if (storageScope.mode === "LOCAL") {
-      setDraftSaveState(languageSaved ? saved : "UNAVAILABLE");
+      setDraftSaveState(saved);
       if (saved === "SAVED") setDraftRestoreIssue(null);
     }
     problemRef.current = text;
     updateProblem(text);
   };
   useEffect(() => {
-    setSelectedLanguage(readDraftLanguage(storageScope, projectId, threadId));
     const stored = readDraft(projectId, threadId, storageScope);
     problemRef.current = stored;
     updateProblem(stored);
@@ -84,17 +81,6 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   });
   const researchReadDenied = useReadAccessProtection(readKey, researchQuery.error);
   const research = researchReadDenied ? { ...researchQuery, data: undefined } : researchQuery;
-  // Keep an already observed language preference without retaining denied research content.
-  const inheritedLanguage = useRef<{ scope: string; value: ResponseLanguage | null }>({ scope: scopeIdentity, value: null });
-  if (inheritedLanguage.current.scope !== scopeIdentity) inheritedLanguage.current = { scope: scopeIdentity, value: null };
-  if (!researchReadDenied) inheritedLanguage.current.value = researchQuery.data?.value.request?.response_language ?? null;
-  const responseLanguage = selectedLanguage !== undefined ? selectedLanguage : inheritedLanguage.current.value;
-  const languageRef = useRef(responseLanguage);
-  languageRef.current = responseLanguage;
-  const chooseLanguage = (language: ResponseLanguage | null) => {
-    setSelectedLanguage(language);
-    if (!writeDraftLanguage(storageScope, projectId, threadId, language)) setDraftSaveState("UNAVAILABLE");
-  };
   const currentSignature = submissionSignature(projectId, threadId, problem, modelSelection, origin, responseLanguage ?? undefined);
   const pendingBlocksNewInput = pendingRead.kind === "INVALID" || pendingRead.kind === "PENDING" && pendingRead.value.signature !== currentSignature;
   const basis = research.data?.value.current_result?.basis_digest;
@@ -160,9 +146,6 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
       }
       problemRef.current = next;
       updateProblem(next);
-      const nextLanguage = languageRef.current !== (captured.responseLanguage ?? null) ? languageRef.current : captured.responseLanguage ?? null;
-      writeDraftLanguage(captured.scope, captured.projectId, admission.thread_id, nextLanguage);
-      if (!next) setSelectedLanguage(nextLanguage);
       onAdmitted(admission.thread_id);
       await Promise.all([
         client.invalidateQueries({ queryKey: ["threads"] }),
@@ -200,7 +183,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
       revision: -1, epoch: scopeEpoch, key: value.key, scope: storageScope });
   };
   return { research, researchReadDenied, queuedNotice, problem, setProblem, draftSaveState, draftRestoreIssue, pendingRead, pendingBlocksNewInput, pendingStorageError,
-    retryPending, modelSelection, chooseModel, clearModel, draftRevision, responseLanguage, chooseLanguage, languageSupported,
+    retryPending, modelSelection, chooseModel, clearModel, draftRevision, responseLanguage, languageSupported,
     renderedRevision: draftRevision.current, submit, resume, isCurrentScope,
     send: () => {
       if (!isCurrentScope() || !canExecute || responseLanguage !== null && !languageSupported || !problem.trim() || pendingSubmission.current?.inFlight || pendingBlocksNewInput) return;

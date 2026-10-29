@@ -1,5 +1,5 @@
 import { getLocale } from "../i18n/locale";
-import { readDraftLanguage, writeDraftLanguage } from "../api/draftLanguage";
+import { readResponseLanguageDefault } from "../api/responseLanguageDefault";
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
 import { Button, Callout, Collapse, HTMLSelect, Icon, InputGroup, Tab, Tabs, Tag } from "@blueprintjs/core";
@@ -27,6 +27,7 @@ import { workspaceSetupIssue, workspaceSetupIssueText, type WorkspaceSetupIssue 
 import { AutoRetrySwitch } from "./AutoRetrySwitch";
 import { HypothesisContractSwitch } from "./HypothesisContractSwitch";
 import { ModelCredentialPanel } from "./ModelCredentialPanel";
+import { LanguageSettingsCard } from "./LanguageSettingsCard";
 import { ModelSettings } from "./ModelSettings";
 import { ProjectWebSetup } from "./ProjectWebSetup";
 import { RecordInspector } from "./RecordInspector";
@@ -177,7 +178,7 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
       ) : (
         <section className="detail-card"><h2>{t("workspace.modelDefaults")}</h2><ModelSettings projectId={project.project_id} threadId={threadId||undefined} selection={session.modelSelection} onSelect={session.chooseModel} onSaved={()=>session.clearModel(session.renderedRevision,capturedEpoch)}/><AutoRetrySwitch projectId={project.project_id}/><HypothesisContractSwitch projectId={project.project_id}/><ModelCredentialPanel projectId={project.project_id} workspaceId={workspaceId ?? undefined}/></section>
       )}
-      <section className="detail-card"><h2>{t("language.settingsTitle")}</h2><p>{t("language.fixed")}</p><p>{t("language.cost")}</p></section>
+      <LanguageSettingsCard scope={storageScope}/>
       {!hosted && consent !== undefined && <WorkspaceInternetConsent consent={consent} focus={focusConsent} onFocused={clearConsentFocus}/>}
       <section className="detail-card"><h2>{t("workspace.usage")}</h2><p>{message("reportedTokens", status?.usage?.total_tokens?.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")??t("workspace.noUsage"), status?.usage?.state==="PARTIAL"?t("workspace.partialUsage"):"")}</p><p>{t("workspace.usagePending")}</p>{!hosted&&<><Button small minimal icon={projectDetailsOpen?"chevron-up":"settings"} onClick={()=>setProjectDetailsOpen(value=>!value)} aria-expanded={projectDetailsOpen}>{t("workspace.projectSettings")}</Button><Collapse isOpen={projectDetailsOpen}><RecordInspector value={project}/></Collapse></>}</section>
       <section className="detail-card"><h2>{hosted?t("workspace.recordsSources"):t("workspace.recordsTools")}</h2><Button minimal icon="folder-open" onClick={()=>onPage("resources")}>{t("workspace.manageSources")}</Button><Button minimal icon="history" onClick={()=>onPage("records")}>{t("workspace.history")}</Button>{!hosted&&<><Button minimal icon={developerOpen?"chevron-up":"chevron-down"} onClick={()=>setDeveloperOpen(value=>!value)} aria-expanded={developerOpen}>{t("workspace.devTools")}</Button><Collapse isOpen={developerOpen}><div className="local-developer-tools"><Button minimal icon="database" onClick={()=>onPage("raw-records")}>{t("workspace.detailedRecords")}</Button><Button minimal icon="code" onClick={()=>{setCatalogNamespace("all");onPage("capabilities");}}>{t("workspace.apiTools")}</Button><RecordInspector value={{request:status?.request,attempt:status?.attempt,budget:status?.budget,usage:status?.usage,cleanup:status?.cleanup}}/></div></Collapse></>}</section>
@@ -316,10 +317,8 @@ export function LiveProjectWorkspace() {
     if (!project) return;
     const target = threadForRow(threads, item.origin.subject_kind, item.origin.subject_id)?.thread_id ?? "";
     const draft = readDraft(project.project_id, target, storageScope);
-    const priorLanguage = readDraftLanguage(storageScope, project.project_id, target);
-    const language = draft && priorLanguage !== undefined ? priorLanguage : item.responseLanguage;
-    const question = language !== undefined && item.questionForLanguage ? item.questionForLanguage(language) : item.question;
-    if (language !== undefined) writeDraftLanguage(storageScope, project.project_id, target, language);
+    // The question is written in the response language set in Settings (the question's own language when automatic).
+    const question = item.questionForLanguage ? item.questionForLanguage(readResponseLanguageDefault(storageScope)) : item.question;
     writeDraft(project.project_id, target, fillQuestion(draft, question), storageScope);
     chooseThread(target);
     setRowOrigin({ threadId: target, origin: item.origin });
@@ -408,7 +407,7 @@ export function LiveProjectWorkspace() {
       onUserInput={cancelOpenLatest} onAdmitted={threadId=>{pendingAdmission.current=threadId;setContext(current=>({...current,threadId}));}}
       rowOrigin={rowOrigin} onOriginDone={()=>setRowOrigin(null)} onInvestigate={investigate} traceFocus={traceFocus} onOpenTrace={openTraceRow}/></WorkspaceErrorBoundary> :
       isTimelineExampleRequested() && page === "research" ? <TimelineExamplePane /> :
-      <section className="workspace-content">{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?t("workspace.missingProject"):t("workspace.taskSelectionNeeded")} {t("workspace.draftNotSent")}</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">{t("workspace.locationFailure")}</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">{t("workspace.identityMissing")}</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title={t("workspace.chooseProjectNotice")}>{t("workspace.selectForInfo")}</Callout>:<section className="detail-card"><h2>{t("workspace.connectModel")}</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">{t("workspace.selectForDefaults")}</p></section>}</>:<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</section>}
+      <section className="workspace-content">{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?t("workspace.missingProject"):t("workspace.taskSelectionNeeded")} {t("workspace.draftNotSent")}</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">{t("workspace.locationFailure")}</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">{t("workspace.identityMissing")}</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title={t("workspace.chooseProjectNotice")}>{t("workspace.selectForInfo")}</Callout>:<section className="detail-card"><h2>{t("workspace.connectModel")}</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">{t("workspace.selectForDefaults")}</p></section>}<LanguageSettingsCard scope={storageScope}/></>:<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</section>}
   </main>;
 }
 
