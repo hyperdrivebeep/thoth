@@ -18,6 +18,16 @@ from dataclasses import dataclass
 
 from thoth.domain.evidence import EvidenceSpan
 
+
+def reciprocal_rank_fusion(rankings: Sequence[Sequence[str]]) -> tuple[str, ...]:
+    """Equal-weight span RRF, k=60, ranks from one; repeated IDs vote once per lane."""
+    scores: dict[str, float] = {}
+    for ranking in rankings:
+        for rank, reference in enumerate(dict.fromkeys(ranking), 1):
+            scores[reference] = scores.get(reference, 0.0) + 1.0 / (60 + rank)
+    return tuple(sorted(scores, key=lambda reference: (-scores[reference], reference)))
+
+
 FUSION_METHOD = "ROUND_ROBIN_DEDUP"
 FUSION_VERSION = "1.0.0"
 

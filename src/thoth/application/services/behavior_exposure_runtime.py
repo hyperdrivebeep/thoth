@@ -1,5 +1,6 @@
 """Bounded use of approved canaries and non-authoritative policy shadows."""
 
+from thoth.application.services.behavior_exposure_compilation import compile_exposure_policy
 from thoth.application.services.improvement_exposure_service import ImprovementExposureService
 from thoth.domain.behavior_artifact import BehaviorArtifactKind
 from thoth.domain.behavior_execution import (
@@ -79,7 +80,11 @@ class BehaviorExposureRuntime:
         artifact = self._behaviors.read(record.spec.project_id, record.spec.candidate_artifact_ref)
         if artifact is None:
             raise BehaviorPolicyError("BEHAVIOR_ARTIFACT_CHANGED")
-        policy = self._components.resolve(artifact.kind, artifact.version).compile(artifact.content)
+        policy = compile_exposure_policy(
+            self._components.resolve(artifact.kind, artifact.version),
+            artifact.content,
+            record.spec.stage,
+        )
         data = base.model_dump(mode="python", exclude={"snapshot_digest"})
         data.update(
             artifact_ref=artifact.artifact_id,

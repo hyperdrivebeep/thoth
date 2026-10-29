@@ -17,6 +17,9 @@ from thoth.domain.enums import AuthorityState, CutoffState
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
 from thoth.domain.glossary import GlossaryConfidence, GlossaryEntry, entry_matches_its_id
 from thoth.domain.ids import Sha256
+from thoth.domain.retrieval_embedding import DenseMaterial
+from thoth.domain.retrieval_routing_policy import FusionMethodSpec as FusionMethodSpec
+from thoth.domain.retrieval_routing_policy import RetrievalRoutingPolicy as RetrievalRoutingPolicy
 
 
 class PromptBehaviorPolicy(DomainModel):
@@ -108,13 +111,6 @@ class FusedLaneSpec(DomainModel):
         return data
 
 
-class FusionMethodSpec(DomainModel):
-    """How the lanes of a fused policy are merged; a new method is a new id or version."""
-
-    method_id: Literal["ROUND_ROBIN_DEDUP"] = "ROUND_ROBIN_DEDUP"
-    method_version: Literal["1.0.0"] = "1.0.0"
-
-
 class RetrievalFusionPolicy(DomainModel):
     """Retrieval policy 4.0.0: two to four lanes, each with a fixed depth, merged by one method.
 
@@ -132,6 +128,8 @@ class RetrievalFusionPolicy(DomainModel):
 
     @model_validator(mode="after")
     def _distinct_lanes(self) -> "RetrievalFusionPolicy":
+        if self.fusion.method_id != "ROUND_ROBIN_DEDUP":
+            raise ValueError("RETRIEVAL_FUSION_VERSION_UNSUPPORTED")
         if len({lane.lane_id for lane in self.lanes}) != len(self.lanes):
             raise ValueError("RETRIEVAL_POLICY_LANE_DUPLICATED")
         return self
@@ -143,12 +141,20 @@ class WorkflowBehaviorPolicy(DomainModel):
     max_semantic_repairs: Literal[0, 1] = 1
 
 
-RetrievalPolicy = RetrievalBehaviorPolicy | RetrievalLanePolicy | RetrievalFusionPolicy
+RetrievalPolicy = (
+    RetrievalBehaviorPolicy | RetrievalLanePolicy | RetrievalFusionPolicy | RetrievalRoutingPolicy
+)
 
 
 def is_retrieval_policy(value: object) -> TypeGuard[RetrievalPolicy]:
     """The one place that says which policy classes are retrieval policies."""
-    return isinstance(value, RetrievalBehaviorPolicy | RetrievalLanePolicy | RetrievalFusionPolicy)
+    return isinstance(
+        value,
+        RetrievalBehaviorPolicy
+        | RetrievalLanePolicy
+        | RetrievalFusionPolicy
+        | RetrievalRoutingPolicy,
+    )
 
 
 def _policy_tag(value: object) -> str | None:
@@ -166,6 +172,7 @@ BehaviorPolicy = Annotated[
     | Annotated[RetrievalBehaviorPolicy, Tag("RETRIEVAL_POLICY:2.0.0")]
     | Annotated[RetrievalLanePolicy, Tag("RETRIEVAL_POLICY:3.0.0")]
     | Annotated[RetrievalFusionPolicy, Tag("RETRIEVAL_POLICY:4.0.0")]
+    | Annotated[RetrievalRoutingPolicy, Tag("RETRIEVAL_POLICY:5.0.0")]
     | Annotated[WorkflowBehaviorPolicy, Tag("WORKFLOW_DEFINITION:2.0.0")],
     Discriminator(_policy_tag),
 ]
@@ -363,6 +370,7 @@ class RetrievalBehaviorInput(DomainModel):
     queries: tuple[str, ...] = Field(default=(), max_length=32)
     catalog: RetrievalCatalogInput | None = None
     glossary: RetrievalGlossaryInput | None = None
+    dense: DenseMaterial | None = None
 
     @model_serializer(mode="wrap")
     def _omit_no_glossary(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
@@ -370,6 +378,8 @@ class RetrievalBehaviorInput(DomainModel):
         data = cast(dict[str, Any], handler(self))
         if self.glossary is None:
             data.pop("glossary", None)
+        if self.dense is None:
+            data.pop("dense", None)
         return data
 
     @model_validator(mode="after")
