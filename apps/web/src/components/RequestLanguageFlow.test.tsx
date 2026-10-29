@@ -5,6 +5,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useResearchSession } from "./useResearchSession";
 import { setLocale } from "../i18n/locale";
+import { writeResponseLanguageDefault } from "../api/responseLanguageDefault";
 
 const state = vi.hoisted(() => ({ fail: true, calls: [] as { method: string; params: Record<string, unknown>; key: string }[] }));
 vi.mock("../api/rpcClient", () => ({ rpc: async (method: string, params: Record<string, unknown>, key: string) => {
@@ -33,6 +34,7 @@ let node: HTMLDivElement;
 let client: QueryClient;
 beforeEach(async () => {
   localStorage.clear(); sessionStorage.clear(); state.calls.length = 0; state.fail = true;
+  writeResponseLanguageDefault(scope, "ko");
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
   client = new QueryClient({defaultOptions: {queries: {retry: false, staleTime: Infinity}, mutations: {retry: false}}});
   client.setQueryData(["workspace-ready"], {value: { response_languages: ["ko", "en"], response_language_scope: "REQUEST" }});
@@ -44,14 +46,14 @@ afterEach(async () => { await act(async () => root.unmount()); client.clear(); n
 
 it("changes only the next draft while an uncertain submission replays its frozen language and key", async () => {
   expect(session.responseLanguage).toBe("ko");
-  await act(async () => { session.chooseLanguage("en"); });
+  await act(async () => { writeResponseLanguageDefault(scope, "en"); });
   await act(async () => { session.setProblem("한국어 질문 원문"); });
   await act(async () => { session.send(); });
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)); });
   const first = state.calls.find(call => call.method === "thread/input")!;
   expect(first.params.response_language).toBe("en");
   expect(first.params.instruction).toBe("한국어 질문 원문");
-  await act(async () => { session.chooseLanguage("ko"); });
+  await act(async () => { writeResponseLanguageDefault(scope, "ko"); });
   expect(session.pendingBlocksNewInput).toBe(true);
   const before = state.calls.length;
   await act(async () => { setLocale("en"); session.send(); });

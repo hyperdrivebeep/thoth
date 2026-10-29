@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, expect, it } from "vitest";
 import { readDraft, writeDraft } from "./conversation";
-import { readDraftLanguage, writeDraftLanguage } from "./draftLanguage";
+import { readResponseLanguageDefault, writeResponseLanguageDefault } from "./responseLanguageDefault";
 import { submissionSignature, type PendingSubmission } from "./localWorkspacePersistence";
 import { clearSubmission, readSubmission, writeSubmission } from "./submissionPersistence";
 
@@ -18,10 +18,11 @@ it("isolates hosted pending payloads and drafts by the server's opaque session s
   expect(readSubmission(b, "p", "t")).toEqual({kind: "NONE"});
   expect(writeSubmission(b, record)).toBe("UNAVAILABLE");
   writeDraft("p", "t", "original draft", a);
-  writeDraftLanguage(a, "p", "t", "en");
+  writeResponseLanguageDefault(a, "en");
   expect(readDraft("p", "t", a)).toBe("original draft");
   expect(readDraft("p", "t", b)).toBe("");
-  expect(readDraftLanguage(b, "p", "t")).toBeUndefined();
+  expect(readResponseLanguageDefault(a)).toBe("en");
+  expect(readResponseLanguageDefault(b)).toBeNull();
   expect(localStorage.length).toBe(0);
   expect(clearSubmission(b, "p", "t")).toBe(true);
   expect(readSubmission(a, "p", "t")).toEqual({kind: "PENDING", value: record});

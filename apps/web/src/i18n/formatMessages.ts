@@ -30,6 +30,7 @@ const formats = {
     en: (name: string) => `Archive project "${name}"? It becomes read-only and is hidden from the list. You can restore it from archived projects.`,
   },
   cutoff: { ko: (value: string | null) => `기준시점 ${value}`, en: (value: string | null) => `Cutoff ${value}` },
+  replyFixed: { ko: (language: string) => `답변: ${language} 고정`, en: (language: string) => `Reply: ${language} (fixed)` },
   missingSelection: { ko: (kind: "project" | "thread") => `저장된 ${kind === "project" ? "프로젝트" : "작업"} 선택 확인 필요`, en: (kind: "project" | "thread") => `Check the saved ${kind === "project" ? "project" : "task"} selection` },
 } as const;
 

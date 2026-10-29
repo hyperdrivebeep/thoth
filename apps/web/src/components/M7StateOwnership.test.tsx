@@ -4,7 +4,7 @@ import { act, type ReactNode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { readDraft, writeDraft } from "../api/conversation";
-import { readDraftLanguage, writeDraftLanguage } from "../api/draftLanguage";
+import { readResponseLanguageDefault, writeResponseLanguageDefault } from "../api/responseLanguageDefault";
 import { saveWorkspaceContext } from "../api/research";
 import { setLocale, t, type Locale } from "../i18n/locale";
 import { FileConnectionPanel } from "./FileConnectionPanel";
@@ -229,7 +229,7 @@ it.each([["ko", "en"], ["en", "ko"]] as const)("W3 existing storage errors follo
   setLocale(from);
   saveWorkspaceContext("p", "t", scope("A"));
   writeDraft("p", "t", "Synthetic unchanged draft", scope("A"));
-  writeDraftLanguage(scope("A"), "p", "t", "en");
+  writeResponseLanguageDefault(scope("A"), "en");
   await mount(<LiveProjectWorkspace />);
   await settle(() => editor()?.value === "Synthetic unchanged draft" && client.isFetching() === 0);
   const original = Storage.prototype.setItem;
@@ -251,5 +251,5 @@ it.each([["ko", "en"], ["en", "ko"]] as const)("W3 existing storage errors follo
   expect(fixture.calls).toHaveLength(callCount);
   expect(after).toEqual(stored);
   expect(editor()?.value).toBe("Synthetic unchanged draft");
-  expect(readDraftLanguage(scope("A"), "p", "t")).toBe("en");
+  expect(readResponseLanguageDefault(scope("A"))).toBe("en");
 });
