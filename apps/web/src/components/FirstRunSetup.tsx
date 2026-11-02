@@ -16,6 +16,7 @@ import { OAuthLoginFlow } from "./OAuthLoginFlow";
 import { localCredentialWorkspaceId } from "./localCredentialWorkspace";
 import { workspaceSetupIssue, workspaceSetupIssueText } from "./workspaceSetupIssue";
 import { WorkspaceLocationNotice } from "./WorkspaceLocationNotice";
+import { useDraftGeneration, type DraftTicket } from "./useDraftGeneration";
 
 const toneIntent: Record<ProviderTone, "success" | "primary" | "none" | "warning"> = {
   ready: "success", pending: "primary", action: "none", blocked: "warning",
@@ -41,14 +42,16 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
       ),
   });
   const connect = useMutation({
-    mutationFn: (input: Record<string, string>) =>
+    mutationFn: ({ input }: { input: Record<string, string>; ticket: DraftTicket }) =>
       rpc<CredentialRegisterResult>(
         "model/credential/register",
         { project_id: "system:workspace", ...input },
         crypto.randomUUID(),
       ),
-    onSuccess: async (result) => {
-      if (result.value?.credential) { setApiKey(""); setKeyProvider(null); }
+    onSuccess: async (result, submitted) => {
+      if (result.value?.credential && submitted.input.api_key !== undefined && keyOwnership.isCurrent(submitted.ticket)) {
+        keyOwnership.advance(); setApiKey(""); setKeyProvider(null);
+      }
       await Promise.all([
         client.invalidateQueries({ queryKey: ["model-credentials", "system:workspace"] }),
         client.invalidateQueries({ queryKey: ["model-settings"] }),
@@ -85,6 +88,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
   const [step, setStep] = useState<"model" | "internet">("model");
   const [keyProvider, setKeyProvider] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState("");
+  const keyOwnership = useDraftGeneration(`${credentialWorkspaceId ?? "unknown"}:${keyProvider ?? ""}`);
   const currentStep = hosted ? "internet" : step;
 
   if (setupIssue) return <main className="first-run-shell bp6-dark">
@@ -130,7 +134,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                       <strong>{company.label}</strong>
                       <Tag minimal round intent={toneIntent[status.tone]}>{status.label}</Tag>
                       <Button className="provider-key-toggle" small minimal icon="key" aria-expanded={keyOpen}
-                        onClick={() => { setKeyProvider(keyOpen ? null : company.provider); setApiKey(""); }}>
+                        onClick={() => { keyOwnership.advance(); setKeyProvider(keyOpen ? null : company.provider); setApiKey(""); }}>
                         {keyOpen ? t("setup.closeKey") : t("setup.useKey")}
                       </Button>
                     </header>
@@ -138,7 +142,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                     <div className="first-run-provider-body">
                       {needsModelRefresh(row) && <Button intent="primary" loading={loadModels.isPending}
                         onClick={() => loadModels.mutate()}>{t("setup.loadModels")}</Button>}
-                      {legacyAction && <Button disabled={!canStartLogin && !canGuideKey} loading={connect.isPending} onClick={() => connect.mutate({ provider: company.provider })}>
+                      {legacyAction && <Button disabled={!canStartLogin && !canGuideKey} loading={connect.isPending} onClick={() => connect.mutate({ input: { provider: company.provider }, ticket: keyOwnership.capture() })}>
                         {loginUnavailable(row) ? t("setup.checkVersion") : row?.connection_state === "LOGIN_PENDING" ? t("setup.waitLogin") : row?.oauth && loginSupported(row) ? t("setup.loggedIn") : canStartLogin ? t("setup.startCodex") : canGuideKey ? t("setup.keyGuide") : t("setup.checkMethods")}
                       </Button>}
                       {xaiLogin && <XaiDeviceLogin key={`${credentialWorkspaceId ?? "unknown"}:system:workspace`}
@@ -160,7 +164,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                           type="password"
                           placeholder={keyPlaceholder[company.provider] ?? t("setup.apiKey")}
                           value={apiKey}
-                          onChange={(event) => setApiKey(event.target.value)}
+                          onChange={(event) => { keyOwnership.advance(); setApiKey(event.target.value); }}
                           aria-label={message("apiKeyLabel", company.label)}
                         />
                         <Button
@@ -168,7 +172,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                           disabled={!apiKey}
                           loading={connect.isPending}
                           onClick={() => {
-                            connect.mutate({ provider: company.provider, api_key: apiKey });
+                            connect.mutate({ input: { provider: company.provider, api_key: apiKey }, ticket: keyOwnership.capture() });
                           }}
                         >
                           {t("setup.registerKey")}

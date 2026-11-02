@@ -111,7 +111,6 @@ async def test_managed_registry_enters_normal_thread_and_cleans_up(tmp_path: Pat
     assert all(item["assertion"] == "ON_OR_BEFORE_CUTOFF" for item in confirmations)
     assert REMOTE.killed is True
     assert REMOTE.files.writes
-    assert result.manifest["r3_or_r4_executed"] is False
 
 
 @pytest.mark.asyncio

@@ -8,7 +8,7 @@ import { LiveProjectWorkspace } from "./LiveProjectWorkspace";
 const fixture = vi.hoisted(() => ({ calls: [] as {method: string; input: Record<string, unknown>; key:string}[],
   effort: "low", pending: null as null | (() => void), delay: false, failOnce:false, unavailable:false,
   reason:"MODEL_CAPABILITY_UNKNOWN", saved:{provider:"retired",model:"old-model",reasoning_effort:"high"}, inheritThread:false, projectSettingsDenied:false, threadDenied:false, includeXaiModel:false, catalogStatus: [] as unknown[], optionExtra: {} as Record<string, unknown> }));
-vi.mock("../api/rpcClient", async (importOriginal) => ({ ...(await importOriginal<typeof import("../api/rpcClient")>()), cancelRpcOperation: vi.fn(),
+vi.mock("../api/rpcClient", async (importOriginal) => ({ ...(await importOriginal<typeof import("../api/rpcClient")>()),
   rpc: async (method: string, input: Record<string, unknown>, key:string) => {
     fixture.calls.push({method, input,key});
     let value: unknown = {};

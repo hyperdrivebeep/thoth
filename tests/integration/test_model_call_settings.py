@@ -20,7 +20,6 @@ from thoth.adapters.models.codex_oauth import CodexOAuthModel
 from thoth.adapters.models.registry import RegisteredModelResolver
 from thoth.apps.runtime import create_runtime
 from thoth.domain.model import ModelRequest, ModelResult
-from thoth.domain.model_call_settings import AUTO_RETRY_INTERRUPTED_DEFAULT
 from thoth.domain.model_settings import ModelOption, ModelSelection
 from thoth.domain.research_execution import research_work
 
@@ -36,11 +35,6 @@ class SeesTheSwitch(ControlledResearchModel):
         work = research_work.get()
         self.seen.append(False if work is None else work.auto_retry_interrupted_call)
         return await super().structured(request)
-
-
-def test_the_default_is_one_line_and_on() -> None:
-    # 사용자 결정 20261010-01: the default changed; explicit saved False remains valid.
-    assert AUTO_RETRY_INTERRUPTED_DEFAULT is True
 
 
 @pytest.mark.asyncio

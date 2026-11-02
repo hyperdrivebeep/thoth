@@ -18,6 +18,7 @@ from thoth.application.services.connector_service import ConnectorService
 from thoth.application.services.full_project_memory import FullProjectMemoryService
 from thoth.application.services.operation_journal import OperationJournal
 from thoth.application.services.scoped_artifacts import ScopedArtifactLedger
+from thoth.apps.local_retrieval_composition import create_local_retrieval
 from thoth.apps.research_entry_composition import ResearchEntryComposition, create_research_entry
 from thoth.apps.research_runtime import ResearchComponents
 from thoth.apps.resource_scope_composition import scope_bus
@@ -141,8 +142,14 @@ def assemble_runtime_entry(
             ),
         )
         register_research_operations(registration.registry, research_component.entry)
+        local_retrieval = create_local_retrieval(
+            registration.registry, stores, artifact_ledger, clock, ids, workspace, mode
+        )
         return RuntimeWithLedger(
-            bus=bus, ledger=ledger, close_storage=research_component.close_storage
+            bus=bus,
+            ledger=ledger,
+            close_storage=research_component.close_storage,
+            local_retrieval=local_retrieval,
         )
     except BaseException as original:
         _release_failed_startup(bus, research_component, original)

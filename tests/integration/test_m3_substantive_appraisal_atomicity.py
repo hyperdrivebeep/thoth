@@ -32,7 +32,6 @@ from thoth.apps.runtime import create_runtime
 from thoth.ports.model import ModelPort
 from thoth.protocol.deferred import current_operation
 
-_OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step70-20261014"
 _POINTS = {
     "add_assessment": (SqliteTestValidityStore, "research_test_assessments", "assessment_id"),
     "add_test_binding": (SqliteHypothesisStore, "hypothesis_test_bindings", "test_binding_id"),
@@ -41,13 +40,6 @@ _POINTS = {
     "insert_receipt": (SqliteLedgerTransaction, "receipts", "receipt_id"),
     "append_audit": (SqliteHypothesisStore, "hypothesis_audit", "audit_id"),
 }
-
-
-def _save(point: str, evidence: dict[str, Any]) -> None:
-    _OUT.mkdir(parents=True, exist_ok=True)
-    (_OUT / f"phase-{point}.json").write_text(
-        json.dumps(evidence, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 @pytest.mark.parametrize("point", ["normal", *_POINTS])
@@ -253,7 +245,6 @@ async def test_post_io_acceptance_is_atomic_and_does_not_repeat_execution(
         evidence["response"] = response.model_dump(mode="json")
         evidence["terminal"] = snapshot(runtime.ledger.engine)
         evidence["sandbox_runs"] = len(sandbox.seen_specs)
-        _save(point, evidence)
         # All verdicts are outside wrappers so product catch-all cannot swallow them.
         assert phase_attempt and len(phase_attempt) == 1
         assert evidence["ambient_at_entry"] is False
@@ -343,7 +334,6 @@ async def test_post_io_acceptance_is_atomic_and_does_not_repeat_execution(
                 assert hypothesis.empirical_appraisal in {"EVIDENCE_FAVORS", "EVIDENCE_AGAINST"}
             else:
                 assert hypothesis.empirical_appraisal == "UNASSESSED" and not hypothesis.test_refs
-        _save(point, evidence)
     finally:
         runtime.close()
     reopened = create_runtime(
@@ -353,7 +343,6 @@ async def test_post_io_acceptance_is_atomic_and_does_not_repeat_execution(
     )
     try:
         evidence["reopened"] = snapshot(reopened.ledger.engine)
-        _save(point, evidence)
         assert evidence["reopened"] == evidence["terminal"]
         replay = await reopened.bus.dispatch(command)
         evidence["replay"] = replay.model_dump(mode="json")
@@ -374,6 +363,5 @@ async def test_post_io_acceptance_is_atomic_and_does_not_repeat_execution(
             )
             assert len(sandbox.seen_specs) == 1
         evidence["verdict"] = "PASS"
-        _save(point, evidence)
     finally:
         reopened.close()

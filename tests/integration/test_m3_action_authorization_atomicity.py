@@ -32,7 +32,6 @@ from thoth.adapters.storage.sqlite import SqliteLedgerTransaction
 from thoth.adapters.storage.transaction import read_connection
 from thoth.protocol.deferred import current_operation
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step89-20261014"
 BOOKKEEPING = {"operations", "idempotency_keys", "events", "operation_resource_bindings"}
 LEDGER_POINTS = ("insert_snapshot", "insert_revision", "set_head", "insert_receipt")
 WRITERS = {
@@ -73,13 +72,6 @@ CONTENT: dict[str, Any] = {
     "body_text": "89b protected body",
     "attachments": [{"name": "request.pdf", "digest": "1" * 64}],
 }
-
-
-def save(name: str, data: dict[str, Any]) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / (name + ".json")).write_text(
-        json.dumps(data, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 async def call(runtime: Any, method: str, key: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -516,7 +508,6 @@ async def test_authorization_post_write_failure_is_atomic(
         assert "action_authorizations" in participants
         if kind == "stale":
             assert {"action_plans", "semantic_revisions"} <= participants
-        save(key, evidence)
     finally:
         runtime.close()
     reopened = create_runtime(tmp_path)
@@ -545,7 +536,6 @@ async def test_authorization_post_write_failure_is_atomic(
             assert views_before["authorization"].get("consumed_at") is None
             assert after_retry["authorization"]["state"] == "CONSUMED"
             assert row_count(reopened, step_execution_attempts) == 1
-        save(key, {**evidence, "verdict": "PASS", "replay_exact": True})
     finally:
         reopened.close()
 
@@ -644,7 +634,6 @@ async def test_authorization_lifecycle_control(tmp_path: Path) -> None:
         assert consumed["state"] == "CONSUMED" and consumed["consumed_at"] is not None
         expected = await views(runtime, ctx, "89b-live")
         persisted = snapshot(runtime.ledger.engine)
-        save("control-authorization-lifecycle", {"views": expected})
     finally:
         runtime.close()
     reopened = create_runtime(tmp_path)

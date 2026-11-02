@@ -1,5 +1,6 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Literal
 
@@ -250,12 +251,25 @@ async def test_read_only_actor_cannot_execute_index_work(tmp_path: Path):
         x.stores.close()
 
 
-async def test_project_drain_has_one_cumulative_job_budget(tmp_path: Path):
+async def test_project_drain_has_one_cumulative_job_budget(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    elapsed = [0.0]
+    loop = asyncio.get_running_loop()
+    origin = loop.time()
+    stamp = SystemClock().now()
+
+    class Clock:
+        def now(self) -> datetime:
+            return stamp + timedelta(seconds=elapsed[0])
+
     class SlowWorker(FakeWorker):
         async def encode_one(
             self, text: str, *, role: Literal["QUERY", "PASSAGE"]
         ) -> EmbeddingVector:
-            await asyncio.sleep(0.6)
+            # Deterministic elapsed encoding time; SQLite/CI scheduling is not the subject.
+            elapsed[0] += 0.6
             return await super().encode_one(text, role=role)
 
     x = fixture(tmp_path)
@@ -263,13 +277,16 @@ async def test_project_drain_has_one_cumulative_job_budget(tmp_path: Path):
         worker = SlowWorker()
         worker.budget = worker.budget.model_copy(update={"job_timeout_ms": 1000})
         x.service.worker = worker
+        x.service.clock = Clock()
         x.service.configure(PROJECT, True, 1)
         x.ingest("a")
         x.ingest("b")
-        started = asyncio.get_running_loop().time()
-        with pytest.raises(TimeoutError):
-            await x.service.drain(PROJECT)
-        assert asyncio.get_running_loop().time() - started < 1.8
+        with monkeypatch.context() as patch:
+            patch.setattr(loop, "time", lambda: origin + elapsed[0])
+            started = loop.time()
+            with pytest.raises(TimeoutError):
+                await x.service.drain(PROJECT)
+            assert loop.time() - started < 1.8
         assert sorted(j.state for j in x.stores.embedding_index.jobs(PROJECT)) == [
             "FAILED",
             "READY",

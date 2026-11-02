@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "scripts" / "check_module_budget.py"
 
@@ -87,15 +89,14 @@ def test_new_long_function_fails(tmp_path: Path) -> None:
     assert "long-function ratchet changed" in result.stdout
 
 
-def test_shrunk_module_requires_lower_ratchet_baseline(tmp_path: Path) -> None:
+def test_shrunk_module_passes_without_rewriting_baseline(tmp_path: Path) -> None:
     module = tmp_path / "src/thoth/watched.py"
     module.parent.mkdir(parents=True)
     module.write_text("def kept():\n    return 1\n", encoding="utf-8")
     manifest = tmp_path / "budget.json"
     _write_manifest(manifest, baseline=5, symbols=["kept"])
     result = _run(tmp_path, manifest)
-    assert result.returncode == 1
-    assert "watched module shrank" in result.stdout
+    assert result.returncode == 0, result.stdout
 
 
 def test_new_top_level_responsibility_fails(tmp_path: Path) -> None:
@@ -151,7 +152,7 @@ def test_new_oversized_web_file_fails(tmp_path: Path) -> None:
     assert "Small.ts" not in result.stdout
 
 
-def test_watched_web_file_may_not_grow_and_must_lower_its_baseline_when_it_shrinks(
+def test_watched_web_file_may_shrink_but_not_exceed_its_baseline(
     tmp_path: Path,
 ) -> None:
     _web_file(tmp_path, "api/progress.ts", 7)
@@ -163,8 +164,7 @@ def test_watched_web_file_may_not_grow_and_must_lower_its_baseline_when_it_shrin
     assert grown.returncode == 1 and "watched module grew" in grown.stdout
     _web_file(tmp_path, "api/progress.ts", 6)
     shrunk = _run(tmp_path, manifest)
-    assert shrunk.returncode == 1 and "watched module shrank" in shrunk.stdout
-    assert "update/refactor the ratchet" in shrunk.stdout
+    assert shrunk.returncode == 0, shrunk.stdout
 
 
 def test_web_test_files_are_not_measured_but_other_suffixes_are(tmp_path: Path) -> None:
@@ -204,7 +204,7 @@ def test_the_repository_limit_is_600_lines_and_the_function_limit_is_unchanged()
     assert manifest["web_excluded_suffixes"] == [".test.ts", ".test.tsx"]
 
 
-def test_every_oversized_repository_file_is_watched_with_its_exact_current_length() -> None:
+def test_every_oversized_repository_file_stays_within_its_reviewed_ceiling() -> None:
     manifest = json.loads((ROOT / "config/module-responsibility-budget.json").read_text("utf-8"))
     limit = manifest["module_line_limit"]
     measured = {
@@ -221,4 +221,36 @@ def test_every_oversized_repository_file_is_watched_with_its_exact_current_lengt
     watched = manifest["watched_modules"]
     assert oversized <= set(watched), sorted(oversized - set(watched))
     for name, definition in watched.items():
-        assert definition["baseline_lines"] == measured[name], name
+        assert measured[name] <= definition["baseline_lines"], name
+
+
+@pytest.mark.parametrize("lines,expected_exit", [(3, 0), (4, 0), (5, 1)])
+def test_watched_function_can_shrink_below_limit_but_cannot_grow(
+    tmp_path: Path, lines: int, expected_exit: int
+) -> None:
+    module = tmp_path / "src/thoth/watched.py"
+    module.parent.mkdir(parents=True)
+    module.write_text("def kept():\n" + "    value = 1\n" * (lines - 1), encoding="utf-8")
+    manifest = tmp_path / "budget.json"
+    _write_manifest(manifest, baseline=10, symbols=["kept"])
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+    payload["watched_long_functions"] = {"src/thoth/watched.py::kept": 4}
+    manifest.write_text(json.dumps(payload), encoding="utf-8")
+    result = _run(tmp_path, manifest)
+    assert result.returncode == expected_exit, result.stdout
+
+
+@pytest.mark.parametrize(
+    "source",
+    ["def kept():\n    pass\n", "def second():\n    pass\ndef kept():\n    pass\n"],
+)
+def test_removing_or_reordering_helpers_does_not_add_responsibility(
+    tmp_path: Path, source: str
+) -> None:
+    module = tmp_path / "src/thoth/watched.py"
+    module.parent.mkdir(parents=True)
+    module.write_text(source, encoding="utf-8")
+    manifest = tmp_path / "budget.json"
+    _write_manifest(manifest, baseline=5, symbols=["kept", "second"])
+    result = _run(tmp_path, manifest)
+    assert result.returncode == 0, result.stdout

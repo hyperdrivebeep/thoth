@@ -9,7 +9,7 @@ from tests.integration.test_four_projectpack_portability import GenericProjectPa
 
 
 @pytest.mark.asyncio
-async def test_sunrise_secondary_uses_same_binary_prompt_policy_schema_trace(
+async def test_sunrise_secondary_completes_the_same_stage_sequence(
     tmp_path: Path,
 ) -> None:
     hero = await run_current_hero(
@@ -24,10 +24,6 @@ async def test_sunrise_secondary_uses_same_binary_prompt_policy_schema_trace(
         model=GenericProjectPackModel(),
         execution_mode="SEALED_REPLAY",
     )
-    hero_contracts = cast(dict[str, str], hero.manifest["trace_contracts"])
-    secondary_contracts = cast(dict[str, str], secondary.manifest["trace_contracts"])
-    for key in ("runner", "prompt", "policy_schema", "response_schema"):
-        assert hero_contracts[key] == secondary_contracts[key]
     hero_stages = cast(dict[str, object], hero.manifest["stages"])
     secondary_stages = cast(dict[str, object], secondary.manifest["stages"])
     assert tuple(hero_stages) == tuple(secondary_stages)

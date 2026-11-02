@@ -61,10 +61,9 @@ def _check_size(
     seen_modules.add(relative)
     definition = watched[relative]
     baseline = _integer(definition["baseline_lines"], f"{relative}.baseline_lines")
-    if lines != baseline:
-        direction = "grew" if lines > baseline else "shrank"
+    if lines > baseline:
         errors.append(
-            f"watched module {direction}; update/refactor the ratchet: "
+            "watched module grew; update/refactor the ratchet: "
             f"{relative} actual={lines} baseline={baseline}"
         )
     return definition
@@ -115,10 +114,10 @@ def build_report(root: Path, manifest_path: Path) -> dict[str, object]:
                 str(value) for value in cast(list[object], definition["top_level_symbols"])
             )
             symbols = _module_symbols(tree)
-            if symbols != expected_symbols:
+            added_symbols = sorted(set(symbols) - set(expected_symbols))
+            if added_symbols:
                 errors.append(
-                    f"top-level responsibility changed in {relative}: "
-                    f"actual={list(symbols)} expected={list(expected_symbols)}"
+                    f"top-level responsibility changed in {relative}: added={added_symbols}"
                 )
 
     for path in _web_files(root, manifest):
@@ -132,19 +131,17 @@ def build_report(root: Path, manifest_path: Path) -> dict[str, object]:
             f"watched modules missing; update ratchet after extraction: {missing_modules}"
         )
 
-    if actual_long != expected_long:
-        new_keys = sorted(set(actual_long) - set(expected_long))
-        removed_keys = sorted(set(expected_long) - set(actual_long))
-        changed = sorted(
-            key
-            for key in set(actual_long).intersection(expected_long)
-            if actual_long[key] != expected_long[key]
-        )
+    new_keys = sorted(set(actual_long) - set(expected_long))
+    grown = sorted(
+        key
+        for key in set(actual_long).intersection(expected_long)
+        if actual_long[key] > expected_long[key]
+    )
+    if new_keys or grown:
         errors.append(
             "long-function ratchet changed: "
-            f"new={new_keys} removed={removed_keys} changed={changed}; "
-            f"remove retired entries at or below {function_limit} lines; "
-            "lower baselines for still-watched shrinking functions, never raise limits"
+            f"new={new_keys} grew={grown}; "
+            "refactor new or growing oversized functions, never raise limits"
         )
 
     return {

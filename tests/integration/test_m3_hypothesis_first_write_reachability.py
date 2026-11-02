@@ -39,15 +39,6 @@ from thoth.domain.resource_scope import current_resource_uses
 from thoth.ports.model import ModelPort
 from thoth.protocol.deferred import current_operation
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step87-20261014"
-
-
-def save(case: str, evidence: dict[str, Any]) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / (case + ".json")).write_text(
-        json.dumps(evidence, indent=2, default=str) + "\n", encoding="utf-8"
-    )
-
 
 def rows_for(connection: Any, project: str, assessment: Any) -> dict[str, Any]:
     assessments = list(
@@ -151,7 +142,6 @@ async def test_native_first_binding_visibility_and_post_persist_rollback(
             )
             if not distinct:
                 evidence["observer_errors"].append("writer and observer share a DBAPI connection")
-                save(case, evidence)
                 raise RuntimeError("HOLD_CONTRACT_MISMATCH: observer connection is not independent")
             window["inside"] = rows_for(internal, project, assessment)
             started = perf_counter()
@@ -165,7 +155,6 @@ async def test_native_first_binding_visibility_and_post_persist_rollback(
                 }
                 evidence["observer_errors"].append(window["external_error"])
                 evidence["windows"].append(window)
-                save(case, evidence)
                 raise RuntimeError(
                     "HOLD_CONTRACT_MISMATCH: SQLite observer read failed; settings unchanged"
                 ) from exc
@@ -175,7 +164,6 @@ async def test_native_first_binding_visibility_and_post_persist_rollback(
                 external.rollback()
             window["resource_uses_unchanged"] = before_uses == current_resource_uses()
         evidence["windows"].append(window)
-        save(case, evidence)
 
     @contextmanager
     def accept(
@@ -203,7 +191,6 @@ async def test_native_first_binding_visibility_and_post_persist_rollback(
             evidence["same_injected_exception"] = exc is injected
             evidence["trace"].append("original_accept_rolled_back")
             evidence["after_phase"] = snapshot(runtime.ledger.engine)
-            save(case, evidence)
             raise
         else:
             evidence["trace"].append("original_accept_committed")
@@ -277,7 +264,6 @@ async def test_native_first_binding_visibility_and_post_persist_rollback(
             response = await runtime.bus.dispatch(command)
             evidence["response"] = response.model_dump(mode="json")
             evidence["terminal"] = snapshot(runtime.ledger.engine)
-            save(case, evidence)
             assert not evidence["observer_errors"], (
                 "HOLD_CONTRACT_MISMATCH: independent SQLite observation failed"
             )
@@ -358,7 +344,6 @@ async def test_native_first_binding_visibility_and_post_persist_rollback(
         external.rollback()
         assert evidence["sqlite_settings_before"] == evidence["sqlite_settings_after"]
         persisted = snapshot(runtime.ledger.engine)
-        save(case, evidence)
     finally:
         external.close()
         runtime.close()
@@ -396,7 +381,6 @@ async def test_native_first_binding_visibility_and_post_persist_rollback(
             replay_exact=True,
             sandbox_execution_count=len(sandbox.seen_specs),
         )
-        save(case, evidence)
     finally:
         reopened.close()
 

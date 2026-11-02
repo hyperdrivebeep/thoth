@@ -33,7 +33,6 @@ from thoth.application.services.research_identity_service import ResearchIdentit
 from thoth.application.services.revision_service import RevisionCommitService
 from thoth.domain.sandbox import SandboxExecutionState
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step98-20261015"
 Snapshot = dict[str, tuple[str, ...]]
 T1_FAULTS: dict[str, tuple[type[object], str]] = {
     "commit": (RevisionCommitService, "commit"),
@@ -45,13 +44,6 @@ T3_FAULTS: dict[str, tuple[type[object], str]] = {
     "revision": (SqliteLedgerTransaction, "insert_revision"),
 }
 SEMANTIC = (SandboxExecutionState.FAILED, "SEMANTIC: invalid assumption")
-
-
-def save(name: str, data: dict[str, Any]) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / f"v98-{name}.json").write_text(
-        json.dumps(data, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 def added(before: Snapshot, after: Snapshot, table: str) -> list[dict[str, Any]]:
@@ -145,7 +137,6 @@ async def test_r2_publication_rolls_back_every_domain_table_after_storage_fault(
         assert len(sandbox.seen_specs) == 1
         assert outcome_heads(runtime, project_id) == []
         reopened(tmp_path / "allowed", runtime)
-        save(f"t1-{fault}", {"checked": checked, "sandbox_calls": len(sandbox.seen_specs)})
     finally:
         runtime.close()
 
@@ -164,9 +155,6 @@ async def test_r2_successful_run_publishes_once_and_names_the_rows_it_adds(
         kinds = control_kinds(before, after)
         assert ("SANDBOX", "ADMISSION") in kinds
         assert ("BEHAVIOR_RUNTIME", "EXECUTION") in kinds
-        save(
-            "t1-success", {"control_kinds": kinds, "changed_tables": changed_tables(before, after)}
-        )
     finally:
         runtime.close()
 
@@ -202,7 +190,6 @@ async def test_r2_recovery_candidate_commit_rolls_back_after_storage_fault(
         assert response.error is not None and len(checked) == 1
         assert len(adapter.seen_specs) == 1
         reopened(tmp_path / "semantic", runtime)
-        save(f"t3-{fault}", {"checked": checked, "sandbox_calls": len(adapter.seen_specs)})
     finally:
         runtime.close()
 
@@ -244,14 +231,6 @@ async def test_r2_publication_fault_then_same_key_replay_and_new_key_retry(
         )
         assert loop(retried)["terminal_state"] == "COMPLETED"
         assert len(sandbox.seen_specs) == 2 and len(outcome_heads(runtime, project_id)) == 1
-        save(
-            "t1-replay-retry",
-            {
-                "fault_request_control_kinds": control_kinds(before, faulted),
-                "fault_request_changed_tables": changed_tables(before, faulted),
-                "sandbox_calls": [1, 1, 2],
-            },
-        )
     finally:
         runtime.close()
 
@@ -282,6 +261,5 @@ async def test_r2_recovery_fault_then_same_key_replay_and_new_key_retry(
         assert closed["terminal_state"] == "CANDIDATE_REVISION_CREATED"
         assert closed["recovery"]["candidate_branch_revision_ids"]
         assert len(adapter.seen_specs) == 2
-        save("t3-replay-retry", {"sandbox_calls": [1, 1, 2]})
     finally:
         runtime.close()

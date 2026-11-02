@@ -1,8 +1,5 @@
 export const metricFormats = {
   filePrepareFailed: {ko:(status:number)=>`파일 준비 실패 (${status})`,en:(status:number)=>`File preparation failed (${status})`},
-  rpcStartFailed: {ko:(status:number)=>`비동기 RPC 시작 실패 (${status})`,en:(status:number)=>`Asynchronous RPC start failed (${status})`},
-  operationReadFailed: {ko:(status:number)=>`operation 조회 실패 (${status})`,en:(status:number)=>`Operation read failed (${status})`},
-  operationCancelFailed: {ko:(status:number)=>`operation 취소 실패 (${status})`,en:(status:number)=>`Operation cancellation failed (${status})`},
   reasoning: {ko:(effort:string)=>`추론 ${effort}`,en:(effort:string)=>`Reasoning ${effort}`},
   modelReasoning: {ko:(model:string,effort:string)=>`${model} · 추론 ${effort}`,en:(model:string,effort:string)=>`${model} · Reasoning ${effort}`},
   modelCalls: {ko:(n:number)=>`모델 ${n}회`,en:(n:number)=>`${n} model ${n===1?"call":"calls"}`},

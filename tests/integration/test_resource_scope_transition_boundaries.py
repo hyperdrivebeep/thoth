@@ -34,7 +34,6 @@ from thoth.ports.model import ModelPort
 from thoth.ports.runtime import ClockPort
 from thoth.protocol.registry import MethodRegistry
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step104-20261016"
 BOOKKEEPING = {
     "operations",
     "idempotency_keys",
@@ -247,30 +246,6 @@ def install(
     return probe
 
 
-def save(name: str, before: Snapshot, after: Snapshot, probe: Probe, **detail: object) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    report = {
-        "changed_tables": [k for k in before if before[k] != after[k]],
-        "table_count": len(before),
-        "fault_hits": probe.hits,
-        "writes": [
-            {
-                "resource_ref": r.resource_ref,
-                "revision": r.revision,
-                "event_kind": r.event_kind,
-                "record_digest": r.record_digest,
-            }
-            for r in probe.writes
-        ],
-        "before_sha256": hashlib.sha256(json.dumps(before, sort_keys=True).encode()).hexdigest(),
-        "after_sha256": hashlib.sha256(json.dumps(after, sort_keys=True).encode()).hexdigest(),
-        **detail,
-    }
-    (OUT / ("v104-" + name + ".json")).write_text(
-        json.dumps(report, indent=2) + "\n", encoding="utf-8", newline="\n"
-    )
-
-
 def failed_bookkeeping(h: ScopeHarness, method: str, key: str, error: dict[str, Any]) -> None:
     with h.runtime.ledger.engine.connect() as connection:
         row = (
@@ -393,7 +368,6 @@ async def test_scope_transition_post_append_rollback_and_retries(
             error = failed.json()["error"]
             assert error["code"] == -32603 and probe.hits == 1 and len(probe.writes) == 1
             after = snapshot(h.runtime.ledger.engine)
-            save(operation + "-fault", before, after, probe, error_code=error["code"])
             assert owner_adjusted(before, after, h.project, method, ("fault",)) == before, (
                 "HOLD_PARTIAL_PUBLICATION: post-append transition"
             )
@@ -431,17 +405,6 @@ async def test_scope_transition_post_append_rollback_and_retries(
             )
         reopened(h, after)
         assert file_hashes(tmp_path) == files and model.calls == 0
-        save(
-            operation + "-retry",
-            before,
-            after,
-            retry,
-            same_key_error_replay=True,
-            new_key_single_publication=True,
-            successful_replay_no_writes=True,
-            files_unchanged=True,
-            model_calls=model.calls,
-        )
 
 
 async def test_http_assign_expiry_after_append_rolls_back_denied_publication(
@@ -469,15 +432,6 @@ async def test_http_assign_expiry_after_append_rolls_back_denied_publication(
             denial(rejected, "RESOURCE_AUTHORITY_CHANGED")
             assert probe.hits == 1 and len(probe.writes) == 1 and probe.session_was_active
             after = snapshot(h.runtime.ledger.engine)
-            save(
-                "expiry-denial",
-                before,
-                after,
-                probe,
-                reason="RESOURCE_AUTHORITY_CHANGED",
-                original_actor_check=True,
-                session_active_before_clock_advance=True,
-            )
             assert (
                 owner_adjusted(before, after, h.project, method, ("expired-after-write",)) == before
             ), "HOLD_PARTIAL_PUBLICATION: actual post-append expiry denial"

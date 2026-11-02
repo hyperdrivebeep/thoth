@@ -6,8 +6,6 @@ exercised in their direct projection mode; this is not a claim that canonical he
 
 from __future__ import annotations
 
-import json
-import os
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
@@ -492,32 +490,6 @@ def test_latest_is_last_appended_revision(tmp_path: Path, case: StoreCase, offse
     finally:
         reopened.dispose()
     expected = {name: [str(getattr(second, case.revision_field))] for name in observed}
-    folder = (
-        Path(__file__).resolve().parents[2]
-        / "outputs/f03b-20261023"
-        / os.environ.get("THOTH_F03B_PHASE", "direct")
-    )
-    folder.mkdir(parents=True, exist_ok=True)
-    (folder / f"{case.table}-{'rollback' if offset else 'tie'}.json").write_text(
-        json.dumps(
-            {
-                "table": case.table,
-                "offset_seconds": offset,
-                "persisted": persisted,
-                "observed": observed,
-                "expected": expected,
-                "reopen_equal": True,
-                "paths": {
-                    name: "PASS" if observed[name] == expected[name] else "FAIL"
-                    for name in observed
-                },
-            },
-            indent=2,
-            default=str,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
     assert observed == expected
 
 
@@ -633,27 +605,6 @@ def test_control_current_version_ties_and_display_history(tmp_path: Path, mode: 
             sorted(
                 (first, second), key=lambda record: (record.created_at.isoformat(), record.version)
             )
-        )
-        folder = (
-            Path(__file__).resolve().parents[2]
-            / "outputs/f03b-20261023"
-            / os.environ.get("THOTH_F03B_PHASE", "direct")
-        )
-        folder.mkdir(parents=True, exist_ok=True)
-        (folder / f"control-{mode}.json").write_text(
-            json.dumps(
-                {
-                    "mode": mode,
-                    "current": None if current is None else current.control_revision_id,
-                    "latest": [record.control_revision_id for record in latest],
-                    "history": [record.control_revision_id for record in history],
-                    "expected_current": expected.control_revision_id,
-                    "expected_history": [record.control_revision_id for record in expected_history],
-                },
-                indent=2,
-            )
-            + "\n",
-            encoding="utf-8",
         )
         assert history == expected_history
         assert current == expected

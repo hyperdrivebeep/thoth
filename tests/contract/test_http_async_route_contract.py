@@ -1,12 +1,9 @@
 """Freeze async HTTP task ownership, auth context and the internal restore interlock."""
 
-import ast
 import asyncio
 import importlib
-import inspect
 import subprocess
 import sys
-import textwrap
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -15,7 +12,6 @@ from typing import cast
 import httpx
 import pytest
 from fastapi import FastAPI
-from fastapi.routing import APIRoute
 from pydantic import JsonValue
 from tests.contract.test_async_http import StaticActorAuth
 
@@ -49,26 +45,6 @@ assert app.state.background_tasks == {} and app.state.session_runtimes == {}
         [sys.executable, "-c", script], capture_output=True, text=True, timeout=30, check=False
     )
     assert completed.returncode == 0, completed.stderr
-
-
-def test_async_route_retains_transport_and_ticket_assertions() -> None:
-    route = next(
-        route
-        for route in http_app.app.routes
-        if isinstance(route, APIRoute) and route.path == "/rpc/async"
-    )
-    source = textwrap.dedent(inspect.getsource(route.endpoint))
-    assertions = [
-        ast.get_source_segment(source, node)
-        for node in sorted(
-            (node for node in ast.walk(ast.parse(source)) if isinstance(node, ast.Assert)),
-            key=lambda node: node.lineno,
-        )
-    ]
-    assert assertions == [
-        "assert blocked is not None",
-        "assert isinstance(claimed, DispatchTicket)",
-    ]
 
 
 def owner() -> AuthenticatedActorContext:

@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
   "authority": "docs/architecture/rpc-method-catalog.md",
-  "canonical_method_count": 363,
+  "canonical_method_count": 370,
   "compatibility_alias_count": 6,
-  "runtime_method_count": 369,
+  "runtime_method_count": 376,
   "notification_count": 221,
   "methods": [
     {
@@ -3201,6 +3201,54 @@
       "runtime_status": "IMPLEMENTED"
     },
     {
+      "name": "model/localAsset/import",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "model/localAsset/install",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "model/localAsset/read",
+      "namespace": "model",
+      "surface": "QUERY",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
       "name": "model/settings/read",
       "namespace": "model",
       "surface": "QUERY",
@@ -3993,6 +4041,22 @@
       "runtime_status": "IMPLEMENTED"
     },
     {
+      "name": "project/embeddingIndex/retry",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
       "name": "project/list",
       "namespace": "project",
       "surface": "QUERY",
@@ -4113,6 +4177,54 @@
       "normal_entrypoint": "project/create",
       "behavioral_evidence": [
         "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/retrieval/experiment/configure",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/retrieval/experiment/prepare",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
+      "name": "project/retrieval/experiment/read",
+      "namespace": "project",
+      "surface": "QUERY",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
       ],
       "canonical": true,
       "alias_target": null,
@@ -5546,5 +5658,5 @@
     "thread/waitingForInput",
     "thread/waitingForProtectedAction"
   ],
-  "catalog_digest": "ca56eaf9f686e31a5c58640745c1dacbb14978bc50efc47f92bc8755714aee91"
+  "catalog_digest": "31fd537c4c407e64f14eb18a588ae374ed068b0ce6fec7dc93a9a8a60d3736ed"
 }

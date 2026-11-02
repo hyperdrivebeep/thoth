@@ -29,41 +29,14 @@ def rule_bundle_digest(manifest: dict[str, Any], root: Path | None = None) -> st
 
 def rule_bundle_paths(manifest: dict[str, Any], root: Path | None = None) -> tuple[str, ...]:
     base = ROOT if root is None else root
-    # Executable guard changes also invalidate a stale preflight. Historical archives stay intact.
+    # Fingerprint the active product checks and contracts; legacy automation is retired.
     guard_files = {
         "Makefile.ps1",
         "config/module-responsibility-budget.json",
         "scripts/architecture_contract.py",
-        "scripts/architecture_gate_contract.py",
-        "scripts/hook_owner_contract.py",
         "scripts/required_architecture_checks.py",
         "scripts/extension_binding_contract.py",
-        "scripts/prepare_architecture_preflight.py",
-        "scripts/complete_architecture_gate.py",
-        "scripts/checkpoint_commit_contract.py",
-        "scripts/git_command_contract.py",
-        "scripts/record_wiki_sync.py",
-        "scripts/verification_identity.py",
-        "scripts/read_only_command_contract.py",
-        "scripts/python_read_contract.py",
-        "scripts/parse_shell_units.ps1",
-        "config/read-only-command-helpers.json",
-        "scripts/verification_bundle_contract.py",
-        "scripts/verification_status.py",
-        "scripts/verification_profiles.py",
-        "scripts/verification_profile_contract.py",
         "docs/architecture/verification-profiles.md",
-        "scripts/verification_progress.py",
-        "scripts/pytest_progress.py",
-        "scripts/cancel_architecture_preflight.py",
-        "scripts/rule_candidate_contract.py",
-        "scripts/rule_recovery_contract.py",
-        "scripts/restore_architecture_rules.py",
-        "scripts/stop_progress_contract.py",
-        "scripts/rule_transaction_contract.py",
-        "scripts/rule_transaction_engine.py",
-        "scripts/change_architecture_rules.py",
-        "config/workflow-plans.json",
         ".codex/hooks.json",
         "config/atomicity-requirements.json",
         "config/atomicity-paths.json",
@@ -78,14 +51,15 @@ def rule_bundle_paths(manifest: dict[str, Any], root: Path | None = None) -> tup
     guard_files.update(
         path.relative_to(base).as_posix() for path in (base / "scripts").glob("check_*.py")
     )
-    guard_files.update(
-        path.relative_to(base).as_posix() for path in (base / ".codex/hooks").glob("*.py")
+    return tuple(
+        dict.fromkeys(
+            [
+                "config/architecture-conformance.json",
+                *map(str, manifest["rule_documents"]),
+                *sorted(guard_files),
+            ]
+        )
     )
-    return tuple(dict.fromkeys([
-        "config/architecture-conformance.json",
-        *map(str, manifest["rule_documents"]),
-        *sorted(guard_files),
-    ]))
 
 
 def python_imports(path: Path) -> set[str]:

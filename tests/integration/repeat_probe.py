@@ -76,38 +76,39 @@ class RepeatProbe:
         engine = bus._operations._engine  # pyright: ignore[reportPrivateUsage,reportAttributeAccessIssue,reportUnknownMemberType,reportUnknownVariableType]
         database = str(engine.url.database)  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType,reportUnknownArgumentType]
         before = domain_snapshot(engine)  # pyright: ignore[reportUnknownArgumentType]
-        saved = sqlite3.connect(":memory:")
-        with closing(sqlite3.connect(database)) as live:
-            live.backup(saved)
-        raw = request.model_dump(mode="json", by_alias=True)
-        key = request.params.meta.idempotency_key + "#repeat"
-        raw["id"] = key
-        raw["params"]["_meta"]["idempotencyKey"] = key
-        if change is not None:
-            change(request.method, raw["params"]["input"])
-        outcome = await original(bus, JsonRpcRequest.model_validate(raw))
-        after = domain_snapshot(engine)  # pyright: ignore[reportUnknownArgumentType]
-        notifications: tuple[str, ...] = ()
-        unchanged_reason: str | None = None
-        cancelled: object = None
-        if outcome.result is not None:
-            answered = outcome.result.get("value")
-            if isinstance(answered, dict):
-                if answered.get("unchanged") is True:
-                    unchanged_reason = str(answered.get("unchanged_reason"))
-                cancelled = answered.get("cancelled")
+        with closing(sqlite3.connect(":memory:")) as saved:
             with closing(sqlite3.connect(database)) as live:
-                rows = live.execute(
-                    "SELECT event_type FROM events WHERE operation_id = ? "
-                    "ORDER BY created_at, event_id",
-                    (str(outcome.result["operation_id"]),),
-                ).fetchall()
-            notifications = tuple(
-                str(row[0]) for row in rows if not str(row[0]).startswith("operation.")
-            )
-        with closing(sqlite3.connect(database)) as live:
-            saved.backup(live)  # the probe leaves no trace in the flow under test
-        saved.close()
+                live.backup(saved)
+            try:
+                raw = request.model_dump(mode="json", by_alias=True)
+                key = request.params.meta.idempotency_key + "#repeat"
+                raw["id"] = key
+                raw["params"]["_meta"]["idempotencyKey"] = key
+                if change is not None:
+                    change(request.method, raw["params"]["input"])
+                outcome = await original(bus, JsonRpcRequest.model_validate(raw))
+                after = domain_snapshot(engine)  # pyright: ignore[reportUnknownArgumentType]
+                notifications: tuple[str, ...] = ()
+                unchanged_reason: str | None = None
+                cancelled: object = None
+                if outcome.result is not None:
+                    answered = outcome.result.get("value")
+                    if isinstance(answered, dict):
+                        if answered.get("unchanged") is True:
+                            unchanged_reason = str(answered.get("unchanged_reason"))
+                        cancelled = answered.get("cancelled")
+                    with closing(sqlite3.connect(database)) as live:
+                        rows = live.execute(
+                            "SELECT event_type FROM events WHERE operation_id = ? "
+                            "ORDER BY created_at, event_id",
+                            (str(outcome.result["operation_id"]),),
+                        ).fetchall()
+                    notifications = tuple(
+                        str(row[0]) for row in rows if not str(row[0]).startswith("operation.")
+                    )
+            finally:
+                with closing(sqlite3.connect(database)) as live:
+                    saved.backup(live)  # also restore after a failed repeated request
         changed = frozenset(name for name in after if after[name] != before.get(name))
         return Repeat(
             method=request.method,

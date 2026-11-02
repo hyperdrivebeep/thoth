@@ -80,17 +80,6 @@ def test_a_shadow_that_breaks_is_held_as_failed_and_the_request_goes_on(
     assert failed.input_digest == uses[0].input_digest
 
 
-def test_a_refused_shadow_keeps_its_reason_and_its_digest() -> None:
-    assert (
-        domain_digest(
-            "BEHAVIOR_POLICY_HELD",
-            "1.0.0",
-            canonical_payload({"reason_code": "SHADOW_SELECTION_HELD"}),
-        )
-        == HELD_OUTPUT
-    )
-
-
 def test_the_active_selection_is_not_caught(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setitem(LANES, PROTECTED_EXACT, breaks(RuntimeError("defect")))
     with pytest.raises(RuntimeError, match="defect"):

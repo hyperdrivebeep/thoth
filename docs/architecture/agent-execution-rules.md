@@ -57,21 +57,16 @@ Memory write, recall and action eligibility are separate gates. `COMMITTED` does
 
 Improvement preserves immutable baseline and candidate. Candidate generation, evaluator, hidden holdout and promotion authority are separated. Promotion requires frozen comparison evidence and staged exposure; regression, leakage, budget or timeout triggers rollback. Official KPI, safety threshold, waiver, final disposition and production model-weight changes remain outside autonomous promotion.
 
-## Development Hook ownership and final verification
+## Development automation retirement and product verification
 
-The development workflow binds an implementation preflight to the actual host PreToolUse session and
-creation turn through an immutable observed-request receipt. This is a workflow guard, not a security
-boundary against a malicious process under the same OS user. No transcript or assistant AUDIT label
-establishes ownership. Other sessions can perform read-only work and stop normally; they cannot edit,
-complete or cancel the active owner's protected work. Later turns of the owning session retain its
-obligation. An explicit owner release and new host-bound preflight provide the handoff path; legacy
-receipt bytes/hashes are preserved and cannot silently become new owned authority.
+On 2026-11-01 the user retired the repository's legacy development Hook, automatic preflight,
+checkpoint, continuation and FULL/TOOLING receipt tooling. It must not be reactivated from old
+records. Historical evidence remains historical; it does not authorize edits or certify current code.
+The empty `.codex/hooks.json` is only an explicit disabled marker. This does not change any host
+application's approval controls or the product's authorization, currentness or Unit-of-Work rules.
 
-At final source freeze, record Wiki synchronization and invoke complete_architecture_gate.py once.
-It selects TOOLING or FULL using verification-profiles.md and the actual file-manifest diff against
-a validated FULL baseline. Policy changes or unknown impact require FULL. TOOLING retains all
-architecture/Hook/owner/portable/CLI regressions but explicitly has full_suite_verified=false.
-It seals only real success with unchanged source/index/rules and matching Wiki/bundle/selection
-evidence. FULL retains Makefile.ps1 verify once, including architecture checks. Focused development
-RED/GREEN and affected checks remain required. Stop never runs tests or creates a new scheduler;
-the owning session's bounded continuation distinguishes a node checkpoint from whole-plan completion.
+Use the current [product verification policy](verification-profiles.md): focused checks during
+implementation and the complete applicable product check before merge/publication. Ordinary pytest
+collection includes all remaining tests; retired-tool exclusions and their selector no longer exist.
+Report failures, skips, interruptions and NOT_RUN separately. Commits and pushes require the user's
+execution instruction. Institution deployment and experiment examples remain available.

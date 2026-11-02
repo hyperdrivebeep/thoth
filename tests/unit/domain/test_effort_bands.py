@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
 from typing import cast
 
 import pytest
@@ -174,5 +173,3 @@ def test_old_one_zero_zero_candidate_reads_with_no_estimates() -> None:
         {k: v for k, v in payload.items() if k != "schema_version"}
     )
     assert fresh.schema_version == "1.1.0"
-    stamp = datetime(2026, 9, 30, tzinfo=UTC)
-    assert stamp.tzinfo is not None

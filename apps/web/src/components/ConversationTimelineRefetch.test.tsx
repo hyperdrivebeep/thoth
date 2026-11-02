@@ -113,3 +113,41 @@ it("keeps cancellation in the current-request fallback when history is unsupport
   expect(container.textContent).toContain("저장된 답변은 없습니다");
   expect(container.textContent).not.toContain("당시 저장된 답변");
 });
+
+it.each(["history-denied", "mixed"])("keeps denied cached answers hidden when the following read times out: %s", async denial => {
+  await mount(denial === "mixed" ? 2 : 1);
+  await returnToWindow(denial);
+  await settle(() => !container.textContent?.includes("저장된 답변 1"));
+  await returnToWindow("temporary");
+  await settle(() => client.getQueryState(["conversation", "p", "t"])?.fetchStatus === "idle");
+  expect(container.textContent).not.toContain("저장된 답변 1");
+  expect(container.textContent).not.toContain("저장된 답변 2");
+  await act(async () => { root!.unmount(); });
+  root = createRoot(container);
+  await act(async () => { root!.render(<QueryClientProvider client={client}><ConversationTimeline projectId="p" threadId="t" status={status} onDetail={() => undefined}/></QueryClientProvider>); });
+  await settle(() => client.getQueryState(["conversation", "p", "t"])?.fetchStatus === "idle");
+  expect(container.textContent).not.toContain("저장된 답변 1");
+  await returnToWindow("success");
+  await settle(() => Boolean(container.textContent?.includes("저장된 답변 1")));
+});
+
+it("does not restore a denied first-page answer when a later page read fails transiently", async () => {
+  await mount();
+  vi.mocked(rpc).mockImplementation(async (method, args) => {
+    const older = args.conversation_before_epoch === 1;
+    if (method === "thread/activity/list") return { operation_id: "read", state: "SUCCEEDED", value: { conversation: {
+      turns: [input(older ? 2 : 1)], next_before_epoch: older ? null : 1, history_limited: false,
+    }} };
+    const n = args.operation_id === "op-2" ? 2 : 1;
+    if (mode === "cross-page" && n === 1) throw new RpcError("denied", -32040, { reason_code: "RESOURCE_SCOPE_ACCESS_DENIED" });
+    if (mode === "cross-page" && n === 2) throw new RpcTransportError("RPC network request failed", "NETWORK");
+    return { operation_id: "read", state: "SUCCEEDED", value: { operation_id: `op-${n}`, state: "SUCCEEDED", result: result(n) } };
+  });
+  await act(async () => { await client.invalidateQueries({ queryKey: ["conversation", "p", "t"] }); });
+  await settle(() => Array.from(container.querySelectorAll("button")).some(button => button.textContent?.includes("이전 대화 불러오기")));
+  await act(async () => { Array.from(container.querySelectorAll("button")).find(button => button.textContent?.includes("이전 대화 불러오기"))!.click(); });
+  await settle(() => Boolean(container.textContent?.includes("저장된 답변 2")));
+  await returnToWindow("cross-page");
+  await settle(() => client.getQueryState(["conversation", "p", "t"])?.fetchStatus === "idle");
+  expect(container.textContent).not.toContain("저장된 답변 1");
+});

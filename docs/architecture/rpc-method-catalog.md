@@ -2,7 +2,7 @@
 
 This source-preview index is derived from the public method catalog, registered runtime method names, and public source schemas. It lists available RPC names; it is not a live-service, account-authorization, model-execution, or full-suite verification receipt. The machine-readable metadata and notification names are in [`schemas/protocol/public-method-catalog.json`](../../schemas/protocol/public-method-catalog.json).
 
-Requests use the public JSON-RPC `/rpc` surface. The method classification below distinguishes reads from commands; each call still follows the runtime's authentication and resource-scope checks. The six compatibility aliases remain listed under their own method names. The catalog contains 362 public methods (356 canonical and 6 aliases) and 221 notifications.
+Requests use the public JSON-RPC `/rpc` surface. The method classification below distinguishes reads from commands; each call still follows the runtime's authentication and resource-scope checks. The six compatibility aliases remain listed under their own method names. The catalog contains 376 public methods (370 canonical and 6 aliases) and 221 notifications.
 
 
 ## Request-scoped response language and expected-result views
@@ -43,6 +43,11 @@ Language policy is included only in explicit-language model-stage and reuse base
 | `model/credential/login/complete` | COMMAND | Accepts a matching manual response for a method that supports it. The raw response is ephemeral and must not appear in operation replay, receipt or telemetry; HOSTED_REVIEW denies before local I/O. |
 
 These credential RPCs use the `system:workspace` scope in LOCAL mode. HOSTED_REVIEW denies them before the local handler. The local setup and settings screens consume the login status and cancel methods through `XaiDeviceLogin`; they do not convert a status read into a new login start. A command's operation record, broker worker state, and workspace profile are distinct effects.
+
+## Local retrieval preparation
+
+For the LOCAL preparation inputs, authority and lifecycle contract, see
+[local retrieval preparation](local-retrieval-preparation.md#preparation-and-state).
 
 ## Research request origin (trace row)
 
@@ -397,6 +402,7 @@ model/callSettings/read
 model/credential/list
 model/credential/login/status
 model/settings/read
+model/localAsset/read
 ```
 
 ### Commands
@@ -409,6 +415,8 @@ model/credential/login/complete
 model/credential/register
 model/settings/update
 model/tooling/install
+model/localAsset/import
+model/localAsset/install
 ```
 
 ## 13. Object Namespace
@@ -502,12 +510,16 @@ project/review/list
 project/role/list
 project/source/list
 project/source/scope/read
+project/retrieval/experiment/read
 ```
 
 ### Commands
 
 ```text
 project/activate
+project/retrieval/experiment/configure
+project/retrieval/experiment/prepare
+project/embeddingIndex/retry
 project/archive
 project/create
 project/cutoff/update

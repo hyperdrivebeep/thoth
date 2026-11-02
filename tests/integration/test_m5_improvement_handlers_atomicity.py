@@ -8,7 +8,6 @@ without runtime bootstrap. Models are scripted and pair comparison runs local bo
 
 from __future__ import annotations
 
-import hashlib
 import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -34,43 +33,8 @@ from thoth.apps.runtime import AppRuntime
 from thoth.domain.behavior_execution import BehaviorBaselineRevision
 from thoth.domain.control_record import ControlRecord
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step99-20261015"
 Snapshot = dict[str, tuple[str, ...]]
 FAULT = "99-V injected after targeted append"
-
-
-def save(name: str, before: Snapshot, after: Snapshot, writes: Writes) -> None:
-    def digest(snapshot: Snapshot) -> str:
-        return hashlib.sha256(json.dumps(snapshot, sort_keys=True).encode()).hexdigest()
-
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / f"v99-{name}.json").write_text(
-        json.dumps(
-            {
-                "before_sha256": digest(before),
-                "after_sha256": digest(after),
-                "changed_tables": [table for table in before if before[table] != after[table]],
-                "fault_hits": writes.hits,
-                "write_order": writes.order,
-                "appended": [
-                    {
-                        "namespace": r.namespace,
-                        "record_type": r.record_type,
-                        "record_id": r.record_id,
-                        "state": r.state,
-                        "version": r.version,
-                    }
-                    for r in writes.appended
-                ],
-                "baseline_promote_count": len(writes.baselines),
-                "reopened_snapshot_equal": True,
-            },
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
-        newline="\n",
-    )
 
 
 def check_reopened(engine: Engine, expected: Snapshot) -> None:
@@ -186,7 +150,6 @@ async def fault_single_write(
     after = domain_snapshot(runtime.ledger.engine)
     assert after == before, "HOLD_DEFECT: public handler left partial domain writes"
     check_reopened(runtime.ledger.engine, before)
-    save(method.replace("/", "-"), before, after, writes)
 
 
 @pytest.mark.parametrize("mode", ["propose", "revise"])
@@ -381,7 +344,6 @@ async def test_final_change_set_fault_rolls_back_decision_and_baseline_together(
         assert len(h.model.guidance) == model_calls
         check_pending(h, promotion)
         check_reopened(h.pair.runtime.ledger.engine, before)
-        save(f"final-fault-{decision}", before, after, writes)
 
 
 @pytest.mark.parametrize("decision", ["APPROVE", "REJECT"])
@@ -404,7 +366,6 @@ async def test_decision_success_publishes_only_the_expected_records(
         after = domain_snapshot(h.pair.runtime.ledger.engine)
         check_success_delta(h, before, after, writes, result, decision)
         check_reopened(h.pair.runtime.ledger.engine, after)
-        save(f"success-{decision}", before, after, writes)
 
 
 async def test_failed_approval_replays_without_writes_and_new_key_promotes_once(
@@ -440,7 +401,6 @@ async def test_failed_approval_replays_without_writes_and_new_key_promotes_once(
         assert domain_snapshot(h.pair.runtime.ledger.engine) == before
         check_pending(h, promotion)
         check_reopened(h.pair.runtime.ledger.engine, before)
-        save("same-key-replay", before, before, replay_writes)
         with monkeypatch.context() as patch:
             retried_writes = observe_writes(patch, final_append_target(h, promotion), fail=False)
             retried = value(await h.call("improvement/promotion/decide", "99-v-new-key", body))
@@ -450,4 +410,3 @@ async def test_failed_approval_replays_without_writes_and_new_key_promotes_once(
         after = domain_snapshot(h.pair.runtime.ledger.engine)
         check_success_delta(h, before, after, retried_writes, retried, "APPROVE")
         check_reopened(h.pair.runtime.ledger.engine, after)
-        save("new-key-retry", before, after, retried_writes)

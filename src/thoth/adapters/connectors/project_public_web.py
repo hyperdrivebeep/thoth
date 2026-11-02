@@ -22,7 +22,7 @@ from thoth.domain.connectors import (
     SelectorFieldSpec,
 )
 from thoth.domain.public_web_access import PROJECT_PUBLIC_WEB_CONNECTOR_ID
-from thoth.domain.registered_site_entrypoints import entrypoint_uri, registered_entrypoints
+from thoth.domain.registered_site_entrypoints import entrypoint_uri
 from thoth.ports.web_reader import PublicReaderPort
 
 
@@ -146,7 +146,3 @@ class ProjectPublicWebConnector:
 
     async def close(self, connector_run_id: str) -> None:
         del connector_run_id
-
-
-def catalog_selectors(hosts: tuple[str, ...]) -> list[dict[str, str]]:
-    return [dict(item) for item in registered_entrypoints(hosts)]

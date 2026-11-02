@@ -13,6 +13,7 @@ from typing import Literal
 
 from tests.integration.test_artifact_row_codec_contract import STAMP, document
 
+from thoth.adapters.embeddings.assets import LocalModelAssets
 from thoth.adapters.runtime import SystemClock, UuidIdGenerator
 from thoth.adapters.storage.bundle import SqliteStoreBundle, SqliteStoreFactory
 from thoth.application.services.embedding_index_service import EmbeddingIndexService
@@ -22,6 +23,7 @@ from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.embedding_index import EmbeddingBudget, EmbeddingCapability, EmbeddingVector
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.governance import ProjectPolicy, SourceBinding
+from thoth.domain.model_asset import AssetFile, EmbeddingAssetDescriptor, ModelAssetManifest
 from thoth.domain.project import Project
 from thoth.domain.resource_scope import ResourceScopeTemplate
 from thoth.domain.retrieval_embedding import DenseModelPin
@@ -99,6 +101,19 @@ class FakeWorker:
         self.close()
 
 
+class DescriptorEncoder(ChildEncoder):
+    def __init__(self, descriptor: "EmbeddingAssetDescriptor") -> None:
+        if descriptor.root == "synthetic-slow-load":
+            time.sleep(30)
+        if descriptor.root == "synthetic-bad-hash":
+            raise ValueError("MODEL_HASH_MISMATCH")
+        if descriptor.root == "synthetic-load-crash":
+            os._exit(23)
+        if descriptor.root == "synthetic-malformed-frame":
+            # Bypass Python's redirected stdout, like native-code diagnostics.
+            os.write(1, b"not a JSON frame\n")
+
+
 @dataclass
 class IndexFixture:
     stores: SqliteStoreBundle
@@ -171,3 +186,22 @@ def fixture(path: Path, *, enabled: bool = True) -> IndexFixture:
     if enabled:
         service.configure(PROJECT, True, 0)
     return IndexFixture(stores, service, worker)
+
+
+def sample_assets(tmp_path: Path) -> tuple[Path, LocalModelAssets]:
+    source = tmp_path / "source"
+    source.mkdir()
+    data = b"synthetic model asset; no actual weights"
+    (source / "model.bin").write_bytes(data)
+    manifest = ModelAssetManifest(
+        model_id="synthetic/model",
+        revision="a" * 40,
+        preprocessing="synthetic",
+        files=(
+            AssetFile(path="model.bin", bytes=len(data), sha256=hashlib.sha256(data).hexdigest()),
+        ),
+        license="synthetic",
+        source="synthetic",
+        max_tokens=100,
+    )
+    return source, LocalModelAssets(tmp_path / "installed", manifest=manifest)

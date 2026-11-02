@@ -21,6 +21,7 @@ import { SourceTimeAdvanced } from "./SourceTimeAdvanced";
 import { useCitationGate } from "./SourceCitationGate";
 import { cutoffLabel, projectCutoffText } from "../api/sourceTime";
 import { FirstRunSetup } from "./FirstRunSetup";
+import { LocalRetrievalSettingsCard } from "./LocalRetrievalSettingsCard";
 import { WorkspaceLocationNotice } from "./WorkspaceLocationNotice";
 import { WorkspaceInternetConsent } from "./WorkspaceInternetConsent";
 import { workspaceSetupIssue, workspaceSetupIssueText, type WorkspaceSetupIssue } from "./workspaceSetupIssue";
@@ -180,6 +181,7 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
       )}
       <LanguageSettingsCard scope={storageScope}/>
       {!hosted && consent !== undefined && <WorkspaceInternetConsent consent={consent} focus={focusConsent} onFocused={clearConsentFocus}/>}
+      <LocalRetrievalSettingsCard workspaceId={workspaceId ?? "UNBOUND"} projectId={project.project_id} hosted={hosted}/>
       <section className="detail-card"><h2>{t("workspace.usage")}</h2><p>{message("reportedTokens", status?.usage?.total_tokens?.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")??t("workspace.noUsage"), status?.usage?.state==="PARTIAL"?t("workspace.partialUsage"):"")}</p><p>{t("workspace.usagePending")}</p>{!hosted&&<><Button small minimal icon={projectDetailsOpen?"chevron-up":"settings"} onClick={()=>setProjectDetailsOpen(value=>!value)} aria-expanded={projectDetailsOpen}>{t("workspace.projectSettings")}</Button><Collapse isOpen={projectDetailsOpen}><RecordInspector value={project}/></Collapse></>}</section>
       <section className="detail-card"><h2>{hosted?t("workspace.recordsSources"):t("workspace.recordsTools")}</h2><Button minimal icon="folder-open" onClick={()=>onPage("resources")}>{t("workspace.manageSources")}</Button><Button minimal icon="history" onClick={()=>onPage("records")}>{t("workspace.history")}</Button>{!hosted&&<><Button minimal icon={developerOpen?"chevron-up":"chevron-down"} onClick={()=>setDeveloperOpen(value=>!value)} aria-expanded={developerOpen}>{t("workspace.devTools")}</Button><Collapse isOpen={developerOpen}><div className="local-developer-tools"><Button minimal icon="database" onClick={()=>onPage("raw-records")}>{t("workspace.detailedRecords")}</Button><Button minimal icon="code" onClick={()=>{setCatalogNamespace("all");onPage("capabilities");}}>{t("workspace.apiTools")}</Button><RecordInspector value={{request:status?.request,attempt:status?.attempt,budget:status?.budget,usage:status?.usage,cleanup:status?.cleanup}}/></div></Collapse></>}</section>
     </>}

@@ -1,11 +1,9 @@
-import { messages } from "../i18n/messages";
 import { t } from "../i18n/locale";
 import { Callout } from "@blueprintjs/core";
 import { useQuery } from "@tanstack/react-query";
 import { readTrace, traceKey } from "../api/trace";
 import { isSyntheticTrace } from "./traceRows";
 
-export const SYNTHETIC_LINE = messages["synthetic.notice"].ko;
 
 /**
  * A thin line above the conversation when the project's trace table was written as demo data. It reads the trace with the

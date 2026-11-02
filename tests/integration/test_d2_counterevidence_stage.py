@@ -2,24 +2,13 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
-from typing import Any
 
 import pytest
 from tests.atomicity.harness import snapshot
 from tests.integration.scoped_runtime import create_runtime
 from tests.integration.storage_coverage_helpers import request, value
 from tests.integration.test_a03_storage_atomicity import creation, setup
-
-OUT = Path(__file__).resolve().parents[2] / "outputs/defect-d2-counterevidence-stage-20261014"
-
-
-def save(stage: str, data: dict[str, Any]) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / (stage + "-request-history.json")).write_text(
-        json.dumps(data, indent=2) + "\n", encoding="utf-8"
-    )
 
 
 @pytest.mark.parametrize("stage", ["GROUNDED_CANDIDATE", "DRAFT"])
@@ -120,16 +109,6 @@ async def test_counter_request_preserves_stage_and_history(tmp_path: Path, stage
             )
         )["hypothesis"]
         summary = detail["item"]["change_summary"]
-        evidence = {
-            "before": before,
-            "requested": requested,
-            "history_item": item,
-            "history_detail": detail,
-            "investigation": observed,
-            "historical": historical,
-            "replay_exact": True,
-        }
-        save(stage, evidence)
         assert after["development_stage"] == before["development_stage"]
         assert historical == before and current == after
         assert after["counterevidence_queries"] == [
@@ -192,6 +171,5 @@ async def test_counter_request_preserves_stage_and_history(tmp_path: Path, stage
             )
         )
         assert restored_detail["item"]["change_summary"] == summary
-        save(stage, {**evidence, "verdict": "PASS", "reopened_exact": True, "restored": restored})
     finally:
         reopened.close()

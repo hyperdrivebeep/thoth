@@ -14,7 +14,6 @@ contract and fixes nothing.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, TypeVar
 
@@ -36,7 +35,6 @@ from thoth.domain.model import ModelRequest, ModelResult
 from thoth.domain.reference import ReferenceAnswerRequest
 
 T = TypeVar("T", bound=BaseModel)
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step97-20261015"
 OWNERS: dict[str, tuple[type[object], str]] = {
     "projection": (SqliteCriterionContractStore, "add_contract"),
     "audit": (SqliteCriterionContractStore, "append_audit"),
@@ -55,13 +53,6 @@ GROUPED_ANSWERS = [
         "quote": "declared test population",
     },
 ]
-
-
-def save(name: str, data: dict[str, Any]) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / f"v97-{name}.json").write_text(
-        json.dumps(data, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 def without_envelope(snapshot: dict[str, tuple[str, ...]]) -> dict[str, tuple[str, ...]]:
@@ -214,7 +205,6 @@ async def test_reference_answer_rolls_back_every_domain_table_after_storage_faul
         assert result.error is not None and len(checked) == 1
         assert (await h.read("read-after-fault"))["revision_digest"] == current["revision_digest"]
         reopened(tmp_path, h)
-        save(f"answer-{fault}", {"checked": checked, "error": str(result.error)[:200]})
 
 
 async def test_grouped_answers_commit_one_revision_per_answer(
@@ -237,7 +227,6 @@ async def test_grouped_answers_commit_one_revision_per_answer(
         # Two criterion revisions, one per answer, and nothing else beside the audit trail.
         assert delta["criterion_contracts"] == 2
         assert (await h.read("read-after-grouped"))["revision_digest"] != current["revision_digest"]
-        save("grouped-success", {"changed_tables": delta})
 
 
 @pytest.mark.parametrize("fault", ["projection", "thread"])
@@ -274,7 +263,6 @@ async def test_second_grouped_answer_fault_leaves_no_revision_of_the_first_answe
         assert delta == {}, delta
         assert (await h.read("read-after-fault"))["revision_digest"] == current["revision_digest"]
         reopened(tmp_path, h)
-        save(f"grouped-second-{fault}", {"calls": order, "changed_tables": delta})
 
 
 async def test_answer_fault_then_same_key_replay_and_new_key_retry(
@@ -297,7 +285,6 @@ async def test_answer_fault_then_same_key_replay_and_new_key_retry(
         assert retried["reference_inquiry"]["answers"][-1]["revision"] == 1
         rows = domain_snapshot(h.runtime.ledger.engine)["criterion_contracts"]
         assert len(rows) == len(before) + 1
-        save("answer-replay-retry", {"rows_before": len(before), "rows_after": len(rows)})
 
 
 async def test_grouped_fault_then_same_key_replay_and_new_key_retry(
@@ -329,4 +316,3 @@ async def test_grouped_fault_then_same_key_replay_and_new_key_retry(
         assert [a["revision"] for a in retried["reference_inquiry"]["answers"]] == [1, 1]
         rows = domain_snapshot(h.runtime.ledger.engine)["criterion_contracts"]
         assert len(rows) == len(before) + 2
-        save("grouped-replay-retry", {"rows_before": len(before), "rows_after": len(rows)})

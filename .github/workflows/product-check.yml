@@ -18,7 +18,35 @@ env:
   THOTH_IRIS_RESULT_FIXTURE: .thoth-ci/no-private-result.json
 
 jobs:
+  changes:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    outputs:
+      docs_only: ${{ steps.scope.outputs.docs_only }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Select verification scope
+        id: scope
+        shell: pwsh
+        env:
+          SCOPE_EVENT: ${{ github.event_name }}
+          SCOPE_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          $scopeJson = python scripts/ci_test_shards.py scope --event "$env:SCOPE_EVENT" --base "$env:SCOPE_BASE"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $scope = $scopeJson | ConvertFrom-Json
+          if ($scope.docs_only -isnot [bool]) { throw 'Invalid verification scope.' }
+          "docs_only=$($scope.docs_only.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          $scope.reason >> $env:GITHUB_STEP_SUMMARY
+
   checks:
+    needs: changes
+    if: ${{ always() }}
     # Public static, Web and quick-start checks. The jobs below cover the full Python suite.
     runs-on: windows-latest
     timeout-minutes: 60
@@ -28,20 +56,31 @@ jobs:
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.thoth-test-browsers
     steps:
+      - name: Validate verification scope
+        env:
+          SCOPE_JOB: ${{ needs.changes.result }}
+          DOCS_ONLY: ${{ needs.changes.outputs.docs_only }}
+        run: |
+          if ($env:SCOPE_JOB -ne 'success' -or $env:DOCS_ONLY -notin @('true', 'false')) {
+            throw 'Verification scope was not established.'
+          }
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - uses: actions/setup-node@v4
+        if: needs.changes.outputs.docs_only != 'true'
         with:
           node-version: "24"
       - uses: pnpm/action-setup@v4
+        if: needs.changes.outputs.docs_only != 'true'
         with:
           version: "11.21.0"
       - uses: astral-sh/setup-uv@v7
         with:
           version: "0.12.5"
       - name: Install locked dependencies
+        if: needs.changes.outputs.docs_only != 'true'
         run: |
           python -m venv --copies --without-pip .venv
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -52,20 +91,28 @@ jobs:
           .\.venv\Scripts\python.exe -m playwright install --only-shell chromium
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Python lint
-        run: .\.venv\Scripts\python.exe -m ruff check src apps tests migrations conftest.py scripts/pytest_environment.py
+        if: needs.changes.outputs.docs_only != 'true'
+        run: .\.venv\Scripts\python.exe -m ruff check src apps tests migrations
       - name: Runtime architecture
+        if: needs.changes.outputs.docs_only != 'true'
         run: .\.venv\Scripts\python.exe scripts/check_architecture.py
       - name: Module size budget
+        if: needs.changes.outputs.docs_only != 'true'
         run: .\.venv\Scripts\python.exe scripts/check_module_budget.py
       - name: Web tests
+        if: needs.changes.outputs.docs_only != 'true'
         run: pnpm --dir apps/web run test --run
       - name: Web lint
+        if: needs.changes.outputs.docs_only != 'true'
         run: pnpm --dir apps/web run lint
       - name: Web types
+        if: needs.changes.outputs.docs_only != 'true'
         run: pnpm --dir apps/web run typecheck
       - name: Web build
+        if: needs.changes.outputs.docs_only != 'true'
         run: pnpm --dir apps/web run build
       - name: README quick-start server smoke
+        if: needs.changes.outputs.docs_only != 'true'
         run: |
           .\.venv\Scripts\python.exe -m thoth.cli workspace
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -88,8 +135,25 @@ jobs:
           } finally {
             & taskkill /PID $thothApi.Id /T /F | Out-Null
           }
+      - name: Install locked documentation-check dependencies
+        if: needs.changes.outputs.docs_only == 'true'
+        run: |
+          python -m venv --copies --without-pip .venv
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Documentation and public-package checks
+        if: needs.changes.outputs.docs_only == 'true'
+        run: |
+          .\.venv\Scripts\python.exe scripts/update_source_manifest.py --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          .\.venv\Scripts\python.exe -m pytest tests/architecture/test_public_source_profile.py tests/architecture/test_portable_build_paths.py tests/architecture/test_wiki_status_references.py tests/unit/test_source_manifest_git_bytes.py -q -rfE -p no:cacheprovider
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          'README/presentation-only checks passed; full product suite NOT_RUN.' >> $env:GITHUB_STEP_SUMMARY
 
   python-fast:
+    needs: changes
+    if: needs.changes.outputs.docs_only != 'true'
     runs-on: windows-latest
     timeout-minutes: 60
     defaults:
@@ -132,6 +196,8 @@ jobs:
           if-no-files-found: error
 
   python-integration:
+    needs: changes
+    if: needs.changes.outputs.docs_only != 'true'
     runs-on: windows-latest
     timeout-minutes: 90
     strategy:
@@ -184,7 +250,7 @@ jobs:
           if-no-files-found: error
 
   python-summary:
-    needs: [python-fast, python-integration]
+    needs: [changes, python-fast, python-integration]
     if: ${{ always() }}
     runs-on: windows-latest
     timeout-minutes: 10
@@ -192,17 +258,31 @@ jobs:
       run:
         shell: pwsh
     steps:
+      - name: Validate verification scope
+        env:
+          SCOPE_JOB: ${{ needs.changes.result }}
+          DOCS_ONLY: ${{ needs.changes.outputs.docs_only }}
+        run: |
+          if ($env:SCOPE_JOB -ne 'success' -or $env:DOCS_ONLY -notin @('true', 'false')) {
+            throw 'Verification scope was not established.'
+          }
+      - name: Report documentation-only scope
+        if: needs.changes.outputs.docs_only == 'true'
+        run: "'README/presentation-only scope: full Python product suite NOT_RUN.' >> $env:GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v5
+        if: needs.changes.outputs.docs_only != 'true'
       - uses: actions/setup-python@v6
+        if: needs.changes.outputs.docs_only != 'true'
         with:
           python-version: "3.13"
       - uses: actions/download-artifact@v8
+        if: needs.changes.outputs.docs_only != 'true'
         with:
           pattern: python-junit-*
           path: test-results/aggregate
           merge-multiple: true
       - name: Summarize every Python group
-        if: ${{ always() }}
+        if: ${{ always() && needs.changes.result == 'success' && needs.changes.outputs.docs_only == 'false' }}
         env:
           FAST_RESULT: ${{ needs.python-fast.result }}
           INTEGRATION_RESULT: ${{ needs.python-integration.result }}
@@ -235,7 +315,7 @@ jobs:
         run: |
           python -m venv --copies --without-pip .venv
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev --extra browser --extra connectors --extra managed
+          uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev --extra browser --extra connectors --extra managed --extra local-retrieval
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Report or enforce Python types
         run: .\.venv\Scripts\python.exe scripts/ci_typecheck.py --markdown-output "$env:GITHUB_STEP_SUMMARY"

@@ -193,6 +193,9 @@ is distributed here; successful login alone does not establish a successful mode
 
 See [installation and credentials](docs/INSTALL.md).
 
+Local settings also offer opt-in [model and index preparation](docs/architecture/local-retrieval-preparation.md).
+It defaults to OFF and does not change the active research search policy.
+
 </details>
 
 ## Model usage and cost

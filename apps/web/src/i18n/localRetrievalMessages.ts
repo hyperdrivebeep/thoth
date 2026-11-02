@@ -1,0 +1,231 @@
+import type { LanguageCode } from "./languageChoices";
+
+/**
+ * Copy for the "Local retrieval preparation" card, included by the central catalog.
+ * Server reason codes are translated here as well; raw paths, stacks and server message
+ * text never pass through this file.
+ */
+export const localRetrievalMessages = {
+  "localRetrieval.title": { ko: "로컬 검색 준비", en: "Local retrieval preparation" },
+  "localRetrieval.hostedOnly": {
+    ko: "이 기능은 로컬 작업 공간에서만 쓸 수 있습니다. 심사 워크스페이스에서는 아무것도 준비하지 않습니다.",
+    en: "This is available only in a local workspace. Nothing is prepared in a review workspace.",
+  },
+  "localRetrieval.intro": {
+    ko: "고정된 로컬 모델로 자료를 미리 색인합니다. 기본은 꺼짐이며, 색인이 준비돼도 기존 검색 방식은 그대로입니다.",
+    en: "Indexes sources ahead of time with one fixed local model. Off by default; even when an index is ready, the existing search method stays as it is.",
+  },
+  "localRetrieval.readFailed": { ko: "상태를 불러오지 못했습니다.", en: "The status could not be loaded." },
+  "localRetrieval.unsupported": {
+    ko: "이 서버는 로컬 검색 준비를 지원하지 않습니다.",
+    en: "This server does not support local retrieval preparation.",
+  },
+  "localRetrieval.modelLabel": { ko: "고정 모델", en: "Fixed model" },
+  "localRetrieval.runtimeNote": {
+    ko: "모델 파일 외에 로컬 실행 구성 요소(선택 설치)가 추가로 필요합니다. 두 가지가 모두 있어야 색인을 준비할 수 있습니다.",
+    en: "Besides the model files, an optional local runtime component is required. Both are needed before an index can be prepared.",
+  },
+  "localRetrieval.asset.MODEL_REQUIRED": { ko: "모델 파일 없음", en: "Model files missing" },
+  "localRetrieval.asset.READY": { ko: "모델 파일 준비됨", en: "Model files ready" },
+  "localRetrieval.asset.FAILED": { ko: "모델 파일 확인 실패", en: "Model file check failed" },
+  "localRetrieval.dependencyAvailable": { ko: "실행 구성 요소: 있음", en: "Runtime component: available" },
+  "localRetrieval.dependencyMissing": {
+    ko: "실행 구성 요소: 없음 — 파일 반입은 할 수 있지만 색인 준비는 할 수 없습니다.",
+    en: "Runtime component: missing — files can be imported, but no index can be prepared.",
+  },
+  "localRetrieval.workerLoaded": { ko: "작업자: 로드됨", en: "Worker: loaded" },
+  "localRetrieval.workerNotLoaded": { ko: "작업자: 로드 안 됨", en: "Worker: not loaded" },
+  "localRetrieval.manageDenied": {
+    ko: "이 작업 공간에서 모델 파일을 관리할 권한이 없습니다.",
+    en: "You cannot manage model files in this workspace.",
+  },
+  "localRetrieval.importTitle": { ko: "로컬 폴더에서 가져오기", en: "Import from a local folder" },
+  "localRetrieval.importHelp": {
+    ko: "이미 받아 둔 모델 폴더를 검증한 뒤 복사합니다. 네트워크를 쓰지 않으며, 고정된 파일 목록과 다르면 거부합니다.",
+    en: "Verifies an already downloaded model folder, then copies it. No network is used; anything that differs from the fixed file list is rejected.",
+  },
+  "localRetrieval.importPathLabel": { ko: "모델 폴더 경로", en: "Model folder path" },
+  "localRetrieval.importButton": { ko: "검증해 가져오기", en: "Verify and import" },
+  "localRetrieval.installTitle": { ko: "고정 파일 내려받아 설치", en: "Download the fixed files" },
+  "localRetrieval.installNotice": {
+    ko: "출처: 공개 모델 저장소의 고정된 버전만 받습니다. 모델 라이선스 고지는 파일과 함께 저장됩니다. 다른 주소나 패키지 설치는 지원하지 않습니다.",
+    en: "Source: only the fixed revision from the public model repository is downloaded. The model license notice is stored with the files. Other addresses or package installs are not supported.",
+  },
+  "localRetrieval.installConfirm": {
+    ko: "네트워크로 위 고정 파일을 내려받는 데 동의합니다",
+    en: "I agree to download the fixed files above over the network",
+  },
+  "localRetrieval.installButton": { ko: "내려받아 설치", en: "Download and install" },
+  "localRetrieval.transfer.COPYING": { ko: "복사 중", en: "Copying" },
+  "localRetrieval.transfer.DOWNLOADING": { ko: "내려받는 중", en: "Downloading" },
+  "localRetrieval.transfer.VERIFYING": { ko: "검증 중", en: "Verifying" },
+  "localRetrieval.projectTitle": { ko: "이 프로젝트의 자료 색인", en: "Source index for this project" },
+  "localRetrieval.noProject": {
+    ko: "프로젝트를 열면 그 프로젝트의 자료 색인을 준비할 수 있습니다.",
+    en: "Open a project to prepare its source index.",
+  },
+  "localRetrieval.enableLabel": { ko: "이 프로젝트에서 로컬 색인 사용", en: "Use local indexing in this project" },
+  "localRetrieval.enableHelp": {
+    ko: "켜도 검색 결과는 바뀌지 않습니다. 색인은 '색인 준비'를 눌러야만 시작됩니다.",
+    en: "Turning this on does not change search results. Indexing starts only when you choose 'Prepare index'.",
+  },
+  "localRetrieval.prepareNotAllowed": { ko: "이 프로젝트의 색인을 바꿀 권한이 없습니다.", en: "You cannot change this project's index." },
+  "localRetrieval.configureConflict": {
+    ko: "설정이 다른 곳에서 바뀌어 저장하지 않았습니다. 최신 상태를 다시 불러왔습니다.",
+    en: "The setting changed elsewhere, so nothing was saved. The latest state was reloaded.",
+  },
+  "localRetrieval.configureFailed": { ko: "설정을 저장하지 못했습니다.", en: "The setting could not be saved." },
+  "localRetrieval.index.OFF": { ko: "꺼짐", en: "Off" },
+  "localRetrieval.index.NO_SOURCES": { ko: "색인할 자료 없음", en: "No sources to index" },
+  "localRetrieval.index.INDEX_PENDING": { ko: "색인 대기", en: "Index pending" },
+  "localRetrieval.index.INDEXING": { ko: "색인 중", en: "Indexing" },
+  "localRetrieval.index.READY": { ko: "색인 준비됨", en: "Index ready" },
+  "localRetrieval.index.FAILED": { ko: "일부 실패", en: "Some failed" },
+  "localRetrieval.index.CANCEL_REQUESTED": { ko: "취소 요청됨", en: "Cancel requested" },
+  "localRetrieval.prepareButton": { ko: "색인 준비", en: "Prepare index" },
+  "localRetrieval.prepareBlockedOff": { ko: "먼저 이 프로젝트에서 로컬 색인을 켜세요.", en: "Turn on local indexing in this project first." },
+  "localRetrieval.prepareBlockedAsset": { ko: "모델 파일이 준비돼야 색인을 준비할 수 있습니다.", en: "The model files must be ready before an index can be prepared." },
+  "localRetrieval.prepareBlockedDependency": {
+    ko: "실행 구성 요소가 없어 색인 준비를 할 수 없습니다.",
+    en: "No index can be prepared because the runtime component is missing.",
+  },
+  "localRetrieval.readyNote": {
+    ko: "자료 색인이 준비돼도 기존 검색 방식은 그대로입니다. 실제 검색에 쓰는 기능은 아직 없습니다.",
+    en: "Even when the source index is ready, the existing search method stays as it is. Nothing uses it in real searches yet.",
+  },
+  "localRetrieval.jobsTitle": { ko: "색인 작업", en: "Index jobs" },
+  "localRetrieval.job.PENDING": { ko: "대기", en: "Pending" },
+  "localRetrieval.job.RUNNING": { ko: "실행 중", en: "Running" },
+  "localRetrieval.job.READY": { ko: "준비됨", en: "Ready" },
+  "localRetrieval.job.FAILED": { ko: "실패", en: "Failed" },
+  "localRetrieval.job.CANCELLED": { ko: "취소됨", en: "Cancelled" },
+  "localRetrieval.job.STALE": { ko: "자료 바뀜", en: "Source changed" },
+  "localRetrieval.retryButton": { ko: "다시 시도", en: "Retry" },
+  "localRetrieval.cancelButton": { ko: "취소 요청", en: "Request cancel" },
+  "localRetrieval.op.import": { ko: "폴더 가져오기", en: "Folder import" },
+  "localRetrieval.op.install": { ko: "내려받아 설치", en: "Download and install" },
+  "localRetrieval.op.prepare": { ko: "색인 준비", en: "Index preparation" },
+  "localRetrieval.op.retry": { ko: "작업 다시 시도", en: "Job retry" },
+  "localRetrieval.opStarting": { ko: "시작 요청 중", en: "Starting" },
+  "localRetrieval.opRunning": { ko: "진행 중", en: "In progress" },
+  "localRetrieval.opCancelRequested": {
+    ko: "취소 요청됨 — 서버가 실제로 멈췄는지 확인하는 중입니다.",
+    en: "Cancel requested — checking whether the server actually stopped.",
+  },
+  "localRetrieval.opCancelRejected": { ko: "취소 요청을 서버가 받아들이지 않았습니다. 작업은 계속됩니다.", en: "The server did not accept the cancel request. The work continues." },
+  "localRetrieval.opCancelUnconfirmed": { ko: "취소 요청이 전달됐는지 확인하지 못했습니다.", en: "It could not be confirmed that the cancel request arrived." },
+  "localRetrieval.opSucceeded": { ko: "완료", en: "Completed" },
+  "localRetrieval.opFailed": { ko: "실패", en: "Failed" },
+  "localRetrieval.opCancelled": { ko: "취소됨 — 서버가 작업 종료를 확인했습니다.", en: "Cancelled — the server confirmed that the work stopped." },
+  "localRetrieval.opRejected": { ko: "서버가 작업을 시작하지 않았습니다.", en: "The server did not start the work." },
+  "localRetrieval.opUnconfirmed": {
+    ko: "결과를 확인하지 못했습니다. 서버 작업은 계속되고 있을 수 있습니다. 같은 작업의 결과를 확인하거나 새로 실행할 수 있습니다.",
+    en: "The result could not be confirmed. The server may still be working. You can check the same work's result or run it again as new work.",
+  },
+  "localRetrieval.opStartUnconfirmed": {
+    ko: "시작 요청이 서버에 닿았는지 확인하지 못했습니다. '결과 확인'은 같은 요청으로 다시 묻고, '새로 실행'은 새 작업을 만듭니다.",
+    en: "It could not be confirmed that the start request reached the server. 'Check result' asks again with the same request; 'Run as new' creates new work.",
+  },
+  "localRetrieval.opAbandoned": { ko: "화면이 바뀌어 결과 확인을 멈췄습니다.", en: "The screen changed, so result checking stopped." },
+  "localRetrieval.confirmResultButton": { ko: "결과 확인", en: "Check result" },
+  "localRetrieval.newRunButton": { ko: "새로 실행", en: "Run as new" },
+  "localRetrieval.operationLabel": { ko: "서버 작업", en: "Server work" },
+  "localRetrieval.reasonUnknown": { ko: "알 수 없는 이유", en: "Unknown reason" },
+} as const;
+
+export type LocalRetrievalMessageKey = keyof typeof localRetrievalMessages;
+
+export function localRetrievalText(key: LocalRetrievalMessageKey, locale: LanguageCode): string {
+  return localRetrievalMessages[key][locale];
+}
+
+/** Server reason codes shown to people. Unknown codes fall back to a generic line plus the code itself. */
+export const localRetrievalReasonMessages = {
+  RESOURCE_AUTHORITY_CHANGED: { ko: "작업 중 권한이나 로그인 상태가 바뀌었습니다.", en: "Access or session authority changed during the operation." },
+  LOCAL_RETRIEVAL_FAILED: { ko: "로컬 준비 작업을 마치지 못했습니다.", en: "Local preparation could not finish." },
+  LOCAL_RETRIEVAL_PROJECT_MISSING: { ko: "프로젝트를 찾을 수 없습니다.", en: "The project could not be found." },
+  EMBEDDING_NOT_PREPARED: { ko: "모델 실행기가 준비되지 않았습니다. 색인 준비를 다시 요청하세요.", en: "The model worker is not prepared. Request index preparation again." },
+  EMBEDDING_PROTOCOL_FAILED: { ko: "모델 실행기의 응답 형식을 확인하지 못했습니다.", en: "The model worker returned an invalid response." },
+  EMBEDDING_JOB_NOT_FOUND: { ko: "지정한 색인 작업을 찾을 수 없습니다.", en: "The specified index job could not be found." },
+  EMBEDDING_REQUEST_DEADLINE: { ko: "색인 준비의 전체 제한 시간을 넘었습니다.", en: "Index preparation exceeded its total time limit." },
+  MODEL_NOT_INSTALLED: { ko: "모델 파일이 설치돼 있지 않습니다.", en: "The model files are not installed." },
+  MODEL_HASH_MISMATCH: { ko: "모델 파일이 고정된 내용과 다릅니다.", en: "The model files differ from the fixed content." },
+  EMBEDDING_DEPENDENCY_UNAVAILABLE: { ko: "로컬 실행 구성 요소가 없습니다.", en: "The local runtime component is missing." },
+  EMBEDDING_LOAD_FAILED: { ko: "모델을 메모리에 올리지 못했습니다.", en: "The model could not be loaded." },
+  EMBEDDING_TIMEOUT: { ko: "제한 시간 안에 끝나지 않았습니다.", en: "It did not finish within the time limit." },
+  EMBEDDING_FAILED: { ko: "색인 작업이 실패했습니다.", en: "The indexing work failed." },
+  EMBEDDING_SOURCE_CHANGED: { ko: "자료가 바뀌어 이 색인은 더 이상 맞지 않습니다.", en: "The source changed, so this index no longer matches." },
+  EMBEDDING_SOURCE_CORRUPT: { ko: "저장된 자료 내용이 기록과 맞지 않습니다.", en: "The stored source content does not match its record." },
+  EMBEDDING_CONFIG_CONFLICT: { ko: "설정이 다른 곳에서 바뀌었습니다.", en: "The setting changed elsewhere." },
+  EMBEDDING_DISABLED: { ko: "이 프로젝트에서 로컬 색인이 꺼져 있습니다.", en: "Local indexing is off in this project." },
+  EMBEDDING_PROJECT_SCOPE_DENIED: { ko: "이 프로젝트에 대한 권한이 없습니다.", en: "You do not have access to this project." },
+  EMBEDDING_INDEX_ACTOR_CHANGED: { ko: "색인을 켠 사람과 달라 실행할 수 없습니다.", en: "A different person turned the index on, so this cannot run." },
+  EMBEDDING_JOB_NOT_PENDING: { ko: "이 작업은 이미 처리됐거나 대기 상태가 아닙니다.", en: "This job was already handled or is not pending." },
+  EMBEDDING_RETRY_CONFLICT: { ko: "작업 상태가 바뀌어 다시 시도하지 않았습니다.", en: "The job state changed, so it was not retried." },
+  INDEX_PENDING: { ko: "색인이 아직 준비되지 않았습니다.", en: "The index is not ready yet." },
+  INDEX_STALE: { ko: "색인이 현재 자료와 맞지 않습니다.", en: "The index does not match the current sources." },
+  INDEX_INCOMPLETE: { ko: "색인이 완전하지 않습니다.", en: "The index is incomplete." },
+  PASSAGE_TOO_LONG: { ko: "자료 구간이 모델의 길이 제한을 넘습니다.", en: "The source passage exceeds the model length limit." },
+  MODEL_SOURCE_MISSING: { ko: "가져올 원본 폴더가 없습니다.", en: "The source folder to import does not exist." },
+  QUERY_TOO_LONG: { ko: "입력이 너무 깁니다.", en: "The input is too long." },
+  MODEL_ASSET_PATH_INVALID: { ko: "폴더 경로를 쓸 수 없습니다. 실제 복사본 폴더의 절대 경로를 입력하세요.", en: "The folder path cannot be used. Enter the absolute path of a real copied folder." },
+  MODEL_ASSET_BUSY: { ko: "같은 모델을 이미 설치하는 중입니다.", en: "The same model is already being installed." },
+  MODEL_ASSET_CONSENT_REQUIRED: { ko: "네트워크 다운로드 동의가 없어 설치하지 않았습니다.", en: "Not installed: the network download was not confirmed." },
+  MODEL_DOWNLOAD_FAILED: { ko: "내려받기에 실패했습니다. 인터넷 연결을 확인하세요.", en: "The download failed. Check the internet connection." },
+  MODEL_MANIFEST_CHANGED: { ko: "화면의 파일 목록이 서버의 고정 목록과 달라 다시 확인이 필요합니다.", en: "The file list on screen differs from the server's fixed list; confirm again." },
+  LOCAL_RETRIEVAL_SCOPE_DENIED: { ko: "모델 파일을 관리할 권한이 없습니다.", en: "You cannot manage model files." },
+  MODEL_ASSET_TIMEOUT: { ko: "파일 준비 제한 시간을 넘었습니다.", en: "File preparation exceeded its time limit." },
+  MODEL_ASSET_CLEANUP_UNCONFIRMED: { ko: "파일 작업 종료를 확인하지 못했습니다. 상태를 다시 확인하세요.", en: "File work termination is unconfirmed. Check its status again." },
+  MODEL_ASSET_IO_FAILED: { ko: "로컬 파일을 읽거나 저장하지 못했습니다.", en: "Local files could not be read or saved." },
+  MODEL_DOWNLOAD_DESTINATION_DENIED: { ko: "허용된 파일 제공처가 아니어서 중단했습니다.", en: "Stopped: the destination is not an allowed file host." },
+  MODEL_DOWNLOAD_REDIRECT_LIMIT: { ko: "파일 제공처의 이동 횟수가 제한을 넘었습니다.", en: "The file host exceeded the redirect limit." },
+  LOCAL_RETRIEVAL_LOCAL_ONLY: { ko: "로컬 작업 공간에서만 사용할 수 있습니다.", en: "Only available in a local workspace." },
+  EMBEDDING_INDEX_BUSY: { ko: "다른 색인 작업이 진행 중입니다.", en: "Another index operation is running." },
+  EMBEDDING_CLEANUP_UNCONFIRMED: { ko: "모델 작업 종료를 확인하지 못했습니다.", en: "Model worker termination is unconfirmed." },
+  OPERATION_TIMEOUT: { ko: "서버 작업이 제한 시간 안에 끝나지 않았습니다.", en: "The server work did not finish within its time limit." },
+  CALLER_CANCELLED: { ko: "요청에 따라 취소됐습니다.", en: "Cancelled as requested." },
+} as const;
+
+export type LocalRetrievalReasonCode = keyof typeof localRetrievalReasonMessages;
+
+export function isKnownLocalRetrievalReason(code: string): code is LocalRetrievalReasonCode {
+  return Object.hasOwn(localRetrievalReasonMessages, code);
+}
+
+/** A code is shown as is only when it looks like a code; anything else (paths, messages) is hidden. */
+const codeShape = /^[A-Z][A-Z0-9_]{2,79}$/;
+
+export function localRetrievalReason(code: string | null | undefined, locale: LanguageCode): string {
+  if (!code) return localRetrievalText("localRetrieval.reasonUnknown", locale);
+  if (isKnownLocalRetrievalReason(code)) return localRetrievalReasonMessages[code][locale];
+  const shown = codeShape.test(code) ? ` (${code})` : "";
+  return `${localRetrievalText("localRetrieval.reasonUnknown", locale)}${shown}`;
+}
+
+const localeTag = (locale: LanguageCode) => locale === "ko" ? "ko-KR" : "en-US";
+
+/** "123.6 MB · 129,606,142 bytes": the rounded size and the exact byte count. */
+export function localRetrievalBytes(bytes: number, locale: LanguageCode): string {
+  const exact = new Intl.NumberFormat(localeTag(locale)).format(bytes);
+  const megabytes = (bytes / 1_000_000).toLocaleString(localeTag(locale), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  return locale === "ko" ? `${megabytes} MB · ${exact} 바이트` : `${megabytes} MB · ${exact} bytes`;
+}
+
+export function localRetrievalCounts(
+  counts: { ready: number; total: number; pending: number; failed: number }, locale: LanguageCode,
+): string {
+  const n = (value: number) => new Intl.NumberFormat(localeTag(locale)).format(value);
+  return locale === "ko"
+    ? `준비 ${n(counts.ready)} / 전체 ${n(counts.total)} · 대기 ${n(counts.pending)} · 실패 ${n(counts.failed)}`
+    : `Ready ${n(counts.ready)} of ${n(counts.total)} · pending ${n(counts.pending)} · failed ${n(counts.failed)}`;
+}
+
+export function localRetrievalTransfer(
+  transfer: { state: "COPYING" | "DOWNLOADING" | "VERIFYING"; transferred_bytes: number; total_bytes: number }, locale: LanguageCode,
+): string {
+  const n = (value: number) => new Intl.NumberFormat(localeTag(locale)).format(value);
+  const label = localRetrievalText(`localRetrieval.transfer.${transfer.state}`, locale);
+  return locale === "ko"
+    ? `${label} · ${n(transfer.transferred_bytes)} / ${n(transfer.total_bytes)} 바이트`
+    : `${label} · ${n(transfer.transferred_bytes)} / ${n(transfer.total_bytes)} bytes`;
+}

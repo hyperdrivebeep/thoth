@@ -77,12 +77,11 @@ def handler(sources: Sources | None = None) -> memory_full.MemoryFullHandlers:
 @pytest.mark.asyncio
 @pytest.mark.parametrize("mode", [None, "DOMAIN_REFERENCE", "MEMORY_ASSERTION", "", "unknown"])
 @pytest.mark.parametrize("recall", [None, "FACT", "LESSON", "", "unknown"])
-@pytest.mark.parametrize("enabled", [True, False])
 async def test_policy_filter_combinations_keep_order_and_original_dicts(
-    mode: str | None, recall: str | None, enabled: bool
+    mode: str | None, recall: str | None
 ) -> None:
     value = await handler().policy_list(
-        {"project_id": "p", "payload_mode": mode, "recall_class": recall, "enabled_only": enabled}
+        {"project_id": "p", "payload_mode": mode, "recall_class": recall}
     )
     indexes: list[int] = []
     if mode in (None, "DOMAIN_REFERENCE") and recall in (None, "FACT"):

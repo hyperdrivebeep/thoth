@@ -18,7 +18,6 @@ Evidence files: outputs/refactor-step96-20261015/step0-multiwrite-*.json.
 
 from __future__ import annotations
 
-import json
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -35,7 +34,6 @@ from thoth.application.services.control_record_service import ControlRecordServi
 from thoth.apps.runtime import create_runtime
 from thoth.protocol.deferred import current_operation
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step96-20261015"
 PROJECT = "project:memory-step0"
 BOOKKEEPING = {
     "operations",
@@ -59,13 +57,6 @@ EXPECTED_ORDER = {
     ),
     "retire_propose": (("RETIRE_CANDIDATE", "retire"), ("CHANGE_SET_PROPOSAL", "change-set")),
 }
-
-
-def save(name: str, data: dict[str, Any]) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / f"step0-multiwrite-{name}.json").write_text(
-        json.dumps(data, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 async def call(runtime: Any, method: str, key: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -283,14 +274,7 @@ async def test_control_route_success_writes_the_two_rows_in_source_order(
                 request(method, f"step0-{route}-ok", payload),
             )
         ) == {"control_records"}
-        save(
-            f"{route}-success",
-            {
-                "route": method,
-                "rows_added_in_order": added,
-                "later_reads": await later_reads(runtime, route, candidate_id, "ok"),
-            },
-        )
+        await later_reads(runtime, route, candidate_id, "ok")
     finally:
         runtime.close()
 
@@ -330,7 +314,7 @@ async def test_second_control_write_failure_rolls_back_both_rows_and_keeps_faile
         replayed = await runtime.bus.dispatch(request(method, key, payload))
         assert replayed.error is not None
         assert replayed.error == failed.error
-        replay_changes = table_changes(before_replay, snapshot(runtime.ledger.engine))
+        table_changes(before_replay, snapshot(runtime.ledger.engine))
         assert rows(runtime) == rows_after
 
         retry_key = key + "-new-key"
@@ -338,9 +322,8 @@ async def test_second_control_write_failure_rolls_back_both_rows_and_keeps_faile
         rows_retry = rows(runtime)
         retry_added = rows_retry[len(rows_after) :]
         reads_after_retry = await later_reads(runtime, route, candidate_id, "retry")
-        follow_up: dict[str, Any] | None = None
         if route == "validate":
-            follow_up = await call(
+            await call(
                 runtime,
                 "memory/changeSet/propose",
                 f"step0-{route}-{mode}-follow-up",
@@ -351,28 +334,6 @@ async def test_second_control_write_failure_rolls_back_both_rows_and_keeps_faile
                     "validated_gate_digest": retried["gate_digest"],
                 },
             )
-        save(
-            f"{route}-{mode}",
-            {
-                "route": method,
-                "hits_in_order": hits,
-                "error": failed.error.model_dump(mode="json"),
-                "rows_added_by_failed_request": added,
-                "domain_tables_changed_by_failed_request": domain_changes(
-                    changes, before, fault_after, request(method, key, payload)
-                ),
-                "later_reads_before": reads_before,
-                "later_reads_after_fault": reads_after_fault,
-                "reopened_rows_equal": True,
-                "same_key_replay_returns_same_error": True,
-                "same_key_replay_changes": replay_changes,
-                "new_key_retry_rows_added": retry_added,
-                "later_reads_after_new_key_retry": reads_after_retry,
-                "follow_up_changeSet_after_validate_retry": None
-                if follow_up is None
-                else sorted(follow_up),
-            },
-        )
         assert [item["type"] for item in retry_added] == [t for t, _ in EXPECTED_ORDER[route]]
         if route == "validate":
             # Approved P1 contract: neither gate nor candidate revision leaks on either fault.
@@ -424,17 +385,7 @@ async def test_competing_revision_between_read_and_append_gives_two_rows_with_on
             patch.setattr(SqliteControlRecordStore, "append", append)
             response = await runtime.bus.dispatch(request(method, key, payload))
         found = [item for item in rows(runtime) if item["record_id"] == candidate_id]
-        read = await later_reads(runtime, "validate", candidate_id, "race")
-        save(
-            "validate-competing-revision",
-            {
-                "response_error": None
-                if response.error is None
-                else response.error.model_dump(mode="json"),
-                "candidate_rows": found,
-                "candidate_read_after": read,
-            },
-        )
+        await later_reads(runtime, "validate", candidate_id, "race")
         assert response.error is None
         versions = [item["version"] for item in found]
         assert len(versions) != len(set(versions))

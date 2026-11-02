@@ -8,6 +8,7 @@ from typing import TypedDict
 from thoth.adapters.connectors import ConnectorRegistry
 from thoth.adapters.storage.sqlite import SqliteLedger
 from thoth.application.services.embedding_index_service import EmbeddingIndexService
+from thoth.application.services.local_retrieval import LocalRetrievalService
 from thoth.domain.deployment_mode import DeploymentMode
 from thoth.domain.environment import EnvironmentProfile
 from thoth.domain.resource_scope import ResourceScopePolicy
@@ -30,10 +31,13 @@ class RuntimeWithLedger[LedgerT: ManagedLedgerPort]:
     ledger: LedgerT
     close_storage: Callable[[], None] | None = None
     embedding_index: EmbeddingIndexService | None = None
+    local_retrieval: LocalRetrievalService | None = None
 
     def close(self) -> None:
         try:
-            if self.embedding_index is not None:
+            if self.local_retrieval is not None:
+                self.local_retrieval.close()
+            elif self.embedding_index is not None:
                 self.embedding_index.close()
         finally:
             self.bus.close_tasks()

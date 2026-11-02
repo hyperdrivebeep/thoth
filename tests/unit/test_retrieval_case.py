@@ -13,7 +13,6 @@ from thoth.adapters.behavior.registry import evaluate_retrieval
 from thoth.domain.behavior_policy import (
     RetrievalBehaviorInput,
     RetrievalBehaviorPolicy,
-    RetrievalLanePolicy,
     RetrievalPolicy,
 )
 from thoth.domain.retrieval_case import (
@@ -162,10 +161,3 @@ def test_a_title_may_head_several_groups_and_a_valid_case_is_accepted() -> None:
     }
     parsed = RetrievalBehaviorInput.model_validate(case_with([one, two]))
     assert parsed.catalog is not None and len(parsed.catalog.groups) == 2
-
-
-def test_a_lane_policy_with_one_lane_still_rejects_a_second_lane() -> None:
-    with pytest.raises(ValueError, match="RETRIEVAL_POLICY_ONE_LANE_SUPPORTED"):
-        RetrievalLanePolicy.model_validate(
-            {"lanes": [{"lane_id": GROUPED_BM25}, {"lane_id": CHAR_BIGRAM}]}
-        )

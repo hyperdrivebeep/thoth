@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -17,8 +16,6 @@ from tests.integration.test_a03_storage_atomicity import setup
 from thoth.adapters.storage.hypothesis import SqliteHypothesisStore
 from thoth.adapters.storage.schema import hypothesis_audit
 from thoth.protocol.deferred import current_operation
-
-_OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step75-20261014"
 
 
 @pytest.mark.parametrize("kind", ["split", "merge"])
@@ -149,10 +146,6 @@ async def test_proposal_audit_insert_failure_does_not_apply_or_publish(
             "before": before,
             "after": after,
         }
-        _OUT.mkdir(parents=True, exist_ok=True)
-        (_OUT / f"proposal-{kind}.json").write_text(
-            json.dumps(evidence, indent=2, default=str) + "\n", encoding="utf-8"
-        )
         assert failed.error is not None and len(hits) == 1
         assert hits[0]["row"] is not None and hits[0]["in_transaction"] and hits[0]["same_engine"]
         assert (
@@ -199,9 +192,6 @@ async def test_proposal_audit_insert_failure_does_not_apply_or_publish(
             heads_unchanged=True,
             hypotheses_unchanged=True,
             verdict="PASS",
-        )
-        (_OUT / f"proposal-{kind}.json").write_text(
-            json.dumps(evidence, indent=2, default=str) + "\n", encoding="utf-8"
         )
     finally:
         reopened.close()

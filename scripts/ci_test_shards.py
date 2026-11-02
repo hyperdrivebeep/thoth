@@ -1,4 +1,4 @@
-"""Balance integration test files without changing pytest's collection or exclusion policy.
+"""Select conservative CI scope and balance integration files without changing pytest collection.
 
 Refresh timings from a complete JUnit report (including failed tests):
   python scripts/ci_test_shards.py refresh --junit test-results/python.xml
@@ -15,7 +15,9 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import statistics
+import subprocess
 import xml.etree.ElementTree as ET
 from collections import Counter
 from collections.abc import Mapping, Sequence
@@ -24,6 +26,63 @@ from typing import cast
 
 ROOT = Path(__file__).resolve().parents[1]
 TIMINGS = Path("tests/ci/integration_durations.json")
+
+
+def documentation_only(paths: Sequence[str]) -> bool:
+    """Only presentation documentation can bypass the product suite, never policy documents."""
+    documents = [value for value in paths if value != "SOURCE_MANIFEST.json"]
+    if not documents:
+        return False
+    for value in documents:
+        path = PurePosixPath(value)
+        if (
+            value != path.as_posix()
+            or any(char in value for char in ("\\", ":", "\n", "\r", "\t"))
+            or path.is_absolute()
+            or ".." in path.parts
+        ):
+            return False
+        if value in {"README.md", "README.ko.md"}:
+            continue
+        if path.parts[:2] in {
+            ("docs", "screenshots"),
+            ("docs", "brand"),
+        } and path.suffix.lower() in {
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".webp",
+            ".gif",
+            ".svg",
+        }:
+            continue
+        return False
+    return True
+
+
+def scope_for_revision(root: Path, event: str, base: str) -> dict[str, bool | str]:
+    full: dict[str, bool | str] = {"docs_only": False, "reason": "Full product verification"}
+    if event != "pull_request" or not re.fullmatch(r"[0-9a-f]{40}", base):
+        return full
+    try:
+        changed = subprocess.run(
+            ["git", "diff", "--name-only", "--no-renames", "-z", base, "HEAD", "--"],
+            cwd=root,
+            capture_output=True,
+            check=False,
+            timeout=30,
+        )
+        if changed.returncode or not changed.stdout.endswith(b"\0"):
+            return full
+        paths = changed.stdout.decode("utf-8").split("\0")[:-1]
+    except (OSError, UnicodeError, subprocess.TimeoutExpired):
+        return full
+    if not documentation_only(paths):
+        return full
+    return {
+        "docs_only": True,
+        "reason": "README or presentation images only; product suite NOT_RUN",
+    }
 
 
 def is_test_path(value: str) -> bool:
@@ -126,13 +185,18 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("command", choices=("plan", "select", "refresh"))
+    parser.add_argument("command", choices=("plan", "select", "refresh", "scope"))
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--durations", type=Path, default=TIMINGS)
     parser.add_argument("--count", type=int, default=16)
     parser.add_argument("--index", type=int)
     parser.add_argument("--junit", type=Path)
+    parser.add_argument("--event", default="")
+    parser.add_argument("--base", default="")
     args = parser.parse_args(argv)
+    if args.command == "scope":
+        print(json.dumps(scope_for_revision(args.root, args.event, args.base)))
+        return 0
     try:
         files = discover(args.root)
         timing_path = args.root / args.durations

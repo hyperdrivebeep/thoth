@@ -4,6 +4,8 @@ from __future__ import annotations
 
 READ_QUERY_METHODS = frozenset(
     {
+        "model/localAsset/read",
+        "project/retrieval/experiment/read",
         "revision/timeline/read",
         "revision/restore/preview",
         "revision/diff/read",

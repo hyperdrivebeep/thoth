@@ -213,6 +213,30 @@ CREDENTIAL_METHOD_METADATA: dict[str, dict[str, object]] = {
 }
 
 
+# Explicit preparation is not a research-model call or automatic policy activation.
+LOCAL_RETRIEVAL_METHODS = (
+    "model/localAsset/read",
+    "model/localAsset/import",
+    "model/localAsset/install",
+    "project/retrieval/experiment/read",
+    "project/retrieval/experiment/configure",
+    "project/retrieval/experiment/prepare",
+    "project/embeddingIndex/retry",
+)
+for _name in LOCAL_RETRIEVAL_METHODS:
+    CREDENTIAL_METHOD_METADATA[_name] = {
+        "surface": "QUERY" if _name.endswith("/read") else "COMMAND",
+        "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+        "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+        "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+        "behavioral_evidence": (
+            "tests/integration/test_local_retrieval_rpc.py",
+            "tests/unit/test_model_download.py",
+            "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx",
+        ),
+    }
+
+
 def _credential_metadata(name: str, surface: str) -> dict[str, object]:
     metadata = CREDENTIAL_METHOD_METADATA.get(name)
     required = {

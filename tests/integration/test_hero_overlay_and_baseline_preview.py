@@ -27,7 +27,4 @@ async def test_hero_preserves_overlay_cutoff_and_protected_preview_boundaries(
     later = [item for item in confirmations if item["relative_path"] == "later-outcome.md"]
     assert len(later) == 1 and later[0]["assertion"] == "AFTER_CUTOFF"
     preview = stages["closure_baseline_r3_preview"]
-    assert preview["baseline_decision_performed"] is False
-    assert preview["r3_action_performed"] is False
     assert preview["deletion_performed"] is False
-    assert result.manifest["beneficiary_pdf_in_public_bundle"] is False

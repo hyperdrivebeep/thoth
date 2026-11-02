@@ -24,7 +24,6 @@ from thoth.adapters.storage.sqlite import SqliteLedgerTransaction
 from thoth.adapters.storage.transaction import read_connection
 from thoth.protocol.deferred import current_operation
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step89-20261014"
 BOOKKEEPING = {"operations", "idempotency_keys", "events", "operation_resource_bindings"}
 LEDGER_POINTS = ("insert_snapshot", "insert_revision", "set_head", "insert_receipt")
 WRITERS = {
@@ -56,13 +55,6 @@ RECORDS = (
     ("portfolio", "portfolio_id", "portfolio_revision_id"),
     ("plan", "plan_id", "plan_revision_id"),
 )
-
-
-def save(name: str, data: dict[str, Any]) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / (name + ".json")).write_text(
-        json.dumps(data, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 async def call(runtime: Any, method: str, key: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -747,7 +739,6 @@ async def test_decision_chain_control(tmp_path: Path) -> None:
         assert second["action_id"] in proposal["merge_proposal"]["action_ids"]
         expected = await views(runtime, ctx, "89a-live")
         persisted = snapshot(runtime.ledger.engine)
-        save("control-decision-chain", {"views": expected, "heads": expected["heads"]})
         assert expected["action/audit/read"]["records"]
     finally:
         runtime.close()
@@ -799,20 +790,6 @@ async def test_action_post_write_failure_is_atomic(
             (use["resource_ref"], use["capability"])
             for use in json.loads(binding_row["content_json"])["resource_uses"]
         )
-        evidence: dict[str, Any] = {
-            "case": [kind, point],
-            "request": command.model_dump(mode="json"),
-            "error": failed.model_dump(mode="json").get("error"),
-            "expected_reads": reads,
-            "observed_resource_uses": actual_reads,
-            "actual_callable": binding,
-            "fault": state,
-            "changed_tables": sorted(
-                name
-                for name in before
-                if not unchanged_or_operation_owner(before, after, name, command)
-            ),
-        }
         assert len(state["hits"]) == 1, "HOLD_CONTRACT_MISMATCH: expected target hit1"
         assert not state["violations"], ("HOLD_DEFECT", state["violations"])
         assert failed.error is not None, "HOLD_DEFECT: post-write failure reported success"
@@ -837,7 +814,6 @@ async def test_action_post_write_failure_is_atomic(
             assert "action_plans" in participants
         if kind == "merge":
             assert state["selected_audit"]["payload"]["applied"] is False
-        save(key, evidence)
     finally:
         runtime.close()
     reopened = create_runtime(tmp_path)
@@ -856,6 +832,5 @@ async def test_action_post_write_failure_is_atomic(
             assert dict(reopened.ledger.read_heads(ctx["project"])) == views_before["heads"]
         else:
             check_publication(reopened, ctx, recovered)
-        save(key, {**evidence, "verdict": "PASS", "replay_exact": True})
     finally:
         reopened.close()

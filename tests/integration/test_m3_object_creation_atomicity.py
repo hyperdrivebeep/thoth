@@ -19,15 +19,7 @@ from thoth.apps.runtime import AppRuntime
 from thoth.domain.project import WorkThread
 from thoth.protocol.deferred import current_operation
 
-_EVIDENCE = Path(__file__).resolve().parents[2] / "outputs/refactor-step68-20261014"
 _THREAD = "thread:a03-storage"
-
-
-def _save(name: str, data: dict[str, Any]) -> None:
-    _EVIDENCE.mkdir(parents=True, exist_ok=True)
-    (_EVIDENCE / name).write_text(
-        json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
 
 
 async def _views(runtime: AppRuntime, project: str, phase: str) -> dict[str, Any]:
@@ -109,7 +101,6 @@ async def test_creation_success_control_and_replay(tmp_path: Path) -> None:
             and r["target_ref"] == "OBJECT:" + parent["object_id"]
             for r in live["dependencies"]
         )
-        _save("control-live.json", {"created": created, "views": live})
     finally:
         runtime.close()
     reopened = create_runtime(tmp_path)
@@ -117,7 +108,6 @@ async def test_creation_success_control_and_replay(tmp_path: Path) -> None:
         assert snapshot(reopened.ledger.engine) == after_read
         restored = await _views(reopened, project, "reopened")
         assert restored == live
-        _save("control-reopened.json", {"views": restored, "snapshot_unchanged": True})
     finally:
         reopened.close()
 
@@ -204,22 +194,7 @@ async def test_followup_failure_keeps_creation_checkpoint_atomic(
     reopened = create_runtime(tmp_path)
     try:
         restarted = snapshot(reopened.ledger.engine)
-        restored = await _views(reopened, project, "fault-reopened")
-        _save(
-            fault + ".json",
-            {
-                "contract_status": "followup interpretation of accepted creation owner contract",
-                "request": command.model_dump(mode="json"),
-                "response": response.model_dump(mode="json"),
-                "seam_hits": hits,
-                "operations": operation_rows,
-                "whole_db_before": before,
-                "whole_db_after": after,
-                "whole_db_delta": delta,
-                "whole_db_reopened": restarted,
-                "reopened": restored,
-            },
-        )
+        await _views(reopened, project, "fault-reopened")
         assert len(hits) == 1, hits
         assert restarted == after
         assert response.error is not None, "Rejected thread attachment must not report success"

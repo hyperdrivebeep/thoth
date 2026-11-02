@@ -16,10 +16,19 @@ from thoth.domain.embedding_index import (
 )
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
-from thoth.ports.embedding_index import BoundedEmbeddingWorkerPort, EmbeddingIndexStorePort
+from thoth.ports.embedding_index import (
+    BoundedEmbeddingWorkerPort,
+    EmbeddingIndexStorePort,
+    PreparableEmbeddingWorkerPort,
+)
 from thoth.ports.governance import GovernanceStorePort
 from thoth.ports.project import ProjectStorePort
 from thoth.ports.runtime import AtomicUnitOfWorkPort, ClockPort, IdGeneratorPort
+
+
+def _require_deadline(stop_at: float) -> None:
+    if asyncio.get_running_loop().time() >= stop_at:
+        raise TimeoutError("EMBEDDING_REQUEST_DEADLINE")
 
 
 class EmbeddingIndexService:
@@ -174,13 +183,21 @@ class EmbeddingIndexService:
             stop_at = min(stop_at, deadline)
         if loop.time() >= stop_at:
             raise TimeoutError("EMBEDDING_REQUEST_DEADLINE")
+        if isinstance(self.worker, PreparableEmbeddingWorkerPort):
+            async with asyncio.timeout_at(stop_at):
+                await self.worker.prepare(deadline=stop_at)
+            _require_deadline(stop_at)
         job = self.store.claim(project, job_id, self.ids.new("embedding-worker"), self._now())
         self._active[job_id] = (project, asyncio.current_task())
         try:
             async with asyncio.timeout_at(stop_at):
                 spans = self._read_source(job.intent)
+                _require_deadline(stop_at)
                 for span in spans:
                     self.store.assert_worker_boundary()
+                    # Cached work also yields to cancellation and foreground requests.
+                    await asyncio.sleep(0)
+                    _require_deadline(stop_at)
                     vector = self.store.cached(project, span.text_sha256)
                     if vector is None:
                         vector = await self.worker.encode_one(span.exact_text, role="PASSAGE")
@@ -188,10 +205,16 @@ class EmbeddingIndexService:
                         self.fault("after_encode_before_checkpoint")
                     with self.uow.transaction():
                         self._check_span(job.intent, span)
+                        _require_deadline(stop_at)
                         self.store.checkpoint(job, span.text_sha256, vector, self._now())
+                        _require_deadline(stop_at)
                 with self.uow.transaction():
                     self._read_source(job.intent)
-                    return self.store.publish(job, self._now())
+                    _require_deadline(stop_at)
+                    published = self.store.publish(job, self._now())
+                    # Raise inside the publication UoW so an overdue READY rolls back.
+                    _require_deadline(stop_at)
+                    return published
         except asyncio.CancelledError:
             if not self._closed:
                 self.store.finish(job, "CANCELLED", "CALLER_CANCELLED")
@@ -207,9 +230,12 @@ class EmbeddingIndexService:
         finally:
             self._active.pop(job_id, None)
 
-    async def drain(self, project: str) -> tuple[EmbeddingJob, ...]:
+    async def drain(
+        self, project: str, *, deadline: float | None = None
+    ) -> tuple[EmbeddingJob, ...]:
         config = self._owner(project)
-        deadline = asyncio.get_running_loop().time() + config.budget.job_timeout_ms / 1000
+        own_deadline = asyncio.get_running_loop().time() + config.budget.job_timeout_ms / 1000
+        deadline = min(deadline, own_deadline) if deadline is not None else own_deadline
         self.store.assert_worker_boundary()
         self.store.reconcile(project)
         done: list[EmbeddingJob] = []

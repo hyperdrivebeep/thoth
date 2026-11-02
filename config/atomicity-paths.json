@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "purpose": "DEVELOPMENT_VERIFICATION_LEDGER_NOT_RUNTIME_POLICY",
   "baseline_head": "f0262732a0e79235f3839c3393f459b90bd53783",
-  "catalog_sha256": "8a74465cef7448dd9315aec0d496cfba39685e6f5e693b059655cf079689e5e4",
+  "catalog_sha256": "aefc02cd38f66a9b51dcfd79d5abda6b0a5331ae2c5816f2c20aa8556273d817",
   "public_entries": [
     {
       "name": "action/audit/read",
@@ -9747,6 +9747,207 @@
         "rpc:workspace/setup/update"
       ],
       "mutation_observed_in_code": true
+    },
+    {
+      "name": "model/localAsset/import",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "model/localAsset/import",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.import_asset",
+      "source": "src/thoth/application/commands/local_retrieval.py",
+      "line": 123,
+      "callable_sha256": "97ece17b9d00d6fcf915b5a820f5b23c2ff008e6028d91de7c622c768e73b253",
+      "entry_kind": "public",
+      "path_id": "rpc:model/localAsset/import",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:model/localAsset/import",
+        "transport:operation_claim"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "model/localAsset/install",
+      "namespace": "model",
+      "surface": "COMMAND",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "model/localAsset/install",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.install_asset",
+      "source": "src/thoth/application/commands/local_retrieval.py",
+      "line": 139,
+      "callable_sha256": "8b9867efe5617ea37d04406888ffb4c46c0c2df252f637dd60538dcfd221fc1b",
+      "entry_kind": "public",
+      "path_id": "rpc:model/localAsset/install",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:model/localAsset/install",
+        "transport:operation_claim"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "model/localAsset/read",
+      "namespace": "model",
+      "surface": "QUERY",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "model/localAsset/read",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.read_asset",
+      "source": "src/thoth/application/commands/local_retrieval.py",
+      "line": 96,
+      "callable_sha256": "a01aabfadbfd82ada5f1d6b4d9ee1f487b367c2cfab1b75d91912f0abfb49912",
+      "entry_kind": "public",
+      "path_id": "rpc:model/localAsset/read",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:model/localAsset/read"
+      ],
+      "mutation_observed_in_code": false
+    },
+    {
+      "name": "project/embeddingIndex/retry",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "project/embeddingIndex/retry",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.retry",
+      "source": "src/thoth/application/commands/local_retrieval.py",
+      "line": 163,
+      "callable_sha256": "8326542f6b778f8923beb885b29fba745ff861de7e374e3422b3021f313c752f",
+      "entry_kind": "public",
+      "path_id": "rpc:project/embeddingIndex/retry",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:project/embeddingIndex/retry",
+        "transport:operation_claim"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "project/retrieval/experiment/configure",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "project/retrieval/experiment/configure",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.configure",
+      "source": "src/thoth/application/commands/local_retrieval.py",
+      "line": 113,
+      "callable_sha256": "97760910c7833ab0e6871c1873fe37ee5fd707534a48ec4a5dfdbd3eb5b7a931",
+      "entry_kind": "public",
+      "path_id": "rpc:project/retrieval/experiment/configure",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:project/retrieval/experiment/configure",
+        "transport:operation_claim"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "project/retrieval/experiment/prepare",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "project/retrieval/experiment/prepare",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.prepare",
+      "source": "src/thoth/application/commands/local_retrieval.py",
+      "line": 153,
+      "callable_sha256": "5bbf45b88c40a0a398ccdb6adcda784bd117ed33e25fa5aa5f621158d414aa3e",
+      "entry_kind": "public",
+      "path_id": "rpc:project/retrieval/experiment/prepare",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:project/retrieval/experiment/prepare",
+        "transport:operation_claim"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "project/retrieval/experiment/read",
+      "namespace": "project",
+      "surface": "QUERY",
+      "canonical_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "policy": "LOCAL only; fixed asset consent; project authority and generation; default OFF",
+      "normal_entrypoint": "LocalRetrievalSettingsCard via local query and async RPC",
+      "behavioral_evidence": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/unit/test_model_download.py",
+        "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "project/retrieval/experiment/read",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.read_project",
+      "source": "src/thoth/application/commands/local_retrieval.py",
+      "line": 108,
+      "callable_sha256": "20117ec8837d47860eb74c1407d11e576be16b3abb761bcf9c3c73c9522f04a5",
+      "entry_kind": "public",
+      "path_id": "rpc:project/retrieval/experiment/read",
+      "owner_scope": "SHARED_OR_OTHER_OWNER",
+      "phase_ids": [
+        "rpc:project/retrieval/experiment/read"
+      ],
+      "mutation_observed_in_code": false
     }
   ],
   "phases": [
@@ -69690,6 +69891,637 @@
       "blockers": [
         "New in the model-call interruption stage; no owner closure receipt."
       ]
+    },
+    {
+      "path_id": "rpc:model/localAsset/import",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "entry_kind": "public",
+      "method_or_trigger": "model/localAsset/import",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.import_asset",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/local_retrieval_composition.py",
+          "line": 60,
+          "binding": "handlers.import_asset"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.embeddings.assets.LocalModelAssets._lock_file",
+        "thoth.adapters.embeddings.assets.LocalModelAssets._copy"
+      ],
+      "phase_id": [
+        "ADMISSION",
+        "FILE_STAGING",
+        "FILE_REPLACE",
+        "CLEANUP"
+      ],
+      "composite_not_one_transaction": true,
+      "canonical_records_and_projections": [
+        "derived model files under models/<model>/<revision>/<manifest_digest>",
+        "attempt-local staging and publisher lock files"
+      ],
+      "head_selector": "Fixed asset manifest identity",
+      "audit_receipt_refs": [
+        "operations",
+        "idempotency_keys"
+      ],
+      "expected_basis": "LOCAL deployment; current actor/capability and project/workspace scope. The preparation catalog owner is outside the ten-owner closure model; no canonical-owner closure is asserted. Exact manifest digest and rechecked authority before IO and before atomic directory rename; READY installation is immutable.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "File staging/copy, publisher lock and directory rename are separate from operation/journal SQL transactions. Cancellation/cleanup confirmation is not atomic rollback of all IO.",
+      "allowed_phase_deltas": [
+        "Only this approved manifest installation and this attempt staging/lock paths may change; existing READY files and unrelated source paths must remain intact.",
+        "Operation claim/terminal journal transitions are separate transport work bound to the original operation and idempotency identity; no table-wide exclusions.",
+        "Existing operation claim/idempotency and terminal state contracts remain applicable; listing this phase is not execution evidence."
+      ],
+      "downstream_reader": [
+        "model/localAsset/read",
+        "apps/web/src/components/LocalRetrievalSettingsCard.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/integration/test_local_retrieval_preparation.py",
+        "tests/unit/test_model_assets.py"
+      ],
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/embeddings/asset_files.py",
+        "src/thoth/adapters/embeddings/assets.py",
+        "src/thoth/application/commands/local_retrieval.py",
+        "src/thoth/application/services/actor_authority.py",
+        "src/thoth/application/services/local_retrieval.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Current handler binding and manually traced phase boundaries only; no full source-bound execution/atomicity closure has been performed.",
+      "verification": {
+        "classification": "MUTATION",
+        "required_callables": [
+          "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.import_asset",
+          "thoth.adapters.embeddings.assets.LocalModelAssets._lock_file",
+          "thoth.adapters.embeddings.assets.LocalModelAssets._copy"
+        ],
+        "cases": []
+      },
+      "blockers": [
+        "2026-11-01 mapping only. No new phase execution receipt or ten-owner closure; historical discovery remains stale."
+      ]
+    },
+    {
+      "path_id": "rpc:model/localAsset/install",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "entry_kind": "public",
+      "method_or_trigger": "model/localAsset/install",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.install_asset",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/local_retrieval_composition.py",
+          "line": 61,
+          "binding": "handlers.install_asset"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.embeddings.download.FixedModelDownload._file",
+        "thoth.adapters.embeddings.assets.LocalModelAssets._lock_file",
+        "thoth.adapters.embeddings.assets.LocalModelAssets._copy"
+      ],
+      "phase_id": [
+        "ADMISSION",
+        "EXTERNAL_IO",
+        "FILE_STAGING",
+        "FILE_REPLACE",
+        "CLEANUP"
+      ],
+      "composite_not_one_transaction": true,
+      "canonical_records_and_projections": [
+        "derived model files under models/<model>/<revision>/<manifest_digest>",
+        "attempt-local staging and publisher lock files"
+      ],
+      "head_selector": "Fixed asset manifest identity",
+      "audit_receipt_refs": [
+        "operations",
+        "idempotency_keys"
+      ],
+      "expected_basis": "LOCAL deployment; current actor/capability and project/workspace scope. The preparation catalog owner is outside the ten-owner closure model; no canonical-owner closure is asserted. Exact manifest digest and rechecked authority before IO and before atomic directory rename; READY installation is immutable. Explicit literal download consent, fixed source/redirect allowlist and byte/time budgets are required.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "File staging/copy, publisher lock and directory rename are separate from operation/journal SQL transactions. Cancellation/cleanup confirmation is not atomic rollback of all IO. Network downloads may have occurred before rejection or cancellation.",
+      "allowed_phase_deltas": [
+        "Only this approved manifest installation and this attempt staging/lock paths may change; existing READY files and unrelated source paths must remain intact.",
+        "Operation claim/terminal journal transitions are separate transport work bound to the original operation and idempotency identity; no table-wide exclusions.",
+        "Existing operation claim/idempotency and terminal state contracts remain applicable; listing this phase is not execution evidence."
+      ],
+      "downstream_reader": [
+        "model/localAsset/read",
+        "apps/web/src/components/LocalRetrievalSettingsCard.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/integration/test_local_retrieval_preparation.py",
+        "tests/unit/test_model_assets.py",
+        "tests/unit/test_model_download.py"
+      ],
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/embeddings/asset_files.py",
+        "src/thoth/adapters/embeddings/assets.py",
+        "src/thoth/adapters/embeddings/download.py",
+        "src/thoth/application/commands/local_retrieval.py",
+        "src/thoth/application/services/actor_authority.py",
+        "src/thoth/application/services/local_retrieval.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Current handler binding and manually traced phase boundaries only; no full source-bound execution/atomicity closure has been performed.",
+      "verification": {
+        "classification": "MUTATION",
+        "required_callables": [
+          "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.install_asset",
+          "thoth.adapters.embeddings.download.FixedModelDownload._file",
+          "thoth.adapters.embeddings.assets.LocalModelAssets._lock_file",
+          "thoth.adapters.embeddings.assets.LocalModelAssets._copy"
+        ],
+        "cases": []
+      },
+      "blockers": [
+        "2026-11-01 mapping only. No new phase execution receipt or ten-owner closure; historical discovery remains stale."
+      ]
+    },
+    {
+      "path_id": "rpc:model/localAsset/read",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "entry_kind": "public",
+      "method_or_trigger": "model/localAsset/read",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.read_asset",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/local_retrieval_composition.py",
+          "line": 59,
+          "binding": "handlers.read_asset"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Fixed asset manifest identity",
+      "audit_receipt_refs": [],
+      "expected_basis": "LOCAL deployment; current actor/capability and project/workspace scope. The preparation catalog owner is outside the ten-owner closure model; no canonical-owner closure is asserted. Fixed manifest files are verified with a bounded deadline; status() does not acquire the publisher lock.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "No network/model call or publication by the query; an in-memory status task cache is not a canonical record.",
+      "allowed_phase_deltas": [
+        "No canonical or derived SQL/file publication; read only the authorized current projection. In-memory status caching may change."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/LocalRetrievalSettingsCard.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/integration/test_local_retrieval_preparation.py"
+      ],
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/embeddings/asset_files.py",
+        "src/thoth/adapters/embeddings/assets.py",
+        "src/thoth/application/commands/local_retrieval.py",
+        "src/thoth/application/services/actor_authority.py",
+        "src/thoth/application/services/local_retrieval.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Current handler binding and manually traced phase boundaries only; no full source-bound execution/atomicity closure has been performed.",
+      "verification": {
+        "classification": "READ_ONLY",
+        "review": {
+          "reason": "Manual source review of the query path: LOCAL deployment; current actor/capability and project/workspace scope. The preparation catalog owner is outside the ten-owner closure model; no canonical-owner closure is asserted. Fixed manifest files are verified with a bounded deadline; status() does not acquire the publisher lock.",
+          "source_files": [
+            {
+              "path": "src/thoth/adapters/embeddings/asset_files.py",
+              "sha256": "8a988782d560aea1ad050b829313f7c470658f41f7be257b737d89b4376010d8"
+            },
+            {
+              "path": "src/thoth/adapters/embeddings/assets.py",
+              "sha256": "41641d0e84196d11767d4e1b124b6fcdbc40ecd5ff35fa3be437973153d77732"
+            },
+            {
+              "path": "src/thoth/application/commands/local_retrieval.py",
+              "sha256": "4b7923d3612879112e6919f0cfd932a0f1e66db7aeab01381eb40c38af8f8c05"
+            },
+            {
+              "path": "src/thoth/application/services/actor_authority.py",
+              "sha256": "03797b231d5e5fabd12d5fcdff6a02e235eeb9c10710b2da8df2f9b4be5904bb"
+            },
+            {
+              "path": "src/thoth/application/services/local_retrieval.py",
+              "sha256": "8c7e474debfce422f3f78d3f7e61cc257316e3ce68a20dbf8e673ef8cd650003"
+            }
+          ]
+        }
+      },
+      "blockers": [
+        "2026-11-01 mapping only. No new phase execution receipt or ten-owner closure; historical discovery remains stale."
+      ]
+    },
+    {
+      "path_id": "rpc:project/embeddingIndex/retry",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "entry_kind": "public",
+      "method_or_trigger": "project/embeddingIndex/retry",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.retry",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/local_retrieval_composition.py",
+          "line": 65,
+          "binding": "handlers.retry"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.retry",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.claim",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.checkpoint",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.publish",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.finish"
+      ],
+      "phase_id": [
+        "ADMISSION",
+        "BASIS_CHECK",
+        "MODEL_IO",
+        "RESEARCH_CHECKPOINTS",
+        "PUBLICATION",
+        "CLEANUP"
+      ],
+      "composite_not_one_transaction": true,
+      "canonical_records_and_projections": [
+        "embedding_jobs",
+        "embedding_vectors"
+      ],
+      "head_selector": "Project config generation plus source/version/text identity and job generation/lease",
+      "audit_receipt_refs": [
+        "operations",
+        "idempotency_keys"
+      ],
+      "expected_basis": "LOCAL deployment; current actor/capability and project/workspace scope. The preparation catalog owner is outside the ten-owner closure model; no canonical-owner closure is asserted. Enabled config generation, owning actor, current scoped source/text digests and job generation/lease are rechecked; encoding runs outside DB transactions. READY publication has deadline and currentness checks within its UoW. The exact existing job id and generation are required; no fresh unrelated job authority is created.",
+      "uow_participants": [
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.retry",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.claim",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.checkpoint",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.publish",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.finish"
+      ],
+      "irreversible_effect_boundary": "Lazy model preparation/encoding is outside DB transactions; claim, vector checkpoints, READY publication and failure/cancel completion are separate bounded transactions. This RPC is not one atomic transaction.",
+      "allowed_phase_deltas": [
+        "Only this project and current-basis job identities/generations/leases and content-keyed derived vector rows may change; checkpoints may remain after a later failure, but stale or overdue READY publication must roll back.",
+        "Existing operation claim/idempotency and terminal state contracts remain applicable; listing this phase is not execution evidence."
+      ],
+      "downstream_reader": [
+        "project/retrieval/experiment/read",
+        "apps/web/src/components/LocalRetrievalSettingsCard.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/integration/test_local_retrieval_preparation.py",
+        "tests/integration/test_embedding_deadline_checkpoints.py",
+        "tests/integration/test_embedding_recovery.py"
+      ],
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/storage/embedding_index.py",
+        "src/thoth/adapters/storage/embedding_schema.py",
+        "src/thoth/adapters/storage/embedding_source.py",
+        "src/thoth/adapters/storage/transaction.py",
+        "src/thoth/application/commands/local_retrieval.py",
+        "src/thoth/application/services/actor_authority.py",
+        "src/thoth/application/services/embedding_index_service.py",
+        "src/thoth/application/services/local_retrieval.py",
+        "src/thoth/application/services/resource_scope_service.py",
+        "src/thoth/application/services/scoped_artifacts.py"
+      ],
+      "atomic_regions": [
+        {
+          "callable": "thoth.adapters.storage.transaction.SqliteAtomicUnitOfWork.transaction",
+          "source": "src/thoth/adapters/storage/transaction.py",
+          "line": 82,
+          "contexts": [
+            "Existing immediate UoW per configure/claim/checkpoint/publish/finish; never around model IO."
+          ]
+        }
+      ],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Current handler binding and manually traced phase boundaries only; no full source-bound execution/atomicity closure has been performed.",
+      "verification": {
+        "classification": "MUTATION",
+        "required_callables": [
+          "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.retry",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.retry",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.claim",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.checkpoint",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.publish",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.finish"
+        ],
+        "cases": []
+      },
+      "blockers": [
+        "2026-11-01 mapping only. No new phase execution receipt or ten-owner closure; historical discovery remains stale."
+      ]
+    },
+    {
+      "path_id": "rpc:project/retrieval/experiment/configure",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "entry_kind": "public",
+      "method_or_trigger": "project/retrieval/experiment/configure",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.configure",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/local_retrieval_composition.py",
+          "line": 63,
+          "binding": "handlers.configure"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.configure"
+      ],
+      "phase_id": [
+        "ADMISSION",
+        "BASIS_CHECK",
+        "PUBLICATION"
+      ],
+      "composite_not_one_transaction": true,
+      "canonical_records_and_projections": [
+        "embedding_configs",
+        "embedding_jobs"
+      ],
+      "head_selector": "Project config generation plus source/version/text identity and job generation/lease",
+      "audit_receipt_refs": [
+        "operations",
+        "idempotency_keys"
+      ],
+      "expected_basis": "LOCAL deployment; current actor/capability and project/workspace scope. The preparation catalog owner is outside the ten-owner closure model; no canonical-owner closure is asserted. Expected config generation must match; configure publishes generation/config and invalidates jobs in one immediate local UoW. A cancellation request does not mean worker termination.",
+      "uow_participants": [
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.configure"
+      ],
+      "irreversible_effect_boundary": "Configuration publication and in-memory cancellation signalling are distinct from operation/journal completion.",
+      "allowed_phase_deltas": [
+        "Only this project config generation/config content and its affected existing job states may change; no evidence or research result is republished.",
+        "Existing operation claim/idempotency and terminal state contracts remain applicable; listing this phase is not execution evidence."
+      ],
+      "downstream_reader": [
+        "project/retrieval/experiment/read",
+        "apps/web/src/components/LocalRetrievalSettingsCard.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/integration/test_local_retrieval_preparation.py"
+      ],
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/storage/embedding_index.py",
+        "src/thoth/adapters/storage/embedding_schema.py",
+        "src/thoth/adapters/storage/embedding_source.py",
+        "src/thoth/adapters/storage/transaction.py",
+        "src/thoth/application/commands/local_retrieval.py",
+        "src/thoth/application/services/actor_authority.py",
+        "src/thoth/application/services/embedding_index_service.py",
+        "src/thoth/application/services/local_retrieval.py",
+        "src/thoth/application/services/resource_scope_service.py",
+        "src/thoth/application/services/scoped_artifacts.py"
+      ],
+      "atomic_regions": [
+        {
+          "callable": "thoth.adapters.storage.transaction.SqliteAtomicUnitOfWork.transaction",
+          "source": "src/thoth/adapters/storage/transaction.py",
+          "line": 82,
+          "contexts": [
+            "Existing immediate UoW per configure/claim/checkpoint/publish/finish; never around model IO."
+          ]
+        }
+      ],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Current handler binding and manually traced phase boundaries only; no full source-bound execution/atomicity closure has been performed.",
+      "verification": {
+        "classification": "MUTATION",
+        "required_callables": [
+          "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.configure",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.configure"
+        ],
+        "cases": []
+      },
+      "blockers": [
+        "2026-11-01 mapping only. No new phase execution receipt or ten-owner closure; historical discovery remains stale."
+      ]
+    },
+    {
+      "path_id": "rpc:project/retrieval/experiment/prepare",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "entry_kind": "public",
+      "method_or_trigger": "project/retrieval/experiment/prepare",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.prepare",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/local_retrieval_composition.py",
+          "line": 64,
+          "binding": "handlers.prepare"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.recover",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.reconcile",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.stage_intent",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.claim",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.checkpoint",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.publish",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.finish"
+      ],
+      "phase_id": [
+        "ADMISSION",
+        "BASIS_CHECK",
+        "MODEL_IO",
+        "RESEARCH_CHECKPOINTS",
+        "PUBLICATION",
+        "CLEANUP"
+      ],
+      "composite_not_one_transaction": true,
+      "canonical_records_and_projections": [
+        "embedding_jobs",
+        "embedding_vectors"
+      ],
+      "head_selector": "Project config generation plus source/version/text identity and job generation/lease",
+      "audit_receipt_refs": [
+        "operations",
+        "idempotency_keys"
+      ],
+      "expected_basis": "LOCAL deployment; current actor/capability and project/workspace scope. The preparation catalog owner is outside the ten-owner closure model; no canonical-owner closure is asserted. Enabled config generation, owning actor, current scoped source/text digests and job generation/lease are rechecked; encoding runs outside DB transactions. READY publication has deadline and currentness checks within its UoW.",
+      "uow_participants": [
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.recover",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.reconcile",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.stage_intent",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.claim",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.checkpoint",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.publish",
+        "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.finish"
+      ],
+      "irreversible_effect_boundary": "Lazy model preparation/encoding is outside DB transactions; claim, vector checkpoints, READY publication and failure/cancel completion are separate bounded transactions. This RPC is not one atomic transaction.",
+      "allowed_phase_deltas": [
+        "Only this project and current-basis job identities/generations/leases and content-keyed derived vector rows may change; checkpoints may remain after a later failure, but stale or overdue READY publication must roll back.",
+        "Existing operation claim/idempotency and terminal state contracts remain applicable; listing this phase is not execution evidence."
+      ],
+      "downstream_reader": [
+        "project/retrieval/experiment/read",
+        "apps/web/src/components/LocalRetrievalSettingsCard.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/integration/test_local_retrieval_preparation.py",
+        "tests/integration/test_embedding_deadline_checkpoints.py",
+        "tests/integration/test_embedding_recovery.py"
+      ],
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/storage/embedding_index.py",
+        "src/thoth/adapters/storage/embedding_schema.py",
+        "src/thoth/adapters/storage/embedding_source.py",
+        "src/thoth/adapters/storage/transaction.py",
+        "src/thoth/application/commands/local_retrieval.py",
+        "src/thoth/application/services/actor_authority.py",
+        "src/thoth/application/services/embedding_index_service.py",
+        "src/thoth/application/services/local_retrieval.py",
+        "src/thoth/application/services/resource_scope_service.py",
+        "src/thoth/application/services/scoped_artifacts.py"
+      ],
+      "atomic_regions": [
+        {
+          "callable": "thoth.adapters.storage.transaction.SqliteAtomicUnitOfWork.transaction",
+          "source": "src/thoth/adapters/storage/transaction.py",
+          "line": 82,
+          "contexts": [
+            "Existing immediate UoW per configure/claim/checkpoint/publish/finish; never around model IO."
+          ]
+        }
+      ],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Current handler binding and manually traced phase boundaries only; no full source-bound execution/atomicity closure has been performed.",
+      "verification": {
+        "classification": "MUTATION",
+        "required_callables": [
+          "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.prepare",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.recover",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.reconcile",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.stage_intent",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.claim",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.checkpoint",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.publish",
+          "thoth.adapters.storage.embedding_index.SqliteEmbeddingIndex.finish"
+        ],
+        "cases": []
+      },
+      "blockers": [
+        "2026-11-01 mapping only. No new phase execution receipt or ten-owner closure; historical discovery remains stale."
+      ]
+    },
+    {
+      "path_id": "rpc:project/retrieval/experiment/read",
+      "owner": "SHARED_OR_OTHER_OWNER",
+      "catalog_owner": "LOCAL_RETRIEVAL_PREPARATION",
+      "entry_kind": "public",
+      "method_or_trigger": "project/retrieval/experiment/read",
+      "actual_callable": "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.read_project",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/local_retrieval_composition.py",
+          "line": 62,
+          "binding": "handlers.read_project"
+        }
+      ],
+      "producer_refs": [],
+      "phase_id": [
+        "READ_ONLY"
+      ],
+      "composite_not_one_transaction": false,
+      "canonical_records_and_projections": [],
+      "head_selector": "Project config generation plus source/version/text identity and job generation/lease",
+      "audit_receipt_refs": [],
+      "expected_basis": "LOCAL deployment; current actor/capability and project/workspace scope. The preparation catalog owner is outside the ten-owner closure model; no canonical-owner closure is asserted. Current configuration generation, active accessible source bindings and READY job/vector-manifest checks determine display state; no worker is started.",
+      "uow_participants": [],
+      "irreversible_effect_boundary": "No network/model call or publication by the query; an in-memory status task cache is not a canonical record.",
+      "allowed_phase_deltas": [
+        "No canonical or derived SQL/file publication; read only the authorized current projection. In-memory status caching may change."
+      ],
+      "downstream_reader": [
+        "apps/web/src/components/LocalRetrievalSettingsCard.tsx"
+      ],
+      "existing_tests": [
+        "tests/integration/test_local_retrieval_rpc.py",
+        "tests/integration/test_local_retrieval_preparation.py"
+      ],
+      "disposition": "READ_ONLY_REVIEWED",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/storage/embedding_index.py",
+        "src/thoth/adapters/storage/embedding_source.py",
+        "src/thoth/adapters/storage/transaction.py",
+        "src/thoth/application/commands/local_retrieval.py",
+        "src/thoth/application/services/actor_authority.py",
+        "src/thoth/application/services/local_retrieval.py",
+        "src/thoth/application/services/resource_scope_service.py",
+        "src/thoth/application/services/scoped_artifacts.py"
+      ],
+      "atomic_regions": [],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Current handler binding and manually traced phase boundaries only; no full source-bound execution/atomicity closure has been performed.",
+      "verification": {
+        "classification": "READ_ONLY",
+        "review": {
+          "reason": "Manual source review of the query path: LOCAL deployment; current actor/capability and project/workspace scope. The preparation catalog owner is outside the ten-owner closure model; no canonical-owner closure is asserted. Current configuration generation, active accessible source bindings and READY job/vector-manifest checks determine display state; no worker is started.",
+          "source_files": [
+            {
+              "path": "src/thoth/adapters/storage/embedding_index.py",
+              "sha256": "6eecebe6e6af589df6b995a49c55e1da7efd27c31149264b2b771bac9c904b3a"
+            },
+            {
+              "path": "src/thoth/adapters/storage/embedding_source.py",
+              "sha256": "df0072a650f1a344ea737edbc1ca9520ef675a16e0248f34c54bbfb912e354a1"
+            },
+            {
+              "path": "src/thoth/adapters/storage/transaction.py",
+              "sha256": "58f0ab73efd0e91c7f2e14f3d9863966d62b17d71e720c6eb240d4cbfba3ac4d"
+            },
+            {
+              "path": "src/thoth/application/commands/local_retrieval.py",
+              "sha256": "4b7923d3612879112e6919f0cfd932a0f1e66db7aeab01381eb40c38af8f8c05"
+            },
+            {
+              "path": "src/thoth/application/services/actor_authority.py",
+              "sha256": "03797b231d5e5fabd12d5fcdff6a02e235eeb9c10710b2da8df2f9b4be5904bb"
+            },
+            {
+              "path": "src/thoth/application/services/local_retrieval.py",
+              "sha256": "8c7e474debfce422f3f78d3f7e61cc257316e3ce68a20dbf8e673ef8cd650003"
+            },
+            {
+              "path": "src/thoth/application/services/resource_scope_service.py",
+              "sha256": "f06e424879c2e374ddf2887db022bb25476c30c43c83605c719f90e3656bc293"
+            },
+            {
+              "path": "src/thoth/application/services/scoped_artifacts.py",
+              "sha256": "165b7e815cc2a73dca7fe5910f13e4acb19676b6f68654417e2d17fb542d9668"
+            }
+          ]
+        }
+      },
+      "blockers": [
+        "2026-11-01 mapping only. No new phase execution receipt or ten-owner closure; historical discovery remains stale."
+      ]
     }
   ],
   "discovery": "outputs/owner-atomicity-20260914/discovery-scope-fix.json",
@@ -69746,7 +70578,8 @@
   "closure_ready": false,
   "blockers": [
     "User scope: finish type corrections/evidence mapping and targeted checks, then use a user-provided real case for QA. Ten-owner closure and final FULL are not being performed.",
-    "2026-09-24 inventory binding refresh is discovery only; 2026-09-14 discovery/phase execution hashes and all ten owner debts remain historical/OPEN until a separate full source-bound closure run."
+    "2026-09-24 inventory binding refresh is discovery only; 2026-09-14 discovery/phase execution hashes and all ten owner debts remain historical/OPEN until a separate full source-bound closure run.",
+    "2026-11-01: seven LOCAL_RETRIEVAL_PREPARATION routes appended from actual runtime binding inspection and manual phase review; handlers/model IO were not invoked. The existing 369 entries and 383 phases, historical discovery_binding and ten OPEN debts are unchanged. LOCAL_RETRIEVAL_PREPARATION is outside the existing ten-owner closure model; this update does not extend or certify that model. The 247 historical entry location/hash drifts remain historical and are not current execution evidence."
   ],
   "discovery_binding": {
     "sha256": "b59c83dd0c6eaa1df31f858f21b51ed1341964922c31305768e2632d7205c696",

@@ -1,17 +1,83 @@
 """The CI partition includes each real integration file exactly once."""
 
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
 from scripts.ci_test_shards import (
     build_shards,
     discover,
+    documentation_only,
     durations_from_junit,
     load_durations,
     main,
+    scope_for_revision,
     validate_partition,
 )
+
+
+@pytest.mark.parametrize(
+    "paths,expected",
+    [
+        (["README.md", "SOURCE_MANIFEST.json"], True),
+        (["docs/screenshots/en/result.png", "docs/brand/logo.svg"], True),
+        ([], False),
+        (["SOURCE_MANIFEST.json"], False),
+        (["README.md", "src/thoth/cli.py"], False),
+        (["README.md", "AGENTS.md"], False),
+        (["docs/architecture/verification-profiles.md"], False),
+        (["docs/brand/../../src/tool.py"], False),
+        (["docs/brand/run.py"], False),
+        (["README.md", ""], False),
+        (["README.md", ".github/workflows/product-check.yml"], False),
+        (["README.md", "pyproject.toml"], False),
+    ],
+)
+def test_documentation_scope_never_exempts_code_or_policy(paths: list[str], expected: bool) -> None:
+    assert documentation_only(paths) is expected
+
+
+def test_scope_uses_exact_base_and_head_with_both_rename_paths(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from scripts import ci_test_shards as module
+
+    base = "a" * 40
+    commands: list[list[str]] = []
+    responses = [b"src/old.py\0README.md\0", b"README.md\0SOURCE_MANIFEST.json\0"]
+
+    def changed(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[bytes]:
+        commands.append(command)
+        assert kwargs["cwd"] == tmp_path
+        return subprocess.CompletedProcess(command, 0, responses.pop(0), b"")
+
+    monkeypatch.setattr(module.subprocess, "run", changed)
+    assert scope_for_revision(tmp_path, "pull_request", base)["docs_only"] is False
+    assert scope_for_revision(tmp_path, "pull_request", base)["docs_only"] is True
+    assert (
+        commands == [["git", "diff", "--name-only", "--no-renames", "-z", base, "HEAD", "--"]] * 2
+    )
+
+
+def test_scope_falls_back_to_full_on_diff_failure_and_non_pr(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from scripts import ci_test_shards as module
+
+    def failed(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[bytes]:
+        return subprocess.CompletedProcess(command, 128, b"", b"missing base")
+
+    monkeypatch.setattr(module.subprocess, "run", failed)
+    assert scope_for_revision(tmp_path, "pull_request", "a" * 40)["docs_only"] is False
+    assert scope_for_revision(tmp_path, "pull_request", "--option")["docs_only"] is False
+
+    def unexpected(*args: object, **kwargs: object) -> None:
+        pytest.fail("Non-PR verification must not consult a change filter")
+
+    monkeypatch.setattr(module.subprocess, "run", unexpected)
+    for event in ("push", "schedule", "workflow_dispatch", ""):
+        assert scope_for_revision(tmp_path, event, "a" * 40)["docs_only"] is False
 
 
 def test_largest_files_are_balanced_deterministically() -> None:

@@ -268,10 +268,16 @@ async def test_unknown_scope_rejected_without_whole_project_fallback(tmp_path: P
 async def test_local_public_ceiling_excludes_internal_resources(tmp_path: Path) -> None:
     runtime, project = await prepare_project(tmp_path)
     try:
-        restricted = await source(runtime, project, tmp_path, "internal.md", "INTERNAL")
+        restricted = await source(
+            runtime, project, tmp_path, "internal.md", "INTERNAL", confirm_source_time=True
+        )
+        assert restricted["cutoff_eligibility"] == "ELIGIBLE"
         snapshot = await seal_snapshot(
             runtime, project, await plan(runtime, project, [restricted["artifact_id"]])
         )
+        frozen = FrozenExportSnapshot.model_validate(snapshot["payload"]["frozen_snapshot"])
+        assert len(frozen.resources) == 1
+        assert frozen.resources[0].reason_codes == ("CLASSIFICATION_CEILING_EXCEEDED",)
         generated = (
             await rpc(
                 runtime,

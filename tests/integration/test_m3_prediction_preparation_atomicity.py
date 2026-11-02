@@ -34,7 +34,6 @@ from thoth.domain.canonical import head_set_digest
 from thoth.ports.model import ModelPort
 from thoth.protocol.deferred import current_operation
 
-_OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step71-20261014"
 _POINTS = {
     "prediction_receipt": (SqliteLedgerTransaction, "insert_receipt", "receipts", "receipt_id"),
     "prediction": (
@@ -53,13 +52,6 @@ _POINTS = {
     ),
     "attempt_audit": (SqliteExecutionStore, "append_audit", "execution_audit", "audit_id"),
 }
-
-
-def _save(point: str, evidence: dict[str, Any]) -> None:
-    _OUT.mkdir(parents=True, exist_ok=True)
-    (_OUT / f"phase-{point}.json").write_text(
-        json.dumps(evidence, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 @pytest.mark.parametrize("point", ["normal", *_POINTS])
@@ -348,7 +340,6 @@ async def test_preparation_rollback_prevents_measurement_and_allows_a_new_reques
             terminal=snapshot(runtime.ledger.engine),
             sandbox_runs=len(sandbox.seen_specs),
         )
-        _save(point, evidence)
         # Wrapper observations are judged here, outside product exception handlers.
         assert state["selected"] == state["prepare_calls"] == 1
         assert evidence["ambient_at_entry"] is False
@@ -411,7 +402,6 @@ async def test_preparation_rollback_prevents_measurement_and_allows_a_new_reques
             assert work["working_head_digest"] == head_set_digest(
                 runtime.ledger.read_heads(project)
             )
-        _save(point, evidence)
     finally:
         runtime.close()
     reopened = create_runtime(
@@ -421,7 +411,6 @@ async def test_preparation_rollback_prevents_measurement_and_allows_a_new_reques
     )
     try:
         evidence["reopened"] = snapshot(reopened.ledger.engine)
-        _save(point, evidence)
         assert evidence["reopened"] == evidence["terminal"]
         replay = await reopened.bus.dispatch(command)
         evidence["replay"] = replay.model_dump(mode="json")
@@ -441,13 +430,11 @@ async def test_preparation_rollback_prevents_measurement_and_allows_a_new_reques
                 )
             )
             evidence["recovered"] = recovered
-            _save(point, evidence)
             assert len(sandbox.seen_specs) == 1
             lifecycle = recovered["r2_closed_loop"]["test_lifecycle"]
             assert len(lifecycle["predictions"]) == 2
             assert all(a["test_validity"] == "VALID" for a in lifecycle["assessments"])
             assert all(a["substantive_update_applied"] for a in lifecycle["appraisals"])
         evidence["verdict"] = "PASS"
-        _save(point, evidence)
     finally:
         reopened.close()

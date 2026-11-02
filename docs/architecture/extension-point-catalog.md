@@ -3,6 +3,7 @@
 | Extension | Port/contract | Registration owner | Core must remain closed to |
 |---|---|---|---|
 | Model | `ModelPort`, `ModelResolverPort` | `apps.model_composition.create_models` registers providers and wraps current resource checks; consumed by runtime | provider names and credential logic |
+| Local embedding preparation | `ModelAssetStorePort`, `ModelAssetDownloadPort`, `PreparableEmbeddingWorkerPort` | `apps.local_retrieval_composition` binds fixed assets and a lazy bounded worker; see [local preparation](local-retrieval-preparation.md) | asset filesystem/network IO, native model imports or user-provided factories in application logic |
 | Parser | `ParserPort`, `ParserRegistryPort`, optional capability contract and `AsyncParserRegistryPort` | `ParserRegistry` in adapter composition; shared by source connection and ProjectPack ingestion | file-format/vendor-specific branches and implicit structured-parser fallback |
 | Connector | `ConnectorPort`, `ConnectorRegistryPort` | `ConnectorRegistry` in adapter composition | LOCAL/GIT/S3/DB/MCP names |
 | Sandbox | `SandboxPort`, `SandboxFactoryRegistryPort` | `SandboxFactoryRegistry` in adapter composition | concrete adapter class names |
@@ -62,7 +63,7 @@ prove OCP for arbitrary Python reflection, dynamically assembled names or every 
 Project-local source authorization comparisons are not factory routing; they remain separately
 subject to A11/A13 authority tests. No new architecture exception is granted.
 
-Architecture, preflight and completion use `scripts/required_architecture_checks.py`. Required
-check identities, PASS/error/exit/skip state and the executable guard bundle are validated. A rule
-change requires a replacement preflight; historical archived receipts are preserved, not rewritten.
-Completion seals source/index stability across full verification and rechecks actual Wiki bytes.
+The current product architecture checks use `scripts/required_architecture_checks.py`.
+Development preflight, completion seals and Wiki-byte gates were retired on 2026-11-01;
+historical receipts remain historical evidence and do not authorize current work.
+Use the verification scope in AGENTS.md and report the actual checks and their limits.
