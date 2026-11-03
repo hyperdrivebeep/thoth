@@ -2,7 +2,12 @@
 
 Reuse the real local automatic-policy fixture and TEST_ONLY legacy evaluator. Scripted sandbox
 time, IDs, clock and elapsed meters are deterministic, but no record/digest is normalized away.
-Ledger and atomic UoW scopes, static methods, evaluator/await/error paths remain observable.
+Ledger and atomic UoW scopes, evaluator/await/error paths remain observable. The trace keeps what
+changes state or checks the basis, in order: control record, artifact and result writes, the
+evaluation gate and baseline-digest checks, candidate, run and promote/rollback calls, the hold
+entry (_hold_unavailable), ledger and atomic UoW scopes, ids, clocks and every exception. Reads of
+control records, artifacts, the registry and observation results and the entries and returns of the
+coordinator methods are not recorded; the outputs hold what the coordinator returned.
 """
 
 from __future__ import annotations
@@ -63,6 +68,10 @@ SCENARIOS = (
 )
 
 
+# The coordinator entry that stays in the trace: the hold taken when evaluation is unavailable.
+HOLD_METHODS = ("_hold_unavailable",)
+
+
 def install(patch: pytest.MonkeyPatch, rec: Recorder) -> dict[str, Any]:
     captured: dict[str, Any] = {}
     moments = 0
@@ -107,21 +116,18 @@ def install(patch: pytest.MonkeyPatch, rec: Recorder) -> dict[str, Any]:
                     captured.update(
                         owner=args[0], arguments=kwargs.copy(), work=research_work.get()
                     )
-            rec.note(
-                owner.__name__,
-                name,
-                [digest(x) for x in (args if static else args[1:])],
-                {k: digest(v) for k, v in kwargs.items()},
-            )
+            if not coordinator or name in HOLD_METHODS:
+                rec.note(
+                    owner.__name__,
+                    name,
+                    [digest(x) for x in (args if static else args[1:])],
+                    {k: digest(v) for k, v in kwargs.items()},
+                )
 
         def end(result: Any = None, error: BaseException | None = None) -> None:
             if coordinator:
-                rec.note(
-                    "return" if error is None else "raise",
-                    name,
-                    digest(result) if error is None else type(error).__name__,
-                    "" if error is None else str(error),
-                )
+                if error is not None:
+                    rec.note("raise", name, type(error).__name__, str(error))
                 if rec.depth == 1:
                     rec.outputs.append(
                         [
@@ -168,11 +174,8 @@ def install(patch: pytest.MonkeyPatch, rec: Recorder) -> dict[str, Any]:
             wrap(RecursiveImprovementCoordinator, name, coordinator=True)
     for owner, names in (
         (ControlRecordService, ("create", "stage")),
-        (SqliteControlRecordStore, ("read", "list", "append")),
-        (
-            SqliteBehaviorArtifactStore,
-            ("read", "list", "add", "read_registry", "activate", "rollback"),
-        ),
+        (SqliteControlRecordStore, ("append",)),
+        (SqliteBehaviorArtifactStore, ("add", "activate", "rollback")),
         (BaselineService, ("composite_current_digest",)),
         (BehaviorCandidateService, ("ensure_baseline", "create_candidate")),
         (
@@ -189,7 +192,7 @@ def install(patch: pytest.MonkeyPatch, rec: Recorder) -> dict[str, Any]:
         ),
         (ImprovementRunner, ("promote", "rollback")),
         (BoundedBehaviorCandidateGenerator, ("generate", "record_evaluation")),
-        (ImprovementObservationResults, ("read", "save")),
+        (ImprovementObservationResults, ("save",)),
         (EvaluationProducer, ("select", "run")),
         (CountingEvaluator, ("evaluate",)),
     ):

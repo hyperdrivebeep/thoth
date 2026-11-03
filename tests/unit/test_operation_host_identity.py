@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import sys
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import nullcontext
 from pathlib import Path
@@ -178,18 +179,25 @@ def test_concurrent_first_calls_read_once_and_new_pid_gets_new_cache(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     calls: list[int] = []
+    entered: list[int] = []
 
     def read() -> str:
+        # The first read waits until the other workers are inside the call too, so the callers
+        # really overlap; without the lock each of them would read.
+        deadline = time.monotonic() + 5
+        while len(entered) < 4 and time.monotonic() < deadline:
+            time.sleep(0.001)
         calls.append(1)
         return "a" * 64
 
+    def call(mode: DeploymentMode) -> str | None:
+        entered.append(1)
+        return identity.operation_host_token(mode)
+
     monkeypatch.setattr(identity, "_read_token", read)
     with ThreadPoolExecutor(max_workers=4) as pool:
-        assert (
-            list(pool.map(identity.operation_host_token, [DeploymentMode.LOCAL] * 8))
-            == ["a" * 64] * 8
-        )
-    assert calls == [1]
+        assert list(pool.map(call, [DeploymentMode.LOCAL] * 8)) == ["a" * 64] * 8
+    assert len(entered) == 8 and calls == [1]
     monkeypatch.setattr(identity.os, "getpid", lambda: 123456789)
     assert identity.operation_host_token(DeploymentMode.LOCAL) == "a" * 64
     assert calls == [1, 1]

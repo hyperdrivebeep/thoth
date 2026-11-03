@@ -360,7 +360,8 @@ async def test_test_refs_are_an_input_field_covered_by_the_digest_and_outside_th
         assert (
             "test_refs" not in one["specification"]
         )  # the new way keeps it out of the specification
-        # the same specification with only test_refs different is a different revision
+        # three separate records (each has its own ids and time, so they differ anyway); that the
+        # digest follows test_refs alone is checked in tests/unit/services/test_action_drafts.py
         assert len({plain["revision_digest"], one["revision_digest"], two["revision_digest"]}) == 3
         read = (await rpc("action/read", project_id="p", action_id=one["action_id"]))["action"]
         assert read["test_refs"] == [ref] and read["revision_digest"] == one["revision_digest"]

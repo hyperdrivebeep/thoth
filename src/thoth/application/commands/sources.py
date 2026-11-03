@@ -1,20 +1,15 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import cast
 
 from pydantic import AwareDatetime, Field, JsonValue, model_validator
 
 from thoth.application.services import (
-    ConnectorAcquisition,
     ConnectorService,
-    IngestArtifactCommand,
-    IngestionService,
 )
 from thoth.application.services.evidence_graph_service import EvidenceGraphService
 from thoth.application.services.resource_scope_context import (
     resource_intake_scope,
-    resource_stage_scope,
 )
 from thoth.application.services.resource_scope_read_context import scope_read_transaction
 from thoth.application.services.resource_scope_service import ResourceScopeService
@@ -25,7 +20,6 @@ from thoth.domain.base import DomainModel
 from thoth.domain.connectors import ConnectorAccessRequest, ConnectorFailure
 from thoth.domain.enums import AuthorityState, CutoffState, SecurityClass
 from thoth.domain.errors import ParserFailure
-from thoth.domain.governance import SourceBinding
 from thoth.domain.policy import PolicyExpectation
 from thoth.domain.project import Project
 from thoth.domain.resource_scope import ResourceScopeError, ResourceScopeTemplate
@@ -115,8 +109,6 @@ class SourceCommandHandlers:
     def __init__(
         self,
         *,
-        inbox_root: Path,
-        ingestion: IngestionService,
         artifacts: ArtifactLedgerPort,
         governance: GovernanceStorePort,
         projects: ProjectStorePort,
@@ -124,12 +116,10 @@ class SourceCommandHandlers:
         clock: ClockPort,
         evidence_graph: EvidenceGraphService,
         ids: IdGeneratorPort,
-        connectors: ConnectorService | None = None,
+        connectors: ConnectorService,
         resource_scopes: ResourceScopeService | None = None,
         source_time: SourceTimeService | None = None,
     ) -> None:
-        self._inbox_root = inbox_root.resolve()
-        self._ingestion = ingestion
         self._artifacts = artifacts
         self._governance = governance
         self._projects = projects
@@ -158,7 +148,6 @@ class SourceCommandHandlers:
 
     async def _connect(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = SourceConnectInput.model_validate(value)
-        acquisition: ConnectorAcquisition | None = None
         project = self._projects.read(request.project_id)
         if (
             project is not None
@@ -169,142 +158,71 @@ class SourceCommandHandlers:
                 RpcErrorCode.DOMAIN_REJECTED,
                 "project revision changed before source connection",
             )
-        if self._connectors is not None:
-            selector = dict(request.selector)
-            if request.relative_path is not None:
-                selector.setdefault("relative_path", request.relative_path)
-            try:
-                connector_id = request.connector_id or self._connectors.route(
-                    cast(dict[str, object], selector)
+        selector = dict(request.selector)
+        if request.relative_path is not None:
+            selector.setdefault("relative_path", request.relative_path)
+        try:
+            connector_id = request.connector_id or self._connectors.route(
+                cast(dict[str, object], selector)
+            )
+        except ConnectorFailure as exc:
+            raise self._connector_error(exc) from exc
+        authenticated = current_authenticated_actor()
+        relative_selector = selector.get("relative_path")
+        if (
+            connector_id == "local-file-upload"
+            and (
+                authenticated is not None
+                or (
+                    isinstance(relative_selector, str)
+                    and relative_selector.replace("\\", "/").startswith("web/")
                 )
-            except ConnectorFailure as exc:
-                raise self._connector_error(exc) from exc
-            authenticated = current_authenticated_actor()
-            relative_selector = selector.get("relative_path")
-            if (
-                connector_id == "local-file-upload"
-                and (
-                    authenticated is not None
-                    or (
-                        isinstance(relative_selector, str)
-                        and relative_selector.replace("\\", "/").startswith("web/")
-                    )
+            )
+            and (
+                (authenticated is not None and authenticated.project_id != request.project_id)
+                or not isinstance(relative_selector, str)
+                or not project_upload_path_allowed(request.project_id, relative_selector)
+            )
+        ):
+            raise RpcApplicationError(
+                RpcErrorCode.AUTHORIZATION_DENIED,
+                "upload path is outside the project inbox",
+                data={"reason_code": "AUTH_UPLOAD_PROJECT_SCOPE_DENIED", "pre_io": True},
+            )
+        try:
+            expectation = (
+                self._connectors.current_policy_expectation(request.project_id)
+                if request.expected_policy_id is None
+                else PolicyExpectation(
+                    policy_id=request.expected_policy_id,
+                    policy_revision=cast(int, request.expected_policy_revision),
+                    policy_digest=cast(str, request.expected_policy_digest),
                 )
-                and (
-                    (authenticated is not None and authenticated.project_id != request.project_id)
-                    or not isinstance(relative_selector, str)
-                    or not project_upload_path_allowed(request.project_id, relative_selector)
-                )
-            ):
-                raise RpcApplicationError(
-                    RpcErrorCode.AUTHORIZATION_DENIED,
-                    "upload path is outside the project inbox",
-                    data={"reason_code": "AUTH_UPLOAD_PROJECT_SCOPE_DENIED", "pre_io": True},
-                )
-            try:
-                expectation = (
-                    self._connectors.current_policy_expectation(request.project_id)
-                    if request.expected_policy_id is None
-                    else PolicyExpectation(
-                        policy_id=request.expected_policy_id,
-                        policy_revision=cast(int, request.expected_policy_revision),
-                        policy_digest=cast(str, request.expected_policy_digest),
-                    )
-                )
-            except ConnectorFailure as exc:
-                raise self._connector_error(exc) from exc
-            try:
-                acquisition = await self._connectors.acquire_one(
-                    ConnectorAccessRequest(
-                        parser_selection=request.parser_selection,
-                        actor_id="agent:authorized-evidence-acquisition",
-                        project_id=request.project_id,
-                        connector_id=connector_id,
-                        selector=selector,
-                        authority=request.authority,
-                        cutoff_state=request.cutoff_state,
-                        security_class=request.security_class,
-                        cutoff_at=None if project is None else project.cutoff_at,
-                        policy_id=expectation.policy_id,
-                        policy_revision=expectation.policy_revision,
-                        policy_digest=expectation.policy_digest,
-                    )
-                )
-            except ConnectorFailure as exc:
-                raise self._connector_error(exc) from exc
-            result = acquisition.ingestion
-            binding = acquisition.binding
-            source_record = acquisition.source
-        else:
-            if request.relative_path is None:
-                raise RpcApplicationError(
-                    RpcErrorCode.DOMAIN_REJECTED,
-                    "legacy source connection requires relative_path",
-                )
-            relative = Path(request.relative_path)
-            path = (self._inbox_root / relative).resolve()
-            if (
-                relative.is_absolute()
-                or not path.is_relative_to(self._inbox_root)
-                or not path.is_file()
-            ):
-                raise RpcApplicationError(
-                    RpcErrorCode.DOMAIN_REJECTED,
-                    "source path is missing or outside the workspace inbox",
-                    data={"relative_path": request.relative_path},
-                )
-            result = await self._ingestion.stage_async(
-                IngestArtifactCommand(
+            )
+        except ConnectorFailure as exc:
+            raise self._connector_error(exc) from exc
+        try:
+            acquisition = await self._connectors.acquire_one(
+                ConnectorAccessRequest(
+                    parser_selection=request.parser_selection,
+                    actor_id="agent:authorized-evidence-acquisition",
                     project_id=request.project_id,
-                    source_uri=f"inbox://{relative.as_posix()}",
-                    media_type=request.media_type,
-                    raw=path.read_bytes(),
+                    connector_id=connector_id,
+                    selector=selector,
                     authority=request.authority,
                     cutoff_state=request.cutoff_state,
                     security_class=request.security_class,
-                    operation_id=self._ids.new("ingest-operation"),
-                    version_label=request.version_label,
-                    source_path=path,
-                    parser_selection=request.parser_selection,
-                    classify_source_time=True,
-                    captured_cutoff_at=None if project is None else project.cutoff_at,
-                    captured_project_revision=None if project is None else project.revision,
+                    cutoff_at=None if project is None else project.cutoff_at,
+                    policy_id=expectation.policy_id,
+                    policy_revision=expectation.policy_revision,
+                    policy_digest=expectation.policy_digest,
                 )
             )
-            with self._ledger.transaction(), resource_stage_scope(result.resource_scope):
-                self._artifacts.persist_ingestion(
-                    result.document, result.source_version_id, result.evidence_candidates
-                )
-                binding = SourceBinding(
-                    binding_id=self._ids.new("source-binding"),
-                    project_id=request.project_id,
-                    artifact_id=result.document.artifact.artifact_id,
-                    capability="READ",
-                    state="ACTIVE",
-                    created_at=self._clock.now(),
-                    updated_at=self._clock.now(),
-                )
-                self._governance.put_source_binding(binding)
-                source_record = self._evidence_graph.register_source(
-                    result.document.artifact,
-                    connector_ref="project/source/connect",
-                    version=result.document.artifact.version_label,
-                )
-                if project is not None:
-                    active_ids = tuple(
-                        item.binding_id
-                        for item in self._governance.list_source_bindings(request.project_id)
-                        if item.state == "ACTIVE"
-                    )
-                    self._update_project(
-                        project.model_copy(
-                            update={
-                                "source_binding_ids": active_ids,
-                                "revision": project.revision + 1,
-                            }
-                        ),
-                        expected_revision=project.revision,
-                    )
+        except ConnectorFailure as exc:
+            raise self._connector_error(exc) from exc
+        result = acquisition.ingestion
+        binding = acquisition.binding
+        source_record = acquisition.source
         assessment = result.document.source_time_assessment
         return {
             "artifact": result.document.artifact.model_dump(mode="json"),
@@ -315,12 +233,8 @@ class SourceCommandHandlers:
             "binding": binding.model_dump(mode="json"),
             "source": source_record.model_dump(mode="json"),
             "source_time": None if assessment is None else assessment.model_dump(mode="json"),
-            "connector_run": (
-                None if acquisition is None else acquisition.run.model_dump(mode="json")
-            ),
-            "connector_receipt": (
-                None if acquisition is None else acquisition.receipt.model_dump(mode="json")
-            ),
+            "connector_run": acquisition.run.model_dump(mode="json"),
+            "connector_receipt": acquisition.receipt.model_dump(mode="json"),
         }
 
     async def list_sources(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
@@ -351,9 +265,7 @@ class SourceCommandHandlers:
                 for binding in self._governance.list_source_bindings(request.project_id)
                 if binding.artifact_id in visible
             ],
-            "connector_capabilities": (
-                [] if self._connectors is None else list(self._connectors.capabilities())
-            ),
+            "connector_capabilities": list(self._connectors.capabilities()),
             "source_times": times,
             "cutoff_basis": None
             if project is None

@@ -2,8 +2,13 @@
 
 One request per scenario is traced on a real runtime with deterministic ids and clock. The golden
 file is generated from the pre-move ExecutionService (THOTH_WRITE_GOLDEN=1), reviewed and frozen;
-the move of pure record construction out of the service must leave it byte-equal. Reads of
-the plan, attempts, executions, reconciliations, authorizations and evidence are part of the trace.
+the move of pure record construction out of the service must leave it byte-equal. The trace keeps
+what changes state or checks a basis, in order: the ledger writes (snapshot, revision, receipt,
+head), the execution, attempt, effect, reconciliation, action and audit record writes with their
+digests, the id and clock sequence, the execution read that is the currentness check, the plan and
+authorization reads, and the evidence reads that go through the scoped ledger (the authority
+check). Only the attempt and reconciliation reads are not recorded.
+What stays guards: write order and digests, id and clock sequence, currentness and authority.
 """
 
 from __future__ import annotations
@@ -127,8 +132,7 @@ def install(monkeypatch: pytest.MonkeyPatch, rec: Recorder) -> None:
         wrap(SqliteExecutionStore, "E", name, "write")
     for name in ("add_action", "append_audit"):
         wrap(SqliteActionStore, "A", name, "write")
-    for name in ("list_attempts", "read_attempt", "read_execution", "read_reconciliation"):
-        wrap(SqliteExecutionStore, "E", name, "read")
+    wrap(SqliteExecutionStore, "E", "read_execution", "read")
     for name in ("read_plan", "list_authorizations"):
         wrap(SqliteActionStore, "A", name, "read")
     wrap(ScopedArtifactLedger, "S", "read_evidence", "read")

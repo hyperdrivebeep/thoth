@@ -125,7 +125,8 @@ def alive(pid: int) -> bool:
         kernel.OpenProcess.restype = ctypes.c_void_p
         handle = kernel.OpenProcess(0x00100000, False, pid)
         if not handle:
-            return False
+            # Only "no such process" (ERROR_INVALID_PARAMETER) means gone; a denied open is not.
+            return ctypes.get_last_error() != 87
         try:
             return kernel.WaitForSingleObject(ctypes.c_void_p(handle), 0) != 0
         finally:

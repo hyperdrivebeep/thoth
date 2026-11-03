@@ -12,6 +12,7 @@ import pytest
 
 from thoth.application.services.action_effect_policy import classify_effect_vector, effect_impact
 from thoth.application.services.action_service import ActionService
+from thoth.domain.action_full import ActionTestRef
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.enums import ActorKind, CutoffState, EntityType
 from thoth.domain.revision import ImpactPropagationPlan
@@ -285,6 +286,18 @@ def test_create_builds_the_complete_candidate_record() -> None:
     )
     assert record.evidence_refs == ("span:1",) and record.hypothesis_refs == ()
     assert len(record.revision_digest) == 64
+
+
+def test_the_revision_digest_follows_test_refs_when_ids_and_clock_are_the_same() -> None:
+    # Each build() hands out the same ids and clock ticks, so only test_refs can move the digest.
+    ref = ActionTestRef(hypothesis_id="hypothesis:u", test_id="test-1")
+    other = ActionTestRef(hypothesis_id="hypothesis:u", test_id="test-2")
+    digests = [
+        create(build()[0], test_refs=refs)[0].revision_digest
+        for refs in ((), (ref,), (other,), (ref,))
+    ]
+    assert digests[1] == digests[3]
+    assert len({digests[0], digests[1], digests[2]}) == 3
 
 
 @pytest.mark.parametrize(

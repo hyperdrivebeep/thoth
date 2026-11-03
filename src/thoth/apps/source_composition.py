@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from thoth.adapters.parsers.registry import default_parser_registry
 from thoth.application.commands.sources import SourceCommandHandlers
 from thoth.application.services.connector_service import ConnectorService
@@ -56,10 +54,8 @@ def create_ingestion_service(
 
 def create_source_handlers(
     *,
-    workspace: Path,
     ledger: ManagedLedgerPort,
     stores: StoreBundlePort,
-    ingestion: IngestionService,
     clock: ClockPort,
     evidence_graph: EvidenceGraphService,
     ids: IdGeneratorPort,
@@ -68,8 +64,6 @@ def create_source_handlers(
     source_time: SourceTimeService | None = None,
 ) -> SourceCommandHandlers:
     return SourceCommandHandlers(
-        inbox_root=workspace / "inbox",
-        ingestion=ingestion,
         artifacts=artifacts,
         governance=stores.governance,
         projects=stores.projects,

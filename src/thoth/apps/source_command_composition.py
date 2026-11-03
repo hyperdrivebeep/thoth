@@ -53,9 +53,7 @@ def create_source_commands(
     )
     source_handlers = create_source_handlers(
         stores=stores,
-        workspace=workspace,
         ledger=ledger,
-        ingestion=ingestion_service,
         clock=clock,
         evidence_graph=evidence_graph_service,
         ids=ids,

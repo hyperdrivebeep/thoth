@@ -258,8 +258,11 @@ async def test_memory_postwrite_fault_rolls_back_cycle_and_survives_restart(
     monkeypatch: pytest.MonkeyPatch,
     fault: str,
 ) -> None:
+    reached: list[str] = []
+
     def inject(step: str) -> None:
         if step == fault:
+            reached.append(step)
             raise RuntimeError("A06 injected postwrite fault")
 
     runtime, _connector, project_id = await prepare_thread(
@@ -276,6 +279,7 @@ async def test_memory_postwrite_fault_rolls_back_cycle_and_survives_restart(
             projections: tuple[MemoryProjection, ...],
         ) -> None:
             original(self, project_id, projections)
+            reached.append(fault)
             raise RuntimeError("A06 injected postwrite fault")
 
         monkeypatch.setattr(SqliteFullMemoryStore, "replace_projections", replace)
@@ -287,6 +291,7 @@ async def test_memory_postwrite_fault_rolls_back_cycle_and_survives_restart(
                 {"project_id": project_id, "thread_id": f"thread:{project_id}"},
             )
         )
+        assert reached == [fault]
         assert response.error is not None
         assert memory_counts(runtime.ledger.engine) == (0, 0, 0, 0)
     finally:
