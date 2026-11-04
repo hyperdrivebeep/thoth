@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-04T16:03:52.914607+00:00",
+  "created_at": "2026-11-04T18:28:32.933663+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -315,6 +315,16 @@
       "path": "apps/web/src/api/localWorkspacePersistence.ts",
       "sha256": "788e2f2338f267a8371362ea8df540dee9274f29ab4188da3d8a1948ee911c78",
       "bytes": 11496
+    },
+    {
+      "path": "apps/web/src/api/parserError.test.ts",
+      "sha256": "1a1211dbd9693593b259d84c7d53450a0340a2cd7f3949cd8aaa01fb2748dbb3",
+      "bytes": 2751
+    },
+    {
+      "path": "apps/web/src/api/parserError.ts",
+      "sha256": "da6b62d462be50eac00fab21aee2e92a7001d1bd9b1fd8a81012e35449c63608",
+      "bytes": 1126
     },
     {
       "path": "apps/web/src/api/presentation.ts",
@@ -677,6 +687,11 @@
       "bytes": 3102
     },
     {
+      "path": "apps/web/src/components/ConnectFailureInWorkspace.test.tsx",
+      "sha256": "2e46e7ac7935a64dbb2accd0f5f31b903bdbe4c98595162d48831f135bcbf670",
+      "bytes": 7855
+    },
+    {
       "path": "apps/web/src/components/ContractV3Screens.test.tsx",
       "sha256": "cc58a42347636f4d117d503d4f7495606cff79c5541327049f6ff543104ffdc0",
       "bytes": 8555
@@ -758,8 +773,13 @@
     },
     {
       "path": "apps/web/src/components/FileConnectionPanel.tsx",
-      "sha256": "c0d9eab7975c2d968f2f0ab69bddbe2dfda9ee53785a912042395d4784eac34c",
-      "bytes": 7086
+      "sha256": "03f54c1786d61f93b4d4b86643ab1093e8ab1f321aeb2d0a910fdc0d55062a40",
+      "bytes": 8411
+    },
+    {
+      "path": "apps/web/src/components/FileConnectionPanelParserError.test.tsx",
+      "sha256": "7ab66b8a61296c594988b03bf4e6bcbbee1467d70ac40acb22da5399a05c4dfe",
+      "bytes": 4164
     },
     {
       "path": "apps/web/src/components/FirstRunSetup.test.tsx",
@@ -1793,8 +1813,8 @@
     },
     {
       "path": "apps/web/src/i18n/messages.ts",
-      "sha256": "025a5ec350320180acdffe16d2c571e73e7c47983761f89ff157ac39eae70c2e",
-      "bytes": 10054
+      "sha256": "be998448081d8ffff15a9848e1738109d5187262279a83eec844a1e2c5006a3a",
+      "bytes": 10141
     },
     {
       "path": "apps/web/src/i18n/metricFormatMessages.ts",
@@ -1810,6 +1830,11 @@
       "path": "apps/web/src/i18n/oauthMessages.ts",
       "sha256": "123160824a0ec1340e63ea32a8eb0922bd34554032529b430ebf2b22bd383e5c",
       "bytes": 10639
+    },
+    {
+      "path": "apps/web/src/i18n/parserErrorMessages.ts",
+      "sha256": "1ec2d4d41808425616b89030f8552b845cc58bbcc70a6f5d230b161e906f759c",
+      "bytes": 5410
     },
     {
       "path": "apps/web/src/i18n/plainWordingResources.ts",
@@ -2193,8 +2218,8 @@
     },
     {
       "path": "docs/architecture/evidence-context.md",
-      "sha256": "4c16d858f32d18876704afe05502297504162226cde64969ea91ed4f5c4bc9b0",
-      "bytes": 5238
+      "sha256": "eedaf9fb629e58b1b47c6ceafa852c0168c05c2e4b5fd73ea1d096eed7a0d14c",
+      "bytes": 6513
     },
     {
       "path": "docs/architecture/extension-point-catalog.md",
@@ -3688,8 +3713,8 @@
     },
     {
       "path": "src/thoth/adapters/http/file_staging.py",
-      "sha256": "3ac2a9209a2df6d6d9328119b4c8c2b4c11432a8be99520c598ab66aa81603f4",
-      "bytes": 4326
+      "sha256": "19b844a3bada1b54b499e3b126880a98267ba8fe99bc6db722cbb8eab13e3c9e",
+      "bytes": 5267
     },
     {
       "path": "src/thoth/adapters/http/hosted_review.py",
@@ -4023,8 +4048,8 @@
     },
     {
       "path": "src/thoth/adapters/parsers/csv_parser.py",
-      "sha256": "28405f870c9995caf799062a8d18eef59a0302170893b7204fb58901e9ff6673",
-      "bytes": 3480
+      "sha256": "ce818aeb95ba249232f93f12de900ab052e944a67a2cf08c27d05132bc081793",
+      "bytes": 3623
     },
     {
       "path": "src/thoth/adapters/parsers/docling_locations.py",
@@ -4063,8 +4088,8 @@
     },
     {
       "path": "src/thoth/adapters/parsers/html_parser.py",
-      "sha256": "11ced1b04288b4b87224e622e283c3ab5be44dd2625b0ba4e7859f80e6f2a1ec",
-      "bytes": 6565
+      "sha256": "c17237793a835a581172879b99ebb3b2648cf1fa567d676864a631e4f04778e0",
+      "bytes": 6729
     },
     {
       "path": "src/thoth/adapters/parsers/hwpx_parser.py",
@@ -4102,9 +4127,14 @@
       "bytes": 7013
     },
     {
+      "path": "src/thoth/adapters/parsers/text_encoding.py",
+      "sha256": "cf1f8358b2bf08f029d555da2b14dd80a2256b8c41ba81ecb9e0191c605dbcce",
+      "bytes": 7208
+    },
+    {
       "path": "src/thoth/adapters/parsers/text_parser.py",
-      "sha256": "22f1cea2947b45fe90441c62db92de14559b160d72e0a332a06304746c855d6b",
-      "bytes": 3739
+      "sha256": "4e332f855808a2df0ce6168a80a2c454dfa74bb27110e64427b037caa2193bb4",
+      "bytes": 3882
     },
     {
       "path": "src/thoth/adapters/parsers/xlsx_parser.py",
@@ -4758,8 +4788,8 @@
     },
     {
       "path": "src/thoth/application/commands/investigation.py",
-      "sha256": "532f5187d99b83a19beff5c469e2eb5d93d53ae9e6830567a690bdf68aac2508",
-      "bytes": 10114
+      "sha256": "56c8b0887490c47393f597587de97805a9c9eec7179fe73a6721caaa0a77b7fe",
+      "bytes": 10963
     },
     {
       "path": "src/thoth/application/commands/judgment_review.py",
@@ -6773,8 +6803,8 @@
     },
     {
       "path": "src/thoth/apps/thread_analysis_composition.py",
-      "sha256": "214ce3b7a0053cc8b3bb821de82c2bd1994fcb5e694d849e1b8b5430e9bc4d9e",
-      "bytes": 4271
+      "sha256": "16b847c3542bae40bd48dc492e276a695fd4e4cc28c475bce02496de1362798f",
+      "bytes": 4294
     },
     {
       "path": "src/thoth/apps/trace_composition.py",
@@ -6978,8 +7008,8 @@
     },
     {
       "path": "src/thoth/domain/enums.py",
-      "sha256": "588a05b7ade5620613a61f2c657476d11fb6154cbb077eaa68eecf1a387355a1",
-      "bytes": 10703
+      "sha256": "069a178392c30949fcaa8e4d7a5b6c67b850d781cdc8322d8363c0ddd9aadbe7",
+      "bytes": 10763
     },
     {
       "path": "src/thoth/domain/environment.py",
@@ -8127,6 +8157,11 @@
       "bytes": 4602
     },
     {
+      "path": "tests/atomicity/fault_helpers.py",
+      "sha256": "753cf470d028f97a7eca5482bae13725ef3d0113f6740c20d366d7833246a8ac",
+      "bytes": 3882
+    },
+    {
       "path": "tests/atomicity/harness.py",
       "sha256": "77de7714764378821c70ae59a82bc5bdff882b9d7a1c0836efa91138aa3ea812",
       "bytes": 8892
@@ -8217,9 +8252,19 @@
       "bytes": 5856
     },
     {
+      "path": "tests/atomicity/test_improvement_phase_faults.py",
+      "sha256": "72d5ca45e020c8a8724d1d92068edfbf034f495b435b1f8e6e14ffbe0b7d6957",
+      "bytes": 6638
+    },
+    {
       "path": "tests/atomicity/test_inventory.py",
       "sha256": "2e4579b28cfc013730589e54a80805a145ca9f035fb1241a51ed15ca8d8d52a4",
       "bytes": 1221
+    },
+    {
+      "path": "tests/atomicity/test_investigation_faults.py",
+      "sha256": "fefbfc5c983482dabcd3e411f704ab8dad7a708c46b2d514166675b7bf6d78a2",
+      "bytes": 5983
     },
     {
       "path": "tests/atomicity/test_operation_research_controls.py",
@@ -8235,6 +8280,11 @@
       "path": "tests/atomicity/test_owner_audit_binding.py",
       "sha256": "fb89977c3bba845dc405972fb1ad0e0fb95047c269145367d3ef9450104b320c",
       "bytes": 3282
+    },
+    {
+      "path": "tests/atomicity/test_owner_write_faults.py",
+      "sha256": "0db917f88898152817b32fc2c7c435750c7ce1f1af2ab1fafffa024d4cc76495",
+      "bytes": 10019
     },
     {
       "path": "tests/atomicity/test_permission_predicates.py",
@@ -8262,6 +8312,11 @@
       "bytes": 4903
     },
     {
+      "path": "tests/atomicity/test_project_lifecycle_faults.py",
+      "sha256": "5e6754df084af5ca404c509da97cb45e6735cbaf1a4999270d3c85470e2a78b0",
+      "bytes": 8367
+    },
+    {
       "path": "tests/atomicity/test_projectpack_bootstrap.py",
       "sha256": "c8dd5898346733839f7a3235bdaef7227c59a213ef57ad2020137901c7cdc3b6",
       "bytes": 1423
@@ -8270,6 +8325,11 @@
       "path": "tests/atomicity/test_receipt_bundle_cache.py",
       "sha256": "35261fad3a89834203e81d0a3e7de8ff0df639213edb8b347b91a53629a173ba",
       "bytes": 9656
+    },
+    {
+      "path": "tests/atomicity/test_revision_commit_faults.py",
+      "sha256": "3761f5ec28a4c0129fb8f7be9b08d69d3966c3d5c5bfa3170034d04df3e8bc90",
+      "bytes": 5740
     },
     {
       "path": "tests/atomicity/test_source_artifact.py",
@@ -8295,6 +8355,11 @@
       "path": "tests/atomicity/test_store_lifecycle.py",
       "sha256": "eb1bdc5459f0d99b4dbad8ca8fe9d2f0274837a3ffd00f21da7a7a2c04f8c258",
       "bytes": 4708
+    },
+    {
+      "path": "tests/atomicity/test_thread_start_faults.py",
+      "sha256": "a3dde9d48922d359f5f7aec7b53ab597bef84ed2de1236149141569da4b32c97",
+      "bytes": 1915
     },
     {
       "path": "tests/ci/integration_durations.json",
@@ -11667,6 +11732,11 @@
       "bytes": 21500
     },
     {
+      "path": "tests/unit/parsers/test_text_encoding.py",
+      "sha256": "4500752d959352b2f66cfc04a0ffc22cc4e105e5b3183915980ba847044ec625",
+      "bytes": 8075
+    },
+    {
       "path": "tests/unit/reducers/test_authority_router.py",
       "sha256": "7d936dadac836465f90418722657e92dec59a02bb975842f02b8e778225dd516",
       "bytes": 4079
@@ -12120,6 +12190,16 @@
       "path": "tests/unit/test_embedding_worker.py",
       "sha256": "23465d66bd360b91d9da73249f1fb12b74a40b1d7dd0bc047f31791a891a1923",
       "bytes": 4585
+    },
+    {
+      "path": "tests/unit/test_file_staging_cjk_upload.py",
+      "sha256": "1d5797f863a8d7cedf4ef3bde297fa178c3419e5a198cf1c54d0855327774feb",
+      "bytes": 2457
+    },
+    {
+      "path": "tests/unit/test_file_staging_names.py",
+      "sha256": "7232379996c82b6fd1f7ddcc92fda8b1dc7182743c6f627ced36324f8bbc4f29",
+      "bytes": 1721
     },
     {
       "path": "tests/unit/test_fused_selection.py",

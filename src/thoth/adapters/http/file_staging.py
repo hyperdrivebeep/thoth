@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import re
+import unicodedata
 from collections.abc import Callable
 from hashlib import sha256
 from os import replace
@@ -36,6 +36,32 @@ MEDIA_TYPES = {
     ".yml": "text/plain",
     ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 }
+
+
+def _keeps(char: str) -> bool:
+    """Letters, digits and combining marks of any script are kept, so Chinese, Japanese and Korean
+    names stay readable. Everything else (path separators, Windows-forbidden characters, spaces,
+    control and invisible direction characters) becomes a hyphen."""
+    return char in "._-" or char.isalnum() or unicodedata.category(char).startswith("M")
+
+
+def safe_upload_name(filename: str, suffix: str) -> str:
+    """The staged file name: the original characters in NFC, with every run of unsafe characters
+    replaced by one hyphen, at most 48 characters before the extension."""
+    parts: list[str] = []
+    replaced = False
+    for char in unicodedata.normalize("NFC", filename):
+        if _keeps(char):
+            parts.append(char)
+            replaced = False
+        elif not replaced:
+            parts.append("-")
+            replaced = True
+    safe_name = "".join(parts).strip(".-")
+    if not safe_name:
+        safe_name = f"source{suffix}"
+    safe_stem = unicodedata.normalize("NFC", Path(safe_name).stem[:48]) or "source"
+    return f"{safe_stem}{suffix}"
 
 
 async def stage_file_upload(
@@ -79,11 +105,7 @@ async def stage_file_upload(
             )
         except RpcApplicationError as exc:
             raise HTTPException(status_code=413, detail=exc.message) from exc
-    safe_name = re.sub(r"[^0-9A-Za-z가-힣._-]+", "-", filename).strip(".-")
-    if not safe_name:
-        safe_name = f"source{suffix}"
-    safe_stem = Path(safe_name).stem[:48] or "source"
-    safe_name = f"{safe_stem}{suffix}"
+    safe_name = safe_upload_name(filename, suffix)
     digest = sha256(payload).hexdigest()
     relative_inbox = project_upload_prefix(authenticated_project_id)
     inbox = workspace / "inbox" / relative_inbox

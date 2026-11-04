@@ -73,3 +73,19 @@ semantic retrieval or interpretation reconciliation. The separate [numeric obser
 and [declared absence checks](absence-checks.md) consume its scoped input without certifying semantic truth.
 Compact JSON byte measurements are not provider-token or answer-quality guarantees.
 No model permissions, retry policy or research limits are raised.
+
+## Text encodings and uploaded file names
+
+The text, CSV and HTML parsers read UTF-8 (with or without a byte order mark) exactly as before and add
+nothing to those results. Other text is read only when its encoding is certain: a UTF-16/32 byte order
+mark or an HTML `<meta charset>` declares it and the bytes read cleanly with it, or nothing is declared
+and exactly one of GB18030, Big5, Shift_JIS, EUC-JP or CP949 reads the bytes as clean text that looks
+like that encoding's language (enough letters, Hangul for CP949, kana for Japanese, common characters
+for Chinese). Anything else, including several encodings that fit, is refused with the parser error
+`TEXT_ENCODING_UNCONFIRMED` (the connect error carries it as `parser_error`; the parser message asks
+for UTF-8) so that no source holds garbled text or U+FFFD. Valid UTF-8 wins over a conflicting
+declaration. The encoding that was used is
+recorded on every node as `TEXT_ENCODING:<name>` in `extraction_warnings`; no table changes.
+Uploaded file names keep letters, digits and combining marks of every script in NFC form; path
+separators, Windows-forbidden characters, spaces, control and invisible direction characters become one
+hyphen per run, and the stored name stays within 48 characters before the extension.

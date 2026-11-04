@@ -5,6 +5,7 @@ from typing import Protocol, cast
 
 from thoth.adapters.parsers.common import node_id, parser_artifact, validate_byte_hash
 from thoth.adapters.parsers.document_time import extract_html_time_observations
+from thoth.adapters.parsers.text_encoding import UTF8, declared_html_encoding, decode_text
 from thoth.domain.artifact import (
     ArtifactEnvelope,
     ParseIssue,
@@ -88,15 +89,12 @@ class HtmlParser:
     def parse(self, artifact: ArtifactEnvelope, raw: bytes) -> StructuralDocument:
         validate_byte_hash(artifact, raw)
         library = cast(HtmlLibrary, import_module("lxml.html"))
+        # A document whose encoding cannot be confirmed is refused here, never read as garbled text.
+        decoded = decode_text(raw, declared=declared_html_encoding(raw))
+        source = raw if decoded.encoding == UTF8 else decoded.text.encode("utf-8")
         try:
-            try:
-                raw.decode("utf-8-sig")
-                encoding = "utf-8"
-            except UnicodeDecodeError:
-                raw.decode("cp949")
-                encoding = "cp949"
             root = library.fromstring(
-                raw, parser=library.HTMLParser(no_network=True, encoding=encoding)
+                source, parser=library.HTMLParser(no_network=True, encoding="utf-8")
             )
         except Exception as exc:
             raise ParserFailure(ParserErrorCode.CORRUPT_DOCUMENT, "HTML parsing failed") from exc
@@ -152,7 +150,7 @@ class HtmlParser:
                     locator=SourceLocator(
                         line=element.sourceline or 1, xml_path=tree.getpath(element)
                     ),
-                    extraction_warnings=("STATIC_HTML_ONLY",),
+                    extraction_warnings=("STATIC_HTML_ONLY", *decoded.warnings),
                 )
             )
         if not nodes or not body_material:

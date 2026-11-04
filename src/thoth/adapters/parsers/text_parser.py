@@ -5,6 +5,7 @@ from pathlib import PurePosixPath
 
 from thoth.adapters.parsers.common import coverage, node_id, parser_artifact, validate_byte_hash
 from thoth.adapters.parsers.text_context import observe_text_context
+from thoth.adapters.parsers.text_encoding import decode_text
 from thoth.domain.artifact import (
     ArtifactEnvelope,
     SourceLocator,
@@ -58,7 +59,8 @@ class TextParser:
 
     def parse(self, artifact: ArtifactEnvelope, raw: bytes) -> StructuralDocument:
         validate_byte_hash(artifact, raw)
-        text = raw.decode("utf-8-sig")
+        decoded = decode_text(raw)
+        text = decoded.text
         # A YAML line keeps its key path (for example /detection/denominator) so a block of short
         # key-value lines can be read together. Other text files are left as flat lines.
         key_path = _KeyPath() if _is_yaml(artifact) else None
@@ -85,6 +87,7 @@ class TextParser:
                     locator=SourceLocator(
                         line=line_number, paragraph=paragraph, json_pointer=pointer
                     ),
+                    extraction_warnings=decoded.warnings,
                 )
             )
         return StructuralDocument(
