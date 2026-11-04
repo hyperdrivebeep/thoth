@@ -128,7 +128,7 @@ button { color: inherit; }
 .thread-button strong { font-size: 12px; line-height: 1.35; }
 .project-button small,
 .thread-button small { margin-top: 4px; color: var(--muted); font-size: 10px; line-height: 1.35; }
-.thread-button > span { color: var(--accent-bright); font-family: monospace; font-size: 10px; }
+.thread-button > span { color: var(--accent-bright); font-family: inherit; font-size: 10px; }
 .project-dot { width: 7px; height: 7px; margin-top: 4px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px #8c7bff88; }
 
 .boundary-note {

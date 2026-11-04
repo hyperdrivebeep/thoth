@@ -6,6 +6,7 @@ import {
   WORKSPACE_PROJECT_ID, type LocalAssetRead, type LocalRetrievalLongMethod, type OperationOutcome, type OperationTimeouts,
   type RetrievalExperimentRead, type RetrievalJob,
 } from "../api/localRetrieval";
+import { LOCAL_RETRIEVAL_INSTALL_COMMAND } from "../api/localRetrievalInstall";
 import { t, useLocale } from "../i18n/locale";
 import {
   localRetrievalBytes, localRetrievalCounts, localRetrievalReason, localRetrievalTransfer,
@@ -228,6 +229,11 @@ function AssetSection({ asset, text, running, sourcePath, onSourcePath, installC
       <Tag minimal round intent={asset.dependency_available ? "success" : "warning"}>{text(asset.dependency_available ? "localRetrieval.dependencyAvailable" : "localRetrieval.dependencyMissing")}</Tag>{" "}
       <Tag minimal round>{text(asset.worker_loaded ? "localRetrieval.workerLoaded" : "localRetrieval.workerNotLoaded")}</Tag>
     </p>
+    {!asset.dependency_available && <div className="local-retrieval-runtime-help">
+      <p className="muted">{text("localRetrieval.installRuntimeHelp")}</p>
+      <code className="local-retrieval-command">{LOCAL_RETRIEVAL_INSTALL_COMMAND}</code>
+      <p className="muted">{text("localRetrieval.installRuntimeRestart")}</p>
+    </div>}
     {asset.asset_state === "FAILED" && <p className="result-notice" role="status">{reason(asset.reason_code)}</p>}
     {asset.active && <div role="status" aria-label={text("localRetrieval.operationLabel")}>
       <ProgressBar intent="primary" value={asset.active.total_bytes > 0 ? Math.min(1, asset.active.transferred_bytes / asset.active.total_bytes) : undefined} />

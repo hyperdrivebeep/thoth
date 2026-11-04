@@ -16,14 +16,22 @@ from thoth.adapters.embeddings.asset_files import check_time, ensure_directory, 
 from thoth.adapters.embeddings.assets import LocalModelAssets
 from thoth.domain.model_asset import ModelAssetDownloadGrant, ModelAssetError, ModelAssetStatus
 
-_HOSTS = frozenset(
-    {
-        "huggingface.co",
-        "cas-bridge.xethub.hf.co",
-        "cdn-lfs.huggingface.co",
-        "cdn-lfs-us-1.huggingface.co",
-    }
-)
+
+def _allowed_host(hostname: str | None) -> bool:
+    """huggingface.co and hf.co with their subdomains; whole names only, never prefix or contains.
+
+    Hugging Face moves large files between CDN names (cdn-lfs.huggingface.co,
+    cas-bridge.xethub.hf.co, us.aws.cdn.hf.co, ...), so the CDN name itself is not fixed here.
+    Integrity does not rest on the host: every file's size and SHA-256 are checked against the
+    pinned manifest.
+    """
+    if hostname is None or not hostname.isascii():
+        return False
+    name = hostname.lower()
+    if not all(name.split(".")):
+        return False
+    return name in {"huggingface.co", "hf.co"} or name.endswith((".huggingface.co", ".hf.co"))
+
 
 _CLEANUPS: set[asyncio.Task[None]] = set()
 
@@ -63,7 +71,7 @@ def _check_url(url: str, lfs_host: str | None) -> str:
         or parsed.username is not None
         or parsed.password is not None
         or port not in (None, 443)
-        or parsed.hostname not in _HOSTS
+        or not _allowed_host(parsed.hostname)
         or (lfs_host is not None and parsed.hostname != lfs_host)
     ):
         raise ModelAssetError("MODEL_DOWNLOAD_DESTINATION_DENIED")

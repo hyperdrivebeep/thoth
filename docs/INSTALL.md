@@ -68,6 +68,17 @@ reportlab for fixtures. Optional extras are separate:
 - `browser`: Playwright-based acquisition; browser installation is separate.
 - `connectors`: PostgreSQL, S3 and MCP SDKs.
 - `managed`: managed sandbox SDK.
+- `local-retrieval`: ONNX Runtime, tokenizers and NumPy for Settings → Local retrieval preparation
+  (opt-in, off by default). It adds about 110 MB to the environment. The model files are separate:
+  about 124 MB per workspace, downloaded or imported from that settings card.
+
+Without `local-retrieval` the settings card still lets you import or download the model files, but
+no index can be prepared and the card says the runtime component is missing. To add it, run the
+basic install command with the extra, then restart THOTH:
+
+```powershell
+uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev --extra local-retrieval
+```
 
 The basic UI does not require enabling every optional adapter. An unavailable adapter remains
 unavailable until it is deliberately configured.

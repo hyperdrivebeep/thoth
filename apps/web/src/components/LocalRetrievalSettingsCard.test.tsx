@@ -4,6 +4,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { LocalAssetRead, OperationTimeouts, RetrievalExperimentRead } from "../api/localRetrieval";
+import { LOCAL_RETRIEVAL_INSTALL_COMMAND } from "../api/localRetrievalInstall";
 import { setLocale } from "../i18n/locale";
 import { localRetrievalReason, localRetrievalText } from "../i18n/localRetrievalMessages";
 import { LocalRetrievalSettingsCard } from "./LocalRetrievalSettingsCard";
@@ -339,6 +340,46 @@ describe("model files", () => {
     expect(isDisabled(button(ko("localRetrieval.prepareButton")))).toBe(true);
     expect(body()).toContain(ko("localRetrieval.prepareBlockedDependency"));
     expect(server.fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("runtime component install guide", () => {
+  const command = () => container.querySelector(".local-retrieval-command");
+
+  it("without the runtime component shows the command and the restart note, under the existing wording", async () => {
+    fixture.asset = () => ({ ...assetReady(), dependency_available: false });
+    await render({ projectId: "p1" });
+    expect(body()).toContain(ko("localRetrieval.dependencyMissing"));
+    expect(body()).toContain(ko("localRetrieval.installRuntimeHelp"));
+    expect(command()?.textContent).toBe(LOCAL_RETRIEVAL_INSTALL_COMMAND);
+    expect(body()).toContain("설치한 뒤 THOTH를 다시 시작하세요.");
+    expect(body().indexOf(ko("localRetrieval.dependencyMissing"))).toBeLessThan(body().indexOf(LOCAL_RETRIEVAL_INSTALL_COMMAND));
+    expect(server.fetch).not.toHaveBeenCalled();
+  });
+
+  it("with the runtime component shows no guide", async () => {
+    await render({ projectId: "p1" });
+    expect(body()).toContain(ko("localRetrieval.dependencyAvailable"));
+    expect(command()).toBeNull();
+    expect(body()).not.toContain(ko("localRetrieval.installRuntimeHelp"));
+    expect(body()).not.toContain(ko("localRetrieval.installRuntimeRestart"));
+  });
+
+  it("in a hosted review workspace shows no guide", async () => {
+    fixture.asset = () => ({ ...assetReady(), dependency_available: false });
+    await render({ hosted: true, projectId: "p1" });
+    expect(command()).toBeNull();
+    expect(body()).not.toContain(ko("localRetrieval.installRuntimeHelp"));
+    expect(body()).not.toContain(LOCAL_RETRIEVAL_INSTALL_COMMAND);
+  });
+
+  it("is shown in English with the same command", async () => {
+    setLocale("en");
+    fixture.asset = () => ({ ...assetReady(), dependency_available: false });
+    await render({ projectId: "p1" });
+    expect(body()).toContain("To install it, run this command in PowerShell from the THOTH folder (optional, about 110 MB):");
+    expect(body()).toContain("After installing, restart THOTH.");
+    expect(command()?.textContent).toBe(LOCAL_RETRIEVAL_INSTALL_COMMAND);
   });
 });
 

@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-04T06:17:22.685711+00:00",
+  "created_at": "2026-11-04T08:09:54.902635+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -290,6 +290,16 @@
       "path": "apps/web/src/api/localRetrieval.ts",
       "sha256": "1eadbbf03cac3eb1656be8013bce04f90f69dff3104cbd759298fca8b76c513d",
       "bytes": 12957
+    },
+    {
+      "path": "apps/web/src/api/localRetrievalInstall.test.ts",
+      "sha256": "7d290be9689543bb72781bee84dc411357bc0b72b3bf5f0c7c0390db48591391",
+      "bytes": 787
+    },
+    {
+      "path": "apps/web/src/api/localRetrievalInstall.ts",
+      "sha256": "63bfa665b26ff39a02b5c00008485401c4e6f8ab805c4ec2724c934ec2bd45aa",
+      "bytes": 323
     },
     {
       "path": "apps/web/src/api/localWorkspacePersistence.test.ts",
@@ -883,13 +893,13 @@
     },
     {
       "path": "apps/web/src/components/LocalRetrievalSettingsCard.test.tsx",
-      "sha256": "59baeca80c515b53bebede0d6617ade6905619896a48fa204430e2919fa1c375",
-      "bytes": 34026
+      "sha256": "769e8169bf39a220634e28d6d5e34b9e9decfb2b9d1cc40132d0492cac1cb3e1",
+      "bytes": 36182
     },
     {
       "path": "apps/web/src/components/LocalRetrievalSettingsCard.tsx",
-      "sha256": "4c726ea80ca21e27fdd29abed5df5d368ec16d97e216f1cf73b9e865dcd086fc",
-      "bytes": 21197
+      "sha256": "635b9f3394967829f9b89bb3a2f1abccfc9dc83063bfc72c1b57faf578739544",
+      "bytes": 21614
     },
     {
       "path": "apps/web/src/components/M7LiveReadDenial.test.tsx",
@@ -1758,8 +1768,8 @@
     },
     {
       "path": "apps/web/src/i18n/localRetrievalMessages.ts",
-      "sha256": "baf4a8749975ca0b34b54fe62a823b0298d259e762cd179d858e97f2249a38fe",
-      "bytes": 19827
+      "sha256": "627c1b26ad7efa3caba92da2bd47074e9708b4b325ad2a4f941154ed89ebaf04",
+      "bytes": 20248
     },
     {
       "path": "apps/web/src/i18n/locale.ts",
@@ -1918,8 +1928,8 @@
     },
     {
       "path": "apps/web/src/styles.css",
-      "sha256": "95c9105ab012451346a34e8e80eda047a871a8d1acdd5429a937b6a6a2b02e88",
-      "bytes": 21406
+      "sha256": "85269229791bbd26e723f844db739af0efa9f849d0804eae5ee3128085c6b508",
+      "bytes": 21404
     },
     {
       "path": "apps/web/src/testSetup.ts",
@@ -1943,8 +1953,8 @@
     },
     {
       "path": "apps/web/src/workstation.css",
-      "sha256": "d329c937bd6c3340765a6a35da28372b4a1c63f22bd9e4396a2383e433cb7667",
-      "bytes": 60252
+      "sha256": "008835150e48038f0ba97444af783f2e0ee2174216144b5a03e89a1efcd3976e",
+      "bytes": 60573
     },
     {
       "path": "apps/web/timeline-preview.html",
@@ -2088,8 +2098,8 @@
     },
     {
       "path": "docs/INSTALL.md",
-      "sha256": "974d3124abf75c1aa38f3262c1ba2fd1ae6a88c36a59066ca14f3b4c5521da38",
-      "bytes": 22132
+      "sha256": "4f664c7deaa18468b19073083e8a76b3abed5e6b1bfccd18ee5a539c4e51b5e3",
+      "bytes": 22820
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.ko.md",
@@ -2178,8 +2188,8 @@
     },
     {
       "path": "docs/architecture/local-retrieval-preparation.md",
-      "sha256": "d790f1ed2073cbe96b22fff067d04bb268b5921c6c665d2a7682da511cc93541",
-      "bytes": 5106
+      "sha256": "182dce18e8c8a7983ee18a64fe904ad895e00004f300f306faf087e891e1ddcb",
+      "bytes": 5777
     },
     {
       "path": "docs/architecture/memory-terms.md",
@@ -3543,8 +3553,8 @@
     },
     {
       "path": "src/thoth/adapters/embeddings/download.py",
-      "sha256": "8e7b50423d404373679205418f90e3c9823d7b30c538afc779698f6b33305481",
-      "bytes": 8713
+      "sha256": "c77a7abe98b8d44655567489f31635c649418cc8c10ef160dc9e9cc3b312681e",
+      "bytes": 9247
     },
     {
       "path": "src/thoth/adapters/embeddings/granite_manifest.json",
@@ -8598,8 +8608,8 @@
     },
     {
       "path": "tests/fixtures/storage_schema_contract.json",
-      "sha256": "9122f262d4b978cd875fb8166d447b30fc93fa20dd9469bd87cd845f69a331bd",
-      "bytes": 1751566
+      "sha256": "de582f61becc6bc72beaa8484920b8c73ed30b7a0af1b6778333aea6225511b1",
+      "bytes": 1761014
     },
     {
       "path": "tests/fixtures/structured_source_fixture.py",
@@ -12233,8 +12243,8 @@
     },
     {
       "path": "tests/unit/test_model_download.py",
-      "sha256": "b6962dbac582008cb8e03680c4c8c489198e6c0d353194caa2e72222e3cd39e7",
-      "bytes": 4927
+      "sha256": "7e3a1fef1068eb28c1b5392823b8f91ab0c58a56d0d5e3ae84a5e22e61209ef0",
+      "bytes": 8428
     },
     {
       "path": "tests/unit/test_model_instruction_sentences.py",

@@ -28,11 +28,18 @@ Handles, sizes and hashes are checked. A separate publisher lock protects an ato
 from an owned staging directory; READY installations are never silently overwritten.
 
 Downloading needs an explicit checkbox and the displayed manifest digest. Only the fixed
-revision/files are fetched over HTTPS from the registered Hugging Face/LFS hosts. Redirects,
-hosts, content sizes and hashes are bounded. No caller URL, package name, factory name or
-credentials are accepted; environment proxies and cookies are not used. This narrow install
-grant does not enable research network access. Tests use synthetic HTTP streams; successful
-real network installation is not claimed.
+revision/files are fetched over HTTPS (port 443, no user information, at most four redirects).
+The host must be exactly `huggingface.co` or `hf.co`, or a subdomain of either (compared as
+whole, lower-cased names, so `evilhf.co`, `evilhuggingface.co` and `hf.co.evil.com` are refused).
+Hugging Face moves large files between CDN names (for example `cdn-lfs.huggingface.co` or
+`us.aws.cdn.hf.co`), so the CDN name is not listed; within
+one file the first CDN name is pinned and a second one is refused. The host is not what keeps the
+files honest: every file's size and SHA-256 are checked against the pinned manifest. Content sizes
+and hashes are bounded. No caller URL, package name, factory name or credentials are accepted;
+environment proxies and cookies are not used. This narrow install grant does not enable research
+network access. Tests use synthetic HTTP streams. One real installation through this route from
+Hugging Face was run on 2026-11-04 (123,586,186 bytes in about 7.6 seconds on the author's PC);
+that is a single observation, not a promise about every network.
 
 ## Preparation and state
 

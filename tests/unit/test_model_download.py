@@ -69,6 +69,23 @@ async def test_mock_download_verifies_bytes_and_fixed_url(tmp_path: Path):
         "https://huggingface.co:123/model",
         "https://huggingface.co:invalid/model",
         "https://user:pass@huggingface.co/model",
+        # Look-alike names are compared whole: no prefix, suffix without the dot, or contains.
+        "https://evilhf.co/model",
+        "https://nothf.co/model",
+        "https://hf.co.evil.com/model",
+        "https://us.aws.cdn.hf.co.evil.com/model",
+        "https://huggingface.co.evil/model",
+        "https://huggingface.co.evil.com/model",
+        "https://cdn-lfs.huggingface.co.evil.com/model",
+        "https://evil-huggingface.co/model",
+        "https://evilhuggingface.co/model",
+        "https://xn--hf-co-9a4c.example/model",
+        "https://.hf.co/model",
+        "https://hf.co./model",
+        # An allowed name still needs HTTPS, port 443 and no user information.
+        "http://us.aws.cdn.hf.co/model",
+        "https://us.aws.cdn.hf.co:8443/model",
+        "https://user:pass@us.aws.cdn.hf.co/model",
     ],
 )
 async def test_redirect_denied_before_second_request(tmp_path: Path, destination: str):
@@ -88,6 +105,75 @@ async def test_redirect_denied_before_second_request(tmp_path: Path, destination
             check_authority=lambda: None,
         )
     assert len(calls) == 1 and not assets.destination.exists()
+
+
+@pytest.mark.parametrize(
+    "cdn",
+    [
+        "https://us.aws.cdn.hf.co/xet-bridge-us/abc/model.bin?X-Amz-Signature=1",
+        "https://cas-bridge.xethub.hf.co/xet-bridge-us/abc/model.bin",
+        "https://cdn-lfs.huggingface.co/repos/ab/cd/model.bin",
+        "https://cdn-lfs-us-1.huggingface.co/repos/ab/cd/model.bin",
+        "https://HF.CO/model.bin",
+        "https://US.AWS.CDN.HF.CO/model.bin",
+    ],
+    ids=[
+        "us-aws-cdn",
+        "xethub-bridge",
+        "cdn-lfs",
+        "cdn-lfs-us-1",
+        "apex-upper-case",
+        "subdomain-upper-case",
+    ],
+)
+async def test_redirect_to_a_hugging_face_cdn_name_installs(tmp_path: Path, cdn: str):
+    source, assets = sample_assets(tmp_path)
+    data = (source / "model.bin").read_bytes()
+    calls: list[httpx.Request] = []
+
+    def transport(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        if request.url.host == "huggingface.co":
+            return httpx.Response(302, headers={"location": cdn})
+        return httpx.Response(200, stream=Bytes(data))
+
+    downloader = FixedModelDownload(assets, httpx.MockTransport(transport))
+    result = await downloader.install(
+        grant(assets.manifest.digest),
+        deadline=time.monotonic() + 5,
+        progress=lambda _state, _count: None,
+        check_authority=lambda: None,
+    )
+    assert result.state == "READY" and assets.status().state == "READY"
+    assert [call.url.host for call in calls] == ["huggingface.co", calls[1].url.host]
+    assert all(
+        "authorization" not in call.headers and "cookie" not in call.headers for call in calls
+    )
+
+
+async def test_a_second_cdn_name_inside_one_file_is_denied(tmp_path: Path):
+    _, assets = sample_assets(tmp_path)
+    calls: list[httpx.Request] = []
+    hops = {
+        "huggingface.co": "https://first.cdn.hf.co/model.bin",
+        "first.cdn.hf.co": "https://second.cdn.hf.co/model.bin",
+    }
+
+    def transport(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        return httpx.Response(302, headers={"location": hops[str(request.url.host)]})
+
+    downloader = FixedModelDownload(assets, httpx.MockTransport(transport))
+    with pytest.raises(ModelAssetError, match="DESTINATION_DENIED"):
+        await downloader.install(
+            grant(assets.manifest.digest),
+            deadline=time.monotonic() + 5,
+            progress=lambda _state, _count: None,
+            check_authority=lambda: None,
+        )
+    # The pinned CDN name was reached; the second name never got a request.
+    assert [call.url.host for call in calls] == ["huggingface.co", "first.cdn.hf.co"]
+    assert not assets.destination.exists()
 
 
 async def test_stalled_body_obeys_total_deadline_and_closes(tmp_path: Path):
