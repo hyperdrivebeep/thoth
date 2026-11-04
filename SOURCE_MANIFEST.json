@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-04T04:09:50.660245+00:00",
+  "created_at": "2026-11-04T04:19:47.321762+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -18,8 +18,8 @@
     },
     {
       "path": ".github/workflows/product-check.yml",
-      "sha256": "28382511fe4d0038c6967977374072f40b012c658bb2c0fdb1d1615cf8563e7c",
-      "bytes": 13514
+      "sha256": "acc55206b2deb57d8e0c71512502065709734f69c21b7b1ba6987e082fecfaa3",
+      "bytes": 13675
     },
     {
       "path": ".gitignore",
@@ -1967,6 +1967,11 @@
       "bytes": 134146
     },
     {
+      "path": "config/complexity-budget.json",
+      "sha256": "d748504437a4a7988f84415b47dbe72677e48f72d1ed462f3498b29daafd0d91",
+      "bytes": 5438
+    },
+    {
       "path": "config/connectors/local-reference.yaml",
       "sha256": "e92bca6e55acc149e8bc398053680f7e58c56b810fd811884fa9b96f6c5fb3ff",
       "bytes": 164
@@ -3212,6 +3217,11 @@
       "bytes": 3984
     },
     {
+      "path": "scripts/check_complexity_budget.py",
+      "sha256": "3584ebec4b5703c9af0b042ac4e286fb9bfbb2f0f30f36f8e70946f9cc46b2d0",
+      "bytes": 17618
+    },
+    {
       "path": "scripts/check_migration_discipline.py",
       "sha256": "0a1d052a8cc56f5348a3eb76c59d12840f50f297ca2f19d5bc6bd4a2a5102aab",
       "bytes": 1900
@@ -3303,8 +3313,8 @@
     },
     {
       "path": "scripts/required_architecture_checks.py",
-      "sha256": "fc570efb0d33661835e3e259d8c2b674435751be80d0c73da07b971fba1f3889",
-      "bytes": 2384
+      "sha256": "e3c1a5971a0040cf738658d0d075f8a1f8f5726b801dcad6cbf3535050cd933f",
+      "bytes": 2418
     },
     {
       "path": "scripts/research_history_fixture.py",
@@ -7935,6 +7945,11 @@
       "path": "tests/architecture/test_atomicity_debt_contract.py",
       "sha256": "c914c278bbbe6ad22b0c6fb26615face646dfebe99b2df63ab9cca11985af61b",
       "bytes": 1507
+    },
+    {
+      "path": "tests/architecture/test_complexity_budget.py",
+      "sha256": "be56f0b05570d30d3cab945170db7fec17b5f1fd4ceef0564769939f49bcd111",
+      "bytes": 8581
     },
     {
       "path": "tests/architecture/test_gate_drift_regressions.py",

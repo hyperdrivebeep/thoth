@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0.0",
+  "complexity_limit": 20,
+  "policy": "Existing functions over the limit are frozen at the listed value. A new function over the limit, or a listed one that rises, fails the check. Lower or remove entries with --update; never raise a value.",
+  "python": {
+    "scan_roots": [
+      "src/thoth"
+    ],
+    "functions": {
+      "src/thoth/adapters/http/app.py::create_app": 22,
+      "src/thoth/adapters/models/claude_messages.py::ClaudeMessagesModel.structured": 33,
+      "src/thoth/adapters/models/context_projection.py::compact_model_context": 25,
+      "src/thoth/adapters/models/reference_schema.py::constrain_span_references": 21,
+      "src/thoth/adapters/models/sse_stream.py::parse_responses_sse": 23,
+      "src/thoth/adapters/models/windows_process_job.py::spawn_windows_job": 22,
+      "src/thoth/adapters/parsers/text_context.py::observe_text_context": 23,
+      "src/thoth/application/services/conversation_router.py::ConversationRouter._slash": 25,
+      "src/thoth/application/services/research_attempt_runner.py::_execute_owned": 25,
+      "src/thoth/application/services/research_context_read.py::read_research_context": 25,
+      "src/thoth/application/services/research_coverage.py::assess_coverage": 21,
+      "src/thoth/application/services/research_gaps.py::validate_gaps": 28,
+      "src/thoth/application/services/restore_impact.py::RestoreImpactPlanner.build": 23,
+      "src/thoth/application/services/scoped_memory_controls.py::ScopedMemoryControls._require": 30,
+      "src/thoth/protocol/bus.py::CommandBus._execute": 28
+    }
+  },
+  "web": {
+    "project_dir": "apps/web",
+    "scan_roots": [
+      "src"
+    ],
+    "excluded_suffixes": [
+      ".test.ts",
+      ".test.tsx"
+    ],
+    "functions": {
+      "apps/web/src/api/conversation.ts::withCurrentCheckpoint.<anon1>": 21,
+      "apps/web/src/api/history.ts::readHistoryEntry": 43,
+      "apps/web/src/api/historyTestFixture.ts::createHistoryFixtureTransport.handle": 24,
+      "apps/web/src/api/localRetrieval.ts::runLocalOperation": 30,
+      "apps/web/src/api/localWorkspacePersistence.ts::readLocalPending": 43,
+      "apps/web/src/api/researchProgress.ts::timelineFromPublished.<anon1>": 23,
+      "apps/web/src/api/resultEvidence.ts::read": 28,
+      "apps/web/src/api/resultEvidenceIdentity.ts::currentResultDigest": 22,
+      "apps/web/src/components/CapabilityWorkbench.tsx::MethodDetail": 23,
+      "apps/web/src/components/ConversationTimeline.tsx::ConversationTimeline": 100,
+      "apps/web/src/components/FirstRunSetup.tsx::FirstRunSetup": 55,
+      "apps/web/src/components/FirstRunSetup.tsx::FirstRunSetup.<anon2>": 47,
+      "apps/web/src/components/HypothesisCompare.tsx::HypothesisCompare.<anon4>": 23,
+      "apps/web/src/components/LinkRecheckDialog.tsx::LinkRecheckDialog": 23,
+      "apps/web/src/components/LiveProjectWorkspace.tsx::LiveProjectWorkspace": 97,
+      "apps/web/src/components/LiveProjectWorkspace.tsx::ProjectSession": 88,
+      "apps/web/src/components/LocalRetrievalSettingsCard.tsx::LocalRetrievalSettingsCard": 29,
+      "apps/web/src/components/LocalRetrievalSettingsCard.tsx::ProjectSection": 22,
+      "apps/web/src/components/ModelCredentialPanel.tsx::CompanyRow": 40,
+      "apps/web/src/components/ModelSettings.tsx::ModelSettings": 85,
+      "apps/web/src/components/OAuthLoginFlow.tsx::OAuthLoginFlow": 61,
+      "apps/web/src/components/OAuthLoginFlow.tsx::OAuthLoginFlow.<anon4>": 26,
+      "apps/web/src/components/OAuthLoginFlow.tsx::readSession": 22,
+      "apps/web/src/components/ProjectWebSetup.tsx::ProjectWebSetup": 23,
+      "apps/web/src/components/ResearchActivityStrip.tsx::ActivityDetails": 30,
+      "apps/web/src/components/ResearchComposer.tsx::ResearchComposer": 59,
+      "apps/web/src/components/ResearchDetailPane.tsx::ResearchDetailPane": 29,
+      "apps/web/src/components/ResearchFollowupSummary.tsx::ResearchFollowupSummary": 26,
+      "apps/web/src/components/ResearchResultCard.tsx::ResearchResultCard": 105,
+      "apps/web/src/components/ResultEvidencePanel.tsx::ResultEvidencePanel": 26,
+      "apps/web/src/components/XaiDeviceLogin.tsx::XaiDeviceLogin": 48,
+      "apps/web/src/components/XaiDeviceLogin.tsx::startSession": 23,
+      "apps/web/src/components/history/DecisionDeltaComparison.tsx::DecisionDeltaComparison": 24,
+      "apps/web/src/components/history/DecisionDeltaComparison.tsx::DecisionDeltaView": 26,
+      "apps/web/src/components/history/HistoryContent.tsx::HistoryContent": 21,
+      "apps/web/src/components/history/HistoryDetail.tsx::HistoryDetail": 48,
+      "apps/web/src/components/history/ResearchHistoryWorkspace.tsx::ScopedHistory": 43,
+      "apps/web/src/components/history/RestorePreviewDialog.tsx::RestorePreviewDialog": 37,
+      "apps/web/src/components/history/useRestoreFlow.ts::useRestoreFlow.run": 34,
+      "apps/web/src/components/modelCredentialPresentation.ts::credentialAccountLabel": 33,
+      "apps/web/src/components/modelCredentialPresentation.ts::credentialAvailabilityNote": 28,
+      "apps/web/src/components/useResearchSession.ts::useResearchSession.mutationFn": 34,
+      "apps/web/src/components/useResearchSession.ts::useResearchSession.send": 24,
+      "apps/web/src/i18n/progressEn.ts::missingFor": 34,
+      "apps/web/src/i18n/progressKo.ts::missingFor": 35,
+      "apps/web/src/i18n/progressKo.ts::sceneFor": 74,
+      "apps/web/src/i18n/progressKo.ts::waitLine": 22
+    }
+  }
+}
