@@ -15,7 +15,7 @@ from thoth.domain.auth import AuthenticatedActorContext
 from thoth.domain.enums import ProjectLifecycle, RiskTier
 from thoth.domain.governance import RoleAssignment
 from thoth.domain.hypothesis import HypothesisPortfolio
-from thoth.domain.project import Project, WorkThread
+from thoth.domain.project import Project
 from thoth.ports.governance import GovernanceStorePort
 from thoth.ports.project import ProjectStorePort
 
@@ -92,7 +92,6 @@ class Harness(ThreadAnalysisCommandHandlers):
         async def execute(
             *,
             project: Project,
-            thread: WorkThread,
             portfolio: HypothesisPortfolio,
             action_plan: ActionPlan,
         ) -> R2ClosedLoopExecution:
@@ -127,13 +126,6 @@ class Harness(ThreadAnalysisCommandHandlers):
         )
         return await self._execute_r2(
             project=self.original_project,
-            thread=WorkThread(
-                thread_id="t",
-                project_id="p",
-                cycle_id="c",
-                problem="fixture",
-                working_head_digest="a" * 64,
-            ),
             portfolio=HypothesisPortfolio.model_construct(),
             action_plan=plan,
         )

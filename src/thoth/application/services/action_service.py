@@ -343,7 +343,7 @@ class ActionService:
         actions = self._actions(project_id, selected_action_refs)
         if any(item.object_id != object_id for item in actions):
             raise ValueError("ActionPlan cannot cross DecisionObject boundaries")
-        steps = tuple(self._normalize_step(project_id, value) for value in step_candidates)
+        steps = tuple(self._normalize_step(value) for value in step_candidates)
         if not steps:
             raise ValueError("ActionPlan requires at least one step")
         self._validate_dag(steps, dependency_edges)
@@ -384,7 +384,6 @@ class ActionService:
             raise ValueError("ActionPlan steps and edges must remain canonical tuples")
         steps = tuple(
             self._normalize_step(
-                current.project_id,
                 {str(key): child for key, child in cast(dict[object, object], item).items()},
             )
             for item in cast(tuple[object, ...], steps_raw)
@@ -696,7 +695,7 @@ class ActionService:
     def _impact(effect: dict[str, object]) -> dict[str, object]:
         return effect_impact(effect)
 
-    def _normalize_step(self, project_id: str, value: dict[str, object]) -> dict[str, object]:
+    def _normalize_step(self, value: dict[str, object]) -> dict[str, object]:
         step = dict(value)
         step_id = step.get("step_id")
         if not isinstance(step_id, str) or not step_id:

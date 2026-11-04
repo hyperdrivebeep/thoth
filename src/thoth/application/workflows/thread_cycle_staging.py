@@ -90,7 +90,7 @@ def stage_revision(
 
 
 def prepare_memory(
-    project_id: str, staged: tuple[StagedRevision, ...], *, ids: IdGeneratorPort
+    staged: tuple[StagedRevision, ...], *, ids: IdGeneratorPort
 ) -> tuple[MemoryRecord, ...]:
     from thoth.application.services.domain_reference_memory import domain_reference_memory
 

@@ -22,7 +22,6 @@ def create_revision_handlers(
     ledger: ManagedLedgerPort,
     stores: StoreBundlePort,
     records: ControlRecordStorePort,
-    controls: ControlRecordService,
     dependencies: DependencyGraphPort,
     governance: GovernanceStorePort,
     clock: ClockPort,

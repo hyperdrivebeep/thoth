@@ -52,6 +52,7 @@ class SourceTimeService:
         classify: bool,
         current_cutoff_state: CutoffState | None = None,
     ) -> StructuralDocument:
+        del project_revision
         if not classify:
             return document
         classification = classify_document_time(

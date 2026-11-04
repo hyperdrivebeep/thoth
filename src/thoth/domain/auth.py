@@ -41,15 +41,6 @@ class AuthenticatedActorContext(DomainModel):
     data_scopes: tuple[str, ...]
 
 
-class AuthorizationDenial(DomainModel):
-    reason_code: str
-    project_id: ProjectId | None = None
-    method: str | None = None
-    actor_id: str | None = None
-    session_id: str | None = None
-    pre_io: Literal[True] = True
-
-
 _AUTH_CONTEXT: ContextVar[AuthenticatedActorContext | None] = ContextVar(
     "thoth_authenticated_actor",
     default=None,

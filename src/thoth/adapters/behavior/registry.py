@@ -58,6 +58,7 @@ class TypedBehaviorHandler:
     def evaluate(
         self, policy: BehaviorPolicy, payload: dict[str, JsonValue]
     ) -> dict[str, JsonValue]:
+        del policy, payload
         raise BehaviorPolicyError("BEHAVIOR_EVALUATION_NOT_CONFIGURED")
 
     def propose(self, policy: BehaviorPolicy, failure_class: str) -> tuple[BehaviorPolicy, ...]:

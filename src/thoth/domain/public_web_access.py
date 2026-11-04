@@ -6,7 +6,7 @@ from pydantic import Field
 
 from thoth.domain.base import DomainModel
 from thoth.domain.canonical import canonical_payload, domain_digest
-from thoth.domain.ids import ProjectId, Sha256
+from thoth.domain.ids import Sha256
 from thoth.domain.workspace_setup import InternetConsent
 
 PROJECT_PUBLIC_WEB_CONNECTOR_ID = "project-public-web"
@@ -33,26 +33,6 @@ class PublicWebUpdateInput(DomainModel):
     enabled: bool
     preferred_hosts: tuple[NormalizedHost, ...] = ()
     workspace_grant_id: str | None = None
-
-
-class PublicWebAccessBasis(DomainModel):
-    project_id: ProjectId
-    policy_id: str = Field(min_length=1, max_length=160)
-    policy_revision: int = Field(ge=1)
-    policy_digest: Sha256
-    workspace_grant_id: str
-    workspace_revision: int = Field(ge=1)
-    allowed_hosts: tuple[NormalizedHost, ...]
-    hosts_digest: Sha256
-    allowed_modes: tuple[PublicWebRequestPurpose, ...] = ("SITE_DISCOVER", "READ")
-
-    @property
-    def digest(self) -> Sha256:
-        return domain_digest(
-            "PUBLIC_WEB_ACCESS_BASIS",
-            "1.0.0",
-            canonical_payload(self.model_dump(mode="json")),
-        )
 
 
 class PublicWebRequestPlan(DomainModel):

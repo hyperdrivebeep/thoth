@@ -356,7 +356,7 @@ class CodexHttpExecutor:
         *,
         expected_digest: str | None,
     ) -> ModelTransportReply:
-        async def trace(event: str, info: dict[str, object]) -> None:
+        async def trace(event: str, _info: dict[str, object]) -> None:
             # Only event identity is observed. Trace data may contain credentials/body.
             if event.startswith(("connection.connect_tcp.", "connection.start_tls.")):
                 stats.last_transport_phase = "CONNECT"

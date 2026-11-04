@@ -32,6 +32,7 @@ class RestoreHandlers:
         self.planner, self.publication, self.legacy_diff = planner, publication, legacy_diff
 
     def authorize_before_claim(self, method: str, value: dict[str, JsonValue]) -> None:
+        del method
         try:
             project = str(value.get("project_id", ""))
             self.planner.access.require_reads(project, ())

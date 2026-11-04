@@ -171,14 +171,3 @@ REQUEST_CODECS = {
         AuthoredInputRevision,
     )
 }
-
-
-def decode_request(content: dict[str, object]) -> DomainModel:
-    if content.get("record_kind") == "ThreadRequestRevision":
-        return decode_thread_request(content)
-    if content.get("schema_version") != "2.0.0":
-        raise ValueError("REQUEST_CODEC_VERSION_UNSUPPORTED")
-    codec = REQUEST_CODECS.get(str(content.get("record_kind")))
-    if codec is None:
-        raise ValueError("REQUEST_CODEC_KIND_UNSUPPORTED")
-    return codec.model_validate(content)

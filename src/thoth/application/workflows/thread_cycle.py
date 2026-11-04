@@ -347,7 +347,7 @@ class ThreadCycleService:
         memory_basis: MemoryPreparationBasis | None,
         research_batch: ResearchOwnershipBatch,
     ) -> tuple[CommitResult, tuple[MemoryRecord, ...], FullMemoryPromotionResult | None]:
-        memories = self._prepare_memory(command.project_id, staged)
+        memories = self._prepare_memory(staged)
         # With a research attempt on record, compare what it read and wrote, not every head.
         scope = read_scope(
             research_work.get(),
@@ -568,7 +568,6 @@ class ThreadCycleService:
 
     def _prepare_memory(
         self,
-        project_id: str,
         staged: tuple[StagedRevision, ...],
     ) -> tuple[MemoryRecord, ...]:
-        return cycle_staging.prepare_memory(project_id, staged, ids=self._ids)
+        return cycle_staging.prepare_memory(staged, ids=self._ids)

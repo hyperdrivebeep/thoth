@@ -274,7 +274,7 @@ class ResearchInputQueue:
                     held = self.hold(host, item, "PREDECESSOR_NOT_SUCCEEDED")
                     return PendingExecution(self.accepted_value(held))
                 if predecessor.state == OperationState.SUCCEEDED:
-                    return await self._activate_and_run(host, operation, item)
+                    return await self._activate_and_run(host, operation)
                 await asyncio.sleep(0.05)
         except asyncio.CancelledError:
             current = host.operations.read(operation_id)
@@ -293,7 +293,6 @@ class ResearchInputQueue:
         self,
         host: ResearchThreadHandlers,
         operation: OperationRecord,
-        item: QueuedResearchInput,
     ) -> dict[str, JsonValue] | PendingExecution:
         with host.records.ledger.transaction():
             latest = self.read(operation)
@@ -439,7 +438,7 @@ class ResearchInputQueue:
             self.store.save(held)
             return held
 
-    def hold_for_steer(self, host: ResearchThreadHandlers, project_id: str, thread_id: str) -> None:
+    def hold_for_steer(self, project_id: str, thread_id: str) -> None:
         for item in self.store.list(project_id, thread_id):
             if item.state in {"QUEUED", "HOLD"}:
                 self.store.save(

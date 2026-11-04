@@ -10,7 +10,6 @@ from thoth.application.commands.projectpacks import ProjectPackCommandHandlers
 from thoth.application.commands.sources import SourceCommandHandlers
 from thoth.application.services.connector_service import ConnectorService
 from thoth.application.services.evidence_graph_service import EvidenceGraphService
-from thoth.application.services.ingestion_service import IngestionService
 from thoth.application.services.scoped_artifacts import ScopedArtifactLedger
 from thoth.application.services.source_time_service import SourceTimeService
 from thoth.apps.projectpack_execution import ProjectPackExecutionFactory
@@ -35,7 +34,6 @@ def create_source_commands(
     effective_models: ModelResolverPort,
     evidence_graph_service: EvidenceGraphService,
     ids: IdGeneratorPort,
-    ingestion_service: IngestionService,
     ledger: ManagedLedgerPort,
     projectpack_root: Path | None,
     source_time_service: SourceTimeService,

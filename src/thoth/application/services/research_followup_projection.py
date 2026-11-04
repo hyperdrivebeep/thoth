@@ -37,7 +37,6 @@ from thoth.domain.research_reference import RevisionRef
 from thoth.domain.research_request import (
     CurrentResultManifestV21,
     ResearchAttempt,
-    ThreadRequestRevision,
     decode_thread_request,
 )
 from thoth.ports.governance import GovernanceStorePort
@@ -53,7 +52,6 @@ def project_thread_followup(
     ledger: LedgerPort,
     access: ResourceAccessPort,
     request_ref: RevisionRef,
-    request: ThreadRequestRevision,
     result_ref: RevisionRef | None,
     manifest: ResultManifest | None,
     attempt: ResearchAttempt | None,

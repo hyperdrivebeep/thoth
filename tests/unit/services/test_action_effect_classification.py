@@ -166,14 +166,13 @@ def test_a_plan_step_with_a_badly_typed_forbidden_effect_is_refused_not_normaliz
 
     service = ActionService.__new__(ActionService)
     service._ids = Ids()  # type: ignore[assignment]
-    step = {
+    step: dict[str, object] = {
         "step_id": "step:1",
         "effect_vector": {"effect_completeness_confirmed": True, key: "yes"},
     }
     with pytest.raises(ValueError, match=key):
-        service._normalize_step("project:1", step)
+        service._normalize_step(step)
     ok = service._normalize_step(
-        "project:1",
         {"step_id": "step:1", "effect_vector": {"effect_completeness_confirmed": True, key: True}},
     )
     assert ok["risk_tier"] == "R4"

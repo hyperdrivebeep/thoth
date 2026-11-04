@@ -29,7 +29,7 @@ def project_thread_read_view(
     )
     from thoth.application.services.user_activity_projection import project_user_activity_events
 
-    current_ref, request, attempt = snapshot.current_ref, snapshot.request, snapshot.attempt
+    current_ref, attempt = snapshot.current_ref, snapshot.attempt
     result_ref, manifest = snapshot.result_ref, snapshot.manifest
     currentness = snapshot.currentness
     activity_source_context = snapshot.activity_source_context
@@ -38,7 +38,6 @@ def project_thread_read_view(
             ledger=ledger,
             access=access,
             request_ref=current_ref,
-            request=request,
             result_ref=result_ref,
             manifest=manifest,
             attempt=attempt,
