@@ -53,6 +53,23 @@ async function start(names: string[]) {
   await tick();
 }
 
+it("reads the project list again after sources are connected, because the project revision went up", async () => {
+  const spy = vi.spyOn(client, "invalidateQueries");
+  await start(["A.md"]);
+  await act(async () => fixture.jobs[0].finish()); await tick();
+  expect(spy.mock.calls.some(([filter]) => JSON.stringify(filter?.queryKey) === JSON.stringify(["projects"]))).toBe(true);
+});
+
+it("also reads the project list again when a later file of the batch fails to connect", async () => {
+  const spy = vi.spyOn(client, "invalidateQueries");
+  fixture.failConnect = "web/B.md";
+  await start(["A.md", "B.md"]);
+  await act(async () => fixture.jobs[0].finish()); await tick();
+  await act(async () => fixture.jobs[1].finish()); await tick();
+  expect(fixture.calls.filter(call => call.startsWith("connect:"))).toEqual(["connect:web/A.md", "connect:web/B.md"]);
+  expect(spy.mock.calls.some(([filter]) => JSON.stringify(filter?.queryKey) === JSON.stringify(["projects"]))).toBe(true);
+});
+
 it("stages the whole batch before connecting, preserving one-file order", async () => {
   await start(["A.md", "B.md"]);
   expect(fixture.calls).toEqual(["stage:A.md"]);

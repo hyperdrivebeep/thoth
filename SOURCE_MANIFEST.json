@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-04T09:39:56.892847+00:00",
+  "created_at": "2026-11-04T12:44:33.111412+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -332,6 +332,11 @@
       "bytes": 3233
     },
     {
+      "path": "apps/web/src/api/projectActionFailure.ts",
+      "sha256": "27eb522348a1c208f7d3fc7eadcc7dd4d83d59eaf6e0c0dc9d37364b410e0cfc",
+      "bytes": 960
+    },
+    {
       "path": "apps/web/src/api/projectCreation.ts",
       "sha256": "f096ff7604b82a8e89012bdd78724845c081a4f172b118b4eeeb35f97479086b",
       "bytes": 375
@@ -598,8 +603,8 @@
     },
     {
       "path": "apps/web/src/components/ArchivedProjects.tsx",
-      "sha256": "6bcaaff687b3c278efca4799fbcdf32f4a685bc6a060b6c572b0bfa28202fb3a",
-      "bytes": 4115
+      "sha256": "20623d2f135e83b5942fe56848e2af044c8ae55c57eb2cd01d4f84cf0a5bfaaf",
+      "bytes": 4230
     },
     {
       "path": "apps/web/src/components/AsyncDraftAndCitationRegression.test.tsx",
@@ -748,13 +753,13 @@
     },
     {
       "path": "apps/web/src/components/FileConnectionPanel.test.tsx",
-      "sha256": "c9e1be62564212a573de09fd3ee01b111bea5edc8ffbd51a60e8cb8487f5838f",
-      "bytes": 7496
+      "sha256": "93aa8945c737e34af672972327fc1ec6b9b0721652fec64ebed6e49e3bd11a36",
+      "bytes": 8483
     },
     {
       "path": "apps/web/src/components/FileConnectionPanel.tsx",
-      "sha256": "faa6811d1e8c21e7796dcae8ff4c36c4defa9c15748766160fc5bdaa00d2098f",
-      "bytes": 6774
+      "sha256": "c0d9eab7975c2d968f2f0ab69bddbe2dfda9ee53785a912042395d4784eac34c",
+      "bytes": 7086
     },
     {
       "path": "apps/web/src/components/FirstRunSetup.test.tsx",
@@ -878,8 +883,8 @@
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspace.tsx",
-      "sha256": "ae7a9bfc3f5f338f7728fa0c4497e8a2b384de59155375cfcd01b03345dd2676",
-      "bytes": 43911
+      "sha256": "b0fd8f2966ca9bc8e29e322b250bd7c336f57b86cbc5479257d436ff0926a811",
+      "bytes": 44160
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspaceConsent.test.tsx",
@@ -958,8 +963,8 @@
     },
     {
       "path": "apps/web/src/components/ModelSettings.tsx",
-      "sha256": "bae7c274c7db338962bb5104c201418a55b78b76236ac5739f01365565329d10",
-      "bytes": 9377
+      "sha256": "3514dee00018c360671e72f6d8b66e9ab5f1372d25ac3190c216505c62464cc7",
+      "bytes": 9433
     },
     {
       "path": "apps/web/src/components/OAuthLoginFlow.tsx",
@@ -967,9 +972,14 @@
       "bytes": 18361
     },
     {
+      "path": "apps/web/src/components/ProjectActionNotice.tsx",
+      "sha256": "2fa033b5c5f8a1511445eb3c860f0a5c1b16c4524b52541a2329bd8faad310b5",
+      "bytes": 577
+    },
+    {
       "path": "apps/web/src/components/ProjectArchiveRestore.test.tsx",
-      "sha256": "ff81d73dabb489fa333cb062fdb4ea9b5154bd64c0567bbdb9b70aa50a8f6086",
-      "bytes": 12328
+      "sha256": "fbe568d342644a3da7ff36df48c2a5a3a830bbc190d6bc9a40f068925634fda6",
+      "bytes": 15926
     },
     {
       "path": "apps/web/src/components/ProjectLanding.test.tsx",
@@ -1498,8 +1508,8 @@
     },
     {
       "path": "apps/web/src/components/modelCatalogPresentation.ts",
-      "sha256": "b72e23b8c5088cda6a1c97f6b812afaf15f38155d37dedc54d2ed13bedcf1a91",
-      "bytes": 3583
+      "sha256": "7a842972c5dded5be41a54020912ba137e0ed192ff14d2e718f5401cde725f26",
+      "bytes": 3885
     },
     {
       "path": "apps/web/src/components/modelCredentialPresentation.ts",
@@ -1853,8 +1863,8 @@
     },
     {
       "path": "apps/web/src/i18n/sourceMessages.ts",
-      "sha256": "6e8060ce839946e831e1ee4be42c57fd609cba8119e852a3e740ed282381fde9",
-      "bytes": 10965
+      "sha256": "1083b83baa4d8a3c04169c08013f80c3a5fc5fddcd4cda5fc0e33c738ab656f9",
+      "bytes": 11390
     },
     {
       "path": "apps/web/src/i18n/stateFormatMessages.ts",
@@ -1933,8 +1943,8 @@
     },
     {
       "path": "apps/web/src/styles.css",
-      "sha256": "85269229791bbd26e723f844db739af0efa9f849d0804eae5ee3128085c6b508",
-      "bytes": 21404
+      "sha256": "15417238980a3e37d8dccc29d802f31033f080e4995109afdab44bdedf7bc14c",
+      "bytes": 21748
     },
     {
       "path": "apps/web/src/testSetup.ts",
@@ -1958,8 +1968,8 @@
     },
     {
       "path": "apps/web/src/workstation.css",
-      "sha256": "008835150e48038f0ba97444af783f2e0ee2174216144b5a03e89a1efcd3976e",
-      "bytes": 60573
+      "sha256": "077f4e383d9d3d71e3166a2df0e2a255d1039c07a5e704968352fe986c9c256e",
+      "bytes": 60722
     },
     {
       "path": "apps/web/timeline-preview.html",
@@ -2098,8 +2108,8 @@
     },
     {
       "path": "docs/BETA.md",
-      "sha256": "e296977e16a601d504d4f1c60ba8ffa505ba5511d4e3f9e016901068d3ed2105",
-      "bytes": 11142
+      "sha256": "607787279832aa248bc9a7506be86e67960183f5400919d3ce0ec325c569f92c",
+      "bytes": 11149
     },
     {
       "path": "docs/DEPENDENCY_LICENSES.json",

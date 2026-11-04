@@ -10,13 +10,22 @@ const WORKSPACE = `workspace:${"a".repeat(32)}`;
 const project = (id: string, name: string, lifecycle: string, revision: number) =>
   ({ project_id: id, name, overlay: "test", lifecycle, revision, cutoff_at: "2026-09-26T00:00:00Z" });
 const fixture = vi.hoisted(() => ({ projects: [] as Record<string, unknown>[], calls: [] as { method: string; input: Record<string, unknown> }[], hosted: false }));
-vi.mock("../api/rpcClient", async importOriginal => ({ ...(await importOriginal<typeof import("../api/rpcClient")>()),
+vi.mock("../api/rpcClient", async importOriginal => { const actual = await importOriginal<typeof import("../api/rpcClient")>(); return { ...actual,
   rpc: async (method: string, input: Record<string, unknown>) => {
     fixture.calls.push({ method, input });
     let value: unknown = {};
+    if (method === "project/archive" || method === "project/restore") {
+      const current = fixture.projects.find(item => item.project_id === input.project_id)!;
+      if (current.revision !== input.expected_revision) throw new actual.RpcError("project revision does not match expected_revision", -32030, { current_revision: current.revision, expected_revision: input.expected_revision });
+    }
+    if (method === "project/archive") {
+      const target = fixture.projects.find(item => item.project_id === input.project_id)!;
+      Object.assign(target, { lifecycle: "ARCHIVED_READ_ONLY", revision: Number(input.expected_revision) + 1 });
+      value = target;
+    }
     if (method === "workspace/ready") value = { ready: true, execution_ready: true, workspace_readable: true, setup_complete: true, workspace_id: WORKSPACE,
       deployment_mode: fixture.hosted ? "HOSTED_REVIEW" : "LOCAL", model_connected: true, setup: { internet_consent: "ALLOWED" } };
-    if (method === "project/list") value = { projects: fixture.projects.filter(item => input.include_archived === true || item.lifecycle !== "ARCHIVED_READ_ONLY") };
+    if (method === "project/list") value = { projects: fixture.projects.filter(item => input.include_archived === true || item.lifecycle !== "ARCHIVED_READ_ONLY").map(item => ({ ...item })) };
     if (method === "project/restore") {
       const target = fixture.projects.find(item => item.project_id === input.project_id)!;
       Object.assign(target, { lifecycle: "DRAFT", revision: Number(input.expected_revision) + 1 });
@@ -35,7 +44,7 @@ vi.mock("../api/rpcClient", async importOriginal => ({ ...(await importOriginal<
     if (method === "model/credential/list") value = { accounts: [] };
     return { value, state: "SUCCEEDED", operation_id: "op" };
   },
-}));
+}; });
 
 let root: Root | undefined;
 let container: HTMLDivElement;
@@ -123,6 +132,46 @@ it("tells the user that archiving makes a project read-only and that it can be r
   act(() => root!.unmount());
   root = undefined;
 }, 15000); // jsdom needs a few seconds to lay out and remove the floating menu
+
+const archiveFromMenu = (name: string) => {
+  act(() => { (container.querySelector('[aria-label="' + name + ' 프로젝트 메뉴"]') as HTMLButtonElement).click(); });
+  act(() => { (document.querySelector('[role="menuitem"]') as HTMLButtonElement).click(); });
+};
+
+it("says in words that a project changed in the meantime, reads the list again and archives on the next try", async () => {
+  fixture.projects = [project("p", "old project", "ACTIVE", 1)];
+  vi.spyOn(window, "confirm").mockReturnValue(true);
+  await mount(false);
+  // Connecting a source in another place raised the revision after this list was read.
+  fixture.projects[0].revision = 2;
+  const listsBefore = fixture.calls.filter(call => call.method === "project/list").length;
+  archiveFromMenu("old project");
+  await settle(() => container.querySelector('.navigation-rail [role="alert"]') !== null);
+  const alert = container.querySelector('.navigation-rail [role="alert"]')!.textContent ?? "";
+  expect(alert).toContain("프로젝트가 그 사이 바뀌었습니다");
+  expect(alert).not.toContain("expected_revision");
+  expect(fixture.calls.filter(call => call.method === "project/archive")).toEqual([{ method: "project/archive", input: { project_id: "p", expected_revision: 1 } }]);
+  await settle(() => fixture.calls.filter(call => call.method === "project/list").length > listsBefore);
+  archiveFromMenu("old project");
+  await settle(() => container.querySelector(".navigation-rail")?.textContent?.includes("old project") === false);
+  expect(fixture.calls.filter(call => call.method === "project/archive").map(call => call.input.expected_revision)).toEqual([1, 2]);
+  act(() => root!.unmount());
+  root = undefined;
+}, 120000); // two floating menus: jsdom is slow to lay out and remove each one
+
+it("explains a stale revision when restoring and reads the list again", async () => {
+  fixture.projects = [project("p", "old project", "ACTIVE", 1), project("q", "archived demo", "ARCHIVED_READ_ONLY", 4)];
+  await mount(false);
+  await act(async () => button("보관한 프로젝트 보기")!.click());
+  await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("archived demo") === true);
+  fixture.projects[1].revision = 5;
+  await act(async () => button("되살리기")!.click());
+  await settle(() => container.querySelector('.archived-projects [role="alert"]') !== null);
+  expect(container.querySelector('.archived-projects [role="alert"]')!.textContent).toContain("프로젝트가 그 사이 바뀌었습니다");
+  await act(async () => button("되살리기")!.click());
+  await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("보관한 프로젝트가 없습니다") === true);
+  expect(fixture.calls.filter(call => call.method === "project/restore").map(call => call.input.expected_revision)).toEqual([4, 5]);
+});
 
 const typeInto = async (input: HTMLInputElement, value: string) => act(async () => {
   Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, value);

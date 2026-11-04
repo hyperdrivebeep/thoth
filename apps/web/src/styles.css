@@ -17,9 +17,14 @@
   --green: #54d2a0;
   --amber: #f0bb62;
   --red: #ff7575;
+  /* Code, paths and commands. An explicit stack: a generic monospace can resolve to a Korean system
+     font that draws a backslash as a won sign. */
+  --code-font: Consolas, "Cascadia Mono", "Courier New", monospace;
 }
 
 * { box-sizing: border-box; }
+
+code, pre, kbd, samp { font-family: var(--code-font); font-variant-ligatures: none; }
 
 body {
   margin: 0;
@@ -271,7 +276,7 @@ button { color: inherit; }
 .flow-preview div { min-height: 88px; padding: 14px 10px; border-right: 1px solid var(--line-soft); }
 .flow-preview span,
 .flow-preview strong { display: block; }
-.flow-preview span { color: var(--faint); font-family: monospace; font-size: 10px; }
+.flow-preview span { color: var(--faint); font-family: var(--code-font); font-variant-ligatures: none; font-size: 10px; }
 .flow-preview strong { margin-top: 22px; font-size: 10px; letter-spacing: .08em; }
 
 .analysis-workspace { padding: 24px 28px 80px; }

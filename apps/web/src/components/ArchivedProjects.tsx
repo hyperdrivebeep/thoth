@@ -4,6 +4,8 @@ import { Button, Callout } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { rpc } from "../api/rpcClient";
+import { rereadProjects } from "../api/projectActionFailure";
+import { ProjectActionNotice } from "./ProjectActionNotice";
 import { forgetProject } from "../api/forgetProject";
 import type { BrowserScope } from "../api/localWorkspacePersistence";
 import type { ProjectSummary } from "../types";
@@ -28,6 +30,7 @@ export function ArchivedProjects({ scopeKey, hosted = false, storageScope, onDel
   const restore = useMutation({
     mutationFn: (target: ProjectSummary) => rpc<ProjectSummary>("project/restore", { project_id: target.project_id, expected_revision: target.revision }, crypto.randomUUID()),
     onSuccess: () => client.invalidateQueries({ queryKey: ["projects"] }),
+    onError: rereadProjects(client),
   });
   const blocked = useReadAccessProtection(["projects", scopeKey, "archived"], archived.error);
   const rows = (blocked ? [] : archived.data?.value.projects ?? []).filter(item => item.lifecycle === "ARCHIVED_READ_ONLY");
@@ -53,7 +56,7 @@ export function ArchivedProjects({ scopeKey, hosted = false, storageScope, onDel
             disabled={restore.isPending} onClick={() => { setDeleted(false); setDeleting(item); }}>{t("archive.delete")}</Button>}
         </span>
       </div>)}
-      {!blocked && restore.error && <Callout compact intent="danger" role="alert">{t("archive.restoreFailed")} {restore.error.message}</Callout>}
+      {!blocked && <ProjectActionNotice error={restore.error} fallbackKey="archive.restoreFailed"/>}
       {deleted && !deleting && <p className="empty-copy" role="status">{t("archive.deleteDone")}</p>}
     </div>}
     {deleting && <ProjectPermanentDelete target={deleting} onClose={() => setDeleting(null)} onDeleted={afterDelete}/>}

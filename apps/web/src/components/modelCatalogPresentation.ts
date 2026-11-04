@@ -45,6 +45,10 @@ export function optionText(option: CatalogOption, provider: string): string {
   return `${option.label ?? option.model} · ${provider}${note ? ` · ${note}` : ""}`;
 }
 
+/** The full model name for a tooltip, so a clipped compact select still shows it. */
+export const optionTitle = (option: (CatalogOption & { provider: string }) | undefined, label: (provider: string) => string): string | undefined =>
+  option ? optionText(option, label(option.provider)) : undefined;
+
 export const excludedReasonLabels: Record<string, string> = {
   get UNSUPPORTED_SLUG() { return t("catalog.unsupported"); }, get UNKNOWN_EFFORT_ONLY() { return t("catalog.unknownEffort"); }, get NAMESPACED_ID() { return t("catalog.otherRoute"); },
 };

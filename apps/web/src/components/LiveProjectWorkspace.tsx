@@ -6,6 +6,8 @@ import { Button, Callout, Collapse, HTMLSelect, Icon, InputGroup, PopoverNext, T
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { rpc } from "../api/rpcClient";
+import { rereadProjects } from "../api/projectActionFailure";
+import { ProjectActionNotice } from "./ProjectActionNotice";
 import { captureProjectCreation } from "../api/projectCreation";
 import { readWorkspaceContext, saveWorkspaceContext } from "../api/research";
 import type { WorkspaceReady } from "../api/research";
@@ -341,6 +343,8 @@ export function LiveProjectWorkspace() {
       await client.invalidateQueries({queryKey:["threads", target.project_id]});
       if (context.projectId === target.project_id) chooseProject("");
     },
+    // A stale revision is the usual reason. Read the list again so the next try uses the current one.
+    onError: rereadProjects(client),
   });
   const removeProject = (target: ProjectSummary) => {
     if (!window.confirm(message("archiveProject", target.name))) return;
@@ -386,11 +390,11 @@ export function LiveProjectWorkspace() {
       <Button icon="plus" intent="primary" className="new-project-button" onClick={()=>{chooseProject("");setOpenCreate(true);}}>{t("workspace.newProject")}</Button>
       <InputGroup small leftIcon="search" aria-label={t("workspace.searchProjects")} placeholder={t("workspace.searchPlaceholder")} value={search} onChange={event=>setSearch(event.target.value)}/>
       <section className="nav-section"><div className="nav-section-heading"><p className="nav-label">PROJECTS</p><Button small minimal icon="refresh" aria-label={t("workspace.refreshProjects")} onClick={()=>void projectsQuery.refetch()}/></div>
+        <ProjectActionNotice error={archiveProject.error} fallbackKey="archive.archiveFailed"/>
         {visibleProjects.filter(item=>`${item.name} ${item.project_id}`.toLowerCase().includes(search.toLowerCase())).flatMap(item=>[
           <ProjectNavItem project={item} active={item.project_id===context.projectId} removing={archiveProject.isPending} key={item.project_id} onOpen={()=>openProject(item.project_id)} onRemove={()=>removeProject(item)}/>,
           item.project_id===context.projectId ? <div className="project-sessions" key={`${item.project_id}-sessions`}>
             <Button small minimal icon="plus" className="new-session-button" aria-label={t("workspace.newTask")} onClick={()=>chooseThread("")}>{t("workspace.newSession")}</Button>
-            {archiveProject.error&&<Callout compact intent="danger">{archiveProject.error.message}</Callout>}
             {threadsQuery.isPending&&<p className="empty-copy">{t("workspace.loadingSessions")}</p>}
             {threadsQuery.error&&<Callout compact intent="danger">{threadsQuery.error.message}</Callout>}
             {visibleThreads.map(thread=><Button minimal alignText="left" className={`thread-button ${thread.thread_id===context.threadId?"active":""}`} key={thread.thread_id} onClick={()=>chooseThread(thread.thread_id)}><Icon icon="chat"/><span><strong>{thread.problem||t("workspace.untitledSession")}</strong><small>{thread.execution_state==="RUNNING"?t("workspace.running"):thread.execution_state==="PAUSED"?t("workspace.paused"):t("workspace.reopen")}</small></span></Button>)}
