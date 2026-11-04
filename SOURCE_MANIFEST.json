@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-04T12:44:33.111412+00:00",
+  "created_at": "2026-11-04T16:03:52.914607+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -978,8 +978,8 @@
     },
     {
       "path": "apps/web/src/components/ProjectArchiveRestore.test.tsx",
-      "sha256": "fbe568d342644a3da7ff36df48c2a5a3a830bbc190d6bc9a40f068925634fda6",
-      "bytes": 15926
+      "sha256": "1dfd0cccb2eeeb886bafa52116a861e31bae907caea21b7ecb6c118e4d3dba10",
+      "bytes": 15816
     },
     {
       "path": "apps/web/src/components/ProjectLanding.test.tsx",
@@ -1945,6 +1945,11 @@
       "path": "apps/web/src/styles.css",
       "sha256": "15417238980a3e37d8dccc29d802f31033f080e4995109afdab44bdedf7bc14c",
       "bytes": 21748
+    },
+    {
+      "path": "apps/web/src/test/jsdomTopLayer.ts",
+      "sha256": "544f7ce85aa84cdcf9ce479a722a73a70a29ba2c0d034acce67d2f595bf1e373",
+      "bytes": 835
     },
     {
       "path": "apps/web/src/testSetup.ts",
@@ -4458,8 +4463,8 @@
     },
     {
       "path": "src/thoth/adapters/storage/receipt_dag.py",
-      "sha256": "79a11879976c59eb30448e35893eebc93b61b6f770c62d21177e288ec7963326",
-      "bytes": 5898
+      "sha256": "960d75148b38256911a26e248e3bd2e867bc4b682dfdb1e53543e4e22f608f93",
+      "bytes": 6010
     },
     {
       "path": "src/thoth/adapters/storage/registry.py",
@@ -5893,8 +5898,8 @@
     },
     {
       "path": "src/thoth/application/services/receipt_dag_service.py",
-      "sha256": "3a0b3458b4f6f63381d06173ed5705d676e38824888f1c879da3d821bf12078b",
-      "bytes": 7393
+      "sha256": "069a6a91b985ba772cb2dc757f2465c1194363830477bc3b259e0fbd97e0ef8a",
+      "bytes": 7638
     },
     {
       "path": "src/thoth/application/services/recursive_improvement.py",
@@ -8182,6 +8187,11 @@
       "bytes": 4352
     },
     {
+      "path": "tests/atomicity/test_execution_midway_faults.py",
+      "sha256": "6c47c2e7834cdbbecf3a09dc91ac99027cc166e7a0fec1809cea205bbe883524",
+      "bytes": 10238
+    },
+    {
       "path": "tests/atomicity/test_execution_outcome.py",
       "sha256": "30d9d3ed7d9ceb8e30817ff525ddddb03203b8bf43e101199dbd6aad19eaa3fe",
       "bytes": 1413
@@ -8257,6 +8267,11 @@
       "bytes": 1423
     },
     {
+      "path": "tests/atomicity/test_receipt_bundle_cache.py",
+      "sha256": "35261fad3a89834203e81d0a3e7de8ff0df639213edb8b347b91a53629a173ba",
+      "bytes": 9656
+    },
+    {
       "path": "tests/atomicity/test_source_artifact.py",
       "sha256": "18fe27d220087e407385a19fa9c368134fb9fc69439a31d75206d67495672db5",
       "bytes": 6355
@@ -8265,6 +8280,11 @@
       "path": "tests/atomicity/test_source_binding_store.py",
       "sha256": "b5ee353d5fcb6f676929cca991de554a09f5875352da08d85dfea9a4d6c55ff5",
       "bytes": 4081
+    },
+    {
+      "path": "tests/atomicity/test_source_connect_faults.py",
+      "sha256": "ddadfb9ddaafae469c5d9a1019348807c8254dc9af1ac8d6165ec7a17ea62ab6",
+      "bytes": 4911
     },
     {
       "path": "tests/atomicity/test_store_bundle.py",

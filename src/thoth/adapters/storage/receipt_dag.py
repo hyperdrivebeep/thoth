@@ -13,6 +13,7 @@ from thoth.adapters.storage.schema import (
     receipt_dag_nodes,
     receipt_dag_verifications,
 )
+from thoth.adapters.storage.transaction import read_connection, write_connection
 from thoth.domain.base import DomainModel
 from thoth.domain.receipt_dag import (
     ReceiptBundle,
@@ -86,7 +87,7 @@ class SqliteReceiptDagStore(ReceiptDagStorePort):
         )
 
     def read_bundle(self, project_id: str, bundle_id: str) -> ReceiptBundle | None:
-        with self._engine.connect() as connection:
+        with read_connection(self._engine) as connection:
             row = connection.execute(
                 select(receipt_dag_bundles.c.content_json).where(
                     receipt_dag_bundles.c.project_id == project_id,
@@ -117,7 +118,7 @@ class SqliteReceiptDagStore(ReceiptDagStorePort):
         )
         if subject_id is not None:
             statement = statement.where(receipt_dag_verifications.c.subject_id == subject_id)
-        with self._engine.connect() as connection:
+        with read_connection(self._engine) as connection:
             rows = connection.execute(statement).all()
         return tuple(
             ReceiptDagVerification.model_validate(orjson.loads(str(row[0]))) for row in rows
@@ -140,7 +141,7 @@ class SqliteReceiptDagStore(ReceiptDagStorePort):
             **extra,
         }
         statement = sqlite_insert(table).values(**payload)
-        with self._engine.begin() as connection:
+        with write_connection(self._engine) as connection:
             if not project_scoped_key:
                 existing_project = connection.execute(
                     select(table.c.project_id).where(table.c[key] == identifier)
@@ -159,7 +160,7 @@ class SqliteReceiptDagStore(ReceiptDagStorePort):
             )
 
     def _list(self, table: Table, project_id: str, model: type[TRecord]) -> tuple[TRecord, ...]:
-        with self._engine.connect() as connection:
+        with read_connection(self._engine) as connection:
             rows = connection.execute(
                 select(table.c.content_json).where(table.c.project_id == project_id)
             ).all()
