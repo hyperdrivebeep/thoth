@@ -43,6 +43,8 @@ see what remains unresolved, and compare two saved results before deciding what 
 > English question, answer and source-text captures are available; broader English quality, real-account coverage and physical PC restart coverage remain incomplete.
 > Read [status and limits](#status), [model usage and cost](#model-usage-and-cost), and the [security policy](SECURITY.md) before relying on a result.
 
+**Trying the beta?** Start with the [beta guide](docs/BETA.md) (베타 테스트 안내): what to install, five flows to try, known limits and how to report a problem.
+
 ## See it work
 
 English captures from a 2026-10-25 investigation on the bundled

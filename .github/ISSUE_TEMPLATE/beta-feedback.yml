@@ -1,0 +1,80 @@
+name: Beta feedback
+description: Tell us what you tried, what you expected and what happened (beta testers)
+title: "[Beta] "
+labels: ["beta-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for testing THOTH. 베타 테스트에 참여해 주셔서 감사합니다.
+
+        **Do not attach your documents, sign-in details, API keys or workspace files.** Blur or crop
+        anything private in screenshots. 개인 자료, 로그인 정보, API 키, 작업 공간 파일은 붙이지 마세요.
+        For a security problem, do not use this form: use **Security → Report a vulnerability**.
+  - type: textarea
+    id: doing
+    attributes:
+      label: What were you doing? (하던 일)
+      description: The steps before the problem, for example "archived a project, then chose Delete permanently".
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect? (기대한 결과)
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead? (실제 결과)
+      description: Include any message shown on screen, copied as text if you can.
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot (화면 캡처)
+      description: Drag an image here. Remove or blur private content first. Optional but very helpful.
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: THOTH version
+      description: Run `.\.venv\Scripts\python.exe -m thoth.cli version` and paste the line.
+      placeholder: THOTH 0.2.0b1 (protocol 0.1.0)
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Windows version and browser
+      placeholder: Windows 11 23H2, Chrome 130
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which flow was it? (어느 흐름인가요)
+      options:
+        - Install or first run
+        - Connecting a model account
+        - Creating a project
+        - Connecting sources
+        - Asking a question
+        - Reading a result
+        - Archiving or deleting a project
+        - Local retrieval preparation (optional)
+        - Language or display
+        - Something else
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed personal documents, credentials and workspace files from this report.
+          required: true
+

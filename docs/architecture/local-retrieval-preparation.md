@@ -74,6 +74,20 @@ claiming a source job. Windows Job memory remains 512 MiB. BLAS initialization u
 thread; ORT stays intra-op 4/inter-op 1. The encoder receives verified bytes rather than
 reopening a mutable model path.
 
+Passage length is capped. The encoder keeps only the first 512 tokens of a passage (the first
+511 plus the closing special token); queries are never cut and a passage that fits is encoded
+exactly as before. Attention memory grows much faster than linearly with length: a 48,985
+character page container took 33 GB in an unbounded run, and before the cap such a page failed
+its source job with EMBEDDING_FAILED at the 512 MiB commit limit (worker peak commit 504 MiB).
+Measured in the real worker: a 512 token passage peaks at 406 MiB commit and a 1,024 token
+passage at 477 MiB, so 512 keeps a margin of about 100 MiB under the limit. A cut passage is
+embedded from its beginning only, so evidence far into a long span is not reflected in its
+vector. The worker counts cut passages in memory (truncated_passages); the index tables do
+not store a per-passage flag. Vectors created before the cap for passages longer than 512
+tokens that still fit the worker limit were computed from the whole passage. The pinned
+preprocessing version was not raised, so such old vectors, if any, are reused until the
+project is rebuilt.
+
 Interrupted operations are not automatically rerun. Files can be checked independently;
 explicit prepare recovers expired S2 leases and reconciles sources. An old operation receipt
 can remain unresolved after a server crash. Current file/index state does not prove that

@@ -20,6 +20,29 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
+# Passages are cut to their first PASSAGE_TOKEN_CAP tokens before they reach the model. Attention
+# memory grows much faster than linearly with length: one 48,985 character page container took
+# 33 GB in an unbounded run and exceeds the worker's 512 MiB commit limit long before that.
+# Queries are never cut. A passage that fits is encoded exactly as before.
+PASSAGE_TOKEN_CAP = 512
+
+
+def cap_passage_tokens(
+    ids: Sequence[int], mask: Sequence[int], types: Sequence[int], cap: int = PASSAGE_TOKEN_CAP
+) -> tuple[list[int], list[int], list[int], bool]:
+    """Keep the first cap-1 tokens and the closing special token; return whether it was cut."""
+    if cap < 2:
+        raise ValueError("EMBEDDING_PASSAGE_CAP_INVALID")
+    if len(ids) <= cap:
+        return list(ids), list(mask), list(types), False
+    return (
+        [*ids[: cap - 1], ids[-1]],
+        [*mask[: cap - 1], mask[-1]],
+        [*types[: cap - 1], types[-1]],
+        True,
+    )
+
+
 class _SessionOptions(Protocol):
     intra_op_num_threads: int
     inter_op_num_threads: int
@@ -72,6 +95,7 @@ class GraniteOnnxEncoder:
         ort = cast(_OrtModule, native_ort)
         ort.disable_telemetry_events()
         self._pin = descriptor.pin
+        self.last_truncated = False
         manifest = granite_manifest()
         if descriptor.manifest_digest != manifest.digest or descriptor.pin != DenseModelPin():
             raise EmbeddingIndexError("MODEL_HASH_MISMATCH")
@@ -133,20 +157,30 @@ class GraniteOnnxEncoder:
         ).issubset({"input_ids", "attention_mask", "token_type_ids"}):
             raise EmbeddingIndexError("EMBEDDING_LOAD_FAILED")
 
+    def tokens_for(
+        self, text: str, role: Literal["QUERY", "PASSAGE"]
+    ) -> tuple[list[int], list[int], list[int], bool]:
+        encoded = self._tokenizer.encode(text, add_special_tokens=True)
+        ids, mask, types = list(encoded.ids), list(encoded.attention_mask), list(encoded.type_ids)
+        if role == "PASSAGE":
+            return cap_passage_tokens(ids, mask, types)
+        return ids, mask, types, False
+
     def encode_one(
         self, text: str, *, role: Literal["QUERY", "PASSAGE"], model: DenseModelPin
     ) -> tuple[float, ...]:
         if model != self._pin:
             raise EmbeddingIndexError("MODEL_HASH_MISMATCH")
-        encoded = self._tokenizer.encode(text, add_special_tokens=True)
-        count = len(encoded.ids)
+        self.last_truncated = False
+        ids, mask, types, truncated = self.tokens_for(text, role)
+        count = len(ids)
         if count > self._max_tokens:
             raise EmbeddingIndexError("QUERY_TOO_LONG" if role == "QUERY" else "PASSAGE_TOO_LONG")
         np = self._np
         values = {
-            "input_ids": np.asarray([encoded.ids], dtype=np.int64),
-            "attention_mask": np.asarray([encoded.attention_mask], dtype=np.int64),
-            "token_type_ids": np.asarray([encoded.type_ids], dtype=np.int64),
+            "input_ids": np.asarray([ids], dtype=np.int64),
+            "attention_mask": np.asarray([mask], dtype=np.int64),
+            "token_type_ids": np.asarray([types], dtype=np.int64),
         }
         output = self._session.run(
             ["last_hidden_state"], {name: values[name] for name in self._input_names}
@@ -163,6 +197,7 @@ class GraniteOnnxEncoder:
         norm = float(norms[0, 0])
         if not math.isfinite(norm) or norm <= 0:
             raise EmbeddingIndexError("EMBEDDING_FAILED")
+        self.last_truncated = truncated
         return tuple(float(v) for v in (vectors / norms).astype(np.float32)[0])
 
 

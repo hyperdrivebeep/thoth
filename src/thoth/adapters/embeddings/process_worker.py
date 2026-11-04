@@ -71,6 +71,8 @@ class ProcessEmbeddingWorker:
         self.last_exit_code: int | None = None
         self.encoder_pid: int | None = None
         self.memory_failure_observed = False
+        # Passages the encoder cut to its token cap in this process lifetime (diagnostic only).
+        self.truncated_passages = 0
 
     def _start(self) -> None:
         if self._process is not None:
@@ -187,6 +189,8 @@ class ProcessEmbeddingWorker:
         vector = EmbeddingVector(bytes.fromhex(data))
         if vector.sha256 != value["sha256"]:
             raise EmbeddingIndexError("EMBEDDING_PROTOCOL_FAILED")
+        if value.get("truncated") is True:
+            self.truncated_passages += 1
         return vector
 
     def _stop(self) -> None:
