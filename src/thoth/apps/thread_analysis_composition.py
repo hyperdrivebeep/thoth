@@ -107,6 +107,7 @@ def create_research_queries(
         service=investigation_service,
         threads=thread_store,
         acquisition=acquisition_trace_store,
+        ledger=ledger,
     )
     return ResearchQueries(
         projection_handlers=projection_handlers,

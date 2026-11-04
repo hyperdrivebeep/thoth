@@ -10,6 +10,7 @@ from thoth.domain.base import DomainModel
 from thoth.domain.investigation import InvestigationRecord
 from thoth.ports.acquisition import AcquisitionTraceStorePort
 from thoth.ports.investigation import InvestigationStorePort
+from thoth.ports.ledger import LedgerPort
 from thoth.ports.thread import ThreadStorePort
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 
@@ -83,11 +84,13 @@ class InvestigationQueryHandlers:
         service: InvestigationService,
         threads: ThreadStorePort,
         acquisition: AcquisitionTraceStorePort,
+        ledger: LedgerPort,
     ) -> None:
         self._store = store
         self._service = service
         self._threads = threads
         self._acquisition = acquisition
+        self._ledger = ledger
 
     async def list(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = InvestigationListInput.model_validate(value)
@@ -147,81 +150,87 @@ class InvestigationQueryHandlers:
                     "parent investigation was not found in this project",
                 )
         try:
-            investigation = self._service.start(
-                thread=thread,
-                trigger=request.trigger,
-                question=request.question,
-                parent_investigation_id=request.parent_investigation_id,
-                target_object_id=request.target_object_id,
-                target_hypothesis_id=request.target_hypothesis_id,
-                mode=request.mode,
-                scope=request.scope or thread.scope,
-                required_evidence_groups=request.required_evidence_groups,
-                query_families=request.query_families,
-                budget=request.budget,
-                stop_conditions=request.stop_conditions,
-                explicit_saturation_opt_in=request.explicit_saturation_opt_in,
-            )
+            with self._ledger.transaction():  # the record and its audit entry are one write
+                investigation = self._service.start(
+                    thread=thread,
+                    trigger=request.trigger,
+                    question=request.question,
+                    parent_investigation_id=request.parent_investigation_id,
+                    target_object_id=request.target_object_id,
+                    target_hypothesis_id=request.target_hypothesis_id,
+                    mode=request.mode,
+                    scope=request.scope or thread.scope,
+                    required_evidence_groups=request.required_evidence_groups,
+                    query_families=request.query_families,
+                    budget=request.budget,
+                    stop_conditions=request.stop_conditions,
+                    explicit_saturation_opt_in=request.explicit_saturation_opt_in,
+                )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
         return {"investigation": investigation.model_dump(mode="json")}
 
     async def update(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = InvestigationUpdateInput.model_validate(value)
-        current = self._read(request)
         try:
-            updated = self._service.update_plan(
-                current,
-                expected_plan_revision=request.expected_plan_revision,
-                mode=request.mode,
-                scope=request.scope,
-                required_evidence_groups=request.required_evidence_groups,
-                query_families=request.query_families,
-                budget_extension=request.budget_extension,
-                stop_conditions=request.stop_conditions,
-                explicit_saturation_opt_in=request.explicit_saturation_opt_in,
-                reason=request.reason,
-            )
+            with self._ledger.transaction():  # the plan change and its audit entry are one write
+                current = self._read(request)
+                updated = self._service.update_plan(
+                    current,
+                    expected_plan_revision=request.expected_plan_revision,
+                    mode=request.mode,
+                    scope=request.scope,
+                    required_evidence_groups=request.required_evidence_groups,
+                    query_families=request.query_families,
+                    budget_extension=request.budget_extension,
+                    stop_conditions=request.stop_conditions,
+                    explicit_saturation_opt_in=request.explicit_saturation_opt_in,
+                    reason=request.reason,
+                )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
         return {"investigation": updated.model_dump(mode="json")}
 
     async def pause(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = InvestigationReadInput.model_validate(value)
-        current = self._read(request)
-        if current.is_ended or current.execution_state == "PAUSED":
-            return _unchanged(
-                current,
-                "INVESTIGATION_ALREADY_ENDED"
-                if current.is_ended
-                else "INVESTIGATION_ALREADY_PAUSED",
-            )
         try:
-            updated = self._service.pause(current)
+            with self._ledger.transaction():  # the state change and its audit entry are one write
+                current = self._read(request)
+                if current.is_ended or current.execution_state == "PAUSED":
+                    return _unchanged(
+                        current,
+                        "INVESTIGATION_ALREADY_ENDED"
+                        if current.is_ended
+                        else "INVESTIGATION_ALREADY_PAUSED",
+                    )
+                updated = self._service.pause(current)
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
         return {"investigation": updated.model_dump(mode="json")}
 
     async def resume(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = InvestigationResumeInput.model_validate(value)
-        current = self._read(request)
         try:
-            updated = self._service.resume(
-                current,
-                expected_checkpoint_digest=request.expected_checkpoint_digest,
-            )
+            with self._ledger.transaction():  # the state change and its audit entry are one write
+                current = self._read(request)
+                updated = self._service.resume(
+                    current,
+                    expected_checkpoint_digest=request.expected_checkpoint_digest,
+                )
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.STALE_CHECKPOINT, str(exc)) from exc
         return {"investigation": updated.model_dump(mode="json")}
 
     async def stop(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = InvestigationStopInput.model_validate(value)
-        current = self._read(request)
-        if current.is_ended and request.reason in TERMINAL_STATE_BY_STOP_REASON:
-            # An ended investigation keeps its verdict and result; a later stop never replaces them.
-            return _unchanged(current, "INVESTIGATION_ALREADY_ENDED")
         try:
-            updated = self._service.stop(current, reason=request.reason)
+            with self._ledger.transaction():  # the verdict and its audit entry are one write
+                current = self._read(request)
+                if current.is_ended and request.reason in TERMINAL_STATE_BY_STOP_REASON:
+                    # An ended investigation keeps its verdict and result; a later stop never
+                    # replaces them.
+                    return _unchanged(current, "INVESTIGATION_ALREADY_ENDED")
+                updated = self._service.stop(current, reason=request.reason)
         except ValueError as exc:
             raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, str(exc)) from exc
         return {"investigation": updated.model_dump(mode="json")}

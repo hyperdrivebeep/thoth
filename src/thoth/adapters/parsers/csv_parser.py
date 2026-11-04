@@ -4,6 +4,7 @@ import csv
 import io
 
 from thoth.adapters.parsers.common import coverage, node_id, parser_artifact, validate_byte_hash
+from thoth.adapters.parsers.text_encoding import decode_text
 from thoth.domain.artifact import (
     ArtifactEnvelope,
     SourceLocator,
@@ -52,7 +53,8 @@ class CsvParser:
 
     def parse(self, artifact: ArtifactEnvelope, raw: bytes) -> StructuralDocument:
         validate_byte_hash(artifact, raw)
-        reader = csv.reader(io.StringIO(raw.decode("utf-8-sig")))
+        decoded = decode_text(raw)
+        reader = csv.reader(io.StringIO(decoded.text))
         nodes: list[StructuralNode] = []
         names: list[str] | None = None
         first = True
@@ -87,6 +89,7 @@ class CsvParser:
                         cell_range=_row_range(row_number, len(row)),
                         json_pointer="/header" if header else f"/rows/{row_number}",
                     ),
+                    extraction_warnings=decoded.warnings,
                 )
             )
         return StructuralDocument(
