@@ -1954,6 +1954,41 @@
       "decorate",
       "operation/resume",
       "thoth.application.commands.research_operations.ResearchOperationHandlers.resume"
+    ],
+    [
+      "register",
+      "model/localAsset/read",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.read_asset"
+    ],
+    [
+      "register",
+      "model/localAsset/import",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.import_asset"
+    ],
+    [
+      "register",
+      "model/localAsset/install",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.install_asset"
+    ],
+    [
+      "register",
+      "project/retrieval/experiment/read",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.read_project"
+    ],
+    [
+      "register",
+      "project/retrieval/experiment/configure",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.configure"
+    ],
+    [
+      "register",
+      "project/retrieval/experiment/prepare",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.prepare"
+    ],
+    [
+      "register",
+      "project/embeddingIndex/retry",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.retry"
     ]
   ],
   "HOSTED_REVIEW": [
@@ -3971,6 +4006,41 @@
       "decorate",
       "operation/resume",
       "thoth.application.commands.research_operations.ResearchOperationHandlers.resume"
+    ],
+    [
+      "register",
+      "model/localAsset/read",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.read_asset"
+    ],
+    [
+      "register",
+      "model/localAsset/import",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.import_asset"
+    ],
+    [
+      "register",
+      "model/localAsset/install",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.install_asset"
+    ],
+    [
+      "register",
+      "project/retrieval/experiment/read",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.read_project"
+    ],
+    [
+      "register",
+      "project/retrieval/experiment/configure",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.configure"
+    ],
+    [
+      "register",
+      "project/retrieval/experiment/prepare",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.prepare"
+    ],
+    [
+      "register",
+      "project/embeddingIndex/retry",
+      "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.retry"
     ]
   ]
 }

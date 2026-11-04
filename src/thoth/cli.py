@@ -16,7 +16,6 @@ from rich.console import Console
 
 from thoth import __version__
 from thoth.adapters.cli.auth_presentation import present_auth_connect, present_auth_status
-from thoth.adapters.cli.diagnostics import register_diagnostic_commands
 from thoth.adapters.cli.sources import register_source_commands
 from thoth.adapters.connectors import load_connector_registry
 from thoth.adapters.models import (
@@ -31,6 +30,7 @@ from thoth.adapters.sandbox import default_sandbox_factory_registry
 from thoth.adapters.storage import SqliteConversationSessionStore
 from thoth.application.services.conversation_router import ConversationRouter
 from thoth.application.services.tui_session_service import TuiSessionService
+from thoth.apps.cli_workspace_composition import register_workspace_commands
 from thoth.apps.conversation_dispatch import BusConversationDispatcher
 from thoth.apps.model_composition import create_codex_model
 from thoth.apps.projectpack_execution import run_project_pack
@@ -38,7 +38,6 @@ from thoth.apps.runtime import create_runtime
 from thoth.apps.tui_presentation import present_research_progress, render_tui_turn
 from thoth.apps.workspace_guard import owned_workspace, workspace_guard
 from thoth.apps.workspace_location_commands import (
-    register_workspace_location_commands,
     workspace_location_info,
 )
 from thoth.apps.workspace_paths import (
@@ -242,8 +241,7 @@ def claude_code_login(
     raise typer.Exit(code=code)
 
 
-register_diagnostic_commands(app, console, DEFAULT_WORKSPACE)
-register_workspace_location_commands(app, DEFAULT_WORKSPACE)
+register_workspace_commands(app, console, DEFAULT_WORKSPACE)
 
 
 @app.command("auth-status")

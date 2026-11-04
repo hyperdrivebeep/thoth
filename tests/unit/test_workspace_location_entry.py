@@ -1,7 +1,5 @@
 """Location policy must run before existing lock/database entry points touch a workspace."""
 
-import json
-import os
 from pathlib import Path
 
 import pytest
@@ -46,24 +44,4 @@ def test_location_policy_precedes_workspace_lock(
                     pytest.fail("a blocked server reached its body")
         assert trace == ["location-policy"]
     finally:
-        out = (
-            Path(__file__).resolve().parents[2]
-            / "outputs/w-location-20261023"
-            / os.environ.get("THOTH_W_PHASE", "direct")
-        )
-        out.mkdir(parents=True, exist_ok=True)
-        (out / f"entry-{entry}.json").write_text(
-            json.dumps(
-                {
-                    "entry": entry,
-                    "trace": trace,
-                    "workspace_created": workspace.exists(),
-                    "database_created": (workspace / "db").exists(),
-                    "server_started": False,
-                },
-                indent=2,
-            )
-            + "\n",
-            encoding="utf-8",
-        )
         assert not workspace.exists()

@@ -31,7 +31,8 @@ def _is_gone(pid: int) -> bool:
     kernel.CloseHandle.restype = wintypes.BOOL
     handle = kernel.OpenProcess(0x00100000, False, pid)
     if not handle:
-        return True
+        # Only "no such process" (ERROR_INVALID_PARAMETER) means gone; a denied open proves nothing.
+        return ctypes.get_last_error() == 87
     try:
         return kernel.WaitForSingleObject(handle, 0) == 0
     finally:

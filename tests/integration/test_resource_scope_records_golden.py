@@ -24,6 +24,7 @@ from thoth.adapters.storage.projects import SqliteProjectStore
 from thoth.adapters.storage.resource_scope import SqliteResourceScopeStore
 from thoth.adapters.storage.sqlite import SqliteLedger
 from thoth.adapters.storage.transaction import SqliteAtomicUnitOfWork
+from thoth.application.services import actor_authority as authority_module
 from thoth.application.services import resource_scope_service as scope_module
 from thoth.application.services.resource_scope_service import ResourceScopeService
 from thoth.domain.auth import (
@@ -178,13 +179,14 @@ def install(patch: pytest.MonkeyPatch, rec: ScopeRecorder) -> None:
             wrap(owner, name)
 
     def auth(name: str) -> None:
-        original = getattr(scope_module, name)
+        owner = authority_module if name == "current_authenticated_actor" else scope_module
+        original = getattr(owner, name)
 
         def traced(*args: Any, **kwargs: Any) -> Any:
             rec.note("auth", name, [digest(v) for v in args])
             return original(*args, **kwargs)
 
-        patch.setattr(scope_module, name, traced)
+        patch.setattr(owner, name, traced)
 
     for name in ("current_authenticated_actor", "record_resource_use"):
         auth(name)

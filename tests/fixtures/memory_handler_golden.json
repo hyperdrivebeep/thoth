@@ -17,37 +17,11 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
     "ids",
     "control-revision"
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "ffd102e4eed40af12764a789b62ea74afd01d60290dfc1ebb1d364049063b844"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "ffd102e4eed40af12764a789b62ea74afd01d60290dfc1ebb1d364049063b844"
    ],
    [
     "C",
@@ -102,37 +76,11 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
     "ids",
     "control-revision"
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "8d1d4f2b695c0cfaa57737d95b8b9d05cb085f857fac4ad7136f1bd384221fb3"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "8d1d4f2b695c0cfaa57737d95b8b9d05cb085f857fac4ad7136f1bd384221fb3"
    ],
    [
     "C",
@@ -187,13 +135,6 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
     "clock"
    ],
    [
@@ -225,13 +166,6 @@
    [
     "ids",
     "memory-candidate"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
    ],
    [
     "ids",
@@ -297,31 +231,11 @@
     "memory-candidate"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
     "ids",
     "control-revision"
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "e0aa0b7dfcfbf13ee7a108817b1be071cfe8668105bd3c96461c05f034bcb650"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "e0aa0b7dfcfbf13ee7a108817b1be071cfe8668105bd3c96461c05f034bcb650"
    ],
    [
     "C",
@@ -378,13 +292,6 @@
    [
     "ids",
     "memory-candidate"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
    ],
    [
     "ids",
@@ -450,13 +357,6 @@
     "memory-candidate"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
     "ids",
     "control-revision"
    ],
@@ -516,13 +416,6 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
     "clock"
    ],
    [
@@ -552,28 +445,8 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "8d1d4f2b695c0cfaa57737d95b8b9d05cb085f857fac4ad7136f1bd384221fb3"
-   ],
-   [
     "ids",
     "memory-memory-entry-candidate"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry-candidate:00000059"
    ],
    [
     "ids",
@@ -581,19 +454,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "8d1d4f2b695c0cfaa57737d95b8b9d05cb085f857fac4ad7136f1bd384221fb3"
    ],
    [
     "C",
@@ -609,37 +469,11 @@
     "memory-change-set-proposal"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-change-set-proposal:00000061"
-   ],
-   [
     "ids",
     "control-revision"
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "bab2bf07903238745d025e3e0705c031de9f0a44afe5e11fd9d798b39df53eb6"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "8d1d4f2b695c0cfaa57737d95b8b9d05cb085f857fac4ad7136f1bd384221fb3"
    ],
    [
     "C",
@@ -694,28 +528,8 @@
     "clock"
    ],
    [
-    "L",
-    "read_heads",
-    "project:memory-golden"
-   ],
-   [
-    "C",
-    "list",
-    "project:memory-golden",
-    "MEMORY",
-    "MEMORY_ENTRY",
-    "latest_only=True"
-   ],
-   [
     "ids",
     "memory-context-pack"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-context-pack:00000057"
    ],
    [
     "ids",
@@ -723,60 +537,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000051"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000045"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000047"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000049"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000051"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000053"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "05f08b2b1971d55d36bef84e1c171650cad7937108c8266523eafa4511c3e2d7"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "01abcacf039fa43951d8766aeec62ae4a108cfc278b04fa483169e4c6c37f20a"
    ],
    [
     "C",
@@ -831,28 +591,8 @@
     "clock"
    ],
    [
-    "L",
-    "read_heads",
-    "project:memory-golden"
-   ],
-   [
-    "C",
-    "list",
-    "project:memory-golden",
-    "MEMORY",
-    "MEMORY_ENTRY",
-    "latest_only=True"
-   ],
-   [
     "ids",
     "memory-context-pack"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-context-pack:00000045"
    ],
    [
     "ids",
@@ -860,13 +600,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000041"
    ],
    [
     "C",
@@ -921,28 +654,8 @@
     "clock"
    ],
    [
-    "L",
-    "read_heads",
-    "project:memory-golden"
-   ],
-   [
-    "C",
-    "list",
-    "project:memory-golden",
-    "MEMORY",
-    "MEMORY_ENTRY",
-    "latest_only=True"
-   ],
-   [
     "ids",
     "memory-context-pack"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-context-pack:00000045"
    ],
    [
     "ids",
@@ -950,13 +663,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000041"
    ],
    [
     "C",
@@ -1011,23 +717,8 @@
     "clock"
    ],
    [
-    "C",
-    "list",
-    "project:memory-golden",
-    "MEMORY",
-    "MEMORY_ENTRY",
-    "latest_only=True"
-   ],
-   [
     "ids",
     "memory-projection-task"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-projection-task:00000047"
    ],
    [
     "ids",
@@ -1035,18 +726,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "05f08b2b1971d55d36bef84e1c171650cad7937108c8266523eafa4511c3e2d7"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "929e5d9de377b71cab95d4a6e58561ebf5b8c19df1f8804d6bc0de16e363d29c"
    ],
    [
     "C",
@@ -1101,23 +780,8 @@
     "clock"
    ],
    [
-    "C",
-    "list",
-    "project:memory-golden",
-    "MEMORY",
-    "MEMORY_ENTRY",
-    "latest_only=True"
-   ],
-   [
     "ids",
     "memory-retention-evaluation"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-retention-evaluation:00000047"
    ],
    [
     "ids",
@@ -1125,20 +789,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000041"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000043"
    ],
    [
     "C",
@@ -1193,13 +843,6 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000041"
-   ],
-   [
     "clock"
    ],
    [
@@ -1229,22 +872,8 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000041"
-   ],
-   [
     "ids",
     "memory-retire-candidate"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-retire-candidate:00000045"
    ],
    [
     "ids",
@@ -1252,13 +881,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000041"
    ],
    [
     "C",
@@ -1272,13 +894,6 @@
    [
     "ids",
     "memory-change-set-proposal"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-change-set-proposal:00000047"
    ],
    [
     "ids",
@@ -1340,27 +955,8 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000041"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:memory-golden"
-   ],
-   [
     "ids",
     "memory-memory-revalidation"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-revalidation:00000045"
    ],
    [
     "ids",
@@ -1368,13 +964,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000041"
    ],
    [
     "C",
@@ -1436,27 +1025,8 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000041"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:memory-golden"
-   ],
-   [
     "ids",
     "memory-memory-revalidation"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-revalidation:00000045"
    ],
    [
     "ids",
@@ -1464,13 +1034,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-memory-entry:00000041"
    ],
    [
     "C",
@@ -1562,22 +1125,8 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
     "ids",
     "memory-gate"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-gate:00000050"
    ],
    [
     "ids",
@@ -1585,13 +1134,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
    ],
    [
     "C",
@@ -1603,30 +1145,11 @@
     "668f41aa5266534e89a3ee69f5671771bb907dcc188394b26cb402439029a4a8"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
     "ids",
     "control-revision"
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "07a6567bbf865ef2bd41a57c42d0aec71a21a1bef7440503e63fd31567c80bf8"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "07a6567bbf865ef2bd41a57c42d0aec71a21a1bef7440503e63fd31567c80bf8"
    ],
    [
     "C",
@@ -1688,13 +1211,6 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:missing"
-   ],
-   [
     "clock"
    ],
    [
@@ -1724,22 +1240,8 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
     "ids",
     "memory-gate"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-gate:00000050"
    ],
    [
     "ids",
@@ -1747,13 +1249,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
    ],
    [
     "C",
@@ -1765,30 +1260,11 @@
     "3928d8441b0b25917b603626420c6c97bf36c44cb94848b891cd048ca918201d"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
     "ids",
     "control-revision"
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "8d1d4f2b695c0cfaa57737d95b8b9d05cb085f857fac4ad7136f1bd384221fb3"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "8d1d4f2b695c0cfaa57737d95b8b9d05cb085f857fac4ad7136f1bd384221fb3"
    ],
    [
     "C",
@@ -1850,22 +1326,8 @@
     "clock"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
     "ids",
     "memory-gate"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-gate:00000050"
    ],
    [
     "ids",
@@ -1873,13 +1335,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
    ],
    [
     "C",
@@ -1891,30 +1346,11 @@
     "42d300b793282d4aa7327d45abcc19e5cca6187b705950f81d2401a97f0a1253"
    ],
    [
-    "C",
-    "read",
-    "project:memory-golden",
-    "MEMORY",
-    "memory-candidate:00000043"
-   ],
-   [
     "ids",
     "control-revision"
    ],
    [
     "clock"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "06bee1ece25f0c8c8023d74458ea16912278078d9f71a77b4cdc2cb813127c12"
-   ],
-   [
-    "C",
-    "read_digest",
-    "project:memory-golden",
-    "06bee1ece25f0c8c8023d74458ea16912278078d9f71a77b4cdc2cb813127c12"
    ],
    [
     "C",

@@ -269,11 +269,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -305,11 +300,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -361,11 +351,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -388,28 +373,7 @@
     null
    ],
    [
-    "S",
-    "enter",
-    "prepare_projections",
-    "project:a02:allowed",
-    "tuple:47f6c1cc60b41dd4"
-   ],
-   [
     "clock"
-   ],
-   [
-    "S",
-    "exit",
-    "prepare_projections",
-    "tuple:40a0cbdb43bccc57"
-   ],
-   [
-    "S",
-    "enter",
-    "prepare_projections",
-    "project:a02:allowed",
-    "tuple:47f6c1cc60b41dd4",
-    "basis=MemoryPreparationBasis:d53c01819faa98ff"
    ],
    [
     "S",
@@ -439,11 +403,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -467,12 +426,6 @@
    ],
    [
     "clock"
-   ],
-   [
-    "S",
-    "exit",
-    "prepare_projections",
-    "tuple:dbc1a2e92a57303a"
    ]
   ]
  },
@@ -539,34 +492,9 @@
   ],
   "trace": [
    [
-    "S",
-    "enter",
-    "build_context",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "project_id=project:a02:allowed",
-    "query=dataset version",
-    "scope=dict:fa916af0392be21b",
-    "target_use=WORKING_CONTEXT",
-    "thread_id=thread:g96a"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
-   ],
-   [
-    "S",
-    "enter",
-    "_save_context",
-    "project:a02:allowed",
-    "thread:g96a",
-    "dataset version",
-    "WORKING_CONTEXT",
-    "dict:fa916af0392be21b",
-    "2026-09-01T00:00:00+00:00",
-    "tuple:4f53cda18c2baa0c",
-    "defaultdict:33b309bde1e47683",
-    null
    ],
    [
     "ids",
@@ -578,18 +506,6 @@
    [
     "F",
     "put_context",
-    "FullMemoryContextPack:ea177f3ac55a5ce4"
-   ],
-   [
-    "S",
-    "exit",
-    "_save_context",
-    "FullMemoryContextPack:ea177f3ac55a5ce4"
-   ],
-   [
-    "S",
-    "exit",
-    "build_context",
     "FullMemoryContextPack:ea177f3ac55a5ce4"
    ]
   ]
@@ -2261,35 +2177,13 @@
   ],
   "trace": [
    [
-    "S",
-    "enter",
-    "build_context",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "project_id=project:a02:allowed",
-    "query=dataset version",
-    "scope=dict:fa916af0392be21b",
-    "target_use=WORKING_CONTEXT",
-    "thread_id=thread:g96a"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
    ],
    [
     "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -2299,24 +2193,7 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -2326,136 +2203,13 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000211"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
     "L",
     "read_dependency_states",
     "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000212"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000213"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000220"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000221"
-   ],
-   [
-    "S",
-    "enter",
-    "_save_context",
-    "project:a02:allowed",
-    "thread:g96a",
-    "dataset version",
-    "WORKING_CONTEXT",
-    "dict:fa916af0392be21b",
-    "2026-09-01T00:00:00+00:00",
-    "tuple:178a6b56cd99fb34",
-    "defaultdict:befcf64e6d43a91b",
-    "MemorySelectionRecord:8bd8901abc1b3c2e"
    ],
    [
     "ids",
@@ -2470,47 +2224,13 @@
     "FullMemoryContextPack:a26a00a25f1dcc75"
    ],
    [
-    "S",
-    "exit",
-    "_save_context",
-    "FullMemoryContextPack:a26a00a25f1dcc75"
-   ],
-   [
-    "S",
-    "exit",
-    "build_context",
-    "FullMemoryContextPack:a26a00a25f1dcc75"
-   ],
-   [
-    "S",
-    "enter",
-    "build_context",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "project_id=project:a02:allowed",
-    "query=unrelated zephyr quasar",
-    "scope=dict:fa916af0392be21b",
-    "target_use=WORKING_CONTEXT",
-    "thread_id=thread:g96a"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
    ],
    [
     "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -2520,24 +2240,7 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -2547,136 +2250,13 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000211"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
     "L",
     "read_dependency_states",
     "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000212"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000213"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000220"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000221"
-   ],
-   [
-    "S",
-    "enter",
-    "_save_context",
-    "project:a02:allowed",
-    "thread:g96a",
-    "unrelated zephyr quasar",
-    "WORKING_CONTEXT",
-    "dict:fa916af0392be21b",
-    "2026-09-01T00:00:00+00:00",
-    "tuple:4f53cda18c2baa0c",
-    "defaultdict:e210a1492aacd5ea",
-    "MemorySelectionRecord:c8fcb4dca8cab0ec"
    ],
    [
     "ids",
@@ -2691,47 +2271,13 @@
     "FullMemoryContextPack:57d6744b5a3ac0b4"
    ],
    [
-    "S",
-    "exit",
-    "_save_context",
-    "FullMemoryContextPack:57d6744b5a3ac0b4"
-   ],
-   [
-    "S",
-    "exit",
-    "build_context",
-    "FullMemoryContextPack:57d6744b5a3ac0b4"
-   ],
-   [
-    "S",
-    "enter",
-    "build_context",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "project_id=project:a02:allowed",
-    "query=reanalysis evidence",
-    "scope=dict:fa916af0392be21b",
-    "target_use=ACTION_CONTEXT",
-    "thread_id=thread:g96a"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
    ],
    [
     "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -2741,24 +2287,7 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -2768,136 +2297,13 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000211"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
     "L",
     "read_dependency_states",
     "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000212"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000213"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000220"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000221"
-   ],
-   [
-    "S",
-    "enter",
-    "_save_context",
-    "project:a02:allowed",
-    "thread:g96a",
-    "reanalysis evidence",
-    "ACTION_CONTEXT",
-    "dict:fa916af0392be21b",
-    "2026-09-01T00:00:00+00:00",
-    "tuple:d95448f84e3fc343",
-    "defaultdict:b0ea21e423b9a333",
-    "MemorySelectionRecord:dfbdb2f4504494f8"
    ],
    [
     "ids",
@@ -2912,51 +2318,9 @@
     "FullMemoryContextPack:9683f6c9d55852b9"
    ],
    [
-    "S",
-    "exit",
-    "_save_context",
-    "FullMemoryContextPack:9683f6c9d55852b9"
-   ],
-   [
-    "S",
-    "exit",
-    "build_context",
-    "FullMemoryContextPack:9683f6c9d55852b9"
-   ],
-   [
-    "S",
-    "enter",
-    "build_context",
-    "cutoff_at=2026-09-02T00:00:00+00:00",
-    "project_id=project:a02:allowed",
-    "query=dataset version",
-    "scope=dict:fa916af0392be21b",
-    "target_use=WORKING_CONTEXT",
-    "thread_id=thread:g96a"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "S",
-    "enter",
-    "_save_context",
-    "project:a02:allowed",
-    "thread:g96a",
-    "dataset version",
-    "WORKING_CONTEXT",
-    "dict:fa916af0392be21b",
-    "2026-09-02T00:00:00+00:00",
-    "tuple:4f53cda18c2baa0c",
-    "defaultdict:4b9287d7f018a05d",
-    "MemorySelectionRecord:3bdf56e11e9f3170"
    ],
    [
     "ids",
@@ -2969,29 +2333,6 @@
     "F",
     "put_context",
     "FullMemoryContextPack:2f2ae811f9b0103a"
-   ],
-   [
-    "S",
-    "exit",
-    "_save_context",
-    "FullMemoryContextPack:2f2ae811f9b0103a"
-   ],
-   [
-    "S",
-    "exit",
-    "build_context",
-    "FullMemoryContextPack:2f2ae811f9b0103a"
-   ],
-   [
-    "S",
-    "enter",
-    "build_context",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "project_id=project:g96a:other",
-    "query=dataset version",
-    "scope=dict:fa916af0392be21b",
-    "target_use=WORKING_CONTEXT",
-    "thread_id=thread:g96a"
    ],
    [
     "F",
@@ -2999,25 +2340,6 @@
     "project:g96a:other"
    ],
    [
-    "L",
-    "read_heads",
-    "project:g96a:other"
-   ],
-   [
-    "S",
-    "enter",
-    "_save_context",
-    "project:g96a:other",
-    "thread:g96a",
-    "dataset version",
-    "WORKING_CONTEXT",
-    "dict:fa916af0392be21b",
-    "2026-09-01T00:00:00+00:00",
-    "tuple:4f53cda18c2baa0c",
-    "defaultdict:adcea0e5acabe4a5",
-    "MemorySelectionRecord:3dfbcd250951e1e4"
-   ],
-   [
     "ids",
     "memory-context"
    ],
@@ -3030,47 +2352,13 @@
     "FullMemoryContextPack:aa7698cec2fb4502"
    ],
    [
-    "S",
-    "exit",
-    "_save_context",
-    "FullMemoryContextPack:aa7698cec2fb4502"
-   ],
-   [
-    "S",
-    "exit",
-    "build_context",
-    "FullMemoryContextPack:aa7698cec2fb4502"
-   ],
-   [
-    "S",
-    "enter",
-    "build_context",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "project_id=project:a02:allowed",
-    "query=dataset version",
-    "scope=dict:a21c1eb9715e6b05",
-    "target_use=WORKING_CONTEXT",
-    "thread_id=thread:g96a"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
    ],
    [
     "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -3080,24 +2368,7 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -3107,136 +2378,13 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000211"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
     "L",
     "read_dependency_states",
     "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000212"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000213"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000220"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000221"
-   ],
-   [
-    "S",
-    "enter",
-    "_save_context",
-    "project:a02:allowed",
-    "thread:g96a",
-    "dataset version",
-    "WORKING_CONTEXT",
-    "dict:a21c1eb9715e6b05",
-    "2026-09-01T00:00:00+00:00",
-    "tuple:178a6b56cd99fb34",
-    "defaultdict:befcf64e6d43a91b",
-    "MemorySelectionRecord:8bd8901abc1b3c2e"
    ],
    [
     "ids",
@@ -3251,48 +2399,13 @@
     "FullMemoryContextPack:8d54468fd98018b7"
    ],
    [
-    "S",
-    "exit",
-    "_save_context",
-    "FullMemoryContextPack:8d54468fd98018b7"
-   ],
-   [
-    "S",
-    "exit",
-    "build_context",
-    "FullMemoryContextPack:8d54468fd98018b7"
-   ],
-   [
-    "S",
-    "enter",
-    "build_context",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "expansion=MemoryExpansionOutcome:6ecde2ca579e96e3",
-    "project_id=project:a02:allowed",
-    "query=reported result",
-    "scope=dict:fa916af0392be21b",
-    "target_use=WORKING_CONTEXT",
-    "thread_id=thread:g96a"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
    ],
    [
     "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -3302,24 +2415,7 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -3329,136 +2425,13 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000211"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
     "L",
     "read_dependency_states",
     "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000212"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000213"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000220"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000221"
-   ],
-   [
-    "S",
-    "enter",
-    "_save_context",
-    "project:a02:allowed",
-    "thread:g96a",
-    "reported result",
-    "WORKING_CONTEXT",
-    "dict:fa916af0392be21b",
-    "2026-09-01T00:00:00+00:00",
-    "tuple:178a6b56cd99fb34",
-    "defaultdict:3adc4ecc39d4483b",
-    "MemorySelectionRecord:0eb1298538d08ef8"
    ],
    [
     "ids",
@@ -3473,47 +2446,13 @@
     "FullMemoryContextPack:d82b22d88340aea0"
    ],
    [
-    "S",
-    "exit",
-    "_save_context",
-    "FullMemoryContextPack:d82b22d88340aea0"
-   ],
-   [
-    "S",
-    "exit",
-    "build_context",
-    "FullMemoryContextPack:d82b22d88340aea0"
-   ],
-   [
-    "S",
-    "enter",
-    "build_context",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "project_id=project:a02:allowed",
-    "query=dataset version from the previous result",
-    "scope=dict:fa916af0392be21b",
-    "target_use=WORKING_CONTEXT",
-    "thread_id=thread:g96a"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
    ],
    [
     "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -3523,24 +2462,7 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -3550,136 +2472,13 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000211"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
     "L",
     "read_dependency_states",
     "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000212"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000213"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000220"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000221"
-   ],
-   [
-    "S",
-    "enter",
-    "_save_context",
-    "project:a02:allowed",
-    "thread:g96a",
-    "dataset version from the previous result",
-    "WORKING_CONTEXT",
-    "dict:fa916af0392be21b",
-    "2026-09-01T00:00:00+00:00",
-    "tuple:57a1084122eb3c27",
-    "defaultdict:2db8934289c80797",
-    "MemorySelectionRecord:17cabe92bb70cdf6"
    ],
    [
     "ids",
@@ -3691,18 +2490,6 @@
    [
     "F",
     "put_context",
-    "FullMemoryContextPack:7f98d051db274496"
-   ],
-   [
-    "S",
-    "exit",
-    "_save_context",
-    "FullMemoryContextPack:7f98d051db274496"
-   ],
-   [
-    "S",
-    "exit",
-    "build_context",
     "FullMemoryContextPack:7f98d051db274496"
    ]
   ]
@@ -3736,92 +2523,14 @@
   ],
   "trace": [
    [
-    "S",
-    "enter",
-    "expansion_skip_reason",
-    "project:a02:allowed",
-    "dataset version"
-   ],
-   [
-    "S",
-    "exit",
-    "expansion_skip_reason",
-    "NOT_CONFIGURED"
-   ],
-   [
-    "S",
-    "enter",
-    "expansion_skip_reason",
-    "project:a02:allowed",
-    "dataset version"
-   ],
-   [
-    "S",
-    "exit",
-    "expansion_skip_reason",
-    "MEMORY_OFF"
-   ],
-   [
-    "S",
-    "enter",
-    "expansion_skip_reason",
-    "project:a02:allowed",
-    "dataset version"
-   ],
-   [
-    "S",
-    "exit",
-    "expansion_skip_reason",
-    "SETTING_OFF"
-   ],
-   [
-    "S",
-    "enter",
-    "expansion_skip_reason",
-    "project:a02:allowed",
-    "dataset version from the previous result"
-   ],
-   [
-    "S",
-    "exit",
-    "expansion_skip_reason",
-    "FOLLOW_UP"
-   ],
-   [
-    "S",
-    "enter",
-    "expansion_skip_reason",
-    "project:g96a:other",
-    "dataset version"
-   ],
-   [
     "F",
     "list_revisions",
     "project:g96a:other"
    ],
    [
-    "S",
-    "exit",
-    "expansion_skip_reason",
-    "NO_CANDIDATES"
-   ],
-   [
-    "S",
-    "enter",
-    "expansion_skip_reason",
-    "project:a02:allowed",
-    "dataset version"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
-   ],
-   [
-    "S",
-    "exit",
-    "expansion_skip_reason",
-    null
    ]
   ]
  },
@@ -4485,16 +3194,6 @@
   ],
   "trace": [
    [
-    "S",
-    "enter",
-    "promote_thread_results",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "memory_ids=tuple:211452b79b8546b0",
-    "project_id=project:a02:allowed",
-    "scope=dict:fa916af0392be21b",
-    "thread_id=thread:g96a:review"
-   ],
-   [
     "M",
     "list",
     "project:a02:allowed"
@@ -4506,11 +3205,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -4527,15 +3221,6 @@
     "exit",
     "capture_basis",
     "MemoryPreparationBasis:0735b9b1d8d053b6"
-   ],
-   [
-    "S",
-    "enter",
-    "prepare_thread_results",
-    "basis=MemoryPreparationBasis:0735b9b1d8d053b6",
-    "candidates=tuple:b6aec1c0e0881f0d",
-    "staged_revisions=tuple:4f53cda18c2baa0c",
-    "thread_id=thread:g96a:review"
    ],
    [
     "S",
@@ -4563,11 +3248,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -4624,9 +3304,53 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
+    "F",
+    "list_revisions",
     "project:a02:allowed"
+   ],
+   [
+    "M",
+    "list",
+    "project:a02:allowed"
+   ],
+   [
+    "S",
+    "exit",
+    "capture_basis",
+    "MemoryPreparationBasis:0735b9b1d8d053b6"
+   ],
+   [
+    "S",
+    "exit",
+    "require_current",
+    null
+   ],
+   [
+    "S",
+    "enter",
+    "require_current",
+    "MemoryPreparationBasis:0735b9b1d8d053b6"
+   ],
+   [
+    "S",
+    "enter",
+    "require_authority",
+    "MemoryPreparationBasis:0735b9b1d8d053b6"
+   ],
+   [
+    "S",
+    "exit",
+    "require_authority",
+    null
+   ],
+   [
+    "S",
+    "enter",
+    "capture_basis",
+    "actor=None",
+    "cutoff_at=2026-09-01T00:00:00+00:00",
+    "project_id=project:a02:allowed",
+    "scope=dict:fa916af0392be21b"
    ],
    [
     "F",
@@ -4678,9 +3402,53 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
+    "F",
+    "list_revisions",
     "project:a02:allowed"
+   ],
+   [
+    "M",
+    "list",
+    "project:a02:allowed"
+   ],
+   [
+    "S",
+    "exit",
+    "capture_basis",
+    "MemoryPreparationBasis:0735b9b1d8d053b6"
+   ],
+   [
+    "S",
+    "exit",
+    "require_current",
+    null
+   ],
+   [
+    "S",
+    "enter",
+    "require_current",
+    "MemoryPreparationBasis:0735b9b1d8d053b6"
+   ],
+   [
+    "S",
+    "enter",
+    "require_authority",
+    "MemoryPreparationBasis:0735b9b1d8d053b6"
+   ],
+   [
+    "S",
+    "exit",
+    "require_authority",
+    null
+   ],
+   [
+    "S",
+    "enter",
+    "capture_basis",
+    "actor=None",
+    "cutoff_at=2026-09-01T00:00:00+00:00",
+    "project_id=project:a02:allowed",
+    "scope=dict:fa916af0392be21b"
    ],
    [
     "F",
@@ -4732,11 +3500,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -4786,11 +3549,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -4838,128 +3596,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "F",
-    "list_revisions",
-    "project:a02:allowed"
-   ],
-   [
-    "M",
-    "list",
-    "project:a02:allowed"
-   ],
-   [
-    "S",
-    "exit",
-    "capture_basis",
-    "MemoryPreparationBasis:0735b9b1d8d053b6"
-   ],
-   [
-    "S",
-    "exit",
-    "require_current",
-    null
-   ],
-   [
-    "S",
-    "enter",
-    "require_current",
-    "MemoryPreparationBasis:0735b9b1d8d053b6"
-   ],
-   [
-    "S",
-    "enter",
-    "require_authority",
-    "MemoryPreparationBasis:0735b9b1d8d053b6"
-   ],
-   [
-    "S",
-    "exit",
-    "require_authority",
-    null
-   ],
-   [
-    "S",
-    "enter",
-    "capture_basis",
-    "actor=None",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "project_id=project:a02:allowed",
-    "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "F",
-    "list_revisions",
-    "project:a02:allowed"
-   ],
-   [
-    "M",
-    "list",
-    "project:a02:allowed"
-   ],
-   [
-    "S",
-    "exit",
-    "capture_basis",
-    "MemoryPreparationBasis:0735b9b1d8d053b6"
-   ],
-   [
-    "S",
-    "exit",
-    "require_current",
-    null
-   ],
-   [
-    "S",
-    "enter",
-    "prepare_projections",
-    "project:a02:allowed",
-    "tuple:764f7f3719caedcd",
-    "basis=MemoryPreparationBasis:0735b9b1d8d053b6",
-    "staged_revisions=tuple:4f53cda18c2baa0c"
-   ],
-   [
-    "S",
-    "enter",
-    "require_current",
-    "MemoryPreparationBasis:0735b9b1d8d053b6"
-   ],
-   [
-    "S",
-    "enter",
-    "require_authority",
-    "MemoryPreparationBasis:0735b9b1d8d053b6"
-   ],
-   [
-    "S",
-    "exit",
-    "require_authority",
-    null
-   ],
-   [
-    "S",
-    "enter",
-    "capture_basis",
-    "actor=None",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "project_id=project:a02:allowed",
-    "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -4987,26 +3623,8 @@
     "clock"
    ],
    [
-    "S",
-    "exit",
-    "prepare_projections",
-    "tuple:dfc073de426a4ff9"
-   ],
-   [
-    "S",
-    "exit",
-    "prepare_thread_results",
-    "PreparedMemoryPromotion:1798416d2f11222d"
-   ],
-   [
     "L",
     "transaction"
-   ],
-   [
-    "S",
-    "enter",
-    "commit_prepared",
-    "PreparedMemoryPromotion:1798416d2f11222d"
    ],
    [
     "L",
@@ -5041,11 +3659,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -5077,18 +3690,6 @@
     "replace_projections",
     "project:a02:allowed",
     "tuple:dfc073de426a4ff9"
-   ],
-   [
-    "S",
-    "exit",
-    "commit_prepared",
-    "FullMemoryPromotionResult:5bea2919cab99d54"
-   ],
-   [
-    "S",
-    "exit",
-    "promote_thread_results",
-    "FullMemoryPromotionResult:5bea2919cab99d54"
    ]
   ]
  },
@@ -5867,16 +4468,6 @@
   ],
   "trace": [
    [
-    "S",
-    "enter",
-    "promote_thread_results",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "memory_ids=tuple:211452b79b8546b0",
-    "project_id=project:a02:allowed",
-    "scope=dict:fa916af0392be21b",
-    "thread_id=thread:g96a:review"
-   ],
-   [
     "M",
     "list",
     "project:a02:allowed"
@@ -5888,11 +4479,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -5909,15 +4495,6 @@
     "exit",
     "capture_basis",
     "MemoryPreparationBasis:5e4925db1009b972"
-   ],
-   [
-    "S",
-    "enter",
-    "prepare_thread_results",
-    "basis=MemoryPreparationBasis:5e4925db1009b972",
-    "candidates=tuple:b6aec1c0e0881f0d",
-    "staged_revisions=tuple:4f53cda18c2baa0c",
-    "thread_id=thread:g96a:review"
    ],
    [
     "S",
@@ -5945,11 +4522,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -6006,11 +4578,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -6031,23 +4598,6 @@
     "exit",
     "require_current",
     null
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
    ],
    [
     "S",
@@ -6100,11 +4650,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -6125,23 +4670,6 @@
     "exit",
     "require_current",
     null
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
    ],
    [
     "S",
@@ -6194,11 +4722,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -6219,18 +4742,6 @@
     "exit",
     "require_current",
     null
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "0000000000000000000000000000000000000000000000000000000000000000"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "0000000000000000000000000000000000000000000000000000000000000000"
    ],
    [
     "S",
@@ -6283,11 +4794,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -6308,143 +4814,6 @@
     "exit",
     "require_current",
     null
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "f88dc6dce0dfef9694574555f1d300bf22f9d7cecb6ecf493204b15c7c45274d"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000094"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "f88dc6dce0dfef9694574555f1d300bf22f9d7cecb6ecf493204b15c7c45274d"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4f30c45a88a15676480817ad30c8179b88f033ee7ea0fb9b840a463230672433"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000095"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4f30c45a88a15676480817ad30c8179b88f033ee7ea0fb9b840a463230672433"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4908bc129e80fe75f915b578505f89b37cfd3488a3cc71d06450ca81aeb5aa8d"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000096"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4908bc129e80fe75f915b578505f89b37cfd3488a3cc71d06450ca81aeb5aa8d"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000211"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "f88dc6dce0dfef9694574555f1d300bf22f9d7cecb6ecf493204b15c7c45274d"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000212"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4f30c45a88a15676480817ad30c8179b88f033ee7ea0fb9b840a463230672433"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000213"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4908bc129e80fe75f915b578505f89b37cfd3488a3cc71d06450ca81aeb5aa8d"
    ],
    [
     "S",
@@ -6497,11 +4866,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -6522,40 +4886,6 @@
     "exit",
     "require_current",
     null
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "c348c02ebaf1b233d554dd754988248687cb96268202d9c3b10f54917b7088e5"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000046"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "c348c02ebaf1b233d554dd754988248687cb96268202d9c3b10f54917b7088e5"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
    ],
    [
     "S",
@@ -6608,11 +4938,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -6633,23 +4958,6 @@
     "exit",
     "require_current",
     null
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
    ],
    [
     "S",
@@ -6673,15 +4981,6 @@
    [
     "ids",
     "memory-receipt"
-   ],
-   [
-    "S",
-    "enter",
-    "prepare_projections",
-    "project:a02:allowed",
-    "tuple:b8814839d2a6e830",
-    "basis=MemoryPreparationBasis:5e4925db1009b972",
-    "staged_revisions=tuple:4f53cda18c2baa0c"
    ],
    [
     "S",
@@ -6711,11 +5010,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -6739,28 +5033,10 @@
    ],
    [
     "clock"
-   ],
-   [
-    "S",
-    "exit",
-    "prepare_projections",
-    "tuple:265d4666924aa365"
-   ],
-   [
-    "S",
-    "exit",
-    "prepare_thread_results",
-    "PreparedMemoryPromotion:b5d282454fe30bb4"
    ],
    [
     "L",
     "transaction"
-   ],
-   [
-    "S",
-    "enter",
-    "commit_prepared",
-    "PreparedMemoryPromotion:b5d282454fe30bb4"
    ],
    [
     "L",
@@ -6793,11 +5069,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -6834,21 +5105,9 @@
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:g96a:poison"
-   ],
-   [
-    "F",
     "commit_transition",
     "FullMemoryRevision:adfec52c1e50f546",
     "MemoryTransitionReceipt:4c9be77e2587e1b0"
-   ],
-   [
-    "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:g96a:revise"
    ],
    [
     "F",
@@ -6858,21 +5117,9 @@
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:g96a:authority-hold"
-   ],
-   [
-    "F",
     "commit_transition",
     "FullMemoryRevision:adaacd661a4c59bd",
     "MemoryTransitionReceipt:1d255e7c48f9133e"
-   ],
-   [
-    "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:g96a:conflict"
    ],
    [
     "F",
@@ -6882,39 +5129,15 @@
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:g96a:no-evidence"
-   ],
-   [
-    "F",
     "commit_transition",
     "FullMemoryRevision:bc9f0c9d54d453f0",
     "MemoryTransitionReceipt:ab39de78dc38788a"
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:g96a:plain"
-   ],
-   [
-    "F",
     "replace_projections",
     "project:a02:allowed",
     "tuple:265d4666924aa365"
-   ],
-   [
-    "S",
-    "exit",
-    "commit_prepared",
-    "FullMemoryPromotionResult:e73cf457f7ae41a9"
-   ],
-   [
-    "S",
-    "exit",
-    "promote_thread_results",
-    "FullMemoryPromotionResult:e73cf457f7ae41a9"
    ]
   ]
  },
@@ -7061,31 +5284,12 @@
   ],
   "trace": [
    [
-    "S",
-    "enter",
-    "rebuild_projections",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
    ],
    [
-    "S",
-    "enter",
-    "prepare_projections",
-    "project:a02:allowed",
-    "tuple:47f6c1cc60b41dd4"
-   ],
-   [
     "clock"
-   ],
-   [
-    "S",
-    "exit",
-    "prepare_projections",
-    "tuple:40a0cbdb43bccc57"
    ],
    [
     "L",
@@ -7103,37 +5307,12 @@
     "tuple:40a0cbdb43bccc57"
    ],
    [
-    "S",
-    "exit",
-    "rebuild_projections",
-    "tuple:40a0cbdb43bccc57"
-   ],
-   [
-    "S",
-    "enter",
-    "rebuild_projections",
-    "project:g96a:empty"
-   ],
-   [
     "F",
     "list_revisions",
     "project:g96a:empty"
    ],
    [
-    "S",
-    "enter",
-    "prepare_projections",
-    "project:g96a:empty",
-    "tuple:4f53cda18c2baa0c"
-   ],
-   [
     "clock"
-   ],
-   [
-    "S",
-    "exit",
-    "prepare_projections",
-    "tuple:34ad4d80566a62d9"
    ],
    [
     "L",
@@ -7148,12 +5327,6 @@
     "F",
     "replace_projections",
     "project:g96a:empty",
-    "tuple:34ad4d80566a62d9"
-   ],
-   [
-    "S",
-    "exit",
-    "rebuild_projections",
     "tuple:34ad4d80566a62d9"
    ]
   ]
@@ -7162,73 +5335,14 @@
   "results": [],
   "trace": [
    [
-    "S",
-    "enter",
-    "expansion_skip_reason",
-    "project:a02:allowed",
-    "Which dataset_version produced the reported result?"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_heads",
+    "F",
+    "list_revisions",
     "project:a02:allowed"
    ],
    [
     "F",
     "list_revisions",
     "project:a02:allowed"
-   ],
-   [
-    "S",
-    "exit",
-    "expansion_skip_reason",
-    "NO_CANDIDATES"
-   ],
-   [
-    "S",
-    "enter",
-    "build_context",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "expansion=MemoryExpansionOutcome:991a75ffbe23d7be",
-    "project_id=project:a02:allowed",
-    "query=Which dataset_version produced the reported result?",
-    "scope=dict:fa916af0392be21b",
-    "target_use=WORKING_CONTEXT",
-    "thread_id=thread:project:a02:allowed"
-   ],
-   [
-    "F",
-    "list_revisions",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "S",
-    "enter",
-    "_save_context",
-    "project:a02:allowed",
-    "thread:project:a02:allowed",
-    "Which dataset_version produced the reported result?",
-    "WORKING_CONTEXT",
-    "dict:fa916af0392be21b",
-    "2026-09-01T00:00:00+00:00",
-    "tuple:4f53cda18c2baa0c",
-    "defaultdict:adcea0e5acabe4a5",
-    "MemorySelectionRecord:80eae831eadec4eb"
    ],
    [
     "ids",
@@ -7244,29 +5358,12 @@
    ],
    [
     "S",
-    "exit",
-    "_save_context",
-    "FullMemoryContextPack:509c0ae44c11d2b1"
-   ],
-   [
-    "S",
-    "exit",
-    "build_context",
-    "FullMemoryContextPack:509c0ae44c11d2b1"
-   ],
-   [
-    "S",
     "enter",
     "capture_basis",
     "actor=ActorRef:d7552887a337a1f7",
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -7324,16 +5421,6 @@
    [
     "S",
     "enter",
-    "prepare_thread_results",
-    "basis=MemoryPreparationBasis:7d36f0a485b46aa2",
-    "candidates=tuple:5914e29602fb8d6f",
-    "relation_budget=MemoryRelationBudget:d331da61b8c46de0",
-    "staged_revisions=tuple:07e49e4f13c672d3",
-    "thread_id=thread:project:a02:allowed"
-   ],
-   [
-    "S",
-    "enter",
     "require_current",
     "MemoryPreparationBasis:7d36f0a485b46aa2"
    ],
@@ -7374,11 +5461,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -7458,11 +5540,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -7559,11 +5636,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -7641,11 +5713,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -7727,11 +5794,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -7809,11 +5871,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -7935,11 +5992,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -7990,18 +6042,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "f88dc6dce0dfef9694574555f1d300bf22f9d7cecb6ecf493204b15c7c45274d"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "f88dc6dce0dfef9694574555f1d300bf22f9d7cecb6ecf493204b15c7c45274d"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -8044,11 +6084,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -8130,11 +6165,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -8214,11 +6244,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -8296,11 +6321,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -8422,11 +6442,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -8477,18 +6492,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4f30c45a88a15676480817ad30c8179b88f033ee7ea0fb9b840a463230672433"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4f30c45a88a15676480817ad30c8179b88f033ee7ea0fb9b840a463230672433"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -8531,11 +6534,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -8617,11 +6615,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -8701,11 +6694,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -8783,11 +6771,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -8909,11 +6892,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -9008,11 +6986,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -9090,11 +7063,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -9176,11 +7144,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -9258,11 +7221,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -9384,11 +7342,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -9439,18 +7392,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4e3de866c7bf35ed396099360afc79693096fc9b9ef7f0617873361b633c5933"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4e3de866c7bf35ed396099360afc79693096fc9b9ef7f0617873361b633c5933"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -9493,11 +7434,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -9579,11 +7515,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -9661,11 +7592,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -9747,11 +7673,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -9825,15 +7746,6 @@
    [
     "ids",
     "memory-receipt"
-   ],
-   [
-    "S",
-    "enter",
-    "prepare_projections",
-    "project:a02:allowed",
-    "tuple:b68aa3bee847ca30",
-    "basis=MemoryPreparationBasis:7d36f0a485b46aa2",
-    "staged_revisions=tuple:07e49e4f13c672d3"
    ],
    [
     "A",
@@ -10062,11 +7974,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -10144,11 +8051,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -10230,11 +8132,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -10312,11 +8209,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -10398,11 +8290,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -10482,11 +8369,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -10526,18 +8408,6 @@
    ],
    [
     "S",
-    "exit",
-    "prepare_projections",
-    "tuple:0df2645eab1d31f5"
-   ],
-   [
-    "S",
-    "exit",
-    "prepare_thread_results",
-    "PreparedMemoryPromotion:d29e036ca3ae6373"
-   ],
-   [
-    "S",
     "enter",
     "require_authority",
     "MemoryPreparationBasis:7d36f0a485b46aa2"
@@ -10564,13 +8434,6 @@
     "exit",
     "require_authority",
     null
-   ],
-   [
-    "S",
-    "enter",
-    "commit_prepared",
-    "PreparedMemoryPromotion:d29e036ca3ae6373",
-    "expected_head=5972d48e39f72b1da81c1499508eaa107a5359a4a8395314858804a9d8900f3e"
    ],
    [
     "L",
@@ -10620,11 +8483,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -10714,21 +8572,9 @@
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000111"
-   ],
-   [
-    "F",
     "commit_transition",
     "FullMemoryRevision:566c6b94ca27d12f",
     "MemoryTransitionReceipt:854dfb6513cbd246"
-   ],
-   [
-    "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000112"
    ],
    [
     "F",
@@ -10738,21 +8584,9 @@
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000113"
-   ],
-   [
-    "F",
     "commit_transition",
     "FullMemoryRevision:919d051bb9ead43b",
     "MemoryTransitionReceipt:e6d2ee4408f70e00"
-   ],
-   [
-    "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000115"
    ],
    [
     "F",
@@ -10762,35 +8596,18 @@
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000116"
-   ],
-   [
-    "F",
     "replace_projections",
     "project:a02:allowed",
     "tuple:0df2645eab1d31f5"
    ],
    [
     "S",
-    "exit",
-    "commit_prepared",
-    "FullMemoryPromotionResult:16cb974120e029a0"
-   ],
-   [
-    "S",
     "enter",
     "capture_basis",
     "actor=ActorRef:d7552887a337a1f7",
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -10868,16 +8685,6 @@
    [
     "S",
     "enter",
-    "prepare_thread_results",
-    "basis=MemoryPreparationBasis:a59532f337164fdb",
-    "candidates=tuple:dc729701ec029064",
-    "relation_budget=MemoryRelationBudget:d331da61b8c46de0",
-    "staged_revisions=tuple:fe10de9bff8b0611",
-    "thread_id=thread:project:a02:allowed"
-   ],
-   [
-    "S",
-    "enter",
     "require_current",
     "MemoryPreparationBasis:a59532f337164fdb"
    ],
@@ -10918,11 +8725,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -11252,11 +9054,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -11389,11 +9186,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -11491,11 +9283,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -11597,11 +9384,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -11699,11 +9481,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -11845,11 +9622,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -11932,63 +9704,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "f88dc6dce0dfef9694574555f1d300bf22f9d7cecb6ecf493204b15c7c45274d"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "f88dc6dce0dfef9694574555f1d300bf22f9d7cecb6ecf493204b15c7c45274d"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000094"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "f88dc6dce0dfef9694574555f1d300bf22f9d7cecb6ecf493204b15c7c45274d"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4f30c45a88a15676480817ad30c8179b88f033ee7ea0fb9b840a463230672433"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000095"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4f30c45a88a15676480817ad30c8179b88f033ee7ea0fb9b840a463230672433"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4908bc129e80fe75f915b578505f89b37cfd3488a3cc71d06450ca81aeb5aa8d"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000096"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4908bc129e80fe75f915b578505f89b37cfd3488a3cc71d06450ca81aeb5aa8d"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -12031,11 +9746,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -12137,11 +9847,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -12241,11 +9946,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -12343,11 +10043,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -12489,11 +10184,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -12576,24 +10266,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4f30c45a88a15676480817ad30c8179b88f033ee7ea0fb9b840a463230672433"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -12636,11 +10308,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -12742,11 +10409,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -12846,11 +10508,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -12948,11 +10605,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -13094,11 +10746,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -13181,24 +10828,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4908bc129e80fe75f915b578505f89b37cfd3488a3cc71d06450ca81aeb5aa8d"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -13241,11 +10870,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -13347,11 +10971,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -13451,11 +11070,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -13553,11 +11167,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -13699,11 +11308,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -13786,46 +11390,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4e3de866c7bf35ed396099360afc79693096fc9b9ef7f0617873361b633c5933"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4e3de866c7bf35ed396099360afc79693096fc9b9ef7f0617873361b633c5933"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000104"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4e3de866c7bf35ed396099360afc79693096fc9b9ef7f0617873361b633c5933"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "33381020a07591162dbd75d5a4bcb3b0aea73b3ee7c19627cd676729b565976e"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000105"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "33381020a07591162dbd75d5a4bcb3b0aea73b3ee7c19627cd676729b565976e"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -13868,11 +11432,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -13974,11 +11533,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -14078,11 +11632,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -14180,11 +11729,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -14326,11 +11870,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -14413,24 +11952,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "33381020a07591162dbd75d5a4bcb3b0aea73b3ee7c19627cd676729b565976e"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -14473,11 +11994,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -14579,11 +12095,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -14681,11 +12192,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -14787,11 +12293,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -14885,15 +12386,6 @@
    [
     "ids",
     "memory-receipt"
-   ],
-   [
-    "S",
-    "enter",
-    "prepare_projections",
-    "project:a02:allowed",
-    "tuple:47f6c1cc60b41dd4",
-    "basis=MemoryPreparationBasis:a59532f337164fdb",
-    "staged_revisions=tuple:fe10de9bff8b0611"
    ],
    [
     "A",
@@ -15379,11 +12871,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -15481,11 +12968,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -15587,11 +13069,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -15689,11 +13166,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -15795,11 +13267,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -15897,11 +13364,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -16003,11 +13465,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -16105,11 +13562,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -16211,11 +13663,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -16313,11 +13760,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -16419,11 +13861,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -16523,11 +13960,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -16587,18 +14019,6 @@
    ],
    [
     "S",
-    "exit",
-    "prepare_projections",
-    "tuple:8ec106baa749fecb"
-   ],
-   [
-    "S",
-    "exit",
-    "prepare_thread_results",
-    "PreparedMemoryPromotion:dd7e89f859582fbb"
-   ],
-   [
-    "S",
     "enter",
     "require_authority",
     "MemoryPreparationBasis:a59532f337164fdb"
@@ -16625,13 +14045,6 @@
     "exit",
     "require_authority",
     null
-   ],
-   [
-    "S",
-    "enter",
-    "commit_prepared",
-    "PreparedMemoryPromotion:dd7e89f859582fbb",
-    "expected_head=401e4e1adc6353f80abf8dce32e561421e756339aa15658a53ae71b04b8b2ed2"
    ],
    [
     "L",
@@ -16681,11 +14094,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -16824,21 +14232,9 @@
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000229"
-   ],
-   [
-    "F",
     "commit_transition",
     "FullMemoryRevision:fbe5a7aa0477ea04",
     "MemoryTransitionReceipt:067bc0a44f6edc0c"
-   ],
-   [
-    "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000230"
    ],
    [
     "F",
@@ -16848,21 +14244,9 @@
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000231"
-   ],
-   [
-    "F",
     "commit_transition",
     "FullMemoryRevision:2802f6c10dfb9a55",
     "MemoryTransitionReceipt:c94dc6e0711657a3"
-   ],
-   [
-    "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000232"
    ],
    [
     "F",
@@ -16872,33 +14256,15 @@
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000234"
-   ],
-   [
-    "F",
     "commit_transition",
     "FullMemoryRevision:b5d86b76ed9fdccf",
     "MemoryTransitionReceipt:d1c1ebc2f3fcd57b"
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000235"
-   ],
-   [
-    "F",
     "replace_projections",
     "project:a02:allowed",
     "tuple:8ec106baa749fecb"
-   ],
-   [
-    "S",
-    "exit",
-    "commit_prepared",
-    "FullMemoryPromotionResult:211fd321c8893703"
    ]
   ]
  },
@@ -16906,58 +14272,13 @@
   "results": [],
   "trace": [
    [
-    "S",
-    "enter",
-    "expansion_skip_reason",
-    "project:a02:allowed",
-    "Which dataset_version produced the reported result?"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
    ],
    [
-    "S",
-    "exit",
-    "expansion_skip_reason",
-    null
-   ],
-   [
-    "S",
-    "enter",
-    "build_context",
-    "cutoff_at=2026-09-01T00:00:00+00:00",
-    "expansion=MemoryExpansionOutcome:9fcd70d24d682eb7",
-    "project_id=project:a02:allowed",
-    "query=Which dataset_version produced the reported result?",
-    "scope=dict:fa916af0392be21b",
-    "target_use=WORKING_CONTEXT",
-    "thread_id=thread:project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_heads",
     "project:a02:allowed"
    ],
    [
@@ -17231,13 +14552,7 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -17247,24 +14562,7 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
@@ -17274,136 +14572,13 @@
    ],
    [
     "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000211"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_heads",
+    "read_dependency_states",
     "project:a02:allowed"
    ],
    [
     "L",
     "read_dependency_states",
     "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000212"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000213"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000220"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_dependency_states",
-    "project:a02:allowed"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000221"
-   ],
-   [
-    "S",
-    "enter",
-    "_save_context",
-    "project:a02:allowed",
-    "thread:project:a02:allowed",
-    "Which dataset_version produced the reported result?",
-    "WORKING_CONTEXT",
-    "dict:fa916af0392be21b",
-    "2026-09-01T00:00:00+00:00",
-    "tuple:4f53cda18c2baa0c",
-    "defaultdict:ac2cdf68b14c821f",
-    "MemorySelectionRecord:790930d08571f44f"
    ],
    [
     "ids",
@@ -17419,29 +14594,12 @@
    ],
    [
     "S",
-    "exit",
-    "_save_context",
-    "FullMemoryContextPack:5c29ef00f140a460"
-   ],
-   [
-    "S",
-    "exit",
-    "build_context",
-    "FullMemoryContextPack:5c29ef00f140a460"
-   ],
-   [
-    "S",
     "enter",
     "capture_basis",
     "actor=ActorRef:d7552887a337a1f7",
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -17543,16 +14701,6 @@
    [
     "S",
     "enter",
-    "prepare_thread_results",
-    "basis=MemoryPreparationBasis:72e2ec50ebd6c78e",
-    "candidates=tuple:29540d62b2e9ab6f",
-    "relation_budget=MemoryRelationBudget:d331da61b8c46de0",
-    "staged_revisions=tuple:561f6be410bf1198",
-    "thread_id=thread:project:a02:allowed"
-   ],
-   [
-    "S",
-    "enter",
     "require_current",
     "MemoryPreparationBasis:72e2ec50ebd6c78e"
    ],
@@ -17593,11 +14741,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -18259,11 +15402,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -18388,29 +15526,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000224"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "1dafd69b34c6745317f947cf4264cfa183d2358e2440e438b97afe33d8639957"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -18453,11 +15568,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -18583,11 +15693,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -18711,11 +15816,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -18837,11 +15937,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -19007,11 +16102,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -19118,138 +16208,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "f88dc6dce0dfef9694574555f1d300bf22f9d7cecb6ecf493204b15c7c45274d"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "f88dc6dce0dfef9694574555f1d300bf22f9d7cecb6ecf493204b15c7c45274d"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000094"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "f88dc6dce0dfef9694574555f1d300bf22f9d7cecb6ecf493204b15c7c45274d"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4f30c45a88a15676480817ad30c8179b88f033ee7ea0fb9b840a463230672433"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000095"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4f30c45a88a15676480817ad30c8179b88f033ee7ea0fb9b840a463230672433"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4908bc129e80fe75f915b578505f89b37cfd3488a3cc71d06450ca81aeb5aa8d"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000096"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4908bc129e80fe75f915b578505f89b37cfd3488a3cc71d06450ca81aeb5aa8d"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000211"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "a33f0be8d5301a4c5be97948cb38438bd8b4f4a649d2ec5e7bf92b6d37648c36"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "f88dc6dce0dfef9694574555f1d300bf22f9d7cecb6ecf493204b15c7c45274d"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000212"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4f30c45a88a15676480817ad30c8179b88f033ee7ea0fb9b840a463230672433"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000213"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4908bc129e80fe75f915b578505f89b37cfd3488a3cc71d06450ca81aeb5aa8d"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -19292,11 +16250,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -19422,11 +16375,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -19550,11 +16498,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -19676,11 +16619,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -19846,11 +16784,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -19957,30 +16890,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "89f2f6bd58bba0a23221d25d604dfd4496feb679122bbe3f29f65ffdb1a559ee"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4f30c45a88a15676480817ad30c8179b88f033ee7ea0fb9b840a463230672433"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ba19ab0c19b94cfbbeccd80526d1d6441b794d956d0ad4ad8b68261353ae0a8e"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ba19ab0c19b94cfbbeccd80526d1d6441b794d956d0ad4ad8b68261353ae0a8e"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -20023,11 +16932,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -20153,11 +17057,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -20281,11 +17180,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -20407,11 +17301,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -20577,11 +17466,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -20688,30 +17572,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "7c68feeb3d2d94461e723eaed831dd433d66bc36fde2aedd6f24ba755a2c2221"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4908bc129e80fe75f915b578505f89b37cfd3488a3cc71d06450ca81aeb5aa8d"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "b3fae9007ff488985f6d00c70112ab58efaf61e59900d092c4ba90a751aeebcc"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "b3fae9007ff488985f6d00c70112ab58efaf61e59900d092c4ba90a751aeebcc"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -20754,11 +17614,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -20884,11 +17739,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -21012,11 +17862,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -21138,11 +17983,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -21308,11 +18148,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -21419,98 +18254,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4e3de866c7bf35ed396099360afc79693096fc9b9ef7f0617873361b633c5933"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4e3de866c7bf35ed396099360afc79693096fc9b9ef7f0617873361b633c5933"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000104"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4e3de866c7bf35ed396099360afc79693096fc9b9ef7f0617873361b633c5933"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "33381020a07591162dbd75d5a4bcb3b0aea73b3ee7c19627cd676729b565976e"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000105"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "33381020a07591162dbd75d5a4bcb3b0aea73b3ee7c19627cd676729b565976e"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000220"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "ab84d3ba8bee43380c38dfa75c01e0c09b73dba65627a0e0c1ee4cf14bc90413"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4e3de866c7bf35ed396099360afc79693096fc9b9ef7f0617873361b633c5933"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_snapshot",
-    "snapshot:00000221"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "33381020a07591162dbd75d5a4bcb3b0aea73b3ee7c19627cd676729b565976e"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -21553,11 +18296,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -21683,11 +18421,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -21811,11 +18544,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -21937,11 +18665,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -22107,11 +18830,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -22218,30 +18936,6 @@
     "transaction"
    ],
    [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "218304026305263fabdc9683cc402d360ea119a1cee93d968f58bb6479a89235"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "33381020a07591162dbd75d5a4bcb3b0aea73b3ee7c19627cd676729b565976e"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4c473c94621f2ffb352c45d13520a4930eef29d4261d8458d94eead55cb3d3b8"
-   ],
-   [
-    "L",
-    "read_revision_by_digest",
-    "project:a02:allowed",
-    "4c473c94621f2ffb352c45d13520a4930eef29d4261d8458d94eead55cb3d3b8"
-   ],
-   [
     "S",
     "enter",
     "require_current",
@@ -22284,11 +18978,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -22414,11 +19103,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -22540,11 +19224,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -22670,11 +19349,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -22792,15 +19466,6 @@
    [
     "ids",
     "memory-receipt"
-   ],
-   [
-    "S",
-    "enter",
-    "prepare_projections",
-    "project:a02:allowed",
-    "tuple:74aa247f2121d74c",
-    "basis=MemoryPreparationBasis:72e2ec50ebd6c78e",
-    "staged_revisions=tuple:561f6be410bf1198"
    ],
    [
     "A",
@@ -23470,11 +20135,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -23596,11 +20256,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -23726,11 +20381,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -23852,11 +20502,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -23982,11 +20627,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -24108,11 +20748,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -24238,11 +20873,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -24364,11 +20994,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -24494,11 +21119,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -24620,11 +21240,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -24750,11 +21365,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -24876,11 +21486,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -25006,11 +21611,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -25132,11 +21732,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -25262,11 +21857,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -25388,11 +21978,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -25518,11 +22103,6 @@
     "scope=dict:fa916af0392be21b"
    ],
    [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
-   ],
-   [
     "F",
     "list_revisions",
     "project:a02:allowed"
@@ -25644,11 +22224,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -25734,18 +22309,6 @@
    ],
    [
     "S",
-    "exit",
-    "prepare_projections",
-    "tuple:0d7bfb622a39940f"
-   ],
-   [
-    "S",
-    "exit",
-    "prepare_thread_results",
-    "PreparedMemoryPromotion:60882ed33681c395"
-   ],
-   [
-    "S",
     "enter",
     "require_authority",
     "MemoryPreparationBasis:72e2ec50ebd6c78e"
@@ -25772,13 +22335,6 @@
     "exit",
     "require_authority",
     null
-   ],
-   [
-    "S",
-    "enter",
-    "commit_prepared",
-    "PreparedMemoryPromotion:60882ed33681c395",
-    "expected_head=12785e04249cd19f63ae72132911d018b5c6a5fcd0ce40af87394e11f44c9581"
    ],
    [
     "L",
@@ -25828,11 +22384,6 @@
     "cutoff_at=2026-09-01T00:00:00+00:00",
     "project_id=project:a02:allowed",
     "scope=dict:fa916af0392be21b"
-   ],
-   [
-    "L",
-    "read_heads",
-    "project:a02:allowed"
    ],
    [
     "F",
@@ -26019,21 +22570,9 @@
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000323"
-   ],
-   [
-    "F",
     "commit_transition",
     "FullMemoryRevision:c791cf0ae0a65bd4",
     "MemoryTransitionReceipt:093b401fce104a0e"
-   ],
-   [
-    "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000324"
    ],
    [
     "F",
@@ -26043,21 +22582,9 @@
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000325"
-   ],
-   [
-    "F",
     "commit_transition",
     "FullMemoryRevision:b5f2acf8d5d3134a",
     "MemoryTransitionReceipt:24b404d61c05e211"
-   ],
-   [
-    "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000326"
    ],
    [
     "F",
@@ -26067,33 +22594,15 @@
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000328"
-   ],
-   [
-    "F",
     "commit_transition",
     "FullMemoryRevision:67f6c6f0559c7902",
     "MemoryTransitionReceipt:a5dcc4b63c265e86"
    ],
    [
     "F",
-    "read_by_source_memory_id",
-    "project:a02:allowed",
-    "memory:00000329"
-   ],
-   [
-    "F",
     "replace_projections",
     "project:a02:allowed",
     "tuple:0d7bfb622a39940f"
-   ],
-   [
-    "S",
-    "exit",
-    "commit_prepared",
-    "FullMemoryPromotionResult:bf7be392e8e9125c"
    ]
   ]
  }

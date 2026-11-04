@@ -9,7 +9,6 @@ comparisons are real bounded local programs. No product source or fixture is mod
 from __future__ import annotations
 
 import asyncio
-import hashlib
 import json
 from collections.abc import AsyncGenerator, Callable
 from contextlib import asynccontextmanager, suppress
@@ -53,7 +52,6 @@ from thoth.domain.research_execution import research_work
 from thoth.domain.sandbox import SandboxExecutionState
 from thoth.protocol.jsonrpc import JsonRpcResponse
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step101-20261015"
 FAULT = "101-V injected storage failure"
 
 
@@ -193,40 +191,8 @@ def added_controls(before: Snapshot, after: Snapshot) -> list[ControlRecord]:
     return [new[key] for key in new.keys() - old.keys()]
 
 
-def save(name: str, before: Snapshot, after: Snapshot, **details: Any) -> None:
-    def sha(data: Snapshot) -> str:
-        return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
-
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / f"v101-{name}.json").write_text(
-        json.dumps(
-            {
-                "before_sha256": sha(before),
-                "after_sha256": sha(after),
-                "changed_tables": [t for t in before if before[t] != after[t]],
-                "new_controls": [
-                    {
-                        "namespace": r.namespace,
-                        "record_type": r.record_type,
-                        "record_id": r.record_id,
-                        "state": r.state,
-                        "version": r.version,
-                    }
-                    for r in added_controls(before, after)
-                ],
-                **details,
-            },
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
-        newline="\n",
-    )
-
-
 def unchanged(h: Harness, before: Snapshot, name: str, **details: Any) -> None:
     after = h.snapshot()
-    save(name, before, after, **details)
     assert after == before, "HOLD_DEFECT: coordinator UoW left partial publication"
     check_reopened(h.runtime.ledger.engine, before)
 
@@ -240,11 +206,6 @@ def caller_cleanup(
 ) -> None:
     """Validate the specific _finish_execution and BehaviorThreadEntry finally writes."""
     after = h.snapshot()
-    save(
-        "caller-" + ("legacy" if failed_request else "cancel" if cancelled else "selected"),
-        boundary,
-        after,
-    )
     for table in boundary:
         if table not in {"control_records", "threads"}:
             assert boundary[table] == after[table], table
@@ -495,21 +456,6 @@ async def test_legacy_final_run_fault_and_available_reproposal_paths_are_observe
         assert after_revision["candidate_digest"] == closed[0].payload["candidate_digest"]
         assert h.records("IMPROVEMENT_RUNTIME", "EVALUATION_REQUEST") == closed
         check_reopened(h.runtime.ledger.engine, h.snapshot())
-        save(
-            "legacy-retry-observation",
-            failed_state,
-            h.snapshot(),
-            open_item="RECURSIVE-LEGACY-INFRA-FAILURE-MARKS-FAILED",
-            same_key="same error; no sandbox/evaluator invocation",
-            fresh_key_state=fresh["state"],
-            new_revision_state=revised["state"],
-            public_revision_version=revised["version"],
-            after_revision_state=after_revision["state"],
-            evaluator_calls=h.evaluator.calls,
-            legacy_candidate_digest=closed[0].payload["candidate_digest"],
-            public_candidate_digest=revised["payload"]["candidate_digest"],
-            scope="Configured legacy route only; public records use a different digest namespace.",
-        )
 
 
 @pytest.mark.parametrize("cancel", [True, False])
@@ -569,13 +515,6 @@ async def test_producer_interruption_records_reason_and_reraises_before_runner_s
                         assert after[table] == seen["before"][table], table
                 assert h.records("IMPROVEMENT_RUNTIME", "RUN") == ()
                 seen["after"] = after
-                save(
-                    "cancel" if cancel else "interrupted",
-                    seen["before"],
-                    after,
-                    same_exception=True,
-                    underlying_runner_calls=len(runner_calls),
-                )
                 raise
 
         with monkeypatch.context() as patch:
@@ -688,12 +627,3 @@ async def test_actual_committed_run_repairs_summary_via_exact_context_coordinato
         assert calls == {"inner": 1, "producer": 1} and h.evaluator.calls == 0
         assert len(h.sandbox.seen_specs) == sandbox_calls
         check_reopened(h.runtime.ledger.engine, after)
-        save(
-            "summary-direct-recovery",
-            baseline,
-            after,
-            calls=calls,
-            exact_run_id=recovered.run_id,
-            transport_key_still_failed=True,
-            scope="Coordinator recovery with captured context; not HTTP fresh-key/resume recovery",
-        )

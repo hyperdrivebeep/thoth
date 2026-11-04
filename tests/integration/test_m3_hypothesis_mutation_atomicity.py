@@ -25,7 +25,6 @@ from thoth.application.commands.hypothesis_inputs import CreateInput, GenerateIn
 from thoth.protocol.deferred import current_operation
 from thoth.protocol.jsonrpc import JsonRpcRequest
 
-_OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step73-20261014"
 _SERVICE = "thoth.application.services.hypothesis_service"
 _COMMIT = "thoth.application.services.revision_service"
 _SQLITE = "thoth.adapters.storage.sqlite"
@@ -41,11 +40,6 @@ _PATH = [
     _STORE + ".add_hypothesis",
     _STORE + ".append_audit",
 ]
-
-
-def _save(name: str, evidence: dict[str, Any]) -> None:
-    _OUT.mkdir(parents=True, exist_ok=True)
-    (_OUT / name).write_text(json.dumps(evidence, indent=2, default=str) + "\n", encoding="utf-8")
 
 
 @contextmanager
@@ -175,16 +169,6 @@ async def test_generate_public_empty_and_partial_evidence(tmp_path: Path, count:
         assert snapshot(reopened.ledger.engine) == after
         for index, record in enumerate(records):
             await _read(reopened, ctx["project"], record, f"read-{index}")
-        _save(
-            f"generate-{count}.json",
-            {
-                "input_schema": GenerateInput.model_json_schema()["properties"]["evidence_scope"],
-                "response": result,
-                "calls": calls,
-                "reopened_equal": True,
-                "verdict": "PASS",
-            },
-        )
     finally:
         reopened.close()
 
@@ -219,16 +203,6 @@ async def test_draft_and_reference_appraisal_use_shared_writer(tmp_path: Path) -
         assert appraised["appraisal"]["substantive_update_applied"] is False
         _assert_path(reference_calls, record["hypothesis_id"])
         after = snapshot(runtime.ledger.engine)
-        _save(
-            "shared-writer-reference.json",
-            {
-                "draft": result,
-                "draft_calls": calls,
-                "reference_appraise": appraised,
-                "reference_calls": reference_calls,
-                "expected_path": _PATH,
-            },
-        )
     finally:
         runtime.close()
     reopened = create_runtime(tmp_path)
@@ -313,17 +287,6 @@ async def test_revise_invalidates_real_references_without_rewriting_history(
         assert historical == current
         await _read(runtime, project, record, "current")
         assert len(sandbox.seen_specs) == 1
-        _save(
-            "derived-invalidation.json",
-            {
-                "before": current,
-                "after": revised,
-                "history": historical,
-                "calls": calls,
-                "old_rows_preserved": True,
-                "verdict": "PASS",
-            },
-        )
     finally:
         runtime.close()
 
@@ -533,7 +496,6 @@ async def test_public_mutation_late_audit_failure_is_atomic(
             "reopened": restarted,
             "expected_reads": reads,
         }
-        _save("fault-" + kind + ".json", evidence)
         assert response.error is not None and len(hits) == 1 and hits[0]["transaction_active"]
         assert restarted == after
         for identifier in records:
@@ -593,6 +555,5 @@ async def test_public_mutation_late_audit_failure_is_atomic(
         if kind == "causal":
             assert recovered["hypothesis"]["causal_profile"]["mechanism"] == "clock-source mismatch"
         evidence.update(recovered=recovered, verdict="PASS")
-        _save("fault-" + kind + ".json", evidence)
     finally:
         reopened.close()

@@ -15,6 +15,13 @@ CommandHandler = Callable[
 ]
 
 PUBLIC_METHODS: tuple[str, ...] = (
+    "model/localAsset/read",
+    "model/localAsset/import",
+    "model/localAsset/install",
+    "project/retrieval/experiment/read",
+    "project/retrieval/experiment/configure",
+    "project/retrieval/experiment/prepare",
+    "project/embeddingIndex/retry",
     "revision/timeline/read",
     "revision/restore/apply",
     "revision/timeline/item/read",

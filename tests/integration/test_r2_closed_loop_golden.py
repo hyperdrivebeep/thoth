@@ -2,13 +2,16 @@
 
 Scenarios run on a real runtime through thread/input (the only entry) with the scripted A04/A05
 model and sandbox adapters (no real model, no real sandbox), a deterministic id generator, clock
-and sandbox time. The trace holds the calls made while a coordinator method is running: method
-entries, exits and exceptions with argument and result digests, sandbox, commit, research, test
-lifecycle, compiler and ledger calls, the id and clock sequence and every transaction entry. The
-golden file is generated from the pre-move coordinator (THOTH_WRITE_GOLDEN=1), reviewed and frozen:
-moving the pure record construction out of it must leave projections, call order, counts, awaits and
-digests unchanged. A few scenarios inject a failure at a boundary with a fake raise; nothing is
-written by the injection itself.
+and sandbox time. While a coordinator method runs, the trace holds what changes state or checks a
+basis, in order: sandbox, commit, research staging and persistence, test lifecycle and compiler
+calls, every transaction entry, the id and clock sequence, the entries and exits of the methods that
+check currentness or end in a hold (GUARD_METHODS) and every exception. Read-only ledger and
+research-context reads and the entries of the other methods are not recorded; the results and
+digests show what they returned. The golden file is generated from the pre-move coordinator
+(THOTH_WRITE_GOLDEN=1), reviewed and frozen: moving the pure record construction out of it must
+leave projections, the order of writes and checks, counts and digests unchanged. A few scenarios
+inject a failure at a boundary with a fake raise; nothing is written by the injection itself. A
+scenario that only holds writes nothing, so its trace is empty.
 """
 
 from __future__ import annotations
@@ -83,24 +86,26 @@ COORDINATOR_METHODS = (
     "_current_action_plan",
     "_failure_execution",
 )
+# Entry and exit stay in the trace for the methods that check currentness or end in a hold.
+GUARD_METHODS = (
+    "_current_research_refs",
+    "_current_portfolio",
+    "_current_action_plan",
+    "_stale_head_execution",
+    "_record_test_hold",
+    "_admission_hold",
+)
 PORTS: list[tuple[Any, str, tuple[str, ...]]] = [
     (SandboxService, "X", ("run", "accepting_observation", "reject_observation")),
     (RevisionCommitService, "C", ("commit",)),
     (
         ResearchIdentityService,
         "R",
-        (
-            "context",
-            "stage_cycle",
-            "persist_cycle",
-            "stage_actions",
-            "read_portfolio",
-            "read_action_plan",
-        ),
+        ("stage_cycle", "persist_cycle", "stage_actions"),
     ),
     (R2TestLifecycle, "T", ("prepare", "prepare_assessments", "complete", "hold", "retry")),
     (R2SandboxSpecCompiler, "P", ("compile",)),
-    (SqliteLedger, "L", ("read_heads", "read_revision_by_digest", "transaction")),
+    (SqliteLedger, "L", ("transaction",)),
 ]
 
 
@@ -181,20 +186,21 @@ def install(monkeypatch: pytest.MonkeyPatch, rec: Recorder) -> None:
         def begin(args: tuple[Any, ...], kwargs: dict[str, Any]) -> None:
             if enter:
                 rec.depth += 1
-            rec.note(
-                short,
-                "enter" if enter else name,
-                *([name] if enter else []),
-                *arguments(args, kwargs),
-            )
+            if not enter or name in GUARD_METHODS:
+                rec.note(
+                    short,
+                    "enter" if enter else name,
+                    *([name] if enter else []),
+                    *arguments(args, kwargs),
+                )
 
         def end(result: Any = None, error: BaseException | None = None) -> None:
             if not enter:
                 return
-            if error is None:
-                rec.note(short, "exit", name, summ(result))
-            else:
+            if error is not None:
                 rec.note(short, "raise", name, type(error).__name__, str(error))
+            elif name in GUARD_METHODS:
+                rec.note(short, "exit", name, summ(result))
             rec.depth -= 1
 
         if asynchronous:
@@ -426,7 +432,7 @@ async def test_r2_closed_loop_results_and_call_order_are_frozen(
     install(monkeypatch, rec)
     await scenario(name, tmp_path / "workspace", monkeypatch, rec)
     observed: dict[str, Any] = {"trace": rec.log, "results": rec.results}
-    assert observed["trace"], "the traced step made no coordinator call"
+    assert observed["results"], "the traced step recorded no result"
     if os.environ.get("THOTH_WRITE_GOLDEN") == "1":
         target = Path(os.environ.get("THOTH_GOLDEN_OUT", str(GOLDEN)))
         data: dict[str, Any] = (

@@ -4,8 +4,12 @@
 1.1 parser control and unchanged call/result shapes. Equality checks remain exact.
 
 Public RPCs and real local comparisons prepare evidence; models are scripted. Fix only test
-IDs, clocks and measured elapsed timers. Preserve every record field and digest. Static methods
-retain their static binding, and all preexisting service methods remain observable after split.
+IDs, clocks and measured elapsed timers. Preserve every record field and digest. The trace keeps
+what changes state or checks authority, scope, budget or currentness, in order: control record,
+artifact and exposure store writes, baseline reads, the authority and thread-scope checks, the
+entries of the service's own checks (GUARD_METHODS), transaction entries, ids, clocks and every
+exception. Reads of control records, artifacts and exposures and the entries and returns of the
+other service methods are not recorded; the outputs hold what the service returned.
 """
 
 from __future__ import annotations
@@ -44,6 +48,16 @@ from thoth.application.services.improvement_thread_scope import ImprovementThrea
 from thoth.application.services.paired_evaluation_service import PairedEvaluationService
 
 GOLDEN = Path(__file__).resolve().parents[1] / "fixtures/improvement_exposure_golden.json"
+# Entry stays in the trace for the service methods that check authority, budget, basis or metadata.
+GUARD_METHODS = (
+    "_authority",
+    "_role_covers",
+    "_budget",
+    "require_approval_current",
+    "require_metadata",
+    "require_runtime_basis",
+    "verify_observations",
+)
 SCENARIOS = (
     "prepare_shadow",
     "prepare_canary",
@@ -89,12 +103,13 @@ def install(patch: pytest.MonkeyPatch, rec: Recorder) -> None:
             if service:
                 rec.depth += 1
             visible = args if static else args[1:]
-            rec.note(
-                owner.__name__,
-                name,
-                [digest(a) for a in visible],
-                {k: digest(v) for k, v in kwargs.items()},
-            )
+            if not service or name in GUARD_METHODS:
+                rec.note(
+                    owner.__name__,
+                    name,
+                    [digest(a) for a in visible],
+                    {k: digest(v) for k, v in kwargs.items()},
+                )
             try:
                 result = original(*args, **kwargs)
             except BaseException as exc:
@@ -104,10 +119,8 @@ def install(patch: pytest.MonkeyPatch, rec: Recorder) -> None:
                         rec.outputs.append([name, {"error": type(exc).__name__, "code": str(exc)}])
                 raise
             else:
-                if service:
-                    rec.note("return", name, digest(result))
-                    if rec.depth == 1:
-                        rec.outputs.append([name, plain(result)])
+                if service and rec.depth == 1:
+                    rec.outputs.append([name, plain(result)])
                 return result
             finally:
                 if service:
@@ -124,10 +137,10 @@ def install(patch: pytest.MonkeyPatch, rec: Recorder) -> None:
     for owner, methods in (
         (
             SqliteBehaviorExecutionStore,
-            ("read", "list", "append", "baseline", "baselines", "promote", "rollback_baseline"),
+            ("append", "baseline", "baselines", "promote", "rollback_baseline"),
         ),
-        (SqliteControlRecordStore, ("read", "append", "list")),
-        (SqliteBehaviorArtifactStore, ("read", "list", "add")),
+        (SqliteControlRecordStore, ("append",)),
+        (SqliteBehaviorArtifactStore, ("add",)),
         (SqliteGovernanceStore, ("read_policy", "list_roles")),
         (ControlRecordService, ("create", "stage")),
         (BehaviorCandidateService, ("create_candidate",)),

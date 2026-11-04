@@ -23,13 +23,7 @@ from thoth.apps.runtime import AppRuntime
 from thoth.domain.canonical import head_set_digest
 from thoth.protocol.deferred import current_operation
 
-_OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step69-20261014"
 _LEDGER_POINTS = ("insert_snapshot", "insert_revision", "set_head", "insert_receipt")
-
-
-def _save(name: str, data: dict[str, Any]) -> None:
-    _OUT.mkdir(parents=True, exist_ok=True)
-    (_OUT / name).write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
 async def _prepare(path: Path, kind: str) -> tuple[AppRuntime, dict[str, Any]]:
@@ -126,17 +120,6 @@ async def test_public_portfolio_minimum_rejects_without_domain_writes(
         restarted = snapshot(reopened.ledger.engine)
         assert restarted == after
         assert_phase_delta(before, restarted, allowed)
-        _save(
-            f"public-minimum-{count}.json",
-            {
-                "request": command.model_dump(mode="json"),
-                "response": response.model_dump(mode="json"),
-                "before": before,
-                "after": after,
-                "reopened": restarted,
-                "verdict": "PASS",
-            },
-        )
     finally:
         reopened.close()
 
@@ -177,10 +160,6 @@ async def test_partial_publication_control_and_replay(
         restored = await _readback(reopened, ctx, "control-reopened")
         assert restored["error"] is None
         assert restored["result"]["value"] == live["result"]["value"]
-        _save(
-            f"control-{kind}-{count}.json",
-            {"created": created, "readback": restored, "snapshot_equal": True},
-        )
     finally:
         reopened.close()
 
@@ -326,7 +305,6 @@ async def test_publication_failure_rolls_back_whole_database(
             "delta": delta,
             "expected_reads": ctx["reads"],
         }
-        _save(key + ".json", evidence)
         assert len(hits) == 1 and response.error is not None
         assert restarted == after
         allowed = failed_command_allowances(
@@ -336,7 +314,6 @@ async def test_publication_failure_rolls_back_whole_database(
         readback = await _readback(reopened, ctx, key + "-read")
         evidence["failed_readback"] = readback
         evidence["observation_snapshot"] = snapshot(reopened.ledger.engine)
-        _save(key + ".json", evidence)
         assert (readback["error"] is not None) == (kind == "portfolio")
         if kind == "appraise":
             assert readback["result"]["value"]["appraisals"] == []
@@ -345,6 +322,5 @@ async def test_publication_failure_rolls_back_whole_database(
         )
         _check_result(reopened, ctx, recovered)
         evidence.update(recovered=recovered, verdict="PASS")
-        _save(key + ".json", evidence)
     finally:
         reopened.close()

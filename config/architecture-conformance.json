@@ -22,15 +22,15 @@
   "layers": {
     "domain": {
       "roots": ["src/thoth/domain"],
-      "forbidden_import_prefixes": ["thoth.adapters", "thoth.application", "thoth.protocol", "fastapi", "sqlalchemy", "openai", "typer", "uvicorn"]
+      "forbidden_import_prefixes": ["thoth.adapters", "thoth.application", "thoth.protocol", "fastapi", "sqlalchemy", "openai", "typer", "uvicorn", "onnxruntime", "tokenizers", "numpy"]
     },
     "ports": {
       "roots": ["src/thoth/ports"],
-      "forbidden_import_prefixes": ["thoth.adapters", "thoth.application", "fastapi", "sqlalchemy", "openai", "typer", "uvicorn"]
+      "forbidden_import_prefixes": ["thoth.adapters", "thoth.application", "fastapi", "sqlalchemy", "openai", "typer", "uvicorn", "onnxruntime", "tokenizers", "numpy"]
     },
     "application": {
       "roots": ["src/thoth/application"],
-      "forbidden_import_prefixes": ["thoth.adapters", "fastapi", "sqlalchemy", "openai", "typer", "uvicorn"]
+      "forbidden_import_prefixes": ["thoth.adapters", "fastapi", "sqlalchemy", "openai", "typer", "uvicorn", "onnxruntime", "tokenizers", "numpy"]
     }
   },
   "canonical_owners": [

@@ -53,8 +53,43 @@ from tests.integration.test_thread_full_catalog_rpc import (
 )
 
 from thoth.apps.runtime import AppRuntime
+from thoth.protocol.bus import CommandBus
+from thoth.protocol.jsonrpc import JsonRpcRequest, JsonRpcResponse
 
 Flow = Callable[[Path], Awaitable[None]]
+
+
+async def test_repeat_probe_restores_the_fixture_after_dispatch_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runtime = create_runtime(tmp_path)
+    try:
+        command = request(
+            "project/create",
+            "probe-project",
+            {"project_id": "p", "name": "Original", "cutoff_at": "2026-09-01T00:00:00Z"},
+        )
+        snapshots: list[dict[str, tuple[str, ...]]] = []
+        original = CommandBus.dispatch
+
+        async def dispatch(bus: CommandBus, message: JsonRpcRequest) -> JsonRpcResponse:
+            if message.params.meta.idempotency_key.endswith("#repeat"):
+                snapshots.append(domain_snapshot(runtime.ledger.engine))
+                with runtime.ledger.engine.begin() as connection:
+                    connection.exec_driver_sql("UPDATE projects SET name = 'Probe mutation'")
+                assert domain_snapshot(runtime.ledger.engine) != snapshots[0]
+                raise RuntimeError("repeat observation failed")
+            return await original(bus, message)
+
+        monkeypatch.setattr(CommandBus, "dispatch", dispatch)
+        RepeatProbe(frozenset({"project/create"})).install(monkeypatch)
+        with pytest.raises(RuntimeError, match="repeat observation failed"):
+            await runtime.bus.dispatch(command)
+        assert len(snapshots) == 1
+        assert domain_snapshot(runtime.ledger.engine) == snapshots[0]
+    finally:
+        runtime.close()
+
 
 # method -> why the repeat is answered unchanged
 _UNCHANGED: list[tuple[str, Flow, dict[str, str]]] = [
@@ -385,7 +420,12 @@ async def test_a_second_stop_finishes_the_cancel_that_a_cut_off_first_stop_did_n
                 )
             )
         )
-        await asyncio.wait_for(model.started.wait(), 8)
+        # This checks cancellation recovery, not an eight-second machine-speed target.
+        await wait_for_event_while_progressing(
+            model.started,
+            lambda: len(model.calls),
+            label="the cancellable request reaches its first model call",
+        )
         scope: dict[str, object] = {"project_id": "p", "thread_id": accepted["thread_id"]}
         operation_id = str(accepted["operation_id"])
 

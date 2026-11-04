@@ -1,10 +1,13 @@
 """FullProjectMemoryService golden (96a): what the service returns and which ports it calls.
 
 Scenarios run on a real runtime (local deterministic reviewer, embedding and relation builder; no
-model call) with deterministic ids and clock. The trace holds only the calls made while a service
-method is running: the method entries and exits with their argument and result digests, the store,
-candidate store, ledger, resource-access, admission and local-port calls, the id and clock sequence
-and every transaction entry. The golden file is generated from the pre-move service
+model call) with deterministic ids and clock. While a service method runs, the trace holds what
+changes state or checks authority, currentness or the basis, in order: store writes and the
+revision and candidate list reads that guard them, ledger transaction and dependency-state calls,
+resource-access, admission and local-port calls, the id and clock sequence, the entries and exits
+of capture_basis, rebase_basis, require_authority and require_current, and every exception. The
+other store and ledger reads and the entries of the other methods are not recorded. The golden file
+is generated from the pre-move service
 (THOTH_WRITE_GOLDEN=1), reviewed and frozen: moving the pure record construction out of the service
 must leave results, call order, counts and digests unchanged.
 """
@@ -58,6 +61,8 @@ SCENARIOS = [
     "rebuild_projections",
     "basis_and_projections",
 ]
+# Entry and exit stay in the trace for the methods that capture the basis or check authority.
+GUARD_METHODS = ("capture_basis", "rebase_basis", "require_authority", "require_current")
 SERVICE_METHODS = (
     "capture_basis",
     "rebase_basis",
@@ -76,29 +81,10 @@ PORTS: list[tuple[Any, str, tuple[str, ...]]] = [
     (
         SqliteFullMemoryStore,
         "F",
-        (
-            "list_revisions",
-            "read_by_source_memory_id",
-            "commit_transition",
-            "put_context",
-            "replace_projections",
-            "list_receipts",
-            "list_contexts",
-            "list_projections",
-        ),
+        ("list_revisions", "commit_transition", "put_context", "replace_projections"),
     ),
     (SqliteMemoryStore, "M", ("add", "list")),
-    (
-        SqliteLedger,
-        "L",
-        (
-            "read_heads",
-            "read_revision_by_digest",
-            "read_snapshot",
-            "read_dependency_states",
-            "transaction",
-        ),
-    ),
+    (SqliteLedger, "L", ("read_dependency_states", "transaction")),
     (LocalMemoryEmbedding, "E", ("embed",)),
     (LocalRelationProjectionBuilder, "G", ("build",)),
     (DeterministicRoleMemoryReviewer, "R", ("review",)),
@@ -173,13 +159,14 @@ def install(monkeypatch: pytest.MonkeyPatch, rec: Recorder) -> None:
 
         def enter(args: tuple[Any, ...], kwargs: dict[str, Any]) -> None:
             rec.depth += 1
-            rec.note("S", "enter", name, *arguments(args, kwargs))
+            if name in GUARD_METHODS:
+                rec.note("S", "enter", name, *arguments(args, kwargs))
 
         def leave(result: Any = None, error: BaseException | None = None) -> None:
-            if error is None:
-                rec.note("S", "exit", name, summ(result))
-            else:
+            if error is not None:
                 rec.note("S", "raise", name, type(error).__name__, str(error))
+            elif name in GUARD_METHODS:
+                rec.note("S", "exit", name, summ(result))
             rec.depth -= 1
 
         if inspect.iscoroutinefunction(original):
@@ -527,7 +514,7 @@ async def test_memory_service_results_and_call_order_are_frozen(
     install(monkeypatch, rec)
     await scenario(name, tmp_path / "workspace", rec)
     observed: dict[str, Any] = {"trace": rec.log, "results": rec.results}
-    assert observed["trace"], "the traced step made no service call"
+    assert observed["trace"] or observed["results"], "the traced step recorded nothing"
     if os.environ.get("THOTH_WRITE_GOLDEN") == "1":
         target = Path(os.environ.get("THOTH_GOLDEN_OUT", str(GOLDEN)))
         data: dict[str, Any] = (

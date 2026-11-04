@@ -176,14 +176,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "b12cb4d272f25b319ee571fc4e7973c6ebd9de604471b9b4618ce76853407094"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -195,28 +187,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -248,16 +218,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -277,39 +237,8 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "67ea84a5cb514188fcf30b5238151a95a12ab261d8606bc0cb90b0236cf7d1e2"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_plan",
-    [
-     "5fe46cf130c7c07eb92e8c04b951527430c0b6e2fb492ffdee2db9b255d5073b"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -327,11 +256,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "054da92bc3a9bad677d4bebf17c66a9c7454f2ed5197ab63d4928c57cb8d140b"
    ],
    [
     "ControlRecordService",
@@ -363,16 +287,6 @@
     "improvement-evaluation_plan"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -390,27 +304,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "evaluation_plan",
-    "36a323580137484396c00e523a4fe5d1e8c2b32f91bb77fb4af2e5db7b82d762"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "0eb0602a3ce3255572d04e37f905577ada1aaa25674b1fe91bbe5e377e7d8b90"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "0eb0602a3ce3255572d04e37f905577ada1aaa25674b1fe91bbe5e377e7d8b90"
-    ],
-    {}
    ],
    [
     "PairedEvaluationService",
@@ -439,16 +332,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -464,26 +347,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -511,32 +374,8 @@
     "exit"
    ],
    [
-    "return",
-    "_measured_result",
-    "2158b29f7ef17ffaf452dca9a03b36790524955a9f2e1ccf5751dcc8c9118412"
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -556,16 +395,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -575,45 +404,10 @@
     {}
    ],
    [
-    "return",
-    "_record",
-    "41fc002e942cb6230a68ae1a4cd31be1024bd402135940c32f8c7c914b57ed72"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "PairedEvaluationService",
     "require_current",
     [
      "2158b29f7ef17ffaf452dca9a03b36790524955a9f2e1ccf5751dcc8c9118412"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -669,16 +463,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -696,11 +480,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "evaluation_assess",
-    "0330d0f7716d4b9e25724eb2c89beb2850ec4dd0f4e8bba5b1d19f0988f6deef"
    ]
   ]
  },
@@ -865,14 +644,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "b12cb4d272f25b319ee571fc4e7973c6ebd9de604471b9b4618ce76853407094"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -884,28 +655,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -937,16 +686,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -966,39 +705,8 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "67ea84a5cb514188fcf30b5238151a95a12ab261d8606bc0cb90b0236cf7d1e2"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_plan",
-    [
-     "5fe46cf130c7c07eb92e8c04b951527430c0b6e2fb492ffdee2db9b255d5073b"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -1016,11 +724,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "054da92bc3a9bad677d4bebf17c66a9c7454f2ed5197ab63d4928c57cb8d140b"
    ],
    [
     "ControlRecordService",
@@ -1052,16 +755,6 @@
     "improvement-evaluation_plan"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -1079,27 +772,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "evaluation_plan",
-    "36a323580137484396c00e523a4fe5d1e8c2b32f91bb77fb4af2e5db7b82d762"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "58c7661270a7c24f9c76f79503be7b234df4f394dd5de5f4fff325c5e265baf4"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "58c7661270a7c24f9c76f79503be7b234df4f394dd5de5f4fff325c5e265baf4"
-    ],
-    {}
    ],
    [
     "PairedEvaluationService",
@@ -1128,16 +800,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -1153,26 +815,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -1200,32 +842,8 @@
     "exit"
    ],
    [
-    "return",
-    "_measured_result",
-    "b07c15af8ed438bebecea497f414f47139ae1de139ae2875e6527ac960d363fc"
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -1245,16 +863,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -1264,45 +872,10 @@
     {}
    ],
    [
-    "return",
-    "_record",
-    "0f4ab939f22ac8f5fe14c0c81b32e6c92ea773c277c7e9ffe9e5cfdc05b5611f"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "PairedEvaluationService",
     "require_current",
     [
      "b07c15af8ed438bebecea497f414f47139ae1de139ae2875e6527ac960d363fc"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -1358,16 +931,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -1385,11 +948,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "evaluation_assess",
-    "f97d5ec336ad282e4affda4be22da1c46121e824195f7d14af1556b70e36e045"
    ]
   ]
  },
@@ -1574,14 +1132,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "4e6d16edd8aa1b2e7d683a6a20666c93a24098847d051dd135f0368dfcca68f8"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -1593,28 +1143,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -1646,16 +1174,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -1675,39 +1193,8 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "f062f7cd68333bb28e74361e0b3e83d5748d5428555adcfaea162372c27ecaca"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_plan",
-    [
-     "dc825492d5a4633ff14ae8da233b2e14496b3bd469551779418a63e8454fb896"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -1725,11 +1212,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "858d8fbae81dafc03bbae21fbac6ff38b3f7397cec509338d696f720230ec904"
    ],
    [
     "ControlRecordService",
@@ -1761,16 +1243,6 @@
     "improvement-evaluation_plan"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -1790,53 +1262,8 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_plan",
-    "72082a0ad434703c66aba9fc2488a8a2ec604804956588555fe3c76d7bfc7b9f"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "1a6a8c97a8a98bf857392806643c12104e2739f453aa374374732857e3672f74"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "1a6a8c97a8a98bf857392806643c12104e2739f453aa374374732857e3672f74"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_measured_result",
-    null
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "d39693c881bc5e2f92c83eaa481aa3a464fc62ae4253a4f68720aa8db6ef79c0",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -1856,36 +1283,11 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_record",
-    "ee1570f7b2f138da70d90fec32c0e9a355e4840309bf102bfe1b22eee46e8481"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -1916,16 +1318,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -1945,53 +1337,8 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_assess",
-    "e0afcc9b77bf17f0370a720173e62dcac551751836c1ae4ba09161a221d7c807"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "1aba59a45574b3ca46e4df9bbab940eb46c705dbc31061a3d7d2f53a1b1400c1"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "1aba59a45574b3ca46e4df9bbab940eb46c705dbc31061a3d7d2f53a1b1400c1"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_measured_result",
-    null
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "d39693c881bc5e2f92c83eaa481aa3a464fc62ae4253a4f68720aa8db6ef79c0",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -2011,16 +1358,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -2028,11 +1365,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "5e7931b82f1d1be74bae509f6eacf2e61d429e0d468af3f57d85fbaed3c6c084"
    ],
    [
     "transaction",
@@ -3273,14 +2605,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "4e6d16edd8aa1b2e7d683a6a20666c93a24098847d051dd135f0368dfcca68f8"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -3292,28 +2616,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -3345,16 +2647,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -3374,39 +2666,8 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "f062f7cd68333bb28e74361e0b3e83d5748d5428555adcfaea162372c27ecaca"
-   ],
-   [
-    "ImprovementHandlers",
-    "revise",
-    [
-     "2394f007121a406cebf560d296549cf58a3c8f442c93e7cae9161192c412f69a"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "19c32b49d8cc8aa26c8757e4bf46e3a8a9bfa19942e14653a11492125fbc4e09"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -3424,11 +2685,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "858d8fbae81dafc03bbae21fbac6ff38b3f7397cec509338d696f720230ec904"
    ],
    [
     "ControlRecordService",
@@ -3457,16 +2713,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -3486,39 +2732,8 @@
     "exit"
    ],
    [
-    "return",
-    "revise",
-    "598de6da1f3487540281c645c8f55e35c38fc0999c4031a0541c34290f65c49c"
-   ],
-   [
-    "ImprovementHandlers",
-    "revise",
-    [
-     "da2cd7501fc8d1d7c279e9bfceb6fdcbe365db9f93055e235d5eb826e811f4f2"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "df1304ff6c7270d86626c7f111887e3583d08824dae67395ba634d5b1c165550"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -3536,11 +2751,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "1f15697d1c6945952e6c61fa09324f9103f470a7cde9442cf1fbb2adc3f36c2c"
    ],
    [
     "ControlRecordService",
@@ -3569,16 +2779,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -3598,39 +2798,8 @@
     "exit"
    ],
    [
-    "return",
-    "revise",
-    "8f66f74cc7c54013711603710b73ffff69062924b20d7debe27c9c3ef0c30cf8"
-   ],
-   [
-    "ImprovementHandlers",
-    "revise",
-    [
-     "c4437263087dccd55ffd4bea9de97ee2dd328ad7c6b0b66196c39c37a6cb0feb"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "a746744973bbe643f1a043a6d9922a57c09876c2a5a3445d1f3b3cc978695bad"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -3648,11 +2817,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
    ],
    [
     "transaction",
@@ -3664,34 +2828,8 @@
     "RpcApplicationError"
    ],
    [
-    "ImprovementHandlers",
-    "revise",
-    [
-     "f8cd4908849fcabb777d794fd282dcc9b1614dace3199f0a9485c04dd88f24bb"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "bdc9bcc91492537c8be59a6c184416de3fc7ce9d149756a293d45a3575c17a58"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -3709,11 +2847,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
    ],
    [
     "transaction",
@@ -3725,34 +2858,8 @@
     "RpcApplicationError"
    ],
    [
-    "ImprovementHandlers",
-    "evaluation_plan",
-    [
-     "1b7321f800d2ab27ae6482ca8bbefb2c5ac11f509bdffd5f0297c014770f9ead"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -3770,11 +2877,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
    ],
    [
     "ControlRecordService",
@@ -3806,16 +2908,6 @@
     "improvement-evaluation_plan"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -3835,53 +2927,8 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_plan",
-    "d6fbcae0bdc0a59cf35e782e8a106168e279d53732c48e073ab9f76d809ec1de"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "199fb397878f86b4eccd6f3d239af32c73c744cb8a7454ebfef748270ffa875c"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "199fb397878f86b4eccd6f3d239af32c73c744cb8a7454ebfef748270ffa875c"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_measured_result",
-    null
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "5086398bd59984546e53e3f84f1a0b64fc889e6b237203dd7af841d2630a8a91",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -3901,36 +2948,11 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_record",
-    "39174a5834f0eaa140c81c744c66ffd9879a69716b3bb6be94fc5c1780feba62"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -3961,16 +2983,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -3990,53 +3002,8 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_assess",
-    "5ba2e29d59adece6e92fd864f1d23e3eff48c869c17a70678f7b3792a3b893a5"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "08a061cb17048e0c2656313cd37f26726bbeebc38990df589647051b15a18422"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "08a061cb17048e0c2656313cd37f26726bbeebc38990df589647051b15a18422"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_measured_result",
-    null
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "5086398bd59984546e53e3f84f1a0b64fc889e6b237203dd7af841d2630a8a91",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -4056,16 +3023,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -4073,11 +3030,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "c8023e2d2ef7042f4f193939b1416ea2b166a79b86d857c99f410dd21235bc9e"
    ],
    [
     "transaction",
@@ -4089,32 +3041,6 @@
     "RpcApplicationError"
    ],
    [
-    "ImprovementHandlers",
-    "exposure_prepare",
-    [
-     "a3ae549211094d67b35f288a2a1094787a5bfaa0d688dbeb505a8cfb8fccb9a6"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -4128,30 +3054,6 @@
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "5086398bd59984546e53e3f84f1a0b64fc889e6b237203dd7af841d2630a8a91",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
     ],
     {}
    ],
@@ -4173,16 +3075,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -4192,45 +3084,8 @@
     {}
    ],
    [
-    "return",
-    "_record",
-    "c8023e2d2ef7042f4f193939b1416ea2b166a79b86d857c99f410dd21235bc9e"
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare",
-    [],
-    {
-     "budget": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-     "plan": "c8023e2d2ef7042f4f193939b1416ea2b166a79b86d857c99f410dd21235bc9e",
-     "project": "project:storage-coverage",
-     "proposal": "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718",
-     "rollback": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-     "scope": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-     "stage": "OFFLINE"
-    }
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -4246,21 +3101,6 @@
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
     ],
     {}
    ],
@@ -4294,16 +3134,6 @@
     "improvement-exposure"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-exposure:00000051"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -4323,38 +3153,6 @@
     "exit"
    ],
    [
-    "return",
-    "exposure_prepare",
-    "18355f1a064d1d9baf8b65618c7a58b24055dea4fa644250935d5d0ff8b614a6"
-   ],
-   [
-    "ImprovementHandlers",
-    "exposure_read",
-    [
-     "a586a6d7d3c833aa89bf7251feeff58ade5da6f4aba49debfc6736b69067cde7"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "a586a6d7d3c833aa89bf7251feeff58ade5da6f4aba49debfc6736b69067cde7",
-     "EXPOSURE"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-exposure:00000051"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -4372,26 +3170,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -4401,57 +3179,11 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_record",
-    "2cd8e3fb71aa4214ffabc2b21a4fe8f181d3745bfc4c7abbb128c4479b8e76de"
-   ],
-   [
-    "return",
-    "exposure_read",
-    "f3ade1fc04be00d59c67c6b71cc2497877daac632a4fe046f591c9e5f569c1ad"
-   ],
-   [
-    "ImprovementHandlers",
-    "exposure_prepare",
-    [
-     "160a300fe4b5a39685884d080f40e828224a3d803404ad2509f1f107e7afa94d"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -4469,30 +3201,6 @@
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "5086398bd59984546e53e3f84f1a0b64fc889e6b237203dd7af841d2630a8a91",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
     ],
     {}
    ],
@@ -4514,16 +3222,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -4533,45 +3231,8 @@
     {}
    ],
    [
-    "return",
-    "_record",
-    "c8023e2d2ef7042f4f193939b1416ea2b166a79b86d857c99f410dd21235bc9e"
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare",
-    [],
-    {
-     "budget": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-     "plan": "c8023e2d2ef7042f4f193939b1416ea2b166a79b86d857c99f410dd21235bc9e",
-     "project": "project:storage-coverage",
-     "proposal": "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718",
-     "rollback": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-     "scope": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-     "stage": "SANDBOX"
-    }
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -4587,21 +3248,6 @@
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
     ],
     {}
    ],
@@ -4635,16 +3281,6 @@
     "improvement-exposure"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-exposure:00000062"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -4664,38 +3300,6 @@
     "exit"
    ],
    [
-    "return",
-    "exposure_prepare",
-    "854c6e98391ac51d9d62ccfadbe334e043620bf0af67f259116e4f0b5f7a734f"
-   ],
-   [
-    "ImprovementHandlers",
-    "exposure_read",
-    [
-     "d4d935b761334ee1633d3a177004a5853b3f535fb56bdc40b7c3c539863b7c29"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "d4d935b761334ee1633d3a177004a5853b3f535fb56bdc40b7c3c539863b7c29",
-     "EXPOSURE"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-exposure:00000062"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -4713,26 +3317,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -4742,57 +3326,11 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_record",
-    "daf4eadbc762a47464a6eb005793a40602930e29b1945e20c5f0bea673f638c9"
-   ],
-   [
-    "return",
-    "exposure_read",
-    "8fec3b3f2cc951775b2caf07bfa40afac5a97306696620fcd8cde183f6970893"
-   ],
-   [
-    "ImprovementHandlers",
-    "exposure_prepare",
-    [
-     "5139b9b3c1df56462f8197d8e9faf6533b54f556c08adac3c68eb395943134b7"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -4810,30 +3348,6 @@
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "5086398bd59984546e53e3f84f1a0b64fc889e6b237203dd7af841d2630a8a91",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
     ],
     {}
    ],
@@ -4855,16 +3369,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -4874,45 +3378,8 @@
     {}
    ],
    [
-    "return",
-    "_record",
-    "c8023e2d2ef7042f4f193939b1416ea2b166a79b86d857c99f410dd21235bc9e"
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare",
-    [],
-    {
-     "budget": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-     "plan": "c8023e2d2ef7042f4f193939b1416ea2b166a79b86d857c99f410dd21235bc9e",
-     "project": "project:storage-coverage",
-     "proposal": "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718",
-     "rollback": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-     "scope": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-     "stage": "SHADOW"
-    }
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -4928,21 +3395,6 @@
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
     ],
     {}
    ],
@@ -4976,16 +3428,6 @@
     "improvement-shadow_run"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-shadow_run:00000073"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -5005,38 +3447,6 @@
     "exit"
    ],
    [
-    "return",
-    "exposure_prepare",
-    "a25438aacabf5febeecd0ecb94891759d3b52bcea27df0e68cf994effd8d9a04"
-   ],
-   [
-    "ImprovementHandlers",
-    "shadow_read",
-    [
-     "fc0d46febff123bafa75765a0c22b4b32bcb6ac329d8d718cae31dced22ef6f0"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "fc0d46febff123bafa75765a0c22b4b32bcb6ac329d8d718cae31dced22ef6f0",
-     "SHADOW_RUN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-shadow_run:00000073"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -5054,26 +3464,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -5083,57 +3473,11 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_record",
-    "0cd5c1725d12587d5c876fb27571e294047d7803f5f002a94e49eba498995ed4"
-   ],
-   [
-    "return",
-    "shadow_read",
-    "e82a42a3f2c3c82705e4800247b757fb473d74a9cd94f11643f7121da2e829a4"
-   ],
-   [
-    "ImprovementHandlers",
-    "exposure_prepare",
-    [
-     "49dcd28297765c625f52544d89cf3334fca79b64c07b29f939014bf17d55d41c"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -5151,30 +3495,6 @@
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "5086398bd59984546e53e3f84f1a0b64fc889e6b237203dd7af841d2630a8a91",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
     ],
     {}
    ],
@@ -5196,16 +3516,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -5215,45 +3525,8 @@
     {}
    ],
    [
-    "return",
-    "_record",
-    "c8023e2d2ef7042f4f193939b1416ea2b166a79b86d857c99f410dd21235bc9e"
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare",
-    [],
-    {
-     "budget": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-     "plan": "c8023e2d2ef7042f4f193939b1416ea2b166a79b86d857c99f410dd21235bc9e",
-     "project": "project:storage-coverage",
-     "proposal": "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718",
-     "rollback": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-     "scope": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-     "stage": "CANARY"
-    }
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -5269,21 +3542,6 @@
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
     ],
     {}
    ],
@@ -5317,16 +3575,6 @@
     "improvement-canary_run"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-canary_run:00000084"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -5346,38 +3594,6 @@
     "exit"
    ],
    [
-    "return",
-    "exposure_prepare",
-    "98ea38eee16e424a658df5da642fe75121d7445d3e33eece3f6652f28f4b6f75"
-   ],
-   [
-    "ImprovementHandlers",
-    "canary_read",
-    [
-     "d3b16f0970918e11cd6922ee92e28bf263c3bbcbc7b31c4be22eab22c2f0561c"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "d3b16f0970918e11cd6922ee92e28bf263c3bbcbc7b31c4be22eab22c2f0561c",
-     "CANARY_RUN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-canary_run:00000084"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -5395,26 +3611,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -5424,63 +3620,17 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_record",
-    "7afd742e574ad04f44628770ca646eb6800c6c1c7c18dbd1776ec5bf66c1242d"
-   ],
-   [
-    "return",
-    "canary_read",
-    "794957ab92d3b7d59ecfa1219bcd91bbf596bef0a9707c0558ff7391809a80ae"
-   ],
-   [
-    "ImprovementHandlers",
-    "promotion_prepare",
-    [
-     "b5ac256d133a0364b9abc45f7c42aa1cf2c0e6a91c28229faff9ffe54056ab15"
     ],
     {}
    ],
    [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -5496,21 +3646,6 @@
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
     ],
     {}
    ],
@@ -5544,16 +3679,6 @@
     "improvement-promotion"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-promotion:00000096"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -5573,45 +3698,12 @@
     "exit"
    ],
    [
-    "return",
-    "promotion_prepare",
-    "854c7ccc4135e092d1dcbe0749a632089eb6d99c063691684a95eccf455e3089"
-   ],
-   [
-    "ImprovementHandlers",
-    "promotion_decide",
-    [
-     "849d83ebfd76d77080afe39420bf1ee1f6c0d99e3ca979434b3132d13ea96aa3"
-    ],
-    {}
-   ],
-   [
     "authority",
     [
      "project:storage-coverage",
      "human:none",
      "none"
     ]
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare_promotion",
-    [
-     "project:storage-coverage",
-     "improvement-promotion:00000096",
-     "132178beccc276ab44177ca0625e412d2e48038e20c461f51bb247d9e753e8a6"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-promotion:00000096"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -5631,16 +3723,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -5653,14 +3735,6 @@
     "raise",
     "promotion_decide",
     "RpcApplicationError"
-   ],
-   [
-    "ImprovementHandlers",
-    "rollback_prepare",
-    [
-     "1e50c7dd4f2cb4674cc526f9fdbf26819790f298456aacd0f410eef37d79ca79"
-    ],
-    {}
    ],
    [
     "transaction",
@@ -5694,16 +3768,6 @@
    [
     "id",
     "improvement-rollback"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-rollback:00000106"
-    ],
-    {}
    ],
    [
     "id",
@@ -5725,19 +3789,6 @@
     "exit"
    ],
    [
-    "return",
-    "rollback_prepare",
-    "00e4e354e107349c3a9519e96d76c6478829008a95dee3f2fba23cdcb39af193"
-   ],
-   [
-    "ImprovementHandlers",
-    "rollback_prepare",
-    [
-     "3fdf6f0ece0022fabc0f0ec35784b6d5c7097146a5fd6e6305e8cb81dd8afc3a"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -5771,16 +3822,6 @@
     "improvement-rollback"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-rollback:00000113"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -5800,39 +3841,8 @@
     "exit"
    ],
    [
-    "return",
-    "rollback_prepare",
-    "9b03d585f6af1910286a76dc442912fbb5b793d1e830c4d0d26958776c042a1c"
-   ],
-   [
-    "ImprovementHandlers",
-    "retire_propose",
-    [
-     "358e6c6c8176e834f6ee341cc58d1308226ee46a15cc96c8360dd8755678913d"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "73d928132d7a0e9c52db8ba018c01d035ca6b8ae3407ae5f4a710e088e8034ba"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -5850,11 +3860,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
    ],
    [
     "ControlRecordService",
@@ -5886,16 +3891,6 @@
     "improvement-retire_candidate"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-retire_candidate:00000120"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -5915,39 +3910,8 @@
     "exit"
    ],
    [
-    "return",
-    "retire_propose",
-    "3cdf6497434b18d3fa087876a43a5549eef8725d75888bd7d1f316f96a08ddb1"
-   ],
-   [
-    "ImprovementHandlers",
-    "retire_propose",
-    [
-     "08773166bb3d278be453fbd6098a2cfe25f1e558f4faf12b4733f941870ea9a9"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "e06379fdc14ade8a2df811012087c9c70dbc6012f4c1d5af12a93d22a072fdde"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -5965,11 +3929,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
    ],
    [
     "transaction",
@@ -5981,32 +3940,6 @@
     "RpcApplicationError"
    ],
    [
-    "ImprovementHandlers",
-    "read",
-    [
-     "e752de79002a5c05f8008d53059bdaab960ce94efea90fec321aaaa480d744c0"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -6020,34 +3953,6 @@
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
-   ],
-   [
-    "return",
-    "read",
-    "9e8ed965cc51a36c7574f4b22629572039a2eb541f588a896f353e6199e8404c"
-   ],
-   [
-    "ImprovementHandlers",
-    "list",
-    [
-     "76993e568c653aaa793f73bad2394e62ee2723bb4dd09f4c2589aa9b7d7f4ceb"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
     ],
     {}
    ],
@@ -6077,37 +3982,6 @@
     {}
    ],
    [
-    "return",
-    "list",
-    "1ddc6392ecc64ab059e5138e21f269bda9919992fc75d3d44418289cc5e88396"
-   ],
-   [
-    "ImprovementHandlers",
-    "audit_read",
-    [
-     "e752de79002a5c05f8008d53059bdaab960ce94efea90fec321aaaa480d744c0"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -6121,55 +3995,6 @@
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "fed8d1c36c61b8cf0994c93e3acd33f33b3c927ad67502f05d3bf09dd1c74718"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     null
-    ],
-    {
-     "latest_only": false
-    }
-   ],
-   [
-    "return",
-    "audit_read",
-    "50889ab6909c99be926da1592a5af9da8e1dded6ca14eddde76f6c8adcc75d19"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_read",
-    [
-     "5086398bd59984546e53e3f84f1a0b64fc889e6b237203dd7af841d2630a8a91"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "5086398bd59984546e53e3f84f1a0b64fc889e6b237203dd7af841d2630a8a91",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000035"
     ],
     {}
    ],
@@ -6191,58 +4016,11 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_record",
-    "c8023e2d2ef7042f4f193939b1416ea2b166a79b86d857c99f410dd21235bc9e"
-   ],
-   [
-    "return",
-    "evaluation_read",
-    "ffde294abd38927fb25f4da488db6112fe3e963f8ecab9284a1e325eaa2ba635"
-   ],
-   [
-    "ImprovementHandlers",
-    "promotion_read",
-    [
-     "5dcea91240ac07ae38cf30eb4bf1e7e7db6e55e76c7f05ed28bc6f704c99592c"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "5dcea91240ac07ae38cf30eb4bf1e7e7db6e55e76c7f05ed28bc6f704c99592c",
-     "PROMOTION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-promotion:00000096"
     ],
     {}
    ],
@@ -6264,16 +4042,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -6281,16 +4049,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "bba98d87e495efde29c20ef56f7b1796c2a4d99e6e26598ddce1ecb7d74b2af1"
-   ],
-   [
-    "return",
-    "promotion_read",
-    "9646ff80af897bc412324b1cad5a0c591837440f3c21aa37c45ec0e159fc5ab0"
    ]
   ]
  },
@@ -6614,14 +4372,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "97f291cad7cab340bda417fad49003ff4ed51a74709dfffb2cb8a5cf0be5fe55"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -6633,28 +4383,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -6686,16 +4414,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -6715,39 +4433,8 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "c43ee0d14a84cfb413d92ec407b3f426fe5148bd6654bfff07282cfaaab1eeca"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_plan",
-    [
-     "16f83556688c7603d3df244bd83eaf3b8fddedfc53b2891a898a8881e8f9c851"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -6765,11 +4452,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
    ],
    [
     "ControlRecordService",
@@ -6801,16 +4483,6 @@
     "improvement-evaluation_plan"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -6828,27 +4500,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "evaluation_plan",
-    "667b51f72656d66e3bddcbe49be0277d703cd7932e5a8fe4d8ff332d34cf7e4d"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "bdf09644c2bdda300db3c1a21d25e6dd30945be941c9864045b5b40e5d40dd19"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "bdf09644c2bdda300db3c1a21d25e6dd30945be941c9864045b5b40e5d40dd19"
-    ],
-    {}
    ],
    [
     "PairedEvaluationService",
@@ -6877,16 +4528,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -6902,26 +4543,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -6949,32 +4570,8 @@
     "exit"
    ],
    [
-    "return",
-    "_measured_result",
-    "1c6951655e8e6b68763db96ef2308617ed850eb5596541edfb4642fa882267cf"
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -6994,16 +4591,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -7013,45 +4600,10 @@
     {}
    ],
    [
-    "return",
-    "_record",
-    "681054cbd7d115d3e246c08d5616ab189d34b9e000680f721abc9704ba6c028d"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "PairedEvaluationService",
     "require_current",
     [
      "1c6951655e8e6b68763db96ef2308617ed850eb5596541edfb4642fa882267cf"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -7107,16 +4659,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -7136,37 +4678,6 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_assess",
-    "75d2e38625aa9158c8696b7df7e42a2fc54e5f09eda7e51cac7d28350e7c736f"
-   ],
-   [
-    "ImprovementHandlers",
-    "exposure_prepare",
-    [
-     "27ebbc54b849bbf2f35e57402e633be0e2423ed940ca0874c48001ba74657834"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -7180,30 +4691,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
     ],
     {}
    ],
@@ -7225,16 +4712,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -7242,25 +4719,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "315839cab50103931938bfa6919a02893fbc880f6217545b7f1f0de539b6b4bb"
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare",
-    [],
-    {
-     "budget": "adeb0370bab402954097dcbce320a78635b9128f90ce4a4cd207aa9e5fa9d3d3",
-     "plan": "315839cab50103931938bfa6919a02893fbc880f6217545b7f1f0de539b6b4bb",
-     "project": "project:paired-execution",
-     "proposal": "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce",
-     "rollback": "02abe89167acf64b8c5d4d110b53563410f8333ff61ab0987c4df015b7445202",
-     "scope": "f3689f63bf2445e733fcfa29e39e742affa78e741ebf82a737889d6bcf490709",
-     "stage": "SHADOW"
-    }
    ],
    [
     "ImprovementThreadScope",
@@ -7297,16 +4755,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -7341,16 +4789,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -7366,26 +4804,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -7435,16 +4853,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -7460,26 +4868,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -7550,16 +4938,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "behavior-exposure:00000142"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -7581,21 +4959,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "behavior-exposure:00000142"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "exposure_prepare",
-    "ede5bd355f39fe4a1fde8fbbaafb2b47fa293386fff349bab9b6edc5f8e9559b"
    ]
   ]
  },
@@ -7945,14 +5308,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "97f291cad7cab340bda417fad49003ff4ed51a74709dfffb2cb8a5cf0be5fe55"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -7964,28 +5319,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -8017,16 +5350,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -8046,39 +5369,8 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "c43ee0d14a84cfb413d92ec407b3f426fe5148bd6654bfff07282cfaaab1eeca"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_plan",
-    [
-     "16f83556688c7603d3df244bd83eaf3b8fddedfc53b2891a898a8881e8f9c851"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -8096,11 +5388,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
    ],
    [
     "ControlRecordService",
@@ -8132,16 +5419,6 @@
     "improvement-evaluation_plan"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -8159,27 +5436,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "evaluation_plan",
-    "667b51f72656d66e3bddcbe49be0277d703cd7932e5a8fe4d8ff332d34cf7e4d"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "bdf09644c2bdda300db3c1a21d25e6dd30945be941c9864045b5b40e5d40dd19"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "bdf09644c2bdda300db3c1a21d25e6dd30945be941c9864045b5b40e5d40dd19"
-    ],
-    {}
    ],
    [
     "PairedEvaluationService",
@@ -8208,16 +5464,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -8233,26 +5479,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -8280,32 +5506,8 @@
     "exit"
    ],
    [
-    "return",
-    "_measured_result",
-    "1c6951655e8e6b68763db96ef2308617ed850eb5596541edfb4642fa882267cf"
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -8325,16 +5527,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -8344,45 +5536,10 @@
     {}
    ],
    [
-    "return",
-    "_record",
-    "681054cbd7d115d3e246c08d5616ab189d34b9e000680f721abc9704ba6c028d"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "PairedEvaluationService",
     "require_current",
     [
      "1c6951655e8e6b68763db96ef2308617ed850eb5596541edfb4642fa882267cf"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -8438,16 +5595,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -8467,37 +5614,6 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_assess",
-    "75d2e38625aa9158c8696b7df7e42a2fc54e5f09eda7e51cac7d28350e7c736f"
-   ],
-   [
-    "ImprovementHandlers",
-    "exposure_prepare",
-    [
-     "82b1dfcd5f7e8506b883d551043f11336314df2ea8c5e507554a94734d0cf566"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -8511,30 +5627,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
     ],
     {}
    ],
@@ -8556,16 +5648,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -8573,25 +5655,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "315839cab50103931938bfa6919a02893fbc880f6217545b7f1f0de539b6b4bb"
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare",
-    [],
-    {
-     "budget": "adeb0370bab402954097dcbce320a78635b9128f90ce4a4cd207aa9e5fa9d3d3",
-     "plan": "315839cab50103931938bfa6919a02893fbc880f6217545b7f1f0de539b6b4bb",
-     "project": "project:paired-execution",
-     "proposal": "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce",
-     "rollback": "02abe89167acf64b8c5d4d110b53563410f8333ff61ab0987c4df015b7445202",
-     "scope": "f3689f63bf2445e733fcfa29e39e742affa78e741ebf82a737889d6bcf490709",
-     "stage": "CANARY"
-    }
    ],
    [
     "ImprovementThreadScope",
@@ -8628,16 +5691,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -8672,16 +5725,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -8697,26 +5740,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -8766,16 +5789,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -8791,26 +5804,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -8881,16 +5874,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "behavior-exposure:00000142"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -8914,47 +5897,6 @@
     "exit"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "behavior-exposure:00000142"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "exposure_prepare",
-    "89569a5358acaa435f5ade0826a6fd058b24600231c156069278bd66fe146dc8"
-   ],
-   [
-    "ImprovementHandlers",
-    "exposure_prepare",
-    [
-     "22a6d9eba543b28730ba97bf5c911a2a3435f9362b1773d32ec76c500b9c9716"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -8968,30 +5910,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
     ],
     {}
    ],
@@ -9013,16 +5931,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -9030,11 +5938,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "315839cab50103931938bfa6919a02893fbc880f6217545b7f1f0de539b6b4bb"
    ],
    [
     "raise",
@@ -9203,14 +6106,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "4e6d16edd8aa1b2e7d683a6a20666c93a24098847d051dd135f0368dfcca68f8"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -9222,28 +6117,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -9275,16 +6148,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -9304,39 +6167,8 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "f062f7cd68333bb28e74361e0b3e83d5748d5428555adcfaea162372c27ecaca"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_plan",
-    [
-     "533f4a7cf6f5116f5dda9c4b557ae974558bb7afe2432beefd0af40ec00ec4b6"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -9354,11 +6186,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "858d8fbae81dafc03bbae21fbac6ff38b3f7397cec509338d696f720230ec904"
    ],
    [
     "ControlRecordService",
@@ -9390,16 +6217,6 @@
     "improvement-evaluation_plan"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -9419,53 +6236,8 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_plan",
-    "89b13117a3232d1bc08a77a122516655db5b3991b77f11b415ba651f1ebc66df"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "1a6a8c97a8a98bf857392806643c12104e2739f453aa374374732857e3672f74"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "1a6a8c97a8a98bf857392806643c12104e2739f453aa374374732857e3672f74"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_measured_result",
-    null
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "d39693c881bc5e2f92c83eaa481aa3a464fc62ae4253a4f68720aa8db6ef79c0",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -9485,36 +6257,11 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_record",
-    "838dbc5d0d5388fdac49dbc382b1fe180904b9ad54203040439ffabb0c34d3cc"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -9545,16 +6292,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -9574,53 +6311,8 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_assess",
-    "345540b2b76a5c1ede64834502acc4207e7ddadd5b7d897d09235a4fbc7b0255"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "1aba59a45574b3ca46e4df9bbab940eb46c705dbc31061a3d7d2f53a1b1400c1"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "1aba59a45574b3ca46e4df9bbab940eb46c705dbc31061a3d7d2f53a1b1400c1"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_measured_result",
-    null
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "d39693c881bc5e2f92c83eaa481aa3a464fc62ae4253a4f68720aa8db6ef79c0",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -9640,16 +6332,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -9657,11 +6339,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "0f4003f4f497201e8aa98c4027637276b0aeb52c3aa1f28e3ca47655c665194b"
    ],
    [
     "transaction",
@@ -9834,14 +6511,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "4e6d16edd8aa1b2e7d683a6a20666c93a24098847d051dd135f0368dfcca68f8"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -9853,28 +6522,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -9906,16 +6553,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -9935,39 +6572,8 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "f062f7cd68333bb28e74361e0b3e83d5748d5428555adcfaea162372c27ecaca"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_plan",
-    [
-     "319e2cfd25581a2b2317b775869fae333c689c350126ad411ff86a1a942557ac"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -9985,11 +6591,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "858d8fbae81dafc03bbae21fbac6ff38b3f7397cec509338d696f720230ec904"
    ],
    [
     "ControlRecordService",
@@ -10021,16 +6622,6 @@
     "improvement-evaluation_plan"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -10050,53 +6641,8 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_plan",
-    "6fbe5696ac6126f484f34bcba5b5dc4647a85dd8274d375a8c1e2ee4781545ed"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "1a6a8c97a8a98bf857392806643c12104e2739f453aa374374732857e3672f74"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "1a6a8c97a8a98bf857392806643c12104e2739f453aa374374732857e3672f74"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_measured_result",
-    null
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "d39693c881bc5e2f92c83eaa481aa3a464fc62ae4253a4f68720aa8db6ef79c0",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -10116,36 +6662,11 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_record",
-    "f76e755eb680e6893a66cc63c2933962f794cf302ea9f0682fdda10f2bc85fa4"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -10176,16 +6697,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -10205,53 +6716,8 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_assess",
-    "7c6477a7643f2fb1d10b44114ddde7141b8966979fd0623547e04e4fa2ddcc76"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "1aba59a45574b3ca46e4df9bbab940eb46c705dbc31061a3d7d2f53a1b1400c1"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "1aba59a45574b3ca46e4df9bbab940eb46c705dbc31061a3d7d2f53a1b1400c1"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_measured_result",
-    null
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "d39693c881bc5e2f92c83eaa481aa3a464fc62ae4253a4f68720aa8db6ef79c0",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -10271,16 +6737,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -10288,11 +6744,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "43bfffc4ca169b1228604bfdb3bf74b7e84fe19aefce59d7f986778637473e1b"
    ],
    [
     "transaction",
@@ -10465,14 +6916,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "27253bcb33ad3c853cecefa599dd458cff1a0d90e253aaa9dd1622bc87845c1d"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -10484,28 +6927,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -10537,16 +6958,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -10566,39 +6977,8 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "0b96f62a1b1be0f5d52f180eea921a8669eb134edad94291c7b2b4290f6b9139"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_plan",
-    [
-     "3fa613cb368b0cc3ee6efe93c5112a55fd3f103972b4173cc19079778e78830e"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "7d975ff2a10fc30acc8bc5cc91b89544487da8cc32a91b550ec30847d9e57b43"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -10616,11 +6996,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "17710ead27f0c9ba9146aef03ee32c276db4b022f588e59a139037f07e581767"
    ],
    [
     "ControlRecordService",
@@ -10652,16 +7027,6 @@
     "improvement-evaluation_plan"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -10681,53 +7046,8 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_plan",
-    "e7a4d7994a723020d230e7c367fdef47a1537af8c14b5536f4bf1b502e1637d9"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "1a6a8c97a8a98bf857392806643c12104e2739f453aa374374732857e3672f74"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "1a6a8c97a8a98bf857392806643c12104e2739f453aa374374732857e3672f74"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_measured_result",
-    null
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "d39693c881bc5e2f92c83eaa481aa3a464fc62ae4253a4f68720aa8db6ef79c0",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -10747,36 +7067,11 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
      "project:storage-coverage",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_record",
-    "9373b2844f37f9777b8d7a315cc259cd6fe9da65c9566277e1381630b2d70f97"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -10807,16 +7102,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -10836,53 +7121,8 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_assess",
-    "009748641f201ab9e5ff9c4a2eb7061efa67567850c1397e8f844e88a51dd797"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "1aba59a45574b3ca46e4df9bbab940eb46c705dbc31061a3d7d2f53a1b1400c1"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "1aba59a45574b3ca46e4df9bbab940eb46c705dbc31061a3d7d2f53a1b1400c1"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_measured_result",
-    null
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "d39693c881bc5e2f92c83eaa481aa3a464fc62ae4253a4f68720aa8db6ef79c0",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -10902,16 +7142,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -10919,11 +7149,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "f30a2f0e04c7e62b9c1e9bd001c2ace1ba6f3bcd36b7f6d72eef025885eb95a0"
    ],
    [
     "transaction",
@@ -11466,14 +7691,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "97f291cad7cab340bda417fad49003ff4ed51a74709dfffb2cb8a5cf0be5fe55"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -11485,28 +7702,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -11538,16 +7733,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -11567,39 +7752,8 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "c43ee0d14a84cfb413d92ec407b3f426fe5148bd6654bfff07282cfaaab1eeca"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_plan",
-    [
-     "16f83556688c7603d3df244bd83eaf3b8fddedfc53b2891a898a8881e8f9c851"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -11617,11 +7771,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
    ],
    [
     "ControlRecordService",
@@ -11653,16 +7802,6 @@
     "improvement-evaluation_plan"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -11680,27 +7819,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "evaluation_plan",
-    "667b51f72656d66e3bddcbe49be0277d703cd7932e5a8fe4d8ff332d34cf7e4d"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "bdf09644c2bdda300db3c1a21d25e6dd30945be941c9864045b5b40e5d40dd19"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "bdf09644c2bdda300db3c1a21d25e6dd30945be941c9864045b5b40e5d40dd19"
-    ],
-    {}
    ],
    [
     "PairedEvaluationService",
@@ -11729,16 +7847,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -11754,26 +7862,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -11801,32 +7889,8 @@
     "exit"
    ],
    [
-    "return",
-    "_measured_result",
-    "1c6951655e8e6b68763db96ef2308617ed850eb5596541edfb4642fa882267cf"
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -11846,16 +7910,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -11865,45 +7919,10 @@
     {}
    ],
    [
-    "return",
-    "_record",
-    "681054cbd7d115d3e246c08d5616ab189d34b9e000680f721abc9704ba6c028d"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "PairedEvaluationService",
     "require_current",
     [
      "1c6951655e8e6b68763db96ef2308617ed850eb5596541edfb4642fa882267cf"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -11959,16 +7978,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -11988,37 +7997,6 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_assess",
-    "75d2e38625aa9158c8696b7df7e42a2fc54e5f09eda7e51cac7d28350e7c736f"
-   ],
-   [
-    "ImprovementHandlers",
-    "exposure_prepare",
-    [
-     "82b1dfcd5f7e8506b883d551043f11336314df2ea8c5e507554a94734d0cf566"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -12032,30 +8010,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
     ],
     {}
    ],
@@ -12077,16 +8031,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -12094,25 +8038,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "315839cab50103931938bfa6919a02893fbc880f6217545b7f1f0de539b6b4bb"
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare",
-    [],
-    {
-     "budget": "adeb0370bab402954097dcbce320a78635b9128f90ce4a4cd207aa9e5fa9d3d3",
-     "plan": "315839cab50103931938bfa6919a02893fbc880f6217545b7f1f0de539b6b4bb",
-     "project": "project:paired-execution",
-     "proposal": "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce",
-     "rollback": "02abe89167acf64b8c5d4d110b53563410f8333ff61ab0987c4df015b7445202",
-     "scope": "f3689f63bf2445e733fcfa29e39e742affa78e741ebf82a737889d6bcf490709",
-     "stage": "CANARY"
-    }
    ],
    [
     "ImprovementThreadScope",
@@ -12149,16 +8074,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -12193,16 +8108,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -12218,26 +8123,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -12287,16 +8172,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -12312,26 +8187,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -12402,16 +8257,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "behavior-exposure:00000142"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -12435,51 +8280,10 @@
     "exit"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "behavior-exposure:00000142"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "exposure_prepare",
-    "89569a5358acaa435f5ade0826a6fd058b24600231c156069278bd66fe146dc8"
-   ],
-   [
-    "ImprovementHandlers",
-    "promotion_prepare",
-    [
-     "14a14829a1e5ab325973273b71d670819e52d3c83be2362a10aa64031d8679c7"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
    [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -12497,40 +8301,6 @@
     {}
    ],
    [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "ImprovementExposureService",
-    "promotion_payload",
-    [
-     "7b213aa6136d6478bf7ecfdc499030a85295460ebe6d77a21f6d8c792e37d893",
-     "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -12544,16 +8314,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "BEHAVIOR_RUNTIME",
-     "behavior-execution:00000160"
     ],
     {}
    ],
@@ -12587,16 +8347,6 @@
     "improvement-promotion"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-promotion:00000271"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -12616,45 +8366,12 @@
     "exit"
    ],
    [
-    "return",
-    "promotion_prepare",
-    "6d05f553ad0b091d0c6adc60398b293cd6aea655bcbbec2bb3f9726551d44ff5"
-   ],
-   [
-    "ImprovementHandlers",
-    "promotion_decide",
-    [
-     "f36adfbf50f4d55fe5f1fcf17570c5c55b5e5cd7c900a4e32431cd5458242c72"
-    ],
-    {}
-   ],
-   [
     "authority",
     [
      "project:paired-execution",
      "human:policy-owner",
      "role-assignment:00000120"
     ]
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare_promotion",
-    [
-     "project:paired-execution",
-     "improvement-promotion:00000271",
-     "07d281cc44635911ef59eb80ae419b7efc38cd8cc426657197e2bac490994d67"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-promotion:00000271"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -12674,31 +8391,11 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -12720,16 +8417,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "BEHAVIOR_RUNTIME",
-     "behavior-execution:00000160"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -12743,16 +8430,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -12791,16 +8468,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -12816,26 +8483,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -12867,25 +8514,6 @@
     ]
    ],
    [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "53e865071e3e723d83f93d10af787c1c498513e8be09653032cdfbc78faa0679",
-     "PROMOTION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-promotion:00000271"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -12903,16 +8531,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -12920,37 +8538,12 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
    ],
    [
     "SqliteGovernanceStore",
     "list_roles",
     [
      "project:paired-execution"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
     ],
     {}
    ],
@@ -12981,16 +8574,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-promotion:00000271"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -13002,25 +8585,6 @@
     "append",
     [
      "08245f536ba5f1134d09052fd805c1089bd85e328ca6dd1a3aab65e6d9f6845d"
-    ],
-    {}
-   ],
-   [
-    "ImprovementExposureService",
-    "apply_promotion",
-    [
-     "08245f536ba5f1134d09052fd805c1089bd85e328ca6dd1a3aab65e6d9f6845d",
-     "1c6951655e8e6b68763db96ef2308617ed850eb5596541edfb4642fa882267cf"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -13050,16 +8614,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -13073,16 +8627,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "BEHAVIOR_RUNTIME",
-     "behavior-execution:00000160"
     ],
     {}
    ],
@@ -13104,16 +8648,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -13129,26 +8663,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -13210,16 +8724,6 @@
     "improvement-revision_change_set_proposal"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision_change_set_proposal:00000279"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -13237,11 +8741,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "promotion_decide",
-    "7f1b91b5b701d7f658cddde5beb4ecbc26cae36f3b05b3bb95a65fa8ce1cbf4a"
    ]
   ]
  },
@@ -13758,14 +9257,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "97f291cad7cab340bda417fad49003ff4ed51a74709dfffb2cb8a5cf0be5fe55"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -13777,28 +9268,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -13830,16 +9299,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -13859,39 +9318,8 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "c43ee0d14a84cfb413d92ec407b3f426fe5148bd6654bfff07282cfaaab1eeca"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_plan",
-    [
-     "16f83556688c7603d3df244bd83eaf3b8fddedfc53b2891a898a8881e8f9c851"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -13909,11 +9337,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
    ],
    [
     "ControlRecordService",
@@ -13945,16 +9368,6 @@
     "improvement-evaluation_plan"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -13972,27 +9385,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "evaluation_plan",
-    "667b51f72656d66e3bddcbe49be0277d703cd7932e5a8fe4d8ff332d34cf7e4d"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "bdf09644c2bdda300db3c1a21d25e6dd30945be941c9864045b5b40e5d40dd19"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "bdf09644c2bdda300db3c1a21d25e6dd30945be941c9864045b5b40e5d40dd19"
-    ],
-    {}
    ],
    [
     "PairedEvaluationService",
@@ -14021,16 +9413,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -14046,26 +9428,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -14093,32 +9455,8 @@
     "exit"
    ],
    [
-    "return",
-    "_measured_result",
-    "1c6951655e8e6b68763db96ef2308617ed850eb5596541edfb4642fa882267cf"
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -14138,16 +9476,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -14157,45 +9485,10 @@
     {}
    ],
    [
-    "return",
-    "_record",
-    "681054cbd7d115d3e246c08d5616ab189d34b9e000680f721abc9704ba6c028d"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "PairedEvaluationService",
     "require_current",
     [
      "1c6951655e8e6b68763db96ef2308617ed850eb5596541edfb4642fa882267cf"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -14251,16 +9544,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -14280,37 +9563,6 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_assess",
-    "75d2e38625aa9158c8696b7df7e42a2fc54e5f09eda7e51cac7d28350e7c736f"
-   ],
-   [
-    "ImprovementHandlers",
-    "exposure_prepare",
-    [
-     "82b1dfcd5f7e8506b883d551043f11336314df2ea8c5e507554a94734d0cf566"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -14324,30 +9576,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
     ],
     {}
    ],
@@ -14369,16 +9597,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -14386,25 +9604,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "315839cab50103931938bfa6919a02893fbc880f6217545b7f1f0de539b6b4bb"
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare",
-    [],
-    {
-     "budget": "adeb0370bab402954097dcbce320a78635b9128f90ce4a4cd207aa9e5fa9d3d3",
-     "plan": "315839cab50103931938bfa6919a02893fbc880f6217545b7f1f0de539b6b4bb",
-     "project": "project:paired-execution",
-     "proposal": "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce",
-     "rollback": "02abe89167acf64b8c5d4d110b53563410f8333ff61ab0987c4df015b7445202",
-     "scope": "f3689f63bf2445e733fcfa29e39e742affa78e741ebf82a737889d6bcf490709",
-     "stage": "CANARY"
-    }
    ],
    [
     "ImprovementThreadScope",
@@ -14441,16 +9640,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -14485,16 +9674,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -14510,26 +9689,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -14579,16 +9738,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -14604,26 +9753,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -14694,16 +9823,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "behavior-exposure:00000142"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -14727,51 +9846,10 @@
     "exit"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "behavior-exposure:00000142"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "exposure_prepare",
-    "89569a5358acaa435f5ade0826a6fd058b24600231c156069278bd66fe146dc8"
-   ],
-   [
-    "ImprovementHandlers",
-    "promotion_prepare",
-    [
-     "14a14829a1e5ab325973273b71d670819e52d3c83be2362a10aa64031d8679c7"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
    [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -14789,40 +9867,6 @@
     {}
    ],
    [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "ImprovementExposureService",
-    "promotion_payload",
-    [
-     "7b213aa6136d6478bf7ecfdc499030a85295460ebe6d77a21f6d8c792e37d893",
-     "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -14836,16 +9880,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "BEHAVIOR_RUNTIME",
-     "behavior-execution:00000160"
     ],
     {}
    ],
@@ -14879,16 +9913,6 @@
     "improvement-promotion"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-promotion:00000271"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -14906,19 +9930,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "promotion_prepare",
-    "6d05f553ad0b091d0c6adc60398b293cd6aea655bcbbec2bb3f9726551d44ff5"
-   ],
-   [
-    "ImprovementHandlers",
-    "promotion_decide",
-    [
-     "c85d25c811833193cdad53de302ddb176d8a737fcc823c653499de2035171fd6"
-    ],
-    {}
    ],
    [
     "authority",
@@ -14941,25 +9952,6 @@
     ]
    ],
    [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "53e865071e3e723d83f93d10af787c1c498513e8be09653032cdfbc78faa0679",
-     "PROMOTION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-promotion:00000271"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -14977,16 +9969,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -14996,35 +9978,10 @@
     {}
    ],
    [
-    "return",
-    "_record",
-    "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
-   ],
-   [
     "SqliteGovernanceStore",
     "list_roles",
     [
      "project:paired-execution"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
     ],
     {}
    ],
@@ -15053,16 +10010,6 @@
      "record_type": "PROMOTION",
      "state": "REJECTED"
     }
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-promotion:00000271"
-    ],
-    {}
    ],
    [
     "id",
@@ -15109,16 +10056,6 @@
     "improvement-revision_change_set_proposal"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision_change_set_proposal:00000279"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -15136,11 +10073,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "promotion_decide",
-    "2e34c831fe6e1456ff53f452542860fc8ff0bafc724ed2ade593f446bebca8d0"
    ]
   ]
  },
@@ -15577,14 +10509,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "97f291cad7cab340bda417fad49003ff4ed51a74709dfffb2cb8a5cf0be5fe55"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -15596,28 +10520,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -15649,16 +10551,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -15678,39 +10570,8 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "c43ee0d14a84cfb413d92ec407b3f426fe5148bd6654bfff07282cfaaab1eeca"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_plan",
-    [
-     "16f83556688c7603d3df244bd83eaf3b8fddedfc53b2891a898a8881e8f9c851"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -15728,11 +10589,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
    ],
    [
     "ControlRecordService",
@@ -15764,16 +10620,6 @@
     "improvement-evaluation_plan"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -15791,27 +10637,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "evaluation_plan",
-    "667b51f72656d66e3bddcbe49be0277d703cd7932e5a8fe4d8ff332d34cf7e4d"
-   ],
-   [
-    "ImprovementHandlers",
-    "evaluation_assess",
-    [
-     "bdf09644c2bdda300db3c1a21d25e6dd30945be941c9864045b5b40e5d40dd19"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_measured_result",
-    [
-     "bdf09644c2bdda300db3c1a21d25e6dd30945be941c9864045b5b40e5d40dd19"
-    ],
-    {}
    ],
    [
     "PairedEvaluationService",
@@ -15840,16 +10665,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -15865,26 +10680,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -15912,32 +10707,8 @@
     "exit"
    ],
    [
-    "return",
-    "_measured_result",
-    "1c6951655e8e6b68763db96ef2308617ed850eb5596541edfb4642fa882267cf"
-   ],
-   [
     "transaction",
     "enter"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -15957,16 +10728,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -15976,45 +10737,10 @@
     {}
    ],
    [
-    "return",
-    "_record",
-    "681054cbd7d115d3e246c08d5616ab189d34b9e000680f721abc9704ba6c028d"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "PairedEvaluationService",
     "require_current",
     [
      "1c6951655e8e6b68763db96ef2308617ed850eb5596541edfb4642fa882267cf"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -16070,16 +10796,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -16099,37 +10815,6 @@
     "exit"
    ],
    [
-    "return",
-    "evaluation_assess",
-    "75d2e38625aa9158c8696b7df7e42a2fc54e5f09eda7e51cac7d28350e7c736f"
-   ],
-   [
-    "ImprovementHandlers",
-    "exposure_prepare",
-    [
-     "82b1dfcd5f7e8506b883d551043f11336314df2ea8c5e507554a94734d0cf566"
-    ],
-    {}
-   ],
-   [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -16143,30 +10828,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
-   ],
-   [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "bd761405c991a40619dd62248b2f24a2a22d258bf6b0b769c59ddd06780a3026",
-     "EVALUATION_PLAN"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
     ],
     {}
    ],
@@ -16188,16 +10849,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -16205,25 +10856,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "315839cab50103931938bfa6919a02893fbc880f6217545b7f1f0de539b6b4bb"
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare",
-    [],
-    {
-     "budget": "adeb0370bab402954097dcbce320a78635b9128f90ce4a4cd207aa9e5fa9d3d3",
-     "plan": "315839cab50103931938bfa6919a02893fbc880f6217545b7f1f0de539b6b4bb",
-     "project": "project:paired-execution",
-     "proposal": "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce",
-     "rollback": "02abe89167acf64b8c5d4d110b53563410f8333ff61ab0987c4df015b7445202",
-     "scope": "f3689f63bf2445e733fcfa29e39e742affa78e741ebf82a737889d6bcf490709",
-     "stage": "CANARY"
-    }
    ],
    [
     "ImprovementThreadScope",
@@ -16260,16 +10892,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -16304,16 +10926,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -16329,26 +10941,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -16398,16 +10990,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -16423,26 +11005,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -16513,16 +11075,6 @@
     }
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "behavior-exposure:00000142"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -16546,51 +11098,10 @@
     "exit"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "behavior-exposure:00000142"
-    ],
-    {}
-   ],
-   [
-    "return",
-    "exposure_prepare",
-    "89569a5358acaa435f5ade0826a6fd058b24600231c156069278bd66fe146dc8"
-   ],
-   [
-    "ImprovementHandlers",
-    "promotion_prepare",
-    [
-     "14a14829a1e5ab325973273b71d670819e52d3c83be2362a10aa64031d8679c7"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
    [
-    "ImprovementHandlers",
-    "_improvement",
-    [
-     "f2ffecc9e844a8b0b665c92450b11923b30d6b4e3ea1a2b52d07efb01435a8c8"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -16608,40 +11119,6 @@
     {}
    ],
    [
-    "return",
-    "_improvement",
-    "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "ImprovementExposureService",
-    "promotion_payload",
-    [
-     "7b213aa6136d6478bf7ecfdc499030a85295460ebe6d77a21f6d8c792e37d893",
-     "f0cad6f3a381ad8cb53bc8ca46d2170083a22b75349edd48720be0ea70f2f6ce"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -16655,16 +11132,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "BEHAVIOR_RUNTIME",
-     "behavior-execution:00000160"
     ],
     {}
    ],
@@ -16698,16 +11165,6 @@
     "improvement-promotion"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-promotion:00000271"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -16727,45 +11184,12 @@
     "exit"
    ],
    [
-    "return",
-    "promotion_prepare",
-    "6d05f553ad0b091d0c6adc60398b293cd6aea655bcbbec2bb3f9726551d44ff5"
-   ],
-   [
-    "ImprovementHandlers",
-    "promotion_decide",
-    [
-     "70f532582a99f4c1e5b96de7b50c008c3fb6ab55a7bd3f0b8b49974898f6a77d"
-    ],
-    {}
-   ],
-   [
     "authority",
     [
      "project:paired-execution",
      "human:policy-owner",
      "role-assignment:00000120"
     ]
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare_promotion",
-    [
-     "project:paired-execution",
-     "improvement-promotion:00000271",
-     "0000000000000000000000000000000000000000000000000000000000000000"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-promotion:00000271"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -16781,16 +11205,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -16809,40 +11223,12 @@
     "RpcApplicationError"
    ],
    [
-    "ImprovementHandlers",
-    "promotion_decide",
-    [
-     "90dc6df90479095d443dded045c92efc851d88dc03cc8c4af9bee8738187cbbb"
-    ],
-    {}
-   ],
-   [
     "authority",
     [
      "project:paired-execution",
      "human:policy-owner",
      "none"
     ]
-   ],
-   [
-    "ImprovementExposureService",
-    "prepare_promotion",
-    [
-     "project:paired-execution",
-     "improvement-promotion:00000271",
-     "07d281cc44635911ef59eb80ae419b7efc38cd8cc426657197e2bac490994d67"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-promotion:00000271"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -16862,31 +11248,11 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -16908,16 +11274,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "BEHAVIOR_RUNTIME",
-     "behavior-execution:00000160"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -16931,16 +11287,6 @@
     [
      "project:paired-execution",
      null
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
     ],
     {}
    ],
@@ -16979,16 +11325,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -17004,26 +11340,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-evaluation_plan:00000017"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
    ],
    [
     "ImprovementThreadScope",
@@ -17055,25 +11371,6 @@
     ]
    ],
    [
-    "ImprovementHandlers",
-    "_record",
-    [
-     "53e865071e3e723d83f93d10af787c1c498513e8be09653032cdfbc78faa0679",
-     "PROMOTION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-promotion:00000271"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_record",
     [
@@ -17091,16 +11388,6 @@
     {}
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:paired-execution",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "ImprovementThreadScope",
     "require_thread",
     [
@@ -17108,11 +11395,6 @@
      null
     ],
     {}
-   ],
-   [
-    "return",
-    "_record",
-    "fd4ef26b95473112ff16ca09b10bda49ba16658e9d1d037c47b1b93abae67408"
    ],
    [
     "SqliteGovernanceStore",
@@ -17297,14 +11579,6 @@
   ],
   "trace": [
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "4e6d16edd8aa1b2e7d683a6a20666c93a24098847d051dd135f0368dfcca68f8"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -17316,28 +11590,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -17369,16 +11621,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000010"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -17398,19 +11640,6 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "f062f7cd68333bb28e74361e0b3e83d5748d5428555adcfaea162372c27ecaca"
-   ],
-   [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "4e6d16edd8aa1b2e7d683a6a20666c93a24098847d051dd135f0368dfcca68f8"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -17422,28 +11651,6 @@
      null
     ],
     {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ImprovementThreadScope",
@@ -17500,16 +11707,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000017"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -17529,17 +11726,26 @@
     "exit"
    ],
    [
-    "return",
-    "propose",
-    "6f96aaf34c401e1a913eaa400990116beeadfb77782d2bba32a50cd3aafafb01"
+    "transaction",
+    "enter"
    ],
    [
-    "ImprovementHandlers",
-    "propose",
+    "ImprovementThreadScope",
+    "require_thread",
     [
-     "7a2ca7175cea5c6f695f53c98bb05b9b3c961f271db5a37e81e1e425d01a8bc7"
+     "project:storage-coverage",
+     null
     ],
     {}
+   ],
+   [
+    "transaction",
+    "rollback"
+   ],
+   [
+    "raise",
+    "propose",
+    "RpcApplicationError"
    ],
    [
     "transaction",
@@ -17564,14 +11770,6 @@
     "RpcApplicationError"
    ],
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "af69d81f8eed58b6c726d088cab0c84649fc8d061ae97499fdbdeca8ac8782e3"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -17594,14 +11792,6 @@
     "RpcApplicationError"
    ],
    [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "eea959eba13e2f968ef6a9d419b6ab982d701294fe980ce8001518257772235d"
-    ],
-    {}
-   ],
-   [
     "transaction",
     "enter"
    ],
@@ -17613,58 +11803,6 @@
      null
     ],
     {}
-   ],
-   [
-    "transaction",
-    "rollback"
-   ],
-   [
-    "raise",
-    "propose",
-    "RpcApplicationError"
-   ],
-   [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "bbc724cd7cce52c91cc0ee5c10ab306dce3c05eb7f539375c4464232fafb9731"
-    ],
-    {}
-   ],
-   [
-    "transaction",
-    "enter"
-   ],
-   [
-    "ImprovementThreadScope",
-    "require_thread",
-    [
-     "project:storage-coverage",
-     null
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {}
-   ],
-   [
-    "SqliteControlRecordStore",
-    "list",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "REVISION"
-    ],
-    {
-     "latest_only": false
-    }
    ],
    [
     "ControlRecordService",
@@ -17696,16 +11834,6 @@
     "improvement-revision"
    ],
    [
-    "SqliteControlRecordStore",
-    "read",
-    [
-     "project:storage-coverage",
-     "IMPROVEMENT",
-     "improvement-revision:00000035"
-    ],
-    {}
-   ],
-   [
     "id",
     "control-revision"
    ],
@@ -17723,19 +11851,6 @@
    [
     "transaction",
     "exit"
-   ],
-   [
-    "return",
-    "propose",
-    "7e503bff5e1d2da742f0ea77c47b7977a9e6d80098debc53ff7ba27b7b932789"
-   ],
-   [
-    "ImprovementHandlers",
-    "propose",
-    [
-     "f65ad769095047e001285388f6279c8625e337f601f73ead883941b21d7f9675"
-    ],
-    {}
    ],
    [
     "transaction",

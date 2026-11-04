@@ -79,8 +79,11 @@ async def test_acquisition_fault_rolls_back_source_and_intent(tmp_path: Path, po
     (tmp_path / "inbox" / "input.txt").write_text("Synthetic rollback source.")
     worker = FakeWorker()
 
+    reached: list[str] = []
+
     def fault(actual: str) -> None:
         if actual == point:
+            reached.append(actual)
             raise RuntimeError("synthetic acquisition fault")
 
     runtime = create_runtime(tmp_path, embedding_worker=worker, acquisition_fault_injector=fault)
@@ -115,6 +118,7 @@ async def test_acquisition_fault_rolls_back_source_and_intent(tmp_path: Path, po
                 },
             )
         )
+        assert reached == [point]
         assert result.error is not None
         assert service.store.jobs("project:rollback") == ()
         assert service.artifacts.list_artifacts("project:rollback") == ()

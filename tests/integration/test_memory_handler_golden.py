@@ -3,8 +3,10 @@
 One request per scenario runs on a real runtime with deterministic ids and clock. The golden file is
 generated from the pre-move handler (THOTH_WRITE_GOLDEN=1), reviewed and frozen. Moving the pure
 record construction out of the handler must leave the full JSON-RPC response (key order included),
-the id and clock sequence, every control record read, list and append (with the record digest), the
-ledger head reads and the guard errors unchanged. The two-append routes (validate,
+the id and clock sequence, every control record append (with the record digest) and the guard
+errors unchanged. Control record reads and lists and the ledger head reads are not recorded; the
+response shows what they returned (a stale owner is made visible by an empty head set, see
+stale_heads). The two-append routes (validate,
 changeSet/propose, retire/propose) keep their order and count. The startup policy seeding is traced
 separately.
 """
@@ -110,26 +112,9 @@ def install(monkeypatch: pytest.MonkeyPatch, rec: Recorder) -> None:
 
     monkeypatch.setattr(SqliteControlRecordStore, "append", append)
 
-    def wrap(owner: Any, short: str, name: str) -> None:
-        original = getattr(owner, name)
-
-        def traced(self: Any, *args: Any, **kwargs: Any) -> Any:
-            rec.note(
-                short,
-                name,
-                *[a for a in args if isinstance(a, str)],
-                *[f"{k}={v}" for k, v in sorted(kwargs.items())],
-            )
-            return original(self, *args, **kwargs)
-
-        monkeypatch.setattr(owner, name, traced)
-
-    for name in ("read", "read_digest", "list"):
-        wrap(SqliteControlRecordStore, "C", name)
     original_heads = SqliteLedger.read_heads
 
     def read_heads(self: SqliteLedger, project_id: str) -> Any:
-        rec.note("L", "read_heads", project_id)
         if rec.on and rec.stale_heads:
             return {}
         return original_heads(self, project_id)

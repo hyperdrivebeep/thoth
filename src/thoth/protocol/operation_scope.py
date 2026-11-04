@@ -2,6 +2,9 @@
 
 SYSTEM_PROJECT_METHODS = frozenset(
     {
+        "model/localAsset/read",
+        "model/localAsset/import",
+        "model/localAsset/install",
         "workspace/setup/read",
         "workspace/setup/update",
         "workspace/ready",

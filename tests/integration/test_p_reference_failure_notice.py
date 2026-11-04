@@ -1,7 +1,5 @@
 """A real post-research reference rejection must describe only readable saved research."""
 
-import json
-import os
 from pathlib import Path
 from typing import Any
 
@@ -17,18 +15,6 @@ from thoth.application.services.revision_service import CommitResult
 from thoth.domain.behavior_execution import BehaviorExecutionRecord
 from thoth.domain.reference import ReferenceError
 from thoth.protocol.deferred import current_operation
-
-
-def save(name: str, evidence: dict[str, Any]) -> None:
-    folder = (
-        Path(__file__).resolve().parents[2]
-        / "outputs/refactor-p-20261022"
-        / os.environ.get("THOTH_P_RUN_LABEL", "p3-direct")
-    )
-    folder.mkdir(parents=True, exist_ok=True)
-    (folder / f"{name}.json").write_text(
-        json.dumps(evidence, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 def install_models(monkeypatch: pytest.MonkeyPatch, version: int) -> list[str]:
@@ -127,7 +113,6 @@ async def test_real_reference_rejection_reports_saved_research_in_both_contracts
             )
         )
         captured.update(error=error, readable=readable, thread_read=current)
-        save(f"reference-v{version}", captured)
         assert error["code"] == (-32030 if version == 1 else -32603)
         data = error["data"]
         assert isinstance(data, dict)
@@ -224,7 +209,6 @@ async def test_other_failures_never_claim_saved_reference_research(
             )
         else:
             assert calls
-        save(f"negative-{version}-{failure}", {"error": error, "model_roles": calls})
 
 
 @pytest.mark.parametrize("result", [{"queued": True}, {"unrelated_result": True}])

@@ -14,12 +14,17 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 
+from pydantic import JsonValue, TypeAdapter, ValidationError
+
 from thoth.domain.embedding_index import (
     EmbeddingBudget,
     EmbeddingCapability,
     EmbeddingIndexError,
     EmbeddingVector,
 )
+from thoth.domain.model_asset import EMBEDDING_ERROR_CODES, EmbeddingAssetDescriptor
+
+_FRAME = TypeAdapter(dict[str, JsonValue])
 
 
 @dataclass(order=True)
@@ -36,10 +41,19 @@ class _Request:
 
 
 class ProcessEmbeddingWorker:
-    def __init__(self, factory: str, budget: EmbeddingBudget = EmbeddingBudget()) -> None:
+    def __init__(
+        self,
+        factory: str,
+        budget: EmbeddingBudget = EmbeddingBudget(),
+        *,
+        descriptor: EmbeddingAssetDescriptor | None = None,
+    ) -> None:
         if not re.fullmatch(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*:[A-Za-z_]\w*", factory):
             raise ValueError("EMBEDDING_FACTORY_INVALID")
         self.factory, self.budget = factory, budget
+        self.descriptor = descriptor
+        self._loaded = False
+        self._prepare_lock = asyncio.Lock()
         self.capability = EmbeddingCapability(
             process_tree="WINDOWS_JOB" if sys.platform == "win32" else "POSIX_SESSION",
             memory_limit="COMMIT" if sys.platform == "win32" else "ADDRESS_SPACE",
@@ -54,12 +68,18 @@ class ProcessEmbeddingWorker:
         self._background = 0
         self.last_pid: int | None = None
         self.last_stop_confirmed = True
+        self.last_exit_code: int | None = None
+        self.encoder_pid: int | None = None
+        self.memory_failure_observed = False
 
     def _start(self) -> None:
         if self._process is not None:
             return
         if self._closed:
             raise EmbeddingIndexError("EMBEDDING_WORKER_CLOSED")
+        self.last_exit_code = None
+        self.encoder_pid = None
+        self.memory_failure_observed = False
         argv = (
             sys.executable,
             "-m",
@@ -67,12 +87,25 @@ class ProcessEmbeddingWorker:
             self.factory,
             self.budget.model_dump_json(),
         )
+        if self.descriptor is not None:
+            argv += (self.descriptor.model_dump_json(),)
         env = dict(os.environ)
         # Trusted application factory, never a module path from a user/model payload.
         env["PYTHONPATH"] = os.pathsep.join(
             dict.fromkeys([str(Path(__file__).resolve().parents[3]), *sys.path])
         )
         env["PYTHONIOENCODING"] = "utf-8"
+        if self.descriptor is not None:
+            # ORT remains intra4/inter1; BLAS initialization must not reserve a machine-wide pool.
+            threads = str(self.descriptor.load_budget.blas_threads)
+            env.update(
+                OPENBLAS_NUM_THREADS=threads,
+                OMP_NUM_THREADS=threads,
+                MKL_NUM_THREADS=threads,
+                TOKENIZERS_PARALLELISM=str(
+                    self.descriptor.load_budget.tokenizer_parallelism
+                ).lower(),
+            )
         if sys.platform == "win32":
             from thoth.adapters.models.windows_process_job import spawn_windows_job
 
@@ -95,16 +128,30 @@ class ProcessEmbeddingWorker:
         def drain() -> None:
             try:
                 assert proc.stderr is not None
-                while proc.stderr.read(4096):
-                    pass
+                while chunk := proc.stderr.read(4096):
+                    if any(
+                        marker in chunk.lower()
+                        for marker in (
+                            b"bad_alloc",
+                            b"memoryerror",
+                            b"not enough memory",
+                            b"memory allocation",
+                            b"out of memory",
+                        )
+                    ):
+                        self.memory_failure_observed = True
             except (OSError, ValueError):
                 pass
 
         self._stderr = threading.Thread(target=drain, daemon=True)
-        self._stderr.start()
+        try:
+            self._stderr.start()
+        except BaseException:
+            self._stderr = None
+            self._stop()
+            raise
 
-    def _exchange(self, item: _Request) -> EmbeddingVector:
-        process = self._process
+    def _exchange(self, item: _Request, process: Any) -> EmbeddingVector:
         if process is None:
             raise EmbeddingIndexError("EMBEDDING_PROCESS_MISSING")
         raw = (
@@ -118,15 +165,32 @@ class ProcessEmbeddingWorker:
         line = process.stdout.readline(16385)
         if not line or len(line) > 16384:
             raise EmbeddingIndexError("EMBEDDING_PROTOCOL_FAILED")
-        value = json.loads(line)
+        try:
+            value = _FRAME.validate_json(line)
+        except ValidationError as exc:
+            raise EmbeddingIndexError("EMBEDDING_PROTOCOL_FAILED") from exc
         if "error" in value:
-            raise EmbeddingIndexError("EMBEDDING_ENCODER_FAILED")
-        vector = EmbeddingVector(bytes.fromhex(value["data"]))
+            code = value["error"]
+            raise EmbeddingIndexError(
+                code
+                if isinstance(code, str) and code in EMBEDDING_ERROR_CODES
+                else "EMBEDDING_FAILED"
+            )
+        if self.descriptor is not None and (value.get("kind"), value.get("protocol")) != (
+            "vector",
+            2,
+        ):
+            raise EmbeddingIndexError("EMBEDDING_PROTOCOL_FAILED")
+        data = value.get("data")
+        if not isinstance(data, str):
+            raise EmbeddingIndexError("EMBEDDING_PROTOCOL_FAILED")
+        vector = EmbeddingVector(bytes.fromhex(data))
         if vector.sha256 != value["sha256"]:
             raise EmbeddingIndexError("EMBEDDING_PROTOCOL_FAILED")
         return vector
 
     def _stop(self) -> None:
+        self._loaded = False
         proc = self._process
         if proc is None:
             return
@@ -154,6 +218,8 @@ class ProcessEmbeddingWorker:
     async def encode_one(self, text: str, *, role: Literal["QUERY", "PASSAGE"]) -> EmbeddingVector:
         if self._closed:
             raise EmbeddingIndexError("EMBEDDING_WORKER_CLOSED")
+        if self.descriptor is not None and not self._loaded:
+            raise EmbeddingIndexError("EMBEDDING_NOT_PREPARED")
         if len(text.encode()) > self.budget.max_input_bytes:
             raise EmbeddingIndexError("EMBEDDING_INPUT_TOO_LARGE")
         if role == "QUERY" and self._queries >= self.budget.query_queue:
@@ -209,15 +275,19 @@ class ProcessEmbeddingWorker:
             self._queries -= item.role == "QUERY"
             self._background -= item.role == "PASSAGE"
             io: asyncio.Task[EmbeddingVector] | None = None
+            owned_process: Any = None
             try:
                 if item.future.cancelled():
                     continue
                 remaining = item.deadline - time.monotonic()
                 if remaining <= 0:
                     raise EmbeddingIndexError("EMBEDDING_TIMEOUT")
+                if self.descriptor is not None and (not self._loaded or self._process is None):
+                    raise EmbeddingIndexError("EMBEDDING_NOT_PREPARED")
                 item.started = True
                 self._start()
-                io = asyncio.create_task(asyncio.to_thread(self._exchange, item))
+                owned_process = self._process
+                io = asyncio.create_task(asyncio.to_thread(self._exchange, item, owned_process))
                 # Cancellation must stop its process, not just its wait.
                 while not io.done():
                     if item.future.cancelled():
@@ -233,7 +303,8 @@ class ProcessEmbeddingWorker:
                     item.future.set_result(vector)
             except BaseException as exc:
                 try:
-                    self._stop()
+                    if owned_process is not None and self._process is owned_process:
+                        self._stop()
                 except EmbeddingIndexError as cleanup_error:
                     item.cleanup_error = cleanup_error
                 if io is not None:
@@ -269,3 +340,64 @@ class ProcessEmbeddingWorker:
         if self._runner is not None:
             with suppress(asyncio.CancelledError):
                 await asyncio.wait_for(self._runner, 3)
+
+    def _read_ready(self, process: Any) -> None:
+        if process is None:
+            raise EmbeddingIndexError("EMBEDDING_LOAD_FAILED")
+        line = process.stdout.readline(16385)
+        if not line or len(line) > 16384:
+            self.last_exit_code = process.poll()
+            raise EmbeddingIndexError("EMBEDDING_LOAD_FAILED")
+        try:
+            value = _FRAME.validate_json(line)
+        except ValidationError as exc:
+            raise EmbeddingIndexError("EMBEDDING_PROTOCOL_FAILED") from exc
+        if "error" in value:
+            code = value["error"]
+            raise EmbeddingIndexError(
+                code
+                if isinstance(code, str) and code in EMBEDDING_ERROR_CODES
+                else "EMBEDDING_LOAD_FAILED"
+            )
+        if (value.get("kind"), value.get("protocol")) != ("ready", 2):
+            raise EmbeddingIndexError("EMBEDDING_LOAD_FAILED")
+        pid = value.get("pid")
+        if type(pid) is not int or pid <= 0:
+            raise EmbeddingIndexError("EMBEDDING_LOAD_FAILED")
+        self.encoder_pid = pid
+
+    async def prepare(self, *, deadline: float | None = None) -> None:
+        try:
+            await self._prepare_with_deadline(deadline)
+        except TimeoutError as exc:
+            raise EmbeddingIndexError("EMBEDDING_TIMEOUT") from exc
+
+    @property
+    def prepared(self) -> bool:
+        return self._loaded
+
+    async def _prepare_with_deadline(self, deadline: float | None) -> None:
+        if self.descriptor is None:
+            return
+        stop_at = time.monotonic() + self.descriptor.load_budget.timeout_ms / 1000
+        if deadline is not None:
+            stop_at = min(stop_at, deadline)
+        async with asyncio.timeout_at(stop_at), self._prepare_lock:
+            if self._closed:
+                raise EmbeddingIndexError("EMBEDDING_WORKER_CLOSED")
+            if self._loaded:
+                return
+            io: asyncio.Task[None] | None = None
+            try:
+                self._start()
+                io = asyncio.create_task(asyncio.to_thread(self._read_ready, self._process))
+                await asyncio.shield(io)
+                if time.monotonic() >= stop_at:
+                    raise EmbeddingIndexError("EMBEDDING_TIMEOUT")
+                self._loaded = True
+            except BaseException:
+                self._stop()
+                if io is not None:
+                    with suppress(Exception):
+                        await asyncio.wait_for(asyncio.shield(io), 3)
+                raise

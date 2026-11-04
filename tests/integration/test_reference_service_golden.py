@@ -5,11 +5,15 @@
 
 Scenarios run on a real runtime through thread/input (the only public entry) with the scripted
 reference mapper, the local deterministic calculators, a deterministic id generator and clock. The
-trace holds the calls made while a ReferenceService method is running: method entries and exits with
-argument and result digests, criterion store, artifact, thread store, ledger, revision commit,
-calculator and mapper calls, the id and clock sequence and every transaction entry. The golden file
-is generated from the pre-move service (THOTH_WRITE_GOLDEN=1), reviewed and frozen: moving the pure
-record construction out of the service must leave results, call order, counts and digests unchanged.
+trace holds what happens while a ReferenceService method runs: criterion store, thread store,
+ledger transaction, revision commit, calculator and mapper calls, the id and clock sequence, the
+entries and exits of the two checks (authorize, current) and every exception. Method entries and
+exits of the other methods are not recorded. An artifact read is recorded only when it is the first
+one after a call starts or after a check (authorize, current) is entered, which shows that no
+artifact is read before the check; repeats of a read and bulk reads of other references are not.
+The golden file is generated from the pre-move service (THOTH_WRITE_GOLDEN=1), reviewed and
+frozen: moving the pure record construction out of the service must leave results, call order,
+counts and digests unchanged.
 """
 
 from __future__ import annotations
@@ -82,6 +86,7 @@ SERVICE_METHODS = (
     "source_digests",
     "automatic_request",
 )
+GUARD_METHODS = ("authorize", "current")
 PORTS: list[tuple[Any, str, tuple[str, ...]]] = [
     (
         SqliteCriterionContractStore,
@@ -133,10 +138,19 @@ class Recorder:
         self.ids = 0
         self.ticks = 0
         self.services: list[ReferenceService] = []
+        self.first_read = True
 
     def note(self, *entry: Any) -> None:
         if self.on and self.depth > 0:
             self.log.append(list(entry))
+
+    def port(self, short: str, *entry: Any) -> None:
+        """Artifact reads ('A') are kept only as the first after a call starts or a check enters."""
+        if short != "A":
+            self.note(short, *entry)
+        elif self.first_read and self.on and self.depth > 0:
+            self.first_read = False
+            self.note(short, *entry)
 
     def result(self, name: str, item: Any) -> None:
         self.results.append([name, plain(item)])
@@ -174,14 +188,18 @@ def install(monkeypatch: pytest.MonkeyPatch, rec: Recorder) -> None:
 
         def traced(self: Any, *args: Any, **kwargs: Any) -> Any:
             rec.depth += 1
-            rec.note("S", "enter", name, *arguments(args, kwargs))
+            if rec.depth == 1 or name in GUARD_METHODS:
+                rec.first_read = True
+            if name in GUARD_METHODS:
+                rec.note("S", "enter", name, *arguments(args, kwargs))
             try:
                 result = original(self, *args, **kwargs)
             except BaseException as error:
                 rec.note("S", "raise", name, type(error).__name__, str(error))
                 rec.depth -= 1
                 raise
-            rec.note("S", "exit", name, summ(result))
+            if name in GUARD_METHODS:
+                rec.note("S", "exit", name, summ(result))
             rec.depth -= 1
             return result
 
@@ -192,14 +210,14 @@ def install(monkeypatch: pytest.MonkeyPatch, rec: Recorder) -> None:
         if inspect.iscoroutinefunction(original):
 
             async def traced_async(self: Any, *args: Any, **kwargs: Any) -> Any:
-                rec.note(short, name, *arguments(args, kwargs))
+                rec.port(short, name, *arguments(args, kwargs))
                 return await original(self, *args, **kwargs)
 
             monkeypatch.setattr(owner, name, traced_async)
             return
 
         def traced(self: Any, *args: Any, **kwargs: Any) -> Any:
-            rec.note(short, name, *arguments(args, kwargs))
+            rec.port(short, name, *arguments(args, kwargs))
             return original(self, *args, **kwargs)
 
         monkeypatch.setattr(owner, name, traced)

@@ -137,10 +137,12 @@ async def test_a_repeated_investigation_pause_writes_nothing(tmp_path: Path) -> 
             "investigation_id": listed["investigations"][0]["investigation_id"],
         }
 
+        audit_keys = iter(("audit-before-repeat", "audit-after-repeat"))
+
         async def audit_count() -> int:
             read = value(
                 await runtime.bus.dispatch(
-                    request("investigation/audit/read", "audit-" + str(id(object())), scope)
+                    request("investigation/audit/read", next(audit_keys), scope)
                 )
             )
             return len(read["records"])

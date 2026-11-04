@@ -1,6 +1,5 @@
 """Staging bytes alone does not publish a source or make evidence available to research."""
 
-import json
 from io import BytesIO
 from pathlib import Path
 
@@ -88,23 +87,6 @@ async def test_staged_bytes_remain_outside_sources_evidence_and_research(tmp_pat
         assert research.error is not None
         assert "requires at least one connected evidence span" in research.error.message
         assert models.calls == 0
-        out = Path(__file__).resolve().parents[2] / "outputs/u-upload-20261023"
-        out.mkdir(parents=True, exist_ok=True)
-        (out / "staged-unconnected-proof.json").write_text(
-            json.dumps(
-                {
-                    "staged_file_exists": True,
-                    "database_unchanged_by_staging": True,
-                    "sources": sources,
-                    "evidence": evidence,
-                    "research_error": research.error.model_dump(mode="json"),
-                    "model_calls": models.calls,
-                },
-                indent=2,
-            )
-            + "\n",
-            encoding="utf-8",
-        )
     finally:
         await upload.close()
         runtime.close()

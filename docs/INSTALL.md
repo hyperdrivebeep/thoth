@@ -326,7 +326,7 @@ not automatically merge; preserve browser storage separately when needed.
 .\.venv\Scripts\python.exe -m pytest tests/integration/test_research_followup_read.py -q
 ```
 
-`pwsh -NoProfile -File .\Makefile.ps1 verify` is the unchanged repository-wide check, a different
+`pwsh -NoProfile -File .\Makefile.ps1 verify` runs the repository-wide product checks, a different
 scope from feature acceptance. Read [verification status](VERIFICATION.md) before interpreting
 failures or running the full suite. Candidate clean-install evidence is recorded there separately.
 

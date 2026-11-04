@@ -2,7 +2,7 @@ import { getLocale } from "../i18n/locale";
 import { readResponseLanguageDefault } from "../api/responseLanguageDefault";
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
-import { Button, Callout, Collapse, HTMLSelect, Icon, InputGroup, Tab, Tabs, Tag } from "@blueprintjs/core";
+import { Button, Callout, Collapse, HTMLSelect, Icon, InputGroup, PopoverNext, Tab, Tabs, Tag } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { rpc } from "../api/rpcClient";
@@ -21,6 +21,7 @@ import { SourceTimeAdvanced } from "./SourceTimeAdvanced";
 import { useCitationGate } from "./SourceCitationGate";
 import { cutoffLabel, projectCutoffText } from "../api/sourceTime";
 import { FirstRunSetup } from "./FirstRunSetup";
+import { LocalRetrievalSettingsCard } from "./LocalRetrievalSettingsCard";
 import { WorkspaceLocationNotice } from "./WorkspaceLocationNotice";
 import { WorkspaceInternetConsent } from "./WorkspaceInternetConsent";
 import { workspaceSetupIssue, workspaceSetupIssueText, type WorkspaceSetupIssue } from "./workspaceSetupIssue";
@@ -180,6 +181,7 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
       )}
       <LanguageSettingsCard scope={storageScope}/>
       {!hosted && consent !== undefined && <WorkspaceInternetConsent consent={consent} focus={focusConsent} onFocused={clearConsentFocus}/>}
+      <LocalRetrievalSettingsCard workspaceId={workspaceId ?? "UNBOUND"} projectId={project.project_id} hosted={hosted}/>
       <section className="detail-card"><h2>{t("workspace.usage")}</h2><p>{message("reportedTokens", status?.usage?.total_tokens?.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")??t("workspace.noUsage"), status?.usage?.state==="PARTIAL"?t("workspace.partialUsage"):"")}</p><p>{t("workspace.usagePending")}</p>{!hosted&&<><Button small minimal icon={projectDetailsOpen?"chevron-up":"settings"} onClick={()=>setProjectDetailsOpen(value=>!value)} aria-expanded={projectDetailsOpen}>{t("workspace.projectSettings")}</Button><Collapse isOpen={projectDetailsOpen}><RecordInspector value={project}/></Collapse></>}</section>
       <section className="detail-card"><h2>{hosted?t("workspace.recordsSources"):t("workspace.recordsTools")}</h2><Button minimal icon="folder-open" onClick={()=>onPage("resources")}>{t("workspace.manageSources")}</Button><Button minimal icon="history" onClick={()=>onPage("records")}>{t("workspace.history")}</Button>{!hosted&&<><Button minimal icon={developerOpen?"chevron-up":"chevron-down"} onClick={()=>setDeveloperOpen(value=>!value)} aria-expanded={developerOpen}>{t("workspace.devTools")}</Button><Collapse isOpen={developerOpen}><div className="local-developer-tools"><Button minimal icon="database" onClick={()=>onPage("raw-records")}>{t("workspace.detailedRecords")}</Button><Button minimal icon="code" onClick={()=>{setCatalogNamespace("all");onPage("capabilities");}}>{t("workspace.apiTools")}</Button><RecordInspector value={{request:status?.request,attempt:status?.attempt,budget:status?.budget,usage:status?.usage,cleanup:status?.cleanup}}/></div></Collapse></>}</section>
     </>}
@@ -194,12 +196,13 @@ function ProjectNavItem({ project, active, removing, onOpen, onRemove }: {
   onRemove: () => void;
 }) {
   const [menuOpen,setMenuOpen] = useState(false);
-  return <div className={`project-nav-row ${active ? "active" : ""}`} onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget))setMenuOpen(false);}}>
+  return <div className={`project-nav-row ${active ? "active" : ""}`}>
     <Button minimal alignText="left" className={`project-button ${active ? "active" : ""}`} onClick={onOpen}>
       <Icon icon={active ? "folder-open" : "folder-close"}/><span><strong>{project.name}</strong></span>
     </Button>
-    <Button small minimal icon="more" aria-label={message("projectMenu", project.name)} aria-expanded={menuOpen} loading={removing} onClick={()=>setMenuOpen(value=>!value)}/>
-    {menuOpen&&<div className="project-inline-menu" role="menu"><Button fill alignText="left" minimal role="menuitem" icon="trash" intent="danger" disabled={removing} onClick={()=>{setMenuOpen(false);onRemove();}}>{t("workspace.removeProject")}</Button></div>}
+    <PopoverNext isOpen={menuOpen} onInteraction={setMenuOpen} placement="right-start" arrow={false} content={<div className="project-inline-menu" role="menu"><Button fill alignText="left" minimal role="menuitem" icon="trash" intent="danger" disabled={removing} onClick={()=>{setMenuOpen(false);onRemove();}}>{t("workspace.removeProject")}</Button></div>}>
+      <Button small minimal icon="more" aria-label={message("projectMenu", project.name)} aria-expanded={menuOpen} loading={removing}/>
+    </PopoverNext>
   </div>;
 }
 

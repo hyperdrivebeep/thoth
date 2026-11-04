@@ -1,0 +1,62 @@
+{
+  "version": "model-asset:1.0.0",
+  "model_id": "ibm-granite/granite-embedding-97m-multilingual-r2",
+  "revision": "835ad14087e140460703cf0fae09f97d469d65c2",
+  "preprocessing": "granite-cls-l2-batch1-question-only:1.0.0",
+  "files": [
+    {
+      "path": "onnx/model_quint8_avx2.onnx",
+      "bytes": 98247878,
+      "sha256": "a6022dd8220ea6f6595562a1328ee216f4a94faa55362f2f4747c80f1e78772e"
+    },
+    {
+      "path": "README.md",
+      "bytes": 20684,
+      "sha256": "a73d22110e7e6d947f55cdd4f1a8b0b622e340fd09a66d302f5fe800899024bd"
+    },
+    {
+      "path": "config.json",
+      "bytes": 1216,
+      "sha256": "de948b0bdc6f356afad7a84b276d8dd7e7fe10fb9add1bb5e610621c28e41ebc"
+    },
+    {
+      "path": "modules.json",
+      "bytes": 349,
+      "sha256": "84e40c8e006c9b1d6c122e02cba9b02458120b5fb0c87b746c41e0207cf642cf"
+    },
+    {
+      "path": "sentence_bert_config.json",
+      "bytes": 60,
+      "sha256": "967ef958285e4a7a37d8ff1832473d967edd913b4e48572f31c3d3ea361d5327"
+    },
+    {
+      "path": "1_Pooling/config.json",
+      "bytes": 313,
+      "sha256": "8bc5c9a40814fcf48d2fbe7cfeff4bee6736c3c2a823ba0ce098985c59d12ab7"
+    },
+    {
+      "path": "tokenizer.json",
+      "bytes": 25301672,
+      "sha256": "4f2842d568e2724370aec203652a42ac783c7937f8347a1a2cc7506d71f1582f"
+    },
+    {
+      "path": "tokenizer_config.json",
+      "bytes": 12860,
+      "sha256": "6ed69389e30a8ecabfce2f9ebcdf0c908b34056f24d994340f2f216521c057d5"
+    },
+    {
+      "path": "special_tokens_map.json",
+      "bytes": 871,
+      "sha256": "013787ee251ff611722479197c00853b62113ad303cb0a36524231783c676c69"
+    },
+    {
+      "path": "config_sentence_transformers.json",
+      "bytes": 283,
+      "sha256": "93a59cbc7d82a47a7148719d9b21c0f2f111121e495b3918143184f4cd0ea25e"
+    }
+  ],
+  "license": "Apache-2.0 (publisher model card; standalone license absent)",
+  "source": "https://huggingface.co/ibm-granite/granite-embedding-97m-multilingual-r2/tree/835ad14087e140460703cf0fae09f97d469d65c2",
+  "max_tokens": 32768,
+  "dimensions": 384
+}

@@ -525,7 +525,8 @@ it("stops xAI device polling when its Unix-seconds expiry passes", async () => {
   fixture.registerResult = xaiStart(0.3);
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
-  await act(async () => { await new Promise(resolve => setTimeout(resolve, 1100)); });
+  // Wait for the expiry notice itself (the 0.3 s expiry is seen on the next one-second clock tick).
+  for (let i = 0; i < 120 && !row.textContent?.includes("유효 시간이 끝났습니다"); i++) await act(async () => { await tick(); });
   expect(row.textContent).toContain("유효 시간이 끝났습니다");
   expect(row.querySelector('a[href="https://grok.com/activate"]')).toBeNull();
   expect(fixture.calls.some(call => call.method === "model/credential/login/status")).toBe(false);
@@ -571,7 +572,8 @@ it("automatically polls one xAI login and stops after a terminal result", async 
   await mount();
   const row = [...container.querySelectorAll(".first-run-provider")].find(item => item.textContent?.includes("xAI"))!;
   await act(async () => [...row.querySelectorAll("button")].find(button => button.textContent === "xAI로 로그인")!.click()); await flush();
-  await act(async () => { await new Promise(resolve => setTimeout(resolve, 5200)); });
+  // The first automatic check runs 5 s after the start; wait for its result, not for a fixed 5.2 s.
+  for (let i = 0; i < 450 && !row.textContent?.includes("xAI 로그인이 거부됐습니다"); i++) await act(async () => { await tick(); });
   expect(row.textContent).toContain("xAI 로그인이 거부됐습니다");
   expect(fixture.calls.filter(call => call.method === "model/credential/login/status")).toHaveLength(1);
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 5200)); });

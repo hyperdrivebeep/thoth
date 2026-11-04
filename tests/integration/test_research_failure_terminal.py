@@ -29,6 +29,7 @@ async def test_primary_and_publication_failure_are_terminal_and_replayable(
         assert inspect.ismethod(handler) and isinstance(handler.__self__, ResearchThreadHandlers)
         host = handler.__self__
         original = host.publish
+        failed_calls: list[None] = []
 
         def publish(*args: object, **kwargs: object):
             if args[3] == "HOLD":
@@ -36,6 +37,7 @@ async def test_primary_and_publication_failure_are_terminal_and_replayable(
             return original(*args, **kwargs)  # type: ignore
 
         async def failed(*args: object, **kwargs: object):
+            failed_calls.append(None)
             raise ModelExecutionHold("MODEL_CALL_TIME_BUDGET_EXHAUSTED")
 
         monkeypatch.setattr(host, "publish", publish)
@@ -70,9 +72,11 @@ async def test_primary_and_publication_failure_are_terminal_and_replayable(
         assert status["attempt"]["status"] == "FAILED"
         assert status["execution_summary"]["effective_execution_state"] == "FAILED"
         assert bool(status["cleanup_failure"]) is release_fault
+        calls_before_replay = len(failed_calls)
+        assert calls_before_replay > 0
         replay = await runtime.bus.dispatch(req)
         assert replay.error is not None and replay.error.model_dump(mode="json") == op.error
-        assert len(model.calls) == 0
+        assert len(failed_calls) == calls_before_replay
     finally:
         runtime.close()
 

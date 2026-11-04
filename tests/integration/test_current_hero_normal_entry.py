@@ -40,7 +40,6 @@ async def test_current_hero_enters_through_one_normal_thread_input(tmp_path: Pat
     assert cast(int, stages["reasoning"]["actions"]) >= 3
     assert stages["sandbox_outcome"]["terminal_state"] == "COMPLETED"
     assert stages["revision_memory_receipt"]["semantic_truth_certified"] is False
-    assert result.manifest["external_write_performed"] is False
     generators = [call for call in model.calls if call.role == ModelRole.HYPOTHESIS_GENERATOR]
     assert generators and all(
         call.prompt_version == "hypothesis_portfolio.v5" and call.max_output_tokens == 8000

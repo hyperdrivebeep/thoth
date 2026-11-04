@@ -3,11 +3,13 @@
 import contextlib
 import importlib
 import json
+import os
 import socket
 import sys
 from typing import cast
 
 from thoth.domain.embedding_index import EmbeddingBudget, EmbeddingVector
+from thoth.domain.model_asset import EMBEDDING_ERROR_CODES, EmbeddingAssetDescriptor
 from thoth.domain.retrieval_embedding import DenseModelPin
 from thoth.ports.embedding import LocalEmbeddingPort
 
@@ -27,10 +29,26 @@ def main() -> None:
     socket.socket.connect = denied
     socket.create_connection = denied
     module, name = sys.argv[1].split(":")
-    with contextlib.redirect_stdout(sys.stderr):
-        factory = getattr(importlib.import_module(module), name)
-        encoder = cast(LocalEmbeddingPort, factory())
+    descriptor = (
+        EmbeddingAssetDescriptor.model_validate_json(sys.argv[3]) if len(sys.argv) > 3 else None
+    )
+    try:
+        with contextlib.redirect_stdout(sys.stderr):
+            factory = getattr(importlib.import_module(module), name)
+            encoder = cast(
+                LocalEmbeddingPort, factory() if descriptor is None else factory(descriptor)
+            )
+    except Exception as exc:
+        code = str(exc)
+        code = code if code in EMBEDDING_ERROR_CODES else "EMBEDDING_LOAD_FAILED"
+        sys.stdout.write(json.dumps({"kind": "error", "protocol": 2, "error": code}) + "\n")
+        sys.stdout.flush()
+        return
+    if descriptor is not None:
+        sys.stdout.write(json.dumps({"kind": "ready", "protocol": 2, "pid": os.getpid()}) + "\n")
+        sys.stdout.flush()
     while True:
+        result: dict[str, str | int]
         max_line = (
             6 * budget.max_input_bytes + 4096
         )  # JSON escaping can expand a control byte sixfold.
@@ -51,11 +69,18 @@ def main() -> None:
                 raise ValueError("EMBEDDING_INPUT_TOO_LARGE")
             with contextlib.redirect_stdout(sys.stderr):
                 vector = EmbeddingVector.from_values(
-                    encoder.encode_one(request["text"], role=request["role"], model=DenseModelPin())
+                    encoder.encode_one(
+                        request["text"],
+                        role=request["role"],
+                        model=DenseModelPin() if descriptor is None else descriptor.pin,
+                    )
                 )
             result = {"data": vector.data.hex(), "sha256": vector.sha256}
         except Exception as exc:
-            result = {"error": "EMBEDDING_ENCODER_FAILED", "type": type(exc).__name__}
+            code = str(exc)
+            result = {"error": code if code in EMBEDDING_ERROR_CODES else "EMBEDDING_FAILED"}
+        if descriptor is not None:
+            result.update(kind="error" if "error" in result else "vector", protocol=2)
         sys.stdout.write(json.dumps(result, separators=(",", ":")) + "\n")
         sys.stdout.flush()
 

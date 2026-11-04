@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +21,6 @@ from thoth.adapters.storage.transaction import read_connection
 from thoth.protocol.deferred import current_operation
 from thoth.protocol.jsonrpc import RpcErrorCode
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/defect-d1-object-followup-20261014"
 THREAD = "thread:a03-storage"
 MATERIALIZE_POINTS = (
     "add_candidate",
@@ -52,13 +50,6 @@ DOMAIN_TABLES = (
     "receipts",
     "threads",
 )
-
-
-def save(name: str, data: dict[str, Any]) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / (name + ".json")).write_text(
-        json.dumps(data, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 async def prepare(tmp_path: Path, kind: str, key: str) -> tuple[Any, dict[str, Any], Any]:
@@ -282,15 +273,6 @@ async def test_creation_fault_checkpoint(
                 patch.setattr(owner, name, instrument(name, getattr(owner, name)))
             response = await runtime.bus.dispatch(command)
         after = snapshot(runtime.ledger.engine)
-        save(
-            key,
-            {
-                "response": response.model_dump(mode="json"),
-                "hits": hits,
-                "before": before,
-                "after": after,
-            },
-        )
         assert len(hits) == 1 and response.error is not None
         if point == "thread_cas_reject":
             assert response.error.code == RpcErrorCode.DOMAIN_REJECTED
@@ -347,21 +329,6 @@ async def test_creation_fault_checkpoint(
         if kind == "followup":
             assert child["parent_object_id"] == ctx["object"]
             assert recovered["lineage"]["target_ref"] == "OBJECT:" + ctx["object"]
-        save(
-            key,
-            {
-                "verdict": "PASS",
-                "request": command.model_dump(mode="json"),
-                "response": response.model_dump(mode="json"),
-                "hits": hits,
-                "before": before,
-                "after": after,
-                "reopened_exact": True,
-                "replay_exact": True,
-                "parent_unchanged": True,
-                "recovered": recovered,
-            },
-        )
     finally:
         reopened.close()
 
@@ -389,9 +356,5 @@ async def test_followup_stale_and_hold_preserve_existing_state(tmp_path: Path, c
             result = value(response)
             assert result["object"] is None and result["commit"] is None
             assert result["candidate"]["permitted_transition"] == "HOLD_ENTRY_INVALID"
-        save(
-            "d1-" + case,
-            {"response": response.model_dump(mode="json"), "before": before, "after": after},
-        )
     finally:
         runtime.close()

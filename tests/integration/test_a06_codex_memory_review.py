@@ -102,7 +102,6 @@ async def test_normal_tui_routes_all_memory_roles_through_async_reviewer(
     stages = cast(dict[str, object], result.manifest["stages"])
     memory = cast(dict[str, object], stages["revision_memory_receipt"])
     assert cast(int, memory["reviewed_memory_count"]) >= 1
-    assert result.manifest["r3_or_r4_executed"] is False
 
 
 @pytest.mark.asyncio

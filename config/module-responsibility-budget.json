@@ -220,7 +220,7 @@
       "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     },
     "src/thoth/application/services/resource_scope_service.py": {
-      "baseline_lines": 809,
+      "baseline_lines": 772,
       "top_level_symbols": [
         "ResourceScopeService"
       ],

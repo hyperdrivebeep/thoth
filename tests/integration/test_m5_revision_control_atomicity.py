@@ -37,7 +37,6 @@ from thoth.ports.model import ModelPort
 from thoth.protocol.jsonrpc import JsonRpcResponse
 from thoth.protocol.registry import MethodRegistry
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step102-20261015"
 FAULT = "102-V after original storage write"
 
 
@@ -290,43 +289,12 @@ def assert_new_control_scopes(
         assert all(row["project_id"] == h.project for row in added)
 
 
-def save(name: str, before: Snapshot, after: Snapshot, probe: Probe, **details: object) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / f"v102-{name}.json").write_text(
-        json.dumps(
-            {
-                "changed_tables": [k for k in before if before[k] != after[k]],
-                "fault_hits": probe.hits,
-                "order": probe.order,
-                "control_writes": [
-                    {
-                        "namespace": r.namespace,
-                        "record_type": r.record_type,
-                        "record_id": r.record_id,
-                        "state": r.state,
-                        "version": r.version,
-                    }
-                    for r in probe.controls
-                ],
-                "lineage_digests": probe.lineage,
-                "commit_dispositions": [r.disposition.value for r in probe.commits],
-                **details,
-            },
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
-        newline="\n",
-    )
-
-
 async def rollback_and_replay(
     h: Harness, probe: Probe, method: str, body: dict[str, object], before: Snapshot, name: str
 ) -> None:
     failed = await h.call(method, "fault", body)
     assert failed.error is not None and probe.hits == 1
     after = h.snapshot()
-    save(name + "-fault", before, after, probe)
     assert after == before, "HOLD_DEFECT: generic revision/lineage UoW partially published"
     check_reopened(h.runtime.ledger.engine, before)
     order = list(probe.order)
@@ -426,14 +394,6 @@ async def test_last_generic_commit_control_fault_rolls_back_the_registered_wrapp
         else:
             assert heads_after[h.key] != heads_before[h.key]
         check_reopened(h.runtime.ledger.engine, h.snapshot())
-        save(
-            "branch-retry" if branched else "fast-forward-retry",
-            before,
-            h.snapshot(),
-            probe,
-            actual_registered_wrapper=True,
-            model_calls=h.model.calls,
-        )
 
 
 async def test_held_validation_conflict_fault_rolls_back_change_set_and_lineage(
@@ -475,14 +435,6 @@ async def test_held_validation_conflict_fault_rolls_back_change_set_and_lineage(
             assert_new_control_scopes(h, before, after, probe.controls[mark:])
         assert dict(h.runtime.ledger.read_heads(h.project)) == h.heads
         check_reopened(h.runtime.ledger.engine, after)
-        save(
-            "held-retry",
-            before,
-            after,
-            probe,
-            previous_version=change["version"],
-            current_version=retried["change_set"]["version"],
-        )
 
 
 async def test_branch_control_and_its_lineage_rollback_together_after_lineage_write(
@@ -535,4 +487,3 @@ async def test_branch_control_and_its_lineage_rollback_together_after_lineage_wr
                 assert before[table] == after[table], table
         assert dict(h.runtime.ledger.read_heads(h.project)) == h.heads
         check_reopened(h.runtime.ledger.engine, after)
-        save("lineage-retry", before, after, probe, model_calls=h.model.calls)

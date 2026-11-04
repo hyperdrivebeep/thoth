@@ -1,6 +1,3 @@
-import { message as formatMessage } from "../i18n/formatMessages";
-import { UiError } from "../i18n/UiError";
-import { t } from "../i18n/locale";
 import { jsonRpcResponseSchema } from "./protocol";
 import { expectedResultContract } from "./expectedResultContract";
 
@@ -10,6 +7,7 @@ export type RpcResult<T> = {
   value: T;
 };
 export const readQueries = new Set(["thread/read", "thread/list", "thread/activity/list", "model/settings/read",
+  "model/localAsset/read", "project/retrieval/experiment/read",
   "model/credential/list", "model/credential/login/status", "workspace/setup/read", "workspace/ready",
   "project/read", "project/list", "project/source/list", "evidence/list", "operation/read",
   "operation/result/read", "operation/checkpoint/read",
@@ -101,73 +99,4 @@ export async function rpc<T>(
   } finally {
     bounded.dispose();
   }
-}
-
-type OperationResult<T> = {
-  operation_id: string;
-  state: string;
-  result: T | null;
-  error: { code?: number; message?: string } | null;
-};
-
-export async function rpcAsync<T>(
-  method: string,
-  input: Record<string, unknown>,
-  idempotencyKey: string,
-  options: {
-    onStarted?: (operationId: string) => void;
-    pollMs?: number;
-  } = {},
-): Promise<RpcResult<T>> {
-  const request = {
-    jsonrpc: "2.0",
-    id: crypto.randomUUID(),
-    method,
-    params: { _meta: { idempotencyKey }, input },
-  };
-  const startedResponse = await fetch("/rpc/async", {
-    method: "POST",
-    credentials: "same-origin",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(request),
-  });
-  if (!startedResponse.ok) throw new Error(formatMessage("rpcStartFailed", startedResponse.status));
-  const started = jsonRpcResponseSchema.parse(await startedResponse.json());
-  if (started.error) throw new Error(`${started.error.message} [${started.error.code}]`);
-  const operationId = String(started.result?.operation_id ?? "");
-  const projectId = String(input.project_id ?? "");
-  if (!operationId || !projectId) throw new UiError("api.noOperation");
-  options.onStarted?.(operationId);
-  const interval = options.pollMs ?? 900;
-  for (;;) {
-    await new Promise((resolve) => setTimeout(resolve, interval));
-    const statusResponse = await fetch(
-      `/operations/${encodeURIComponent(operationId)}?project_id=${encodeURIComponent(projectId)}`,
-      { credentials: "same-origin" },
-    );
-    if (!statusResponse.ok) throw new Error(formatMessage("operationReadFailed", statusResponse.status));
-    const operation = (await statusResponse.json()) as OperationResult<T>;
-    if (operation.state === "SUCCEEDED" && operation.result !== null) {
-      return { operation_id: operationId, state: operation.state, value: operation.result };
-    }
-    if (operation.state === "FAILED") {
-      throw new Error(operation.error?.message ?? t("api.analysisFailed"));
-    }
-    if (operation.state === "CANCELLED") {
-      throw new UiError("api.analysisCancelled");
-    }
-  }
-}
-
-export async function cancelRpcOperation(projectId: string, operationId: string) {
-  const response = await fetch(`/operations/${encodeURIComponent(operationId)}/cancel`, {
-    method: "POST",
-    credentials: "same-origin",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ project_id: projectId }),
-  });
-  if (!response.ok) throw new Error(formatMessage("operationCancelFailed", response.status));
-  const envelope = jsonRpcResponseSchema.parse(await response.json());
-  if (envelope.error) throw new RpcError(envelope.error.message, envelope.error.code, envelope.error.data);
-  return envelope;
 }

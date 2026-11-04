@@ -27,7 +27,6 @@ from thoth.adapters.storage.transaction import read_connection
 from thoth.protocol.deferred import current_operation
 from thoth.protocol.jsonrpc import JsonRpcRequest
 
-_OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step74-20261014"
 _H = "thoth.application.services.hypothesis_service"
 _R = "thoth.application.services.revision_service"
 _S = "thoth.adapters.storage.sqlite"
@@ -41,11 +40,6 @@ _BASE = [
     _S + ".insert_receipt",
 ]
 _KINDS = ("assumption", "prediction", "relation_add", "relation_remove", "revalidate", "counter")
-
-
-def _save(name: str, data: dict[str, Any]) -> None:
-    _OUT.mkdir(parents=True, exist_ok=True)
-    (_OUT / name).write_text(json.dumps(data, indent=2, default=str) + "\n", encoding="utf-8")
 
 
 def _rows(state: dict[str, tuple[str, ...]], table: str) -> list[dict[str, Any]]:
@@ -634,7 +628,6 @@ async def test_auxiliary_late_audit_rolls_back_all_participants(
     try:
         restarted = snapshot(reopened.ledger.engine)
         data.update(before=before, after=after, reopened=restarted, expected_reads=ctx["reads"])
-        _save("fault-" + kind + ".json", data)
         _path(data, kind)
         assert response.error is not None and len(data["hits"]) == 1
         hit = data["hits"][0]
@@ -656,7 +649,6 @@ async def test_auxiliary_late_audit_rolls_back_all_participants(
         )
         await _check(reopened, ctx, kind, recovered, "recovered")
         data.update(recovered=recovered, verdict="PASS")
-        _save("fault-" + kind + ".json", data)
     finally:
         reopened.close()
 
@@ -711,17 +703,6 @@ async def test_prediction_assumption_and_investigation_chain(
             )
         )
         await _check(runtime, ctx, "counter", counter, "counter")
-        _save(
-            "normal-prediction-assumption-counter.json",
-            {
-                "prediction": predicted,
-                "assumption": assumption,
-                "counter": counter,
-                "trace": traced,
-                "old_prediction_preserved": True,
-                "verdict": "PASS",
-            },
-        )
     finally:
         runtime.close()
 
@@ -806,6 +787,5 @@ async def test_portfolio_relation_lifecycle_and_replay(tmp_path: Path) -> None:
         ]
         assert len(history) == 2 and any(json.loads(r)["active"] for r in history)
         evidence.update(reopened_equal=True, readback=relations, verdict="PASS")
-        _save("normal-portfolio-relations.json", evidence)
     finally:
         reopened.close()

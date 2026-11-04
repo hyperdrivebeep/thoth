@@ -7,7 +7,7 @@ from typing import Any, cast
 
 import pytest
 from tests.atomicity.harness import snapshot
-from tests.integration.p_r2_failure_helpers import ambient, capture_exit, revise_hypothesis, save
+from tests.integration.p_r2_failure_helpers import ambient, capture_exit, revise_hypothesis
 from tests.integration.test_a02_autonomous_acquisition import StaticModelResolver
 from tests.integration.test_a04_r2_closed_loop import A04R2Model
 from tests.integration.test_hypothesis_prediction_outcome_cycle import (
@@ -94,7 +94,6 @@ async def test_prepared_rejection_pair_rolls_back_on_write_fault(
                 patch.setattr(R2TestLifecycle, "complete", invalid_completion)
             response = await runtime.bus.dispatch(command)
         evidence["response"] = response.model_dump(mode="json")
-        save(f"pair-{path}-{write_number}-{after_write}", evidence)
         assert evidence["faults"] == 1
         expected = ["hold", "reject"] if path == "stale" else ["reject", "hold"]
         assert evidence["trace"] == expected[:write_number]
@@ -165,7 +164,6 @@ async def test_final_prepared_completion_and_candidate_roll_back_together(
             patch.setattr(R2ClosedLoopCoordinator, "_failure_execution", failure)
             response = await runtime.bus.dispatch(command)
         evidence["response"] = response.model_dump(mode="json")
-        save(f"final-{state.value}-{after_candidate}-{sandbox_error}", evidence)
         assert evidence["complete_hits"] == evidence["candidate_hits"] == 1
         assert evidence["has_test_completion"] is True
         assert evidence["await_ambient"] == [False]

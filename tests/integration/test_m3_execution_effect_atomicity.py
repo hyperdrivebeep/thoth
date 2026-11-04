@@ -36,7 +36,6 @@ from tests.integration.test_m3_execution_revision_atomicity import (
     bound,
     call,
     revision,
-    save,
     start_input,
     views,
 )
@@ -543,22 +542,6 @@ async def test_execution_effect_post_write_failure_is_atomic(
             for use in json.loads(binding_row["content_json"])["resource_uses"]
         )
         expected_order = expected_prefix(kind, owner, writer, event, nth)
-        evidence: dict[str, Any] = {
-            "case": [kind, label],
-            "request": command.model_dump(mode="json"),
-            "error": failed.model_dump(mode="json").get("error"),
-            "expected_reads": reads,
-            "observed_resource_uses": actual_reads,
-            "actual_callable": binding,
-            "expected_writer_order": [list(step) for step in expected_order],
-            "observed_writer_order": [list(step) for step in state["order"]],
-            "fault": state,
-            "changed_tables": sorted(
-                name
-                for name in before
-                if not unchanged_or_operation_owner(before, after, name, command)
-            ),
-        }
         assert len(state["hits"]) == 1, "HOLD_CONTRACT_MISMATCH: expected target hit1"
         assert state["order"] == expected_order, (
             "HOLD_CONTRACT_MISMATCH: source-derived writer order differs",
@@ -579,7 +562,6 @@ async def test_execution_effect_post_write_failure_is_atomic(
         )
         allowed = failed_command_allowances(runtime.ledger.engine, command, expected_reads=reads)
         assert_phase_delta(before, after, allowed)
-        save(key, evidence)
     finally:
         runtime.close()
     reopened = create_runtime(tmp_path)
@@ -594,8 +576,7 @@ async def test_execution_effect_post_write_failure_is_atomic(
         assert await views(reopened, ctx, "92b-preserved") == views_before
         recovered = value(await reopened.bus.dispatch(request(method, key + "-retry", payload)))
         check_published(reopened, ctx, kind, recovered)
-        counts = check_effect_rows(reopened, ctx, kind, recovered)
-        save(key, {**evidence, "verdict": "PASS", "replay_exact": True, "recovered_rows": counts})
+        check_effect_rows(reopened, ctx, kind, recovered)
     finally:
         reopened.close()
 
@@ -725,7 +706,7 @@ async def test_execution_effect_chain_control(tmp_path: Path) -> None:
             },
         )
         assert invalidated["execution"]["state"] == "INVALIDATED"
-        revisions = check_chain(runtime, ctx)
+        check_chain(runtime, ctx)
         action_head = [
             key
             for key in runtime.ledger.read_heads(ctx["project"])
@@ -734,10 +715,6 @@ async def test_execution_effect_chain_control(tmp_path: Path) -> None:
         assert action_head, "compensation Action head is missing"
         expected = await views(runtime, ctx, "92b-live")
         persisted = snapshot(runtime.ledger.engine)
-        save(
-            "control-execution-effect-chain",
-            {"revisions": len(revisions), "action_head": action_head, "views": expected},
-        )
     finally:
         runtime.close()
     reopened = create_runtime(tmp_path / "chain")

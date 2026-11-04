@@ -25,7 +25,6 @@ from thoth.adapters.storage.sqlite import SqliteLedgerTransaction
 from thoth.adapters.storage.transaction import read_connection
 from thoth.protocol.deferred import current_operation
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step84-20261014"
 BOOKKEEPING = {"operations", "idempotency_keys", "events", "operation_resource_bindings"}
 FRAME_POINTS = (
     "insert_snapshot",
@@ -50,13 +49,6 @@ CASES = (
     + [(k, "append_audit") for k in LATE_KINDS]
     + [(k, "proposal_insert") for k in ("split", "merge")]
 )
-
-
-def save(name: str, data: dict[str, Any]) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / (name + ".json")).write_text(
-        json.dumps(data, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 async def read_object(
@@ -324,10 +316,6 @@ async def test_revision_relation_work_control(tmp_path: Path) -> None:
         assert snapshot(runtime.ledger.engine) == before_conflict
         expected = await views(runtime, ctx, "84-live")
         persisted = snapshot(runtime.ledger.engine)
-        save(
-            "control-revision-relation",
-            {"results": results, "views": expected, "original_preserved": True},
-        )
     finally:
         runtime.close()
     await check_reopened(tmp_path, ctx, persisted, expected)
@@ -366,7 +354,6 @@ async def test_attention_lifecycle_control(tmp_path: Path) -> None:
         )
         expected = await views(runtime, ctx, "84-live")
         persisted = snapshot(runtime.ledger.engine)
-        save("control-attention", {"ack": ack, "cleared": cleared, "views": expected})
     finally:
         runtime.close()
     await check_reopened(tmp_path, ctx, persisted, expected)
@@ -576,15 +563,6 @@ async def test_mutation_post_write_failure_is_atomic(
     command = request(method, key, payload)
     reads = expected_reads(ctx, kind)
     before = snapshot(runtime.ledger.engine)
-    save(
-        key + "-source-expectation",
-        {
-            "expected_reads": reads,
-            "current": ctx["current"],
-            "request": command.model_dump(mode="json"),
-            "basis": "source-read-set-expectations.json",
-        },
-    )
     try:
         registry = cast(Any, vars(runtime.bus)["_registry"])
         actual = registry.resolve(method)
@@ -621,7 +599,6 @@ async def test_mutation_post_write_failure_is_atomic(
             for use in json.loads(binding_row["content_json"])["resource_uses"]
         )
         evidence["observed_resource_uses"] = actual_reads
-        save(key, evidence)
         assert len(state["hits"]) == 1, "HOLD_CONTRACT_MISMATCH: expected target hit1"
         required = {
             "profile": {"decision_objects"},
@@ -678,15 +655,5 @@ async def test_mutation_post_write_failure_is_atomic(
                 == record["revision_digest"]
             )
             assert record["object_revision_id"] in recovered["commit"]["receipt"]["subject_refs"]
-        save(
-            key,
-            {
-                **evidence,
-                "verdict": "PASS",
-                "reopened": restarted,
-                "replay_exact": True,
-                "recovered": recovered,
-            },
-        )
     finally:
         reopened.close()

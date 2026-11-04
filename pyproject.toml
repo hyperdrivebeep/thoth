@@ -33,6 +33,7 @@ dependencies = [
 
 [project.optional-dependencies]
 structured-pdf = ["docling==2.127.0"]
+local-retrieval = ["onnxruntime==1.31.1", "tokenizers==0.23.3", "numpy==2.5.3"]
 dev = [
   "basedpyright>=1.26,<2",
   "pytest>=8.3,<10",
@@ -61,6 +62,7 @@ packages = ["src/thoth"]
 [tool.pytest.ini_options]
 addopts = "-q --strict-config --strict-markers"
 testpaths = ["tests"]
+pythonpath = ["."]
 asyncio_mode = "auto"
 
 [tool.ruff]

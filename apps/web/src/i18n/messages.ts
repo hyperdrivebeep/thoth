@@ -22,6 +22,7 @@ import { credentialMessages } from "./credentialMessages";
 import { workspaceDetailMessages } from "./workspaceDetailMessages";
 import { workspaceMessages } from "./workspaceMessages";
 import { setupMessages } from "./setupMessages";
+import { localRetrievalMessages } from "./localRetrievalMessages";
 /** Whole UI messages. Research text and canonical status codes never pass through this catalog. */
 export const messages = {
   "usage.memoryExpansion": { ko: "기억 검색어 넓히기", en: "Memory query expansion" },
@@ -49,6 +50,7 @@ export const messages = {
   ...workspaceDetailMessages,
   ...workspaceMessages,
   ...setupMessages,
+  ...localRetrievalMessages,
   "language.display": { ko: "화면 언어", en: "Display language" },
   "language.acceptedShort": { ko: "보낸 요청", en: "Submitted" },
   "language.cardTitle": { ko: "언어", en: "Language" },

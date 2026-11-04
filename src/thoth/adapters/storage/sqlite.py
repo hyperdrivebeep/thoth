@@ -421,10 +421,3 @@ class SqliteLedger:
 
     def close(self) -> None:
         self._engine.dispose()
-
-
-def remove_database(path: Path) -> None:
-    """Test helper with an explicit narrow target."""
-    resolved = path.resolve()
-    if resolved.is_file():
-        resolved.unlink()

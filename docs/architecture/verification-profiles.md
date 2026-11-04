@@ -9,7 +9,26 @@ main pushes, manual dispatches and the nightly default-branch run (18:00 UTC / 0
 The existing `checks` job keeps the static, Web and quick-start checks. `python-fast` collects
 everything except `tests/integration`; sixteen `python-integration` matrix jobs cover every
 integration test file exactly once. Each uses `-q -rfE -p no:cacheprovider` plus a JUnit report,
-with the same root conftest and inactive-Hook selection policy as a local full run.
+with ordinary pytest collection, identical to a local full run. The remaining tests are not
+filtered by a legacy Hook selector.
+
+Pull requests limited to `README.md`, `README.ko.md` and image files under `docs/screenshots/`
+or `docs/brand/` use a documentation/public-package check in the existing `checks` job. A
+co-changed `SOURCE_MANIFEST.json` is checked there too; changing only the manifest does not
+qualify. Contract documentation, AGENTS, source, tests, settings, dependencies and CI changes
+always retain the full product check. Unknown or unavailable diff input selects the full check.
+Pushes, scheduled runs and manual dispatches also always run the full check.
+
+The `changes` job compares the exact PR base with the tested HEAD, with renames shown as both
+paths. The Python test jobs skip only for that explicit documentation-only result; the independent
+`python-types` job still runs on every event, retaining its existing enforcement and artifact contract.
+`python-summary` still runs, rejects a failed/missing scope decision, and labels the full Python
+suite **NOT_RUN** for documentation-only PRs. In full mode it still requires every shard and report.
+The first real PR must verify both modes; local tests and YAML inspection are not a remote CI run.
+Both `checks` and `python-summary` run even when scope selection fails and reject missing/failed
+scope output, so a failed selector does not turn a required job into a successful skip. The selector
+and workflow are reviewed repository code, not a security boundary against a PR that rewrites CI.
+Reviewers must inspect CI/script changes rather than trust that PR's own documentation-only label.
 
 Before merging, require both `checks` and `python-summary` to pass for the reviewed revision.
 The summary requires every Python job to succeed and every report to exist; it shows failures,
@@ -30,7 +49,7 @@ The product check consists of:
 - Locked Python and Web installation and the README quick start, through the first setup screen.
 - `python -m pytest`: all applicable product, contract, integration and structure tests.
 - `pnpm --dir apps/web run test --run`, `lint`, `typecheck` and `build`.
-- `python -m ruff check src apps tests migrations conftest.py scripts/pytest_environment.py`.
+- `python -m ruff check src apps tests migrations`.
 - `python scripts/check_architecture.py` for runtime layer boundaries. Module/function budgets,
   protocol parity, canonical owners and migration guards remain active in the Python suite.
 
@@ -41,20 +60,17 @@ assets; no account, external page or model call is required. The basic README fi
 still needs only its documented minimal dependencies. See INSTALL.md for the optional setup.
 
 Python lint uses the same product paths as the existing `Makefile.ps1` lint task.
-Inactive checkpoint and verification-runner scripts are not runtime product lint targets.
-
-`config/inactive-development-hook-tests.json` identifies exact inactive development diagnostics.
-The existing helper excludes them only when repository `.codex/hooks.json` has an empty hooks
-object. It reports deselection counts. `--include-inactive-hooks` explicitly includes diagnostics;
-nonempty Hook configuration restores them. Invalid selection policy fails visibly.
-Private Wiki and process records are local-only, not prerequisites for a public checkout.
-Synthetic corruption and authorization guards remain active where they need no private records
-or inactive development entry points.
+On 2026-11-01 the user permanently retired the old development Hook/checkpoint/receipt automation.
+Its dedicated tests and helpers, inactive-test list, root selector conftest and selection plugin were
+removed together. Product and structural checks that shared those files were retained. There is no
+`--include-inactive-hooks` option or conditional Hook exclusion now: every remaining test is collected
+normally. Private Wiki and process records remain local-only, not public-checkout prerequisites.
 
 Failures, interruptions, skips, expected failures and unrun checks are reported separately.
 A product pass does not certify real provider accounts, answer quality, hosted deployment,
 field effectiveness or resolved atomicity debt. No credentials or real model calls are needed.
 
-The older `FULL`/`TOOLING` receipt formats and checkpoint tools are historical development
-protocols. Their artifacts are not rewritten or presented as product-check results. They remain
-available for explicit diagnostics and are no longer the merge/publication gate.
+Older `FULL`/`TOOLING` receipts are historical development evidence. Their stored bytes are preserved,
+but the retired runner and checkpoint tools are no longer supported entry points. Neither a historic
+receipt nor a focused pass replaces the current product check. Host application approval policies are
+outside this repository change.

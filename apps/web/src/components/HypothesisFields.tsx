@@ -1,10 +1,8 @@
-import { messages } from "../i18n/messages";
 import { t } from "../i18n/locale";
 import { ReadableList } from "./ReadableList";
 import { hypothesisStatusWord, reviewWord, type ReviewView } from "./hypothesisReview";
 import type { HypothesisRow } from "./hypothesisView";
 
-export const CAUSE_UNCONFIRMED_TEXT = messages["hypothesisFields.unconfirmed"].ko;
 
 /** Shown above the hypotheses when the review found none that holds. */
 export function CauseUnconfirmed() {

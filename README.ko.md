@@ -179,6 +179,9 @@ API는 로컬 루프백 주소에 바인딩되고, Vite는 API 요청을 8765 �
 
 자세한 내용은 [설치와 인증 안내](docs/INSTALL.md)를 확인하세요.
 
+로컬 설정에서 [모델 파일과 자료 색인 준비](docs/architecture/local-retrieval-preparation.md)를 선택할 수 있습니다.
+기본값은 꺼짐이며, 준비를 마쳐도 실제 연구의 검색 정책이 바뀌지는 않습니다.
+
 </details>
 
 ## 모델 사용량과 비용

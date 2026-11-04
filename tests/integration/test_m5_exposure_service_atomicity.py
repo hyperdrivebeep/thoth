@@ -8,7 +8,6 @@ work has already happened. No production code, fixture, model endpoint or server
 
 from __future__ import annotations
 
-import hashlib
 import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -34,7 +33,6 @@ from thoth.domain.behavior_execution import (
 )
 from thoth.domain.control_record import ControlRecord
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step100-20261015"
 FAULT = "100-V injected after targeted service write"
 
 
@@ -162,58 +160,10 @@ def completion_target(h: ExposureHarness, record: ControlRecord) -> bool:
     )
 
 
-def save(name: str, before: Snapshot, after: Snapshot, writes: Writes, **details: object) -> None:
-    def sha(snapshot: Snapshot) -> str:
-        return hashlib.sha256(json.dumps(snapshot, sort_keys=True).encode()).hexdigest()
-
-    added = set(after["control_records"]) - set(before["control_records"])
-    rows = [ControlRecord.model_validate_json(json.loads(row)["content_json"]) for row in added]
-    data = {
-        "before_sha256": sha(before),
-        "after_sha256": sha(after),
-        "changed_tables": [table for table in before if before[table] != after[table]],
-        "fault_hits": writes.hits,
-        "write_order": writes.order,
-        "exposure_writes": [
-            {"exposure_id": r.spec.exposure_id, "revision": r.revision, "state": r.state}
-            for r in writes.exposures
-        ],
-        "baseline_writes": [
-            {"revision": r.revision, "change_kind": r.change_kind, "exposure_ref": r.exposure_ref}
-            for r in writes.baselines
-        ],
-        "control_writes": [
-            {
-                "namespace": r.namespace,
-                "record_type": r.record_type,
-                "record_id": r.record_id,
-                "state": r.state,
-                "version": r.version,
-            }
-            for r in writes.controls
-        ],
-        "added_control_rows": [
-            {
-                "namespace": r.namespace,
-                "record_type": r.record_type,
-                "record_id": r.record_id,
-                "state": r.state,
-            }
-            for r in rows
-        ],
-        **details,
-    }
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / f"v100-{name}.json").write_text(
-        json.dumps(data, indent=2) + "\n", encoding="utf-8", newline="\n"
-    )
-
-
 def unchanged(
     h: ExposureHarness, before: Snapshot, writes: Writes, name: str, **info: object
 ) -> None:
     after = domain_snapshot(h.pair.runtime.ledger.engine)
-    save(name, before, after, writes, **info)
     assert after == before, "HOLD_DEFECT: partial publication after service storage failure"
     check_reopened(h.pair.runtime.ledger.engine, before)
 
@@ -448,21 +398,6 @@ def successful_delta(before: Snapshot, after: Snapshot, writes: Writes, action: 
     # including all digests, in that exact representation (without dropping any fields).
     stored_json = {r.control_revision_id: r.model_dump(mode="json") for r in parsed}
     written_json = {r.control_revision_id: r.model_dump(mode="json") for r in writes.controls}
-    representation = {
-        "native_model_equal": {r.control_revision_id: r for r in parsed}
-        == {r.control_revision_id: r for r in writes.controls},
-        "complete_stored_json_equal": stored_json == written_json,
-        "written_payload_types": [
-            {k: type(v).__name__ for k, v in r.payload.items()} for r in writes.controls
-        ],
-        "stored_payload_types": [
-            {k: type(v).__name__ for k, v in r.payload.items()} for r in parsed
-        ],
-    }
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / f"v100-{action}-storage-representation.json").write_text(
-        json.dumps(representation, indent=2) + "\n", encoding="utf-8", newline="\n"
-    )
     assert stored_json == written_json
     assert all(r.namespace == "IMPROVEMENT" for r in parsed)
     assert len(parsed) == (2 if action == "complete" else 1)
@@ -546,4 +481,3 @@ async def test_service_failure_replays_without_reentry_and_fresh_key_publishes_o
         assert retried["exposure"] == retried_writes.exposures[0].model_dump(mode="json")
         assert current(h).revision == previous.revision + 1
         check_reopened(h.pair.runtime.ledger.engine, after)
-        save(f"{action}-new-key", before, after, retried_writes, extra_model_calls=0)

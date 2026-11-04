@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from threading import Barrier, Event
@@ -35,16 +34,7 @@ from thoth.ports.model import ModelPort
 from thoth.protocol.deferred import current_operation
 from thoth.protocol.jsonrpc import JsonRpcRequest, RpcErrorCode
 
-_OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step72-20261014"
 _METHOD = "hypothesis/test/bind"
-
-
-def _save(case: str, evidence: dict[str, Any]) -> None:
-    _OUT.mkdir(parents=True, exist_ok=True)
-    round_id = os.environ.get("THOTH_STEP72_ROUND", "1")
-    (_OUT / f"{case}-round{round_id}.json").write_text(
-        json.dumps(evidence, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 def _rows(state: dict[str, tuple[str, ...]], table: str) -> list[dict[str, Any]]:
@@ -272,7 +262,6 @@ async def test_existing_test_binding_is_not_written_again(
                 evidence["initial_responses"].append(response.model_dump(mode="json"))
                 after = snapshot(runtime.ledger.engine)
                 evidence["after"] = after
-                _save(case, evidence)
                 if case == "single":
                     assert value(response) == expected
                     successful_commands.append(command)
@@ -322,7 +311,6 @@ async def test_existing_test_binding_is_not_written_again(
                     owner_future, peer_future = pool.submit(owner_worker), pool.submit(peer_worker)
                     responses = [owner_future.result(timeout=30), peer_future.result(timeout=30)]
                 evidence["initial_responses"] = [r.model_dump(mode="json") for r in responses]
-                _save(case, evidence)
                 assert value(responses[0]) == expected
                 if case == "same_key":
                     peer = responses[1]
@@ -339,7 +327,6 @@ async def test_existing_test_binding_is_not_written_again(
             assert value(await runtime.bus.dispatch(completed)) == expected
         after = snapshot(runtime.ledger.engine)
         evidence["after"] = after
-        _save(case, evidence)
         assert evidence["add_calls"] == [] and len(sandbox.seen_specs) == 1
         if case == "read_failure":
             allowed = failed_command_allowances(
@@ -359,7 +346,6 @@ async def test_existing_test_binding_is_not_written_again(
         ]
         assert rows == [binding]
         evidence["terminal"] = after
-        _save(case, evidence)
     finally:
         runtime.close()
         if second_runtime is not None:
@@ -371,7 +357,6 @@ async def test_existing_test_binding_is_not_written_again(
     )
     try:
         evidence["reopened"] = snapshot(reopened.ledger.engine)
-        _save(case, evidence)
         assert evidence["reopened"] == evidence["terminal"]
         if case == "read_failure":
             retried = request(_METHOD, "72-retry-read", body)
@@ -404,6 +389,5 @@ async def test_existing_test_binding_is_not_written_again(
             "operation_count": len(successful_commands) if successful_commands else 1,
         }
         evidence["verdict"] = "PASS"
-        _save(case, evidence)
     finally:
         reopened.close()

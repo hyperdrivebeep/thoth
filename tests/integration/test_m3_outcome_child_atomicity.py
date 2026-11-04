@@ -44,7 +44,6 @@ from thoth.adapters.storage.transaction import read_connection
 from thoth.domain.canonical import head_set_digest
 from thoth.protocol.deferred import current_operation
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step94-20261015"
 BOOKKEEPING = {"operations", "idempotency_keys", "events", "operation_resource_bindings"}
 OWNERS = {"L": SqliteLedgerTransaction, "O": SqliteOutcomeStore}
 TABLES = {
@@ -121,13 +120,6 @@ CASES: list[tuple[str, str, str, str, str | None, int]] = [
     ("change_set", "audit_changeSetProposed", "O", "append_audit", "outcome/changeSetProposed", 1),
     ("impact", "add_impact", "O", "add_impact", None, 1),
 ]
-
-
-def save(name: str, data: dict[str, Any]) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / (name + ".json")).write_text(
-        json.dumps(data, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 async def call(runtime: Any, method: str, key: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -469,22 +461,6 @@ async def test_outcome_child_post_write_failure_is_atomic(
             for use in json.loads(binding_row["content_json"])["resource_uses"]
         )
         expected_order = expected_prefix(kind, owner, writer, event, nth)
-        evidence: dict[str, Any] = {
-            "case": [kind, label],
-            "request": command.model_dump(mode="json"),
-            "error": failed.model_dump(mode="json").get("error"),
-            "expected_reads": reads,
-            "observed_resource_uses": actual_reads,
-            "actual_callable": binding,
-            "expected_writer_order": [list(step) for step in expected_order],
-            "observed_writer_order": [list(step) for step in state["order"]],
-            "fault": state,
-            "changed_tables": sorted(
-                name
-                for name in before
-                if not unchanged_or_operation_owner(before, after, name, command)
-            ),
-        }
         assert len(state["hits"]) == 1, "HOLD_CONTRACT_MISMATCH: expected target hit1"
         assert state["order"] == expected_order, (
             "HOLD_CONTRACT_MISMATCH: source-derived writer order differs",
@@ -506,7 +482,6 @@ async def test_outcome_child_post_write_failure_is_atomic(
         )
         allowed = failed_command_allowances(runtime.ledger.engine, command, expected_reads=reads)
         assert_phase_delta(before, after, allowed)
-        save(key, evidence)
     finally:
         runtime.close()
     reopened = create_runtime(tmp_path)
@@ -524,7 +499,6 @@ async def test_outcome_child_post_write_failure_is_atomic(
         counts_after = row_counts(reopened, ctx["project"])
         delta = tuple(a - b for a, b in zip(counts_after, counts_before, strict=True))
         assert delta == DELTAS[kind], ("HOLD_DEFECT: duplicated or missing rows", delta)
-        save(key, {**evidence, "verdict": "PASS", "replay_exact": True, "recovered_delta": delta})
     finally:
         reopened.close()
 
@@ -624,14 +598,6 @@ async def test_followup_audit_statement_failure_is_atomic(tmp_path: Path) -> Non
             before,
             after,
             failed_command_allowances(runtime.ledger.engine, command, expected_reads=reads),
-        )
-        save(
-            key,
-            {
-                "case": ["followup", "statement"],
-                "error": failed.model_dump(mode="json").get("error"),
-                "expected_reads": reads,
-            },
         )
     finally:
         runtime.close()
@@ -747,10 +713,6 @@ async def test_outcome_child_chain_control(tmp_path: Path) -> None:
         expected = await views(runtime, ctx, "94b-live")
         # The snapshot is taken after the reads: reads add operation bookkeeping rows (see 92b/94a).
         persisted = snapshot(runtime.ledger.engine)
-        save(
-            "control-outcome-child-chain",
-            {"assessment_revisions": len(revisions), "audit_events": events, "views": expected},
-        )
     finally:
         runtime.close()
     reopened = create_runtime(tmp_path / "chain")

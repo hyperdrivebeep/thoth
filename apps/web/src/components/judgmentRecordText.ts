@@ -26,7 +26,6 @@ export const eliminationNote = () => t("judgment.eliminationNote");
 const STANDING_WORDS: Record<string, string> = { get FITS() { return t("judgment.this"); }, get AGAINST_ONCE() { return t("judgment.againstOnce"); }, get AGAINST_REPEATED() { return t("judgment.againstRepeated"); }, get MIXED() { return t("judgment.mixed"); } };
 /** The line on a hypothesis about the test results people recorded for it; null when none counts. */
 export const standingLine = (standing: DiscriminationItem["standing"]) => (standing && STANDING_WORDS[standing] ? message("standingResults", STANDING_WORDS[standing]) : null);
-export const STANDING_NOTE = messages["judgment.standingNote"].ko;
 export const standingNote = () => t("judgment.standingNote");
 const againstStanding = (standing: DiscriminationItem["standing"]) => standing === "AGAINST_ONCE" || standing === "AGAINST_REPEATED";
 

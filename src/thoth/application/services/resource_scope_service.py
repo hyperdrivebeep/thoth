@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from thoth.application.services import resource_scope_records as scope_records
+from thoth.application.services.actor_authority import current_actor_for
 from thoth.application.services.resource_scope_context import current_resource_intake
 from thoth.application.services.resource_scope_read_context import (
     ScopeReadContext,
     scope_read_context,
 )
-from thoth.domain.auth import AuthenticatedActorContext, current_authenticated_actor
+from thoth.domain.auth import AuthenticatedActorContext
 from thoth.domain.canonical import model_digest
 from thoth.domain.governance import ProjectPolicy
 from thoth.domain.operation import OperationRecord
@@ -61,45 +62,7 @@ class ResourceScopeService:
         self._evidence = evidence
 
     def _actor(self, project_id: str) -> AuthenticatedActorContext | None:
-        actor = current_authenticated_actor()
-        if actor is None:
-            return None
-        session = self._sessions.read(actor.session_id)
-        role = next(
-            (
-                r
-                for r in self._governance.list_roles(project_id)
-                if r.role_assignment_id == actor.role_assignment_id
-            ),
-            None,
-        )
-        if (
-            actor.project_id != project_id
-            or session is None
-            or role is None
-            or session.state != "ACTIVE"
-            or session.expires_at <= self._clock.now()
-            or session.project_id != project_id
-            or session.actor_id != actor.actor_id
-            or session.role_assignment_id != actor.role_assignment_id
-            or session.role != actor.role
-            or session.capabilities != actor.capabilities
-            or session.data_scopes != actor.data_scopes
-            or role.state != "ACTIVE"
-            or role.actor_id != actor.actor_id
-            or role.role != actor.role
-            or (role.scope,) != actor.data_scopes
-            or tuple(
-                sorted(
-                    tag.removeprefix("CAP_")
-                    for tag in role.authority_tags
-                    if tag.startswith("CAP_")
-                )
-            )
-            != actor.capabilities
-        ):
-            raise ResourceScopeError("RESOURCE_AUTHORITY_CHANGED")
-        return actor
+        return current_actor_for(project_id, self._sessions, self._governance, self._clock)
 
     def _policy(self, project_id: str) -> ProjectPolicy:
         project = self._projects.read(project_id)

@@ -17,12 +17,11 @@ def test_public_method_manifest_exactly_matches_runtime_and_notifications() -> N
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     methods = manifest["methods"]
     by_name = {item["name"]: item for item in methods}
-    assert len(methods) == len(by_name) == 369
+    # Reviewed public surface including the seven S3/S4 preparation methods.
+    assert len(methods) == len(by_name) == 376
     assert set(by_name) == set(PUBLIC_METHODS)
-    assert sum(item["canonical"] for item in methods) == 363
-    assert manifest["runtime_method_count"] == 369
-    assert manifest["canonical_method_count"] == 363
-    assert manifest["compatibility_alias_count"] == 6
+    assert manifest["runtime_method_count"] == len(methods)
+    assert manifest["canonical_method_count"] == sum(item["canonical"] for item in methods)
     assert {
         f"project/source/scope/{name}" for name in ("read", "grant", "revoke", "assign", "update")
     } <= set(by_name)
@@ -35,6 +34,7 @@ def test_public_method_manifest_exactly_matches_runtime_and_notifications() -> N
         "revision/history/read": "revision/list",
         "project/delete": "project/archive",
     }
+    assert manifest["compatibility_alias_count"] == len(aliases)
     required = {
         "namespace",
         "surface",
@@ -48,8 +48,33 @@ def test_public_method_manifest_exactly_matches_runtime_and_notifications() -> N
     assert set(manifest["notifications"]) == set(IMPLEMENTED_NOTIFICATIONS)
     assert len(manifest["notifications"]) == 221
     assert all(item["namespace"] == item["name"].split("/", 1)[0] for item in methods)
-    model = {name: item for name, item in by_name.items() if item["namespace"] == "model"}
-    assert len(model) == 11
+    local_preparation = {
+        "model/localAsset/read": "QUERY",
+        "model/localAsset/import": "COMMAND",
+        "model/localAsset/install": "COMMAND",
+        "project/retrieval/experiment/read": "QUERY",
+        "project/retrieval/experiment/configure": "COMMAND",
+        "project/retrieval/experiment/prepare": "COMMAND",
+        "project/embeddingIndex/retry": "COMMAND",
+    }
+    for name, surface in local_preparation.items():
+        item = by_name[name]
+        assert item["surface"] == surface
+        assert (name in READ_QUERY_METHODS) == (surface == "QUERY")
+        assert item["canonical"] is True and item["alias_target"] is None
+        assert item["canonical_owner"] == "LOCAL_RETRIEVAL_PREPARATION"
+        assert item["policy"] == (
+            "LOCAL only; fixed asset consent; project authority and generation; default OFF"
+        )
+        assert item["normal_entrypoint"] == (
+            "LocalRetrievalSettingsCard via local query and async RPC"
+        )
+        assert "tests/integration/test_local_retrieval_rpc.py" in item["behavioral_evidence"]
+    model = {
+        name: item
+        for name, item in by_name.items()
+        if item["namespace"] == "model" and name not in local_preparation
+    }
     assert {name: model[name]["surface"] for name in model} == {
         "model/credential/list": "QUERY",
         "model/credential/login/status": "QUERY",

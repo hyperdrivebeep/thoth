@@ -6,10 +6,7 @@ from pathlib import Path
 
 import pytest
 from scripts.check_ocp_extensions import extension_manifest_errors
-from scripts.checkpoint_commit_contract import prepare_checkpoint, validate_checkpoint_action
 from scripts.required_architecture_checks import CHECKS, validate_check_results
-from scripts.verification_identity import assert_unchanged, index_digest, repository_digest
-from tests.architecture.test_checkpoint_commit_contract import git, repository, verified_gate
 from tests.architecture.test_reevaluated_guards import mirror
 
 
@@ -78,57 +75,3 @@ def test_required_gate_checks_cannot_be_skipped(mutation: str) -> None:
         checks[-1] = checks[0]
     with pytest.raises(ValueError, match="check"):
         validate_check_results(checks)
-
-
-def test_verification_detects_source_and_index_drift(tmp_path: Path) -> None:
-    repo = tmp_path / "repo"
-    repository(repo)
-    source, index = repository_digest(repo), index_digest(repo)
-    assert_unchanged(repo, source, index)
-    (repo / "README.md").write_text("new\n")
-    with pytest.raises(ValueError, match="source/index"):
-        assert_unchanged(repo, source, index)
-    source = repository_digest(repo)
-    git(repo, "add", "README.md")
-    with pytest.raises(ValueError, match="source/index"):
-        assert_unchanged(repo, source, index)
-
-
-def test_real_git_mixed_state_and_branch_drift_are_rejected(tmp_path: Path) -> None:
-    repo, gate = tmp_path / "repo", tmp_path / "gate"
-    repository(repo)
-    (repo / "README.md").write_text("staged\n")
-    git(repo, "add", "README.md")
-    (repo / "README.md").write_text("unstaged\n")
-    verified_gate(gate, repo)
-    with pytest.raises(ValueError, match="fully staged"):
-        prepare_checkpoint(root=repo, gate_dir=gate, remote_name="origin", branch="main")
-    git(repo, "add", "README.md")
-    prepare_checkpoint(root=repo, gate_dir=gate, remote_name="origin", branch="main")
-    git(repo, "checkout", "-b", "other")
-    with pytest.raises(ValueError, match="branch changed"):
-        validate_checkpoint_action(root=repo, gate_dir=gate, action="commit")
-
-
-def test_checkpoint_cannot_reuse_an_older_active_verification(tmp_path: Path) -> None:
-    repo, gate = tmp_path / "repo", tmp_path / "gate"
-    repository(repo)
-    (repo / "README.md").write_text("candidate\n")
-    git(repo, "add", "README.md")
-    verified_gate(gate, repo)
-    prepare_checkpoint(root=repo, gate_dir=gate, remote_name="origin", branch="main")
-    verified_gate(gate, repo)
-    with pytest.raises(ValueError, match="active verification"):
-        validate_checkpoint_action(root=repo, gate_dir=gate, action="commit")
-
-
-def test_checkpoint_binds_effective_push_url_not_only_fetch_url(tmp_path: Path) -> None:
-    repo, gate = tmp_path / "repo", tmp_path / "gate"
-    repository(repo)
-    (repo / "README.md").write_text("candidate\n")
-    git(repo, "add", "README.md")
-    verified_gate(gate, repo)
-    prepare_checkpoint(root=repo, gate_dir=gate, remote_name="origin", branch="main")
-    git(repo, "remote", "set-url", "--push", "origin", "https://example.invalid/other.git")
-    with pytest.raises(ValueError, match="remote"):
-        validate_checkpoint_action(root=repo, gate_dir=gate, action="commit")

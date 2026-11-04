@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import json
-import os
-from pathlib import Path
 from typing import Any
 
 import pytest
@@ -19,18 +16,6 @@ from thoth.domain.sandbox import SandboxRunSpec
 
 def ambient() -> bool:
     return vars(transaction_module)["_AMBIENT"].get() is not None
-
-
-def save(name: str, evidence: dict[str, Any]) -> None:
-    folder = (
-        Path(__file__).resolve().parents[2]
-        / "outputs/refactor-p-20261022"
-        / os.environ.get("THOTH_P_RUN_LABEL", "p2-direct")
-    )
-    folder.mkdir(parents=True, exist_ok=True)
-    (folder / f"{name}.json").write_text(
-        json.dumps(evidence, indent=2, default=str) + "\n", encoding="utf-8"
-    )
 
 
 def capture_exit(patch: pytest.MonkeyPatch, runtime: AppRuntime, evidence: dict[str, Any]) -> None:

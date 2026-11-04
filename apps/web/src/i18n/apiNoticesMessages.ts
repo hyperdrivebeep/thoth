@@ -7,18 +7,6 @@ export const apiNoticesMessages = {
     "ko": "선택한 프로젝트와 project_id가 일치해야 합니다.",
     "en": "project_id must match the selected project."
   },
-  "api.noOperation": {
-    "ko": "비동기 operation 식별자가 없습니다.",
-    "en": "The asynchronous operation identifier is missing."
-  },
-  "api.analysisFailed": {
-    "ko": "분석 operation이 실패했습니다.",
-    "en": "The analysis operation failed."
-  },
-  "api.analysisCancelled": {
-    "ko": "사용자가 분석을 취소했습니다.",
-    "en": "The user cancelled the analysis."
-  },
   "api.restoreTarget": {
     "ko": "복원 대상의 연결을 확인하지 못했습니다.",
     "en": "The restoration target link could not be verified."

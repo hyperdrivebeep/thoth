@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import importlib
-from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -249,4 +248,3 @@ async def test_ready_uses_the_open_decision_without_reprobing_or_mutable_aliases
     assert (await handler.ready({}))["workspace_location"] == location_detail(snapshot)
     if kind == "UNKNOWN":
         assert "accept-location" not in str(first["workspace_location"])
-        assert replace(snapshot, confirmed=False).confirmed is False

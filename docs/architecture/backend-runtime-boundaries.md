@@ -22,7 +22,9 @@ When canonical ledger and projection disagree, the command fails closed and reco
 
 ## Unit of Work
 
-One accepted command owns one atomic Unit of Work:
+Each canonical publication checkpoint owns one short atomic Unit of Work. A long-running
+accepted command may have several durable checkpoints; it does not hold one database transaction
+across the whole research run. Model, connector and network I/O run outside these transactions.
 
 ```text
 validate project/actor/policy/cutoff/head
@@ -33,7 +35,12 @@ validate project/actor/policy/cutoff/head
 → commit once
 ```
 
-Failure before commit leaves none of those state changes visible. Content-addressed bytes written before the database transaction may remain as unreferenced immutable blobs; they are not canonical until the database reference commits and may be garbage-collected by a separate verified process.
+Failure before a checkpoint commits leaves none of that checkpoint's state changes visible.
+Earlier committed checkpoints remain available for recovery. External effects are reconciled
+separately and are never repeated merely because later publication failed. Content-addressed bytes
+written before the database transaction may remain as unreferenced immutable blobs; they are not
+canonical until the database reference commits and may be garbage-collected by a separate verified
+process.
 
 ## Idempotency and concurrency
 

@@ -381,9 +381,12 @@ publication or actual collaborator usefulness.
 
 ## Developer configuration
 
-`.codex/hooks.json` is explicitly empty. Together with the unchanged
-`config/inactive-development-hook-tests.json`, it preserves the recorded environment's selection.
-Personal Codex settings, local verification receipts and inactive backups are excluded.
+`.codex/hooks.json` remains explicitly empty. On 2026-11-01 the user retired the legacy development
+Hook/checkpoint/receipt tools, their dedicated tests and inactive-test selection mechanism. Remaining
+product and structural tests use ordinary pytest collection. Mixed files retained their live product
+checks. Historical results above keep their original selection and meaning; they are not new passes.
+Personal Codex settings, local verification receipts and inactive backups remain excluded. Institution
+deployment and experiment examples are retained. See the [current policy](architecture/verification-profiles.md).
 
 Rights-unconfirmed optional assets may be absent from this public package, so asset-dependent
 legacy checks can have additional unavailable-input failures. That package boundary is disclosed

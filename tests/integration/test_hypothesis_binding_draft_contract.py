@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -18,7 +17,6 @@ from thoth.application.services.hypothesis_service import HypothesisService
 from thoth.ports.runtime import ClockPort, IdGeneratorPort
 from thoth.protocol.deferred import current_operation
 
-_OUT = Path(__file__).resolve().parents[2] / "outputs/refactor-step78-20261014"
 _BIND_KEYS = (
     "test_binding_id",
     "project_id",
@@ -145,16 +143,6 @@ async def test_binding_and_appraisal_drafts_use_original_dependencies_in_native_
                     )
                 )
             )
-        _OUT.mkdir(parents=True, exist_ok=True)
-        (_OUT / "native-draft-observation.json").write_text(
-            json.dumps(
-                {"observed": observed, "lifecycle": lifecycle, "reused": same},
-                indent=2,
-                default=str,
-            )
-            + "\n",
-            encoding="utf-8",
-        )
         binds = [e for e in observed if e["kind"] == "bind" and e["operation_key"] == "78-native"]
         appraisals = [e for e in observed if e["kind"] == "appraise"]
         reuses = [e for e in observed if e["operation_key"] == "78-reuse"]

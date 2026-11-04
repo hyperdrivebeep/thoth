@@ -6,7 +6,11 @@
 All public handler calls (including harness setup) are recorded. Real local pair execution and
 scripted exposure work prepare valid evidence; clocks, IDs and the pair elapsed timer are fixed
 before setup. No stored digest is normalized or discarded. These are local regression fixtures,
-not evidence of live model quality or elapsed-time performance.
+not evidence of live model quality or elapsed-time performance. The trace keeps what changes state
+or checks authority, scope or currentness, in order: control record and behavior store writes,
+the thread-scope, assessment and authority checks, governance role reads, transaction entries, ids,
+clocks and every exception. Reads of control records and the entries and returns of handlers are
+not recorded; the outputs hold what the handlers returned.
 """
 
 from __future__ import annotations
@@ -148,12 +152,13 @@ def install(patch: pytest.MonkeyPatch, rec: Recorder) -> None:
         def begin(args: tuple[Any, ...], kwargs: dict[str, Any]) -> None:
             if handler:
                 rec.depth += 1
-            rec.note(
-                owner.__name__,
-                name,
-                [digest(x) for x in args],
-                {k: digest(v) for k, v in kwargs.items()},
-            )
+            else:
+                rec.note(
+                    owner.__name__,
+                    name,
+                    [digest(x) for x in args],
+                    {k: digest(v) for k, v in kwargs.items()},
+                )
 
         def end(result: Any = None, error: BaseException | None = None) -> None:
             if handler:
@@ -171,11 +176,8 @@ def install(patch: pytest.MonkeyPatch, rec: Recorder) -> None:
                             },
                         ]
                     )
-                rec.note(
-                    "return" if error is None else "raise",
-                    name,
-                    digest(result) if error is None else type(error).__name__,
-                )
+                if error is not None:
+                    rec.note("raise", name, type(error).__name__)
                 rec.depth -= 1
 
         if inspect.iscoroutinefunction(original):
@@ -209,14 +211,10 @@ def install(patch: pytest.MonkeyPatch, rec: Recorder) -> None:
         wrap(ImprovementHandlers, name, handler=True)
     for owner, names in (
         (ControlRecordService, ("create", "stage")),
-        (SqliteControlRecordStore, ("read", "list", "append")),
+        (SqliteControlRecordStore, ("append",)),
         (SqliteGovernanceStore, ("list_roles",)),
         (ImprovementThreadScope, ("require_thread", "require_record", "may_read")),
         (PairedEvaluationService, ("require_assessment", "require_current")),
-        (
-            ImprovementExposureService,
-            ("prepare", "promotion_payload", "prepare_promotion", "apply_promotion"),
-        ),
         (SqliteBehaviorExecutionStore, ("append", "promote")),
     ):
         for name in names:

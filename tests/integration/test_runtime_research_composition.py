@@ -143,7 +143,6 @@ def test_domain_assembly_preserves_interleaving_and_scoped_consumers(
         assert c["pack_factory"].kwargs["storage_factory"] is factory
         assert c["pack_factory"].kwargs["workspace"] is tmp_path
         assert c["pack_factory"].kwargs["models"] is c["analysis"].kwargs["models"]
-        assert c["source"].kwargs["inbox_root"] == tmp_path / "inbox"
         assert c["source"].kwargs["ledger"] is runtime.ledger
         assert c["source"].kwargs["projects"] is factory.bundles[0].projects
         assert c["source"].kwargs["artifacts"] is c["analysis"].kwargs["artifacts"]

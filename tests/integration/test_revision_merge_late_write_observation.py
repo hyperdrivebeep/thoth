@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -34,7 +33,6 @@ from thoth.domain.revision import RevisionChangeSet, SemanticMergeResult
 from thoth.protocol.jsonrpc import JsonRpcResponse
 from thoth.protocol.registry import MethodRegistry
 
-OUT = Path(__file__).resolve().parents[2] / "outputs/d-revision-publication-20261015"
 FAULT = "102 O3/O1 after original MERGE_RECEIPT append"
 
 
@@ -255,41 +253,10 @@ def assert_reached_merge_tail(probe: MergeProbe) -> None:
     assert probe.assessments[0].receipt_ref == probe.commits[0].receipt.receipt_id
 
 
-def save(
-    name: str, before: Snapshot, after: Snapshot, probe: MergeProbe, **details: object
-) -> None:
-    delta = {
-        table: {
-            "removed": [json.loads(row) for row in sorted(set(before[table]) - set(after[table]))],
-            "added": [json.loads(row) for row in sorted(set(after[table]) - set(before[table]))],
-        }
-        for table in before
-        if before[table] != after[table]
-    }
-    report = {
-        "verdict": details.pop("verdict"),
-        "changed_tables": list(delta),
-        "delta": delta,
-        "before_sha256": hashlib.sha256(json.dumps(before, sort_keys=True).encode()).hexdigest(),
-        "after_sha256": hashlib.sha256(json.dumps(after, sort_keys=True).encode()).hexdigest(),
-        "fault_hits": probe.hits,
-        "write_order": probe.order,
-        "original_receipt_write_observed": probe.raw_receipt_visible_before_fault,
-        "assessment": probe.assessments[0].model_dump(mode="json"),
-        "canonical_receipt": probe.commits[0].receipt.model_dump(mode="json"),
-        "attempted_controls": [r.model_dump(mode="json") for r in probe.controls],
-        **details,
-    }
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / f"o3-o1-{name}.json").write_text(
-        json.dumps(report, indent=2) + "\n", encoding="utf-8", newline="\n"
-    )
-
-
 async def test_auto_merge_success_control(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     async with harness(tmp_path) as h:
         body = await prepare_siblings(h)
-        before = h.snapshot()
+        h.snapshot()
         with monkeypatch.context() as patch:
             probe = install(patch, h, fail=False)
             result = value(await h.call("revision/merge/propose", "o1-control", body))
@@ -305,7 +272,6 @@ async def test_auto_merge_success_control(tmp_path: Path, monkeypatch: pytest.Mo
         stored = control_rows(after)
         assert all(r.control_revision_id in stored for r in probe.controls)
         check_reopened(h.runtime.ledger.engine, after)
-        save("control", before, after, probe, verdict="CONTROL_PASS", model_calls=h.model.calls)
 
 
 async def test_late_merge_receipt_fault_observation(
@@ -314,7 +280,7 @@ async def test_late_merge_receipt_fault_observation(
     async with harness(tmp_path) as h:
         body = await prepare_siblings(h)
         before = h.snapshot()
-        heads_before = dict(h.runtime.ledger.read_heads(h.project))
+        dict(h.runtime.ledger.read_heads(h.project))
         with monkeypatch.context() as patch:
             probe = install(patch, h, fail=True)
             failed = await h.call("revision/merge/propose", "o1-fault", body)
@@ -328,33 +294,7 @@ async def test_late_merge_receipt_fault_observation(
             assert h.snapshot() == after
         assessment = probe.assessments[0]
         assert assessment.merged_revision_digest is not None
-        stored = control_rows(after)
-        receipt_ids = {r.receipt_id for r in h.runtime.ledger.read_receipts(h.project)}
-        remaining_controls = [
-            r.model_dump(mode="json") for r in probe.controls if r.control_revision_id in stored
-        ]
-        verdict = "HOLD_PARTIAL_PUBLICATION" if after != before else "NO_PARTIAL_PUBLICATION"
-        save(
-            "fault",
-            before,
-            after,
-            probe,
-            verdict=verdict,
-            response_error=failed.error.model_dump(mode="json"),
-            heads_before=heads_before,
-            heads_after=dict(h.runtime.ledger.read_heads(h.project)),
-            merged_revision_present=h.runtime.ledger.read_revision_by_digest(
-                h.project, assessment.merged_revision_digest
-            )
-            is not None,
-            canonical_receipt_present=assessment.receipt_ref in receipt_ids,
-            remaining_controls=remaining_controls,
-            reopened_snapshot_equal=True,
-            same_key_error_replay_equal=True,
-            replay_additional_writes=0,
-            model_calls=h.model.calls,
-            observation_scope="D automatic merge rollback and replay",
-        )
+        control_rows(after)
         assert h.model.calls == 0
         assert after == before, (
             "D_RED_PARTIAL_PUBLICATION: late merge receipt failure left committed domain state"
@@ -377,11 +317,4 @@ async def test_late_merge_receipt_fault_observation(
             again = await h.call("revision/merge/propose", "o1-new-key", body)
             assert value(again) == result and retry_probe.order == order
             assert h.snapshot() == successful
-        save(
-            "atomic-retry",
-            before,
-            successful,
-            retry_probe,
-            verdict="PASS",
-            same_key_success_replay=True,
-        )
+        check_reopened(h.runtime.ledger.engine, successful)
