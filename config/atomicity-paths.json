@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "purpose": "DEVELOPMENT_VERIFICATION_LEDGER_NOT_RUNTIME_POLICY",
   "baseline_head": "f0262732a0e79235f3839c3393f459b90bd53783",
-  "catalog_sha256": "aefc02cd38f66a9b51dcfd79d5abda6b0a5331ae2c5816f2c20aa8556273d817",
+  "catalog_sha256": "4fb6bbf13b41d3b021dff8da7010d052f343f54bc338d08e3ac4f13950764ece",
   "public_entries": [
     {
       "name": "action/audit/read",
@@ -7353,6 +7353,32 @@
       "owner_scope": "PROJECT_GOVERNANCE",
       "phase_ids": [
         "rpc:project/overlay/update"
+      ],
+      "mutation_observed_in_code": true
+    },
+    {
+      "name": "project/permanentDelete",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED",
+      "method": "project/permanentDelete",
+      "actual_callable": "thoth.application.commands.project_deletion.ProjectDeletionHandlers.permanent_delete",
+      "source": "src/thoth/application/commands/project_deletion.py",
+      "line": 85,
+      "callable_sha256": "cd443d1f7b256cba2efe34ea1580359fe44c5eae0dc30471c6df93ad72578e05",
+      "entry_kind": "public",
+      "path_id": "rpc:project/permanentDelete",
+      "owner_scope": "PROJECT_GOVERNANCE",
+      "phase_ids": [
+        "rpc:project/permanentDelete"
       ],
       "mutation_observed_in_code": true
     },
@@ -49951,6 +49977,107 @@
             ]
           }
         ]
+      }
+    },
+    {
+      "path_id": "rpc:project/permanentDelete",
+      "owner": "PROJECT_GOVERNANCE",
+      "catalog_owner": "PROJECT_GOVERNANCE",
+      "entry_kind": "public",
+      "method_or_trigger": "project/permanentDelete",
+      "actual_callable": "thoth.application.commands.project_deletion.ProjectDeletionHandlers.permanent_delete",
+      "caller_refs": [
+        {
+          "source": "src/thoth/apps/project_deletion_composition.py",
+          "line": 28,
+          "binding": "handlers.permanent_delete"
+        }
+      ],
+      "producer_refs": [
+        "thoth.adapters.storage.project_purge.SqliteProjectPurge.purge",
+        "thoth.adapters.storage.project_purge.SqliteProjectPurge._delete_rows",
+        "thoth.adapters.storage.project_purge.SqliteProjectPurge.clean_files"
+      ],
+      "phase_id": [
+        "LIFECYCLE_PUBLICATION",
+        "CLEANUP"
+      ],
+      "composite_not_one_transaction": true,
+      "canonical_records_and_projections": [
+        "project_deletions",
+        "every table with a project_id column (derived from the schema, projects last)",
+        "artifact_versions",
+        "checkpoints",
+        "operation_owners",
+        "revision_parents",
+        "structural_fts"
+      ],
+      "head_selector": "Archived lifecycle, exact project name and the absence of a deletion record for the selected project.",
+      "audit_receipt_refs": [
+        "project_deletions"
+      ],
+      "expected_basis": "Archived project whose exact name is typed; no other project references it and no operation or embedding job of it is running. A repeated request finds the deletion record and answers already deleted.",
+      "uow_participants": [
+        "thoth.adapters.storage.project_purge.SqliteProjectPurge.purge",
+        "thoth.adapters.storage.project_purge.SqliteProjectPurge._delete_rows"
+      ],
+      "irreversible_effect_boundary": "Every row of the project and the deletion record commit in one short ledger transaction. The project-only upload folder is removed after that commit; a failed removal stays listed in the deletion record and a repeat finishes it. Object blobs are never deleted.",
+      "allowed_phase_deltas": [
+        "Accepted delete removes every project row and writes the deletion record together; a refusal or an injected failure leaves all rows unchanged. After the commit only the owed upload folder can still be present."
+      ],
+      "downstream_reader": [
+        "project/list",
+        "project/read",
+        "project/create"
+      ],
+      "existing_tests": [
+        "tests/integration/test_project_permanent_delete.py"
+      ],
+      "fault_points": "Failure after each table, failure at the deletion record, upload folder removal failure and repeat.",
+      "disposition": "OWNER_EVIDENCE_PENDING",
+      "evidence_refs": [],
+      "source_refs": [
+        "src/thoth/adapters/storage/project_purge.py",
+        "src/thoth/application/commands/project_deletion.py",
+        "src/thoth/apps/project_deletion_composition.py"
+      ],
+      "atomic_regions": [
+        {
+          "callable": "thoth.adapters.storage.sqlite.SqliteLedger.transaction",
+          "source": "src/thoth/adapters/storage/sqlite.py",
+          "line": 242,
+          "contexts": [
+            "SqliteAtomicUnitOfWork(self._engine, immediate=True).transaction()"
+          ]
+        },
+        {
+          "callable": "thoth.adapters.storage.transaction.SqliteAtomicUnitOfWork.transaction",
+          "source": "src/thoth/adapters/storage/transaction.py",
+          "line": 77,
+          "contexts": [
+            "resource_use_transaction()"
+          ]
+        },
+        {
+          "callable": "thoth.application.commands.project_deletion.ProjectDeletionHandlers.permanent_delete",
+          "source": "src/thoth/application/commands/project_deletion.py",
+          "line": 85,
+          "contexts": [
+            "self._ledger.transaction()"
+          ]
+        }
+      ],
+      "entry_is_not_a_transaction": true,
+      "region_semantics": "Listed source-level regions are reachable candidates; the whole RPC, external I/O and operation terminal are not certified as one transaction.",
+      "verification": {
+        "classification": "MUTATION",
+        "required_callables": [
+          "thoth.application.commands.project_deletion.ProjectDeletionHandlers.permanent_delete",
+          "thoth.adapters.storage.project_purge.SqliteProjectPurge.purge",
+          "thoth.adapters.storage.project_purge.SqliteProjectPurge._delete_rows"
+        ],
+        "cases": [],
+        "status": "CURRENT_SOURCE_EXECUTION_EVIDENCE_PENDING"
       }
     },
     {

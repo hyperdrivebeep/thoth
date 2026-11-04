@@ -33,6 +33,7 @@ from thoth.ports.object_store import ObjectStorePort
 from thoth.ports.operation import OperationStorePort
 from thoth.ports.outcome import OutcomeStorePort
 from thoth.ports.project import ProjectStorePort
+from thoth.ports.project_purge import ProjectPurgePort
 from thoth.ports.receipt_dag import ReceiptDagStorePort
 from thoth.ports.research_history import ResearchHistoryReadPort
 from thoth.ports.research_identity import ResearchIdentityStorePort
@@ -69,6 +70,8 @@ class StoreBundlePort(Protocol):
     def operations(self) -> OperationStorePort: ...
     @property
     def projects(self) -> ProjectStorePort: ...
+    @property
+    def project_purge(self) -> ProjectPurgePort: ...
     @property
     def governance(self) -> GovernanceStorePort: ...
     @property

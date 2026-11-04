@@ -2,7 +2,7 @@
 
 This source-preview index is derived from the public method catalog, registered runtime method names, and public source schemas. It lists available RPC names; it is not a live-service, account-authorization, model-execution, or full-suite verification receipt. The machine-readable metadata and notification names are in [`schemas/protocol/public-method-catalog.json`](../../schemas/protocol/public-method-catalog.json).
 
-Requests use the public JSON-RPC `/rpc` surface. The method classification below distinguishes reads from commands; each call still follows the runtime's authentication and resource-scope checks. The six compatibility aliases remain listed under their own method names. The catalog contains 376 public methods (370 canonical and 6 aliases) and 221 notifications.
+Requests use the public JSON-RPC `/rpc` surface. The method classification below distinguishes reads from commands; each call still follows the runtime's authentication and resource-scope checks. The six compatibility aliases remain listed under their own method names. The catalog contains 377 public methods (371 canonical and 6 aliases) and 221 notifications.
 
 
 ## Request-scoped response language and expected-result views
@@ -521,6 +521,7 @@ project/retrieval/experiment/configure
 project/retrieval/experiment/prepare
 project/embeddingIndex/retry
 project/archive
+project/permanentDelete
 project/create
 project/cutoff/update
 project/delete

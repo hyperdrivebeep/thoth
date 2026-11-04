@@ -10,6 +10,10 @@ class ProjectAlreadyExistsError(ValueError):
     pass
 
 
+class ProjectIdRetiredError(ProjectAlreadyExistsError):
+    """The id belonged to a permanently deleted project and is never handed out again."""
+
+
 class ProjectStorePort(Protocol):
     def create(self, project: Project, *, created_at: str) -> None: ...
 

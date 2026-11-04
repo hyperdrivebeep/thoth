@@ -18,7 +18,7 @@ def test_public_method_manifest_exactly_matches_runtime_and_notifications() -> N
     methods = manifest["methods"]
     by_name = {item["name"]: item for item in methods}
     # Reviewed public surface including the seven S3/S4 preparation methods.
-    assert len(methods) == len(by_name) == 376
+    assert len(methods) == len(by_name) == 377
     assert set(by_name) == set(PUBLIC_METHODS)
     assert manifest["runtime_method_count"] == len(methods)
     assert manifest["canonical_method_count"] == sum(item["canonical"] for item in methods)

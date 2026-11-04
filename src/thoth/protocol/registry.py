@@ -63,6 +63,7 @@ PUBLIC_METHODS: tuple[str, ...] = (
     "project/activate",
     "project/archive",
     "project/delete",
+    "project/permanentDelete",
     "project/restore",
     "project/metadata/update",
     "project/list",

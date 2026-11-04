@@ -33,6 +33,7 @@ from thoth.adapters.storage.memory import SqliteFullMemoryStore, SqliteMemorySto
 from thoth.adapters.storage.objects import ContentAddressedObjectStore
 from thoth.adapters.storage.operations import SqliteOperationStore
 from thoth.adapters.storage.outcome import SqliteOutcomeStore
+from thoth.adapters.storage.project_purge import SqliteProjectPurge
 from thoth.adapters.storage.projects import SqliteProjectStore
 from thoth.adapters.storage.receipt_dag import SqliteReceiptDagStore
 from thoth.adapters.storage.research_history import SqliteResearchHistoryReader
@@ -68,6 +69,7 @@ class SqliteStoreBundle:
         self.research_history = SqliteResearchHistoryReader(ledger.engine)
         self.operations = SqliteOperationStore(ledger.engine)
         self.projects = SqliteProjectStore(ledger.engine)
+        self.project_purge = SqliteProjectPurge(ledger.engine, workspace)
         self.embedding_index = SqliteEmbeddingIndex(ledger.engine)
         self.governance = SqliteGovernanceStore(ledger.engine, binding_projection=binding_changed)
         self.artifacts = SqliteArtifactLedger(ledger.engine, ingestion_projection=project_ingestion)

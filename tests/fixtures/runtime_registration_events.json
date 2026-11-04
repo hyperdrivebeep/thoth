@@ -1989,6 +1989,11 @@
       "register",
       "project/embeddingIndex/retry",
       "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.retry"
+    ],
+    [
+      "register",
+      "project/permanentDelete",
+      "thoth.application.commands.project_deletion.ProjectDeletionHandlers.permanent_delete"
     ]
   ],
   "HOSTED_REVIEW": [
@@ -4041,6 +4046,11 @@
       "register",
       "project/embeddingIndex/retry",
       "thoth.application.commands.local_retrieval.LocalRetrievalHandlers.retry"
+    ],
+    [
+      "register",
+      "project/permanentDelete",
+      "thoth.application.commands.project_deletion.ProjectDeletionHandlers.permanent_delete"
     ]
   ]
 }

@@ -14,6 +14,8 @@ This is the authoritative runtime-boundary rule for the local modular monolith. 
 | canonical ledger | immutable domain revisions, heads, event/receipt lineage | derived search/vector/summary views |
 | specialized projections | transactionally updated current/query views | independent canonical truth |
 
+The ledger is immutable with one exception: the user's explicit `project/permanentDelete` of an archived project (exact name typed) removes that project's rows and project-only upload folder in one transaction and leaves a deletion record (its own operation record is kept under `system:workspace`); archive stays reversible, and shared content-addressed objects are never deleted by it.
+
 ## Canonical owner rule
 
 Every aggregate has exactly one canonical owner in `config/architecture-conformance.json`. A specialized table may be a current projection, but it must be derived from or transactionally committed with the canonical revision. `ControlRecord` is not a universal escape hatch for canonical state.
