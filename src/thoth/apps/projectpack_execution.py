@@ -63,7 +63,7 @@ async def run_project_pack(
         projects = stores.projects
         project = create_pack_project(pack, stores, clock)
         artifact_ledger, ingestion = create_pack_ingestion(
-            pack, workspace, ledger, stores, project, projects, clock, ids, parser_registry
+            ledger, stores, project, projects, clock, ids, parser_registry
         )
         thread = WorkThread(
             thread_id=pack.scenario.thread_id,

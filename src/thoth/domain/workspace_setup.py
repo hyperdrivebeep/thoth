@@ -28,9 +28,3 @@ class LocalWorkspaceReady(DomainModel):
     workspace_readable: bool
     execution_ready: bool
     workspace_id: str = Field(pattern=r"^workspace:[0-9a-f]{32}$")
-
-
-class PublicWebPolicy(DomainModel):
-    enabled: bool = False
-    preferred_hosts: tuple[str, ...] = ()
-    workspace_grant_id: str | None = None

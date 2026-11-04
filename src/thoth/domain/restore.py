@@ -103,16 +103,6 @@ class RestoreProposalV1(DomainModel):
     parent_revision_digests: tuple[Sha256, ...]
 
 
-def decode_restore_record(payload: dict[str, object]) -> RestoreReceiptV1 | RestoreProposalV1:
-    if payload.get("schema_version") != "1.0.0":
-        raise ValueError("RESTORE_CODEC_VERSION_UNSUPPORTED")
-    if payload.get("record_kind") == "RestoreReceipt":
-        return RestoreReceiptV1.model_validate(payload)
-    if payload.get("record_kind") == "RestoreProposal":
-        return RestoreProposalV1.model_validate(payload)
-    raise ValueError("RESTORE_CODEC_KIND_UNSUPPORTED")
-
-
 class RestoreError(ValueError):
     def __init__(self, reason_code: str) -> None:
         self.reason_code = reason_code

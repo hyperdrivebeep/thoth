@@ -1,7 +1,5 @@
 """ProjectPack source policy and ingestion use the same ownership boundary as normal runtime."""
 
-from pathlib import Path
-
 from thoth.adapters.parsers.registry import default_parser_registry
 from thoth.adapters.projectpacks.loader import source_path
 from thoth.application.services.ingestion_service import IngestArtifactCommand, IngestionService
@@ -75,8 +73,6 @@ def create_pack_project(
 
 
 def create_pack_ingestion(
-    pack: LoadedProjectPack,
-    workspace: Path,
     ledger: ManagedLedgerPort,
     stores: StoreBundlePort,
     project: Project,

@@ -62,7 +62,7 @@ from thoth.domain.hypothesis import HypothesisPortfolio
 from thoth.domain.outcome import OutcomeRecord
 from thoth.domain.policy import AuthoritativeExecutionPolicy, R2RecoveryPolicy
 from thoth.domain.post_execution_learning import CommittedExecutionBasis
-from thoth.domain.project import Project, WorkThread
+from thoth.domain.project import Project
 from thoth.domain.recovery import (
     ExecutionFailureClass,
     RecoveryAttempt,
@@ -121,7 +121,6 @@ class R2ClosedLoopCoordinator:
         self,
         *,
         project: Project,
-        thread: WorkThread,
         portfolio: HypothesisPortfolio,
         action_plan: ActionPlan,
     ) -> R2ClosedLoopExecution | None:

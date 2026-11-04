@@ -151,7 +151,7 @@ class IsolatedProgramExecutor:
         finally:
             if overran:
                 # The workspace is left for inspection, never removed by a run that did not finish.
-                state, output = self._incomplete(state, output, Path(workspace).name)
+                state, output = self._incomplete(state, Path(workspace).name)
             else:
                 cleanup_workspace = asyncio.create_task(self._cleanup_workspace(directory))
                 while True:
@@ -205,7 +205,6 @@ class IsolatedProgramExecutor:
     @staticmethod
     def _incomplete(
         state: Literal["SUCCEEDED", "FAILED", "TIMEOUT", "CANCELLED", "OUTPUT_LIMIT"],
-        output: bytes,
         workspace_name: str,
     ) -> tuple[Literal["SUCCEEDED", "FAILED", "TIMEOUT", "CANCELLED", "OUTPUT_LIMIT"], bytes]:
         """The outcome of a run whose cleanup went past its bound.

@@ -114,7 +114,7 @@ def test_memory_filters_keep_id_consumption_and_bind_actual_owner_revision() -> 
         for entity, identifier, content in values
     )
     events.clear()
-    records = PREPARE(service, "p", staged)
+    records = PREPARE(service, staged)
     assert events == ["id:memory:7", "id:memory:8", "id:memory:9"]
     assert len(records) == 1 and records[0].memory_id == "memory:8"
     assert records[0].owner_revision_ref == staged[1].revision.revision_digest

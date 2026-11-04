@@ -83,13 +83,13 @@ def create_evidence_access(
 
 
 def create_memory_access(
-    ledger: ManagedLedgerPort, stores: StoreBundlePort, scopes: ResourceScopeService
+    stores: StoreBundlePort, scopes: ResourceScopeService
 ) -> ScopedMemoryCandidates:
     return ScopedMemoryCandidates(stores.memory_candidates, scopes)
 
 
 def create_execution_access(
-    ledger: ManagedLedgerPort, stores: StoreBundlePort, scopes: ResourceScopeService
+    stores: StoreBundlePort, scopes: ResourceScopeService
 ) -> ScopedExecutionStore:
     return ScopedExecutionStore(stores.executions, scopes)
 

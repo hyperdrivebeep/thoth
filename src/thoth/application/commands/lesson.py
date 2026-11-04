@@ -27,6 +27,7 @@ class LessonHandlers:
         self._lessons, self._closures, self._projects = lessons, closures, projects
 
     def authorize_before_claim(self, method: str, value: dict[str, JsonValue]) -> None:
+        del method
         require_trace_project(self._projects, str(value.get("project_id", "")))
 
     async def list(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:

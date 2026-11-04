@@ -59,7 +59,7 @@ def default_sandbox_factory_registry() -> SandboxFactoryRegistryPort:
         SandboxFactoryRegistration(
             adapter_id="disabled",
             capability=DisabledSandboxAdapter().capability,
-            factory=lambda workspace: DisabledSandboxAdapter(),
+            factory=lambda _workspace: DisabledSandboxAdapter(),
         )
     )
     registry.register(
@@ -98,7 +98,7 @@ def default_sandbox_factory_registry() -> SandboxFactoryRegistryPort:
                 security_tier="MANAGED_EPHEMERAL",
                 network_modes=("DENY_ALL",),
             ),
-            factory=lambda workspace: E2BManagedSandboxAdapter(),
+            factory=lambda _workspace: E2BManagedSandboxAdapter(),
         )
     )
     return registry

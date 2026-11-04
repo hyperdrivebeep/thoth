@@ -14,7 +14,7 @@ from thoth.domain.retrieval_embedding import DenseModelPin
 from thoth.ports.embedding import LocalEmbeddingPort
 
 
-def denied(*args: object, **kwargs: object) -> None:
+def denied(*_args: object, **_kwargs: object) -> None:
     raise RuntimeError("EMBEDDING_NETWORK_DISABLED")
 
 

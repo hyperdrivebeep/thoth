@@ -58,7 +58,6 @@ def create_history_commands(
         ledger,
         stores,
         control_store,
-        control_service,
         dependency_graph,
         governance,
         clock,

@@ -174,7 +174,7 @@ def _safe_section(value: object, classes: set[str]) -> str | None:
 
 
 def _source_target(
-    span_id: object, context: SourceActivityContext, fallback: Mapping[str, object]
+    context: SourceActivityContext, fallback: Mapping[str, object]
 ) -> tuple[UserActivityTarget, set[str]]:
     classes = _redaction_classes(fallback, source_content=True)
     classes.update(_redaction_classes(context, source_content=True))

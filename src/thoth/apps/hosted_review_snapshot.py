@@ -135,13 +135,6 @@ def referenced_object_digests(database: Path) -> tuple[str, ...]:
     return tuple(sorted(found))
 
 
-def object_file_for(workspace: Path, digest: str) -> Path:
-    normalized = digest.lower()
-    if _DIGEST.fullmatch(normalized) is None:
-        raise ValueError("HOSTED_REVIEW_SNAPSHOT_OBJECT_DIGEST_INVALID")
-    return object_store_root(workspace) / normalized[:2] / normalized
-
-
 def stored_object_digests(workspace: Path) -> tuple[str, ...]:
     root = object_store_root(workspace)
     if not root.is_dir():
@@ -270,7 +263,7 @@ def _should_skip(path: Path, workspace: Path) -> bool:
     return any(part in _SKIP_DIR_NAMES for part in relative.parts)
 
 
-def _require_objects(workspace: Path, referenced: tuple[str, ...], stored: tuple[str, ...]) -> None:
+def _require_objects(referenced: tuple[str, ...], stored: tuple[str, ...]) -> None:
     missing = [digest for digest in referenced if digest not in stored]
     if missing:
         raise ValueError("HOSTED_REVIEW_SNAPSHOT_OBJECT_MISSING")
@@ -284,7 +277,7 @@ def export_workspace_archive(workspace: Path) -> bytes:
     live_db = sqlite_path(workspace)
     referenced = referenced_object_digests(live_db)
     stored = stored_object_digests(workspace)
-    _require_objects(workspace, referenced, stored)
+    _require_objects(referenced, stored)
     with tarfile.open(fileobj=buffer, mode="w:gz") as archive:
         if live_db.is_file():
             backup = workspace / "db" / ".hosted-review-backup.sqlite3"
@@ -378,8 +371,8 @@ def _restore_archive_into_directory(
         )
     database = sqlite_path(workspace)
     db_refs = referenced_object_digests(database)
-    _require_objects(workspace, referenced, stored)
-    _require_objects(workspace, db_refs, stored)
+    _require_objects(referenced, stored)
+    _require_objects(db_refs, stored)
     closed = fail_stale_running_sqlite(database)
     digest = hashlib.sha256(database.read_bytes()).hexdigest() if database.is_file() else ""
     return {

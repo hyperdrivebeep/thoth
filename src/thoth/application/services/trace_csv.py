@@ -397,7 +397,7 @@ _BUILDERS: dict[str, tuple[str, Callable[[dict[str, str]], BaseModel]]] = {
 }
 
 
-def _reference_ids(row_type: str, model: BaseModel) -> Iterable[str]:
+def _reference_ids(model: BaseModel) -> Iterable[str]:
     if isinstance(model, TraceLink):
         return (model.from_id, model.to_id)
     if isinstance(model, (CriterionRule, ResultRecord)):
@@ -508,7 +508,7 @@ def _upsert_row(
     model = _guard(parsed.issues, number, key, lambda: build(cells))
     if model is None:
         return None
-    parsed.reference_ids.update(_reference_ids(row_type, model))
+    parsed.reference_ids.update(_reference_ids(model))
     return ParsedRow(
         row=number,
         row_type=row_type,

@@ -236,7 +236,7 @@ def create_runtime(
         thread_runtime_store = stores.thread_runtime
         investigation_store = stores.investigations(artifact_ledger.scopes)
         acquisition_trace_store = stores.acquisition_trace
-        memory_store = create_memory_access(ledger, stores, artifact_ledger.scopes)
+        memory_store = create_memory_access(stores, artifact_ledger.scopes)
         baseline_service = shared.baselines
         behavior_runtime = create_behavior_runtime(ledger, stores, clock, ids, workspace)
         behavior_store, behavior_candidates, improvement_runner = behavior_runtime.legacy()
@@ -253,7 +253,7 @@ def create_runtime(
             fault_injector=memory_fault_injector,
         )
         dependency_graph = stores.dependencies
-        execution_store = create_execution_access(ledger, stores, artifact_ledger.scopes)
+        execution_store = create_execution_access(stores, artifact_ledger.scopes)
         outcome_store = stores.outcomes(artifact_ledger.scopes)
         field_measurement_service = shared.measurement
         object_store = stores.objects
@@ -424,7 +424,6 @@ def create_runtime(
             effective_models=effective_models,
             evidence_graph_service=evidence_graph_service,
             ids=ids,
-            ingestion_service=ingestion_service,
             ledger=ledger,
             projectpack_root=projectpack_root,
             source_time_service=source_time_service,

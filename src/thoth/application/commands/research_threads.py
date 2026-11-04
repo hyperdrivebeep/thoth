@@ -217,7 +217,7 @@ class ResearchThreadHandlers:
                     "edit_kind": "STEER",
                 }
             )
-            self.queue.hold_for_steer(self, str(value["project_id"]), str(value["thread_id"]))
+            self.queue.hold_for_steer(str(value["project_id"]), str(value["thread_id"]))
             return submitted
 
     def submit(

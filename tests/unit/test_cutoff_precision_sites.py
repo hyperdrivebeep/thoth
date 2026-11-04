@@ -114,7 +114,6 @@ async def r2_hold_reason(stored_project_cutoff: datetime) -> str | None:
     try:
         held = await handlers._execute_r2(  # pyright: ignore[reportPrivateUsage]
             project=project(stored_project_cutoff),
-            thread=cast(Any, None),
             portfolio=cast(Any, None),
             action_plan=plan,
         )

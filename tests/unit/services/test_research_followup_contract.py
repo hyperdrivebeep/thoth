@@ -87,7 +87,6 @@ def test_currentness_progress_and_action_precedence_without_record_io(
         ledger=cast(LedgerPort, NoRecordAccess()),
         access=cast(ResourceAccessPort, NoRecordAccess()),
         request_ref=ref,
-        request=request_record(ref),
         result_ref=None,
         manifest=manifest,
         attempt=None,

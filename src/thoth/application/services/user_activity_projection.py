@@ -151,7 +151,7 @@ def _append_source_events(
         context: SourceActivityContext = (
             contexts.get(str(span_id), {}) if isinstance(span_id, str) else {}
         )
-        target, classes = _source_target(span_id, context, locator)
+        target, classes = _source_target(context, locator)
         display = f" {target.display_ref}" if target.display_ref else ""
         add(
             severity="info",

@@ -444,7 +444,6 @@ class ThreadAnalysisCommandHandlers:
         check_research_boundary()
         r2_execution = await self._execute_r2(
             project=project,
-            thread=thread,
             portfolio=result.portfolio,
             action_plan=result.action_plan,
         )
@@ -561,7 +560,6 @@ class ThreadAnalysisCommandHandlers:
         self,
         *,
         project: Project,
-        thread: WorkThread,
         portfolio: HypothesisPortfolio,
         action_plan: ActionPlan,
     ) -> R2ClosedLoopExecution | None:
@@ -581,7 +579,6 @@ class ThreadAnalysisCommandHandlers:
                 return held
         return await self._r2_closed_loop.execute_if_required(
             project=current,
-            thread=thread,
             portfolio=portfolio,
             action_plan=action_plan,
         )
