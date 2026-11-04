@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-03T14:08:29.200553+00:00",
+  "created_at": "2026-11-03T16:25:12.043297+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -848,8 +848,8 @@
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspace.tsx",
-      "sha256": "37bead2fb44a1df543ddff288e341d6060e724bd15452e0e0bf9d06bdb357f50",
-      "bytes": 43811
+      "sha256": "69dbcdec12d721a53acdb333c2377a6ac5b9bf35ab3298a14b9d1e58d9c19e45",
+      "bytes": 43808
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspaceConsent.test.tsx",
@@ -938,8 +938,8 @@
     },
     {
       "path": "apps/web/src/components/ProjectArchiveRestore.test.tsx",
-      "sha256": "0c4a5e09c15eebc5e65b228b9cf35eb0827a7421976add249b2ff0457ae75d6e",
-      "bytes": 7820
+      "sha256": "49e797bd677566236603583b33926d80f0d7ce8c9088cd19be739bf294202b37",
+      "bytes": 8297
     },
     {
       "path": "apps/web/src/components/ProjectLanding.test.tsx",
@@ -1918,8 +1918,8 @@
     },
     {
       "path": "apps/web/src/workstation.css",
-      "sha256": "3966e9ae7cfbe505529950eac7dc169846828547bcfc6954aba74d9feb618abf",
-      "bytes": 60286
+      "sha256": "406785b8f2dd9503089a327cabf1e642bc273730bf90abead3db9d7a7f1c0547",
+      "bytes": 60113
     },
     {
       "path": "apps/web/timeline-preview.html",

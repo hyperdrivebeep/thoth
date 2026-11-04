@@ -2,7 +2,7 @@ import { getLocale } from "../i18n/locale";
 import { readResponseLanguageDefault } from "../api/responseLanguageDefault";
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
-import { Button, Callout, Collapse, HTMLSelect, Icon, InputGroup, Tab, Tabs, Tag } from "@blueprintjs/core";
+import { Button, Callout, Collapse, HTMLSelect, Icon, InputGroup, PopoverNext, Tab, Tabs, Tag } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { rpc } from "../api/rpcClient";
@@ -196,12 +196,13 @@ function ProjectNavItem({ project, active, removing, onOpen, onRemove }: {
   onRemove: () => void;
 }) {
   const [menuOpen,setMenuOpen] = useState(false);
-  return <div className={`project-nav-row ${active ? "active" : ""}`} onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget))setMenuOpen(false);}}>
+  return <div className={`project-nav-row ${active ? "active" : ""}`}>
     <Button minimal alignText="left" className={`project-button ${active ? "active" : ""}`} onClick={onOpen}>
       <Icon icon={active ? "folder-open" : "folder-close"}/><span><strong>{project.name}</strong></span>
     </Button>
-    <Button small minimal icon="more" aria-label={message("projectMenu", project.name)} aria-expanded={menuOpen} loading={removing} onClick={()=>setMenuOpen(value=>!value)}/>
-    {menuOpen&&<div className="project-inline-menu" role="menu"><Button fill alignText="left" minimal role="menuitem" icon="trash" intent="danger" disabled={removing} onClick={()=>{setMenuOpen(false);onRemove();}}>{t("workspace.removeProject")}</Button></div>}
+    <PopoverNext isOpen={menuOpen} onInteraction={setMenuOpen} placement="right-start" arrow={false} content={<div className="project-inline-menu" role="menu"><Button fill alignText="left" minimal role="menuitem" icon="trash" intent="danger" disabled={removing} onClick={()=>{setMenuOpen(false);onRemove();}}>{t("workspace.removeProject")}</Button></div>}>
+      <Button small minimal icon="more" aria-label={message("projectMenu", project.name)} aria-expanded={menuOpen} loading={removing}/>
+    </PopoverNext>
   </div>;
 }
 

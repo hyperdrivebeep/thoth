@@ -104,12 +104,18 @@ it("tells the user that archiving makes a project read-only and that it can be r
   fixture.projects = [project("p", "old project", "ACTIVE", 1)];
   const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
   await mount(false);
-  await act(async () => (container.querySelector('[aria-label="old project 프로젝트 메뉴"]') as HTMLButtonElement).click());
-  await act(async () => button("프로젝트 제거")!.click());
+  // Synchronous act: an async act around the floating popover waits for tens of seconds in jsdom.
+  act(() => { (container.querySelector('[aria-label="old project 프로젝트 메뉴"]') as HTMLButtonElement).click(); });
+  // The menu is drawn in a portal outside the sidebar so the sidebar's overflow cannot clip it.
+  expect(document.querySelector('[role="menuitem"]')).not.toBeNull();
+  expect(container.querySelector('[role="menu"]')).toBeNull();
+  act(() => { (document.querySelector('[role="menuitem"]') as HTMLButtonElement).click(); });
   expect(confirm).toHaveBeenCalledOnce();
   const message = String(confirm.mock.calls[0][0]);
   expect(message).toContain("보관하면 읽기 전용이 되고 목록에서 숨겨집니다.");
   expect(message).toContain("'보관한 프로젝트 보기'에서 되살릴 수 있습니다.");
   expect(message).not.toContain("데이터는 보관되고");
   expect(fixture.calls.some(call => call.method === "project/archive")).toBe(false);
-});
+  act(() => root!.unmount());
+  root = undefined;
+}, 15000); // jsdom needs a few seconds to lay out and remove the floating menu
