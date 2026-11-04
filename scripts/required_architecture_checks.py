@@ -12,6 +12,7 @@ CHECKS = (
     "check_architecture.py",
     "check_ocp_extensions.py",
     "check_module_budget.py",
+    "check_complexity_budget.py",
     "check_canonical_owners.py",
     "check_migration_discipline.py",
 )

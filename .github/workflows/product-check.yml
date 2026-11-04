@@ -99,6 +99,9 @@ jobs:
       - name: Module size budget
         if: needs.changes.outputs.docs_only != 'true'
         run: .\.venv\Scripts\python.exe scripts/check_module_budget.py
+      - name: Complexity budget
+        if: needs.changes.outputs.docs_only != 'true'
+        run: .\.venv\Scripts\python.exe scripts/check_complexity_budget.py
       - name: Web tests
         if: needs.changes.outputs.docs_only != 'true'
         run: pnpm --dir apps/web run test --run
