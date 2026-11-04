@@ -2,8 +2,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, expect, it, vi } from "vitest";
 import { saveWorkspaceContext } from "../api/research";
+import { answerTopLayerSelectorsWithNo } from "../test/jsdomTopLayer";
 import { LiveProjectWorkspace } from "./LiveProjectWorkspace";
 
 const WORKSPACE = `workspace:${"a".repeat(32)}`;
@@ -49,6 +50,9 @@ vi.mock("../api/rpcClient", async importOriginal => { const actual = await impor
 let root: Root | undefined;
 let container: HTMLDivElement;
 let client: QueryClient;
+let restoreMatches: () => void;
+beforeAll(() => { restoreMatches = answerTopLayerSelectorsWithNo(); });
+afterAll(() => restoreMatches());
 async function settle(check: () => boolean) {
   for (let i = 0; i < 40; i++) {
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 15)); });
@@ -117,7 +121,6 @@ it("tells the user that archiving makes a project read-only and that it can be r
   fixture.projects = [project("p", "old project", "ACTIVE", 1)];
   const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
   await mount(false);
-  // Synchronous act: an async act around the floating popover waits for tens of seconds in jsdom.
   act(() => { (container.querySelector('[aria-label="old project 프로젝트 메뉴"]') as HTMLButtonElement).click(); });
   // The menu is drawn in a portal outside the sidebar so the sidebar's overflow cannot clip it.
   expect(document.querySelector('[role="menuitem"]')).not.toBeNull();
@@ -131,7 +134,7 @@ it("tells the user that archiving makes a project read-only and that it can be r
   expect(fixture.calls.some(call => call.method === "project/archive")).toBe(false);
   act(() => root!.unmount());
   root = undefined;
-}, 15000); // jsdom needs a few seconds to lay out and remove the floating menu
+});
 
 const archiveFromMenu = (name: string) => {
   act(() => { (container.querySelector('[aria-label="' + name + ' 프로젝트 메뉴"]') as HTMLButtonElement).click(); });
@@ -157,7 +160,7 @@ it("says in words that a project changed in the meantime, reads the list again a
   expect(fixture.calls.filter(call => call.method === "project/archive").map(call => call.input.expected_revision)).toEqual([1, 2]);
   act(() => root!.unmount());
   root = undefined;
-}, 120000); // two floating menus: jsdom is slow to lay out and remove each one
+});
 
 it("explains a stale revision when restoring and reads the list again", async () => {
   fixture.projects = [project("p", "old project", "ACTIVE", 1), project("q", "archived demo", "ARCHIVED_READ_ONLY", 4)];
@@ -200,7 +203,7 @@ it("permanently deletes an archived project by typing its name, keeps the open p
   expect(container.querySelector("#live-problem")).not.toBeNull();
   expect(localStorage.getItem(forget)).toBeNull();
   expect(localStorage.getItem(keep)).toBe("{}");
-}, 20000); // the open workspace and the floating dialog are slow to lay out in jsdom
+});
 
 it("goes back to the project list when the deleted project was the open one", async () => {
   fixture.projects = [project("p", "open demo", "ACTIVE", 1), project("r", "other demo", "ACTIVE", 1)];
@@ -212,7 +215,7 @@ it("goes back to the project list when the deleted project was the open one", as
   expect(container.querySelector("#live-problem")).toBeNull();
   expect(container.querySelector(".project-home")!.textContent).toContain("other demo");
   expect(container.querySelector(".project-home")!.textContent).not.toContain("open demo");
-}, 20000);
+});
 
 it("offers no permanent delete in the hosted review environment", async () => {
   fixture.hosted = true;

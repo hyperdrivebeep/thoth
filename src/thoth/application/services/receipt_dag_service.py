@@ -56,6 +56,11 @@ class ReceiptDagService:
         return self.sync(project_id)
 
     def sync(self, project_id: str) -> ReceiptDagManifest:
+        # The derived nodes, edges and manifest become visible together or not at all.
+        with self._ledger.transaction():
+            return self._synchronize(project_id)
+
+    def _synchronize(self, project_id: str) -> ReceiptDagManifest:
         for receipt in self._ledger.read_receipts(project_id):
             self._node(
                 project_id,
