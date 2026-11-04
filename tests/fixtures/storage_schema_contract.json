@@ -119,6 +119,8 @@
         "thoth.adapters.storage.outcome.outcome_impacts": "outcome_impacts",
         "thoth.adapters.storage.outcome.outcome_profiles": "outcome_profiles",
         "thoth.adapters.storage.outcome.outcome_series": "outcome_series",
+        "thoth.adapters.storage.project_deletion_schema.project_deletions": "project_deletions",
+        "thoth.adapters.storage.projects.project_deletions": "project_deletions",
         "thoth.adapters.storage.projects.projects": "projects",
         "thoth.adapters.storage.receipt_dag.receipt_dag_bundles": "receipt_dag_bundles",
         "thoth.adapters.storage.receipt_dag.receipt_dag_edges": "receipt_dag_edges",
@@ -344,6 +346,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -632,6 +635,7 @@
         "outcome_profiles",
         "outcome_series",
         "plan_executions",
+        "project_deletions",
         "project_head_sets",
         "project_policies",
         "project_references",
@@ -777,6 +781,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -2665,6 +2670,22 @@
             "ix_plan_executions_project_id": "CREATE INDEX ix_plan_executions_project_id ON plan_executions (project_id)"
           },
           "sql": "\nCREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)\n\n"
+        },
+        "project_deletions": {
+          "columns": [
+            "project_id",
+            "name_sha256",
+            "deleted_at",
+            "cleanup_json"
+          ],
+          "constraint_names": [
+            null
+          ],
+          "constraint_types": [
+            "PrimaryKeyConstraint"
+          ],
+          "indexes": {},
+          "sql": "\nCREATE TABLE project_deletions (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname_sha256 VARCHAR(64) NOT NULL, \n\tdeleted_at VARCHAR(32) NOT NULL, \n\tcleanup_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)\n\n"
         },
         "project_head_sets": {
           "columns": [
@@ -3429,6 +3450,8 @@
         "thoth.adapters.storage.outcome.outcome_impacts": "outcome_impacts",
         "thoth.adapters.storage.outcome.outcome_profiles": "outcome_profiles",
         "thoth.adapters.storage.outcome.outcome_series": "outcome_series",
+        "thoth.adapters.storage.project_deletion_schema.project_deletions": "project_deletions",
+        "thoth.adapters.storage.projects.project_deletions": "project_deletions",
         "thoth.adapters.storage.projects.projects": "projects",
         "thoth.adapters.storage.receipt_dag.receipt_dag_bundles": "receipt_dag_bundles",
         "thoth.adapters.storage.receipt_dag.receipt_dag_edges": "receipt_dag_edges",
@@ -3654,6 +3677,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -3942,6 +3966,7 @@
         "outcome_profiles",
         "outcome_series",
         "plan_executions",
+        "project_deletions",
         "project_head_sets",
         "project_policies",
         "project_references",
@@ -4087,6 +4112,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -5975,6 +6001,22 @@
             "ix_plan_executions_project_id": "CREATE INDEX ix_plan_executions_project_id ON plan_executions (project_id)"
           },
           "sql": "\nCREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)\n\n"
+        },
+        "project_deletions": {
+          "columns": [
+            "project_id",
+            "name_sha256",
+            "deleted_at",
+            "cleanup_json"
+          ],
+          "constraint_names": [
+            null
+          ],
+          "constraint_types": [
+            "PrimaryKeyConstraint"
+          ],
+          "indexes": {},
+          "sql": "\nCREATE TABLE project_deletions (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname_sha256 VARCHAR(64) NOT NULL, \n\tdeleted_at VARCHAR(32) NOT NULL, \n\tcleanup_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)\n\n"
         },
         "project_head_sets": {
           "columns": [
@@ -6739,6 +6781,8 @@
         "thoth.adapters.storage.outcome.outcome_impacts": "outcome_impacts",
         "thoth.adapters.storage.outcome.outcome_profiles": "outcome_profiles",
         "thoth.adapters.storage.outcome.outcome_series": "outcome_series",
+        "thoth.adapters.storage.project_deletion_schema.project_deletions": "project_deletions",
+        "thoth.adapters.storage.projects.project_deletions": "project_deletions",
         "thoth.adapters.storage.projects.projects": "projects",
         "thoth.adapters.storage.receipt_dag.receipt_dag_bundles": "receipt_dag_bundles",
         "thoth.adapters.storage.receipt_dag.receipt_dag_edges": "receipt_dag_edges",
@@ -6964,6 +7008,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "evaluation_runs",
         "behavior_exposure_history",
         "behavior_baseline_history",
@@ -7252,6 +7297,7 @@
         "outcome_profiles",
         "outcome_series",
         "plan_executions",
+        "project_deletions",
         "project_head_sets",
         "project_policies",
         "project_references",
@@ -7397,6 +7443,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "evaluation_runs",
         "behavior_exposure_history",
         "behavior_baseline_history",
@@ -9285,6 +9332,22 @@
             "ix_plan_executions_project_id": "CREATE INDEX ix_plan_executions_project_id ON plan_executions (project_id)"
           },
           "sql": "\nCREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)\n\n"
+        },
+        "project_deletions": {
+          "columns": [
+            "project_id",
+            "name_sha256",
+            "deleted_at",
+            "cleanup_json"
+          ],
+          "constraint_names": [
+            null
+          ],
+          "constraint_types": [
+            "PrimaryKeyConstraint"
+          ],
+          "indexes": {},
+          "sql": "\nCREATE TABLE project_deletions (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname_sha256 VARCHAR(64) NOT NULL, \n\tdeleted_at VARCHAR(32) NOT NULL, \n\tcleanup_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)\n\n"
         },
         "project_head_sets": {
           "columns": [
@@ -10049,6 +10112,8 @@
         "thoth.adapters.storage.outcome.outcome_impacts": "outcome_impacts",
         "thoth.adapters.storage.outcome.outcome_profiles": "outcome_profiles",
         "thoth.adapters.storage.outcome.outcome_series": "outcome_series",
+        "thoth.adapters.storage.project_deletion_schema.project_deletions": "project_deletions",
+        "thoth.adapters.storage.projects.project_deletions": "project_deletions",
         "thoth.adapters.storage.projects.projects": "projects",
         "thoth.adapters.storage.receipt_dag.receipt_dag_bundles": "receipt_dag_bundles",
         "thoth.adapters.storage.receipt_dag.receipt_dag_edges": "receipt_dag_edges",
@@ -10274,6 +10339,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -10562,6 +10628,7 @@
         "outcome_profiles",
         "outcome_series",
         "plan_executions",
+        "project_deletions",
         "project_head_sets",
         "project_policies",
         "project_references",
@@ -10707,6 +10774,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -12595,6 +12663,22 @@
             "ix_plan_executions_project_id": "CREATE INDEX ix_plan_executions_project_id ON plan_executions (project_id)"
           },
           "sql": "\nCREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)\n\n"
+        },
+        "project_deletions": {
+          "columns": [
+            "project_id",
+            "name_sha256",
+            "deleted_at",
+            "cleanup_json"
+          ],
+          "constraint_names": [
+            null
+          ],
+          "constraint_types": [
+            "PrimaryKeyConstraint"
+          ],
+          "indexes": {},
+          "sql": "\nCREATE TABLE project_deletions (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname_sha256 VARCHAR(64) NOT NULL, \n\tdeleted_at VARCHAR(32) NOT NULL, \n\tcleanup_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)\n\n"
         },
         "project_head_sets": {
           "columns": [
@@ -13359,6 +13443,8 @@
         "thoth.adapters.storage.outcome.outcome_impacts": "outcome_impacts",
         "thoth.adapters.storage.outcome.outcome_profiles": "outcome_profiles",
         "thoth.adapters.storage.outcome.outcome_series": "outcome_series",
+        "thoth.adapters.storage.project_deletion_schema.project_deletions": "project_deletions",
+        "thoth.adapters.storage.projects.project_deletions": "project_deletions",
         "thoth.adapters.storage.projects.projects": "projects",
         "thoth.adapters.storage.receipt_dag.receipt_dag_bundles": "receipt_dag_bundles",
         "thoth.adapters.storage.receipt_dag.receipt_dag_edges": "receipt_dag_edges",
@@ -13584,6 +13670,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -13872,6 +13959,7 @@
         "outcome_profiles",
         "outcome_series",
         "plan_executions",
+        "project_deletions",
         "project_head_sets",
         "project_policies",
         "project_references",
@@ -14017,6 +14105,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -15905,6 +15994,22 @@
             "ix_plan_executions_project_id": "CREATE INDEX ix_plan_executions_project_id ON plan_executions (project_id)"
           },
           "sql": "\nCREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)\n\n"
+        },
+        "project_deletions": {
+          "columns": [
+            "project_id",
+            "name_sha256",
+            "deleted_at",
+            "cleanup_json"
+          ],
+          "constraint_names": [
+            null
+          ],
+          "constraint_types": [
+            "PrimaryKeyConstraint"
+          ],
+          "indexes": {},
+          "sql": "\nCREATE TABLE project_deletions (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname_sha256 VARCHAR(64) NOT NULL, \n\tdeleted_at VARCHAR(32) NOT NULL, \n\tcleanup_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)\n\n"
         },
         "project_head_sets": {
           "columns": [
@@ -16669,6 +16774,8 @@
         "thoth.adapters.storage.outcome.outcome_impacts": "outcome_impacts",
         "thoth.adapters.storage.outcome.outcome_profiles": "outcome_profiles",
         "thoth.adapters.storage.outcome.outcome_series": "outcome_series",
+        "thoth.adapters.storage.project_deletion_schema.project_deletions": "project_deletions",
+        "thoth.adapters.storage.projects.project_deletions": "project_deletions",
         "thoth.adapters.storage.projects.projects": "projects",
         "thoth.adapters.storage.receipt_dag.receipt_dag_bundles": "receipt_dag_bundles",
         "thoth.adapters.storage.receipt_dag.receipt_dag_edges": "receipt_dag_edges",
@@ -16894,6 +17001,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -17182,6 +17290,7 @@
         "outcome_profiles",
         "outcome_series",
         "plan_executions",
+        "project_deletions",
         "project_head_sets",
         "project_policies",
         "project_references",
@@ -17327,6 +17436,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -19215,6 +19325,22 @@
             "ix_plan_executions_project_id": "CREATE INDEX ix_plan_executions_project_id ON plan_executions (project_id)"
           },
           "sql": "\nCREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)\n\n"
+        },
+        "project_deletions": {
+          "columns": [
+            "project_id",
+            "name_sha256",
+            "deleted_at",
+            "cleanup_json"
+          ],
+          "constraint_names": [
+            null
+          ],
+          "constraint_types": [
+            "PrimaryKeyConstraint"
+          ],
+          "indexes": {},
+          "sql": "\nCREATE TABLE project_deletions (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname_sha256 VARCHAR(64) NOT NULL, \n\tdeleted_at VARCHAR(32) NOT NULL, \n\tcleanup_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)\n\n"
         },
         "project_head_sets": {
           "columns": [
@@ -19979,6 +20105,8 @@
         "thoth.adapters.storage.outcome.outcome_impacts": "outcome_impacts",
         "thoth.adapters.storage.outcome.outcome_profiles": "outcome_profiles",
         "thoth.adapters.storage.outcome.outcome_series": "outcome_series",
+        "thoth.adapters.storage.project_deletion_schema.project_deletions": "project_deletions",
+        "thoth.adapters.storage.projects.project_deletions": "project_deletions",
         "thoth.adapters.storage.projects.projects": "projects",
         "thoth.adapters.storage.receipt_dag.receipt_dag_bundles": "receipt_dag_bundles",
         "thoth.adapters.storage.receipt_dag.receipt_dag_edges": "receipt_dag_edges",
@@ -20204,6 +20332,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -20492,6 +20621,7 @@
         "outcome_profiles",
         "outcome_series",
         "plan_executions",
+        "project_deletions",
         "project_head_sets",
         "project_policies",
         "project_references",
@@ -20637,6 +20767,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -22525,6 +22656,22 @@
             "ix_plan_executions_project_id": "CREATE INDEX ix_plan_executions_project_id ON plan_executions (project_id)"
           },
           "sql": "\nCREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)\n\n"
+        },
+        "project_deletions": {
+          "columns": [
+            "project_id",
+            "name_sha256",
+            "deleted_at",
+            "cleanup_json"
+          ],
+          "constraint_names": [
+            null
+          ],
+          "constraint_types": [
+            "PrimaryKeyConstraint"
+          ],
+          "indexes": {},
+          "sql": "\nCREATE TABLE project_deletions (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname_sha256 VARCHAR(64) NOT NULL, \n\tdeleted_at VARCHAR(32) NOT NULL, \n\tcleanup_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)\n\n"
         },
         "project_head_sets": {
           "columns": [
@@ -23289,6 +23436,8 @@
         "thoth.adapters.storage.outcome.outcome_impacts": "outcome_impacts",
         "thoth.adapters.storage.outcome.outcome_profiles": "outcome_profiles",
         "thoth.adapters.storage.outcome.outcome_series": "outcome_series",
+        "thoth.adapters.storage.project_deletion_schema.project_deletions": "project_deletions",
+        "thoth.adapters.storage.projects.project_deletions": "project_deletions",
         "thoth.adapters.storage.projects.projects": "projects",
         "thoth.adapters.storage.receipt_dag.receipt_dag_bundles": "receipt_dag_bundles",
         "thoth.adapters.storage.receipt_dag.receipt_dag_edges": "receipt_dag_edges",
@@ -23514,6 +23663,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -23802,6 +23952,7 @@
         "outcome_profiles",
         "outcome_series",
         "plan_executions",
+        "project_deletions",
         "project_head_sets",
         "project_policies",
         "project_references",
@@ -23947,6 +24098,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -25835,6 +25987,22 @@
             "ix_plan_executions_project_id": "CREATE INDEX ix_plan_executions_project_id ON plan_executions (project_id)"
           },
           "sql": "\nCREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)\n\n"
+        },
+        "project_deletions": {
+          "columns": [
+            "project_id",
+            "name_sha256",
+            "deleted_at",
+            "cleanup_json"
+          ],
+          "constraint_names": [
+            null
+          ],
+          "constraint_types": [
+            "PrimaryKeyConstraint"
+          ],
+          "indexes": {},
+          "sql": "\nCREATE TABLE project_deletions (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname_sha256 VARCHAR(64) NOT NULL, \n\tdeleted_at VARCHAR(32) NOT NULL, \n\tcleanup_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)\n\n"
         },
         "project_head_sets": {
           "columns": [
@@ -26599,6 +26767,8 @@
         "thoth.adapters.storage.outcome.outcome_impacts": "outcome_impacts",
         "thoth.adapters.storage.outcome.outcome_profiles": "outcome_profiles",
         "thoth.adapters.storage.outcome.outcome_series": "outcome_series",
+        "thoth.adapters.storage.project_deletion_schema.project_deletions": "project_deletions",
+        "thoth.adapters.storage.projects.project_deletions": "project_deletions",
         "thoth.adapters.storage.projects.projects": "projects",
         "thoth.adapters.storage.receipt_dag.receipt_dag_bundles": "receipt_dag_bundles",
         "thoth.adapters.storage.receipt_dag.receipt_dag_edges": "receipt_dag_edges",
@@ -26824,6 +26994,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -27112,6 +27283,7 @@
         "outcome_profiles",
         "outcome_series",
         "plan_executions",
+        "project_deletions",
         "project_head_sets",
         "project_policies",
         "project_references",
@@ -27257,6 +27429,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -29146,6 +29319,22 @@
           },
           "sql": "\nCREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)\n\n"
         },
+        "project_deletions": {
+          "columns": [
+            "project_id",
+            "name_sha256",
+            "deleted_at",
+            "cleanup_json"
+          ],
+          "constraint_names": [
+            null
+          ],
+          "constraint_types": [
+            "PrimaryKeyConstraint"
+          ],
+          "indexes": {},
+          "sql": "\nCREATE TABLE project_deletions (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname_sha256 VARCHAR(64) NOT NULL, \n\tdeleted_at VARCHAR(32) NOT NULL, \n\tcleanup_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)\n\n"
+        },
         "project_head_sets": {
           "columns": [
             "project_id",
@@ -29909,6 +30098,8 @@
         "thoth.adapters.storage.outcome.outcome_impacts": "outcome_impacts",
         "thoth.adapters.storage.outcome.outcome_profiles": "outcome_profiles",
         "thoth.adapters.storage.outcome.outcome_series": "outcome_series",
+        "thoth.adapters.storage.project_deletion_schema.project_deletions": "project_deletions",
+        "thoth.adapters.storage.projects.project_deletions": "project_deletions",
         "thoth.adapters.storage.projects.projects": "projects",
         "thoth.adapters.storage.receipt_dag.receipt_dag_bundles": "receipt_dag_bundles",
         "thoth.adapters.storage.receipt_dag.receipt_dag_edges": "receipt_dag_edges",
@@ -30134,6 +30325,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "research_test_assessments",
         "behavior_exposure_history",
         "behavior_baseline_history",
@@ -30422,6 +30614,7 @@
         "outcome_profiles",
         "outcome_series",
         "plan_executions",
+        "project_deletions",
         "project_head_sets",
         "project_policies",
         "project_references",
@@ -30567,6 +30760,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "research_test_assessments",
         "behavior_exposure_history",
         "behavior_baseline_history",
@@ -32456,6 +32650,22 @@
           },
           "sql": "\nCREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)\n\n"
         },
+        "project_deletions": {
+          "columns": [
+            "project_id",
+            "name_sha256",
+            "deleted_at",
+            "cleanup_json"
+          ],
+          "constraint_names": [
+            null
+          ],
+          "constraint_types": [
+            "PrimaryKeyConstraint"
+          ],
+          "indexes": {},
+          "sql": "\nCREATE TABLE project_deletions (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname_sha256 VARCHAR(64) NOT NULL, \n\tdeleted_at VARCHAR(32) NOT NULL, \n\tcleanup_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)\n\n"
+        },
         "project_head_sets": {
           "columns": [
             "project_id",
@@ -33225,6 +33435,9 @@
         "thoth.adapters.storage.outcome.outcome_impacts": "outcome_impacts",
         "thoth.adapters.storage.outcome.outcome_profiles": "outcome_profiles",
         "thoth.adapters.storage.outcome.outcome_series": "outcome_series",
+        "thoth.adapters.storage.project_deletion_schema.project_deletions": "project_deletions",
+        "thoth.adapters.storage.project_purge.project_deletions": "project_deletions",
+        "thoth.adapters.storage.projects.project_deletions": "project_deletions",
         "thoth.adapters.storage.projects.projects": "projects",
         "thoth.adapters.storage.receipt_dag.receipt_dag_bundles": "receipt_dag_bundles",
         "thoth.adapters.storage.receipt_dag.receipt_dag_edges": "receipt_dag_edges",
@@ -33461,6 +33674,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -33749,6 +33963,7 @@
         "outcome_profiles",
         "outcome_series",
         "plan_executions",
+        "project_deletions",
         "project_head_sets",
         "project_policies",
         "project_references",
@@ -33894,6 +34109,7 @@
         "resource_scope_heads",
         "resource_scope_receipts",
         "operation_resource_bindings",
+        "project_deletions",
         "behavior_exposure_history",
         "behavior_baseline_history",
         "evaluation_runs",
@@ -35782,6 +35998,22 @@
             "ix_plan_executions_project_id": "CREATE INDEX ix_plan_executions_project_id ON plan_executions (project_id)"
           },
           "sql": "\nCREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)\n\n"
+        },
+        "project_deletions": {
+          "columns": [
+            "project_id",
+            "name_sha256",
+            "deleted_at",
+            "cleanup_json"
+          ],
+          "constraint_names": [
+            null
+          ],
+          "constraint_types": [
+            "PrimaryKeyConstraint"
+          ],
+          "indexes": {},
+          "sql": "\nCREATE TABLE project_deletions (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname_sha256 VARCHAR(64) NOT NULL, \n\tdeleted_at VARCHAR(32) NOT NULL, \n\tcleanup_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)\n\n"
         },
         "project_head_sets": {
           "columns": [

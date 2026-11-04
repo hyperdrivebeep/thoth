@@ -184,7 +184,7 @@ export const workspaceMessages = {
     "en": "Open API tools"
   },
   "workspace.removeProject": {
-    "ko": "프로젝트 제거",
+    "ko": "프로젝트 보관",
     "en": "Archive project"
   },
   "workspace.contextCorrupt": {

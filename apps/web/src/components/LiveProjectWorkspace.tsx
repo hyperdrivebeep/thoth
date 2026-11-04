@@ -200,7 +200,7 @@ function ProjectNavItem({ project, active, removing, onOpen, onRemove }: {
     <Button minimal alignText="left" className={`project-button ${active ? "active" : ""}`} onClick={onOpen}>
       <Icon icon={active ? "folder-open" : "folder-close"}/><span><strong>{project.name}</strong></span>
     </Button>
-    <PopoverNext isOpen={menuOpen} onInteraction={setMenuOpen} placement="right-start" arrow={false} content={<div className="project-inline-menu" role="menu"><Button fill alignText="left" minimal role="menuitem" icon="trash" intent="danger" disabled={removing} onClick={()=>{setMenuOpen(false);onRemove();}}>{t("workspace.removeProject")}</Button></div>}>
+    <PopoverNext isOpen={menuOpen} onInteraction={setMenuOpen} placement="right-start" arrow={false} content={<div className="project-inline-menu" role="menu"><Button fill alignText="left" minimal role="menuitem" icon="box" disabled={removing} onClick={()=>{setMenuOpen(false);onRemove();}}>{t("workspace.removeProject")}</Button></div>}>
       <Button small minimal icon="more" aria-label={message("projectMenu", project.name)} aria-expanded={menuOpen} loading={removing}/>
     </PopoverNext>
   </div>;
@@ -397,7 +397,7 @@ export function LiveProjectWorkspace() {
             {!threadsQuery.isPending&&!threadsQuery.error&&threads.length===0&&<p className="empty-copy">{t("workspace.firstQuestion")}</p>}
           </div> : null,
         ])}
-        {!projectsQuery.isPending&&!projectsQuery.error&&projects.length===0&&<p className="empty-copy">{t("workspace.noProjects")}</p>}<ArchivedProjects scopeKey={scopeKey}/>
+        {!projectsQuery.isPending&&!projectsQuery.error&&projects.length===0&&<p className="empty-copy">{t("workspace.noProjects")}</p>}<ArchivedProjects scopeKey={scopeKey} hosted={hosted} storageScope={storageScope} onDeleted={projectId=>{if(context.projectId===projectId)chooseProject("");}}/>
       </section>
       <div className="sidebar-bottom"><Button minimal alignText="left" icon={hosted?"info-sign":"settings"} onClick={()=>setPage("settings")}>{hosted?t("workspace.operations"):t("workspace.settingsTools")}</Button></div>
     </aside>

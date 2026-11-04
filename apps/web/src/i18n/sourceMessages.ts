@@ -188,6 +188,61 @@ export const sourceMessages = {
     "ko": "되살리지 못했습니다.",
     "en": "Could not restore the project."
   },
+  "archive.delete": { "ko": "영구 삭제", "en": "Delete permanently" },
+  "archive.deleteCancel": { "ko": "취소", "en": "Cancel" },
+  "archive.deleteClose": { "ko": "닫기", "en": "Close" },
+  "archive.deleteRetry": { "ko": "다시 시도", "en": "Try again" },
+  "archive.deleting": { "ko": "삭제하는 중…", "en": "Deleting…" },
+  "archive.deleteWarning": { "ko": "복구할 수 없습니다.", "en": "This cannot be undone." },
+  "archive.deleteRemoves": {
+    "ko": "지워지는 것: 이 프로젝트의 대화, 자료 기록, 업로드한 원본 파일.",
+    "en": "Deleted: this project's conversations, source records, and uploaded original files."
+  },
+  "archive.deleteKeeps": {
+    "ko": "남는 것: 다른 프로젝트와 공유하는 파일(내용이 같은 파일은 한 번만 저장됩니다).",
+    "en": "Kept: files shared with other projects (identical files are stored only once)."
+  },
+  "archive.deleteTypeName": {
+    "ko": "계속하려면 프로젝트 이름을 그대로 입력하세요.",
+    "en": "To continue, type the project name exactly."
+  },
+  "archive.deleteNameLabel": { "ko": "프로젝트 이름 확인", "en": "Confirm project name" },
+  "archive.deleteDone": {
+    "ko": "프로젝트를 영구 삭제했습니다.",
+    "en": "The project was permanently deleted."
+  },
+  "archive.deleteLeftover": {
+    "ko": "프로젝트는 삭제했지만 일부 파일을 지우지 못했습니다. 다시 시도하면 마저 지웁니다.",
+    "en": "The project was deleted, but some files could not be removed. Try again to finish removing them."
+  },
+  "archive.deleteNotArchived": {
+    "ko": "보관한 프로젝트만 영구 삭제할 수 있습니다.",
+    "en": "Only an archived project can be deleted permanently."
+  },
+  "archive.deleteNameMismatch": {
+    "ko": "프로젝트 이름이 일치하지 않습니다.",
+    "en": "The project name does not match."
+  },
+  "archive.deleteActive": {
+    "ko": "이 프로젝트의 작업이 아직 실행 중입니다. 끝난 뒤 다시 시도하세요.",
+    "en": "Work in this project is still running. Try again after it finishes."
+  },
+  "archive.deleteLocalOnly": {
+    "ko": "검토용 호스팅 환경에서는 프로젝트를 영구 삭제할 수 없습니다.",
+    "en": "Projects cannot be deleted permanently in the hosted review environment."
+  },
+  "archive.deleteDenied": {
+    "ko": "이 프로젝트를 영구 삭제할 권한이 없습니다.",
+    "en": "You do not have permission to delete this project permanently."
+  },
+  "archive.deleteNotFound": {
+    "ko": "프로젝트를 찾을 수 없습니다. 이미 삭제됐을 수 있어 목록을 새로 읽습니다.",
+    "en": "The project was not found. It may already be deleted, so the list is being refreshed."
+  },
+  "archive.deleteFailed": {
+    "ko": "프로젝트를 영구 삭제하지 못했습니다. 다시 시도하세요.",
+    "en": "The project could not be deleted permanently. Try again."
+  },
   "credential.connections": {
     "ko": "계정 연결",
     "en": "Account connections"

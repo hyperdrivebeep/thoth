@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0.0",
   "authority": "docs/architecture/rpc-method-catalog.md",
-  "canonical_method_count": 370,
+  "canonical_method_count": 371,
   "compatibility_alias_count": 6,
-  "runtime_method_count": 376,
+  "runtime_method_count": 377,
   "notification_count": 221,
   "methods": [
     {
@@ -4099,6 +4099,20 @@
       "runtime_status": "IMPLEMENTED"
     },
     {
+      "name": "project/permanentDelete",
+      "namespace": "project",
+      "surface": "COMMAND",
+      "canonical_owner": "PROJECT_GOVERNANCE",
+      "policy": "project:versioned-policy",
+      "normal_entrypoint": "project/create",
+      "behavioral_evidence": [
+        "A01"
+      ],
+      "canonical": true,
+      "alias_target": null,
+      "runtime_status": "IMPLEMENTED"
+    },
+    {
       "name": "project/policy/read",
       "namespace": "project",
       "surface": "QUERY",
@@ -5658,5 +5672,5 @@
     "thread/waitingForInput",
     "thread/waitingForProtectedAction"
   ],
-  "catalog_digest": "31fd537c4c407e64f14eb18a588ae374ed068b0ce6fec7dc93a9a8a60d3736ed"
+  "catalog_digest": "aee0d7442c3e7287edc1838ba248ec6a587c56e1d2034fc1c32a8e2db8d3fa6f"
 }

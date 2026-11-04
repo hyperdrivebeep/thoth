@@ -9,18 +9,22 @@ import { LiveProjectWorkspace } from "./LiveProjectWorkspace";
 const WORKSPACE = `workspace:${"a".repeat(32)}`;
 const project = (id: string, name: string, lifecycle: string, revision: number) =>
   ({ project_id: id, name, overlay: "test", lifecycle, revision, cutoff_at: "2026-09-26T00:00:00Z" });
-const fixture = vi.hoisted(() => ({ projects: [] as Record<string, unknown>[], calls: [] as { method: string; input: Record<string, unknown> }[] }));
+const fixture = vi.hoisted(() => ({ projects: [] as Record<string, unknown>[], calls: [] as { method: string; input: Record<string, unknown> }[], hosted: false }));
 vi.mock("../api/rpcClient", async importOriginal => ({ ...(await importOriginal<typeof import("../api/rpcClient")>()),
   rpc: async (method: string, input: Record<string, unknown>) => {
     fixture.calls.push({ method, input });
     let value: unknown = {};
     if (method === "workspace/ready") value = { ready: true, execution_ready: true, workspace_readable: true, setup_complete: true, workspace_id: WORKSPACE,
-      deployment_mode: "LOCAL", model_connected: true, setup: { internet_consent: "ALLOWED" } };
+      deployment_mode: fixture.hosted ? "HOSTED_REVIEW" : "LOCAL", model_connected: true, setup: { internet_consent: "ALLOWED" } };
     if (method === "project/list") value = { projects: fixture.projects.filter(item => input.include_archived === true || item.lifecycle !== "ARCHIVED_READ_ONLY") };
     if (method === "project/restore") {
       const target = fixture.projects.find(item => item.project_id === input.project_id)!;
       Object.assign(target, { lifecycle: "DRAFT", revision: Number(input.expected_revision) + 1 });
       value = target;
+    }
+    if (method === "project/permanentDelete") {
+      fixture.projects = fixture.projects.filter(item => item.project_id !== input.project_id);
+      value = { project_id: input.project_id, deleted: true, already_deleted: false, deleted_at: "2026-11-04T00:00:00Z", deleted_rows: 1, cleanup_pending: [] };
     }
     if (method === "thread/list") value = { threads: [{ project_id: input.project_id, thread_id: "t", updated_at: "2026-09-20T00:00:00Z", problem: "stored work", execution_state: "IDLE", lifecycle: "OPEN" }] };
     if (method === "thread/read") value = { project_id: input.project_id, thread_id: input.thread_id, problem: "stored work", lifecycle: "OPEN", execution_state: "IDLE", current_object_ids: [], operation_state: "SUCCEEDED", current_result: null };
@@ -57,7 +61,7 @@ async function mount(selected: boolean) {
 afterEach(async () => {
   if (root) await act(async () => root!.unmount());
   root = undefined; client?.clear(); container?.remove(); vi.restoreAllMocks(); localStorage.clear(); sessionStorage.clear(); vi.unstubAllGlobals();
-  fixture.projects = []; fixture.calls = [];
+  fixture.projects = []; fixture.calls = []; fixture.hosted = false;
 });
 
 const newProject = () => container.querySelector("button.new-project-button") as HTMLButtonElement;
@@ -119,3 +123,54 @@ it("tells the user that archiving makes a project read-only and that it can be r
   act(() => root!.unmount());
   root = undefined;
 }, 15000); // jsdom needs a few seconds to lay out and remove the floating menu
+
+const typeInto = async (input: HTMLInputElement, value: string) => act(async () => {
+  Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, value);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+});
+async function deleteFromArchive(name: string) {
+  await act(async () => button("보관한 프로젝트 보기")!.click());
+  await settle(() => container.querySelector(".archived-projects")?.textContent?.includes(name) === true);
+  await act(async () => ([...container.querySelectorAll(".archived-projects button")].find(item => item.textContent === "영구 삭제") as HTMLButtonElement).click());
+  await settle(() => document.querySelector(".project-delete-dialog") !== null);
+  const dialog = document.querySelector(".project-delete-dialog")!;
+  await typeInto(dialog.querySelector("input")!, name);
+  await act(async () => ([...dialog.querySelectorAll("button")].find(item => item.textContent === "영구 삭제") as HTMLButtonElement).click());
+  await settle(() => document.querySelector(".project-delete-dialog") === null);
+}
+
+it("permanently deletes an archived project by typing its name, keeps the open project and forgets the deleted one's drafts", async () => {
+  fixture.projects = [project("p", "open demo", "ACTIVE", 1), project("q", "archived demo", "ARCHIVED_READ_ONLY", 4)];
+  const keep = `thoth:local-workspace:v1:draft:${JSON.stringify([WORKSPACE, "p", "t"])}`;
+  const forget = `thoth:local-workspace:v1:draft:${JSON.stringify([WORKSPACE, "q", "t"])}`;
+  await mount(true);
+  localStorage.setItem(keep, "{}"); localStorage.setItem(forget, "{}");
+  await deleteFromArchive("archived demo");
+  expect(fixture.calls.filter(call => call.method === "project/permanentDelete")).toEqual([{ method: "project/permanentDelete", input: { project_id: "q", confirm_name: "archived demo" } }]);
+  await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("보관한 프로젝트가 없습니다") === true);
+  expect(container.querySelector("#live-problem")).not.toBeNull();
+  expect(localStorage.getItem(forget)).toBeNull();
+  expect(localStorage.getItem(keep)).toBe("{}");
+}, 20000); // the open workspace and the floating dialog are slow to lay out in jsdom
+
+it("goes back to the project list when the deleted project was the open one", async () => {
+  fixture.projects = [project("p", "open demo", "ACTIVE", 1), project("r", "other demo", "ACTIVE", 1)];
+  await mount(true);
+  // Another window archived it; this window still has it open until the list is read again.
+  Object.assign(fixture.projects[0], { lifecycle: "ARCHIVED_READ_ONLY", revision: 2 });
+  await deleteFromArchive("open demo");
+  await settle(() => container.querySelector(".project-home") !== null);
+  expect(container.querySelector("#live-problem")).toBeNull();
+  expect(container.querySelector(".project-home")!.textContent).toContain("other demo");
+  expect(container.querySelector(".project-home")!.textContent).not.toContain("open demo");
+}, 20000);
+
+it("offers no permanent delete in the hosted review environment", async () => {
+  fixture.hosted = true;
+  fixture.projects = [project("p", "old project", "ACTIVE", 1), project("q", "archived demo", "ARCHIVED_READ_ONLY", 4)];
+  await mount(false);
+  await act(async () => button("보관한 프로젝트 보기")!.click());
+  await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("archived demo") === true);
+  expect([...container.querySelectorAll(".archived-projects button")].some(item => item.textContent === "영구 삭제")).toBe(false);
+  expect(button("되살리기")).toBeDefined();
+});

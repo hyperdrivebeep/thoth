@@ -6,11 +6,12 @@ from sqlalchemy import Engine, insert, select, update
 from sqlalchemy.exc import IntegrityError
 
 from thoth.adapters.storage.governance_history import SqliteGovernanceHistory
+from thoth.adapters.storage.project_deletion_schema import project_deletions
 from thoth.adapters.storage.schema import projects
 from thoth.adapters.storage.transaction import read_connection, write_connection
 from thoth.domain.enums import ProjectLifecycle
 from thoth.domain.project import Project
-from thoth.ports.project import ProjectAlreadyExistsError, ProjectStorePort
+from thoth.ports.project import ProjectAlreadyExistsError, ProjectIdRetiredError, ProjectStorePort
 
 
 class SqliteProjectStore(ProjectStorePort):
@@ -20,6 +21,13 @@ class SqliteProjectStore(ProjectStorePort):
     def create(self, project: Project, *, created_at: str) -> None:
         try:
             with write_connection(self._engine) as connection:
+                retired = connection.execute(
+                    select(project_deletions.c.project_id).where(
+                        project_deletions.c.project_id == project.project_id
+                    )
+                ).first()
+                if retired is not None:
+                    raise ProjectIdRetiredError(project.project_id)
                 connection.execute(
                     insert(projects).values(
                         project_id=project.project_id,

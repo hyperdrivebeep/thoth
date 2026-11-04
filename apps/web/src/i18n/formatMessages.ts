@@ -30,6 +30,12 @@ const formats = {
     en: (name: string) => `Archive project "${name}"? It becomes read-only and is hidden from the list. You can restore it from archived projects.`,
   },
   cutoff: { ko: (value: string | null) => `기준시점 ${value}`, en: (value: string | null) => `Cutoff ${value}` },
+  deleteProjectTitle: { ko: (name: string) => `프로젝트 "${name}" 영구 삭제`, en: (name: string) => `Delete project "${name}" permanently` },
+  deleteProjectLabel: { ko: (name: string) => `${name} 영구 삭제`, en: (name: string) => `Delete ${name} permanently` },
+  deleteReferenced: {
+    ko: (ids: string) => `다른 프로젝트가 이 프로젝트를 참조하고 있어 삭제할 수 없습니다. 참조하는 프로젝트: ${ids}`,
+    en: (ids: string) => `Other projects reference this project, so it cannot be deleted. Referencing projects: ${ids}`,
+  },
   replyFixed: { ko: (language: string) => `답변: ${language} 고정`, en: (language: string) => `Reply: ${language} (fixed)` },
   missingSelection: { ko: (kind: "project" | "thread") => `저장된 ${kind === "project" ? "프로젝트" : "작업"} 선택 확인 필요`, en: (kind: "project" | "thread") => `Check the saved ${kind === "project" ? "project" : "task"} selection` },
 } as const;

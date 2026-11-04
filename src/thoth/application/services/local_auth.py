@@ -162,4 +162,6 @@ class LocalAuthenticationService(HttpAuthenticationPort):
             required.add("REVISION")
         if method.startswith("project/role/") or method.startswith("project/policy/"):
             required.add("ADMIN")
+        if method == "project/permanentDelete":
+            required.add("ADMIN")
         return frozenset(required)

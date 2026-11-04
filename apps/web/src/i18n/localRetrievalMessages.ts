@@ -33,6 +33,14 @@ export const localRetrievalMessages = {
     ko: "실행 구성 요소: 없음 — 파일 반입은 할 수 있지만 색인 준비는 할 수 없습니다.",
     en: "Runtime component: missing — files can be imported, but no index can be prepared.",
   },
+  "localRetrieval.installRuntimeHelp": {
+    ko: "설치 방법: THOTH 폴더에서 PowerShell로 아래 명령을 실행하세요(선택 설치, 약 110MB).",
+    en: "To install it, run this command in PowerShell from the THOTH folder (optional, about 110 MB):",
+  },
+  "localRetrieval.installRuntimeRestart": {
+    ko: "설치한 뒤 THOTH를 다시 시작하세요.",
+    en: "After installing, restart THOTH.",
+  },
   "localRetrieval.workerLoaded": { ko: "작업자: 로드됨", en: "Worker: loaded" },
   "localRetrieval.workerNotLoaded": { ko: "작업자: 로드 안 됨", en: "Worker: not loaded" },
   "localRetrieval.manageDenied": {

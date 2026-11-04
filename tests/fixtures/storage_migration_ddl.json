@@ -1,7 +1,7 @@
 {
   "contract": {
     "heads": [
-      "5d28a619afb4"
+      "8e3b5f1a7c42"
     ],
     "schema_rows": [
       [
@@ -1884,6 +1884,12 @@
       ],
       [
         "index",
+        "sqlite_autoindex_project_deletions_1",
+        "project_deletions",
+        null
+      ],
+      [
+        "index",
         "sqlite_autoindex_project_head_sets_1",
         "project_head_sets",
         null
@@ -2649,6 +2655,12 @@
         "plan_executions",
         "plan_executions",
         "CREATE TABLE plan_executions (\n\texecution_revision_id VARCHAR(160) NOT NULL, \n\tplan_execution_id VARCHAR(160) NOT NULL, \n\tproject_id VARCHAR(160) NOT NULL, \n\tobject_id VARCHAR(160) NOT NULL, \n\tplan_id VARCHAR(160) NOT NULL, \n\tcontent_json TEXT NOT NULL, \n\trevision_digest VARCHAR(64) NOT NULL, \n\tcreated_at VARCHAR(32) NOT NULL, \n\tPRIMARY KEY (execution_revision_id), \n\tUNIQUE (revision_digest)\n)"
+      ],
+      [
+        "table",
+        "project_deletions",
+        "project_deletions",
+        "CREATE TABLE project_deletions (\n\tproject_id VARCHAR(160) NOT NULL, \n\tname_sha256 VARCHAR(64) NOT NULL, \n\tdeleted_at VARCHAR(32) NOT NULL, \n\tcleanup_json TEXT NOT NULL, \n\tPRIMARY KEY (project_id)\n)"
       ],
       [
         "table",

@@ -58,7 +58,7 @@ from thoth.protocol.jsonrpc import (
 from thoth.protocol.notifications import notifications_for
 from thoth.protocol.operation_claim import claim_busy_response, claim_operation
 from thoth.protocol.operation_owner import OperationOwner, stale_running_error
-from thoth.protocol.operation_scope import SYSTEM_PROJECT_METHODS
+from thoth.protocol.operation_scope import SYSTEM_PROJECT_METHODS, WORKSPACE_OPERATION_METHODS
 from thoth.protocol.read_queries import READ_QUERY_METHODS
 from thoth.protocol.registry import CommandHandler, MethodRegistry
 
@@ -516,7 +516,7 @@ class CommandBus:
                 RpcErrorCode.INVALID_PARAMS,
                 "input.project_id is required for project isolation",
             )
-        return value
+        return "system:workspace" if request.method in WORKSPACE_OPERATION_METHODS else value
 
     def _continue_accepted(
         self, request: JsonRpcRequest, operation: OperationRecord, value: AcceptedRunning

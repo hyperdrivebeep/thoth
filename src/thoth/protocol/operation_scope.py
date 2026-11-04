@@ -1,5 +1,9 @@
 """Existing system RPCs that do not require input.project_id."""
 
+# The target project is deleted by the command, so its own operation, events and idempotency
+# record cannot live under that project: they are recorded under the workspace instead.
+WORKSPACE_OPERATION_METHODS = frozenset({"project/permanentDelete"})
+
 SYSTEM_PROJECT_METHODS = frozenset(
     {
         "model/localAsset/read",
