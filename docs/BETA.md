@@ -64,7 +64,7 @@ what happened.
 | 2 | Connect sources | In the input box choose **Connect sources** (자료 연결) and add two or three files. | Each file is accepted, appears under the project, and its text can be opened. Tell us about files that fail or look garbled. |
 | 3 | Ask a question | Ask something your documents can answer. Pick the response language you want for this question. | Progress is shown while the investigation runs. A usage line under the saved result shows calls and tokens. |
 | 4 | Read the result | Open the answer, its evidence references, the hypotheses and tests, and the research history. | Every claim points to a source position you can open. Note anything you cannot trace back, anything that reads as overconfident, and anything unclear. Changing only the display language should not start a model call. |
-| 5 | Archive, then delete permanently | In the project menu choose **Archive project** (프로젝트 제거; it only archives). Open **View archived projects** (보관한 프로젝트 보기), choose **Delete permanently** (영구 삭제), and type the project name when asked. | Archiving can be undone with **Restore**. Permanent deletion cannot. Check that the project and its conversations disappear and that other projects are untouched. |
+| 5 | Archive, then delete permanently | In the project menu choose **Archive project** (프로젝트 보관). It only archives. Open **View archived projects** (보관한 프로젝트 보기), choose **Delete permanently** (영구 삭제), and type the project name when asked. | Archiving can be undone with **Restore** (되살리기). Permanent deletion cannot. Check that the project and its conversations disappear and that other projects are untouched. |
 
 Optional sixth flow: switch the display language and the response language in Settings, then ask a
 second question in the other language in the same conversation.
@@ -138,7 +138,7 @@ repository and read the [security policy](../SECURITY.md).
   추가하고, 되돌리는 명령이 없으니 백업을 보관하세요. `python -m thoth.cli version`으로 버전을
   확인해 신고에 적어 주세요.
 - **시험할 흐름 5개**: 새 프로젝트 만들기 → 자료 연결 → 질문 → 결과 읽기(근거를 따라가 보기) →
-  프로젝트 제거(보관) 후 "보관한 프로젝트 보기"에서 영구 삭제(프로젝트 이름 입력). 영구 삭제는
+  프로젝트 보관 후 "보관한 프로젝트 보기"에서 영구 삭제(프로젝트 이름 입력). 영구 삭제는
   되돌릴 수 없습니다.
 - **알려진 한계**: 로컬 검색 준비는 기본 꺼짐이고 실험이며, 보류 평가에서 기준을 넘지 못했습니다.
   부품은 선택 설치(약 110MB + 모델 약 124MB)입니다. 영구 삭제해도 다른 프로젝트와 공유하는 파일은

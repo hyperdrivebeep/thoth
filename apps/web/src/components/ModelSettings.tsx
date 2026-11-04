@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { rpc } from "../api/rpcClient";
 import { providerLabel } from "./statusLabels";
-import { catalogLine, excludedModels, excludedReasonLabels, optionText, staleCatalogNotice, type CatalogStatusRow } from "./modelCatalogPresentation";
+import { catalogLine, excludedModels, excludedReasonLabels, optionText, optionTitle, staleCatalogNotice, type CatalogStatusRow } from "./modelCatalogPresentation";
 
 export type ModelSelection = { provider: string; model: string; reasoning_effort?: string };
 type ModelOption = { provider: string; model: string; reasoning_efforts: string[]; default_effort: string | null;   entitlement?: string; execution?: string; label?: string | null };
@@ -90,7 +90,7 @@ export function ModelSettings({ projectId, threadId, selection, onSelect, onSave
       : inherited.error ? <small role="alert">{t("model.parentFailed")}</small>
         : <small>{message("inheritedSelection", inheritedLabel ?? t("model.noProjectModel"))}</small>)}
     {inheritsProject && data?.availability !== "UNAVAILABLE" && <small>{t("model.inheritsProject")}</small>}
-    <label><span className="model-control-label">{t("model.modelLabel")}</span> <HTMLSelect key={`${scopeIdentity}:${query.dataUpdatedAt}`} aria-label={t("model.researchModel")} disabled={!data} value={option ? `${option.provider}/${option.model}` : ""}
+    <label><span className="model-control-label">{t("model.modelLabel")}</span> <HTMLSelect key={`${scopeIdentity}:${query.dataUpdatedAt}`} aria-label={t("model.researchModel")} title={optionTitle(option, providerLabel)} disabled={!data} value={option ? `${option.provider}/${option.model}` : ""}
       onChange={event => {
         const next = data?.model_options.find(o => `${o.provider}/${o.model}` === event.target.value);
         if (next) choose({ provider: next.provider, model: next.model,

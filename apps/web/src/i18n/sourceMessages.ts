@@ -188,6 +188,14 @@ export const sourceMessages = {
     "ko": "되살리지 못했습니다.",
     "en": "Could not restore the project."
   },
+  "archive.archiveFailed": {
+    "ko": "프로젝트를 보관하지 못했습니다. 다시 시도해 주세요.",
+    "en": "The project could not be archived. Try again."
+  },
+  "archive.revisionChanged": {
+    "ko": "프로젝트가 그 사이 바뀌었습니다. 목록을 다시 읽었으니 다시 시도해 주세요.",
+    "en": "The project changed in the meantime. The list was read again; please try again."
+  },
   "archive.delete": { "ko": "영구 삭제", "en": "Delete permanently" },
   "archive.deleteCancel": { "ko": "취소", "en": "Cancel" },
   "archive.deleteClose": { "ko": "닫기", "en": "Close" },

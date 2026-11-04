@@ -65,8 +65,14 @@ export function FileConnectionPanel({ projectId, hosted = false }: { projectId: 
       setFiles([]); setUploadProgress(null); setConnectingName("");
       if(fileInput.current)fileInput.current.value="";
     }
-    await Promise.all([client.invalidateQueries({queryKey:["sources",captured.projectId]}),client.invalidateQueries({queryKey:["evidence",captured.projectId]}),client.invalidateQueries({queryKey:["research",captured.projectId]})]);
-  }, onError: (_error, captured) => { if (ownsSelection(captured)) { setUploadProgress(null); setConnectingName(""); } } });
+    await Promise.all([client.invalidateQueries({queryKey:["sources",captured.projectId]}),client.invalidateQueries({queryKey:["evidence",captured.projectId]}),client.invalidateQueries({queryKey:["research",captured.projectId]}),
+      // Connecting a source raises the project revision; the sidebar list must not keep the old one.
+      client.invalidateQueries({queryKey:["projects"]})]);
+  }, onError: (_error, captured) => {
+    // An earlier file of the batch may have been connected before a later one failed.
+    void client.invalidateQueries({queryKey:["projects"]});
+    if (ownsSelection(captured)) { setUploadProgress(null); setConnectingName(""); }
+  } });
   const progress = uploadProgress ? uploadProgress.value.phase === "processing"
     ? message("fileUploadWaiting", uploadProgress.name)
     : uploadProgress.value.total ? message("fileUploadProgress", uploadProgress.name, Math.min(100, Math.floor(100 * uploadProgress.value.loaded / uploadProgress.value.total)))
