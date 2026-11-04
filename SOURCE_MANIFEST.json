@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-04T08:09:54.902635+00:00",
+  "created_at": "2026-11-04T09:39:56.892847+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -15,6 +15,11 @@
       "path": ".gitattributes",
       "sha256": "a1d9f19d35f297456914889079165667dd58d91e6af5a286a894640c4c84826c",
       "bytes": 348
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/beta-feedback.yml",
+      "sha256": "3f4e47d614207f0470636bcdaf6192739da2d7f2eaebb0322c47a5b6978008dd",
+      "bytes": 2610
     },
     {
       "path": ".github/workflows/product-check.yml",
@@ -58,13 +63,13 @@
     },
     {
       "path": "README.md",
-      "sha256": "86ab4ea7fc0d868360343d4c4157e2d79f4a6d61ecde3a4c09a76325f0380b6e",
-      "bytes": 16136
+      "sha256": "7e7b429301ed11c4af0800732dbf48f9f104b5125be0225bf00c76cffe8ca542",
+      "bytes": 16305
     },
     {
       "path": "SECURITY.md",
-      "sha256": "48e715efa1a31a8810149f97202b4f7dc09521b60cd53079c8691371def25139",
-      "bytes": 2960
+      "sha256": "09100240bfbb820168f8963fb429639478ba2eb0c1729b0b7b717562936b62cc",
+      "bytes": 3056
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -98,8 +103,8 @@
     },
     {
       "path": "apps/web/package.json",
-      "sha256": "290b42ee7d4105ee51cfffd1005da0c043d88ccf8ab174aa65d87706a3c6d19c",
-      "bytes": 1048
+      "sha256": "79370062833818edabaa99f3c5a1a24fb0f0f64eff78a357876177b1d3cb84cb",
+      "bytes": 1055
     },
     {
       "path": "apps/web/preview-timeline.html",
@@ -2092,6 +2097,11 @@
       "bytes": 237
     },
     {
+      "path": "docs/BETA.md",
+      "sha256": "e296977e16a601d504d4f1c60ba8ffa505ba5511d4e3f9e016901068d3ed2105",
+      "bytes": 11142
+    },
+    {
       "path": "docs/DEPENDENCY_LICENSES.json",
       "sha256": "a3346d8486e55d36271f80bda265ad3dea426dca4f21fa7314a8eb439c7a320a",
       "bytes": 9906
@@ -2188,8 +2198,8 @@
     },
     {
       "path": "docs/architecture/local-retrieval-preparation.md",
-      "sha256": "182dce18e8c8a7983ee18a64fe904ad895e00004f300f306faf087e891e1ddcb",
-      "bytes": 5777
+      "sha256": "ea3f5e618c06e80cd249be829c0ef0880a9b98ac0619da3df424125b04088c4f",
+      "bytes": 6898
     },
     {
       "path": "docs/architecture/memory-terms.md",
@@ -2305,6 +2315,11 @@
       "path": "docs/releases/v0.1.0-preview.md",
       "sha256": "1648f8dd66741982b2f4f502f8e56812957f2b5c5d61d5a447fb4383e263b39d",
       "bytes": 4617
+    },
+    {
+      "path": "docs/releases/v0.2.0-beta.1.md",
+      "sha256": "bf8f91bd498d574a8c78c78da8ba9092e2b721aec56aa8a6b02cad2159099684",
+      "bytes": 6476
     },
     {
       "path": "docs/screenshots/01-trace-verdict.png",
@@ -2983,8 +2998,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "e0c6b6536af13695469f64deffa8d65763d4c2d414b83fa01d567645fd8d2e96",
-      "bytes": 99
+      "sha256": "86441294d87218320bfdeaf25a8f6e5995704efa68e735b7e8c04dfd69d45485",
+      "bytes": 106
     },
     {
       "path": "pnpm-lock.yaml",
@@ -2998,8 +3013,8 @@
     },
     {
       "path": "pyproject.toml",
-      "sha256": "975e568323ebdaf7c4f2f7036c645a62c4cd55b352ab50c018f5d0f51a958397",
-      "bytes": 1987
+      "sha256": "e03a916f54d199985521222f3b03e92bc53019ea3f63b525e248d952026b453f",
+      "bytes": 1989
     },
     {
       "path": "qa/scenarios/hero_6g_current_core.py",
@@ -3388,8 +3403,8 @@
     },
     {
       "path": "src/thoth/__init__.py",
-      "sha256": "f4ab5aa926f449017489327a55317c8a52bae4b50e08d2f744402d347bfe6cf9",
-      "bytes": 54
+      "sha256": "96b4c6225566b4b86da66127dbb989ffd5c4d7fba2ee52166528d47ca1793799",
+      "bytes": 56
     },
     {
       "path": "src/thoth/adapters/__init__.py",
@@ -3568,18 +3583,18 @@
     },
     {
       "path": "src/thoth/adapters/embeddings/onnx_encoder.py",
-      "sha256": "5376263e560243c2630fb910434b38cab958da98bbdd0c67fa5f204905f03dbd",
-      "bytes": 6639
+      "sha256": "100ebe3cbc5100609ef65abf4a1d885bbaaf0c91e404cb9a57495c1db27cae4b",
+      "bytes": 8088
     },
     {
       "path": "src/thoth/adapters/embeddings/process_worker.py",
-      "sha256": "3c37e2c12160fad1cd6c30d05da71eccd0965c7d0a2695cbde6a38b404839058",
-      "bytes": 16130
+      "sha256": "f1bab3b3db1e095ff95e74756c9bbade53c408d893d924e4b47b943e8c7edc17",
+      "bytes": 16346
     },
     {
       "path": "src/thoth/adapters/embeddings/worker_main.py",
-      "sha256": "556158de3cdbb66ab587446284272db33464ce68ee794f9ce4b0ab302168855a",
-      "bytes": 3441
+      "sha256": "77fd46fb01d7181a931e90f57ff3b1de80f4ce2f80159ab42275611e3e562934",
+      "bytes": 3633
     },
     {
       "path": "src/thoth/adapters/environment.py",
@@ -10808,8 +10823,8 @@
     },
     {
       "path": "tests/test_foundation.py",
-      "sha256": "acf98d6ec1bcc8c2331ac7af4b0094b5789758d6b3a088703342e5238a31603b",
-      "bytes": 1420
+      "sha256": "cfb2d3661c8539b113349ecd5ba3488d3f1f5457e36a982b5c2a1ade7186cd38",
+      "bytes": 1422
     },
     {
       "path": "tests/unit/application/test_action_mutation_projection.py",
@@ -12067,6 +12082,11 @@
       "bytes": 4237
     },
     {
+      "path": "tests/unit/test_embedding_token_cap.py",
+      "sha256": "15cddfb184b9085051f29ddf8cbc8807df86958c83ac38490237620a3680d733",
+      "bytes": 5101
+    },
+    {
       "path": "tests/unit/test_embedding_worker.py",
       "sha256": "23465d66bd360b91d9da73249f1fb12b74a40b1d7dd0bc047f31791a891a1923",
       "bytes": 4585
@@ -12563,8 +12583,8 @@
     },
     {
       "path": "uv.lock",
-      "sha256": "8570620ad649f8b5337d6623a20210995baab916ca345be1be6dd637a0480e5f",
-      "bytes": 429528
+      "sha256": "3f116340b21a16d48d949785205ae60ca9092e3de72bb7804eff9af0d140ff36",
+      "bytes": 429530
     }
   ],
   "source_archive_sha256": "523b6b783080f57fc229cdf0449683ffc26aad999376b410f6fb1c78a383b75c",

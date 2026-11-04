@@ -76,6 +76,9 @@ def main() -> None:
                     )
                 )
             result = {"data": vector.data.hex(), "sha256": vector.sha256}
+            if getattr(encoder, "last_truncated", False) is True:
+                # Only a cut passage carries the flag; other frames are unchanged.
+                result["truncated"] = True
         except Exception as exc:
             code = str(exc)
             result = {"error": code if code in EMBEDDING_ERROR_CODES else "EMBEDDING_FAILED"}
