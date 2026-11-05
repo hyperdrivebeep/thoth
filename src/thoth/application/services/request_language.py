@@ -9,13 +9,27 @@ if TYPE_CHECKING:
 from pydantic import BaseModel, JsonValue
 
 from thoth.domain.model import ModelRequest
-from thoth.domain.research_request import ThreadRequestRevision, ThreadRequestRevisionV21
-from thoth.domain.response_language import LANGUAGE_POLICY_VERSION, explicit_language
+from thoth.domain.research_request import (
+    LANGUAGE_REQUEST_TYPES,
+    ThreadRequestRevision,
+    request_with_language,
+)
+from thoth.domain.response_language import (
+    LANGUAGE_POLICY_VERSION,
+    ResponseLanguage,
+    explicit_language,
+)
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
+
+_PARTIAL_DRAFT_PREFIX: dict[ResponseLanguage, str] = {
+    "ko": "검증 보류 · 부분 초안: ",
+    "en": "Review on hold · partial draft: ",
+    "zh-Hans": "复核暂缓 · 部分草稿\uff1a",
+}
 
 
 def apply_request_language(work: "ResearchWork", request: ThreadRequestRevision) -> None:
-    if isinstance(request, ThreadRequestRevisionV21):
+    if isinstance(request, LANGUAGE_REQUEST_TYPES):
         work.response_language = request.response_language
         work.context["response_language"] = request.response_language
         work.result_only["response_language"] = request.response_language
@@ -26,14 +40,29 @@ def with_result_language(
 ) -> dict[str, object]:
     return (
         {**result, "response_language": request.response_language}
-        if isinstance(request, ThreadRequestRevisionV21)
+        if isinstance(request, LANGUAGE_REQUEST_TYPES)
         else result
     )
 
 
 def partial_answer(answer: str, language: str | None) -> str:
-    prefix = "Review on hold · partial draft: " if language == "en" else "검증 보류 · 부분 초안: "
-    return prefix + answer
+    # Without an explicit language the legacy Korean prefix stays.
+    key = "ko" if language is None else explicit_language(language)
+    return _PARTIAL_DRAFT_PREFIX[key] + answer
+
+
+def script_check_problem(language: ResponseLanguage | None, problem: str) -> str:
+    """The question text the Hangul-question script checks run against for this answer language.
+
+    Korean answers are checked as a Hangul question. A Chinese answer has no Hangul to demand, so
+    its basis has none (the checks then pass it); English has its own prose check and the
+    question as asked is kept for it, as it is without an explicit language.
+    """
+    if language == "ko":
+        return "한국어 " + problem
+    if language == "zh-Hans":
+        return ""
+    return problem
 
 
 def validation_problem(problem: str) -> str:
@@ -42,7 +71,7 @@ def validation_problem(problem: str) -> str:
     work = research_work.get()
     if work is None or work.response_language is None:
         return problem
-    return "한국어 " + problem if work.response_language == "ko" else problem
+    return script_check_problem(work.response_language, problem)
 
 
 def legacy_start_params(value: dict[str, JsonValue]) -> dict[str, JsonValue]:
@@ -85,20 +114,14 @@ def with_request_language(
     validate_request_language(value)
     if "response_language" not in value:
         return request
-    return ThreadRequestRevisionV21.model_validate(
-        {
-            **request.model_dump(),
-            "schema_version": "2.1.0",
-            "response_language": value["response_language"],
-        }
-    )
+    return request_with_language(request, explicit_language(value["response_language"]))
 
 
 def resume_language(
     request: ThreadRequestRevision, value: dict[str, JsonValue]
 ) -> dict[str, JsonValue]:
     validate_request_language(value)
-    language = request.response_language if isinstance(request, ThreadRequestRevisionV21) else None
+    language = request.response_language if isinstance(request, LANGUAGE_REQUEST_TYPES) else None
     if "response_language" in value and value["response_language"] != language:
         raise RpcApplicationError(RpcErrorCode.DOMAIN_REJECTED, "REQUEST_LANGUAGE_CONFLICT")
     return {} if language is None else {"response_language": language}

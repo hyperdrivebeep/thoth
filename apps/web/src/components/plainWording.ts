@@ -14,9 +14,10 @@ export function plainReason(text: string): string | null {
 const HANGUL = /[가-힣]/;
 const LATIN_WORD = /[A-Za-z]{3,}/;
 
-/** Text that people can read as it is: Korean (or only numbers and signs). English that nobody has worded is set aside. */
+/** Text that people can read as it is: Korean (or only numbers and signs). English that nobody has worded is set aside, unless the result itself was written in another language. */
 export function isReadable(text: string, responseLanguage?: string | null): boolean {
-  return getLocale() === "en" || responseLanguage === "en" || HANGUL.test(text) || !LATIN_WORD.test(text);
+  const writtenInAnotherLanguage = responseLanguage != null && responseLanguage !== "ko";
+  return getLocale() === "en" || writtenInAnotherLanguage || HANGUL.test(text) || !LATIN_WORD.test(text);
 }
 
 export function splitReadable(items: string[], responseLanguage?: string | null): { plain: string[]; technical: string[] } {

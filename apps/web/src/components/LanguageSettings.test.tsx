@@ -8,6 +8,7 @@ import { LanguageSettingsCard } from "./LanguageSettingsCard";
 import { ResearchComposer } from "./ResearchComposer";
 import { getDisplayPreference, getLocale, setDisplayPreference, setLocale, t } from "../i18n/locale";
 import { LANGUAGE_CHOICES } from "../i18n/languageChoices";
+import { RESPONSE_LANGUAGE_CHOICES } from "../api/responseLanguages";
 import { readResponseLanguageDefault } from "../api/responseLanguageDefault";
 import type { BrowserScope } from "../api/localWorkspacePersistence";
 
@@ -74,13 +75,14 @@ describe("response language default in Settings", () => {
   it("lists the languages from the one constant, with automatic first", async () => {
     await mount();
     const labels = [...select("reply-language-default").options].map(option => option.textContent);
-    expect(labels).toEqual([t("language.replyAuto"), ...LANGUAGE_CHOICES.map(choice => choice.label)]);
+    expect(labels).toEqual([t("language.replyAuto"), ...RESPONSE_LANGUAGE_CHOICES.map(choice => choice.label)]);
+    expect(labels).toContain("中文(简体)");
     expect([...select("display-language").options].map(option => option.value)).toEqual(["auto", ...LANGUAGE_CHOICES.map(choice => choice.code)]);
     expect(document.body.textContent).toContain(t("language.replyAutoHelp"));
   });
 
-  it.each(["ko", "en"] as const)("a fixed %s in Settings is sent with the next question", async language => {
-    await mount();
+  it.each(["ko", "en", "zh-Hans"] as const)("a fixed %s in Settings is sent with the next question", async language => {
+    await mount(["ko", "en", "zh-Hans"]);
     await choose("reply-language-default", language);
     expect(session.responseLanguage).toBe(language);
     await send("Question to answer in the chosen language");
@@ -96,6 +98,19 @@ describe("response language default in Settings", () => {
     await send("Question in whatever language it is");
     expect(sent()).toHaveLength(1);
     expect("response_language" in sent()[0].params).toBe(false);
+  });
+
+  it("a server that does not list a language leaves it disabled while the others stay available", async () => {
+    await mount(["ko", "en"]);
+    const options = [...select("reply-language-default").options];
+    expect(options.find(option => option.value === "zh-Hans")!.disabled).toBe(true);
+    expect(options.filter(option => option.value === "ko" || option.value === "en").every(option => !option.disabled)).toBe(true);
+    expect(document.body.textContent).not.toContain(t("language.unsupported"));
+    await choose("reply-language-default", "zh-Hans");
+    expect(document.body.textContent).toContain(t("language.unsupported"));
+    expect(session.languageSupported).toBe(false);
+    await send("A question that must not be sent in an unsupported language");
+    expect(sent()).toHaveLength(0);
   });
 
   it("without server support the fixed choices are disabled with the reason, and automatic stays available", async () => {

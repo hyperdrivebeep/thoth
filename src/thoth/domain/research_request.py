@@ -8,6 +8,11 @@ from thoth.domain.base import DomainModel
 from thoth.domain.model_settings import ResolvedModelSettings
 from thoth.domain.research_basis import ResearchResultBasis
 from thoth.domain.research_reference import RevisionRef as RevisionRef
+from thoth.domain.response_language import (
+    LegacyResponseLanguage,
+    ResponseLanguage,
+    request_codec_version,
+)
 
 
 class ThreadRequestRevision(DomainModel):
@@ -35,15 +40,41 @@ class ThreadRequestRevisionV21(ThreadRequestRevision):
     """Explicit response language belongs to one immutable request revision."""
 
     schema_version: Literal["2.1.0"] = "2.1.0"  # type: ignore[reportIncompatibleVariableOverride]
-    response_language: Literal["ko", "en"]
+    response_language: LegacyResponseLanguage
+
+
+class ThreadRequestRevisionV22(ThreadRequestRevision):
+    """Same as 2.1.0 with the full language list; the codec that holds languages added later."""
+
+    schema_version: Literal["2.2.0"] = "2.2.0"  # type: ignore[reportIncompatibleVariableOverride]
+    response_language: ResponseLanguage
+
+
+LANGUAGE_REQUEST_CODECS: dict[str, type[ThreadRequestRevisionV21 | ThreadRequestRevisionV22]] = {
+    "2.1.0": ThreadRequestRevisionV21,
+    "2.2.0": ThreadRequestRevisionV22,
+}
+LanguageRequest = ThreadRequestRevisionV21 | ThreadRequestRevisionV22
+LANGUAGE_REQUEST_TYPES = (ThreadRequestRevisionV21, ThreadRequestRevisionV22)
+
+
+def request_with_language(
+    request: ThreadRequestRevision, language: ResponseLanguage
+) -> LanguageRequest:
+    """The request fixed to this language, in the oldest codec that can hold it."""
+    version = request_codec_version(language)
+    return LANGUAGE_REQUEST_CODECS[version].model_validate(
+        {**request.model_dump(), "schema_version": version, "response_language": language}
+    )
 
 
 def decode_thread_request(content: object) -> ThreadRequestRevision:
-    if (
-        isinstance(content, dict)
-        and cast(dict[str, object], content).get("schema_version") == "2.1.0"
-    ):
-        return ThreadRequestRevisionV21.model_validate(content)
+    if isinstance(content, dict):
+        codec = LANGUAGE_REQUEST_CODECS.get(
+            str(cast(dict[str, object], content).get("schema_version"))
+        )
+        if codec is not None:
+            return codec.model_validate(content)
     return ThreadRequestRevision.model_validate(content)
 
 

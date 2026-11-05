@@ -44,3 +44,14 @@ it.each([
   expect(generated.responseLanguage).toBe(response);
   expect(generated.origin.verdict_revision).toBe(verdict.revision_digest);
 });
+
+it.each(["ko", "en"] as const)("a Chinese answer language has no screen text yet, so the question follows the %s screen", display => {
+  setLocale(display);
+  const view = demo.phase2 as unknown as TraceView;
+  const verdict = view.verdicts.find(item => item.subject_id === "SYN-C-DET-RAIN")!;
+  const chinese = investigationFor("p", "CRITERION", verdict, view, "zh-Hans")!;
+  const automatic = investigationFor("p", "CRITERION", verdict, view, null)!;
+  expect(chinese.question).toBe(automatic.question);
+  expect(chinese.responseLanguage).toBe("zh-Hans");
+  expect(chinese.questionForLanguage?.("zh-Hans")).toBe(automatic.question);
+});

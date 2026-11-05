@@ -16,11 +16,7 @@ def language_for(request: ModelRequest[BaseModel]) -> ResponseLanguage | None:
 
 def user_visible_language_contract(request: ModelRequest[BaseModel] | None = None) -> str:
     if request is not None and (language := language_for(request)) is not None:
-        return (
-            language_instruction(language)
-            + " "
-            + (_PLAIN_WORDING if language == "ko" else _PLAIN_WORDING_EN)
-        )
+        return language_instruction(language) + " " + _PLAIN_WORDING_BY_LANGUAGE[language]
     return (
         "Write user-facing prose in the same language as context_pack.problem; "
         "do not switch that prose to English when the question is not English. "
@@ -49,3 +45,22 @@ _PLAIN_WORDING_EN = (
     "'detection_rate >= 0.90 ratio'). Use plain English for internal terminology. "
     "Write FACT/UNKNOWN display labels as 'Fact' and 'Unknown'; preserve schema enum values."
 )
+
+
+_PLAIN_WORDING_ZH = (
+    "Write so the person who asked can read it at once, in short plain sentences. "
+    "Write easy Simplified Chinese. "
+    "Keep the technical terms, units and standard abbreviations that appear in the user's "
+    "own material (for example SNR, RCS, CFAR, dB) exactly as they are. "
+    "Do not use program-internal codes, field names, variable names or made-up ids in prose; "
+    "say conditions in words (write '检测率不低于 0.90', not 'detection_rate >= 0.90 ratio') "
+    "and use plain Chinese words for internal terms such as sandbox-owner or gap. "
+    "Write the FACT/UNKNOWN display labels as '事实' and '未知'; preserve schema enum values."
+)
+
+# One entry per response language; a missing language is an error, never an English fallback.
+_PLAIN_WORDING_BY_LANGUAGE: dict[ResponseLanguage, str] = {
+    "ko": _PLAIN_WORDING,
+    "en": _PLAIN_WORDING_EN,
+    "zh-Hans": _PLAIN_WORDING_ZH,
+}

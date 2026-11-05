@@ -1,4 +1,5 @@
-import type { ResponseLanguage } from "../api/localWorkspacePersistence";
+import type { ResponseLanguage } from "../api/responseLanguages";
+import { isLanguageCode, type LanguageCode } from "../i18n/languageChoices";
 import { investigationQuestion } from "../i18n/traceEnglish";
 import { getLocale } from "../i18n/locale";
 import type { TraceView, Verdict } from "../api/trace";
@@ -25,7 +26,8 @@ export function investigationFor(projectId: string, kind: string, verdict: Verdi
   if (!canInvestigate(kind, verdict)) return null;
   const name = titleOf(view);
   const subject = kindOf(kind);
-  const questionLanguage = responseLanguage ?? getLocale();
+  // The question is written in a screen language: the answer language when the screen has it, else the current screen language.
+  const questionLanguage: LanguageCode = isLanguageCode(responseLanguage) ? responseLanguage : getLocale();
   const reasons = verdict.reasons.computed.map(code => reasonSentence(code, name, verdict.conditions.condition, questionLanguage));
   const failed = !verdict.state.startsWith("HOLD");
   const what = subject === "CRITERION" ? "기준" : "요구사항";

@@ -4,6 +4,7 @@ from pydantic import ValidationError
 
 from thoth.application.services.english_prose import EnglishProseCheck
 from thoth.application.services.hypothesis_contract_v3 import language_problem
+from thoth.application.services.request_language import script_check_problem
 from thoth.domain.hypothesis_v5 import ExpectedResultV5
 from thoth.domain.hypothesis_v5_wire import ReceivedExpectedResultV5, ReceivedFilledRowV5
 from thoth.domain.model import ContextPack
@@ -68,7 +69,7 @@ def accept_grounding_row(
             )
             bad = checker.mismatch(rationale)
         else:
-            problem = "한국어 " + context.problem if language == "ko" else context.problem
+            problem = script_check_problem(language, context.problem)
             bad = language_problem(rationale, problem) is not None
         if bad:
             return None, "GROUNDING_RATIONALE_LANGUAGE_MISMATCH"

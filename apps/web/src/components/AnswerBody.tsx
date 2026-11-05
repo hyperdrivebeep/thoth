@@ -1,11 +1,12 @@
 import { message } from "../i18n/formatMessages";
+import type { ResponseLanguage } from "../api/responseLanguages";
 import { Fragment, useMemo } from "react";
 import { parseAnswer, type Inline } from "./answerText";
 
 /** The answer as paragraphs, lists and bold text, with each source shown as a numbered button. */
 export function AnswerBody({ answer, onCite, language }: {
   answer: string;
-  language?: "ko" | "en" | null;
+  language?: ResponseLanguage | null;
   onCite: (spanId: string, numbers: Record<string, number>) => void;
 }) {
   const parsed = useMemo(() => parseAnswer(answer), [answer]);
