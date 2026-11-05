@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-05T16:00:06.292068+00:00",
+  "created_at": "2026-11-05T16:29:11.033593+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -708,8 +708,8 @@
     },
     {
       "path": "apps/web/src/components/ConversationTimeline.tsx",
-      "sha256": "a7e7a6cd71b2e1bbe088635f41f23c042523cc945f812bc35dd374c905778138",
-      "bytes": 10188
+      "sha256": "01be1ed7beba27877ef958beff4b96f96e12736e8ebcd971968047ba0b69cb84",
+      "bytes": 12582
     },
     {
       "path": "apps/web/src/components/ConversationTimelineLegacyEmpty.test.tsx",
@@ -725,6 +725,16 @@
       "path": "apps/web/src/components/ConversationTimelineSynthetic.test.tsx",
       "sha256": "68980715c34e1c3bea9d28dbd8bfb278defdcab6e104ba84a0a5ef5e35d9f502",
       "bytes": 3886
+    },
+    {
+      "path": "apps/web/src/components/ConversationTurnView.test.tsx",
+      "sha256": "7098c53ca1dca8fecee5937b30c1ca4c34d1bebb156ae7717c995b0d1819c7d4",
+      "bytes": 7338
+    },
+    {
+      "path": "apps/web/src/components/ConversationTurnView.tsx",
+      "sha256": "f29c60bab8e576c5afe5b7aca38f4a9ff83a14542999fd0a7e856ae0d5be47d8",
+      "bytes": 2814
     },
     {
       "path": "apps/web/src/components/Disclosure.tsx",
@@ -1632,6 +1642,11 @@
       "bytes": 7198
     },
     {
+      "path": "apps/web/src/components/timelineTurns.ts",
+      "sha256": "6d5f6805d56074400b32b68319745c2047429a033a2924c4d8a544eb2b28fafd",
+      "bytes": 1936
+    },
+    {
       "path": "apps/web/src/components/traceDemo.fixture.json",
       "sha256": "67a2ded77e8510b848210c7deaaa1458a4c143eca2e27d18897be2a729b7c40c",
       "bytes": 162986
@@ -1680,6 +1695,11 @@
       "path": "apps/web/src/components/traceText.ts",
       "sha256": "7b9ca8647638fb47293c424ec8cc8b934b5db587eb6fe8737c98f884ae74b82b",
       "bytes": 20590
+    },
+    {
+      "path": "apps/web/src/components/turnSummary.ts",
+      "sha256": "b35e6d55520140469bbbb8d5addc252d8f53169e9c5fc1f7028b1497adb1f732",
+      "bytes": 3159
     },
     {
       "path": "apps/web/src/components/useConversationReadProtection.ts",
@@ -1933,8 +1953,8 @@
     },
     {
       "path": "apps/web/src/i18n/ja/researchMessagesJa.ts",
-      "sha256": "056b63c3cd2228afa9373a7a15edc561a048b5dd2c85e4084c44eb623246c238",
-      "bytes": 5725
+      "sha256": "e351e9482f6258766ca2b46e4b555a8d77a9f216aea523d528b8f59e7295d0cd",
+      "bytes": 6212
     },
     {
       "path": "apps/web/src/i18n/ja/researchPanelsMessagesJa.ts",
@@ -2003,8 +2023,8 @@
     },
     {
       "path": "apps/web/src/i18n/metricFormatMessages.ts",
-      "sha256": "92a9f13b1d5672e3b6e0638b29ab897f9782d37de28cc72bc5b37d9780cf10b2",
-      "bytes": 14098
+      "sha256": "b253f596cf344efb7412bb218cc34480c912fc683848fddd76baf37da12a27ca",
+      "bytes": 14779
     },
     {
       "path": "apps/web/src/i18n/modelHelpMessages.ts",
@@ -2068,8 +2088,8 @@
     },
     {
       "path": "apps/web/src/i18n/researchMessages.ts",
-      "sha256": "c074b0556bcf30df8bfd4344c8bce137af50babfbbf2c3150824e669baa7663a",
-      "bytes": 10084
+      "sha256": "92ead87d17ff226ad9b8e9fb77b75538602f67241c74c07944a0f46821001fef",
+      "bytes": 10893
     },
     {
       "path": "apps/web/src/i18n/researchPanelsMessages.ts",
@@ -2268,8 +2288,8 @@
     },
     {
       "path": "apps/web/src/i18n/zh/researchMessagesZh.ts",
-      "sha256": "8c0005a6604845c008ac200eda412b68039ead5656e394552c1f2c0d44b333e1",
-      "bytes": 4473
+      "sha256": "fc56e705f567b1027cf48c08c476e0cfa6969d70c0fe38eaa69e4c8dde9545f0",
+      "bytes": 4927
     },
     {
       "path": "apps/web/src/i18n/zh/researchPanelsMessagesZh.ts",
@@ -2363,8 +2383,8 @@
     },
     {
       "path": "apps/web/src/workstation.css",
-      "sha256": "c8a08d1317ad8dabad2bcafaa60147eeff48cee619ae307d4520d7d3b40bbb10",
-      "bytes": 62197
+      "sha256": "adf08511c539543614b7cfd7d0a858780c8ad365982f61d00c6a37b67b363aad",
+      "bytes": 62930
     },
     {
       "path": "apps/web/timeline-preview.html",
@@ -2413,7 +2433,7 @@
     },
     {
       "path": "config/complexity-budget.json",
-      "sha256": "d74a81cadae13526d96e8575cae9798bbb9f91d7e98cf10e356ca91b68f9175d",
+      "sha256": "e9bc11960db1de06317182063171db50ff28120d3f258825b84c02a87228f5e2",
       "bytes": 5436
     },
     {

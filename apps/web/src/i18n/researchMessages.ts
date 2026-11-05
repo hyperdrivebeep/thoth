@@ -219,6 +219,17 @@ export const researchMessages = {
     "ko": "검토 근거 — 기준과 남은 확인 사항",
     "en": "Review basis — criteria and open checks"
   },
+  "timeline.turnAnswered": { "ko": "답변 있음", "en": "Answered" },
+  "timeline.turnNoAnswer": { "ko": "답 없음", "en": "No answer" },
+  "timeline.turnCutOff": { "ko": "끊김", "en": "Cut off" },
+  "timeline.turnInterrupted": { "ko": "완료되지 않음", "en": "Not finished" },
+  "timeline.turnFailed": { "ko": "실패", "en": "Failed" },
+  "timeline.turnCancelled": { "ko": "취소됨", "en": "Cancelled" },
+  "timeline.turnStale": { "ko": "최신 확인 안 됨", "en": "Not confirmed current" },
+  "timeline.turnUnavailable": { "ko": "볼 수 없음", "en": "Unavailable" },
+  "timeline.expandTurn": { "ko": "펼치기", "en": "Expand" },
+  "timeline.collapseTurn": { "ko": "접기", "en": "Collapse" },
+  "timeline.retryShort": { "ko": "같은 질문으로 다시 조사", "en": "Ask again" },
   "result.references": {
     "ko": "참고값·조건",
     "en": "Reference values and conditions"
