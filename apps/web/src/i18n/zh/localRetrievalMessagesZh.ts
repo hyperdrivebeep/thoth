@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { localRetrievalMessages, localRetrievalReasonMessages } from "../localRetrievalMessages";
 
-export const localRetrievalZh: ZhOf<typeof localRetrievalMessages> = {
+export const localRetrievalZh: ColumnOf<typeof localRetrievalMessages> = {
   "localRetrieval.title": "本地检索准备",
   "localRetrieval.hostedOnly": "仅在本地工作区可用。审查工作区不做任何准备。",
   "localRetrieval.intro": "使用一个固定的本地模型，提前为资料建立索引。默认关闭；即使索引已就绪，现有的检索方式也保持不变。",
@@ -79,7 +79,7 @@ export const localRetrievalZh: ZhOf<typeof localRetrievalMessages> = {
   "localRetrieval.operationLabel": "服务器工作",
   "localRetrieval.reasonUnknown": "原因未知",
 };
-export const localRetrievalReasonZh: ZhOf<typeof localRetrievalReasonMessages> = {
+export const localRetrievalReasonZh: ColumnOf<typeof localRetrievalReasonMessages> = {
   "RESOURCE_AUTHORITY_CHANGED": "操作期间，访问权限或会话权限发生了变化。",
   "LOCAL_RETRIEVAL_FAILED": "本地准备未能完成。",
   "LOCAL_RETRIEVAL_PROJECT_MISSING": "找不到该项目。",

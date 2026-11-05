@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { workspaceDetailMessages } from "../workspaceDetailMessages";
 
-export const workspaceDetailZh: ZhOf<typeof workspaceDetailMessages> = {
+export const workspaceDetailZh: ColumnOf<typeof workspaceDetailMessages> = {
   "workspace.questionEvidence": "从问题到证据，再从证据到下一步行动。",
   "workspace.continueHeading": "继续你的研究，或开始一个新问题。",
   "workspace.authorizedRead": "在你的访问权限范围内，仍可阅读已保存的研究。",

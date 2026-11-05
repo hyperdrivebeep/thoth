@@ -1,6 +1,7 @@
 import { pickLocale } from "./pickLocale";
 import { statusEnglish } from "./statusEnglish";
 import { statusChinese } from "./statusChinese";
+import { statusJapanese } from "./statusJapanese";
 
 const korean = {
 labels: {
@@ -83,8 +84,9 @@ memoryExclusions: {
 
 const english: { [K in keyof typeof korean]: Record<keyof typeof korean[K], string> } = statusEnglish;
 const chinese: { [K in keyof typeof korean]: Record<keyof typeof korean[K], string> } = statusChinese;
+const japanese: { [K in keyof typeof korean]: Record<keyof typeof korean[K], string> } = statusJapanese;
 type Group = keyof typeof korean;
 export function statusText(group: Group, code: string): string | undefined {
-  const catalog: Readonly<Record<string, string>> = pickLocale({ ko: korean, en: english, "zh-Hans": chinese })[group];
+  const catalog: Readonly<Record<string, string>> = pickLocale({ ko: korean, en: english, "zh-Hans": chinese, ja: japanese })[group];
   return catalog[code];
 }

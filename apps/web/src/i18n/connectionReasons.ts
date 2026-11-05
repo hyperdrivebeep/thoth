@@ -94,7 +94,41 @@ const chinese: Record<keyof typeof korean, string> = {
   MODEL_TOOL_PREFIX_UNAVAILABLE: "找不到 THOTH 工具文件夹 (LOCALAPPDATA)。请自己运行下面的命令。",
   CATALOG_UNAVAILABLE: "登录成功，但模型列表暂时还不可用。",
   MODEL_CATALOG_REFRESH_TIMEOUT: "模型列表检查未能及时完成。请稍后重试。",
-};export function connectionReason(code: string): string | undefined {
-  const values: Readonly<Record<string, string>> = pickLocale({ ko: korean, en: english, "zh-Hans": chinese });
+};
+const japanese: Record<keyof typeof korean, string> = {
+  CODEX_STANDALONE_NOT_INSTALLED: "ChatGPT のログインに必要な Codex 接続ツールが、このコンピューターにありません。",
+  CODEX_STANDALONE_PIN_UNAVAILABLE: "必要なバージョン（0.157.1）の Codex 接続ツールが見つかりませんでした。",
+  CODEX_PACKAGE_INTEGRITY_UNAVAILABLE: "Codex のインストール情報を確認できませんでした。ツールをインストールし直してください。",
+  CODEX_PACKAGE_INTEGRITY_MISMATCH: "Codex ツールのファイルが公式の配布物と異なります。ツールをインストールし直してください。",
+  CODEX_PACKAGE_ROOT_ABSOLUTE_REQUIRED: "Codex ツールの場所の設定が正しくありません。",
+  UPDATE_REVIEW_REQUIRED: "Codex ツールの場所またはバージョンが変わりました。ツールをインストールし直してください。",
+  CODEX_PINNED_PLATFORM_UNSUPPORTED: "このオペレーティングシステムでは、ChatGPT のログインにまだ対応していません。API キーで接続してください。",
+  CLAUDE_CLIENT_REGISTRATION_REQUIRED: "Claude のサブスクリプションによるログインは、このコンピューターではまだ有効になっていません。現在は API キーで接続できます。",
+  CLAUDE_CODE_NOT_INSTALLED: "Claude のログインに必要な Claude Code が、このコンピューターにありません。",
+  CLAUDE_CODE_NATIVE_BINARY_REQUIRED: "Claude Code の実行ファイルが見つかりませんでした。THOTH のツールフォルダにインストールしてください。",
+  CLAUDE_CODE_NOT_EXECUTABLE: "Claude Code の実行ファイルを実行できませんでした。インストールし直してください。",
+  CLAUDE_CODE_CAPABILITY_UNSUPPORTED: "インストール済みの Claude Code のバージョンが古すぎます。THOTH のツールフォルダに、対応するバージョンをインストールしてください。",
+  CLAUDE_CODE_LOGIN_START_FAILED: "Claude Code がログインを開始できませんでした。しばらくしてからもう一度お試しください。",
+  CLAUDE_CODE_LOGIN_REQUIRED: "設定のモデル接続から Claude にサインインしてから、もう一度お試しください。",
+  CLAUDE_CODE_LOGIN_FAILED: "Claude のログインが完了しませんでした。新しいログインは、選んだときにだけ始まります。",
+  CLAUDE_CODE_LOGIN_NOT_CONFIRMED: "Claude Code は終了しましたが、ログインを確認できませんでした。もう一度お試しください。",
+  LOGIN_REQUIRED: "ログインが必要です。",
+  LOGIN_PENDING: "ログインを完了しています。",
+  XAI_LOGIN_REQUIRED: "xAI のログインが必要です。",
+  MODEL_CREDENTIAL_UNAVAILABLE: "API キーが登録されていません。",
+  NODE_NPM_UNAVAILABLE: "自動インストールには Node.js (npm) が必要です。Node.js LTS をインストールしてからもう一度お試しいただくか、下のコマンドをご自身で実行してください。",
+  CODEX_TOOL_INSTALL_FAILED: "Codex ツールのインストールに失敗しました。インターネット接続を確認して、もう一度お試しください。",
+  CLAUDE_CODE_TOOL_INSTALL_FAILED: "Claude Code のインストールに失敗しました。インターネット接続を確認して、もう一度お試しください。",
+  CODEX_TOOL_INSTALL_TIMEOUT: "インストールが5分以内に終わりませんでした。しばらくしてからもう一度お試しください。",
+  CLAUDE_CODE_TOOL_INSTALL_TIMEOUT: "インストールが5分以内に終わりませんでした。しばらくしてからもう一度お試しください。",
+  MODEL_TOOL_INSTALL_TIMEOUT: "インストールが時間内に終わりませんでした。しばらくしてから状態を確認してください。",
+  MODEL_TOOL_INSTALL_IN_PROGRESS: "このツールはすでにインストール中です。終わるまでお待ちください。",
+  MODEL_TOOL_PREFIX_UNAVAILABLE: "THOTH のツールフォルダ（LOCALAPPDATA）の場所を特定できませんでした。下のコマンドをご自身で実行してください。",
+  CATALOG_UNAVAILABLE: "ログインには成功しましたが、モデル一覧はまだ利用できません。",
+  MODEL_CATALOG_REFRESH_TIMEOUT: "モデル一覧の確認が時間内に終わりませんでした。しばらくしてからもう一度お試しください。",
+};
+
+export function connectionReason(code: string): string | undefined {
+  const values: Readonly<Record<string, string>> = pickLocale({ ko: korean, en: english, "zh-Hans": chinese, ja: japanese });
   return values[code];
 }

@@ -53,7 +53,7 @@ it("picks the language of each screen from the browser's language tags and never
   expect(browserLanguage(["zh-SG"])).toBe("zh-Hans");
   expect(browserLanguage(["zh-TW", "zh-HK", "en-US"])).toBe("en");
   expect(browserLanguage(["zh-Hant", "ko-KR"])).toBe("ko");
-  expect(browserLanguage(["ja-JP"])).toBe("ko");
+  expect(browserLanguage(["fr-FR"])).toBe("ko");
   expect(browserLanguage(["en-GB", "zh-CN"])).toBe("en");
   expect(browserLanguage(["ko"])).toBe("ko");
   expect(isLanguageCode("zh-Hans")).toBe(true);
@@ -91,7 +91,7 @@ it("puts Chinese fonts first on the Chinese screen only, on the page and on body
   expect(faces.indexOf("PingFang SC")).toBeGreaterThan(faces.indexOf("Microsoft YaHei UI"));
   expect(faces).toContain("Noto Sans SC");
   expect(faces.some(face => /Malgun|Pretendard|Noto Sans KR|Apple SD/.test(face))).toBe(false);
-  expect(workstationCss.match(/:lang\(/g)).toHaveLength(2);
+  expect(workstationCss.match(/:lang\(/g)).toHaveLength(4);
   expect(rule![1]).not.toMatch(/code-font/);
 });
 

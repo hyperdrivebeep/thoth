@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { coreMessages } from "../coreMessages";
 
-export const coreZh: ZhOf<typeof coreMessages> = {
+export const coreZh: ColumnOf<typeof coreMessages> = {
   "usage.memoryExpansion": "记忆检索词扩展",
   "language.display": "显示语言",
   "language.acceptedShort": "已提交",

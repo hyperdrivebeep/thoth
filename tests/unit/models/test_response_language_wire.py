@@ -82,7 +82,7 @@ def response_body():
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("provider", ["codex", "openai", "claude", "xai", "anthropic"])
-@pytest.mark.parametrize("language", ["ko", "en", "zh-Hans"])
+@pytest.mark.parametrize("language", ["ko", "en", "zh-Hans", "ja"])
 async def test_final_http_payload_has_request_language_schema_and_exact_budget_bytes(
     tmp_path: Path, monkeypatch, provider, language
 ):
@@ -155,7 +155,9 @@ async def test_final_http_payload_has_request_language_schema_and_exact_budget_b
     assert len(sent[0]) == len(boundary.payloads[0])
     assert json.loads(sent[0]) == json.loads(boundary.payloads[0])
     wire = sent[0].decode()
-    name = {"ko": "Korean", "en": "English", "zh-Hans": "Simplified Chinese"}[language]
+    name = {"ko": "Korean", "en": "English", "zh-Hans": "Simplified Chinese", "ja": "Japanese"}[
+        language
+    ]
     assert f"response language to {name}" in wire
     assert "한국어 질문" in wire
     assert "knowledge_state" in wire and "UNKNOWN" in wire and '"null"' in wire

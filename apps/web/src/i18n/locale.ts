@@ -61,8 +61,8 @@ export function formatDate(value: string | number | Date): string {
 export const localeTag = (selectedLocale: Locale = locale): string => LOCALE_TAGS[selectedLocale];
 export function formatNumber(value: number): string { return new Intl.NumberFormat(LOCALE_TAGS[locale]).format(value); }
 export function hypothesisLabel(number: string | number): string {
-  return { ko: `가설 ${number}`, en: `Hypothesis ${number}`, "zh-Hans": `假设 ${number}` }[locale];
+  return { ko: `가설 ${number}`, en: `Hypothesis ${number}`, "zh-Hans": `假设 ${number}`, ja: `仮説 ${number}` }[locale];
 }
 export function evidenceCount(count: number): string {
-  return { ko: `근거 ${formatNumber(count)}개`, en: `${formatNumber(count)} evidence ${count === 1 ? "reference" : "references"}`, "zh-Hans": `${formatNumber(count)} 条证据` }[locale];
+  return { ko: `근거 ${formatNumber(count)}개`, en: `${formatNumber(count)} evidence ${count === 1 ? "reference" : "references"}`, "zh-Hans": `${formatNumber(count)} 条证据`, ja: `根拠 ${formatNumber(count)} 件` }[locale];
 }

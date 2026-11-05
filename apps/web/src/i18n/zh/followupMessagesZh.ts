@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { followupMessages } from "../followupMessages";
 
-export const followupZh: ZhOf<typeof followupMessages> = {
+export const followupZh: ColumnOf<typeof followupMessages> = {
   "followup.noAction": "没有记录下一步行动",
   "followup.complete": "已完成",
   "followup.partialHold": "部分暂缓",

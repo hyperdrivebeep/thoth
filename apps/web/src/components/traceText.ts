@@ -3,6 +3,7 @@ import type { MessageKey } from "../i18n/messages";
 import { t, getLocale, formatDate, type Locale } from "../i18n/locale";
 import { criterionVerdicts, requirementVerdicts, reasonEnglish } from "../i18n/traceEnglish";
 import { criterionVerdictsZh, requirementVerdictsZh, reasonChinese } from "../i18n/traceChinese";
+import { criterionVerdictsJa, requirementVerdictsJa, reasonJapanese } from "../i18n/traceJapanese";
 import { iga } from "../api/koreanParticles";
 import type { ChangedDependency, ImportIssue, TraceResult, TraceRule, VerdictChange } from "../api/trace";
 import { resultText, ruleText } from "./traceRows";
@@ -30,6 +31,7 @@ const requirementLooks: Record<string, Look> = {
 const verdictTexts: Record<Exclude<Locale, "ko">, { criterion: Record<string, string>; requirement: Record<string, string>; unknown: string }> = {
   en: { criterion: criterionVerdicts, requirement: requirementVerdicts, unknown: "Unknown assessment" },
   "zh-Hans": { criterion: criterionVerdictsZh, requirement: requirementVerdictsZh, unknown: "未知的评估" },
+  ja: { criterion: criterionVerdictsJa, requirement: requirementVerdictsJa, unknown: "不明な判定" },
 };
 export const verdictLook = (kind: string, state: string, locale: Locale = getLocale()): Look => {
   const look = (kind === "REQUIREMENT" ? requirementLooks : criterionLooks)[state] ?? { text: "알 수 없는 판정", intent: "none", icon: "help" };
@@ -109,6 +111,7 @@ export const timeText = (iso: string) => {
 export function reasonSentence(code: string, titleOf: (id: string) => string, condition?: string | null, locale: Locale = getLocale()): string {
   if (locale === "en") return reasonEnglish(code, titleOf, condition);
   if (locale === "zh-Hans") return reasonChinese(code, titleOf, condition);
+  if (locale === "ja") return reasonJapanese(code, titleOf, condition);
   const [head, ...rest] = code.split(":");
   const tail = rest.join(":");
   const known: Record<string, string> = {

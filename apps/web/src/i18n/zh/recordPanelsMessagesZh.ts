@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { recordPanelsMessages } from "../recordPanelsMessages";
 
-export const recordPanelsZh: ZhOf<typeof recordPanelsMessages> = {
+export const recordPanelsZh: ColumnOf<typeof recordPanelsMessages> = {
   "evidence.loading": "正在加载此回答的证据…",
   "evidence.scopeChanged": "访问范围或记录链接已变化。请关闭详情并重新打开证据。",
   "evidence.failed": "无法读取此回答的证据。这并不表示不存在证据。",

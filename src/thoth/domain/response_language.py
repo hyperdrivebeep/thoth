@@ -8,10 +8,13 @@ wording in language_contract_text.py and request_language.py.
 
 from typing import Literal, get_args
 
-ResponseLanguage = Literal["ko", "en", "zh-Hans"]
+ResponseLanguage = Literal["ko", "en", "zh-Hans", "ja"]
 # The languages the 2.1.0 request codec can hold. Frozen: records written before zh-Hans decode
 # through it, and ko/en requests keep being written with it so their bytes never change.
 LegacyResponseLanguage = Literal["ko", "en"]
+# The languages the 2.2.0 request codec can hold. Frozen the same way: zh-Hans requests keep being
+# written with it, and a record written before ja decodes through it.
+ResponseLanguageV22 = Literal["ko", "en", "zh-Hans"]
 SUPPORTED_RESPONSE_LANGUAGES: tuple[ResponseLanguage, ...] = get_args(ResponseLanguage)
 LANGUAGE_POLICY_VERSION = "1.0.0"
 
@@ -19,14 +22,17 @@ _ENGLISH_NAME: dict[ResponseLanguage, str] = {
     "ko": "Korean",
     "en": "English",
     "zh-Hans": "Simplified Chinese",
+    "ja": "Japanese",
 }
 _REQUEST_CODEC_VERSION: dict[ResponseLanguage, str] = {
     "ko": "2.1.0",
     "en": "2.1.0",
     "zh-Hans": "2.2.0",
+    "ja": "2.3.0",
 }
 _SCRIPT_NOTE: dict[ResponseLanguage, str] = {
     "zh-Hans": " Use Simplified Chinese characters, not Traditional Chinese characters.",
+    "ja": " Write in Japanese (kanji and kana), not in Chinese.",
 }
 
 

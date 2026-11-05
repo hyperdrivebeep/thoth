@@ -25,7 +25,10 @@ _PARTIAL_DRAFT_PREFIX: dict[ResponseLanguage, str] = {
     "ko": "검증 보류 · 부분 초안: ",
     "en": "Review on hold · partial draft: ",
     "zh-Hans": "复核暂缓 · 部分草稿\uff1a",
+    "ja": "検証保留・部分草稿\uff1a",
 }
+# Answers in these languages have no Hangul to demand: the Hangul-question script checks pass them.
+_NO_HANGUL_CHECK: frozenset[str] = frozenset({"zh-Hans", "ja"})
 
 
 def apply_request_language(work: "ResearchWork", request: ThreadRequestRevision) -> None:
@@ -54,13 +57,13 @@ def partial_answer(answer: str, language: str | None) -> str:
 def script_check_problem(language: ResponseLanguage | None, problem: str) -> str:
     """The question text the Hangul-question script checks run against for this answer language.
 
-    Korean answers are checked as a Hangul question. A Chinese answer has no Hangul to demand, so
-    its basis has none (the checks then pass it); English has its own prose check and the
-    question as asked is kept for it, as it is without an explicit language.
+    Korean answers are checked as a Hangul question. A Chinese or Japanese answer has no Hangul to
+    demand, so its basis has none (the checks then pass it); English has its own prose check and
+    the question as asked is kept for it, as it is without an explicit language.
     """
     if language == "ko":
         return "한국어 " + problem
-    if language == "zh-Hans":
+    if language in _NO_HANGUL_CHECK:
         return ""
     return problem
 

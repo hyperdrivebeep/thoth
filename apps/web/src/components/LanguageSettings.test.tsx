@@ -189,7 +189,7 @@ describe("display language", () => {
     expect(getDisplayPreference()).toBe("auto");
     expect(getLocale()).toBe("en");
     expect(document.documentElement.lang).toBe("en");
-    browser("ja-JP", "ko-KR");
+    browser("fr-FR", "ko-KR");
     await act(async () => { setDisplayPreference("auto"); });
     expect(getLocale()).toBe("ko");
     browser("fr-FR");
@@ -238,7 +238,7 @@ describe("Simplified Chinese screen", () => {
     expect(card.textContent).toContain("显示语言");
     expect(card.textContent).toContain("默认回答语言");
     expect(card.textContent).toContain("自动（提问所用的语言）");
-    expect([...select("display-language").options].map(option => option.textContent)).toEqual([t("language.displayAuto"), "한국어", "English", "中文(简体)"]);
+    expect([...select("display-language").options].map(option => option.textContent)).toEqual([t("language.displayAuto"), "한국어", "English", "中文(简体)", "日本語"]);
     expect(select("reply-language-default").value).toBe("auto");
     await choose("reply-language-default", "zh-Hans");
     expect(session.responseLanguage).toBe("zh-Hans");
@@ -257,5 +257,43 @@ describe("Simplified Chinese screen", () => {
     browser("zh-TW", "en-US");
     await act(async () => { setDisplayPreference("auto"); });
     expect(getLocale()).toBe("en");
+  });
+});
+
+describe("Japanese screen", () => {
+  it("shows Settings and the question box in Japanese, keeps the answer language apart, and marks the page language", async () => {
+    await mount(["ko", "en", "zh-Hans", "ja"], true);
+    await choose("display-language", "ja");
+    expect(getLocale()).toBe("ja");
+    expect(document.documentElement.lang).toBe("ja");
+    expect(select("display-language").value).toBe("ja");
+    const card = document.querySelector(".language-card")!;
+    expect(card.textContent).toContain("表示言語");
+    expect(card.textContent).toContain("回答言語の既定値");
+    expect(card.textContent).toContain("自動（質問と同じ言語）");
+    expect([...select("reply-language-default").options].map(option => option.textContent)).toEqual([t("language.replyAuto"), "한국어", "English", "中文(简体)", "日本語"]);
+    expect(select("reply-language-default").value).toBe("auto");
+    await choose("reply-language-default", "ja");
+    expect(session.responseLanguage).toBe("ja");
+    expect(document.querySelector(".language-fixed")!.textContent).toContain("回答：日本語（固定）");
+    await choose("display-language", "ko");
+    expect(session.responseLanguage).toBe("ja");
+    expect(document.documentElement.lang).toBe("ko");
+  });
+
+  it("sends a fixed Japanese answer language with the next question", async () => {
+    await mount(["ko", "en", "zh-Hans", "ja"]);
+    await choose("reply-language-default", "ja");
+    await send("Question to answer in Japanese");
+    expect(sent()).toHaveLength(1);
+    expect(sent()[0].params.response_language).toBe("ja");
+  });
+
+  it("follows a Japanese browser when the screen language is automatic", async () => {
+    await mount();
+    const browser = (...languages: string[]) => Object.defineProperty(globalThis.navigator, "languages", { value: languages, configurable: true });
+    browser("ja-JP", "en");
+    await choose("display-language", "auto");
+    expect(getLocale()).toBe("ja");
   });
 });

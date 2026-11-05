@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { sourceMessages } from "../sourceMessages";
 
-export const sourceZh: ZhOf<typeof sourceMessages> = {
+export const sourceZh: ColumnOf<typeof sourceMessages> = {
   "sources.fileUploadStalled": "两分钟内没有发送任何数据，因此上传已停止。请检查连接后重试。没有连接任何资料。",
   "sources.fileUploadCancel": "取消上传",
   "sources.fileUploadCancelled": "上传已取消。没有连接任何资料。",

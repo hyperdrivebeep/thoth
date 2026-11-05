@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { reviewPanelsMessages } from "../reviewPanelsMessages";
 
-export const reviewPanelsZh: ZhOf<typeof reviewPanelsMessages> = {
+export const reviewPanelsZh: ColumnOf<typeof reviewPanelsMessages> = {
   "absence.title": "对\"不存在\"主张的字面检查",
   "absence.limitation": "只在记录的提取范围内检查了模型声明的字符串。这并不能证明整个资料中不存在，也不能验证含义或事实。",
   "absence.empty": "没有声明任何需要检查的\"不存在\"主张。这并不表示每一句话都被检查过。",

@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { credentialMessages } from "../credentialMessages";
 
-export const credentialZh: ZhOf<typeof credentialMessages> = {
+export const credentialZh: ColumnOf<typeof credentialMessages> = {
   "connection.timeout": "THOTH 服务器未及时响应。请稍后重试。",
   "connection.offline": "无法连接到 THOTH 服务器。请检查它是否在运行。",
   "connection.intro.openai": "使用 ChatGPT 账户登录，或使用 OpenAI API 密钥连接。",

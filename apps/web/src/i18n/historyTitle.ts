@@ -25,7 +25,19 @@ const titlesZh: Record<string, Readonly<Record<string, string>>> = {
   RESTORE: { "연구 항목 복원": "研究项目已恢复" },
   RESULT: { "연구 진행 중간 저장": "研究检查点", "당시 연구 답변": "已保存的研究回答" },
 };
-const titles = { en: titlesEn, "zh-Hans": titlesZh } as const;
+const titlesJa: Record<string, Readonly<Record<string, string>>> = {
+  REVISION: {
+    "결정 객체 변경": "判断の対象を更新しました", "근거 충분성 평가 변경": "根拠の十分さの評価を更新しました",
+    "가설 변경": "仮説を更新しました", "가설 구성 변경": "仮説の構成を更新しました",
+    "행동 제안 변경": "行動の提案を更新しました", "행동 구성 변경": "行動の構成を更新しました",
+    "행동 계획 변경": "行動計画を更新しました", "근거 연결 변경": "根拠のリンクを更新しました",
+    "기억 변경": "記憶を更新しました", "연구 항목 변경": "調査項目を更新しました",
+  },
+  MEMORY: { "연구 기억 기록": "調査の記憶を記録しました" },
+  RESTORE: { "연구 항목 복원": "調査項目を復元しました" },
+  RESULT: { "연구 진행 중간 저장": "調査のチェックポイント", "당시 연구 답변": "保存された調査の回答" },
+};
+const titles = { en: titlesEn, "zh-Hans": titlesZh, ja: titlesJa } as const;
 
 export function historyTitle(item: { kind: string; title: string }): string {
   const locale = getLocale();

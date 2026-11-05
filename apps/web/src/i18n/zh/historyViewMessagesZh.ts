@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { historyViewMessages } from "../historyViewMessages";
 
-export const historyViewZh: ZhOf<typeof historyViewMessages> = {
+export const historyViewZh: ColumnOf<typeof historyViewMessages> = {
   "delta.answerContent": "回答内容",
   "delta.applicability": "适用条件",
   "delta.state": "状态",

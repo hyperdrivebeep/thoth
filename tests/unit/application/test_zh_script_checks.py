@@ -62,3 +62,20 @@ def test_the_same_cell_is_kept_for_a_chinese_answer_to_a_korean_question():
         research_work.reset(token)
     assert changed == 1 and table_of(result, "h1")["h2"] == CHINESE
     assert dropped(result, "h1") == []
+
+
+JAPANESE = "検出率が悪い"
+
+
+def test_a_japanese_cell_is_kept_for_a_japanese_answer_to_a_korean_question_and_dropped_for_ko():
+    assert script_check_problem("ja", KOREAN) == ""
+    assert language_problem(JAPANESE, script_check_problem("ja", KOREAN)) is None
+    assert language_problem(JAPANESE, script_check_problem("ko", KOREAN)) == "LANGUAGE"
+    token = research_work.set(work_in("ja"))
+    try:
+        assert validation_problem(KOREAN) == ""
+        result, changed = merged(portfolio({}), fill_of("h1", row("h1", "h2", JAPANESE)))
+    finally:
+        research_work.reset(token)
+    assert changed == 1 and table_of(result, "h1")["h2"] == JAPANESE
+    assert dropped(result, "h1") == []

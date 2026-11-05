@@ -188,3 +188,17 @@ it("shows the delete wording in Simplified Chinese too", async () => {
   await typeName(NAME);
   expect(buttons(dialog()!, "永久删除")[0].disabled).toBe(false);
 });
+
+it("shows the delete wording in Japanese too", async () => {
+  setLocale("ja");
+  await openDialog(false, "アーカイブ済みのプロジェクトを見る");
+  await act(async () => buttons(container, "完全に削除")[0].click());
+  await settle(() => dialog() !== null);
+  expect(dialog()!.textContent).toContain("この操作は元に戻せません。");
+  expect(dialog()!.textContent).toContain("プロジェクト「Archived demo」を完全に削除");
+  expect(dialog()!.textContent).not.toMatch(/[가-힣]/);
+  expect(buttons(dialog()!, "キャンセル")).toHaveLength(1);
+  expect(buttons(dialog()!, "完全に削除")[0].disabled).toBe(true);
+  await typeName(NAME);
+  expect(buttons(dialog()!, "完全に削除")[0].disabled).toBe(false);
+});

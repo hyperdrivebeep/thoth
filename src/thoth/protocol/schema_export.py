@@ -33,6 +33,7 @@ from thoth.domain.research_request import (
     ThreadRequestRevision,
     ThreadRequestRevisionV21,
     ThreadRequestRevisionV22,
+    ThreadRequestRevisionV23,
 )
 from thoth.domain.restore import (
     RestoreApplyInput,
@@ -47,6 +48,7 @@ SCHEMA_MODELS: dict[str, type[BaseModel]] = {
     "thread-request-v2.schema.json": ThreadRequestRevision,
     "thread-request-v21.schema.json": ThreadRequestRevisionV21,
     "thread-request-v22.schema.json": ThreadRequestRevisionV22,
+    "thread-request-v23.schema.json": ThreadRequestRevisionV23,
     "hypothesis-portfolio-v4.schema.json": HypothesisPortfolioV4,
     "hypothesis-table-fill-v4.schema.json": HypothesisTableFillV4,
     "hypothesis-portfolio-v5.schema.json": ReceivedHypothesisPortfolioV5,

@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { finishingMessages } from "../finishingMessages";
 
-export const finishingZh: ZhOf<typeof finishingMessages> = {
+export const finishingZh: ColumnOf<typeof finishingMessages> = {
   "progress.tableOnly": "只引用表格中的数字",
   "progress.noGuess": "不要猜测",
   "progress.withLocator": "附上原文位置作答",

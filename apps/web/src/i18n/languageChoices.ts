@@ -9,6 +9,7 @@ export const LANGUAGE_CHOICES = [
   { code: "en", label: "English", tag: "en-US", browser: /^en(-|$)/, title: "THOTH · Research workspace" },
   // Traditional Chinese tags (zh-TW, zh-HK, zh-MO, zh-Hant) are not matched: the text is Simplified.
   { code: "zh-Hans", label: "中文(简体)", tag: "zh-CN", browser: /^zh(?!-(tw|hk|mo|hant))(-|$)/, title: "THOTH · 研究工作区" },
+  { code: "ja", label: "日本語", tag: "ja-JP", browser: /^ja(-|$)/, title: "THOTH · 調査ワークスペース" },
 ] as const;
 
 export type LanguageCode = (typeof LANGUAGE_CHOICES)[number]["code"];

@@ -7,6 +7,7 @@ export const RESPONSE_LANGUAGE_CHOICES = [
   { code: "ko", label: "한국어" },
   { code: "en", label: "English" },
   { code: "zh-Hans", label: "中文(简体)" },
+  { code: "ja", label: "日本語" },
 ] as const;
 
 export type ResponseLanguage = (typeof RESPONSE_LANGUAGE_CHOICES)[number]["code"];

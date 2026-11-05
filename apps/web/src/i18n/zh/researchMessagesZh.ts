@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { researchMessages } from "../researchMessages";
 
-export const researchZh: ZhOf<typeof researchMessages> = {
+export const researchZh: ColumnOf<typeof researchMessages> = {
   "timeline.title": "研究对话",
   "timeline.accessUnverified": "由于无法验证对话访问权限或已保存的依据，回答已隐藏。",
   "timeline.loadFailed": "无法加载对话。",

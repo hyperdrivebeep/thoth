@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { remainingMessages } from "../remainingMessages";
 
-export const remainingZh: ZhOf<typeof remainingMessages> = {
+export const remainingZh: ColumnOf<typeof remainingMessages> = {
   "examples.historyLoading": "正在打开历史示例…",
   "examples.resultLoading": "正在打开结果示例…",
   "conversation.unavailable": "在当前权限下无法访问此回答，或无法验证其已保存的依据。",

@@ -10,19 +10,21 @@ import { resultLanguage } from "../i18n/ResponseLanguageContext";
 afterEach(() => { localStorage.clear(); sessionStorage.clear(); });
 
 it("lists the answer languages in one place, apart from the screen languages", () => {
-  expect(RESPONSE_LANGUAGE_CHOICES.map(choice => choice.code)).toEqual(["ko", "en", "zh-Hans"]);
+  expect(RESPONSE_LANGUAGE_CHOICES.map(choice => choice.code)).toEqual(["ko", "en", "zh-Hans", "ja"]);
+  expect(responseLanguageLabel("ja")).toBe("日本語");
   expect(responseLanguageLabel("zh-Hans")).toBe("中文(简体)");
-  expect(LANGUAGE_CHOICES.map(choice => choice.code)).toEqual(["ko", "en", "zh-Hans"]);
+  expect(LANGUAGE_CHOICES.map(choice => choice.code)).toEqual(["ko", "en", "zh-Hans", "ja"]);
   expect(RESPONSE_LANGUAGE_CHOICES.map(choice => choice.label)).toEqual(LANGUAGE_CHOICES.map(choice => choice.label));
 });
 
 it("accepts only listed languages, and keeps from a server's list only the ones this app can offer", () => {
-  expect(["ko", "en", "zh-Hans"].every(isResponseLanguage)).toBe(true);
-  expect(["ja", "zh", "zh-Hant", "", null, 1].some(isResponseLanguage)).toBe(false);
-  expect(knownResponseLanguages(["ko", "ja", "zh-Hans", 3])).toEqual(["ko", "zh-Hans"]);
+  expect(["ko", "en", "zh-Hans", "ja"].every(isResponseLanguage)).toBe(true);
+  expect(["fr", "zh", "zh-Hant", "ja-JP", "", null, 1].some(isResponseLanguage)).toBe(false);
+  expect(knownResponseLanguages(["ko", "fr", "zh-Hans", "ja", 3])).toEqual(["ko", "zh-Hans", "ja"]);
   expect(knownResponseLanguages(undefined)).toEqual([]);
   expect(resultLanguage({ response_language: "zh-Hans" })).toBe("zh-Hans");
-  expect(resultLanguage({ response_language: "ja" })).toBeNull();
+  expect(resultLanguage({ response_language: "fr" })).toBeNull();
+  expect(resultLanguage({ response_language: "ja" })).toBe("ja");
 });
 
 it("keeps a Chinese default and a Chinese pending request, and refuses an unlisted language", () => {
@@ -36,6 +38,6 @@ it("keeps a Chinese default and a Chinese pending request, and refuses an unlist
   expect(writeSubmission(scope, pending)).toBe("SAVED");
   expect(readSubmission(scope, "p", "t")).toEqual({ kind: "PENDING", value: pending });
   expect(clearSubmission(scope, "p", "t")).toBe(true);
-  const unlisted = { ...pending, responseLanguage: "ja" } as unknown as PendingSubmission;
+  const unlisted = { ...pending, responseLanguage: "fr" } as unknown as PendingSubmission;
   expect(writeSubmission(scope, unlisted)).toBe("UNAVAILABLE");
 });

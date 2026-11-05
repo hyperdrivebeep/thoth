@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { modelHelpMessages } from "../modelHelpMessages";
 
-export const modelHelpZh: ZhOf<typeof modelHelpMessages> = {
+export const modelHelpZh: ColumnOf<typeof modelHelpMessages> = {
   "modelHelp.retry": "如果模型调用被中断，只有该次调用会自动重试，最多两次，并会消耗额外的 token。关闭后，可在被中断的结果卡片上手动继续。",
   "modelHelp.retryReadFailed": "无法读取自动重试设置。",
   "modelHelp.retryLabel": "自动重试被中断的模型调用",

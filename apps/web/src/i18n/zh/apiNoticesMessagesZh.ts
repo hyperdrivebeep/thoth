@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { apiNoticesMessages } from "../apiNoticesMessages";
 
-export const apiNoticesZh: ZhOf<typeof apiNoticesMessages> = {
+export const apiNoticesZh: ColumnOf<typeof apiNoticesMessages> = {
   "api.jsonObject": "输入必须是 JSON 对象。",
   "api.projectMismatch": "project_id 必须与所选项目一致。",
   "api.restoreTarget": "无法验证恢复目标的链接。",

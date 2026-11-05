@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { workspaceMessages } from "../workspaceMessages";
 
-export const workspaceZh: ZhOf<typeof workspaceMessages> = {
+export const workspaceZh: ColumnOf<typeof workspaceMessages> = {
   "workspace.newProject": "新项目",
   "workspace.projectName": "项目名称",
   "workspace.namePlaceholder": "研究问题或项目名称",

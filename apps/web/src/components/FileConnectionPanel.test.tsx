@@ -160,3 +160,17 @@ it("shows the source connection panel and the upload progress in Simplified Chin
   await act(async () => button("取消上传")!.click()); await tick();
   expect(fixture.calls).toEqual(["stage:report.pdf"]);
 });
+
+it("shows the source connection panel and the upload progress in Japanese", async () => {
+  await act(async () => setLocale("ja"));
+  expect(container.textContent).toContain("資料ファイルを接続");
+  await start(["report.pdf"]);
+  await act(async () => fixture.jobs[0].options?.onProgress?.({ phase: "uploading", loaded: 50, total: 100 }));
+  expect(container.textContent).toContain("report.pdf を送信中（50%）");
+  await act(async () => fixture.jobs[0].options?.onProgress?.({ phase: "processing", loaded: 100, total: 100 }));
+  expect(container.textContent).toContain("report.pdf を送信し終えました。サーバーが処理しています…");
+  expect(container.textContent).not.toMatch(/[가-힣]/);
+  expect(button("アップロードをキャンセル")).toBeDefined();
+  await act(async () => button("アップロードをキャンセル")!.click()); await tick();
+  expect(fixture.calls).toEqual(["stage:report.pdf"]);
+});

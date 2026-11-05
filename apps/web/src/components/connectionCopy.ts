@@ -88,6 +88,11 @@ const connectedSummaries: Record<LanguageCode, Record<ConnectedRoute, string>> =
     LOGIN: "已通过账户登录连接。首次研究运行时会验证实际响应。",
     KEY: "已通过 API 密钥连接。首次研究运行时会验证实际响应。",
   },
+  ja: {
+    BOTH: "アカウントのログインと API キーで接続しました。実際の応答は、最初の調査の実行時に検証されます。",
+    LOGIN: "アカウントのログインで接続しました。実際の応答は、最初の調査の実行時に検証されます。",
+    KEY: "API キーで接続しました。実際の応答は、最初の調査の実行時に検証されます。",
+  },
 };
 function connectedSummary(account: CredentialAccount): string {
   return pickLocale(connectedSummaries)[account.oauth && account.has_key ? "BOTH" : account.oauth ? "LOGIN" : "KEY"];
