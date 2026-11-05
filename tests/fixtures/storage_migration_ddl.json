@@ -1,7 +1,7 @@
 {
   "contract": {
     "heads": [
-      "8e3b5f1a7c42"
+      "9f4c2d7e1a35"
     ],
     "schema_rows": [
       [
@@ -2330,7 +2330,7 @@
         "table",
         "embedding_vectors",
         "embedding_vectors",
-        "CREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)"
+        "CREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, truncated INTEGER, source_tokens INTEGER, \n\tPRIMARY KEY (project_id, content_key)\n)"
       ],
       [
         "table",

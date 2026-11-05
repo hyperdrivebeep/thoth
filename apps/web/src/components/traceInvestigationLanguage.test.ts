@@ -57,3 +57,15 @@ it.each(["ko", "en", "zh-Hans"] as const)("a Chinese answer language writes the 
   expect(chinese.questionForLanguage?.("zh-Hans")).toBe(chinese.question);
   expect(chinese.questionForLanguage?.(null)).toBe(investigationFor("p", "CRITERION", verdict, view, null)!.question);
 });
+
+it.each(["ko", "en", "zh-Hans", "ja"] as const)("a Japanese answer language writes the question in Japanese on the %s screen", display => {
+  setLocale(display);
+  const view = demo.phase2 as unknown as TraceView;
+  const verdict = view.verdicts.find(item => item.subject_id === "SYN-C-DET-RAIN")!;
+  const japanese = investigationFor("p", "CRITERION", verdict, view, "ja")!;
+  expect(japanese.responseLanguage).toBe("ja");
+  expect(japanese.question).toContain("考えられる原因と、それらを見分けるテストを探してください。");
+  expect(japanese.question).not.toMatch(/[가-힣]/);
+  expect(japanese.question).not.toMatch(/FAIL_COMPUTED|THRESHOLD_NOT_MET/);
+  expect(japanese.questionForLanguage?.("ja")).toBe(japanese.question);
+});

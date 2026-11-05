@@ -186,10 +186,18 @@ class ProcessEmbeddingWorker:
         data = value.get("data")
         if not isinstance(data, str):
             raise EmbeddingIndexError("EMBEDDING_PROTOCOL_FAILED")
-        vector = EmbeddingVector(bytes.fromhex(data))
+        cut = value.get("truncated") is True
+        tokens = value.get("tokens")
+        vector = EmbeddingVector(
+            bytes.fromhex(data),
+            # A real encoder (descriptor protocol) sends the flag only for a cut passage, so its
+            # silence means the passage fit; a stand-in worker says nothing either way.
+            truncated=True if cut else (False if self.descriptor is not None else None),
+            source_tokens=tokens if cut and isinstance(tokens, int) and tokens >= 1 else None,
+        )
         if vector.sha256 != value["sha256"]:
             raise EmbeddingIndexError("EMBEDDING_PROTOCOL_FAILED")
-        if value.get("truncated") is True:
+        if cut:
             self.truncated_passages += 1
         return vector
 

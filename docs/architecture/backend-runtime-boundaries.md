@@ -16,6 +16,10 @@ This is the authoritative runtime-boundary rule for the local modular monolith. 
 
 The ledger is immutable with one exception: the user's explicit `project/permanentDelete` of an archived project (exact name typed) removes that project's rows and project-only upload folder in one transaction and leaves a deletion record (its own operation record is kept under `system:workspace`); archive stays reversible, and shared content-addressed objects are never deleted by it.
 
+The only way to remove shared objects is the explicit `thoth objects prune` command (adapters/storage/object_prune.py): with the workspace lock held it keeps every object whose 64-hex digest appears in any database value or workspace file, previews the rest (older than 24 hours) with a list hash, and deletes only on `--confirm <list hash>`; any unreadable table or file stops it with nothing deleted.
+
+A killed THOTH process leaves its operations RUNNING, and nothing seals them at start: an operation whose outcome is unknown (a restore, a source connection) stays RUNNING, and a measured command is sealed only when its own key is sent again (`protocol/operation_owner.py` `seal`; pinned by the owner-recovery tests). `project/permanentDelete` additionally seals, as FAILED with `OPERATION_OWNER_GONE`, the RUNNING operations of the one project it is about to delete whose recorded owner is confirmed gone (owner record present, same host token, valid process marker, workspace lock held, and `is_alive` exactly `False`; research included), then runs the purge's own active-operation check unchanged.
+
 ## Canonical owner rule
 
 Every aggregate has exactly one canonical owner in `config/architecture-conformance.json`. A specialized table may be a current projection, but it must be derived from or transactionally committed with the canonical revision. `ControlRecord` is not a universal escape hatch for canonical state.

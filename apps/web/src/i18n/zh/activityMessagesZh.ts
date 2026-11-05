@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { activityMessages } from "../activityMessages";
 
-export const activityZh: ZhOf<typeof activityMessages> = {
+export const activityZh: ColumnOf<typeof activityMessages> = {
   "activity.planned": "已计划",
   "activity.running": "运行中",
   "activity.succeeded": "执行完成",

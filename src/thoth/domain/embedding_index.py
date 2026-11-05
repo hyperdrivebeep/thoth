@@ -3,7 +3,7 @@
 import hashlib
 import math
 import struct
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 
 from pydantic import Field, model_validator
@@ -138,6 +138,12 @@ def embedding_key(text_sha256: str, model: DenseModelPin) -> str:
 @dataclass(frozen=True)
 class EmbeddingVector:
     data: bytes
+    # Whether the passage was cut to the token cap before encoding, and how many tokens it had
+    # before the cut. None means not recorded (a vector made before this was kept, or by a worker
+    # that does not report it); False means the passage fit and was encoded whole.
+    # They describe how the vector was made, not which vector it is, so equality ignores them.
+    truncated: bool | None = field(default=None, compare=False)
+    source_tokens: int | None = field(default=None, compare=False)
 
     def __post_init__(self) -> None:
         if len(self.data) != 384 * 4:
@@ -147,6 +153,8 @@ class EmbeddingVector:
             raise EmbeddingIndexError("EMBEDDING_VECTOR_NONFINITE")
         if abs(math.sqrt(sum(v * v for v in values)) - 1) > 1e-4:
             raise EmbeddingIndexError("EMBEDDING_VECTOR_NOT_NORMALIZED")
+        if self.source_tokens is not None and self.source_tokens < 1:
+            raise EmbeddingIndexError("EMBEDDING_SOURCE_TOKENS_INVALID")
 
     @classmethod
     def from_values(cls, values: tuple[float, ...]) -> "EmbeddingVector":

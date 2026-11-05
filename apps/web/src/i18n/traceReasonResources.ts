@@ -65,4 +65,16 @@ const chinese: Record<keyof typeof korean, { label: string; hint: string }> = {
   REQUIRED_INCOMPLETE: { label: "必要标准未完成", hint: "没有必要标准，或必要标准中还有尚未判定为满足或未满足的。" },
   BASIS_CHANGED: { label: "依据已变化", hint: "此评估所依据的规则、结果或链接已变化，需要重新计算。" },
 };
-export const traceReasonText = bilingualRecord(korean, english, chinese);
+const japanese: Record<keyof typeof korean, { label: string; hint: string }> = {
+  UNTESTED: { label: "未テスト", hint: "この基準にテストが結びついていますが、まだ結果がありません。" },
+  UNLINKED: { label: "未リンク", hint: "この基準に結びついたテストがなく、結果の入る場所がありません。" },
+  UNIT: { label: "単位のエラー", hint: "結果の単位が基準の単位と異なるため、比較しませんでした。" },
+  DENOMINATOR: { label: "分母のエラー", hint: "結果の分母が0以下か、値が分子・分母から計算した値と異なるため、比較しませんでした。" },
+  VALUE: { label: "値のエラー", hint: "結果の値が空か、数値でないか、大きすぎるため、比較しませんでした。" },
+  CONDITION_MISMATCH: { label: "条件の不一致", hint: "結果はありますが、基準の条件と異なるため、使いませんでした。" },
+  NO_RULE: { label: "ルールなし", hint: "この基準には判定ルールがないため、比較しませんでした。" },
+  VALID_MISS: { label: "有効だが未達", hint: "結果を比較でき、基準に届きませんでした。" },
+  REQUIRED_INCOMPLETE: { label: "必須の基準が未完了", hint: "必須の基準がないか、必須の基準のうち、満たすか満たさないかがまだ決まっていないものがあります。" },
+  BASIS_CHANGED: { label: "根拠の変更", hint: "この判定が拠りどころにしたルール・結果・リンクが変わったため、再計算が必要です。" },
+};
+export const traceReasonText = bilingualRecord(korean, english, chinese, japanese);

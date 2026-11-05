@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { commonStateMessages } from "../commonStateMessages";
 
-export const commonStateZh: ZhOf<typeof commonStateMessages> = {
+export const commonStateZh: ColumnOf<typeof commonStateMessages> = {
   "state.applied": "已应用",
   "state.revise": "需要修订",
   "state.hold": "暂缓",

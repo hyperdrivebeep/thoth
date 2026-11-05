@@ -91,7 +91,7 @@ def test_readers_older_than_2_2_0_refuse_zh_hans_instead_of_reading_it_as_someth
         ThreadRequestRevisionV21.model_validate({**chinese.model_dump(), "schema_version": "2.1.0"})
 
 
-def test_a_2_2_0_record_may_also_hold_ko_or_en_and_an_unknown_language_is_refused():
+def test_a_2_2_0_record_may_also_hold_ko_or_en_and_is_closed_to_later_languages():
     korean = with_request_language(request_record(request_ref()), {"response_language": "ko"})
     wide = {**korean.model_dump(), "schema_version": "2.2.0"}
     decoded = decode_thread_request(wide)
@@ -99,7 +99,7 @@ def test_a_2_2_0_record_may_also_hold_ko_or_en_and_an_unknown_language_is_refuse
     with pytest.raises(ValidationError):
         decode_thread_request({**wide, "response_language": "ja"})
     with pytest.raises(RpcApplicationError, match="RESPONSE_LANGUAGE_UNSUPPORTED"):
-        with_request_language(request_record(request_ref()), {"response_language": "ja"})
+        with_request_language(request_record(request_ref()), {"response_language": "fr"})
 
 
 @pytest.mark.parametrize("language", ["ko", "en"])
@@ -149,4 +149,4 @@ def test_the_partial_draft_prefix_follows_the_language_and_defaults_to_the_legac
     assert partial_answer("a", "en").startswith("Review on hold")
     assert partial_answer("a", "zh-Hans").startswith("复核暂缓")
     with pytest.raises(ValueError, match="RESPONSE_LANGUAGE_UNSUPPORTED"):
-        partial_answer("a", "ja")
+        partial_answer("a", "fr")

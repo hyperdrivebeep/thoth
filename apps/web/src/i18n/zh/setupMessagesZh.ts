@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { setupMessages } from "../setupMessages";
 
-export const setupZh: ZhOf<typeof setupMessages> = {
+export const setupZh: ColumnOf<typeof setupMessages> = {
   "setup.checkNeeded": "设置需要处理",
   "setup.checkWorkspace": "检查已有的工作区设置",
   "setup.checkAgain": "重新检查设置",

@@ -29,6 +29,18 @@ const patterns: Record<Exclude<LanguageCode, "ko">, Pattern[]> = {
     [/^접근 범위를 벗어난 자료 (\d+)곳은 사용하지 않았습니다\.$/, m => `${m[1]} 处超出访问范围的资料没有被使用。`],
     [/^원격 종료 확인 상태는 (.+)입니다\.$/, m => `远程终止的确认状态：${m[1]}。`],
   ],
+  ja: [
+    [/^연결된 자료(.*)을 읽었습니다\.$/, m => `${t("activity.sourceFallback")}${m[1]}を読み込みました。`],
+    [/^(.+)을 읽었습니다\.$/, m => `${m[1]}を読み込みました。`],
+    [/^가설 (\d+)개 중 (\d+)개를 검토했습니다\.$/, m => `仮説 ${m[1]} 件のうち ${m[2]} 件をレビューしました。`],
+    [/^지지 관계가 기록된 근거 (\d+)곳을 확인했습니다\.$/, m => `裏づけの関係が記録された根拠の位置 ${m[1]} か所を確認しました。`],
+    [/^반례 관계가 기록된 근거 (\d+)곳을 확인했습니다\.$/, m => `反証の関係が記録された根拠の位置 ${m[1]} か所を確認しました。`],
+    [/^판정이 끝나지 않은 근거 (\d+)곳을 보류했습니다\.$/, m => `判定が終わっていない根拠の位置 ${m[1]} か所を保留にしました。`],
+    [/^근거 후보 (\d+)곳이 결과 범위에 연결되었습니다\.$/, m => `根拠の候補 ${m[1]} か所を、結果の範囲に結びつけました。`],
+    [/^현재성이 달라진 자료 (\d+)곳은 다시 확인해야 합니다\.$/, m => `最新性が変わった資料 ${m[1]} か所は、もう一度確認する必要があります。`],
+    [/^접근 범위를 벗어난 자료 (\d+)곳은 사용하지 않았습니다\.$/, m => `アクセス範囲の外にある資料 ${m[1]} か所は、使いませんでした。`],
+    [/^원격 종료 확인 상태는 (.+)입니다\.$/, m => `リモートでの終了の確認状態：${m[1]}。`],
+  ],
 };
 
 /** Adapter for application-owned v1 activity wording. Never use on source or model content. */
@@ -58,8 +70,14 @@ const actionLabels: Record<Exclude<LanguageCode, "ko">, Record<string, string>> 
     adopt_counter: "采纳反面证据", run: "执行行动", call_model: "模型调用", retry: "重试",
     cancel: "取消", hold: "暂缓", stage_complete: "研究阶段",
   },
+  ja: {
+    search: "資料を検索", open: "資料を開く", fetch: "資料を取得", parse: "内容を解析", read: "資料を読み込む",
+    screen: "関連性をレビュー", select_candidate: "根拠の候補を選ぶ", adopt_support: "裏づける根拠を採用",
+    adopt_counter: "反証の根拠を採用", run: "行動を実行", call_model: "モデル呼び出し", retry: "再試行",
+    cancel: "キャンセル", hold: "保留", stage_complete: "調査の段階",
+  },
 };
-const researchActivity: Record<Exclude<LanguageCode, "ko">, string> = { en: "Research activity", "zh-Hans": "研究活动" };
+const researchActivity: Record<Exclude<LanguageCode, "ko">, string> = { en: "Research activity", "zh-Hans": "研究活动", ja: "調査の活動" };
 
 /** The label of an activity action in a language other than Korean (Korean shows the server's own wording). */
 export function activityActionLabel(action: string): string {

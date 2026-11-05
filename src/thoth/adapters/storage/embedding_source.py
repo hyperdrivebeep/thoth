@@ -13,6 +13,7 @@ from thoth.domain.embedding_index import (
     source_refs,
 )
 from thoth.domain.evidence import EvidenceSpan
+from thoth.domain.retrieval_embedding import DenseModelPin
 
 type IngestionProjection = Callable[
     [Connection, StructuralDocument, str, tuple[EvidenceSpan, ...]], None
@@ -24,11 +25,15 @@ def configuration(connection: Connection, project: str) -> EmbeddingIndexConfig:
     row = connection.execute(
         select(embedding_configs.c.content_json).where(embedding_configs.c.project_id == project)
     ).first()
-    return (
-        EmbeddingIndexConfig(project_id=project, actor_ref="local:operator")
-        if row is None
-        else EmbeddingIndexConfig.model_validate_json(row[0])
-    )
+    if row is None:
+        return EmbeddingIndexConfig(project_id=project, actor_ref="local:operator")
+    stored = EmbeddingIndexConfig.model_validate_json(row[0])
+    if stored.model == DenseModelPin():
+        return stored
+    # Saved under an older preprocessing version. The row is not rewritten: reading it as the
+    # current version makes every job made under the old one stop matching, and the ordinary
+    # reconcile turns those into STALE so an explicit prepare builds them again.
+    return stored.model_copy(update={"model": DenseModelPin()})
 
 
 def stage(connection: Connection, intent: EmbeddingIntent) -> str:

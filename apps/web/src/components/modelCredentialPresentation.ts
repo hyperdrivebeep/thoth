@@ -148,9 +148,22 @@ const guidanceZh: Record<string, string> = {
   "Finish the THOTH Codex sign-in, then check connection status": "请先完成 THOTH 专用的 Codex 登录，再检查连接状态。",
   "Check the isolated Codex connection and model catalog": "请检查 THOTH 专用 Codex 的连接和模型列表。",
 };
+const guidanceJa: Record<string, string> = {
+  "Use the saved THOTH workspace API key": "保存済みの THOTH ワークスペースの API キーを使います。",
+  "Install the pinned Codex standalone package in the THOTH tools prefix": "THOTH のツールフォルダに、指定バージョンの Codex をインストールしてください。",
+  "Connect the THOTH-only Codex profile": "THOTH 専用の Codex プロファイルでログインしてください。",
+  "Check the isolated Codex model catalog": "THOTH 専用の Codex のモデル一覧を確認してください。",
+  "The Codex route is eligible; live execution has not been verified": "Codex の経路は利用を試せますが、実際の実行はまだ確認されていません。",
+  "Install the official Claude Code executable, then sign in from THOTH": "公式の Claude Code をインストールしてから、THOTH でログインしてください。",
+  "Sign in with the official Claude Code executable in the THOTH profile": "THOTH 専用プロファイルの公式 Claude Code でログインしてください。",
+  "Use a THOTH workspace API key for this provider": "このプロバイダーは、THOTH ワークスペースの API キーで接続してください。",
+  "Use the THOTH workspace xAI device login; remote execution is unverified": "THOTH ワークスペースの xAI デバイスコードによるログインを使ってください。リモートでの実行はまだ確認されていません。",
+  "Finish the THOTH Codex sign-in, then check connection status": "THOTH 専用の Codex ログインを完了してから、接続状態を確認してください。",
+  "Check the isolated Codex connection and model catalog": "THOTH 専用の Codex の接続とモデル一覧を確認してください。",
+};
 export function guidanceText(value: string | null | undefined): string | null {
   if (!value) return null;
-  if (guidanceKo[value]) return pickLocale({ ko: guidanceKo[value], en: value, "zh-Hans": guidanceZh[value] });
+  if (guidanceKo[value]) return pickLocale({ ko: guidanceKo[value], en: value, "zh-Hans": guidanceZh[value], ja: guidanceJa[value] });
   // A terminal command stays literal; only the sentence around it is Korean.
   const command = /^Run (.+) in the server terminal$/.exec(value);
   if (command) return t("labels.command") + command[1];

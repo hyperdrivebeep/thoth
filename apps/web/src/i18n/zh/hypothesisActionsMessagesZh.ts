@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { hypothesisActionsMessages } from "../hypothesisActionsMessages";
 
-export const hypothesisActionsZh: ZhOf<typeof hypothesisActionsMessages> = {
+export const hypothesisActionsZh: ColumnOf<typeof hypothesisActionsMessages> = {
   "hypothesisLink.unrelated": "变化的评估不影响此假设",
   "hypothesisLink.unrelatedHint": "此假设被认为与变化的部分无关。",
   "hypothesisLink.supports": "新结果仍然符合此假设（已审查证据）",

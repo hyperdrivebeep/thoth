@@ -54,4 +54,13 @@ const chinese: Record<keyof typeof korean, { test: string; action: string; hint:
   RESULT_RECORDED: { test: "已记录结果的测试", action: "已记录结果的行动", hint: "这些测试已经做过，不再作为下一步要做的测试推荐。" },
   HYPOTHESIS_ELIMINATED: { test: "已排除假设的测试", action: "已排除假设的行动", hint: "多次测试结果已将这些假设排除。候选数量中已不计入它们，但记录仍然保留。" },
 };
-export const testOrderTitles = bilingualRecord(korean, english, chinese);
+const japanese: Record<keyof typeof korean, { test: string; action: string; hint: string }> = {
+  READY: { test: "最初に試すテスト", action: "最初に見る行動", hint: "どの結果になっても、残る原因の候補が最も少なくなるテストから並べました。" },
+  COST_UNKNOWN: { test: "コストがまだ分からないテスト", action: "コストがまだ分からない行動", hint: "同じルールで並べましたが、コストの見積もりがないため別に置きました。コストをゼロとは見なしません。" },
+  NO_DECISION_CHANGE: { test: "結果が違っても、やることが同じテスト", action: "結果が違っても、やることが同じ行動", hint: "どの結果になっても次の行動が同じなので、下に回しました。" },
+  NOT_EXECUTABLE: { test: "今はできないテスト", action: "今はできない行動", hint: "現在は実行できません。" },
+  UNCOUNTABLE: { test: "どれだけ見分けられるか、まだ数えられないテスト", action: "順番に見る行動", hint: "ほかの仮説がこのテストで何を示すかが書かれていないため、見分ける度合いを数えられません。リスク、コスト、元に戻せるかの順にだけ並べました。" },
+  RESULT_RECORDED: { test: "結果をすでに記録したテスト", action: "結果をすでに記録した行動", hint: "すでに行ったテストなので、次に行うテストとしては出しません。" },
+  HYPOTHESIS_ELIMINATED: { test: "除外された仮説のテスト", action: "除外された仮説の行動", hint: "テスト結果の繰り返しにより、これらの仮説は除外されました。候補の数からは外しましたが、記録は残っています。" },
+};
+export const testOrderTitles = bilingualRecord(korean, english, chinese, japanese);

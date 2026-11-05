@@ -58,9 +58,21 @@ _PLAIN_WORDING_ZH = (
     "Write the FACT/UNKNOWN display labels as '事实' and '未知'; preserve schema enum values."
 )
 
+_PLAIN_WORDING_JA = (
+    "Write so the person who asked can read it at once, in short plain sentences. "
+    "Write easy Japanese. "
+    "Keep the technical terms, units and standard abbreviations that appear in the user's "
+    "own material (for example SNR, RCS, CFAR, dB) exactly as they are. "
+    "Do not use program-internal codes, field names, variable names or made-up ids in prose; "
+    "say conditions in words (write '検出率 0.90 以上', not 'detection_rate >= 0.90 ratio') "
+    "and use plain Japanese words for internal terms such as sandbox-owner or gap. "
+    "Write the FACT/UNKNOWN display labels as '事実' and '不明'; preserve schema enum values."
+)
+
 # One entry per response language; a missing language is an error, never an English fallback.
 _PLAIN_WORDING_BY_LANGUAGE: dict[ResponseLanguage, str] = {
     "ko": _PLAIN_WORDING,
     "en": _PLAIN_WORDING_EN,
     "zh-Hans": _PLAIN_WORDING_ZH,
+    "ja": _PLAIN_WORDING_JA,
 }

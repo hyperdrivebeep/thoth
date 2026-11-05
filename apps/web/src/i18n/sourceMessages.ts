@@ -32,6 +32,7 @@ export const sourceMessages = {
     "ko": "파일 선택…",
     "en": "Choose files…"
   },
+  "sources.browse": { "ko": "찾아보기", "en": "Browse" },
   "sources.fileLabel": {
     "ko": "연결할 파일 자료",
     "en": "Source files to connect"

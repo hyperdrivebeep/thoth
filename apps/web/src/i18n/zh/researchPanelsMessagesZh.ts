@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { researchPanelsMessages } from "../researchPanelsMessages";
 
-export const researchPanelsZh: ZhOf<typeof researchPanelsMessages> = {
+export const researchPanelsZh: ColumnOf<typeof researchPanelsMessages> = {
   "tracePage.notComputed": "尚未计算",
   "tracePage.reasons": "详细原因",
   "tracePage.nextCheck": "下一步检查",

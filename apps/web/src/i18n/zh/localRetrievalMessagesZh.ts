@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { localRetrievalMessages, localRetrievalReasonMessages } from "../localRetrievalMessages";
 
-export const localRetrievalZh: ZhOf<typeof localRetrievalMessages> = {
+export const localRetrievalZh: ColumnOf<typeof localRetrievalMessages> = {
   "localRetrieval.title": "本地检索准备",
   "localRetrieval.hostedOnly": "仅在本地工作区可用。审查工作区不做任何准备。",
   "localRetrieval.intro": "使用一个固定的本地模型，提前为资料建立索引。默认关闭；即使索引已就绪，现有的检索方式也保持不变。",
@@ -48,6 +48,7 @@ export const localRetrievalZh: ZhOf<typeof localRetrievalMessages> = {
   "localRetrieval.prepareBlockedOff": "请先在此项目中开启本地索引。",
   "localRetrieval.prepareBlockedAsset": "必须先准备好模型文件，才能准备索引。",
   "localRetrieval.prepareBlockedDependency": "由于缺少运行时组件，无法准备索引。",
+"localRetrieval.outdatedIndex": "资料的检索预处理方式已更改，需要重建索引。请选择“准备索引”。无需重新下载模型文件。",
   "localRetrieval.readyNote": "即使资料索引已就绪，现有的检索方式也保持不变。目前实际检索中还没有任何地方使用它。",
   "localRetrieval.jobsTitle": "索引任务",
   "localRetrieval.job.PENDING": "待处理",
@@ -79,7 +80,7 @@ export const localRetrievalZh: ZhOf<typeof localRetrievalMessages> = {
   "localRetrieval.operationLabel": "服务器工作",
   "localRetrieval.reasonUnknown": "原因未知",
 };
-export const localRetrievalReasonZh: ZhOf<typeof localRetrievalReasonMessages> = {
+export const localRetrievalReasonZh: ColumnOf<typeof localRetrievalReasonMessages> = {
   "RESOURCE_AUTHORITY_CHANGED": "操作期间，访问权限或会话权限发生了变化。",
   "LOCAL_RETRIEVAL_FAILED": "本地准备未能完成。",
   "LOCAL_RETRIEVAL_PROJECT_MISSING": "找不到该项目。",

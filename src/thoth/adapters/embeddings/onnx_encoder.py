@@ -84,6 +84,10 @@ class _OrtModule(Protocol):
 
 
 class GraniteOnnxEncoder:
+    # Set by tokens_for on every call; a class default keeps encoders built without __init__
+    # (tokenizing tests) working.
+    last_source_tokens: int | None = None
+
     def __init__(self, descriptor: EmbeddingAssetDescriptor) -> None:
         try:
             import numpy
@@ -161,7 +165,10 @@ class GraniteOnnxEncoder:
         self, text: str, role: Literal["QUERY", "PASSAGE"]
     ) -> tuple[list[int], list[int], list[int], bool]:
         encoded = self._tokenizer.encode(text, add_special_tokens=True)
-        ids, mask, types = list(encoded.ids), list(encoded.attention_mask), list(encoded.type_ids)
+        ids: list[int] = list(encoded.ids)
+        mask: list[int] = list(encoded.attention_mask)
+        types: list[int] = list(encoded.type_ids)
+        self.last_source_tokens = len(ids)
         if role == "PASSAGE":
             return cap_passage_tokens(ids, mask, types)
         return ids, mask, types, False

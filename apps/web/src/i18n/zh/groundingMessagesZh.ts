@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { groundingMessages } from "../groundingMessages";
 
-export const groundingZh: ZhOf<typeof groundingMessages> = {
+export const groundingZh: ColumnOf<typeof groundingMessages> = {
   "grounding.observation": "转述已记录的观察 · AI 建议",
   "grounding.inference": "由数据推断 · AI 建议",
   "grounding.hypothesis": "仅基于假设的预测 · AI 建议",

@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { advancedMessages } from "../advancedMessages";
 
-export const advancedZh: ZhOf<typeof advancedMessages> = {
+export const advancedZh: ColumnOf<typeof advancedMessages> = {
   "advanced.projectHint": "截止时间 · 策略绑定 · 生命周期",
   "advanced.task": "任务",
   "advanced.taskHint": "输入应用 · 研究进展 · 当前结果",

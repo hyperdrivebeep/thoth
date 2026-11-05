@@ -53,6 +53,18 @@ async function start(names: string[]) {
   await tick();
 }
 
+function browseText() { return container.querySelector(".bp6-file-upload-input")?.getAttribute("bp6-button-text"); }
+
+it("shows the file-picker button text in the screen language instead of Blueprint's English default", async () => {
+  expect(browseText()).toBe("Browse");
+  await act(async () => setLocale("ko"));
+  expect(browseText()).toBe("찾아보기");
+  await act(async () => setLocale("ja"));
+  expect(browseText()).toBe("参照");
+  await act(async () => setLocale("zh-Hans"));
+  expect(browseText()).toBe("浏览");
+});
+
 it("reads the project list again after sources are connected, because the project revision went up", async () => {
   const spy = vi.spyOn(client, "invalidateQueries");
   await start(["A.md"]);
@@ -158,5 +170,19 @@ it("shows the source connection panel and the upload progress in Simplified Chin
   expect(container.textContent).not.toMatch(/[가-힣]/);
   expect(button("取消上传")).toBeDefined();
   await act(async () => button("取消上传")!.click()); await tick();
+  expect(fixture.calls).toEqual(["stage:report.pdf"]);
+});
+
+it("shows the source connection panel and the upload progress in Japanese", async () => {
+  await act(async () => setLocale("ja"));
+  expect(container.textContent).toContain("資料ファイルを接続");
+  await start(["report.pdf"]);
+  await act(async () => fixture.jobs[0].options?.onProgress?.({ phase: "uploading", loaded: 50, total: 100 }));
+  expect(container.textContent).toContain("report.pdf を送信中（50%）");
+  await act(async () => fixture.jobs[0].options?.onProgress?.({ phase: "processing", loaded: 100, total: 100 }));
+  expect(container.textContent).toContain("report.pdf を送信し終えました。サーバーが処理しています…");
+  expect(container.textContent).not.toMatch(/[가-힣]/);
+  expect(button("アップロードをキャンセル")).toBeDefined();
+  await act(async () => button("アップロードをキャンセル")!.click()); await tick();
   expect(fixture.calls).toEqual(["stage:report.pdf"]);
 });

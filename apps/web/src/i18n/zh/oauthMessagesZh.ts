@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { oauthMessages } from "../oauthMessages";
 
-export const oauthZh: ZhOf<typeof oauthMessages> = {
+export const oauthZh: ColumnOf<typeof oauthMessages> = {
   "oauth.idle": "此次登录尝试已失效。请刷新账户状态。",
   "oauth.catalogLoading": "登录已确认。正在加载模型列表。",
   "oauth.browser": "请在浏览器中完成登录。完成情况会自动检查。",

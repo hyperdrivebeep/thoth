@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { judgmentMessages } from "../judgmentMessages";
 
-export const judgmentZh: ZhOf<typeof judgmentMessages> = {
+export const judgmentZh: ColumnOf<typeof judgmentMessages> = {
   "testOrder.note": "排序依据规则而非分数。能把可能原因缩小到最少的测试排在最前，其次是风险较低、成本较低、可逆的测试，最后按创建顺序。未知的预测在每种结果下都仍然可能。排序不使用合理性；证据单独显示在假设卡片上。测试结果出来后，排序可能随之变化。",
   "testOrder.excluded": "已排除在排序之外的行动（禁止的风险）",
   "testOrder.uncountable": "缺少其他假设的预测，因此只算作把候选原因减少了一个。",

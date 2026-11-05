@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { traceMessages } from "../traceMessages";
 
-export const traceZh: ZhOf<typeof traceMessages> = {
+export const traceZh: ColumnOf<typeof traceMessages> = {
   "trace.decider.test": "测试负责人",
   "trace.decider.validity": "指定核验人",
   "trace.decider.rule": "要求负责人",

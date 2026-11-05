@@ -77,8 +77,12 @@ def main() -> None:
                 )
             result = {"data": vector.data.hex(), "sha256": vector.sha256}
             if getattr(encoder, "last_truncated", False) is True:
-                # Only a cut passage carries the flag; other frames are unchanged.
+                # Only a cut passage carries the flag and its original size; other frames are
+                # unchanged.
                 result["truncated"] = True
+                tokens = getattr(encoder, "last_source_tokens", None)
+                if isinstance(tokens, int) and tokens >= 1:
+                    result["tokens"] = tokens
         except Exception as exc:
             code = str(exc)
             result = {"error": code if code in EMBEDDING_ERROR_CODES else "EMBEDDING_FAILED"}

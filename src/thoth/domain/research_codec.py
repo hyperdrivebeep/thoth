@@ -21,6 +21,7 @@ from thoth.domain.research_request import (
     CurrentResultManifestV21,
     ThreadRequestRevisionV21,
     ThreadRequestRevisionV22,
+    ThreadRequestRevisionV23,
 )
 from thoth.domain.research_stage import ResearchStageRecord
 from thoth.domain.trace_closure import TraceClosureRecord
@@ -61,6 +62,7 @@ VERSIONED_CODECS[("PostExecutionLearningResult", "2.1.0")] = PostExecutionLearni
 VERSIONED_CODECS[("CurrentResultManifest", "2.1.0")] = CurrentResultManifestV21
 VERSIONED_CODECS[("ThreadRequestRevision", "2.1.0")] = ThreadRequestRevisionV21
 VERSIONED_CODECS[("ThreadRequestRevision", "2.2.0")] = ThreadRequestRevisionV22
+VERSIONED_CODECS[("ThreadRequestRevision", "2.3.0")] = ThreadRequestRevisionV23
 
 
 def decode_current_result_manifest(

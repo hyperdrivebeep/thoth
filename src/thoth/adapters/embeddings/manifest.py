@@ -3,7 +3,7 @@
 from importlib.resources import files
 
 from thoth.domain.model_asset import ModelAssetManifest
-from thoth.domain.retrieval_embedding import DenseModelPin
+from thoth.domain.retrieval_embedding import GRANITE_ASSET_PREPROCESSING, DenseModelPin
 
 
 def granite_manifest() -> ModelAssetManifest:
@@ -14,7 +14,7 @@ def granite_manifest() -> ModelAssetManifest:
     if (value.model_id, value.revision, value.preprocessing) != (
         pin.model_id,
         pin.revision,
-        pin.preprocessing,
+        GRANITE_ASSET_PREPROCESSING,
     ) or model.sha256 != pin.onnx_sha256:
         raise ValueError("MODEL_MANIFEST_PIN_MISMATCH")
     return value

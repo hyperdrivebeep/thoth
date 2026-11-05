@@ -373,3 +373,10 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
   --bp-typography-family-default: "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Noto Sans SC", "Source Han Sans SC", sans-serif;
   font-family: var(--bp-typography-family-default);
 }
+
+/* Japanese screens: Japanese faces come first so that kanji take their Japanese shapes and not the Korean or Chinese ones.
+   Blueprint sets its own font-family on body, so body is named too. The other screens keep the fonts above. */
+:root:lang(ja), :root:lang(ja) body {
+  --bp-typography-family-default: "Segoe UI", "Yu Gothic UI", "Meiryo", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  font-family: var(--bp-typography-family-default);
+}

@@ -246,6 +246,28 @@ describe("hosted and default state", () => {
     expect(fixture.calls.map(call => call.method)).toEqual(["model/localAsset/read"]);
   });
 
+  it("tells the person to rebuild an index made under an earlier preprocessing version, in every language", async () => {
+    fixture.project = () => ({ ...projectEnabled(), outdated_index: true });
+    await render({ projectId: "p1" });
+    expect(body()).toContain(ko("localRetrieval.outdatedIndex"));
+    for (const locale of ["en", "zh-Hans", "ja"] as const) {
+      await act(async () => { setLocale(locale); await tick(); });
+      expect(body()).toContain(localRetrievalText("localRetrieval.outdatedIndex", locale));
+    }
+    expect(localRetrievalText("localRetrieval.outdatedIndex", "ja")).not.toBe(ko("localRetrieval.outdatedIndex"));
+  });
+
+  it("shows no rebuild line when the index is current or the server does not say", async () => {
+    fixture.project = projectEnabled;
+    await render({ projectId: "p1" });
+    expect(body()).not.toContain(ko("localRetrieval.outdatedIndex"));
+    await act(async () => { root.unmount(); await tick(); });
+    root = createRoot(container);
+    fixture.project = () => ({ ...projectEnabled(), outdated_index: false });
+    await render({ projectId: "p1" });
+    expect(body()).not.toContain(ko("localRetrieval.outdatedIndex"));
+  });
+
   it("switches wording between Korean and English without re-reading", async () => {
     await render({ projectId: "p1" });
     expect(body()).toContain(ko("localRetrieval.title"));

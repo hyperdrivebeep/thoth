@@ -146,7 +146,9 @@ def assemble_runtime_entry(
         local_retrieval = create_local_retrieval(
             registration.registry, stores, artifact_ledger, clock, ids, workspace, mode
         )
-        register_project_deletion(registration.registry, stores, clock, mode)
+        deletion = register_project_deletion(registration.registry, stores, clock, mode)
+        if owner is not None:
+            deletion.bind_dead_owner_sealer(owner.seal_project)
         return RuntimeWithLedger(
             bus=bus,
             ledger=ledger,

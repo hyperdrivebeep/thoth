@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { parserErrorMessages } from "../parserErrorMessages";
 
-export const parserErrorZh: ZhOf<typeof parserErrorMessages> = {
+export const parserErrorZh: ColumnOf<typeof parserErrorMessages> = {
   "parserError.AMBIGUOUS_PARSER_SELECTION": "THOTH 无法确定如何读取此文件。请检查文件类型和扩展名是否一致。",
   "parserError.PARSER_CAPABILITY_UNAVAILABLE": "读取此文件所需的读取器不可用。请查看安装指南中的可选组件。",
   "parserError.PARSER_DEADLINE": "读取文件的时间超过了允许的时长。请将其拆分为较小的文件后重新上传。",

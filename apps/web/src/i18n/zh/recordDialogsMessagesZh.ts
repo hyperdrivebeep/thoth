@@ -1,7 +1,7 @@
-import type { ZhOf } from "../withZh";
+import type { ColumnOf } from "../withColumns";
 import type { recordDialogsMessages } from "../recordDialogsMessages";
 
-export const recordDialogsZh: ZhOf<typeof recordDialogsMessages> = {
+export const recordDialogsZh: ColumnOf<typeof recordDialogsMessages> = {
   "traceImport.item": "项目",
   "traceImport.link": "链接",
   "traceImport.rule": "评估规则",
