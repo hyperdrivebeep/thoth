@@ -62,7 +62,7 @@
       "apps/web/src/components/ResearchComposer.tsx::ResearchComposer": 58,
       "apps/web/src/components/ResearchDetailPane.tsx::ResearchDetailPane": 29,
       "apps/web/src/components/ResearchFollowupSummary.tsx::ResearchFollowupSummary": 26,
-      "apps/web/src/components/ResearchResultCard.tsx::ResearchResultCard": 105,
+      "apps/web/src/components/ResearchResultCard.tsx::ResearchResultCard": 43,
       "apps/web/src/components/ResultEvidencePanel.tsx::ResultEvidencePanel": 26,
       "apps/web/src/components/XaiDeviceLogin.tsx::XaiDeviceLogin": 48,
       "apps/web/src/components/XaiDeviceLogin.tsx::startSession": 23,

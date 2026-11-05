@@ -56,7 +56,9 @@ it("shows numbered citations and bold text instead of internal ids and asterisks
   expect(text).not.toContain("span:");
   expect(text).not.toContain("**");
   expect(text).toContain("[1]");
-  expect(node.querySelector(".answer-text strong")?.textContent).toContain("1세부");
+  // the hold lead is its own bold line; the first bold run of the body text follows it
+  expect(node.querySelector(".answer-text .answer-lead strong")?.textContent).toBe("검증 보류 · 부분 초안:");
+  expect(node.querySelector(".answer-text p:not(.answer-lead) strong")?.textContent).toContain("1세부");
   const first = cites()[0];
   expect(first.textContent).toBe("[1]");
   await act(async () => first.click());

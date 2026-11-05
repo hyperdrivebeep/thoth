@@ -67,13 +67,20 @@ export function hypothesisRows(result: Record<string, unknown>): HypothesisRow[]
  * One first-screen line about the counter-evidence search. The count covers the counter sources of every hypothesis, searched or not;
  * "-" (not 0) only when no search was recorded and no counter source exists. The "N/M" part counts only the searched hypotheses.
  */
-export function counterSearchLine(result: Record<string, unknown>): string | null {
+export type CounterSearchSummary = { searched: number; total: number; counter: number };
+
+/** The counts behind the counter-evidence line; null when the result has no hypotheses to search against. */
+export function counterSearchSummary(result: Record<string, unknown>): CounterSearchSummary | null {
   const rows = hypothesisRows(result);
   if (!rows.length) return null;
-  const searched = rows.filter(row => row.counterTerminal);
-  const total = rows.reduce((sum, row) => sum + row.counter.length, 0);
-  if (!searched.length) return formatMessage("counterNotRun", total);
-  return formatMessage("counterCoverage", searched.length, rows.length, total);
+  return { searched: rows.filter(row => row.counterTerminal).length, total: rows.length, counter: rows.reduce((sum, row) => sum + row.counter.length, 0) };
+}
+
+export function counterSearchLine(result: Record<string, unknown>): string | null {
+  const summary = counterSearchSummary(result);
+  if (!summary) return null;
+  if (!summary.searched) return formatMessage("counterNotRun", summary.counter);
+  return formatMessage("counterCoverage", summary.searched, summary.total, summary.counter);
 }
 
 /** A source the review cited for this hypothesis and judged "not supporting" is shown as not applicable; a source never looked at stays unevaluated. */

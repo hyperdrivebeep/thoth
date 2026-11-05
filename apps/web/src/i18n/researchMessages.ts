@@ -207,6 +207,18 @@ export const researchMessages = {
     "ko": "다른 상세 보기",
     "en": "More details"
   },
+  "result.statusStripLabel": {
+    "ko": "결과 상태",
+    "en": "Result status"
+  },
+  "result.counterTagNotRun": {
+    "ko": "반대 근거 안 찾음",
+    "en": "Counterevidence not searched"
+  },
+  "result.holdDetailsPlain": {
+    "ko": "검토 근거 — 기준과 남은 확인 사항",
+    "en": "Review basis — criteria and open checks"
+  },
   "result.references": {
     "ko": "참고값·조건",
     "en": "Reference values and conditions"
