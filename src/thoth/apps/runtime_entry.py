@@ -38,7 +38,7 @@ from thoth.ports.store_bundle import StoreBundlePort
 from thoth.ports.task_profile import TaskProfileCatalogPort
 from thoth.protocol.bus import CommandBus
 from thoth.protocol.journal_completion import JournalCompletion
-from thoth.protocol.operation_owner import OperationOwner, sweep_dead_owners_at_start
+from thoth.protocol.operation_owner import OperationOwner
 
 
 def assemble_runtime_entry(
@@ -105,7 +105,6 @@ def assemble_runtime_entry(
                 clock=clock,
                 resource_access=artifact_ledger.scopes,
             )
-            sweep_dead_owners_at_start(owner, (item.project_id for item in stores.projects.list()))
             if isinstance(stores.events, JournalCompletionStorePort):
                 journal_completion = JournalCompletion(
                     workspace_key=workspace_owner_key(workspace),

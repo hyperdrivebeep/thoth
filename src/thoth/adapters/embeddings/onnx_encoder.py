@@ -165,8 +165,10 @@ class GraniteOnnxEncoder:
         self, text: str, role: Literal["QUERY", "PASSAGE"]
     ) -> tuple[list[int], list[int], list[int], bool]:
         encoded = self._tokenizer.encode(text, add_special_tokens=True)
-        ids, mask, types = list(encoded.ids), list(encoded.attention_mask), list(encoded.type_ids)
-        self.last_source_tokens = len(cast("list[int]", ids))
+        ids: list[int] = list(encoded.ids)
+        mask: list[int] = list(encoded.attention_mask)
+        types: list[int] = list(encoded.type_ids)
+        self.last_source_tokens = len(ids)
         if role == "PASSAGE":
             return cap_passage_tokens(ids, mask, types)
         return ids, mask, types, False

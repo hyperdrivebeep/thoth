@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-05T09:56:35.660785+00:00",
+  "created_at": "2026-11-05T13:52:54.784266+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -2473,8 +2473,8 @@
     },
     {
       "path": "docs/BETA.md",
-      "sha256": "1b57ebfc97b68c8dc6b67cf92a6a0507e922fabeb8ee098787e085923fce6e6c",
-      "bytes": 13139
+      "sha256": "a0b121e2bf0b54afa7d31ac09a0dc5eee17209fe3be5b41a3aa4c79e04d0125d",
+      "bytes": 13172
     },
     {
       "path": "docs/DEPENDENCY_LICENSES.json",
@@ -2528,8 +2528,8 @@
     },
     {
       "path": "docs/architecture/backend-runtime-boundaries.md",
-      "sha256": "0d34cfa71c62cd1edada66cc995d52709005da082b18f15554f23faf68240dff",
-      "bytes": 8114
+      "sha256": "67435177969f4b31ba7ebe66d03fc4050efe4c969feefd38036c98285d3401ff",
+      "bytes": 8187
     },
     {
       "path": "docs/architecture/canonical-owner-matrix.md",
@@ -3973,8 +3973,8 @@
     },
     {
       "path": "src/thoth/adapters/embeddings/onnx_encoder.py",
-      "sha256": "c304d70cadabbde3a02762564259e4ce14a4736818533039474efae475811b03",
-      "bytes": 8320
+      "sha256": "f4f3dcefc3e6292139e9bc5c0920a531d237434a137ddfd8840c1ca6b45a1b9f",
+      "bytes": 8350
     },
     {
       "path": "src/thoth/adapters/embeddings/process_worker.py",
@@ -7118,8 +7118,8 @@
     },
     {
       "path": "src/thoth/apps/runtime_entry.py",
-      "sha256": "8671b101b4483afca679f034d12f8a1bf39d1aa5da980a9c989e683c4fef4e98",
-      "bytes": 7444
+      "sha256": "03b7d76b6e82ebb208714145f3e8d498f9eb51e8c0ce66680fb9f59b5063604f",
+      "bytes": 7316
     },
     {
       "path": "src/thoth/apps/runtime_registration.py",
@@ -8403,8 +8403,8 @@
     },
     {
       "path": "src/thoth/protocol/operation_owner.py",
-      "sha256": "6dc1587e80425d3c06a59063b943946dec7b34bf5ce1e9e11a6877fbabeb2450",
-      "bytes": 13538
+      "sha256": "1460e2abf21fba192d0e3288a3d52533ede854d8070fad46c3013ffe7b6fef8b",
+      "bytes": 11308
     },
     {
       "path": "src/thoth/protocol/operation_scope.py",
@@ -9093,8 +9093,8 @@
     },
     {
       "path": "tests/fixtures/storage_migration_ddl.json",
-      "sha256": "16228d705f5a1580113073527dbf88d7bce2dc9489e28cdf9b984e6fcb79beb5",
-      "bytes": 112199
+      "sha256": "f7a5b202ee31293584215370b815266d0e84116ea3696eac833371d497c51b06",
+      "bytes": 112241
     },
     {
       "path": "tests/fixtures/storage_schema_contract.json",
@@ -9208,7 +9208,7 @@
     },
     {
       "path": "tests/integration/migration_head_helpers.py",
-      "sha256": "07ac6369a48464786aa56de3842086ca63a2b8e9fbf8e941e7ec132eb30c33f9",
+      "sha256": "46cf5429ba797f971614d8859add03495f898ede87ceb97a1dc46d5361c6e310",
       "bytes": 698
     },
     {
@@ -9723,8 +9723,8 @@
     },
     {
       "path": "tests/integration/test_dead_operation_sweep.py",
-      "sha256": "757f2a35f57c103b8384469479445469a23fd72543271a0ca7c565d2c647924b",
-      "bytes": 14616
+      "sha256": "534fe3cbfefeba3b696bdc19b5a6a3b142607ee4590c9746a97d383fff3f8a82",
+      "bytes": 10251
     },
     {
       "path": "tests/integration/test_decision_object_restore_fail_closed.py",
@@ -11063,8 +11063,8 @@
     },
     {
       "path": "tests/integration/test_stale_running_current_behavior.py",
-      "sha256": "ec00985fe8099d924baa58681941777c2cfd4577a1af0198023dda73a23d6f4b",
-      "bytes": 16143
+      "sha256": "dd6ab402e02900c2e42504d0bc20e28faa8e94b8bb4771cf2a5e3786ba24fa38",
+      "bytes": 15507
     },
     {
       "path": "tests/integration/test_state_transition_noop.py",

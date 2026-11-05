@@ -1,18 +1,13 @@
 """LOCAL recovery for measured commands whose original worker is confirmed gone."""
 
 import logging
-from collections.abc import Callable, Iterable
+from collections.abc import Callable
 from contextlib import AbstractContextManager
-from dataclasses import dataclass
 from typing import Literal
 
 from thoth.domain.deployment_mode import STALE_RUNNING_MESSAGE, STALE_RUNNING_REASON
 from thoth.domain.enums import OperationState
-from thoth.domain.operation import (
-    RESEARCH_OPERATION_METHODS,
-    OperationOwnerRecord,
-    OperationRecord,
-)
+from thoth.domain.operation import OperationOwnerRecord, OperationRecord
 from thoth.domain.resource_scope import current_resource_uses, resource_use_scope
 from thoth.ports.journal import JournalPort
 from thoth.ports.operation import OperationStorePort
@@ -22,7 +17,6 @@ from thoth.ports.worker_identity import WorkerIdentityPort
 from thoth.protocol.jsonrpc import JsonRpcError, JsonRpcRequest, RpcErrorCode
 
 _LOG = logging.getLogger("thoth.operation_owner")
-WORKSPACE_PROJECT = "system:workspace"
 OwnerVerdict = Literal["GONE", "ALIVE", "UNPROVEN", "NO_OWNER"]
 
 # V-S2 approved evidence is pinned by tests/fixtures/sealable_methods.json.
@@ -123,35 +117,6 @@ def stale_running_error() -> JsonRpcError:
         message=STALE_RUNNING_MESSAGE,
         data={"reason_code": STALE_RUNNING_REASON, "remote_observation": "UNKNOWN"},
     )
-
-
-@dataclass(frozen=True)
-class OwnerSweep:
-    """What one pass over RUNNING operations did; every count is a number of operations."""
-
-    sealed: int = 0
-    owner_alive: int = 0
-    owner_unproven: int = 0
-    no_owner_record: int = 0
-    research_left: int = 0
-    errors: int = 0
-
-    def total(self) -> int:
-        return (
-            self.sealed
-            + self.owner_alive
-            + self.owner_unproven
-            + self.no_owner_record
-            + self.research_left
-            + self.errors
-        )
-
-    def line(self) -> str:
-        return (
-            f"sealed {self.sealed}; owner alive {self.owner_alive}; owner not provable "
-            f"{self.owner_unproven}; no owner record {self.no_owner_record}; "
-            f"research left to its own recovery {self.research_left}; errors {self.errors}"
-        )
 
 
 class OperationOwner:
@@ -295,32 +260,14 @@ class OperationOwner:
             _LOG.warning("operation %s could not be checked", listed.operation_id, exc_info=True)
             return "ERROR"
 
-    def sweep_at_start(self, project_ids: Iterable[str]) -> OwnerSweep:
-        """Seal every non-research RUNNING operation whose owner is confirmed gone."""
-        counts = {"SEALED": 0, "ALIVE": 0, "UNPROVEN": 0, "NO_OWNER": 0, "GONE": 0, "ERROR": 0}
-        research_left = 0
-        for project_id in project_ids:
-            for listed in self._operations.list_by_project(project_id):
-                if listed.state is not OperationState.RUNNING:
-                    continue
-                if listed.method in RESEARCH_OPERATION_METHODS:
-                    research_left += 1
-                    continue
-                counts[self._seal_if_gone(listed, inside_request=False)] += 1
-        return OwnerSweep(
-            sealed=counts["SEALED"],
-            owner_alive=counts["ALIVE"],
-            owner_unproven=counts["UNPROVEN"] + counts["GONE"],
-            no_owner_record=counts["NO_OWNER"],
-            research_left=research_left,
-            errors=counts["ERROR"],
-        )
-
     def seal_project(self, project_id: str) -> int:
         """Seal this project's RUNNING operations of any kind whose owner is confirmed gone.
 
-        Used just before a permanent delete, which removes the project's records anyway; an
-        operation with a living or unprovable owner is left for the delete's own check.
+        Used only just before a permanent delete, which removes the project's records anyway.
+        Nothing seals at start: an operation whose outcome is unknown (a restore, a source
+        connection) stays RUNNING, and a measured command is sealed only when its own key is sent
+        again (see seal). An operation with a living or unprovable owner is left for the
+        delete's own check.
         """
         try:
             listing = self._operations.list_by_project(project_id)
@@ -332,14 +279,3 @@ class OperationOwner:
             if listed.state is OperationState.RUNNING:
                 sealed += self._seal_if_gone(listed, inside_request=True) == "SEALED"
         return sealed
-
-
-def sweep_dead_owners_at_start(owner: OperationOwner, project_ids: Iterable[str]) -> None:
-    """Run the start-up pass; it logs what it did and never stops the server from starting."""
-    try:
-        report = owner.sweep_at_start((*project_ids, WORKSPACE_PROJECT))
-    except Exception:
-        _LOG.warning("start-up check of leftover operations failed", exc_info=True)
-        return
-    if report.total():
-        _LOG.info("leftover operations at start: %s", report.line())
