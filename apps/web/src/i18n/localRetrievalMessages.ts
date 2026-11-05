@@ -104,6 +104,10 @@ export const localRetrievalMessages = {
     ko: "자료 색인이 준비돼도 기존 검색 방식은 그대로입니다. 실제 검색에 쓰는 기능은 아직 없습니다.",
     en: "Even when the source index is ready, the existing search method stays as it is. Nothing uses it in real searches yet.",
   },
+  "localRetrieval.outdatedIndex": {
+    ko: "검색 준비 방식이 바뀌어 색인을 다시 만들어야 합니다. '색인 준비'를 누르세요. 모델 파일은 다시 받지 않아도 됩니다.",
+    en: "The way passages are prepared for search changed, so the index must be rebuilt. Choose 'Prepare index'. The model files do not need to be downloaded again.",
+  },
   "localRetrieval.jobsTitle": { ko: "색인 작업", en: "Index jobs" },
   "localRetrieval.job.PENDING": { ko: "대기", en: "Pending" },
   "localRetrieval.job.RUNNING": { ko: "실행 중", en: "Running" },

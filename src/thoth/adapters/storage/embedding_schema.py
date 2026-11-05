@@ -35,4 +35,8 @@ embedding_vectors = Table(
     Column("content_key", String(64), primary_key=True),
     Column("vector_sha256", String(64), nullable=False),
     Column("data", LargeBinary, nullable=False),
+    # NULL: made before the passage cap was recorded (or by a worker that does not say).
+    # 1/0: the passage was / was not cut to the token cap; source_tokens is its size before a cut.
+    Column("truncated", Integer, nullable=True),
+    Column("source_tokens", Integer, nullable=True),
 )

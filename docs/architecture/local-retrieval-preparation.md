@@ -82,11 +82,20 @@ its source job with EMBEDDING_FAILED at the 512 MiB commit limit (worker peak co
 Measured in the real worker: a 512 token passage peaks at 406 MiB commit and a 1,024 token
 passage at 477 MiB, so 512 keeps a margin of about 100 MiB under the limit. A cut passage is
 embedded from its beginning only, so evidence far into a long span is not reflected in its
-vector. The worker counts cut passages in memory (truncated_passages); the index tables do
-not store a per-passage flag. Vectors created before the cap for passages longer than 512
-tokens that still fit the worker limit were computed from the whole passage. The pinned
-preprocessing version was not raised, so such old vectors, if any, are reused until the
-project is rebuilt.
+vector. The preprocessing version names the cap (`granite-cls-l2-batch1-question-only-cap512:1.1.0`;
+a test keeps the number equal to the cap), and the vector's content key includes it. The worker
+reports a cut passage and its original size, and the index stores them per vector in
+`embedding_vectors.truncated` / `source_tokens`: 1 and a size for a cut passage, 0 for one that
+fit, NULL where nothing was recorded (vectors made before the record existed, or by a worker that
+does not say). A vector that is already stored keeps its record. The worker also still counts cut
+passages in memory (truncated_passages). Raising the version to 1.1.0 did not touch the
+installed model files: the packaged manifest keeps its own identifier
+(`GRANITE_ASSET_PREPROCESSING`, still `…:1.0.0`), so the installed folder, named by the manifest
+digest, is found as before and nothing is downloaded again. Rows saved under 1.0.0 (settings,
+jobs, vectors) still load: a saved setting is read as the current version, so the old jobs stop
+matching, the ordinary reconcile marks them STALE, and an explicit "Prepare index" builds the
+sources again under 1.1.0. Old vectors stay in the table unused. Until then the project card says
+the index must be rebuilt (`outdated_index`).
 
 Interrupted operations are not automatically rerun. Files can be checked independently;
 explicit prepare recovers expired S2 leases and reconciles sources. An old operation receipt

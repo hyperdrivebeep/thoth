@@ -215,6 +215,10 @@ export function LocalRetrievalSettingsCard({ workspaceId, projectId, hosted = fa
 
 type Text = (key: LocalRetrievalMessageKey) => string;
 
+/** Shown only until the sources are indexed again under the current preprocessing version. */
+function OutdatedIndexNotice({ outdated, text }: { outdated: boolean | undefined; text: Text }) {
+  return outdated ? <Callout compact intent="warning">{text("localRetrieval.outdatedIndex")}</Callout> : null;
+}
 function AssetSection({ asset, text, running, sourcePath, onSourcePath, installConfirmed, onConfirmInstall, onImport, onInstall, reason, transfer, bytes }: {
   asset: LocalAssetRead; text: Text; running: boolean; sourcePath: string; onSourcePath: (value: string) => void;
   installConfirmed: boolean; onConfirmInstall: (checked: boolean) => void; onImport: () => void; onInstall: () => void;
@@ -279,6 +283,7 @@ function ProjectSection({ project, asset, text, running, configuring, configureN
     </p>
     {project.total_sources > 0 && <ProgressBar intent={project.state === "READY" ? "success" : "primary"} animate={indexActive} stripes={indexActive}
       value={Math.min(1, project.ready_sources / project.total_sources)} />}
+    <OutdatedIndexNotice outdated={project.outdated_index} text={text} />
     <p>
       <Button intent="primary" onClick={onPrepare} disabled={Boolean(blocked) || running || indexActive}>{text("localRetrieval.prepareButton")}</Button>
       {blocked && <small className="muted" role="status"> {text(blocked)}</small>}

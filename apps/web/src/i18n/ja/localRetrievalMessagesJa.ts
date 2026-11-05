@@ -48,6 +48,7 @@ export const localRetrievalJa: ColumnOf<typeof localRetrievalMessages> = {
   "localRetrieval.prepareBlockedOff": "先に、このプロジェクトでローカルのインデックス化をオンにしてください。",
   "localRetrieval.prepareBlockedAsset": "インデックスを準備するには、モデルのファイルが準備できている必要があります。",
   "localRetrieval.prepareBlockedDependency": "実行コンポーネントがないため、インデックスを準備できません。",
+"localRetrieval.outdatedIndex": "検索の前処理方法が変わったため、インデックスを作り直す必要があります。「インデックスを準備」を選んでください。モデルのファイルをもう一度ダウンロードする必要はありません。",
   "localRetrieval.readyNote": "資料のインデックスの準備ができても、既存の検索方法はそのままです。実際の検索では、まだ何もこれを使っていません。",
   "localRetrieval.jobsTitle": "インデックスのジョブ",
   "localRetrieval.job.PENDING": "待機中",

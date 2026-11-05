@@ -6,6 +6,8 @@ project and types its exact name. Archive stays the reversible step; nothing els
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from pydantic import Field, JsonValue
 
 from thoth.application.services.actor_authority import current_actor_for
@@ -65,6 +67,28 @@ class ProjectDeletionHandlers:
         self._governance = governance
         self._clock = clock
         self._mode = mode
+        self._seal_dead_operations: Callable[[str], int] | None = None
+
+    def bind_dead_owner_sealer(self, seal: Callable[[str], int]) -> None:
+        """Let the runtime seal this project's operations whose owner process is confirmed gone."""
+        self._seal_dead_operations = seal
+
+    def _seal_before_delete(self, request: ProjectPermanentDeleteInput) -> None:
+        """Make leftovers of a killed process stop counting as active work for this delete.
+
+        Only a project that this request is about to delete is touched, and only after the same
+        checks the delete itself makes first. The sealing is its own committed change: if the
+        delete is then refused, an operation whose owner is gone stays sealed.
+        """
+        if self._seal_dead_operations is None:
+            return
+        project = self._store.read(request.project_id)
+        if (
+            project is not None
+            and project.lifecycle == ProjectLifecycle.ARCHIVED_READ_ONLY
+            and request.confirm_name == project.name
+        ):
+            self._seal_dead_operations(request.project_id)
 
     def authorize_before_claim(self, method: str, value: dict[str, JsonValue]) -> None:
         """Runs before the operation is claimed, so a refusal leaves no record at all."""
@@ -87,6 +111,7 @@ class ProjectDeletionHandlers:
         request = ProjectPermanentDeleteInput.model_validate(value)
         digest = project_name_digest(request.confirm_name)
         deleted_rows = 0
+        self._seal_before_delete(request)
         with self._ledger.transaction():
             record = self._purge.read_record(request.project_id)
             already = record is not None

@@ -79,14 +79,21 @@ second question in the other language in the same conversation.
 - **Local retrieval parts are optional.** They need the extra install above and a model download
   of about 124 MB per workspace. Passages longer than 512 tokens are embedded from their first 512
   tokens only, so evidence deep inside a very long passage is not reflected in the index.
+  Which passages were cut is recorded per stored vector. If you used local indexing before this
+  release, the project card says the index must be rebuilt; choose 'Prepare index' again. The model
+  files are not downloaded again.
 - **Permanent deletion keeps shared files.** Identical files are stored once, so a file that another
   project also uses stays on disk. Files only this project used are removed. There is no tool yet to
   clean up files no project uses.
 - **Permanent deletion can be refused.** Only archived projects can be deleted. It is refused while
   work in the project is still running, and in the hosted review environment. If THOTH was closed
-  abnormally while a job was running, a leftover "running" record can block deletion until it is
-  cleaned up; there is no cleanup tool yet. Deletion cannot be undone and nothing is exported for you
-  first.
+  abnormally while a job was running, the next start marks that job's leftover "running" record as
+  failed, and a delete does the same for the project it is about to remove, so the record no longer
+  blocks deletion. A record whose owning process cannot be confirmed as gone (it has no owner
+  record, or was written on another computer or before a restart of the machine) is left as it is
+  and can still block deletion; the same goes for an interrupted research run, which keeps its own
+  resume path until you delete the project. Deletion cannot be undone and nothing is exported for
+  you first.
 - **Windows only, source checkout only.** There is no installer and no standalone package.
 - **The Chinese screen is machine-translated and has not been reviewed.** Simplified Chinese
   (中文(简体)) can be chosen as the display language in Settings. Its wording was produced by machine
@@ -153,7 +160,9 @@ repository and read the [security policy](../SECURITY.md).
   되돌릴 수 없습니다.
 - **알려진 한계**: 로컬 검색 준비는 기본 꺼짐이고 실험이며, 보류 평가에서 기준을 넘지 못했습니다.
   부품은 선택 설치(약 110MB + 모델 약 124MB)입니다. 영구 삭제해도 다른 프로젝트와 공유하는 파일은
-  남고, 작업이 실행 중이거나 비정상 종료로 남은 실행 기록이 있으면 삭제가 거절될 수 있습니다.
+  남고, 작업이 실행 중이면 삭제가 거절될 수 있습니다. 비정상 종료로 남은 실행 기록은 다음 시작 때
+  (연구 실행은 그 프로젝트를 삭제할 때) 실패로 정리되지만, 맡았던 프로세스가 사라졌는지 확인할 수
+  없는 기록(주인 기록이 없거나 다른 컴퓨터·재부팅 전에 남은 것)은 그대로 남아 삭제를 막을 수 있습니다.
   한국어 Windows에서 일부 코드 상자의 역슬래시가 ₩로 보일 수 있습니다.
   중국어(간체) 화면은 기계 번역이며 검수되지 않았습니다.
   일본어 화면도 기계 번역이며 검수되지 않았습니다.

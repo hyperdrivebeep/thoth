@@ -131,7 +131,10 @@ class LocalRetrievalService:
             if b.state == "ACTIVE" and b.artifact_id in allowed
         }
         jobs: list[dict[str, object]] = []
+        older_index = False
         for job in self.store.jobs(project):
+            if job.intent.artifact_id in active and job.intent.model != config.model:
+                older_index = True  # made under an earlier preprocessing version
             if (
                 job.intent.config_generation != config.generation
                 or job.intent.artifact_id not in active
@@ -182,6 +185,8 @@ class LocalRetrievalService:
                 total_sources=len(active),
                 failed_sources=failed,
                 pending_sources=max(0, len(active) - ready - failed) if config.enabled else 0,
+                # Shown only until the sources are indexed again under the current version.
+                outdated_index=config.enabled and older_index and ready < len(active),
                 jobs=jobs,
                 active_operation_id=self._index_operation if running else None,
             )

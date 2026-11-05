@@ -29,6 +29,8 @@ const projectReadSchema = z.object({
   jobs: z.array(z.object({ job_id: z.string(), generation: z.number().int(),
     state: z.enum(["PENDING", "RUNNING", "READY", "FAILED", "CANCELLED", "STALE"]), reason_code: z.string().nullable() })),
   active_operation_id: z.string().nullable(),
+  // True while sources are indexed only under an earlier preprocessing version.
+  outdated_index: z.boolean().optional(),
 });
 
 // Runtime validation owns the DTO contract; TypeScript follows the same schema.

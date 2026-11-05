@@ -1401,7 +1401,9 @@
             "project_id",
             "content_key",
             "vector_sha256",
-            "data"
+            "data",
+            "truncated",
+            "source_tokens"
           ],
           "constraint_names": [
             null
@@ -1410,7 +1412,7 @@
             "PrimaryKeyConstraint"
           ],
           "indexes": {},
-          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
+          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\ttruncated INTEGER, \n\tsource_tokens INTEGER, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
         },
         "entity_snapshots": {
           "columns": [
@@ -4732,7 +4734,9 @@
             "project_id",
             "content_key",
             "vector_sha256",
-            "data"
+            "data",
+            "truncated",
+            "source_tokens"
           ],
           "constraint_names": [
             null
@@ -4741,7 +4745,7 @@
             "PrimaryKeyConstraint"
           ],
           "indexes": {},
-          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
+          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\ttruncated INTEGER, \n\tsource_tokens INTEGER, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
         },
         "entity_snapshots": {
           "columns": [
@@ -8063,7 +8067,9 @@
             "project_id",
             "content_key",
             "vector_sha256",
-            "data"
+            "data",
+            "truncated",
+            "source_tokens"
           ],
           "constraint_names": [
             null
@@ -8072,7 +8078,7 @@
             "PrimaryKeyConstraint"
           ],
           "indexes": {},
-          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
+          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\ttruncated INTEGER, \n\tsource_tokens INTEGER, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
         },
         "entity_snapshots": {
           "columns": [
@@ -11394,7 +11400,9 @@
             "project_id",
             "content_key",
             "vector_sha256",
-            "data"
+            "data",
+            "truncated",
+            "source_tokens"
           ],
           "constraint_names": [
             null
@@ -11403,7 +11411,7 @@
             "PrimaryKeyConstraint"
           ],
           "indexes": {},
-          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
+          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\ttruncated INTEGER, \n\tsource_tokens INTEGER, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
         },
         "entity_snapshots": {
           "columns": [
@@ -14725,7 +14733,9 @@
             "project_id",
             "content_key",
             "vector_sha256",
-            "data"
+            "data",
+            "truncated",
+            "source_tokens"
           ],
           "constraint_names": [
             null
@@ -14734,7 +14744,7 @@
             "PrimaryKeyConstraint"
           ],
           "indexes": {},
-          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
+          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\ttruncated INTEGER, \n\tsource_tokens INTEGER, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
         },
         "entity_snapshots": {
           "columns": [
@@ -18056,7 +18066,9 @@
             "project_id",
             "content_key",
             "vector_sha256",
-            "data"
+            "data",
+            "truncated",
+            "source_tokens"
           ],
           "constraint_names": [
             null
@@ -18065,7 +18077,7 @@
             "PrimaryKeyConstraint"
           ],
           "indexes": {},
-          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
+          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\ttruncated INTEGER, \n\tsource_tokens INTEGER, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
         },
         "entity_snapshots": {
           "columns": [
@@ -21387,7 +21399,9 @@
             "project_id",
             "content_key",
             "vector_sha256",
-            "data"
+            "data",
+            "truncated",
+            "source_tokens"
           ],
           "constraint_names": [
             null
@@ -21396,7 +21410,7 @@
             "PrimaryKeyConstraint"
           ],
           "indexes": {},
-          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
+          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\ttruncated INTEGER, \n\tsource_tokens INTEGER, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
         },
         "entity_snapshots": {
           "columns": [
@@ -24718,7 +24732,9 @@
             "project_id",
             "content_key",
             "vector_sha256",
-            "data"
+            "data",
+            "truncated",
+            "source_tokens"
           ],
           "constraint_names": [
             null
@@ -24727,7 +24743,7 @@
             "PrimaryKeyConstraint"
           ],
           "indexes": {},
-          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
+          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\ttruncated INTEGER, \n\tsource_tokens INTEGER, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
         },
         "entity_snapshots": {
           "columns": [
@@ -28049,7 +28065,9 @@
             "project_id",
             "content_key",
             "vector_sha256",
-            "data"
+            "data",
+            "truncated",
+            "source_tokens"
           ],
           "constraint_names": [
             null
@@ -28058,7 +28076,7 @@
             "PrimaryKeyConstraint"
           ],
           "indexes": {},
-          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
+          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\ttruncated INTEGER, \n\tsource_tokens INTEGER, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
         },
         "entity_snapshots": {
           "columns": [
@@ -31380,7 +31398,9 @@
             "project_id",
             "content_key",
             "vector_sha256",
-            "data"
+            "data",
+            "truncated",
+            "source_tokens"
           ],
           "constraint_names": [
             null
@@ -31389,7 +31409,7 @@
             "PrimaryKeyConstraint"
           ],
           "indexes": {},
-          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
+          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\ttruncated INTEGER, \n\tsource_tokens INTEGER, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
         },
         "entity_snapshots": {
           "columns": [
@@ -34729,7 +34749,9 @@
             "project_id",
             "content_key",
             "vector_sha256",
-            "data"
+            "data",
+            "truncated",
+            "source_tokens"
           ],
           "constraint_names": [
             null
@@ -34738,7 +34760,7 @@
             "PrimaryKeyConstraint"
           ],
           "indexes": {},
-          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
+          "sql": "\nCREATE TABLE embedding_vectors (\n\tproject_id VARCHAR(160) NOT NULL, \n\tcontent_key VARCHAR(64) NOT NULL, \n\tvector_sha256 VARCHAR(64) NOT NULL, \n\tdata BLOB NOT NULL, \n\ttruncated INTEGER, \n\tsource_tokens INTEGER, \n\tPRIMARY KEY (project_id, content_key)\n)\n\n"
         },
         "entity_snapshots": {
           "columns": [

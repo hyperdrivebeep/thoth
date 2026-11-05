@@ -1,11 +1,18 @@
 """LOCAL recovery for measured commands whose original worker is confirmed gone."""
 
-from collections.abc import Callable
+import logging
+from collections.abc import Callable, Iterable
 from contextlib import AbstractContextManager
+from dataclasses import dataclass
+from typing import Literal
 
 from thoth.domain.deployment_mode import STALE_RUNNING_MESSAGE, STALE_RUNNING_REASON
 from thoth.domain.enums import OperationState
-from thoth.domain.operation import OperationOwnerRecord, OperationRecord
+from thoth.domain.operation import (
+    RESEARCH_OPERATION_METHODS,
+    OperationOwnerRecord,
+    OperationRecord,
+)
 from thoth.domain.resource_scope import current_resource_uses, resource_use_scope
 from thoth.ports.journal import JournalPort
 from thoth.ports.operation import OperationStorePort
@@ -13,6 +20,10 @@ from thoth.ports.resource_scope import ResourceAccessPort
 from thoth.ports.runtime import AtomicUnitOfWorkPort, ClockPort
 from thoth.ports.worker_identity import WorkerIdentityPort
 from thoth.protocol.jsonrpc import JsonRpcError, JsonRpcRequest, RpcErrorCode
+
+_LOG = logging.getLogger("thoth.operation_owner")
+WORKSPACE_PROJECT = "system:workspace"
+OwnerVerdict = Literal["GONE", "ALIVE", "UNPROVEN", "NO_OWNER"]
 
 # V-S2 approved evidence is pinned by tests/fixtures/sealable_methods.json.
 SEALABLE_METHODS: frozenset[str] = frozenset(
@@ -114,6 +125,35 @@ def stale_running_error() -> JsonRpcError:
     )
 
 
+@dataclass(frozen=True)
+class OwnerSweep:
+    """What one pass over RUNNING operations did; every count is a number of operations."""
+
+    sealed: int = 0
+    owner_alive: int = 0
+    owner_unproven: int = 0
+    no_owner_record: int = 0
+    research_left: int = 0
+    errors: int = 0
+
+    def total(self) -> int:
+        return (
+            self.sealed
+            + self.owner_alive
+            + self.owner_unproven
+            + self.no_owner_record
+            + self.research_left
+            + self.errors
+        )
+
+    def line(self) -> str:
+        return (
+            f"sealed {self.sealed}; owner alive {self.owner_alive}; owner not provable "
+            f"{self.owner_unproven}; no owner record {self.no_owner_record}; "
+            f"research left to its own recovery {self.research_left}; errors {self.errors}"
+        )
+
+
 class OperationOwner:
     """Injected LOCAL policy; OS identity/liveness is never read inside the UoW."""
 
@@ -153,22 +193,31 @@ class OperationOwner:
     def record(self) -> OperationOwnerRecord | None:
         return self._record
 
-    def gone(self, operation: OperationRecord, method: str) -> bool:
+    def verdict(self, operation: OperationRecord) -> OwnerVerdict:
+        """GONE only when the owner is confirmed not running; ALIVE when confirmed running."""
         owner = operation.owner
+        if operation.state is not OperationState.RUNNING:
+            return "UNPROVEN"
+        if owner is None:
+            return "NO_OWNER"
         if (
-            operation.state is not OperationState.RUNNING
-            or method != operation.method
-            or method not in SEALABLE_METHODS
-            or owner is None
-            or self._record is None
+            self._record is None
             or owner.host_token is None
             or owner.host_token != self._host_token
             or owner.process_marker == "UNKNOWN"
             or not self._holds_workspace()
         ):
-            return False
+            return "UNPROVEN"
+        alive = self._worker.is_alive(owner.process_id, owner.process_marker, owner.worker_id)
+        if alive is None:
+            return "UNPROVEN"
+        return "ALIVE" if alive else "GONE"
+
+    def gone(self, operation: OperationRecord, method: str) -> bool:
         return (
-            self._worker.is_alive(owner.process_id, owner.process_marker, owner.worker_id) is False
+            method == operation.method
+            and method in SEALABLE_METHODS
+            and self.verdict(operation) == "GONE"
         )
 
     def seal(
@@ -181,19 +230,33 @@ class OperationOwner:
             operation, request.method
         ):
             return None
+        found, sealed_now = self._fail_gone(operation, inside_request=False)
+        if sealed_now and found is not None:
+            measure(request, found.project_id, "FAILED")
+        return found
+
+    def _fail_gone(
+        self, operation: OperationRecord, *, inside_request: bool
+    ) -> tuple[OperationRecord | None, bool]:
+        """Fail one operation whose owner is gone; the bool says this call changed it.
+
+        Inside a request another project's scope is already open, so a nested scope for the
+        operation's own project would be refused; the request's scope is reused then.
+        """
         with self._pin_workspace() as held:
             if not held:
-                return None
-            with resource_use_scope(operation.project_id), self._uow.transaction():
+                return None, False
+            scope = resource_use_scope(None if inside_request else operation.project_id)
+            with scope, self._uow.transaction():
                 current = self._operations.read(operation.operation_id)
                 if current is None:
-                    return None
+                    return None, False
                 if self._resource_access is not None:
                     self._resource_access.require_operation(current)
                 if current.state is not OperationState.RUNNING:
-                    return current
+                    return current, False
                 if current.owner != operation.owner:
-                    return current
+                    return current, False
                 error = owner_gone_error()
                 payload = error.model_dump(mode="json")
                 if self._resource_access is not None:
@@ -206,12 +269,77 @@ class OperationOwner:
                     current.operation_id, payload, completed_at=self._clock.now()
                 )
                 if failed.state is not OperationState.FAILED or failed.error != payload:
-                    return failed
+                    return failed, False
                 self._journal.append(
                     project_id=failed.project_id,
                     operation_id=failed.operation_id,
                     event_type="operation.failed",
                     payload={"code": error.code, "message": error.message},
                 )
-        measure(request, failed.project_id, "FAILED")
-        return failed
+        return failed, True
+
+    def _seal_if_gone(
+        self, listed: OperationRecord, *, inside_request: bool
+    ) -> OwnerVerdict | Literal["SEALED", "ERROR"]:
+        """Read the row again (a listing carries no owner), then seal it only if confirmed gone."""
+        try:
+            operation = self._operations.read(listed.operation_id)
+            if operation is None or operation.state is not OperationState.RUNNING:
+                return "UNPROVEN"
+            verdict = self.verdict(operation)
+            if verdict != "GONE":
+                return verdict
+            _, changed = self._fail_gone(operation, inside_request=inside_request)
+            return "SEALED" if changed else "UNPROVEN"
+        except Exception:  # one unreadable or refused row must not stop the others
+            _LOG.warning("operation %s could not be checked", listed.operation_id, exc_info=True)
+            return "ERROR"
+
+    def sweep_at_start(self, project_ids: Iterable[str]) -> OwnerSweep:
+        """Seal every non-research RUNNING operation whose owner is confirmed gone."""
+        counts = {"SEALED": 0, "ALIVE": 0, "UNPROVEN": 0, "NO_OWNER": 0, "GONE": 0, "ERROR": 0}
+        research_left = 0
+        for project_id in project_ids:
+            for listed in self._operations.list_by_project(project_id):
+                if listed.state is not OperationState.RUNNING:
+                    continue
+                if listed.method in RESEARCH_OPERATION_METHODS:
+                    research_left += 1
+                    continue
+                counts[self._seal_if_gone(listed, inside_request=False)] += 1
+        return OwnerSweep(
+            sealed=counts["SEALED"],
+            owner_alive=counts["ALIVE"],
+            owner_unproven=counts["UNPROVEN"] + counts["GONE"],
+            no_owner_record=counts["NO_OWNER"],
+            research_left=research_left,
+            errors=counts["ERROR"],
+        )
+
+    def seal_project(self, project_id: str) -> int:
+        """Seal this project's RUNNING operations of any kind whose owner is confirmed gone.
+
+        Used just before a permanent delete, which removes the project's records anyway; an
+        operation with a living or unprovable owner is left for the delete's own check.
+        """
+        try:
+            listing = self._operations.list_by_project(project_id)
+        except Exception:  # the delete's own check still decides; this pass is only a help
+            _LOG.warning("operations of %s could not be listed", project_id, exc_info=True)
+            return 0
+        sealed = 0
+        for listed in listing:
+            if listed.state is OperationState.RUNNING:
+                sealed += self._seal_if_gone(listed, inside_request=True) == "SEALED"
+        return sealed
+
+
+def sweep_dead_owners_at_start(owner: OperationOwner, project_ids: Iterable[str]) -> None:
+    """Run the start-up pass; it logs what it did and never stops the server from starting."""
+    try:
+        report = owner.sweep_at_start((*project_ids, WORKSPACE_PROJECT))
+    except Exception:
+        _LOG.warning("start-up check of leftover operations failed", exc_info=True)
+        return
+    if report.total():
+        _LOG.info("leftover operations at start: %s", report.line())

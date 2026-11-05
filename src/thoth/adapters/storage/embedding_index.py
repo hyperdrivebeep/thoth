@@ -267,6 +267,8 @@ class SqliteEmbeddingIndex:
                     content_key=key,
                     vector_sha256=vector.sha256,
                     data=vector.data,
+                    truncated=None if vector.truncated is None else int(vector.truncated),
+                    source_tokens=vector.source_tokens,
                 )
                 .on_conflict_do_nothing(index_elements=["project_id", "content_key"])
             )
@@ -298,7 +300,11 @@ class SqliteEmbeddingIndex:
             )
             if row is None:
                 return None
-            vector = EmbeddingVector(bytes(row["data"]))
+            vector = EmbeddingVector(
+                bytes(row["data"]),
+                truncated=None if row["truncated"] is None else bool(row["truncated"]),
+                source_tokens=row["source_tokens"],
+            )
             if vector.sha256 != row["vector_sha256"]:
                 raise EmbeddingIndexError("EMBEDDING_CACHE_CORRUPT")
             return vector

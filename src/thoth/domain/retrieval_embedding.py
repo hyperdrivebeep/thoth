@@ -14,7 +14,15 @@ from thoth.domain.ids import Sha256
 GRANITE_MODEL = "ibm-granite/granite-embedding-97m-multilingual-r2"
 GRANITE_REVISION = "835ad14087e140460703cf0fae09f97d469d65c2"
 GRANITE_ONNX_SHA = "a6022dd8220ea6f6595562a1328ee216f4a94faa55362f2f4747c80f1e78772e"
-GRANITE_PREPROCESSING = "granite-cls-l2-batch1-question-only:1.0.0"
+# Identity of the installed file bundle (the packaged manifest). It names how the model files are
+# meant to be used and must not change with code-side preprocessing, or the installed folder
+# (named by the manifest digest) would no longer be found and the model would need a reinstall.
+GRANITE_ASSET_PREPROCESSING = "granite-cls-l2-batch1-question-only:1.0.0"
+# Identity of what this code does to a passage before the model sees it. The number after "cap" is
+# the passage token cap (onnx_encoder.PASSAGE_TOKEN_CAP; a test keeps them equal). Raise the
+# version whenever the preprocessing changes, so vectors made another way are never mixed in.
+GRANITE_PREPROCESSING_V1 = "granite-cls-l2-batch1-question-only:1.0.0"
+GRANITE_PREPROCESSING = "granite-cls-l2-batch1-question-only-cap512:1.1.0"
 
 
 class DenseModelPin(DomainModel):
@@ -23,7 +31,12 @@ class DenseModelPin(DomainModel):
     onnx_sha256: Literal["a6022dd8220ea6f6595562a1328ee216f4a94faa55362f2f4747c80f1e78772e"] = (
         GRANITE_ONNX_SHA
     )
-    preprocessing: Literal["granite-cls-l2-batch1-question-only:1.0.0"] = GRANITE_PREPROCESSING
+    # The earlier value stays readable so rows written before the cap still load; they are
+    # recognised as outdated by comparing with DenseModelPin(), never rewritten in place.
+    preprocessing: Literal[
+        "granite-cls-l2-batch1-question-only:1.0.0",
+        "granite-cls-l2-batch1-question-only-cap512:1.1.0",
+    ] = GRANITE_PREPROCESSING
 
 
 class DenseScore(DomainModel):

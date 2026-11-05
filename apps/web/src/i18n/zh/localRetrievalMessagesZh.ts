@@ -48,6 +48,7 @@ export const localRetrievalZh: ColumnOf<typeof localRetrievalMessages> = {
   "localRetrieval.prepareBlockedOff": "请先在此项目中开启本地索引。",
   "localRetrieval.prepareBlockedAsset": "必须先准备好模型文件，才能准备索引。",
   "localRetrieval.prepareBlockedDependency": "由于缺少运行时组件，无法准备索引。",
+"localRetrieval.outdatedIndex": "资料的检索预处理方式已更改，需要重建索引。请选择“准备索引”。无需重新下载模型文件。",
   "localRetrieval.readyNote": "即使资料索引已就绪，现有的检索方式也保持不变。目前实际检索中还没有任何地方使用它。",
   "localRetrieval.jobsTitle": "索引任务",
   "localRetrieval.job.PENDING": "待处理",

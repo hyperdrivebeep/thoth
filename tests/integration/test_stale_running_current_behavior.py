@@ -4,9 +4,15 @@ The change that follows (an owner record, then sealing a request whose owner is 
 must change exactly what is pinned here and nothing else. Children are real processes killed for
 real, with a synthetic home; no model, login or network is used.
 
+Start-up sweep (CARD-20261105-11): opening a LOCAL workspace now seals every non-research
+RUNNING operation whose recorded owner is confirmed gone, so the leftovers below are already
+FAILED (OPERATION_OWNER_GONE) when the runtime opens instead of staying RUNNING until a same-key
+replay. tests/integration/test_dead_operation_sweep.py covers the sweep itself.
+
 Updated D-B2 observations:
- - measured commands with a confirmed dead owner seal on same-key replay;
- - an unmeasured source connection stays RUNNING without automatic redispatch;
+ - measured commands with a confirmed dead owner are sealed when the workspace is opened and a
+   same-key replay returns that stored failure;
+ - an unmeasured source connection is sealed the same way, without automatic redispatch;
  - operations columns stay unchanged; process identity lives in operation_owners;
  - domain and normal terminal publication remain separate commits;
  - a new key after an applied change is still refused by its revision guard.
@@ -162,14 +168,16 @@ async def test_a_request_interrupted_after_its_change_was_committed_is_sealed(
     assert _interrupted_child(tmp_path, workspace, "after-domain-commit") == 37
     runtime = _open(workspace)
     try:
-        # The change was committed; the terminal result never was.
-        assert [row[1:] for row in _rows(runtime, "project/metadata/update")] == [("RUNNING", None)]
+        # The change was committed; the terminal result never was. Opening the workspace sealed
+        # the operation (it was RUNNING with no completion time before the start-up sweep).
+        sealed = _rows(runtime, "project/metadata/update")
+        assert [row[1] for row in sealed] == ["FAILED"] and sealed[0][2] is not None
         read = value(
             await runtime.bus.query(request("project/read", "after", {"project_id": PROJECT}))
         )
         assert read["name"] == "Renamed" and read["revision"] == 1
 
-        # Same-key replay seals the confirmed dead owner once; it never reruns the handler.
+        # Same-key replay returns the stored failure; it never reruns the handler.
         first = await runtime.bus.dispatch(_rename("rename", 0))
         again = await runtime.bus.dispatch(_rename("rename", 0))
         for replay in (first, again):
@@ -202,13 +210,14 @@ async def test_a_request_interrupted_inside_its_handler_is_sealed_with_nothing_c
     assert _interrupted_child(tmp_path, workspace, "inside-handler") is None
     runtime = _open(workspace)
     try:
-        assert [row[1:] for row in _rows(runtime, "project/metadata/update")] == [("RUNNING", None)]
+        sealed = _rows(runtime, "project/metadata/update")
+        assert [row[1] for row in sealed] == ["FAILED"] and sealed[0][2] is not None
         before = value(
             await runtime.bus.query(request("project/read", "before", {"project_id": PROJECT}))
         )
         assert before["name"] == "Original" and before["revision"] == 0
 
-        # Asking again seals the request without running the interrupted handler.
+        # Asking again returns the stored failure without running the interrupted handler.
         for _ in range(2):
             replay = await runtime.bus.dispatch(_rename("rename", 0))
             assert replay.error is not None and replay.result is None
@@ -255,7 +264,7 @@ async def test_process_owner_is_separate_from_unchanged_operation_columns(tmp_pa
         assert "owner" not in stored.model_dump(mode="json")
         assert not _OWNER_PROCESS_COLUMNS & columns
         assert not _OWNER_PROCESS_COLUMNS & set(OperationRecord.model_fields)
-        assert stuck["state"] == "RUNNING"
+        assert stuck["state"] == "FAILED"
         assert json.dumps(dict(stuck), default=str).count(str(workspace)) == 0
     finally:
         runtime.close()
@@ -358,7 +367,7 @@ async def test_an_interrupted_project_change_is_refused_when_asked_again_with_a_
         runtime.close()
 
 
-async def test_excluded_source_connection_stays_running_after_actual_child_kill(
+async def test_excluded_source_connection_is_sealed_at_start_after_actual_child_kill(
     tmp_path: Path,
 ) -> None:
     workspace = tmp_path / "workspace"
@@ -381,9 +390,9 @@ async def test_excluded_source_connection_stays_running_after_actual_child_kill(
         )
         for _ in range(2):
             response = await runtime.bus.dispatch(command)
-            assert response.error is None and response.result is not None
-            assert response.result["state"] == "RUNNING" and response.result["value"] is None
-        assert [r[1] for r in _rows(runtime, "project/source/connect")] == ["RUNNING"]
+            assert response.error is not None and response.result is None
+            assert response.error.data["reason_code"] == "OPERATION_OWNER_GONE"
+        assert [r[1] for r in _rows(runtime, "project/source/connect")] == ["FAILED"]
         assert domain_snapshot(runtime.ledger.engine) == before
     finally:
         runtime.close()
