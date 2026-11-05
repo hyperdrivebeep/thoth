@@ -158,7 +158,8 @@ jobs:
     needs: changes
     if: needs.changes.outputs.docs_only != 'true'
     runs-on: windows-latest
-    timeout-minutes: 60
+    # Observed 34 to 57 minutes depending on runner speed; 60 left almost no margin.
+    timeout-minutes: 90
     defaults:
       run:
         shell: pwsh

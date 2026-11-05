@@ -53,6 +53,18 @@ async function start(names: string[]) {
   await tick();
 }
 
+function browseText() { return container.querySelector(".bp6-file-upload-input")?.getAttribute("bp6-button-text"); }
+
+it("shows the file-picker button text in the screen language instead of Blueprint's English default", async () => {
+  expect(browseText()).toBe("Browse");
+  await act(async () => setLocale("ko"));
+  expect(browseText()).toBe("찾아보기");
+  await act(async () => setLocale("ja"));
+  expect(browseText()).toBe("参照");
+  await act(async () => setLocale("zh-Hans"));
+  expect(browseText()).toBe("浏览");
+});
+
 it("reads the project list again after sources are connected, because the project revision went up", async () => {
   const spy = vi.spyOn(client, "invalidateQueries");
   await start(["A.md"]);

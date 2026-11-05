@@ -11,6 +11,7 @@ export const sourceJa: ColumnOf<typeof sourceMessages> = {
   "sources.hostedUpload": " アップロードしたファイルは、このレビュー用プロジェクトで使われます。",
   "sources.localUpload": " ファイルはこのコンピューターの THOTH ワークスペースに一時的に置かれます。",
   "sources.chooseFiles": "ファイルを選択…",
+  "sources.browse": "参照",
   "sources.fileLabel": "接続する資料ファイル",
   "sources.authority": "資料の権威性",
   "sources.scope": "利用範囲",

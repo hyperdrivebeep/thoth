@@ -11,6 +11,7 @@ export const sourceZh: ColumnOf<typeof sourceMessages> = {
   "sources.hostedUpload": " 上传的文件用于此审查项目。",
   "sources.localUpload": " 文件暂存在这台电脑的 THOTH 工作区中。",
   "sources.chooseFiles": "选择文件…",
+  "sources.browse": "浏览",
   "sources.fileLabel": "要连接的资料文件",
   "sources.authority": "资料权威性",
   "sources.scope": "使用范围",
