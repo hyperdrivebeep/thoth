@@ -1,4 +1,4 @@
-import { getLocale } from "./locale";
+import { localeTag } from "./locale";
 import type { CompletedStage, ResearchStatus } from "../api/research";
 import { eulreul, eunneun, gwawa, iga } from "../api/koreanParticles";
 
@@ -50,7 +50,7 @@ export function formatBytes(bytes: number | null | undefined): string | null {
     return null;
   }
   if (bytes < 1024) {
-    return `맥락 ${bytes.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")}B`;
+    return `맥락 ${bytes.toLocaleString(localeTag())}B`;
   }
   const kb = bytes / 1024;
   if (kb < 1024) {
@@ -293,7 +293,7 @@ export function waitLine(status?: ResearchStatus): string | null {
     return `모델 응답 대기 · ${elapsed ?? "경과 미확인"} · 첫 글자 아직 없음`;
   }
   if (typeof received === "number") {
-    return `마지막 모델 응답 ${received.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")}B${elapsed ? ` · ${elapsed}` : ""}`;
+    return `마지막 모델 응답 ${received.toLocaleString(localeTag())}B${elapsed ? ` · ${elapsed}` : ""}`;
   }
   return elapsed ? `마지막 모델 호출 · ${elapsed}` : null;
 }
@@ -304,10 +304,10 @@ export function usageLine(status?: ResearchStatus): string | null {
     return null;
   }
   const total = usage.total_tokens;
-  const tokens = total == null ? "미확인" : total.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR");
+  const tokens = total == null ? "미확인" : total.toLocaleString(localeTag());
   const partial = usage.state === "PARTIAL" ? " (부분 관측)" : "";
   const cached =
-    usage.cached_input_tokens != null ? ` · 캐시 입력 ${usage.cached_input_tokens.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")}` : "";
+    usage.cached_input_tokens != null ? ` · 캐시 입력 ${usage.cached_input_tokens.toLocaleString(localeTag())}` : "";
   return `사용 토큰 ${tokens}${partial}${cached}`;
 }
 
@@ -422,7 +422,7 @@ export function modelActionPayload(status?: ResearchStatus): { payload: string |
   return {
     live: false,
     payload: compactPayload([
-      typeof received === "number" ? `${received.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")}B` : null,
+      typeof received === "number" ? `${received.toLocaleString(localeTag())}B` : null,
       elapsed,
     ]),
   };

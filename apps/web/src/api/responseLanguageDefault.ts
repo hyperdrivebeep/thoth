@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
-import type { BrowserScope, ResponseLanguage } from "./localWorkspacePersistence";
+import type { BrowserScope } from "./localWorkspacePersistence";
+import { isResponseLanguage, type ResponseLanguage } from "./responseLanguages";
 
 /**
  * The default response language of one browser scope (a local workspace, or a hosted browser
@@ -33,7 +34,7 @@ export function readResponseLanguageDefault(scope: BrowserScope): ResponseLangua
   if (!name) return null;
   try {
     const value = store(scope)?.getItem(name);
-    return value === "ko" || value === "en" ? value : null;
+    return isResponseLanguage(value) ? value : null;
   } catch { return null; }
 }
 

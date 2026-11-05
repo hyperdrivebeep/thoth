@@ -7,6 +7,7 @@ from pydantic import JsonValue
 from thoth.application.services.browser_submission_scope import browser_submission_scope
 from thoth.domain.base import DomainModel
 from thoth.domain.deployment_mode import DeploymentMode, parse_deployment_mode
+from thoth.domain.response_language import SUPPORTED_RESPONSE_LANGUAGES
 from thoth.domain.workspace_setup import LocalWorkspaceReady, WorkspaceSetupState
 from thoth.ports.workspace_setup import WorkspaceSetupPort, WorkspaceSetupUnavailable
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
@@ -144,7 +145,7 @@ class WorkspaceSetupHandlers:
             payload["browser_scope_id"] = browser_submission_scope(self._workspace_id)
         return {
             **payload,
-            "response_languages": ["ko", "en"],
+            "response_languages": list(SUPPORTED_RESPONSE_LANGUAGES),
             "response_language_scope": "REQUEST",
             "expected_result_contracts": ["v4", "v5"],
         }

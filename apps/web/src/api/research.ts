@@ -1,4 +1,5 @@
 import type { PackRunResult, WorkThread } from "../types";
+import type { ResponseLanguage } from "./responseLanguages";
 import { z } from "zod";
 import type { Currentness } from "./historyModels";
 import type { CoverageMatrix, NextUserAction, UserProgressSummary } from "./researchFollowup";
@@ -143,7 +144,7 @@ export type ResearchStatus = WorkThread & {
   user_progress_summary?: UserProgressSummary | null;
   coverage_matrix?: CoverageMatrix | null;
   next_user_action?: NextUserAction | null;
-  request?: { response_language?: "ko" | "en"; operation_id: string; authored_text?: string; effective_question?: string; model_settings?: unknown; policy_digest?: string; cutoff_at?: string };
+  request?: { response_language?: ResponseLanguage; operation_id: string; authored_text?: string; effective_question?: string; model_settings?: unknown; policy_digest?: string; cutoff_at?: string };
   completed_stages?: CompletedStage[];
   stage_reuse?: { reused: number; new: number };
   activity_events?: ActivityEvent[];
@@ -168,7 +169,7 @@ export type WorkspaceLocationInfo = {
 export type WorkspaceReady = {
   workspace_location?: WorkspaceLocationInfo;
   browser_scope_id?: string;
-  response_languages?: ("ko" | "en")[];
+  response_languages?: string[];
   response_language_scope?: "REQUEST";
   expected_result_contracts?: string[];
   ready: boolean;

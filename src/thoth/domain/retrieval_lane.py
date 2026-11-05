@@ -40,6 +40,7 @@ from thoth.domain.query_identifiers import (
     occurs,
     scan_query,
 )
+from thoth.domain.retrieval_cjk_policy import CJK_LANE_IDS, RetrievalCjkPolicy
 from thoth.domain.retrieval_embedding import DenseMaterial, RoutingObservation, dense_rank
 from thoth.domain.retrieval_fused_selection import select_fused as _select_fused
 from thoth.domain.retrieval_fusion import (
@@ -153,9 +154,9 @@ def block_key(span: EvidenceSpan) -> str | None:
     return pointer_block_key(span.locator.json_pointer)
 
 
-def _is_chrome(span: EvidenceSpan) -> bool:
+def _is_chrome(span: EvidenceSpan, size: Callable[[str], int] = len) -> bool:
     text = span.exact_text.strip()
-    if len(text) < MIN_SPAN_CHARS and not block_key(span):
+    if size(text) < MIN_SPAN_CHARS and not block_key(span):
         return True
     lowered = text.casefold()
     if lowered in {"---", "article"}:
@@ -218,12 +219,23 @@ def lexical_substring_v1(
     request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
 ) -> tuple[EvidenceSpan, ...]:
     """Candidates ranked by substring term coverage, as the research path has always done."""
-    terms = search_terms(" ".join((request.question, *request.queries)))
+    return lexical_ranked(
+        request, eligible, search_terms(" ".join((request.question, *request.queries)))
+    )
+
+
+def lexical_ranked(
+    request: RetrievalRequest,
+    eligible: tuple[EvidenceSpan, ...],
+    terms: set[str],
+    size: Callable[[str], int] = len,
+) -> tuple[EvidenceSpan, ...]:
+    """The substring ranking for the given terms; `size` measures a text for the short-line rule."""
     protected: frozenset[str] = (
         frozenset() if request.catalog is None else request.catalog.protected_refs
     )
     pool = (
-        tuple(span for span in eligible if not _is_chrome(span) or span.span_id in protected)
+        tuple(span for span in eligible if not _is_chrome(span, size) or span.span_id in protected)
         or eligible
     )
     exact = {
@@ -348,10 +360,16 @@ def _flat(chunks: tuple[Chunk, ...]) -> tuple[EvidenceSpan, ...]:
     return tuple(span for chunk in chunks for span in chunk)
 
 
-def _grouped_chunks(
-    request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...], terms: list[str]
+def grouped_chunks(
+    request: RetrievalRequest,
+    eligible: tuple[EvidenceSpan, ...],
+    terms: list[str],
+    terms_of: Callable[[str], tuple[str, ...]] = identifier_terms,
 ) -> tuple[Chunk, ...]:
-    """Structure groups ranked by BM25 over their title and body for the given query terms."""
+    """Structure groups ranked by BM25 over their title and body for the given query terms.
+
+    `terms_of` cuts the text of a group into the terms it is scored on; the query terms must come
+    from the same function."""
     by_id = {s.span_id: s for s in eligible}
     groups = () if request.catalog is None else request.catalog.groups
     units: list[tuple[tuple[EvidenceSpan, ...], tuple[EvidenceSpan, ...]]] = []
@@ -368,7 +386,7 @@ def _grouped_chunks(
         [
             term
             for span in {s.span_id: s for s in (*title, *body)}.values()
-            for term in identifier_terms(span.exact_text)
+            for term in terms_of(span.exact_text)
         ]
         for title, body in units
     ]
@@ -385,7 +403,7 @@ def grouped_bm25_chunks_v1(
     table head or heading. Spans come back in the order title first, then body in document order.
     """
     terms = [t for text in (request.question, *request.queries) for t in identifier_terms(text)]
-    return _grouped_chunks(request, eligible, terms)
+    return grouped_chunks(request, eligible, terms)
 
 
 def glossary_texts(request: RetrievalRequest) -> tuple[str, ...]:
@@ -404,7 +422,7 @@ def glossary_bm25_chunks_v1(
     terms = expansion_terms(
         glossary_texts(request), request.glossary, request.glossary_min_confidence
     )
-    return _grouped_chunks(request, eligible, terms) if terms else ()
+    return grouped_chunks(request, eligible, terms) if terms else ()
 
 
 def glossary_bm25_v1(
@@ -424,9 +442,17 @@ def char_bigram_v1(
     request: RetrievalRequest, eligible: tuple[EvidenceSpan, ...]
 ) -> tuple[EvidenceSpan, ...]:
     """Single spans ranked by BM25 over Hangul syllable bigrams and symbol-preserving words."""
+    return bigram_ranked(request, eligible, bigram_terms)
+
+
+def bigram_ranked(
+    request: RetrievalRequest,
+    eligible: tuple[EvidenceSpan, ...],
+    terms_of: Callable[[str], tuple[str, ...]],
+) -> tuple[EvidenceSpan, ...]:
     units = [((), (s,)) for s in eligible]
-    docs = [list(bigram_terms(s.exact_text)) for s in eligible]
-    terms = [t for text in (request.question, *request.queries) for t in bigram_terms(text)]
+    docs = [list(terms_of(s.exact_text)) for s in eligible]
+    terms = [t for text in (request.question, *request.queries) for t in terms_of(text)]
     return _flat(_ranked_chunks(units, docs, terms, set(request.pinned_refs)))
 
 
@@ -506,16 +532,37 @@ def select_retrieval_context(
         if lane_id is not None:
             raise ValueError("RETRIEVAL_LANE_ID_NOT_ALLOWED_FOR_FUSION")
         return _select_fused(request, policy)
+    if isinstance(policy, RetrievalCjkPolicy):
+        if lane_id is not None:
+            raise ValueError("RETRIEVAL_LANE_ID_NOT_ALLOWED_FOR_CJK")
+        from thoth.domain.retrieval_cjk_lanes import select_cjk
+
+        return select_cjk(request, policy)
     if lane_id is None:
         lane_id = (
             policy.lanes[0].lane_id
             if isinstance(policy, RetrievalLanePolicy)
             else LEXICAL_SUBSTRING_V1
         )
+    if lane_id in CJK_LANE_IDS:
+        raise ValueError("RETRIEVAL_LANE_CJK_NEEDS_CJK_POLICY")
+    return select_with_lane(request, policy, lane_id)
+
+
+def select_with_lane(
+    request: RetrievalRequest, policy: RetrievalPolicy, lane_id: str
+) -> LaneSelection:
+    """The frame around one named lane: admission, pins, budgets and provenance."""
     lane = LANES.get(lane_id)
     if lane is None:
         raise ValueError("RETRIEVAL_LANE_UNKNOWN")
-    named = policy.lanes[0] if isinstance(policy, RetrievalLanePolicy) else None
+    named = (
+        policy.lanes[0]
+        if isinstance(policy, RetrievalLanePolicy)
+        else policy
+        if isinstance(policy, RetrievalCjkPolicy)
+        else None
+    )
     if (
         named is not None
         and named.lane_id == lane_id

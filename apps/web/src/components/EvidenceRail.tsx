@@ -1,6 +1,5 @@
 import { message as formatMessage } from "../i18n/formatMessages";
-import { t } from "../i18n/locale";
-import { getLocale } from "../i18n/locale";
+import { t, localeTag } from "../i18n/locale";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Callout, HTMLSelect, InputGroup } from "@blueprintjs/core";
 
@@ -64,7 +63,7 @@ export function EvidenceRail({
         <div>
           <p className="eyebrow">{eyebrowLabel("EVIDENCE")}</p>
           <h2>{loading ? t("evidenceRail.loading") : error ? t("evidenceRail.failed") : heading ?? formatMessage("activeEvidence", evidence.length)}</h2>
-          {totalCount > evidence.length && <span>{formatMessage("evidenceTotal", totalCount.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR"))}</span>}
+          {totalCount > evidence.length && <span>{formatMessage("evidenceTotal", totalCount.toLocaleString(localeTag()))}</span>}
         </div>
       </div>
       {evidence.length > 0 && (

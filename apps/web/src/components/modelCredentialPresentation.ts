@@ -1,5 +1,6 @@
 import { message as formatMessage } from "../i18n/formatMessages";
-import { t, getLocale } from "../i18n/locale";
+import { t } from "../i18n/locale";
+import { pickLocale } from "../i18n/pickLocale";
 export type CredentialRegisterResult = {
   started?: boolean;
   provider?: string;
@@ -134,9 +135,22 @@ const guidanceKo: Record<string, string> = {
   "Finish the THOTH Codex sign-in, then check connection status": "THOTH 전용 Codex 로그인을 마친 뒤 연결 상태를 확인하세요.",
   "Check the isolated Codex connection and model catalog": "THOTH 전용 Codex의 연결과 모델 목록을 확인하세요.",
 };
+const guidanceZh: Record<string, string> = {
+  "Use the saved THOTH workspace API key": "使用已保存的 THOTH 工作区 API 密钥。",
+  "Install the pinned Codex standalone package in the THOTH tools prefix": "请在 THOTH 工具文件夹中安装指定版本的 Codex。",
+  "Connect the THOTH-only Codex profile": "请登录 THOTH 专用的 Codex 配置文件。",
+  "Check the isolated Codex model catalog": "请检查 THOTH 专用 Codex 的模型列表。",
+  "The Codex route is eligible; live execution has not been verified": "Codex 途径可以尝试使用，但实际执行尚未得到验证。",
+  "Install the official Claude Code executable, then sign in from THOTH": "请先安装官方的 Claude Code，再从 THOTH 登录。",
+  "Sign in with the official Claude Code executable in the THOTH profile": "请用 THOTH 专用配置文件中的官方 Claude Code 登录。",
+  "Use a THOTH workspace API key for this provider": "此服务提供商请使用 THOTH 工作区 API 密钥连接。",
+  "Use the THOTH workspace xAI device login; remote execution is unverified": "请使用 THOTH 工作区的 xAI 设备码登录。远程执行尚未得到验证。",
+  "Finish the THOTH Codex sign-in, then check connection status": "请先完成 THOTH 专用的 Codex 登录，再检查连接状态。",
+  "Check the isolated Codex connection and model catalog": "请检查 THOTH 专用 Codex 的连接和模型列表。",
+};
 export function guidanceText(value: string | null | undefined): string | null {
   if (!value) return null;
-  if (guidanceKo[value]) return getLocale() === "en" ? value : guidanceKo[value];
+  if (guidanceKo[value]) return pickLocale({ ko: guidanceKo[value], en: value, "zh-Hans": guidanceZh[value] });
   // A terminal command stays literal; only the sentence around it is Korean.
   const command = /^Run (.+) in the server terminal$/.exec(value);
   if (command) return t("labels.command") + command[1];

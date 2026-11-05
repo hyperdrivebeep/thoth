@@ -1,4 +1,5 @@
 import { message as formatMessage } from "../i18n/formatMessages";
+import type { ResponseLanguage } from "../api/responseLanguages";
 import type { MessageKey } from "../i18n/messages";
 import { t, useTranslation } from "../i18n/locale";
 import { Button, Callout, Tag } from "@blueprintjs/core";
@@ -77,7 +78,7 @@ function groupSummary(rows: CriterionRow[]) {
 
 /** `onInvestigate` is given by the workspace that can open a conversation; `focusRow` marks the row a result came from. */
 export function TracePage({ projectId, onInvestigate, focusRow = null, responseLanguage }: {
-  responseLanguage?: "ko" | "en" | null; projectId: string; onInvestigate?: (item: RowInvestigation) => void; focusRow?: { kind: string; id: string } | null;
+  responseLanguage?: ResponseLanguage | null; projectId: string; onInvestigate?: (item: RowInvestigation) => void; focusRow?: { kind: string; id: string } | null;
 }) {
   useTranslation();
   const client = useQueryClient();

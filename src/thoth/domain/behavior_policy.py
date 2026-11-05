@@ -17,6 +17,7 @@ from thoth.domain.enums import AuthorityState, CutoffState
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
 from thoth.domain.glossary import GlossaryConfidence, GlossaryEntry, entry_matches_its_id
 from thoth.domain.ids import Sha256
+from thoth.domain.retrieval_cjk_policy import RetrievalCjkPolicy as RetrievalCjkPolicy
 from thoth.domain.retrieval_embedding import DenseMaterial
 from thoth.domain.retrieval_routing_policy import FusionMethodSpec as FusionMethodSpec
 from thoth.domain.retrieval_routing_policy import RetrievalRoutingPolicy as RetrievalRoutingPolicy
@@ -142,7 +143,11 @@ class WorkflowBehaviorPolicy(DomainModel):
 
 
 RetrievalPolicy = (
-    RetrievalBehaviorPolicy | RetrievalLanePolicy | RetrievalFusionPolicy | RetrievalRoutingPolicy
+    RetrievalBehaviorPolicy
+    | RetrievalLanePolicy
+    | RetrievalFusionPolicy
+    | RetrievalRoutingPolicy
+    | RetrievalCjkPolicy
 )
 
 
@@ -153,7 +158,8 @@ def is_retrieval_policy(value: object) -> TypeGuard[RetrievalPolicy]:
         RetrievalBehaviorPolicy
         | RetrievalLanePolicy
         | RetrievalFusionPolicy
-        | RetrievalRoutingPolicy,
+        | RetrievalRoutingPolicy
+        | RetrievalCjkPolicy,
     )
 
 
@@ -173,6 +179,7 @@ BehaviorPolicy = Annotated[
     | Annotated[RetrievalLanePolicy, Tag("RETRIEVAL_POLICY:3.0.0")]
     | Annotated[RetrievalFusionPolicy, Tag("RETRIEVAL_POLICY:4.0.0")]
     | Annotated[RetrievalRoutingPolicy, Tag("RETRIEVAL_POLICY:5.0.0")]
+    | Annotated[RetrievalCjkPolicy, Tag("RETRIEVAL_POLICY:6.0.0")]
     | Annotated[WorkflowBehaviorPolicy, Tag("WORKFLOW_DEFINITION:2.0.0")],
     Discriminator(_policy_tag),
 ]

@@ -1,5 +1,7 @@
 import type { MessageKey } from "../i18n/messages";
-import { t, getLocale } from "../i18n/locale";
+import { t } from "../i18n/locale";
+import type { LanguageCode } from "../i18n/languageChoices";
+import { pickLocale } from "../i18n/pickLocale";
 import { connectionReason } from "../i18n/connectionReasons";
 import { RpcError, RpcTransportError } from "../api/rpcClient";
 import { credentialLocallyConfigured, type CredentialAccount } from "./modelCredentialPresentation";
@@ -69,14 +71,35 @@ export function needsModelRefresh(account: CredentialAccount | undefined): boole
   return state === "CATALOG_UNAVAILABLE" || account.available_model_providers?.length === 0;
 }
 
+type ConnectedRoute = "BOTH" | "LOGIN" | "KEY";
+const connectedSummaries: Record<LanguageCode, Record<ConnectedRoute, string>> = {
+  ko: {
+    BOTH: "계정 로그인과 API 키로 연결됐습니다. 첫 연구에서 실제 응답을 확인합니다.",
+    LOGIN: "계정 로그인으로 연결됐습니다. 첫 연구에서 실제 응답을 확인합니다.",
+    KEY: "API 키로 연결됐습니다. 첫 연구에서 실제 응답을 확인합니다.",
+  },
+  en: {
+    BOTH: "Connected via account login and API key. Actual responses will be verified on the first research run.",
+    LOGIN: "Connected via account login. Actual responses will be verified on the first research run.",
+    KEY: "Connected via API key. Actual responses will be verified on the first research run.",
+  },
+  "zh-Hans": {
+    BOTH: "已通过账户登录和 API 密钥连接。首次研究运行时会验证实际响应。",
+    LOGIN: "已通过账户登录连接。首次研究运行时会验证实际响应。",
+    KEY: "已通过 API 密钥连接。首次研究运行时会验证实际响应。",
+  },
+};
+function connectedSummary(account: CredentialAccount): string {
+  return pickLocale(connectedSummaries)[account.oauth && account.has_key ? "BOTH" : account.oauth ? "LOGIN" : "KEY"];
+}
+
 /** One status per provider card; technical states stay in the details section. */
 export function providerStatus(provider: string, account: CredentialAccount | undefined, loading: boolean): ProviderStatus {
   const base = t(intro[provider] ?? "connection.intro.key");
   if (loading && !account) return { tone: "pending", label: t("connection.checking"), summary: base };
   if (!account) return { tone: "action", label: t("connection.disconnected"), summary: base };
   if (credentialLocallyConfigured(account)) {
-    const how = account.oauth && account.has_key ? "계정 로그인과 API 키로" : account.oauth ? "계정 로그인으로" : "API 키로";
-    return { tone: "ready", label: t("connection.connected"), summary: getLocale() === "en" ? `Connected via ${account.oauth && account.has_key ? "account login and API key" : account.oauth ? "account login" : "API key"}. Actual responses will be verified on the first research run.` : how + " 연결됐습니다. 첫 연구에서 실제 응답을 확인합니다." };
+    return { tone: "ready", label: t("connection.connected"), summary: connectedSummary(account) };
   }
   const state = account.connection_state ?? "";
   if (isCodexToolReason(state) || isClaudeToolReason(state)) return { tone: "blocked", label: t("connection.toolNeeded"), summary: reasonText(state)! };

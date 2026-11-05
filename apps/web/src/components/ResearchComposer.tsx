@@ -1,7 +1,7 @@
 import { Button, Callout, TextArea } from "@blueprintjs/core";
 import { useTranslation, t } from "../i18n/locale";
 import { message } from "../i18n/formatMessages";
-import { languageLabel } from "../i18n/languageChoices";
+import { isResponseLanguage, responseLanguageLabel } from "../api/responseLanguages";
 import { ModelSettings } from "./ModelSettings";
 import { ResearchProgress, UsageSummary } from "./ResearchProgress";
 import { useCitationGate } from "./SourceCitationGate";
@@ -50,9 +50,9 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
         placeholder={threadId?t("composer.followupPlaceholder"):t("composer.startPlaceholder")}/>
       {session.responseLanguage && !session.languageSupported && <small className="language-help">{t("language.unsupported")}</small>}
       <div className="composer-tools"><Button minimal icon="paperclip" aria-label={t("composer.attach")} title={t("composer.attach")} disabled={readSuspended} onClick={onAttach}>{t("composer.attachShort")}</Button>
-      {session.responseLanguage && <span className="language-fixed" title={t("language.fixed")}>{message("replyFixed", languageLabel(session.responseLanguage))}
+      {session.responseLanguage && <span className="language-fixed" title={t("language.fixed")}>{message("replyFixed", responseLanguageLabel(session.responseLanguage))}
         {onOpenSettings && <> · <Button small minimal className="language-fixed-link" onClick={()=>onOpenSettings()}>{t("language.changeInSettings")}</Button></>}</span>}
-      {acceptedRequest && acceptedLanguage !== session.responseLanguage && <small className="language-current" title={t("language.fixed")}>{t("language.acceptedShort")}: {acceptedLanguage === "en" ? "English" : acceptedLanguage === "ko" ? "한국어" : t("language.automatic")}</small>}
+      {acceptedRequest && acceptedLanguage !== session.responseLanguage && <small className="language-current" title={t("language.fixed")}>{t("language.acceptedShort")}: {isResponseLanguage(acceptedLanguage) ? responseLanguageLabel(acceptedLanguage) : t("language.automatic")}</small>}
         {hosted || readSuspended ? null : <ModelSettings compact key={`${projectId}:${threadId||"new"}`} projectId={projectId} threadId={threadId||undefined}
           selection={session.modelSelection} onSelect={session.chooseModel} onSaved={()=>session.clearModel(session.renderedRevision,epoch)}/>}
         {onOpenSettings && <Button minimal icon="settings" aria-label={t("workspace.settings")} title={t("workspace.settings")} onClick={()=>onOpenSettings()}/>}

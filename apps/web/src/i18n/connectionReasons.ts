@@ -1,4 +1,4 @@
-import { getLocale } from "./locale";
+import { pickLocale } from "./pickLocale";
 const korean = {
   CODEX_STANDALONE_NOT_INSTALLED: "ChatGPT 로그인에 필요한 Codex 연결 도구가 이 PC에 없습니다.",
   CODEX_STANDALONE_PIN_UNAVAILABLE: "ChatGPT 로그인에 필요한 Codex 연결 도구(0.157.1)를 찾지 못했습니다.",
@@ -63,7 +63,38 @@ const english: Record<keyof typeof korean, string> = {
   "CATALOG_UNAVAILABLE": "Login succeeded, but the model list is not available yet.",
   "MODEL_CATALOG_REFRESH_TIMEOUT": "The model list check did not finish in time. Try again shortly."
 };
-export function connectionReason(code: string): string | undefined {
-  const values: Readonly<Record<string, string>> = getLocale() === "en" ? english : korean;
+const chinese: Record<keyof typeof korean, string> = {
+  CODEX_STANDALONE_NOT_INSTALLED: "这台电脑上没有 ChatGPT 登录所需的 Codex 连接工具。",
+  CODEX_STANDALONE_PIN_UNAVAILABLE: "未找到所需版本（0.157.1）的 Codex 连接工具。",
+  CODEX_PACKAGE_INTEGRITY_UNAVAILABLE: "无法验证 Codex 的安装信息。请重新安装该工具。",
+  CODEX_PACKAGE_INTEGRITY_MISMATCH: "Codex 工具文件与官方发行版不一致。请重新安装该工具。",
+  CODEX_PACKAGE_ROOT_ABSOLUTE_REQUIRED: "Codex 工具的位置设置无效。",
+  UPDATE_REVIEW_REQUIRED: "Codex 工具的位置或版本已变化。请重新安装该工具。",
+  CODEX_PINNED_PLATFORM_UNSUPPORTED: "此操作系统暂不支持 ChatGPT 登录。请使用 API 密钥连接。",
+  CLAUDE_CLIENT_REGISTRATION_REQUIRED: "这台电脑上尚未启用 Claude 订阅登录。目前可以使用 API 密钥连接。",
+  CLAUDE_CODE_NOT_INSTALLED: "这台电脑上没有 Claude 登录所需的 Claude Code。",
+  CLAUDE_CODE_NATIVE_BINARY_REQUIRED: "未找到 Claude Code 可执行文件。请将其安装到 THOTH 工具文件夹中。",
+  CLAUDE_CODE_NOT_EXECUTABLE: "无法运行 Claude Code 可执行文件。请重新安装。",
+  CLAUDE_CODE_CAPABILITY_UNSUPPORTED: "已安装的 Claude Code 版本过旧。请在 THOTH 工具文件夹中安装受支持的版本。",
+  CLAUDE_CODE_LOGIN_START_FAILED: "Claude Code 无法开始登录。请稍后重试。",
+  CLAUDE_CODE_LOGIN_REQUIRED: "请在设置的模型连接中登录 Claude，然后重试。",
+  CLAUDE_CODE_LOGIN_FAILED: "Claude 登录没有完成。只有在你选择时才会开始新的登录。",
+  CLAUDE_CODE_LOGIN_NOT_CONFIRMED: "Claude Code 已退出，但无法确认登录状态。请重试。",
+  LOGIN_REQUIRED: "需要登录。",
+  LOGIN_PENDING: "正在完成登录。",
+  XAI_LOGIN_REQUIRED: "需要登录 xAI。",
+  MODEL_CREDENTIAL_UNAVAILABLE: "没有登记 API 密钥。",
+  NODE_NPM_UNAVAILABLE: "自动安装需要 Node.js (npm)。请安装 Node.js LTS 后重试，或自己运行下面的命令。",
+  CODEX_TOOL_INSTALL_FAILED: "Codex 工具安装失败。请检查互联网连接后重试。",
+  CLAUDE_CODE_TOOL_INSTALL_FAILED: "Claude Code 安装失败。请检查互联网连接后重试。",
+  CODEX_TOOL_INSTALL_TIMEOUT: "安装未能在五分钟内完成。请稍后重试。",
+  CLAUDE_CODE_TOOL_INSTALL_TIMEOUT: "安装未能在五分钟内完成。请稍后重试。",
+  MODEL_TOOL_INSTALL_TIMEOUT: "安装未能及时完成。请稍后检查其状态。",
+  MODEL_TOOL_INSTALL_IN_PROGRESS: "此工具正在安装中。请等待其完成。",
+  MODEL_TOOL_PREFIX_UNAVAILABLE: "找不到 THOTH 工具文件夹 (LOCALAPPDATA)。请自己运行下面的命令。",
+  CATALOG_UNAVAILABLE: "登录成功，但模型列表暂时还不可用。",
+  MODEL_CATALOG_REFRESH_TIMEOUT: "模型列表检查未能及时完成。请稍后重试。",
+};export function connectionReason(code: string): string | undefined {
+  const values: Readonly<Record<string, string>> = pickLocale({ ko: korean, en: english, "zh-Hans": chinese });
   return values[code];
 }

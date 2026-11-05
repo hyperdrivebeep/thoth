@@ -6,7 +6,7 @@ import { readResearchStatus } from "../api/researchStatusRead";
 import { useReadAccessProtection } from "./useReadAccessProtection";
 import { clearSubmission, hasSubmissionStore, readSubmission, submissionScopeId, writeSubmission } from "../api/submissionPersistence";
 import { useResponseLanguageDefault } from "../api/responseLanguageDefault";
-import { useResponseLanguageSupport } from "./useResponseLanguageSupport";
+import { useSupportedResponseLanguages } from "./useResponseLanguageSupport";
 import type { ResponseLanguage } from "../api/localWorkspacePersistence";
 import type { ResearchAdmission } from "../api/research";
 import type { ModelSelection } from "./ModelSettings";
@@ -27,9 +27,10 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
   const active = useRef(true);
   useLayoutEffect(() => { active.current = true; return () => { active.current = false; }; }, []);
   const isCurrentScope = () => active.current && currentScope.current === scopeIdentity && epoch.current === scopeEpoch;
-  // The default set in Settings: null is automatic (the request names no language), otherwise ko or en on every new request.
+  // The default set in Settings: null is automatic (the request names no language), otherwise one fixed language on every new request.
   const responseLanguage = useResponseLanguageDefault(storageScope);
-  const languageSupported = useResponseLanguageSupport(storageScope);
+  const supportedLanguages = useSupportedResponseLanguages(storageScope);
+  const languageSupported = supportedLanguages.length > 0 && (responseLanguage === null || supportedLanguages.includes(responseLanguage));
   const [problem, updateProblem] = useState(() => readDraft(projectId, threadId, storageScope));
   const problemRef = useRef(problem);
   const [draftSaveState, setDraftSaveState] = useState<DraftWriteResult>(() =>
@@ -176,7 +177,7 @@ export function useResearchSession(projectId: string, threadId: string, epoch: R
     setPendingRead(stored);
     if (stored.kind !== "PENDING") return;
     const { value } = stored;
-    if (value.responseLanguage && !languageSupported) return;
+    if (value.responseLanguage && !supportedLanguages.includes(value.responseLanguage)) return;
     pendingSubmission.current = { signature: value.signature, key: value.key, inFlight: true };
     setPendingStorageError(null);
     submit.mutate({ projectId, threadId, problem: value.problem, selection: value.selection, origin: value.origin ?? null, responseLanguage: value.responseLanguage,

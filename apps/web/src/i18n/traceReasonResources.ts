@@ -53,4 +53,16 @@ const english: Record<keyof typeof korean, {label: string; hint: string}> = {
     "hint": "Rules, results, or links used by this assessment changed; recomputation is needed."
   }
 };
-export const traceReasonText = bilingualRecord(korean, english);
+const chinese: Record<keyof typeof korean, { label: string; hint: string }> = {
+  UNTESTED: { label: "未测试", hint: "已有测试与此标准关联，但还没有结果。" },
+  UNLINKED: { label: "未关联", hint: "没有测试与此标准关联，因此没有地方接收结果。" },
+  UNIT: { label: "单位错误", hint: "结果的单位与标准的单位不同，因此没有进行比较。" },
+  DENOMINATOR: { label: "分母错误", hint: "结果的分母不大于 0，或其值与按分子/分母计算的值不一致，因此没有进行比较。" },
+  VALUE: { label: "值错误", hint: "结果的值为空、不是数字或过大，因此没有进行比较。" },
+  CONDITION_MISMATCH: { label: "条件不一致", hint: "有结果，但与标准的条件不同，因此没有采用。" },
+  NO_RULE: { label: "没有规则", hint: "此标准没有评估规则，因此没有进行比较。" },
+  VALID_MISS: { label: "有效但未达标", hint: "结果可以比较，并且没有达到标准。" },
+  REQUIRED_INCOMPLETE: { label: "必要标准未完成", hint: "没有必要标准，或必要标准中还有尚未判定为满足或未满足的。" },
+  BASIS_CHANGED: { label: "依据已变化", hint: "此评估所依据的规则、结果或链接已变化，需要重新计算。" },
+};
+export const traceReasonText = bilingualRecord(korean, english, chinese);

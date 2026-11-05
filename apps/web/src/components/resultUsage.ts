@@ -1,6 +1,5 @@
-import { t } from "../i18n/locale";
+import { t, localeTag } from "../i18n/locale";
 import { message as formatMessage } from "../i18n/formatMessages";
-import { getLocale } from "../i18n/locale";
 import type { ResearchStatus } from "../api/research";
 
 const noUsage = () => t("usage.none");
@@ -25,14 +24,14 @@ function timeText(status: ResearchStatus, operationId: string, wallMs: number | 
 export function resultUsageLine(status: ResearchStatus | undefined, operationId: string | undefined): string {
   const usage = operationId ? status?.result_usage?.[operationId] : undefined;
   if (!status || !operationId || !usage) return noUsage();
-  const tokens = usage.total_tokens == null ? t("state.unknown") : usage.total_tokens.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR") + (usage.state === "PARTIAL" ? t("workspace.partialUsage") : "");
+  const tokens = usage.total_tokens == null ? t("state.unknown") : usage.total_tokens.toLocaleString(localeTag()) + (usage.state === "PARTIAL" ? t("workspace.partialUsage") : "");
   // The stage counts and the retry count describe what this run did; they are never shown for another result.
   const reuse = status.request?.operation_id === operationId ? status.stage_reuse : undefined;
   const reused = reuse && reuse.reused > 0 ? formatMessage("reusedStages", reuse.reused, reuse.new) : "";
   const retried = usage.auto_retries ? formatMessage("autoRetries", usage.auto_retries) : "";
   // The totals already include these calls; the share is shown so it is not a hidden cost.
   const apart = Object.entries(usage.by_purpose ?? {})
-    .map(([purpose, part]) => formatMessage("usagePart", purpose === "MEMORY_QUERY_EXPANSION" ? t("usage.memoryExpansion") : part.label, part.total_tokens == null ? null : part.total_tokens.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR"))).join("");
+    .map(([purpose, part]) => formatMessage("usagePart", purpose === "MEMORY_QUERY_EXPANSION" ? t("usage.memoryExpansion") : part.label, part.total_tokens == null ? null : part.total_tokens.toLocaleString(localeTag()))).join("");
   return formatMessage("resultUsage", tokens, timeText(status, operationId, usage.wall_ms), reused, retried, apart);
 }
 

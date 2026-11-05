@@ -15,6 +15,7 @@ from thoth.application.services.hypothesis_table_filler import (
 from thoth.application.services.hypothesis_table_filler import (
     request_context as _request_context,
 )
+from thoth.application.services.request_language import script_check_problem
 from thoth.domain.hypothesis_grounding_result import GroundedPortfolioResult, PredictionCell
 from thoth.domain.hypothesis_v4 import TableFillAnswerV4, expected_is_unknown
 from thoth.domain.hypothesis_v5 import DiscriminatingTestV5, ExpectedResultV5, HypothesisV5
@@ -78,7 +79,7 @@ def merge_grounded_fill(
                     normalize_label=True,
                 )
             if kept is not None and not expected_is_unknown(kept) and language != "en":
-                problem = "한국어 " + context.problem if language == "ko" else context.problem
+                problem = script_check_problem(language, context.problem)
                 mismatch = language_problem(kept.expected or "", problem)
                 if mismatch:
                     kept, reason = None, f"EXPECTED_{mismatch}_MISMATCH"

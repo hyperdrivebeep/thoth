@@ -366,3 +366,10 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 .model-settings.compact .model-control-label { position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%); }
 .model-settings.compact label:last-of-type select { min-width:68px;max-width:82px; }
 .composer-tools>.bp6-button:last-child { min-width:32px;min-height:32px; }
+
+/* Simplified Chinese screens: Chinese faces come first so that Han characters take their Simplified shapes and not the Korean ones.
+   Blueprint sets its own font-family on body, so body is named too. The Korean and English screens keep the fonts above. */
+:root:lang(zh-Hans), :root:lang(zh-Hans) body {
+  --bp-typography-family-default: "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Noto Sans SC", "Source Han Sans SC", sans-serif;
+  font-family: var(--bp-typography-family-default);
+}

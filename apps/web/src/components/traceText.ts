@@ -2,6 +2,7 @@ import { message } from "../i18n/formatMessages";
 import type { MessageKey } from "../i18n/messages";
 import { t, getLocale, formatDate, type Locale } from "../i18n/locale";
 import { criterionVerdicts, requirementVerdicts, reasonEnglish } from "../i18n/traceEnglish";
+import { criterionVerdictsZh, requirementVerdictsZh, reasonChinese } from "../i18n/traceChinese";
 import { iga } from "../api/koreanParticles";
 import type { ChangedDependency, ImportIssue, TraceResult, TraceRule, VerdictChange } from "../api/trace";
 import { resultText, ruleText } from "./traceRows";
@@ -25,9 +26,16 @@ const requirementLooks: Record<string, Look> = {
   HOLD_INCOMPLETE: { text: "보류 · 결과 없는 조건이 있음", intent: "warning", icon: "warning-sign" },
   HOLD_NO_CRITERIA: { text: "보류 · 필수 기준이 없음", intent: "warning", icon: "warning-sign" },
 };
+/** The verdict wording of the languages whose sentences live outside this file; Korean is written below. */
+const verdictTexts: Record<Exclude<Locale, "ko">, { criterion: Record<string, string>; requirement: Record<string, string>; unknown: string }> = {
+  en: { criterion: criterionVerdicts, requirement: requirementVerdicts, unknown: "Unknown assessment" },
+  "zh-Hans": { criterion: criterionVerdictsZh, requirement: requirementVerdictsZh, unknown: "未知的评估" },
+};
 export const verdictLook = (kind: string, state: string, locale: Locale = getLocale()): Look => {
   const look = (kind === "REQUIREMENT" ? requirementLooks : criterionLooks)[state] ?? { text: "알 수 없는 판정", intent: "none", icon: "help" };
-  return locale === "en" ? { ...look, text: (kind === "REQUIREMENT" ? requirementVerdicts : criterionVerdicts)[state] ?? "Unknown assessment" } : look;
+  if (locale === "ko") return look;
+  const texts = verdictTexts[locale];
+  return { ...look, text: (kind === "REQUIREMENT" ? texts.requirement : texts.criterion)[state] ?? texts.unknown };
 };
 
 /** Who decides after the check. Provisional names, to be confirmed with the people who do this work. */
@@ -100,6 +108,7 @@ export const timeText = (iso: string) => {
 /** One reason the rule found, as a sentence. `titleOf` names a criterion for the reasons a requirement carries. */
 export function reasonSentence(code: string, titleOf: (id: string) => string, condition?: string | null, locale: Locale = getLocale()): string {
   if (locale === "en") return reasonEnglish(code, titleOf, condition);
+  if (locale === "zh-Hans") return reasonChinese(code, titleOf, condition);
   const [head, ...rest] = code.split(":");
   const tail = rest.join(":");
   const known: Record<string, string> = {

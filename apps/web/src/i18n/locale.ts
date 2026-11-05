@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { messages, type MessageKey } from "./messages";
-import { browserLanguage, isLanguageCode, type LanguageCode } from "./languageChoices";
+import { browserLanguage, DOCUMENT_TITLES, isLanguageCode, LOCALE_TAGS, type LanguageCode } from "./languageChoices";
 
 export type Locale = LanguageCode;
 /** What the person chose: a language, or "auto" to follow the browser. */
@@ -38,7 +38,7 @@ if (typeof window !== "undefined") {
 export function applyDocumentLocale(value: Locale): void {
   if (typeof document === "undefined") return;
   document.documentElement.lang = value;
-  document.title = value === "ko" ? "THOTH · 연구 작업 공간" : "THOTH · Research workspace";
+  document.title = DOCUMENT_TITLES[value];
 }
 const subscribe = (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener); }; };
 export function useLocale(): Locale { return useSyncExternalStore(subscribe, getLocale, () => "ko"); }
@@ -47,7 +47,7 @@ export function t(key: MessageKey, selectedLocale: Locale = locale): string { re
 export function useTranslation() { useLocale(); return t; }
 export function messageKey(key: MessageKey): MessageKey { return key; }
 const legacyUiText = new Map<string, MessageKey>(Object.entries(messages).flatMap(([key, pair]) =>
-  [[pair.ko, key as MessageKey], [pair.en, key as MessageKey]]));
+  [[pair.ko, key as MessageKey], [pair.en, key as MessageKey], [pair["zh-Hans"], key as MessageKey]]));
 /** Only call for application-owned notices/errors, never model answers or user/source text. */
 export function uiText(value: string): string {
   const key = Object.hasOwn(messages, value) ? value as MessageKey : legacyUiText.get(value);
@@ -55,8 +55,14 @@ export function uiText(value: string): string {
 }
 export function formatDate(value: string | number | Date): string {
   const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? String(value) : date.toLocaleString(locale === "ko" ? "ko-KR" : "en-US");
+  return Number.isNaN(date.valueOf()) ? String(value) : date.toLocaleString(LOCALE_TAGS[locale]);
 }
-export function formatNumber(value: number): string { return new Intl.NumberFormat(locale === "ko" ? "ko-KR" : "en-US").format(value); }
-export function hypothesisLabel(number: string | number): string { return locale === "ko" ? `가설 ${number}` : `Hypothesis ${number}`; }
-export function evidenceCount(count: number): string { return locale === "ko" ? `근거 ${formatNumber(count)}개` : `${formatNumber(count)} evidence ${count === 1 ? "reference" : "references"}`; }
+/** The BCP-47 tag of the current language, for toLocaleString and Intl. */
+export const localeTag = (selectedLocale: Locale = locale): string => LOCALE_TAGS[selectedLocale];
+export function formatNumber(value: number): string { return new Intl.NumberFormat(LOCALE_TAGS[locale]).format(value); }
+export function hypothesisLabel(number: string | number): string {
+  return { ko: `가설 ${number}`, en: `Hypothesis ${number}`, "zh-Hans": `假设 ${number}` }[locale];
+}
+export function evidenceCount(count: number): string {
+  return { ko: `근거 ${formatNumber(count)}개`, en: `${formatNumber(count)} evidence ${count === 1 ? "reference" : "references"}`, "zh-Hans": `${formatNumber(count)} 条证据` }[locale];
+}

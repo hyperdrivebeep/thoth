@@ -7,6 +7,7 @@ from thoth.domain.behavior_policy import (
     PromptBehaviorPolicy,
     RetrievalBehaviorInput,
     RetrievalBehaviorPolicy,
+    RetrievalCjkPolicy,
     RetrievalFusionPolicy,
     RetrievalLanePolicy,
     RetrievalPolicy,
@@ -37,6 +38,7 @@ class TypedBehaviorHandler:
         | type[RetrievalLanePolicy]
         | type[RetrievalFusionPolicy]
         | type[RetrievalRoutingPolicy]
+        | type[RetrievalCjkPolicy]
         | type[WorkflowBehaviorPolicy],
         version: str = "2.0.0",
     ) -> None:
@@ -50,7 +52,9 @@ class TypedBehaviorHandler:
 
     def default_policy(self) -> BehaviorPolicy:
         policy_type = self._policy_type
-        if issubclass(policy_type, (RetrievalFusionPolicy, RetrievalRoutingPolicy)):
+        if issubclass(
+            policy_type, (RetrievalFusionPolicy, RetrievalRoutingPolicy, RetrievalCjkPolicy)
+        ):
             # No lane combination is a default. The baseline is always 2.0.0, so nothing asks.
             raise BehaviorPolicyError("BEHAVIOR_POLICY_INVALID")
         return policy_type()
@@ -224,6 +228,20 @@ class RetrievalRoutingHandler(TypedBehaviorHandler):
         return evaluate_retrieval(policy, payload)
 
 
+class RetrievalCjkHandler(TypedBehaviorHandler):
+    """Policy 6 (CJK lanes) is registered for evaluation/shadow only, never a default."""
+
+    def __init__(self) -> None:
+        super().__init__(BehaviorArtifactKind.RETRIEVAL_POLICY, RetrievalCjkPolicy, "6.0.0")
+
+    def evaluate(
+        self, policy: BehaviorPolicy, payload: dict[str, JsonValue]
+    ) -> dict[str, JsonValue]:
+        if not isinstance(policy, RetrievalCjkPolicy):
+            raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
+        return evaluate_retrieval(policy, payload)
+
+
 class WorkflowBehaviorHandler(TypedBehaviorHandler):
     def __init__(self) -> None:
         super().__init__(BehaviorArtifactKind.WORKFLOW_DEFINITION, WorkflowBehaviorPolicy)
@@ -271,5 +289,6 @@ def default_behavior_components() -> BehaviorComponentRegistry:
     registry.register(RetrievalLaneHandler())
     registry.register(RetrievalFusionHandler())
     registry.register(RetrievalRoutingHandler())
+    registry.register(RetrievalCjkHandler())
     registry.register(WorkflowBehaviorHandler())
     return registry

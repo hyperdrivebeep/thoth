@@ -88,6 +88,12 @@ second question in the other language in the same conversation.
   cleaned up; there is no cleanup tool yet. Deletion cannot be undone and nothing is exported for you
   first.
 - **Windows only, source checkout only.** There is no installer and no standalone package.
+- **The Chinese screen is machine-translated and has not been reviewed.** Simplified Chinese
+  (中文(简体)) can be chosen as the display language in Settings. Its wording was produced by machine
+  translation from the Korean and English text and no native speaker has checked it, so some phrases
+  may be stiff or wrong. Messages that the server writes itself (for example the workspace-location
+  notice) appear in English on this screen. The display language and the answer language are
+  separate settings.
 - **Model accounts.** The ChatGPT/Codex bridge is experimental and uses a private endpoint. Claude
   and xAI real-account use is unverified.
 - **Small display issues.** On Korean Windows a backslash can show as ₩ in some code or command
@@ -144,6 +150,7 @@ repository and read the [security policy](../SECURITY.md).
   부품은 선택 설치(약 110MB + 모델 약 124MB)입니다. 영구 삭제해도 다른 프로젝트와 공유하는 파일은
   남고, 작업이 실행 중이거나 비정상 종료로 남은 실행 기록이 있으면 삭제가 거절될 수 있습니다.
   한국어 Windows에서 일부 코드 상자의 역슬래시가 ₩로 보일 수 있습니다.
+  중국어(간체) 화면은 기계 번역이며 검수되지 않았습니다.
 - **개인정보·비용**: 질문하면 자료의 관련 부분이 연결한 모델 계정으로 전송되고 그 계정의 사용량을
   씁니다(합성 자료 기준 조사 한 번에 호출 8~9회, 토큰 33만~45만 개). 허락받은 자료만 쓰고,
   신고에는 개인 자료·로그인 정보·작업 공간 파일을 붙이지 마세요.

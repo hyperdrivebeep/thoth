@@ -1,3 +1,7 @@
+import { isResponseLanguage, type ResponseLanguage } from "./responseLanguages";
+
+export type { ResponseLanguage };
+
 /** Browser convenience only. Research records and permissions remain server-owned. */
 export type BrowserScope = { mode: "LOCAL"; workspaceId: string | null } | { mode: "HOSTED"; browserScopeId?: string | null };
 export type WorkspaceContext = { projectId: string; threadId: string };
@@ -6,7 +10,6 @@ export type DraftWriteResult = "SAVED" | "TOO_LARGE" | "UNAVAILABLE";
 export type DraftReadResult = { kind: "MISSING" | "VALID" | "CORRUPT" | "UNAVAILABLE"; text: string };
 export type PendingModelSelection = { provider: string; model: string; reasoning_effort?: string };
 export type PendingOrigin = { kind: "TRACE_VERDICT"; project_id: string; subject_kind: "CRITERION" | "REQUIREMENT"; subject_id: string; verdict_revision: string };
-export type ResponseLanguage = "ko" | "en";
 type PendingFields = { workspaceId: string; projectId: string; threadId: string;
   problem: string; selection: PendingModelSelection | null; origin?: PendingOrigin | null; signature: string; key: string; createdAt: number };
 export type PendingSubmission = PendingFields & ({ version: 1; responseLanguage?: never } | { version: 2; responseLanguage: ResponseLanguage });
@@ -121,7 +124,7 @@ export function readLocalPending(workspaceId: string | null, projectId: string, 
       !("signature" in value) || typeof value.signature !== "string" ||
       !("key" in value) || typeof value.key !== "string" || !/^[a-f0-9-]{36}$/i.test(value.key) ||
       !("createdAt" in value) || typeof value.createdAt !== "number" || !Number.isFinite(value.createdAt)) return { kind: "INVALID" };
-    if (value.version === 2 && (!("responseLanguage" in value) || !["ko", "en"].includes(String(value.responseLanguage)))) return { kind: "INVALID" };
+    if (value.version === 2 && (!("responseLanguage" in value) || !isResponseLanguage(value.responseLanguage))) return { kind: "INVALID" };
     const pending = value as PendingSubmission;
     return pending.signature === submissionSignature(projectId, threadId, pending.problem, pending.selection, pending.origin ?? null, pending.responseLanguage)
       ? { kind: "PENDING", value: pending } : { kind: "INVALID" };
@@ -150,7 +153,7 @@ export function writeLocalPending(value: PendingSubmission, storage?: Storage): 
   if (!validWorkspaceId(value.workspaceId) || !value.projectId || !validRecordId(value.projectId) || !validRecordId(value.threadId) ||
     !(value.selection === null || validPendingSelection(value.selection)) || !(value.origin == null || validPendingOrigin(value.origin)) ||
     value.signature !== submissionSignature(value.projectId, value.threadId, value.problem, value.selection, value.origin ?? null, value.responseLanguage)) return "UNAVAILABLE";
-  if (value.version === 2 && value.responseLanguage !== "ko" && value.responseLanguage !== "en") return "UNAVAILABLE";
+  if (value.version === 2 && !isResponseLanguage(value.responseLanguage)) return "UNAVAILABLE";
   const raw = JSON.stringify(value);
   if (raw.length > maxPendingLength) return "TOO_LARGE";
   try { (storage ?? localStorage).setItem(pendingKey(value.workspaceId, value.projectId, value.threadId), raw); return "SAVED"; }

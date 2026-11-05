@@ -1,5 +1,5 @@
 import { message as formatMessage } from "../i18n/formatMessages";
-import { activityAction, activityDisplay } from "../i18n/activityDisplay";
+import { activityActionLabel, activityDisplay } from "../i18n/activityDisplay";
 import { t, getLocale } from "../i18n/locale";
 import { Icon, Spinner, Tag } from "@blueprintjs/core";
 
@@ -105,7 +105,7 @@ function ActivityDetails({ event }: { event: UserActivityEvent }) {
     event.result?.exit_code != null ? formatMessage("exitCode", event.result.exit_code) : null,
   ].filter(Boolean);
   return <div className="research-activity-detail">
-    {getLocale() === "en" && <details className="connection-tech"><summary>Original activity detail</summary><p>{event.label_ko}</p>{event.why_ko && <p>{event.why_ko}</p>}{event.result?.summary_ko && <p>{event.result.summary_ko}</p>}</details>}
+    {getLocale() !== "ko" && <details className="connection-tech"><summary>{t("activity.originalDetail")}</summary><p>{event.label_ko}</p>{event.why_ko && <p>{event.why_ko}</p>}{event.result?.summary_ko && <p>{event.result.summary_ko}</p>}</details>}
     {event.why_ko && <p><strong>{t("traceHistory.reason")}</strong>{activityDisplay(event.why_ko)}</p>}
     {event.tool && <section aria-label={t("activity.toolInfo")}>
       <h5>{t("activity.tool")}</h5>
@@ -147,7 +147,7 @@ export function ResearchActivityStrip({ events, detailOpen = false }: { events?:
       {summaryEvents.map((event) => <li key={event.event_id} data-severity={event.severity}>
         <div className="research-activity-icon">{stateIcon(event)}</div>
         <div className="research-activity-main">
-          <strong>{activityDisplay(event.label_ko, activityAction[event.action] ?? "Research activity")}</strong>
+          <strong>{activityDisplay(event.label_ko, activityActionLabel(event.action))}</strong>
           {targetLabel(event) && <span>{targetLabel(event)}</span>}
           <div className="research-activity-badges">
             <Tag minimal>{stateLabels[event.state]}</Tag>
@@ -160,7 +160,7 @@ export function ResearchActivityStrip({ events, detailOpen = false }: { events?:
       <ol className="research-activity-expanded">
         {events.map((event) => <li key={event.event_id}>
           <header>
-            {stateIcon(event)}<strong>{activityDisplay(event.label_ko, activityAction[event.action] ?? "Research activity")}</strong>
+            {stateIcon(event)}<strong>{activityDisplay(event.label_ko, activityActionLabel(event.action))}</strong>
             <Tag minimal>{stateLabels[event.state]}</Tag>
             <Tag minimal>{relationLabels[event.research_relation]}</Tag>
           </header>

@@ -1,7 +1,14 @@
-/** The one list of languages the screen and the answers can use. Add a language here, then add its message column. */
+/**
+ * The one list of languages the screen can use. Add a language here, then add its message column
+ * (i18n/zh/ shows the shape) and its wording in the per-language files; tsc and the catalog test name what is missing.
+ * `tag` is the BCP-47 tag for dates and numbers, `browser` says which browser language tags choose it, and
+ * `title` is the page title.
+ */
 export const LANGUAGE_CHOICES = [
-  { code: "ko", label: "한국어" },
-  { code: "en", label: "English" },
+  { code: "ko", label: "한국어", tag: "ko-KR", browser: /^ko(-|$)/, title: "THOTH · 연구 작업 공간" },
+  { code: "en", label: "English", tag: "en-US", browser: /^en(-|$)/, title: "THOTH · Research workspace" },
+  // Traditional Chinese tags (zh-TW, zh-HK, zh-MO, zh-Hant) are not matched: the text is Simplified.
+  { code: "zh-Hans", label: "中文(简体)", tag: "zh-CN", browser: /^zh(?!-(tw|hk|mo|hant))(-|$)/, title: "THOTH · 研究工作区" },
 ] as const;
 
 export type LanguageCode = (typeof LANGUAGE_CHOICES)[number]["code"];
@@ -15,11 +22,19 @@ export function languageLabel(code: LanguageCode): string {
   return LANGUAGE_CHOICES.find(choice => choice.code === code)?.label ?? code;
 }
 
+const byCode = <K extends keyof (typeof LANGUAGE_CHOICES)[number]>(key: K) =>
+  Object.fromEntries(LANGUAGE_CHOICES.map(choice => [choice.code, choice[key]])) as Record<LanguageCode, (typeof LANGUAGE_CHOICES)[number][K]>;
+
+/** The BCP-47 tag of each language, for dates and numbers. */
+export const LOCALE_TAGS: Readonly<Record<LanguageCode, string>> = byCode("tag");
+/** The page title of each language. */
+export const DOCUMENT_TITLES: Readonly<Record<LanguageCode, string>> = byCode("title");
+
 /** The language of the first browser language this app can show; Korean when none matches. */
 export function browserLanguage(languages: readonly string[]): LanguageCode {
   for (const tag of languages) {
-    const base = tag.toLowerCase().split("-")[0];
-    if (isLanguageCode(base)) return base;
+    const found = LANGUAGE_CHOICES.find(choice => choice.browser.test(tag.toLowerCase()));
+    if (found) return found.code;
   }
   return "ko";
 }

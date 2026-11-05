@@ -174,3 +174,17 @@ it("shows the delete wording in English too", async () => {
   expect(dialog()!.textContent).toContain('Delete project "Archived demo" permanently');
   expect(buttons(dialog()!, "Cancel")).toHaveLength(1);
 });
+
+it("shows the delete wording in Simplified Chinese too", async () => {
+  setLocale("zh-Hans");
+  await openDialog(false, "查看已归档的项目");
+  await act(async () => buttons(container, "永久删除")[0].click());
+  await settle(() => dialog() !== null);
+  expect(dialog()!.textContent).toContain("此操作无法撤销。");
+  expect(dialog()!.textContent).toContain("永久删除项目“Archived demo”");
+  expect(dialog()!.textContent).not.toMatch(/[가-힣]/);
+  expect(buttons(dialog()!, "取消")).toHaveLength(1);
+  expect(buttons(dialog()!, "永久删除")[0].disabled).toBe(true);
+  await typeName(NAME);
+  expect(buttons(dialog()!, "永久删除")[0].disabled).toBe(false);
+});
