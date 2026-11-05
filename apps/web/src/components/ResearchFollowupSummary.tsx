@@ -4,6 +4,7 @@ import { useResultLanguage } from "../i18n/ResponseLanguageContext";
 import { Button, Tag } from "@blueprintjs/core";
 import type { CoverageMatrix, CoverageMatrixRow, DecisionDelta, NextUserAction, UserProgressSummary } from "../api/researchFollowup";
 import { Disclosure } from "./Disclosure";
+import { coverageCounts } from "./coverageCounts";
 import { currentnessLabel } from "./history/historyPresentation";
 import { DecisionDeltaView } from "./history/DecisionDeltaComparison";
 import { criterionText, isReadable, plainReason } from "./plainWording";
@@ -122,7 +123,7 @@ export function ResearchFollowupSummary({
   if (!progress && !coverage && !action && !delta) return null;
   const rows = coverage?.rows ?? [];
   const nextAction = action ?? progress?.next_user_action ?? null;
-  const unresolved = rows.filter(row => row.status === "UNRESOLVED" || row.status === "NOT_ASSESSED");
+  const { needsCheck } = coverageCounts(coverage);
   return <section className="followup-summary" aria-label={t("followup.summaryLabel")}>
     <header>
       <div><h3>{t("followup.title")}</h3><p>{t("followup.statusNotice")}</p></div>
@@ -142,7 +143,7 @@ export function ResearchFollowupSummary({
       </div>
       <p className="muted">{currentnessLabel(progress.currentness)}</p>
     </Disclosure>}
-    {coverage && <Disclosure defaultOpen={unresolved.length > 0} label={message("answerChecks", rows.length)}>
+    {coverage && <Disclosure defaultOpen={needsCheck > 0} label={message("answerChecks", rows.length)}>
       {coverage.availability === "UNAVAILABLE" ? <p className="result-notice">{t("followup.inaccessibleChecks")}</p> : rows.length === 0 ? <p className="muted">{t("followup.noAnswerChecks")}</p>
         : <div className="coverage-table" role="table" aria-label={t("followup.checkStatus")}>
           <div className="coverage-head" role="row"><span>{t("followup.criterion")}</span><span>{t("followup.criterionStatus")}</span><span>{t("history.assessment")}</span></div>

@@ -150,6 +150,12 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 .user-message p {margin:8px 0 0;white-space:pre-wrap;font-size:14px;overflow-wrap:anywhere}
 .assistant-message {padding:26px 4px 0;line-height:1.8}
 .assistant-message>header {font-weight:700;letter-spacing:.13em;color:var(--accent-bright);margin-bottom:14px}
+.assistant-message>header {align-items:center;flex-wrap:wrap;justify-content:flex-start;gap:10px}
+.result-status-strip {display:inline-flex;flex-wrap:wrap;gap:4px;letter-spacing:0;font-weight:400}
+.result-status-strip .bp6-tag {font-size:11px}
+.answer-text .answer-lead {color:var(--amber);font-size:13px;margin:0 0 8px}
+.answer-text .answer-heading {font-size:14px;font-weight:600;margin:14px 0 6px}
+.result-hold-details {margin-top:14px}.result-hold-details>.toolkit-disclosure-body {border-left:0;padding-left:0}
 .assistant-message .answer-text {font-size:15px;line-height:1.85;white-space:pre-wrap;overflow-wrap:anywhere}
 .conversation-findings {margin-top:22px}
 .conversation-findings h3 {font-size:14px;color:var(--muted)}

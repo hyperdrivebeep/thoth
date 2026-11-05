@@ -3,11 +3,26 @@
 export type Inline =
   | { kind: "text"; text: string; bold: boolean }
   | { kind: "cite"; n: number; spanId: string; bold: boolean };
-export type AnswerBlock = { kind: "p"; inline: Inline[] } | { kind: "ul"; items: Inline[][] };
+/** A paragraph block with `heading` set is a markdown heading line (`#`–`####`) and is shown as a title, never as "#" text. */
+export type AnswerBlock = { kind: "p"; inline: Inline[]; heading?: number } | { kind: "ul"; items: Inline[][] };
 export type Citation = { n: number; spanId: string };
 export type ParsedAnswer = { blocks: AnswerBlock[]; citations: Citation[] };
 
 const SPAN = /span:[0-9A-Za-z][0-9A-Za-z_-]*/g;
+const HEADING = /^\s{0,3}(#{1,4})\s+(.*?)\s*#*\s*$/;
+const LIST_ITEM = /^\s*- /;
+
+/**
+ * The hold prefix the server puts in front of a partial draft, in each answer language
+ * (src/thoth/application/services/request_language.py, _PARTIAL_DRAFT_PREFIX). It is shown as its own line so that a
+ * markdown heading the model wrote right after it still starts a line and is read as a heading.
+ */
+const LEADS = ["검증 보류 · 부분 초안: ", "Review on hold · partial draft: ", "复核暂缓 · 部分草稿：", "検証保留・部分草稿："];
+
+export function splitAnswerLead(answer: string): { lead: string | null; body: string } {
+  for (const lead of LEADS) if (answer.startsWith(lead)) return { lead: lead.trim(), body: answer.slice(lead.length) };
+  return { lead: null, body: answer };
+}
 
 export function parseAnswer(answer: string): ParsedAnswer {
   const numbers = new Map<string, number>();
@@ -35,12 +50,21 @@ export function parseAnswer(answer: string): ParsedAnswer {
   const blocks: AnswerBlock[] = [];
   for (const paragraph of answer.split(/\n\s*\n/)) {
     const lines = paragraph.split("\n").filter(line => line.trim() !== "");
-    if (lines.length === 0) continue;
-    if (lines.every(line => /^\s*- /.test(line))) {
-      blocks.push({ kind: "ul", items: lines.map(line => inline(line.replace(/^\s*- /, ""))) });
-    } else {
-      blocks.push({ kind: "p", inline: inline(lines.join("\n")) });
+    // A heading or a list keeps its own block even when the model wrote it right under a sentence without a blank line.
+    let text: string[] = [];
+    let items: string[] = [];
+    const flush = () => {
+      if (text.length) blocks.push({ kind: "p", inline: inline(text.join("\n")) });
+      if (items.length) blocks.push({ kind: "ul", items: items.map(item => inline(item)) });
+      text = []; items = [];
+    };
+    for (const line of lines) {
+      const heading = HEADING.exec(line);
+      if (heading) { flush(); blocks.push({ kind: "p", inline: inline(heading[2]), heading: heading[1].length }); }
+      else if (LIST_ITEM.test(line)) { if (text.length) flush(); items.push(line.replace(LIST_ITEM, "")); }
+      else { if (items.length) flush(); text.push(line); }
     }
+    flush();
   }
   return { blocks, citations: [...numbers].map(([spanId, n]) => ({ n, spanId })) };
 }
