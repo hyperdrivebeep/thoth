@@ -2,7 +2,12 @@
 
 from pydantic import JsonValue
 
-from thoth.domain.behavior_policy import BehaviorPolicy, BehaviorPolicyError, RetrievalRoutingPolicy
+from thoth.domain.behavior_policy import (
+    BehaviorPolicy,
+    BehaviorPolicyError,
+    RetrievalCjkPolicy,
+    RetrievalRoutingPolicy,
+)
 from thoth.ports.behavior_resolver import BehaviorComponentHandlerPort
 
 
@@ -21,4 +26,6 @@ def compile_exposure_policy(
     policy = handler.compile(content)
     if isinstance(policy, RetrievalRoutingPolicy) and stage != "SHADOW":
         raise BehaviorPolicyError("RETRIEVAL_ROUTING_SHADOW_ONLY")
+    if isinstance(policy, RetrievalCjkPolicy) and stage != "SHADOW":
+        raise BehaviorPolicyError("RETRIEVAL_CJK_SHADOW_ONLY")
     return policy

@@ -1,5 +1,5 @@
 import { message } from "../i18n/formatMessages";
-import { getLocale } from "../i18n/locale";
+import { localeTag } from "../i18n/locale";
 import { t, useTranslation } from "../i18n/locale";
 import { Button, Callout, Icon } from "@blueprintjs/core";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -82,7 +82,7 @@ export function ConversationTimeline({ projectId, threadId, status, sourceUris, 
     {query.error && <Callout intent="warning" role="alert">{query.data ? t("timeline.refreshFailed") : t("timeline.loadFailedSpace")}<Button small onClick={() => void query.refetch()}>{t("workspace.reload")}</Button></Callout>}
     {query.data?.pages.some(page => page.limited) && <Callout compact>{t("timeline.limited")}</Callout>}
     {turns.map(turn => <div className="conversation-turn" key={turn.input.request_revision_digest}>
-      <article className="user-message"><header>{message("questionHeading", turn.input.edit_kind)}<time dateTime={turn.input.created_at}>{new Date(turn.input.created_at).toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")}</time></header><p>{turn.input.text}</p></article>
+      <article className="user-message"><header>{message("questionHeading", turn.input.edit_kind)}<time dateTime={turn.input.created_at}>{new Date(turn.input.created_at).toLocaleString(localeTag())}</time></header><p>{turn.input.text}</p></article>
       <ResearchResultCard onOpenTrace={onOpenTrace} projectId={projectId} hypothesisLinks={linked.links} linkDistribution={linked.distribution} result={turn.result} state={turn.state} unavailable={turn.unavailable} error={turn.error} failure={turn.failure} terminalReason={turn.terminalReason} onDetail={onDetail} onRetry={onRetry ? () => onRetry(turn.input.text) : undefined} usageLine={resultUsageLine(liveStatus, turn.input.operation_id)}
         hasSavedResult={savedBefore.has(turn.input.request_revision_digest) || Boolean(liveStatus?.request?.operation_id === turn.input.operation_id && liveStatus.previous_result)}
         currentness={turn.currentness} historySelection={{kind:"result",scope:{projectId,threadId,requestDigest:turn.input.request_revision_digest},operationId:turn.input.operation_id,
@@ -90,7 +90,7 @@ export function ConversationTimeline({ projectId, threadId, status, sourceUris, 
     </div>)}
     {unavailableHistory && <Callout compact>{t("timeline.unsupported")}</Callout>}
     {(currentQuestion || running) && <div className="conversation-turn">
-      {currentQuestion && <article className="user-message"><header>{message("questionExample", example)}{example ? <time dateTime={TIMELINE_EXAMPLE_ASKED_AT}>{new Date(TIMELINE_EXAMPLE_ASKED_AT).toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")}</time> : null}</header><p>{currentQuestion}</p></article>}
+      {currentQuestion && <article className="user-message"><header>{message("questionExample", example)}{example ? <time dateTime={TIMELINE_EXAMPLE_ASKED_AT}>{new Date(TIMELINE_EXAMPLE_ASKED_AT).toLocaleString(localeTag())}</time> : null}</header><p>{currentQuestion}</p></article>}
       <ResearchLiveProgress status={liveStatus} sourceUris={liveSources} />
       {queuedInstruction && <Callout compact icon="time" className="queued-instruction-notice" role="status">{t("timeline.queued")}</Callout>}
       {!running && <ResearchResultCard onOpenTrace={onOpenTrace} hypothesisLinks={linked.links} linkDistribution={linked.distribution} result={currentRequestResult?.result ?? null} state={liveStatus && ["FAILED", "CANCELLED"].includes(liveStatus.operation_state ?? "") ? liveStatus.operation_state! : liveStatus?.current_result ? liveStatus.operation_state ?? "UNKNOWN" : "STALE"} error={liveStatus?.operation_error} failure={liveStatus?.failure} terminalReason={currentRequestResult?.terminal_reason} onDetail={onDetail} onRetry={onRetry && liveStatus?.request?.authored_text ? () => onRetry(liveStatus.request!.authored_text!) : undefined}

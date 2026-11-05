@@ -1,4 +1,4 @@
-import { t, getLocale } from "../../i18n/locale";
+import { t, localeTag } from "../../i18n/locale";
 import type { Currentness } from "../../api/historyModels";
 
 const states: Record<string, string> = {
@@ -21,7 +21,7 @@ export const kindLabel = (kind: string) => kinds[kind] ?? t("history.record");
 export function formatHistoryTime(value: string | null): string {
   if (!value) return t("history.noTime");
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? t("history.unknownTime") : date.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  return Number.isNaN(date.getTime()) ? t("history.unknownTime") : date.toLocaleString(localeTag(), { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 export const groupLabels: Record<string, string> = {
   get CONTENT() { return t("trace.field.content"); }, get CONCLUSION() { return t("history.assessment"); }, get EVIDENCE() { return t("history.evidence"); }, get CONDITION() { return t("history.condition"); }, get STATUS() { return t("history.assessmentState"); },

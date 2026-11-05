@@ -45,13 +45,15 @@ it.each([
   expect(generated.origin.verdict_revision).toBe(verdict.revision_digest);
 });
 
-it.each(["ko", "en"] as const)("a Chinese answer language has no screen text yet, so the question follows the %s screen", display => {
+it.each(["ko", "en", "zh-Hans"] as const)("a Chinese answer language writes the question in Chinese on the %s screen", display => {
   setLocale(display);
   const view = demo.phase2 as unknown as TraceView;
   const verdict = view.verdicts.find(item => item.subject_id === "SYN-C-DET-RAIN")!;
   const chinese = investigationFor("p", "CRITERION", verdict, view, "zh-Hans")!;
-  const automatic = investigationFor("p", "CRITERION", verdict, view, null)!;
-  expect(chinese.question).toBe(automatic.question);
   expect(chinese.responseLanguage).toBe("zh-Hans");
-  expect(chinese.questionForLanguage?.("zh-Hans")).toBe(automatic.question);
+  expect(chinese.question).toContain("请找出可能的原因，以及能区分这些原因的测试。");
+  expect(chinese.question).not.toMatch(/[가-힣]/);
+  expect(chinese.question).not.toMatch(/FAIL_COMPUTED|THRESHOLD_NOT_MET/);
+  expect(chinese.questionForLanguage?.("zh-Hans")).toBe(chinese.question);
+  expect(chinese.questionForLanguage?.(null)).toBe(investigationFor("p", "CRITERION", verdict, view, null)!.question);
 });

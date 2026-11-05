@@ -12,7 +12,8 @@ afterEach(() => { localStorage.clear(); sessionStorage.clear(); });
 it("lists the answer languages in one place, apart from the screen languages", () => {
   expect(RESPONSE_LANGUAGE_CHOICES.map(choice => choice.code)).toEqual(["ko", "en", "zh-Hans"]);
   expect(responseLanguageLabel("zh-Hans")).toBe("中文(简体)");
-  expect(LANGUAGE_CHOICES.map(choice => choice.code)).toEqual(["ko", "en"]);
+  expect(LANGUAGE_CHOICES.map(choice => choice.code)).toEqual(["ko", "en", "zh-Hans"]);
+  expect(RESPONSE_LANGUAGE_CHOICES.map(choice => choice.label)).toEqual(LANGUAGE_CHOICES.map(choice => choice.label));
 });
 
 it("accepts only listed languages, and keeps from a server's list only the ones this app can offer", () => {

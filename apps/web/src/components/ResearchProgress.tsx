@@ -1,5 +1,5 @@
 import { message } from "../i18n/formatMessages";
-import { getLocale } from "../i18n/locale";
+import { localeTag } from "../i18n/locale";
 import { t, useTranslation } from "../i18n/locale";
 import { Button, Callout } from "@blueprintjs/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -30,7 +30,7 @@ export function ResearchProgress({ status }: { status: ResearchStatus }) {
 export function UsageSummary({status}: {status?: Pick<ResearchStatus, "usage">}) {
   useTranslation();
   const usage=status?.usage;
-  const number=(value:number|null|undefined)=>value == null ? t("progress.unknown") : value.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR");
+  const number=(value:number|null|undefined)=>value == null ? t("progress.unknown") : value.toLocaleString(localeTag());
   return <span className="usage-summary" title={message("usageTooltip", number(usage?.input_tokens), number(usage?.output_tokens))}>
     {message("usageCaption", number(usage?.total_tokens), usage?.state === "PARTIAL")}
   </span>;

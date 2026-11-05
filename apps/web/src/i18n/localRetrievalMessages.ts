@@ -1,4 +1,6 @@
 import type { LanguageCode } from "./languageChoices";
+import { LOCALE_TAGS } from "./languageChoices";
+import { localRetrievalReasonZh, localRetrievalZh } from "./zh/localRetrievalMessagesZh";
 
 /**
  * Copy for the "Local retrieval preparation" card, included by the central catalog.
@@ -144,7 +146,7 @@ export const localRetrievalMessages = {
 export type LocalRetrievalMessageKey = keyof typeof localRetrievalMessages;
 
 export function localRetrievalText(key: LocalRetrievalMessageKey, locale: LanguageCode): string {
-  return localRetrievalMessages[key][locale];
+  return locale === "zh-Hans" ? localRetrievalZh[key] : localRetrievalMessages[key][locale];
 }
 
 /** Server reason codes shown to people. Unknown codes fall back to a generic line plus the code itself. */
@@ -205,27 +207,30 @@ const codeShape = /^[A-Z][A-Z0-9_]{2,79}$/;
 
 export function localRetrievalReason(code: string | null | undefined, locale: LanguageCode): string {
   if (!code) return localRetrievalText("localRetrieval.reasonUnknown", locale);
-  if (isKnownLocalRetrievalReason(code)) return localRetrievalReasonMessages[code][locale];
+  if (isKnownLocalRetrievalReason(code)) return locale === "zh-Hans" ? localRetrievalReasonZh[code] : localRetrievalReasonMessages[code][locale];
   const shown = codeShape.test(code) ? ` (${code})` : "";
   return `${localRetrievalText("localRetrieval.reasonUnknown", locale)}${shown}`;
 }
 
-const localeTag = (locale: LanguageCode) => locale === "ko" ? "ko-KR" : "en-US";
+const localeTag = (locale: LanguageCode) => LOCALE_TAGS[locale];
 
 /** "123.6 MB · 129,606,142 bytes": the rounded size and the exact byte count. */
 export function localRetrievalBytes(bytes: number, locale: LanguageCode): string {
   const exact = new Intl.NumberFormat(localeTag(locale)).format(bytes);
   const megabytes = (bytes / 1_000_000).toLocaleString(localeTag(locale), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  return locale === "ko" ? `${megabytes} MB · ${exact} 바이트` : `${megabytes} MB · ${exact} bytes`;
+  const unit = { ko: "바이트", en: "bytes", "zh-Hans": "字节" }[locale];
+  return `${megabytes} MB · ${exact} ${unit}`;
 }
 
 export function localRetrievalCounts(
   counts: { ready: number; total: number; pending: number; failed: number }, locale: LanguageCode,
 ): string {
   const n = (value: number) => new Intl.NumberFormat(localeTag(locale)).format(value);
-  return locale === "ko"
-    ? `준비 ${n(counts.ready)} / 전체 ${n(counts.total)} · 대기 ${n(counts.pending)} · 실패 ${n(counts.failed)}`
-    : `Ready ${n(counts.ready)} of ${n(counts.total)} · pending ${n(counts.pending)} · failed ${n(counts.failed)}`;
+  return {
+    ko: `준비 ${n(counts.ready)} / 전체 ${n(counts.total)} · 대기 ${n(counts.pending)} · 실패 ${n(counts.failed)}`,
+    en: `Ready ${n(counts.ready)} of ${n(counts.total)} · pending ${n(counts.pending)} · failed ${n(counts.failed)}`,
+    "zh-Hans": `就绪 ${n(counts.ready)} / 共 ${n(counts.total)} · 待处理 ${n(counts.pending)} · 失败 ${n(counts.failed)}`,
+  }[locale];
 }
 
 export function localRetrievalTransfer(
@@ -233,7 +238,6 @@ export function localRetrievalTransfer(
 ): string {
   const n = (value: number) => new Intl.NumberFormat(localeTag(locale)).format(value);
   const label = localRetrievalText(`localRetrieval.transfer.${transfer.state}`, locale);
-  return locale === "ko"
-    ? `${label} · ${n(transfer.transferred_bytes)} / ${n(transfer.total_bytes)} 바이트`
-    : `${label} · ${n(transfer.transferred_bytes)} / ${n(transfer.total_bytes)} bytes`;
+  const unit = { ko: "바이트", en: "bytes", "zh-Hans": "字节" }[locale];
+  return `${label} · ${n(transfer.transferred_bytes)} / ${n(transfer.total_bytes)} ${unit}`;
 }

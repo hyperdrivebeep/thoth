@@ -39,17 +39,17 @@
       "apps/web/src/api/historyTestFixture.ts::createHistoryFixtureTransport.handle": 24,
       "apps/web/src/api/localRetrieval.ts::runLocalOperation": 30,
       "apps/web/src/api/localWorkspacePersistence.ts::readLocalPending": 43,
-      "apps/web/src/api/researchProgress.ts::timelineFromPublished.<anon1>": 23,
+      "apps/web/src/api/researchProgress.ts::timelineFromPublished.<anon1>": 22,
       "apps/web/src/api/resultEvidence.ts::read": 28,
       "apps/web/src/api/resultEvidenceIdentity.ts::currentResultDigest": 22,
       "apps/web/src/components/CapabilityWorkbench.tsx::MethodDetail": 23,
-      "apps/web/src/components/ConversationTimeline.tsx::ConversationTimeline": 100,
+      "apps/web/src/components/ConversationTimeline.tsx::ConversationTimeline": 99,
       "apps/web/src/components/FirstRunSetup.tsx::FirstRunSetup": 55,
       "apps/web/src/components/FirstRunSetup.tsx::FirstRunSetup.<anon2>": 47,
       "apps/web/src/components/HypothesisCompare.tsx::HypothesisCompare.<anon4>": 23,
       "apps/web/src/components/LinkRecheckDialog.tsx::LinkRecheckDialog": 23,
       "apps/web/src/components/LiveProjectWorkspace.tsx::LiveProjectWorkspace": 97,
-      "apps/web/src/components/LiveProjectWorkspace.tsx::ProjectSession": 88,
+      "apps/web/src/components/LiveProjectWorkspace.tsx::ProjectSession": 87,
       "apps/web/src/components/LocalRetrievalSettingsCard.tsx::LocalRetrievalSettingsCard": 29,
       "apps/web/src/components/LocalRetrievalSettingsCard.tsx::ProjectSection": 22,
       "apps/web/src/components/ModelCredentialPanel.tsx::CompanyRow": 40,
@@ -59,7 +59,7 @@
       "apps/web/src/components/OAuthLoginFlow.tsx::readSession": 22,
       "apps/web/src/components/ProjectWebSetup.tsx::ProjectWebSetup": 23,
       "apps/web/src/components/ResearchActivityStrip.tsx::ActivityDetails": 30,
-      "apps/web/src/components/ResearchComposer.tsx::ResearchComposer": 59,
+      "apps/web/src/components/ResearchComposer.tsx::ResearchComposer": 58,
       "apps/web/src/components/ResearchDetailPane.tsx::ResearchDetailPane": 29,
       "apps/web/src/components/ResearchFollowupSummary.tsx::ResearchFollowupSummary": 26,
       "apps/web/src/components/ResearchResultCard.tsx::ResearchResultCard": 105,
@@ -80,7 +80,7 @@
       "apps/web/src/i18n/progressEn.ts::missingFor": 34,
       "apps/web/src/i18n/progressKo.ts::missingFor": 35,
       "apps/web/src/i18n/progressKo.ts::sceneFor": 74,
-      "apps/web/src/i18n/progressKo.ts::waitLine": 22
+      "apps/web/src/i18n/progressKo.ts::waitLine": 21
     }
   }
 }

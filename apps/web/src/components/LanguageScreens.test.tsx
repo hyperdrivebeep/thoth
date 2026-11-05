@@ -16,11 +16,13 @@ import { investigationFor } from "./traceInvestigation";
 
 afterEach(() => setLocale("ko"));
 
-it("provides both languages for every static message without leaked translation calls", () => {
+it("provides every language for every static message without leaked translation calls", () => {
   for (const [key, value] of Object.entries(messages)) {
     expect(value.ko.trim(), key).not.toBe("");
     expect(value.en.trim(), key).not.toBe("");
-    expect(value.ko + value.en, key).not.toMatch(/\bt\("/);
+    expect(value["zh-Hans"].trim(), key).not.toBe("");
+    expect(value.ko + value.en + value["zh-Hans"], key).not.toMatch(/\bt\("/);
+    expect(value["zh-Hans"], key).not.toMatch(/[가-힣]/);
   }
 });
 
@@ -66,6 +68,17 @@ it("keeps verdict meaning and generated request language independent of display 
       const next = nextStep(kind, verdict.state, true);
       expect(next?.lines.length).toBe(checks);
       expect(JSON.stringify(next)).not.toMatch(/[가-힣]/);
+      expect(investigationFor("p", kind, verdict, view, "ko")?.question).toBe(question);
+      for (const code of verdict.reasons.computed) {
+        expect(reasonSentence(code, id => id, verdict.conditions.condition)).not.toMatch(/[가-힣]/);
+      }
+      setLocale("zh-Hans");
+      const chinese = verdictLook(kind, verdict.state);
+      expect([chinese.intent, chinese.icon]).toEqual([before.intent, before.icon]);
+      expect(chinese.text).toMatch(/[\u4e00-\u9fff]/);
+      expect(chinese.text).not.toMatch(/[가-힣]/);
+      expect(nextStep(kind, verdict.state, true)?.lines.length).toBe(checks);
+      expect(JSON.stringify(nextStep(kind, verdict.state, true))).not.toMatch(/[가-힣]/);
       expect(investigationFor("p", kind, verdict, view, "ko")?.question).toBe(question);
       for (const code of verdict.reasons.computed) {
         expect(reasonSentence(code, id => id, verdict.conditions.condition)).not.toMatch(/[가-힣]/);

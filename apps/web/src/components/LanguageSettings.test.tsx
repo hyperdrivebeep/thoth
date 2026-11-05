@@ -226,3 +226,36 @@ describe("display language", () => {
     expect(session.responseLanguage).toBe("en");
   });
 });
+
+describe("Simplified Chinese screen", () => {
+  it("shows Settings and the question box in Chinese, keeps the answer language apart, and marks the page language", async () => {
+    await mount(["ko", "en", "zh-Hans"], true);
+    await choose("display-language", "zh-Hans");
+    expect(getLocale()).toBe("zh-Hans");
+    expect(document.documentElement.lang).toBe("zh-Hans");
+    expect(select("display-language").value).toBe("zh-Hans");
+    const card = document.querySelector(".language-card")!;
+    expect(card.textContent).toContain("显示语言");
+    expect(card.textContent).toContain("默认回答语言");
+    expect(card.textContent).toContain("自动（提问所用的语言）");
+    expect([...select("display-language").options].map(option => option.textContent)).toEqual([t("language.displayAuto"), "한국어", "English", "中文(简体)"]);
+    expect(select("reply-language-default").value).toBe("auto");
+    await choose("reply-language-default", "zh-Hans");
+    expect(session.responseLanguage).toBe("zh-Hans");
+    expect(document.querySelector(".language-fixed")!.textContent).toContain("回答：中文(简体)（已固定）");
+    await choose("display-language", "ko");
+    expect(session.responseLanguage).toBe("zh-Hans");
+    expect(document.documentElement.lang).toBe("ko");
+  });
+
+  it("follows a Chinese browser when the screen language is automatic, and a Traditional one falls to the next language", async () => {
+    await mount();
+    const browser = (...languages: string[]) => Object.defineProperty(globalThis.navigator, "languages", { value: languages, configurable: true });
+    browser("zh-CN", "en");
+    await choose("display-language", "auto");
+    expect(getLocale()).toBe("zh-Hans");
+    browser("zh-TW", "en-US");
+    await act(async () => { setDisplayPreference("auto"); });
+    expect(getLocale()).toBe("en");
+  });
+});

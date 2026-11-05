@@ -1,6 +1,7 @@
 import type { ResponseLanguage } from "../api/responseLanguages";
 import { isLanguageCode, type LanguageCode } from "../i18n/languageChoices";
 import { investigationQuestion } from "../i18n/traceEnglish";
+import { investigationQuestionZh } from "../i18n/traceChinese";
 import { getLocale } from "../i18n/locale";
 import type { TraceView, Verdict } from "../api/trace";
 import type { WorkThread } from "../types";
@@ -33,8 +34,9 @@ export function investigationFor(projectId: string, kind: string, verdict: Verdi
   const what = subject === "CRITERION" ? "기준" : "요구사항";
   const ask = failed ? "원인 후보와 그것을 가를 시험을 찾아 주세요." : "판정하려면 무엇이 더 필요한지, 가능한 원인 후보와 그것을 가를 시험을 찾아 주세요.";
   const question = [`「${name(verdict.subject_id)}」 ${what}의 판정이 "${verdictLook(kind, verdict.state, "ko").text}"입니다.`, ...reasons, ask].join(" ");
-  const generated = questionLanguage === "en" ? investigationQuestion(name(verdict.subject_id), subject,
-    verdictLook(kind, verdict.state, "en").text, reasons, failed) : question;
+  const writers = { en: investigationQuestion, "zh-Hans": investigationQuestionZh };
+  const write = questionLanguage === "ko" ? null : writers[questionLanguage];
+  const generated = write ? write(name(verdict.subject_id), subject, verdictLook(kind, verdict.state, questionLanguage).text, reasons, failed) : question;
   return { ...(responseLanguage !== undefined ? { responseLanguage,
     questionForLanguage: (language: ResponseLanguage | null) => investigationFor(projectId, kind, verdict, view, language)!.question } : {}), origin: { kind: "TRACE_VERDICT", project_id: projectId, subject_kind: subject, subject_id: verdict.subject_id, verdict_revision: verdict.revision_digest }, question: generated };
 }

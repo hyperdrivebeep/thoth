@@ -586,5 +586,9 @@ export const activityMessages = {
   "review.excluded": {
     "ko": "이 범위에서는 배제됨",
     "en": "Excluded within this scope"
+  },
+  "activity.originalDetail": {
+    "ko": "원래 활동 기록",
+    "en": "Original activity detail"
   }
 } as const;

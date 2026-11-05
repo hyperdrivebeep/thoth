@@ -146,3 +146,17 @@ it("keeps cancellation available during processing and connects zero sources", a
   await act(async () => button("업로드 취소")!.click()); await tick();
   expect(fixture.calls).toEqual(["stage:report.pdf"]);
 });
+
+it("shows the source connection panel and the upload progress in Simplified Chinese", async () => {
+  await act(async () => setLocale("zh-Hans"));
+  expect(container.textContent).toContain("连接资料文件");
+  await start(["report.pdf"]);
+  await act(async () => fixture.jobs[0].options?.onProgress?.({ phase: "uploading", loaded: 50, total: 100 }));
+  expect(container.textContent).toContain("正在上传 report.pdf（50%）");
+  await act(async () => fixture.jobs[0].options?.onProgress?.({ phase: "processing", loaded: 100, total: 100 }));
+  expect(container.textContent).toContain("report.pdf 已发送完毕。服务器正在处理…");
+  expect(container.textContent).not.toMatch(/[가-힣]/);
+  expect(button("取消上传")).toBeDefined();
+  await act(async () => button("取消上传")!.click()); await tick();
+  expect(fixture.calls).toEqual(["stage:report.pdf"]);
+});

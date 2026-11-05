@@ -361,6 +361,42 @@ This first slice provides domain contracts, a local single-text encoder port, ev
 shadow behavior only. It does not provide indexing, workers, model loading, installation or UI.
 Those capabilities remain unavailable until their separately reviewed implementation slices.
 
+## CJK lanes (6.0.0, shadow only)
+
+The earlier lanes read Latin/digit words and Hangul. A Han or kana run gives the BM25 lanes no
+term at all (`identifier_terms`, `bigram_terms`) and gives the substring lane one term for the whole
+clause (`search_terms`, whose `\w+` tokens run through unbroken Chinese or Japanese). So a question
+in pure Chinese or Japanese selects nothing in `GROUPED_BM25` and `CHAR_BIGRAM`, and in
+`LEXICAL_SUBSTRING_V1` only by accident of ordering.
+
+`RetrievalCjkPolicy` (`domain/retrieval_cjk_policy.py`) is policy 6.0.0: the two budgets, a fixed
+`exposure: SHADOW_ONLY`, and one required `lane_id`, with no default lane. The lanes
+(`domain/retrieval_cjk_lanes.py`) are `LEXICAL_SUBSTRING_CJK`, `GROUPED_BM25_CJK` and
+`CHAR_BIGRAM_CJK`, each 1.0.0. Each is the earlier lane plus the terms of `domain/retrieval_cjk.py`
+(`cjk-bigram:1.0.0`): after NFKC folding, every maximal run of Han characters, hiragana and
+katakana gives its overlapping character bigrams, or the character itself for a run of one. No stop
+list is applied, and Simplified and Traditional Chinese stay different characters. Latin, digits and
+Hangul are read by the earlier rule, so for a text with no Han or kana the terms are the earlier
+terms exactly. The substring lane also measures the 24-character short-line floor with a Han/kana
+character counting as three, because that floor was set for Latin text.
+
+- The earlier lanes, policies 2.0.0 to 5.0.0 and their serialization are unchanged. The CJK lane ids
+  are not in `LaneId` or `FusedLaneId`, so 3.0.0 and 4.0.0 cannot name them, and
+  `select_retrieval_context` refuses them with any other policy
+  (`RETRIEVAL_LANE_CJK_NEEDS_CJK_POLICY`) and refuses a `lane_id` argument for a 6.0.0 policy.
+- The lanes register when `retrieval_cjk_lanes` is first imported, which only selecting with a 6.0.0
+  policy does.
+- Like 5.0.0 it is evaluated through `evaluate_retrieval` and cannot prepare a CANARY or BASELINE
+  exposure (`RETRIEVAL_CJK_SHADOW_ONLY`); the handler has no default policy. The run-time shadow
+  replay (`select_evidence_for_behavior`) holds it (`RETRIEVAL_CJK_UNSUPPORTED_ENTRY`) rather than
+  run it with the budget-only analysis scorer.
+- Nothing here says the lanes are good. `outputs/cjk-retrieval-20261105/report.md` is an offline
+  comparison on a small synthetic corpus; promotion needs the evaluation set.
+- `test_retrieval_cjk` pins the term table (Simplified, Traditional, kana, half-width, mixed), that
+  Hangul and Latin terms equal the earlier ones, that each lane finds a pure Chinese or Japanese
+  question's paragraph where the earlier lanes find none, the policy and handler guards, and the
+  evaluation output.
+
 ## Tests
 
 The research selection is pinned by an equivalence suite against a preserved copy of the earlier

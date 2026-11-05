@@ -45,4 +45,13 @@ const english: Record<keyof typeof korean, {test: string; action: string; hint: 
     "hint": "Repeated recorded test results excluded these hypotheses from the candidate count. Their records are retained."
   }
 };
-export const testOrderTitles = bilingualRecord(korean, english);
+const chinese: Record<keyof typeof korean, { test: string; action: string; hint: string }> = {
+  READY: { test: "先尝试的测试", action: "先查看的行动", hint: "无论结果如何，剩下的可能原因最少的测试排在最前。" },
+  COST_UNKNOWN: { test: "成本未知的测试", action: "成本未知的行动", hint: "按同样的规则排序，但因为没有成本估计而单独列出。不会把成本当作 0。" },
+  NO_DECISION_CHANGE: { test: "无论结果如何后续行动都相同的测试", action: "无论结果如何都相同的行动", hint: "无论出现什么结果，后续行动都一样，因此排在后面。" },
+  NOT_EXECUTABLE: { test: "目前无法进行的测试", action: "目前无法进行的行动", hint: "目前无法执行。" },
+  UNCOUNTABLE: { test: "尚无法计算区分程度的测试", action: "按顺序查看的行动", hint: "没有写明其他假设在这项测试中会得到什么结果，因此无法计算区分程度。仅按风险、成本、可逆性的顺序排列。" },
+  RESULT_RECORDED: { test: "已记录结果的测试", action: "已记录结果的行动", hint: "这些测试已经做过，不再作为下一步要做的测试推荐。" },
+  HYPOTHESIS_ELIMINATED: { test: "已排除假设的测试", action: "已排除假设的行动", hint: "多次测试结果已将这些假设排除。候选数量中已不计入它们，但记录仍然保留。" },
+};
+export const testOrderTitles = bilingualRecord(korean, english, chinese);

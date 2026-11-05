@@ -1,6 +1,5 @@
-import { t } from "../i18n/locale";
+import { t, localeTag } from "../i18n/locale";
 import { message as formatMessage } from "../i18n/formatMessages";
-import { getLocale } from "../i18n/locale";
 import type { ResearchStatus } from "./research";
 import { sourceCardTitle } from "../sourceDisplay";
 import { progressEvidenceLabels, progressSourceActionLocation } from "./progressEvidenceLocations";
@@ -324,7 +323,7 @@ function timelineFromPublished(status: ResearchStatus, sourceUris: string[], fac
           "model_call",
           waiting
             ? compactPayload([elapsed ?? t("progress.elapsedUnknown"), firstByte ? formatMessage("firstByte", firstByte) : t("progress.noFirstByte")])
-            : compactPayload([received != null ? `${received.toLocaleString(getLocale() === "en" ? "en-US" : "ko-KR")}B` : null, elapsed]),
+            : compactPayload([received != null ? `${received.toLocaleString(localeTag())}B` : null, elapsed]),
           waiting,
         ),
       );
