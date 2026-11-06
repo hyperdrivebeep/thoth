@@ -18,7 +18,7 @@ def descriptor(root: str) -> EmbeddingAssetDescriptor:
 
 async def test_explicit_prepare_before_query_and_legacy_factory_compatibility() -> None:
     worker = ProcessEmbeddingWorker(
-        "tests.embedding_fixtures:DescriptorEncoder", descriptor=descriptor("synthetic")
+        "tests.embedding_child_encoders:DescriptorEncoder", descriptor=descriptor("synthetic")
     )
     try:
         with pytest.raises(EmbeddingIndexError, match="NOT_PREPARED"):
@@ -46,7 +46,7 @@ async def test_explicit_prepare_before_query_and_legacy_factory_compatibility() 
 )
 async def test_startup_errors_are_typed_and_child_is_released(root: str, reason: str) -> None:
     worker = ProcessEmbeddingWorker(
-        "tests.embedding_fixtures:DescriptorEncoder", descriptor=descriptor(root)
+        "tests.embedding_child_encoders:DescriptorEncoder", descriptor=descriptor(root)
     )
     try:
         with pytest.raises(EmbeddingIndexError, match=reason):
@@ -61,7 +61,9 @@ async def test_prepare_timeout_does_not_use_query_budget_or_leave_child() -> Non
     value = descriptor("synthetic-slow-load").model_copy(
         update={"load_budget": EmbeddingLoadBudget(timeout_ms=300)}
     )
-    worker = ProcessEmbeddingWorker("tests.embedding_fixtures:DescriptorEncoder", descriptor=value)
+    worker = ProcessEmbeddingWorker(
+        "tests.embedding_child_encoders:DescriptorEncoder", descriptor=value
+    )
     try:
         with pytest.raises(EmbeddingIndexError, match="EMBEDDING_TIMEOUT"):
             await worker.prepare()
@@ -88,7 +90,7 @@ def test_optional_dependency_missing_is_explicit_before_asset_io(
 
 async def test_queued_query_cannot_implicitly_reload_after_previous_child_failure() -> None:
     worker = ProcessEmbeddingWorker(
-        "tests.embedding_fixtures:DescriptorEncoder", descriptor=descriptor("synthetic")
+        "tests.embedding_child_encoders:DescriptorEncoder", descriptor=descriptor("synthetic")
     )
     try:
         await worker.prepare()

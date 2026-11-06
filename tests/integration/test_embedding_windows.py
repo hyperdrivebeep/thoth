@@ -6,7 +6,6 @@ Synthetic encoders and sources only; no downloaded weights and no provider calls
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
 
 import pytest
 from sqlalchemy import text
@@ -357,29 +356,8 @@ async def test_collecting_orphans_keeps_every_window_of_a_current_passage(tmp_pa
         x.stores.close()
 
 
-class WindowedEncoder:
-    """Child-side stand-in: 'tokens:N' reports N source tokens, each window has its own vector."""
-
-    def __init__(self) -> None:
-        self.last_truncated = False
-        self.last_source_tokens: int | None = None
-
-    def encode_one(
-        self,
-        text: str,
-        *,
-        role: Literal["QUERY", "PASSAGE"],
-        model: DenseModelPin,
-        window: int = 0,
-    ) -> tuple[float, ...]:
-        count = int(text.split(":")[1]) if text.startswith("tokens:") else 10
-        self.last_source_tokens = count
-        self.last_truncated = role == "PASSAGE" and count > 2 and window_cut(count)
-        return unit_vector(f"{text}#{window}")
-
-
 async def test_the_worker_asks_the_encoder_for_one_window_at_a_time() -> None:
-    worker = ProcessEmbeddingWorker("tests.integration.test_embedding_windows:WindowedEncoder")
+    worker = ProcessEmbeddingWorker("tests.embedding_child_encoders:WindowedEncoder")
     try:
         first = await worker.encode_one(f"tokens:{LONG}", role="PASSAGE")
         assert first.source_tokens == LONG and first.truncated is None

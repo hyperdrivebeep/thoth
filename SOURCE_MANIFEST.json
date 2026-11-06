@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-06T06:37:40.977582+00:00",
+  "created_at": "2026-11-06T09:22:43.809300+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -8947,9 +8947,14 @@
       "bytes": 10107
     },
     {
+      "path": "tests/embedding_child_encoders.py",
+      "sha256": "3806b602a300766fdba255e6154e3fcddfe58d5447d6853d3247ceb61b491cee",
+      "bytes": 3800
+    },
+    {
       "path": "tests/embedding_fixtures.py",
-      "sha256": "46fcd8551bc573a72c949b69d78e1167265dadb5016f82de22850444ce7480d7",
-      "bytes": 8029
+      "sha256": "9041b99ade6d4fba7c6de3fbb5599a5623c806d0902b029e68b3cc09d910e972",
+      "bytes": 6651
     },
     {
       "path": "tests/fixtures/action_response_golden.json",
@@ -9858,8 +9863,8 @@
     },
     {
       "path": "tests/integration/test_embedding_preprocess_version.py",
-      "sha256": "b8acdce621adeef5d09812451a77fd2b43dbc0cfc09af66911a83563920045c2",
-      "bytes": 13374
+      "sha256": "bcbf6643c656cb82a500d0ad89278c8d9c07a8fa933a9a7656560b45a05bc7b4",
+      "bytes": 12756
     },
     {
       "path": "tests/integration/test_embedding_publication_paths.py",
@@ -9878,13 +9883,13 @@
     },
     {
       "path": "tests/integration/test_embedding_runtime_process.py",
-      "sha256": "b96dd308a1e340bc938d8bd1c7a8b71da4a1f8579c19fcba4f5ecd37737d28a6",
-      "bytes": 2879
+      "sha256": "c79511b1ebf6287f4888a11f9f2e69e88e107368de349c496df39cc2c54c9db2",
+      "bytes": 2885
     },
     {
       "path": "tests/integration/test_embedding_windows.py",
-      "sha256": "e47650ce05c63306b4402be1e568c851485df26366f2af9d3a3592c4275809e3",
-      "bytes": 17472
+      "sha256": "4bce2363f13e594036c72efe321c03bbd4cf997f12bfb0e748e7f5efba9e8da2",
+      "bytes": 16751
     },
     {
       "path": "tests/integration/test_evaluation_execution_limits.py",
@@ -12727,14 +12732,19 @@
       "bytes": 4242
     },
     {
+      "path": "tests/unit/test_embedding_child_import_weight.py",
+      "sha256": "d19f4fe999b63165976a2ff1fb82e4c0d27b190293941154fff9c32712a66b9b",
+      "bytes": 1429
+    },
+    {
       "path": "tests/unit/test_embedding_preparation.py",
-      "sha256": "3398602d532e1e25375a4d8d641474c4f800440b3555010662621d95a8784d17",
-      "bytes": 4237
+      "sha256": "32d08e41f99db8f3af76fea2ff6ff3d3615552adeab19b07ec8af77030cd55ce",
+      "bytes": 4275
     },
     {
       "path": "tests/unit/test_embedding_token_cap.py",
-      "sha256": "789803550d9c20ae99c0d4d491e619874c156d6b34d036271e8f39cd0cfa1416",
-      "bytes": 5202
+      "sha256": "0479d70d7d8ddf4f527202356477301db9d88a0257894dae38de97bcb2551fa8",
+      "bytes": 4737
     },
     {
       "path": "tests/unit/test_embedding_window_geometry.py",
@@ -12743,8 +12753,8 @@
     },
     {
       "path": "tests/unit/test_embedding_worker.py",
-      "sha256": "23465d66bd360b91d9da73249f1fb12b74a40b1d7dd0bc047f31791a891a1923",
-      "bytes": 4585
+      "sha256": "ebdb20fb2caebd34d7a112ba406f62e3fe01befbcdba33bcef65785bc8b1e667",
+      "bytes": 4591
     },
     {
       "path": "tests/unit/test_file_staging_cjk_upload.py",

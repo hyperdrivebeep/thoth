@@ -284,26 +284,8 @@ async def test_only_cut_passages_are_recorded_and_a_cached_record_is_never_overw
         x.stores.close()
 
 
-class ReportingEncoder:
-    """Child-side stand-in for the real encoder's reporting attributes."""
-
-    def __init__(self) -> None:
-        self.last_truncated = False
-        self.last_source_tokens: int | None = None
-
-    def encode_one(
-        self, text: str, *, role: Literal["QUERY", "PASSAGE"], model: DenseModelPin
-    ) -> tuple[float, ...]:
-        count = int(text.split(":")[1]) if text.startswith("tokens:") else 10
-        self.last_source_tokens = count
-        self.last_truncated = role == "PASSAGE" and count > PASSAGE_TOKEN_CAP
-        return unit_vector(text)
-
-
 async def test_the_worker_carries_the_cut_flag_and_size_and_leaves_short_inputs_unchanged() -> None:
-    worker = ProcessEmbeddingWorker(
-        "tests.integration.test_embedding_preprocess_version:ReportingEncoder"
-    )
+    worker = ProcessEmbeddingWorker("tests.embedding_child_encoders:ReportingEncoder")
     try:
         long = await worker.encode_one("tokens:3000", role="PASSAGE")
         assert long.truncated is True and long.source_tokens == 3000

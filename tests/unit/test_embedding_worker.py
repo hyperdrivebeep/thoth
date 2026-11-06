@@ -10,7 +10,7 @@ from tests.embedding_fixtures import unit_vector
 from thoth.adapters.embeddings.process_worker import ProcessEmbeddingWorker
 from thoth.domain.embedding_index import EmbeddingBudget, EmbeddingIndexError, EmbeddingVector
 
-FACTORY = "tests.embedding_fixtures:ChildEncoder"
+FACTORY = "tests.embedding_child_encoders:ChildEncoder"
 
 
 async def test_child_roundtrip_close_and_no_automatic_start() -> None:
