@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-06T01:05:31.896380+00:00",
+  "created_at": "2026-11-06T02:50:21.970026+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -9848,8 +9848,8 @@
     },
     {
       "path": "tests/integration/test_embedding_recovery.py",
-      "sha256": "f32ee1e85d8e2b1e03661ce9c3c2a18c95336bf1b884828b8df452328d716fce",
-      "bytes": 10948
+      "sha256": "bea9301d5d4d2a65ae7818b2e06aa3bc902b9be052f3b68063e23fdc11d88aa3",
+      "bytes": 10980
     },
     {
       "path": "tests/integration/test_embedding_runtime.py",

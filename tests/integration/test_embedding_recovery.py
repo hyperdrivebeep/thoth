@@ -266,11 +266,11 @@ async def test_project_drain_has_one_cumulative_job_budget(
 
     class SlowWorker(FakeWorker):
         async def encode_one(
-            self, text: str, *, role: Literal["QUERY", "PASSAGE"]
+            self, text: str, *, role: Literal["QUERY", "PASSAGE"], window: int = 0
         ) -> EmbeddingVector:
             # Deterministic elapsed encoding time; SQLite/CI scheduling is not the subject.
             elapsed[0] += 0.6
-            return await super().encode_one(text, role=role)
+            return await super().encode_one(text, role=role, window=window)
 
     x = fixture(tmp_path)
     try:
