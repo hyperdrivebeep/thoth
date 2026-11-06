@@ -4,7 +4,6 @@ from types import SimpleNamespace
 from typing import Literal
 
 import pytest
-from tests.embedding_fixtures import unit_vector
 
 from thoth.adapters.embeddings.onnx_encoder import (
     PASSAGE_TOKEN_CAP,
@@ -97,21 +96,8 @@ def test_encoder_cuts_passages_only(
         assert ids[:-1] == original[0][: expected_count - 1] and ids[-1] == original[0][-1]
 
 
-class CappedEncoder:
-    """Child-side stand-in: flags passages whose text starts with 'long'."""
-
-    def __init__(self) -> None:
-        self.last_truncated = False
-
-    def encode_one(
-        self, text: str, *, role: Literal["QUERY", "PASSAGE"], model: DenseModelPin
-    ) -> tuple[float, ...]:
-        self.last_truncated = role == "PASSAGE" and text.startswith("long")
-        return unit_vector(text)
-
-
 async def test_only_cut_passages_are_counted_by_the_worker() -> None:
-    worker = ProcessEmbeddingWorker("tests.unit.test_embedding_token_cap:CappedEncoder")
+    worker = ProcessEmbeddingWorker("tests.embedding_child_encoders:CappedEncoder")
     try:
         assert (await worker.encode_one("short passage", role="PASSAGE")).data
         assert worker.truncated_passages == 0

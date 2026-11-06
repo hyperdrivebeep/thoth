@@ -4,13 +4,12 @@ import asyncio
 import ctypes
 import hashlib
 import os
-import socket
-import time
 from ctypes import wintypes
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
+from tests.embedding_child_encoders import unit_vector
 from tests.integration.test_artifact_row_codec_contract import STAMP, document
 
 from thoth.adapters.embeddings.assets import LocalModelAssets
@@ -23,10 +22,10 @@ from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.embedding_index import EmbeddingBudget, EmbeddingCapability, EmbeddingVector
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.governance import ProjectPolicy, SourceBinding
-from thoth.domain.model_asset import AssetFile, EmbeddingAssetDescriptor, ModelAssetManifest
+from thoth.domain.model_asset import AssetFile, ModelAssetManifest
 from thoth.domain.project import Project
 from thoth.domain.resource_scope import ResourceScopeTemplate
-from thoth.domain.retrieval_embedding import DenseModelPin, window_cut
+from thoth.domain.retrieval_embedding import window_cut
 
 PROJECT = "project:codec"
 
@@ -53,29 +52,6 @@ def process_is_gone(pid: int) -> bool:
         return kernel.WaitForSingleObject(handle, 0) == 0
     finally:
         kernel.CloseHandle(handle)
-
-
-def unit_vector(text: str) -> tuple[float, ...]:
-    position = hashlib.sha256(text.encode()).digest()[0]
-    return tuple(1.0 if i == position else 0.0 for i in range(384))
-
-
-class ChildEncoder:
-    def encode_one(
-        self, text: str, *, role: Literal["QUERY", "PASSAGE"], model: DenseModelPin
-    ) -> tuple[float, ...]:
-        if text.startswith("sleep:"):
-            time.sleep(float(text.split(":")[1]))
-        if text == "crash":
-            os._exit(23)
-        if text == "bad":
-            return (0.0,) * 384
-        if text == "network":
-            socket.create_connection(("127.0.0.1", 9))
-        if text == "memory":
-            # Deliberately exceed the approved Job commit cap in this owned child only.
-            bytearray(600 * 1024 * 1024)
-        return unit_vector(text)
 
 
 class FakeWorker:
@@ -111,19 +87,6 @@ class FakeWorker:
 
     async def aclose(self) -> None:
         self.close()
-
-
-class DescriptorEncoder(ChildEncoder):
-    def __init__(self, descriptor: "EmbeddingAssetDescriptor") -> None:
-        if descriptor.root == "synthetic-slow-load":
-            time.sleep(30)
-        if descriptor.root == "synthetic-bad-hash":
-            raise ValueError("MODEL_HASH_MISMATCH")
-        if descriptor.root == "synthetic-load-crash":
-            os._exit(23)
-        if descriptor.root == "synthetic-malformed-frame":
-            # Bypass Python's redirected stdout, like native-code diagnostics.
-            os.write(1, b"not a JSON frame\n")
 
 
 @dataclass
