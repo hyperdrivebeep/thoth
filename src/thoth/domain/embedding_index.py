@@ -3,7 +3,9 @@
 import hashlib
 import math
 import struct
+from collections.abc import Sequence
 from dataclasses import dataclass, field
+from decimal import Decimal
 from typing import Literal
 
 from pydantic import Field, model_validator
@@ -12,7 +14,7 @@ from thoth.domain.base import DomainModel
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
 from thoth.domain.ids import Sha256
-from thoth.domain.retrieval_embedding import DenseModelPin
+from thoth.domain.retrieval_embedding import MAX_PASSAGE_WINDOWS, DenseModelPin
 
 
 class EmbeddingBudget(DomainModel):
@@ -135,12 +137,42 @@ def embedding_key(text_sha256: str, model: DenseModelPin) -> str:
     )
 
 
+def window_key(text_sha256: str, model: DenseModelPin, window: int) -> str:
+    """Content key of window 1 or later of a long passage.
+
+    Window 0 keeps embedding_key, so a passage that fits one window is stored exactly as before.
+    """
+    if not 1 <= window < MAX_PASSAGE_WINDOWS:
+        raise EmbeddingIndexError("EMBEDDING_WINDOW_INVALID")
+    return domain_digest(
+        "EMBEDDING_WINDOW_KEY",
+        "1.0.0",
+        canonical_payload(
+            {
+                "text_sha256": text_sha256,
+                "model": model,
+                "role": "PASSAGE",
+                "dtype": "float32-le",
+                "dimensions": 384,
+                "window": window,
+            }
+        ),
+    )
+
+
+def content_key(text_sha256: str, model: DenseModelPin, window: int = 0) -> str:
+    return (
+        embedding_key(text_sha256, model) if window == 0 else window_key(text_sha256, model, window)
+    )
+
+
 @dataclass(frozen=True)
 class EmbeddingVector:
     data: bytes
-    # Whether the passage was cut to the token cap before encoding, and how many tokens it had
-    # before the cut. None means not recorded (a vector made before this was kept, or by a worker
-    # that does not report it); False means the passage fit and was encoded whole.
+    # Whether some of the passage was left out of every window, and how many tokens the passage
+    # had when it needed more than one window or was cut. None means not recorded (a vector made
+    # before this was kept, or by a worker that does not report it); False means every token
+    # reached the model. source_tokens is what tells a reader how many windows to expect.
     # They describe how the vector was made, not which vector it is, so equality ignores them.
     truncated: bool | None = field(default=None, compare=False)
     source_tokens: int | None = field(default=None, compare=False)
@@ -165,3 +197,16 @@ class EmbeddingVector:
     @property
     def sha256(self) -> str:
         return hashlib.sha256(self.data).hexdigest()
+
+    def values(self) -> tuple[float, ...]:
+        return struct.unpack("<384f", self.data)
+
+
+def max_window_score(query: EmbeddingVector, windows: Sequence[EmbeddingVector]) -> Decimal:
+    """MaxP: a passage scores as its best window. Vectors are unit length, so a dot product is
+    the cosine. The result is rounded to nine places and fits DenseScore."""
+    if not windows:
+        raise EmbeddingIndexError("EMBEDDING_WINDOWS_MISSING")
+    q = query.values()
+    best = max(sum(a * b for a, b in zip(q, w.values(), strict=True)) for w in windows)
+    return Decimal(f"{max(-1.0, min(1.0, best)):.9f}")

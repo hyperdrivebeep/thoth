@@ -15,6 +15,7 @@ from thoth.domain.embedding_index import (
     source_refs,
 )
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
+from thoth.domain.retrieval_embedding import window_count
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
 from thoth.ports.embedding_index import (
     BoundedEmbeddingWorkerPort,
@@ -194,20 +195,29 @@ class EmbeddingIndexService:
                 spans = self._read_source(job.intent)
                 _require_deadline(stop_at)
                 for span in spans:
-                    self.store.assert_worker_boundary()
-                    # Cached work also yields to cancellation and foreground requests.
-                    await asyncio.sleep(0)
-                    _require_deadline(stop_at)
-                    vector = self.store.cached(project, span.text_sha256)
-                    if vector is None:
-                        vector = await self.worker.encode_one(span.exact_text, role="PASSAGE")
-                    if self.fault is not None:
-                        self.fault("after_encode_before_checkpoint")
-                    with self.uow.transaction():
-                        self._check_span(job.intent, span)
+                    # A passage longer than one window is stored window by window. The first
+                    # window records the passage's size, which says how many windows follow;
+                    # each one is checkpointed alone, so an interrupted job resumes after the
+                    # last stored window.
+                    window, windows = 0, 1
+                    while window < windows:
+                        self.store.assert_worker_boundary()
+                        # Cached work also yields to cancellation and foreground requests.
+                        await asyncio.sleep(0)
                         _require_deadline(stop_at)
-                        self.store.checkpoint(job, span.text_sha256, vector, self._now())
-                        _require_deadline(stop_at)
+                        vector = self.store.cached(project, span.text_sha256, window)
+                        if vector is None:
+                            vector = await self._encode_window(span, window)
+                        if window == 0:
+                            windows = window_count(vector.source_tokens)
+                        if self.fault is not None:
+                            self.fault("after_encode_before_checkpoint")
+                        with self.uow.transaction():
+                            self._check_span(job.intent, span)
+                            _require_deadline(stop_at)
+                            self._checkpoint(job, span, vector, window)
+                            _require_deadline(stop_at)
+                        window += 1
                 with self.uow.transaction():
                     self._read_source(job.intent)
                     _require_deadline(stop_at)
@@ -259,11 +269,32 @@ class EmbeddingIndexService:
         if active is not None and active[0] == project and active[1] is not None:
             active[1].cancel()
 
+    def _checkpoint(
+        self, job: EmbeddingJob, span: EvidenceSpan, vector: EmbeddingVector, window: int
+    ) -> None:
+        # The first window is stored by the call every earlier version made.
+        if window == 0:
+            self.store.checkpoint(job, span.text_sha256, vector, self._now())
+        else:
+            self.store.checkpoint(job, span.text_sha256, vector, self._now(), window)
+
+    async def _encode_window(self, span: EvidenceSpan, window: int) -> EmbeddingVector:
+        if window == 0:
+            return await self.worker.encode_one(span.exact_text, role="PASSAGE")
+        return await self.worker.encode_one(span.exact_text, role="PASSAGE", window=window)
+
     def read_vectors(
         self, project: str, spans: tuple[EvidenceSpan, ...]
     ) -> tuple[EmbeddingVector, ...]:
+        """One vector per span: its first window. Every later window must exist as well; use
+        read_window_vectors to score a passage by its best window."""
+        return tuple(windows[0] for windows in self.read_window_vectors(project, spans))
+
+    def read_window_vectors(
+        self, project: str, spans: tuple[EvidenceSpan, ...]
+    ) -> tuple[tuple[EmbeddingVector, ...], ...]:
         self._actor(project)
-        vectors: list[EmbeddingVector] = []
+        vectors: list[tuple[EmbeddingVector, ...]] = []
         if connected_retrieval_spans(spans) != spans:
             raise EmbeddingIndexError("EMBEDDING_INELIGIBLE_SOURCE")
         with self.uow.transaction():
@@ -290,10 +321,10 @@ class EmbeddingIndexService:
                 ready[key] = job
                 if span.span_id not in {r.span_id for r in job.intent.refs}:
                     raise EmbeddingIndexError("EMBEDDING_SOURCE_CHANGED")
-                vector = self.store.cached(project, span.text_sha256)
-                if vector is None:
+                windows = self.store.cached_windows(project, span.text_sha256)
+                if windows is None:
                     raise EmbeddingIndexError("INDEX_INCOMPLETE")
-                vectors.append(vector)
+                vectors.append(windows)
         return tuple(vectors)
 
     async def aclose(self) -> None:

@@ -1,6 +1,7 @@
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
 import { Button, Callout, Icon } from "@blueprintjs/core";
+import type { ReactNode } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { readConversation, type ConversationTurn } from "../api/conversation";
 import { canRetainConversation } from "../api/conversationRefresh";
@@ -33,6 +34,8 @@ type TimelineProps = {
   onOpenHistory?: () => void;
   /** Back to the trace row an investigation started from. */
   onOpenTrace?: (row: { kind: string; id: string }) => void;
+  /** Shown under the empty-thread greeting: what the project offers before the first question. */
+  emptyNotice?: ReactNode;
 };
 
 /** The follow-up fields of the live status belong to exactly one request revision. */
@@ -102,7 +105,7 @@ function SavedTurnCard({ turn, projectId, threadId, status, liveStatus, savedBef
 }
 
 export function ConversationTimeline(props: TimelineProps) {
-  const { projectId, threadId, status, sourceUris, onDetail, onContinue, onOpenHistory, onOpenTrace, onRetry, onResume, resuming = false, queuedInstruction = false } = props;
+  const { projectId, threadId, status, sourceUris, onDetail, onContinue, onOpenHistory, onOpenTrace, onRetry, onResume, resuming = false, queuedInstruction = false, emptyNotice } = props;
   const example = isTimelineExampleRequested();
   const liveStatus = example ? timelineExampleStatus : status;
   const liveSources = example ? TIMELINE_EXAMPLE_SOURCES : sourceUris;
@@ -148,7 +151,7 @@ export function ConversationTimeline(props: TimelineProps) {
     {(currentQuestion || running) && <CurrentTurn projectId={projectId} threadId={threadId} liveStatus={liveStatus} liveSources={liveSources} example={example} question={currentQuestion} running={running}
       onDetail={onDetail} onRetry={onRetry} onResume={onResume} resuming={resuming} queuedInstruction={queuedInstruction} onOpenTrace={onOpenTrace} linked={linked}/>}
     {emptyExistingThread && <div className="conversation-empty legacy-thread-empty"><Icon icon="chat" size={36}/><h1>{t("timeline.unavailable")}</h1><p>{t("timeline.recoverAdvice")}</p><div className="legacy-thread-actions"><Button intent="primary" icon="edit" onClick={onContinue}>{t("timeline.newQuestion")}</Button><Button icon="history" onClick={onOpenHistory}>{t("timeline.openHistory")}</Button></div></div>}
-    {!threadId && turns.length === 0 && !currentQuestion && !running && <div className="conversation-empty"><span>THOTH</span><h1>{t("timeline.emptyTitle")}</h1><p>{t("timeline.emptyNotice")}</p></div>}
+    {!threadId && turns.length === 0 && !currentQuestion && !running && <div className="conversation-empty"><span>THOTH</span><h1>{t("timeline.emptyTitle")}</h1><p>{t("timeline.emptyNotice")}</p>{emptyNotice}</div>}
     {query.isPending && threadId && !example && <p className="muted" role="status">{t("timeline.loading")}</p>}
   </section>;
 }

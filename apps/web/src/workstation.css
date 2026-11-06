@@ -163,6 +163,13 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 .turn-summary-preview {flex-basis:100%;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .turn-summary-actions {display:flex;gap:4px;flex-shrink:0;align-items:center}
 .turn-summary-open {padding:4px 0;background:transparent;border:0;margin-top:4px;justify-content:flex-start;gap:4px}
+.workspace-counts {display:flex;gap:6px;align-items:center;font-size:11px}
+.setup-needed-button {font-size:11px;min-height:22px;padding:2px 8px}
+.project-readiness {text-align:left;max-width:620px;margin:26px auto 0;padding:14px 16px;background:var(--surface-1);border:1px solid var(--line);border-radius:6px}
+.project-readiness .readiness-title {font-size:12px;font-weight:600;margin:0 0 8px;color:var(--text)}
+.project-readiness .readiness-facts {display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.project-readiness p.muted {margin:0 0 10px;max-width:none}
+.project-readiness .readiness-actions {display:flex;gap:8px;flex-wrap:wrap}
 .assistant-message .answer-text {font-size:15px;line-height:1.85;white-space:pre-wrap;overflow-wrap:anywhere}
 .conversation-findings {margin-top:22px}
 .conversation-findings h3 {font-size:14px;color:var(--muted)}

@@ -22,6 +22,7 @@ from thoth.domain.embedding_index import (
     EmbeddingIndexConfig,
     EmbeddingIntent,
     EmbeddingVector,
+    content_key,
     embedding_key,
     source_refs,
 )
@@ -31,6 +32,7 @@ from thoth.domain.retrieval_embedding import (
     GRANITE_PREPROCESSING,
     GRANITE_PREPROCESSING_V1,
     DenseModelPin,
+    window_count,
 )
 
 # The packaged manifest digest before this version existed. If it changes, every installed model
@@ -212,11 +214,15 @@ class _ReportingWorker(FakeWorker):
         super().__init__()
         self.report = report
 
-    async def encode_one(self, text: str, *, role: Literal["QUERY", "PASSAGE"]) -> EmbeddingVector:
+    async def encode_one(
+        self, text: str, *, role: Literal["QUERY", "PASSAGE"], window: int = 0
+    ) -> EmbeddingVector:
         self.calls.append(text)
         truncated, tokens = self.report.get(text, (None, None))
         return EmbeddingVector(
-            EmbeddingVector.from_values(unit_vector(text)).data,
+            EmbeddingVector.from_values(
+                unit_vector(text if window == 0 else f"{text}#{window}")
+            ).data,
             truncated=truncated,
             source_tokens=tokens,
         )
@@ -246,21 +252,23 @@ async def test_only_cut_passages_are_recorded_and_a_cached_record_is_never_overw
                 cached.exact_text: (False, None),
             }
         )
-        # This passage already has a stored vector whose record says it was cut.
+        # This passage already has stored vectors whose record says it was cut. 999 tokens need
+        # three windows, so every window is stored.
         with x.stores.ledger.engine.begin() as connection:
             vector = EmbeddingVector.from_values(unit_vector(cached.exact_text))
-            connection.execute(
-                text(
-                    "INSERT INTO embedding_vectors (project_id, content_key, vector_sha256, data,"
-                    " truncated, source_tokens) VALUES (:p, :k, :s, :d, 1, 999)"
-                ),
-                {
-                    "p": PROJECT,
-                    "k": embedding_key(cached.text_sha256, DenseModelPin()),
-                    "s": vector.sha256,
-                    "d": vector.data,
-                },
-            )
+            for window in range(window_count(999)):
+                connection.execute(
+                    text(
+                        "INSERT INTO embedding_vectors (project_id, content_key, vector_sha256,"
+                        " data, truncated, source_tokens) VALUES (:p, :k, :s, :d, 1, 999)"
+                    ),
+                    {
+                        "p": PROJECT,
+                        "k": content_key(cached.text_sha256, DenseModelPin(), window),
+                        "s": vector.sha256,
+                        "d": vector.data,
+                    },
+                )
         await x.service.drain(PROJECT)
         assert _recorded(x, cut) == (1, 777)
         assert _recorded(x, fits) == (0, None)

@@ -10,8 +10,12 @@ from typing import cast
 
 from thoth.domain.embedding_index import EmbeddingBudget, EmbeddingVector
 from thoth.domain.model_asset import EMBEDDING_ERROR_CODES, EmbeddingAssetDescriptor
-from thoth.domain.retrieval_embedding import DenseModelPin
-from thoth.ports.embedding import LocalEmbeddingPort
+from thoth.domain.retrieval_embedding import (
+    MAX_PASSAGE_WINDOWS,
+    PASSAGE_WINDOW_TOKENS,
+    DenseModelPin,
+)
+from thoth.ports.embedding import LocalEmbeddingPort, WindowedEmbeddingPort
 
 
 def denied(*_args: object, **_kwargs: object) -> None:
@@ -58,31 +62,51 @@ def main() -> None:
         if len(line) > max_line:
             raise RuntimeError("EMBEDDING_INPUT_TOO_LARGE")
         try:
-            request = json.loads(line)
+            loaded: object = json.loads(line)
+            if not isinstance(loaded, dict):
+                raise ValueError("EMBEDDING_PROTOCOL_INVALID")
+            request = cast(dict[str, object], loaded)
             if (
-                set(request) != {"text", "role"}
+                set(request) not in ({"text", "role"}, {"text", "role", "window"})
                 or not isinstance(request["text"], str)
                 or request["role"] not in ("QUERY", "PASSAGE")
             ):
                 raise ValueError("EMBEDDING_PROTOCOL_INVALID")
+            # Only window 1 or later of a long passage names a window; the first one is implied.
+            window = request.get("window", 0)
+            if (
+                type(window) is not int
+                or not 0 <= window < MAX_PASSAGE_WINDOWS
+                or (window and request["role"] != "PASSAGE")
+            ):
+                raise ValueError("EMBEDDING_PROTOCOL_INVALID")
             if len(request["text"].encode()) > budget.max_input_bytes:
                 raise ValueError("EMBEDDING_INPUT_TOO_LARGE")
+            model = DenseModelPin() if descriptor is None else descriptor.pin
             with contextlib.redirect_stdout(sys.stderr):
-                vector = EmbeddingVector.from_values(
-                    encoder.encode_one(
-                        request["text"],
-                        role=request["role"],
-                        model=DenseModelPin() if descriptor is None else descriptor.pin,
+                if window:
+                    values = cast(WindowedEmbeddingPort, encoder).encode_one(
+                        request["text"], role=request["role"], model=model, window=window
                     )
-                )
+                else:
+                    values = encoder.encode_one(request["text"], role=request["role"], model=model)
+                vector = EmbeddingVector.from_values(values)
             result = {"data": vector.data.hex(), "sha256": vector.sha256}
+            tokens = getattr(encoder, "last_source_tokens", None)
             if getattr(encoder, "last_truncated", False) is True:
-                # Only a cut passage carries the flag and its original size; other frames are
-                # unchanged.
+                # A passage with content past its last window carries the flag and its original
+                # size.
                 result["truncated"] = True
-                tokens = getattr(encoder, "last_source_tokens", None)
                 if isinstance(tokens, int) and tokens >= 1:
                     result["tokens"] = tokens
+            elif (
+                request["role"] == "PASSAGE"
+                and isinstance(tokens, int)
+                and tokens > PASSAGE_WINDOW_TOKENS
+            ):
+                # More than one window and nothing dropped: the size tells the reader how many
+                # windows exist. Passages that fit one window leave the frame unchanged.
+                result["tokens"] = tokens
         except Exception as exc:
             code = str(exc)
             result = {"error": code if code in EMBEDDING_ERROR_CODES else "EMBEDDING_FAILED"}

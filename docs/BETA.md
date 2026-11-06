@@ -77,9 +77,10 @@ second question in the other language in the same conversation.
   too slow). So it stays an experiment. Preparing the index does not change how evidence is chosen for
   your questions.
 - **Local retrieval parts are optional.** They need the extra install above and a model download
-  of about 124 MB per workspace. Passages longer than 512 tokens are embedded from their first 512
-  tokens only, so evidence deep inside a very long passage is not reflected in the index.
-  Which passages were cut is recorded per stored vector. If you used local indexing before this
+  of about 124 MB per workspace. A passage longer than 512 tokens is embedded as several
+  overlapping windows (at most eight, about 3,200 tokens in all), and a passage scores as its best
+  window, so evidence deep inside a long passage is reflected in the index. Text past the last
+  window is left out; that is recorded per stored vector. If you used local indexing before this
   release, the project card says the index must be rebuilt; choose 'Prepare index' again. The model
   files are not downloaded again.
 - **Permanent deletion keeps shared files.** Identical files are stored once, so a file that another

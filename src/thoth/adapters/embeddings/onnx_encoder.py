@@ -13,18 +13,25 @@ from thoth.adapters.embeddings.asset_files import verified_bytes
 from thoth.adapters.embeddings.manifest import granite_manifest
 from thoth.domain.embedding_index import EmbeddingIndexError
 from thoth.domain.model_asset import EmbeddingAssetDescriptor, ModelAssetError
-from thoth.domain.retrieval_embedding import DenseModelPin
+from thoth.domain.retrieval_embedding import (
+    PASSAGE_WINDOW_TOKENS,
+    DenseModelPin,
+    window_bounds,
+    window_cut,
+)
 
 if TYPE_CHECKING:
     from numpy import float32 as NpFloat32
     from numpy.typing import NDArray
 
 
-# Passages are cut to their first PASSAGE_TOKEN_CAP tokens before they reach the model. Attention
-# memory grows much faster than linearly with length: one 48,985 character page container took
-# 33 GB in an unbounded run and exceeds the worker's 512 MiB commit limit long before that.
-# Queries are never cut. A passage that fits is encoded exactly as before.
-PASSAGE_TOKEN_CAP = 512
+# No input longer than PASSAGE_TOKEN_CAP tokens reaches the model. Attention memory grows much
+# faster than linearly with length: one 48,985 character page container took 33 GB in an unbounded
+# run and exceeds the worker's 512 MiB commit limit long before that. A longer passage is encoded
+# as several overlapping windows of at most this length, one per call (see window_bounds), and
+# content past the last window is dropped. Queries are never cut. A passage that fits is encoded
+# exactly as before.
+PASSAGE_TOKEN_CAP = PASSAGE_WINDOW_TOKENS
 
 
 def cap_passage_tokens(
@@ -81,6 +88,32 @@ class _OrtModule(Protocol):
         enable_fallback: int,
         read_config_from_model: bool,
     ) -> _Session: ...
+
+
+def window_passage_tokens(
+    ids: Sequence[int], mask: Sequence[int], types: Sequence[int], window: int
+) -> tuple[list[int], list[int], list[int], bool]:
+    """Tokens of one window, and whether content past the last window was dropped.
+
+    Window 0 of a long passage is the first cap-1 tokens plus the closing special token, which
+    is the input cap_passage_tokens always produced, so its vector is the one 1.1.0 stored.
+    """
+    if window < 0:
+        raise EmbeddingIndexError("EMBEDDING_WINDOW_INVALID")
+    if len(ids) <= PASSAGE_TOKEN_CAP:
+        if window != 0:
+            raise EmbeddingIndexError("EMBEDDING_WINDOW_INVALID")
+        return list(ids), list(mask), list(types), False
+    bounds = window_bounds(len(ids))
+    if window >= len(bounds):
+        raise EmbeddingIndexError("EMBEDDING_WINDOW_INVALID")
+    start, end = bounds[window]
+    return (
+        [ids[0], *ids[1 + start : 1 + end], ids[-1]],
+        [mask[0], *mask[1 + start : 1 + end], mask[-1]],
+        [types[0], *types[1 + start : 1 + end], types[-1]],
+        window_cut(len(ids)),
+    )
 
 
 class GraniteOnnxEncoder:
@@ -162,7 +195,7 @@ class GraniteOnnxEncoder:
             raise EmbeddingIndexError("EMBEDDING_LOAD_FAILED")
 
     def tokens_for(
-        self, text: str, role: Literal["QUERY", "PASSAGE"]
+        self, text: str, role: Literal["QUERY", "PASSAGE"], window: int = 0
     ) -> tuple[list[int], list[int], list[int], bool]:
         encoded = self._tokenizer.encode(text, add_special_tokens=True)
         ids: list[int] = list(encoded.ids)
@@ -170,16 +203,18 @@ class GraniteOnnxEncoder:
         types: list[int] = list(encoded.type_ids)
         self.last_source_tokens = len(ids)
         if role == "PASSAGE":
-            return cap_passage_tokens(ids, mask, types)
+            return window_passage_tokens(ids, mask, types, window)
+        if window != 0:
+            raise EmbeddingIndexError("EMBEDDING_WINDOW_INVALID")
         return ids, mask, types, False
 
     def encode_one(
-        self, text: str, *, role: Literal["QUERY", "PASSAGE"], model: DenseModelPin
+        self, text: str, *, role: Literal["QUERY", "PASSAGE"], model: DenseModelPin, window: int = 0
     ) -> tuple[float, ...]:
         if model != self._pin:
             raise EmbeddingIndexError("MODEL_HASH_MISMATCH")
         self.last_truncated = False
-        ids, mask, types, truncated = self.tokens_for(text, role)
+        ids, mask, types, truncated = self.tokens_for(text, role, window)
         count = len(ids)
         if count > self._max_tokens:
             raise EmbeddingIndexError("QUERY_TOO_LONG" if role == "QUERY" else "PASSAGE_TOO_LONG")

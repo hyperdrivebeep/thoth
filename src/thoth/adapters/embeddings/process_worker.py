@@ -23,6 +23,7 @@ from thoth.domain.embedding_index import (
     EmbeddingVector,
 )
 from thoth.domain.model_asset import EMBEDDING_ERROR_CODES, EmbeddingAssetDescriptor
+from thoth.domain.retrieval_embedding import MAX_PASSAGE_WINDOWS
 
 _FRAME = TypeAdapter(dict[str, JsonValue])
 
@@ -35,6 +36,7 @@ class _Request:
     role: Literal["QUERY", "PASSAGE"] = field(compare=False)
     deadline: float = field(compare=False)
     future: asyncio.Future[EmbeddingVector] = field(compare=False)
+    window: int = field(default=0, compare=False)
     finished: asyncio.Event = field(default_factory=asyncio.Event, compare=False)
     started: bool = field(default=False, compare=False)
     cleanup_error: EmbeddingIndexError | None = field(default=None, compare=False)
@@ -71,7 +73,7 @@ class ProcessEmbeddingWorker:
         self.last_exit_code: int | None = None
         self.encoder_pid: int | None = None
         self.memory_failure_observed = False
-        # Passages the encoder cut to its token cap in this process lifetime (diagnostic only).
+        # Passages with content past their last window in this process lifetime (diagnostic only).
         self.truncated_passages = 0
 
     def _start(self) -> None:
@@ -158,7 +160,13 @@ class ProcessEmbeddingWorker:
             raise EmbeddingIndexError("EMBEDDING_PROCESS_MISSING")
         raw = (
             json.dumps(
-                {"text": item.text, "role": item.role}, ensure_ascii=False, separators=(",", ":")
+                {
+                    "text": item.text,
+                    "role": item.role,
+                    **({"window": item.window} if item.window else {}),
+                },
+                ensure_ascii=False,
+                separators=(",", ":"),
             ).encode()
             + b"\n"
         )
@@ -188,16 +196,19 @@ class ProcessEmbeddingWorker:
             raise EmbeddingIndexError("EMBEDDING_PROTOCOL_FAILED")
         cut = value.get("truncated") is True
         tokens = value.get("tokens")
+        sized = isinstance(tokens, int) and tokens >= 1
         vector = EmbeddingVector(
             bytes.fromhex(data),
-            # A real encoder (descriptor protocol) sends the flag only for a cut passage, so its
-            # silence means the passage fit; a stand-in worker says nothing either way.
+            # A real encoder (descriptor protocol) sends the flag only for a passage with content
+            # past its last window, so its silence means every token reached the model; a stand-in
+            # worker says nothing either way. The size comes with the flag and with any passage
+            # that needed more than one window.
             truncated=True if cut else (False if self.descriptor is not None else None),
-            source_tokens=tokens if cut and isinstance(tokens, int) and tokens >= 1 else None,
+            source_tokens=tokens if sized and isinstance(tokens, int) else None,
         )
         if vector.sha256 != value["sha256"]:
             raise EmbeddingIndexError("EMBEDDING_PROTOCOL_FAILED")
-        if cut:
+        if cut and item.window == 0:
             self.truncated_passages += 1
         return vector
 
@@ -227,9 +238,13 @@ class ProcessEmbeddingWorker:
             self._closed = True
             raise EmbeddingIndexError("EMBEDDING_CLEANUP_UNCONFIRMED")
 
-    async def encode_one(self, text: str, *, role: Literal["QUERY", "PASSAGE"]) -> EmbeddingVector:
+    async def encode_one(
+        self, text: str, *, role: Literal["QUERY", "PASSAGE"], window: int = 0
+    ) -> EmbeddingVector:
         if self._closed:
             raise EmbeddingIndexError("EMBEDDING_WORKER_CLOSED")
+        if not 0 <= window < MAX_PASSAGE_WINDOWS or (window and role != "PASSAGE"):
+            raise EmbeddingIndexError("EMBEDDING_WINDOW_INVALID")
         if self.descriptor is not None and not self._loaded:
             raise EmbeddingIndexError("EMBEDDING_NOT_PREPARED")
         if len(text.encode()) > self.budget.max_input_bytes:
@@ -248,6 +263,7 @@ class ProcessEmbeddingWorker:
             role,
             time.monotonic() + timeout / 1000,
             future,
+            window,
         )
         self._queries += role == "QUERY"
         self._background += role == "PASSAGE"

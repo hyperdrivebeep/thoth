@@ -18,11 +18,56 @@ GRANITE_ONNX_SHA = "a6022dd8220ea6f6595562a1328ee216f4a94faa55362f2f4747c80f1e78
 # meant to be used and must not change with code-side preprocessing, or the installed folder
 # (named by the manifest digest) would no longer be found and the model would need a reinstall.
 GRANITE_ASSET_PREPROCESSING = "granite-cls-l2-batch1-question-only:1.0.0"
-# Identity of what this code does to a passage before the model sees it. The number after "cap" is
-# the passage token cap (onnx_encoder.PASSAGE_TOKEN_CAP; a test keeps them equal). Raise the
-# version whenever the preprocessing changes, so vectors made another way are never mixed in.
+# Identity of what this code does to a passage before the model sees it. Raise the version
+# whenever the preprocessing changes, so vectors made another way are never mixed in.
+# 1.1.0 kept only the first PASSAGE_WINDOW_TOKENS tokens. 1.2.0 encodes a long passage as several
+# overlapping windows; "win510o128m8" is WINDOW_CONTENT_TOKENS, WINDOW_OVERLAP_TOKENS and
+# MAX_PASSAGE_WINDOWS, and "cap512" is the length of one window with its two special tokens
+# (onnx_encoder.PASSAGE_TOKEN_CAP). A test keeps the name equal to these numbers.
 GRANITE_PREPROCESSING_V1 = "granite-cls-l2-batch1-question-only:1.0.0"
-GRANITE_PREPROCESSING = "granite-cls-l2-batch1-question-only-cap512:1.1.0"
+GRANITE_PREPROCESSING_V11 = "granite-cls-l2-batch1-question-only-cap512:1.1.0"
+GRANITE_PREPROCESSING = "granite-cls-l2-batch1-question-only-win510o128m8-cap512:1.2.0"
+
+# Window geometry. Content tokens exclude the opening and closing special tokens of a window.
+PASSAGE_WINDOW_TOKENS = 512
+WINDOW_CONTENT_TOKENS = 510
+WINDOW_OVERLAP_TOKENS = 128
+MAX_PASSAGE_WINDOWS = 8
+
+
+def window_bounds(source_tokens: int) -> tuple[tuple[int, int], ...]:
+    """Content-token slices [start, end) of a passage with source_tokens tokens (specials included).
+
+    A passage that fits one window has one slice and is encoded whole. Window 0 always starts at
+    the first content token and holds the first WINDOW_CONTENT_TOKENS, which is exactly what the
+    1.1.0 cap kept. Later windows start WINDOW_CONTENT_TOKENS - WINDOW_OVERLAP_TOKENS after the
+    previous one. At most MAX_PASSAGE_WINDOWS windows are made; content past the last one is cut.
+    """
+    if source_tokens < 2:
+        raise ValueError("EMBEDDING_SOURCE_TOKENS_INVALID")
+    content = source_tokens - 2
+    step = WINDOW_CONTENT_TOKENS - WINDOW_OVERLAP_TOKENS
+    bounds: list[tuple[int, int]] = []
+    start = 0
+    while len(bounds) < MAX_PASSAGE_WINDOWS:
+        end = min(start + WINDOW_CONTENT_TOKENS, content)
+        bounds.append((start, end))
+        if end >= content:
+            break
+        start += step
+    return tuple(bounds)
+
+
+def window_count(source_tokens: int | None) -> int:
+    """Windows of a passage whose first window reported source_tokens; None means a single one."""
+    if source_tokens is None or source_tokens <= PASSAGE_WINDOW_TOKENS:
+        return 1
+    return len(window_bounds(source_tokens))
+
+
+def window_cut(source_tokens: int) -> bool:
+    """True when content past the last window is not encoded by any window."""
+    return window_bounds(source_tokens)[-1][1] < source_tokens - 2
 
 
 class DenseModelPin(DomainModel):
@@ -36,6 +81,7 @@ class DenseModelPin(DomainModel):
     preprocessing: Literal[
         "granite-cls-l2-batch1-question-only:1.0.0",
         "granite-cls-l2-batch1-question-only-cap512:1.1.0",
+        "granite-cls-l2-batch1-question-only-win510o128m8-cap512:1.2.0",
     ] = GRANITE_PREPROCESSING
 
 
