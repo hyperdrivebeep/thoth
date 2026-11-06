@@ -3,6 +3,7 @@
 from time import perf_counter_ns
 
 from thoth.application.services.behavior_context import SHADOW_SELECTION_FAILED
+from thoth.application.services.dense_material import DenseMaterialSource
 from thoth.application.services.research_retrieval_policy import (
     current_glossary,
     record_held_selection,
@@ -20,6 +21,7 @@ from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
 from thoth.domain.research_execution import ResearchWork
 from thoth.domain.retrieval_coverage import RetrievalSelection
+from thoth.domain.retrieval_embedding import DenseMaterial
 from thoth.domain.retrieval_lane import (
     MAX_BLOCK_SPANS,
     LaneSelection,
@@ -31,6 +33,7 @@ from thoth.domain.retrieval_lane import (
 # Re-exported: callers and tests import the term rules from here.
 from thoth.domain.retrieval_lane import search_terms as search_terms
 from thoth.domain.retrieval_lane import tokens as tokens
+from thoth.domain.retrieval_routing_policy import RetrievalRoutingPolicy
 from thoth.ports.artifact_ledger import ArtifactLedgerPort
 
 
@@ -64,6 +67,26 @@ def text_neighbors(
     return tuple(dict.fromkeys([*near, *block]))
 
 
+def routing_requested() -> bool:
+    """Whether this request's active policy or any shadow is a routing policy, the only kind that
+    reads dense scores. Without one, nothing would use a prepared material."""
+    return isinstance(retrieval_policy(), RetrievalRoutingPolicy) or any(
+        isinstance(policy, RetrievalRoutingPolicy) for _, policy in retrieval_shadows()
+    )
+
+
+async def dense_for(
+    source: DenseMaterialSource | None,
+    work: ResearchWork,
+    project: str,
+    evidence: tuple[EvidenceSpan, ...],
+) -> DenseMaterial | None:
+    """Dense scores for the request's question, only when a routing policy could read them."""
+    if source is None or not routing_requested():
+        return None
+    return await source.material(project, work.effective_question, evidence)
+
+
 def lexical_selection(
     question: str,
     queries: tuple[str, ...],
@@ -71,6 +94,7 @@ def lexical_selection(
     pinned: tuple[str, ...] = (),
     *,
     context: CandidateContext | None = None,
+    dense: DenseMaterial | None = None,
 ) -> LaneSelection:
     """Select the shortlist with the active policy, then run each shadow policy on the same request.
 
@@ -83,6 +107,7 @@ def lexical_selection(
         pinned,
         None if context is None else context.to_catalog(),
         current_glossary(),
+        dense=dense,
     )
     started = perf_counter_ns()
     selection = select_retrieval_context(request, retrieval_policy())
@@ -152,12 +177,13 @@ def work_candidates(
     queries: tuple[str, ...],
     evidence: tuple[EvidenceSpan, ...],
     artifacts: ArtifactLedgerPort | None = None,
+    dense: DenseMaterial | None = None,
 ) -> tuple[EvidenceSpan, ...]:
     """The shortlist for a request: its question, its queries and the spans its start row pins."""
     eligible = connected_retrieval_spans(evidence)
     context = None if artifacts is None else candidate_context(eligible, artifacts)
     selection = lexical_selection(
-        work.effective_question, queries, evidence, work.pinned_spans, context=context
+        work.effective_question, queries, evidence, work.pinned_spans, context=context, dense=dense
     )
     result = selection.selected
     work.retrieval_selection = RetrievalSelection(

@@ -349,6 +349,13 @@ Incomplete, stale, unavailable or incompatible dense material selects RRF(LEX, G
 an explicit routing/fallback observation. A wrong project is a scope error, not a fallback.
 The full-catalog and one-artifact paths do not need dense material.
 
+In the research path (`lexical_selection`), the request carries a `DenseMaterial` only when the
+project switched local retrieval on and a routing policy is the active policy or a shadow. The
+default policies ignore it, so a project without the experiment, and a project with it under the
+default policy, journal exactly the bytes they journaled before. The dense source and its
+fall-back reasons are described in `local-retrieval-preparation.md`; whatever reason it gives is
+the `fallback_reason` of the routing observation.
+
 The evaluation codec carries optional dense material, omitted entirely for earlier cases.
 The evaluator checks its binding but does not certify that a host actually ran a model.
 Only 5.0.0 adds a `routing` output. Runtime journals also record the routing observation and

@@ -462,6 +462,21 @@ class SqliteEmbeddingIndex:
         with read_connection(self.engine) as c:
             return source.matches(c, intent)
 
+    def index_stamp(self, project: str) -> tuple[bool, int, tuple[tuple[str, int], ...]]:
+        """What a resident copy of the READY index depends on, read without parsing any job.
+
+        It changes when the project is switched on or off or reconfigured, when a source is indexed
+        (a new READY job) and when one leaves READY (STALE, cancelled, retried).
+        """
+        with read_connection(self.engine) as c:
+            config = source.configuration(c, project)
+            rows = c.execute(
+                select(embedding_jobs.c.job_id, embedding_jobs.c.generation)
+                .where(embedding_jobs.c.project_id == project, embedding_jobs.c.state == "READY")
+                .order_by(embedding_jobs.c.job_id)
+            ).all()
+        return config.enabled, config.generation, tuple((str(r[0]), int(r[1])) for r in rows)
+
     def reconcile(self, project: str) -> int:
         changed = 0
         with self.uow.transaction(), write_connection(self.engine) as c:

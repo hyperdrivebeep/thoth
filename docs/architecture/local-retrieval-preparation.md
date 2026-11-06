@@ -114,7 +114,56 @@ explicit prepare recovers expired S2 leases and reconciles sources. An old opera
 can remain unresolved after a server crash. Current file/index state does not prove that
 receipt succeeded. Recovery never automatically calls a research model.
 
+## Dense scores in the research path
+
+`DenseMaterialProvider` (`application/services/dense_material.py`) gives the research path a
+`DenseMaterial` for the original question. It is asked only when the project has local retrieval
+switched on and the active or a shadow retrieval policy is a `RetrievalRoutingPolicy`; it is not
+asked for a frame with one source (routing sends it to the lexical lane). Nothing else changes:
+a project without the experiment gets no material and its selections, journal entries and digests
+are the ones it had before.
+
+Scoring reads a resident matrix: all windows of the READY sources of a project as float64, one
+copy per project, at most two projects and 128 MiB (43,690 windows). It is read once when the
+index is READY and dropped when the index state changes. The state is a stamp read from one SQL
+query per question (`index_stamp`: enabled, config generation and the id and generation of every
+READY job); a new READY job, a job that leaves READY, a reconfiguration and a switch off change
+it. `EmbeddingIndexService` also reports configure, reconcile and each job's end through
+`on_change`, which drops the copy at once. Turning a project off through
+`LocalRetrievalService.configure` is noticed on the next question. A passage scores as its best
+window, equal to `max_window_score` (the reference): a score within 1e-12 of a rounding boundary
+or of zero is computed again the reference way, so the nine-place strings match. numpy is used only
+if the `local-retrieval` extra is installed.
+
+The question is encoded by the already running worker with the 2 s query timeout. A worker that is
+not running (for example right after a restart, because preparation only starts it for sources
+still waiting to be indexed) is started in the background once per 60 s and the question goes on
+without dense scores meanwhile.
+
+Whatever prevents dense gives a material with `unavailable_reason`, which routing records as the
+`fallback_reason` and answers with RRF(LEX, GB). A project that is off gets no material, so its
+reason stays `DENSE_MATERIAL_MISSING`.
+
+| Situation | Reason |
+| --- | --- |
+| numpy missing | `EMBEDDING_DEPENDENCY_UNAVAILABLE` |
+| no READY source | `INDEX_PENDING` (also: resident copy still being read after 5 s) |
+| encoder not running | `EMBEDDING_NOT_PREPARED` |
+| a frame span is not in the index | `INDEX_INCOMPLETE` (also: a READY source cannot be read) |
+| a frame span's text changed after indexing | `INDEX_STALE` |
+| resident copy over 128 MiB, or more than 20,000 spans | `INDEX_TOO_LARGE` |
+| question longer than the worker accepts | `QUERY_TOO_LONG` |
+| encoder exceeded the query timeout | `EMBEDDING_TIMEOUT` |
+| any other encoder or index failure | `EMBEDDING_FAILED` |
+
+Selection speed: the source digest of a frame and the digest of a whole material are computed
+without the generic canonical walk but give the same bytes (tests pin this), the digest of the
+frame just bound is remembered for the very same span objects so binding and checking compute it
+once, and a prepared material builds its scores without per-score validation because the producer
+has already clamped and rounded them.
+
 ## Verification limits
+
 
 The bounded local smoke uses existing pinned files and synthetic Korean/English text:
 twelve encodes across three workers on Python 3.12/3.13. It checks loading and deterministic

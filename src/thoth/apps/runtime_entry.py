@@ -144,7 +144,14 @@ def assemble_runtime_entry(
         )
         register_research_operations(registration.registry, research_component.entry)
         local_retrieval = create_local_retrieval(
-            registration.registry, stores, artifact_ledger, clock, ids, workspace, mode
+            registration.registry,
+            stores,
+            artifact_ledger,
+            clock,
+            ids,
+            workspace,
+            mode,
+            research_component.entry.analysis,
         )
         deletion = register_project_deletion(registration.registry, stores, clock, mode)
         if owner is not None:
