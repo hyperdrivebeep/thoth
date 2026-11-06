@@ -43,7 +43,7 @@
       "apps/web/src/api/resultEvidence.ts::read": 28,
       "apps/web/src/api/resultEvidenceIdentity.ts::currentResultDigest": 22,
       "apps/web/src/components/CapabilityWorkbench.tsx::MethodDetail": 23,
-      "apps/web/src/components/ConversationTimeline.tsx::ConversationTimeline": 99,
+      "apps/web/src/components/ConversationTimeline.tsx::ConversationTimeline": 50,
       "apps/web/src/components/FirstRunSetup.tsx::FirstRunSetup": 55,
       "apps/web/src/components/FirstRunSetup.tsx::FirstRunSetup.<anon2>": 47,
       "apps/web/src/components/HypothesisCompare.tsx::HypothesisCompare.<anon4>": 23,
