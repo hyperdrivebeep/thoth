@@ -25,8 +25,10 @@ from thoth.domain.embedding_index import (
     EmbeddingIntent,
     EmbeddingJob,
     EmbeddingVector,
+    content_key,
     embedding_key,
 )
+from thoth.domain.retrieval_embedding import MAX_PASSAGE_WINDOWS, window_count
 
 
 class SqliteEmbeddingIndex:
@@ -238,13 +240,18 @@ class SqliteEmbeddingIndex:
             raise EmbeddingIndexError("EMBEDDING_SOURCE_CHANGED")
 
     def checkpoint(
-        self, job: EmbeddingJob, text_sha: str, vector: EmbeddingVector, now_ms: int
+        self,
+        job: EmbeddingJob,
+        text_sha: str,
+        vector: EmbeddingVector,
+        now_ms: int,
+        window: int = 0,
     ) -> None:
         with self.uow.transaction(), write_connection(self.engine) as c:
             self._lease(c, job, now_ms)
             if text_sha not in {r.text_sha256 for r in job.intent.refs}:
                 raise EmbeddingIndexError("EMBEDDING_TEXT_NOT_IN_JOB")
-            key = embedding_key(text_sha, job.intent.model)
+            key = content_key(text_sha, job.intent.model, window)
             project = job.intent.project_id
             old = (
                 c.execute(
@@ -283,31 +290,60 @@ class SqliteEmbeddingIndex:
             )
             self._fault("after_vector_stage")
 
-    def cached(self, project: str, text_sha: str) -> EmbeddingVector | None:
+    def cached(self, project: str, text_sha: str, window: int = 0) -> EmbeddingVector | None:
         with read_connection(self.engine) as c:
             config = source.configuration(c, project)
             if not config.enabled:
                 return None
-            row = (
-                c.execute(
-                    select(embedding_vectors).where(
-                        embedding_vectors.c.project_id == project,
-                        embedding_vectors.c.content_key == embedding_key(text_sha, config.model),
-                    )
+            return self._vector(c, project, content_key(text_sha, config.model, window))
+
+    @staticmethod
+    def _vector(c: object, project: str, key: str) -> EmbeddingVector | None:
+        from typing import cast
+
+        from sqlalchemy import Connection
+
+        row = (
+            cast(Connection, c)
+            .execute(
+                select(embedding_vectors).where(
+                    embedding_vectors.c.project_id == project,
+                    embedding_vectors.c.content_key == key,
                 )
-                .mappings()
-                .first()
             )
-            if row is None:
+            .mappings()
+            .first()
+        )
+        if row is None:
+            return None
+        vector = EmbeddingVector(
+            bytes(row["data"]),
+            truncated=None if row["truncated"] is None else bool(row["truncated"]),
+            source_tokens=row["source_tokens"],
+        )
+        if vector.sha256 != row["vector_sha256"]:
+            raise EmbeddingIndexError("EMBEDDING_CACHE_CORRUPT")
+        return vector
+
+    def cached_windows(self, project: str, text_sha: str) -> tuple[EmbeddingVector, ...] | None:
+        """Every window of a passage, in order, or None when any window is missing.
+
+        The first window's recorded size says how many windows exist.
+        """
+        with read_connection(self.engine) as c:
+            config = source.configuration(c, project)
+            if not config.enabled:
                 return None
-            vector = EmbeddingVector(
-                bytes(row["data"]),
-                truncated=None if row["truncated"] is None else bool(row["truncated"]),
-                source_tokens=row["source_tokens"],
-            )
-            if vector.sha256 != row["vector_sha256"]:
-                raise EmbeddingIndexError("EMBEDDING_CACHE_CORRUPT")
-            return vector
+            first = self._vector(c, project, content_key(text_sha, config.model, 0))
+            if first is None:
+                return None
+            windows = [first]
+            for window in range(1, window_count(first.source_tokens)):
+                vector = self._vector(c, project, content_key(text_sha, config.model, window))
+                if vector is None:
+                    return None
+                windows.append(vector)
+            return tuple(windows)
 
     def publish(self, job: EmbeddingJob, now_ms: int) -> EmbeddingJob:
         with self.uow.transaction(), write_connection(self.engine) as c:
@@ -451,12 +487,14 @@ class SqliteEmbeddingIndex:
         return changed
 
     def _manifest(self, job: EmbeddingJob) -> str:
-        entries: list[tuple[str, str, str]] = []
+        entries: list[tuple[str, ...]] = []
         for ref in job.intent.refs:
-            vector = self.cached(job.intent.project_id, ref.text_sha256)
-            if vector is None:
+            windows = self.cached_windows(job.intent.project_id, ref.text_sha256)
+            if windows is None:
                 raise EmbeddingIndexError("EMBEDDING_INDEX_INCOMPLETE")
-            entries.append((ref.span_id, ref.text_sha256, vector.sha256))
+            # A passage with one window is listed exactly as before; each later window adds its
+            # own hash.
+            entries.append((ref.span_id, ref.text_sha256, *(w.sha256 for w in windows)))
         return domain_digest(
             "EMBEDDING_READY_MANIFEST",
             "1.0.0",
@@ -486,13 +524,32 @@ class SqliteEmbeddingIndex:
             jobs = self.jobs(project)
             if any(j.state == "RUNNING" for j in jobs):
                 return 0
-            retained = {
-                embedding_key(ref.text_sha256, j.intent.model)
-                for j in jobs
-                if j.state in ("PENDING", "RUNNING", "READY", "FAILED")
-                and source.matches(c, j.intent)
-                for ref in j.intent.refs
+            retained: set[str] = set()
+            # The first window of a long passage records its size, which says how many more
+            # windows there are and so which keys must stay.
+            sizes = {
+                row[0]: row[1]
+                for row in c.execute(
+                    select(
+                        embedding_vectors.c.content_key, embedding_vectors.c.source_tokens
+                    ).where(
+                        embedding_vectors.c.project_id == project,
+                        embedding_vectors.c.source_tokens.is_not(None),
+                    )
+                )
             }
+            for j in jobs:
+                if j.state not in ("PENDING", "RUNNING", "READY", "FAILED") or not source.matches(
+                    c, j.intent
+                ):
+                    continue
+                for ref in j.intent.refs:
+                    first = embedding_key(ref.text_sha256, j.intent.model)
+                    retained.add(first)
+                    for window in range(
+                        1, min(window_count(sizes.get(first)), MAX_PASSAGE_WINDOWS)
+                    ):
+                        retained.add(content_key(ref.text_sha256, j.intent.model, window))
             statement = delete(embedding_vectors).where(embedding_vectors.c.project_id == project)
             if retained:
                 statement = statement.where(embedding_vectors.c.content_key.not_in(retained))

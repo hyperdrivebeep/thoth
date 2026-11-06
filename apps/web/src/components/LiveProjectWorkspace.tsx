@@ -1,42 +1,27 @@
-import { localeTag } from "../i18n/locale";
-import { readResponseLanguageDefault } from "../api/responseLanguageDefault";
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
-import { Button, Callout, Collapse, HTMLSelect, Icon, InputGroup, PopoverNext, Tab, Tabs, Tag } from "@blueprintjs/core";
+import { Button, Callout, Collapse, Icon, InputGroup, PopoverNext, Tab, Tabs, Tag } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { rpc } from "../api/rpcClient";
 import { rereadProjects } from "../api/projectActionFailure";
 import { ProjectActionNotice } from "./ProjectActionNotice";
 import { captureProjectCreation } from "../api/projectCreation";
-import { readWorkspaceContext, saveWorkspaceContext } from "../api/research";
 import type { WorkspaceReady } from "../api/research";
-import { inspectLocalContext, validWorkspaceId, type BrowserScope, type PendingOrigin } from "../api/localWorkspacePersistence";
-import { readDraft, writeDraft } from "../api/conversation";
-import { fillQuestion, threadForRow, type RowInvestigation } from "./traceInvestigation";
-import type { ConnectedArtifact, ProjectSummary, WorkThread } from "../types";
+import { validWorkspaceId, type BrowserScope } from "../api/localWorkspacePersistence";
+import type { RowInvestigation } from "./traceInvestigation";
+import type { ProjectSummary, WorkThread } from "../types";
 import { CapabilityWorkbench } from "./CapabilityWorkbench";
 import { DomainRecords } from "./DomainRecords";
 import { ResearchHistoryWorkspace } from "./history/ResearchHistoryWorkspace";
-import { FileConnectionPanel } from "./FileConnectionPanel";
-import { SourceTimeAdvanced } from "./SourceTimeAdvanced";
 import { useCitationGate } from "./SourceCitationGate";
-import { cutoffLabel, projectCutoffText } from "../api/sourceTime";
-import { FirstRunSetup } from "./FirstRunSetup";
-import { LocalRetrievalSettingsCard } from "./LocalRetrievalSettingsCard";
+import { projectCutoffText } from "../api/sourceTime";
 import { WorkspaceLocationNotice } from "./WorkspaceLocationNotice";
-import { WorkspaceInternetConsent } from "./WorkspaceInternetConsent";
 import { workspaceSetupIssue, workspaceSetupIssueText, type WorkspaceSetupIssue } from "./workspaceSetupIssue";
-import { AutoRetrySwitch } from "./AutoRetrySwitch";
-import { HypothesisContractSwitch } from "./HypothesisContractSwitch";
 import { ModelCredentialPanel } from "./ModelCredentialPanel";
 import { LanguageSettingsCard } from "./LanguageSettingsCard";
-import { ModelSettings } from "./ModelSettings";
-import { ProjectWebSetup } from "./ProjectWebSetup";
-import { RecordInspector } from "./RecordInspector";
 import { useResearchSession } from "./useResearchSession";
 import { useReadAccessProtection } from "./useReadAccessProtection";
-import { isHttpUrl, sourceCardHost, sourceCardTitle } from "../sourceDisplay";
 import { eyebrowLabel } from "./statusLabels";
 import { WorkspaceErrorBoundary } from "./WorkspaceErrorBoundary";
 import { ConversationTimeline } from "./ConversationTimeline";
@@ -45,13 +30,16 @@ import { ResearchComposer } from "./ResearchComposer";
 import { ResearchSidePanel, type SidePanelTab } from "./ResearchSidePanel";
 import { TracePage } from "./TracePage";
 import type { ResearchDetail } from "./ResearchResultCard";
+import { ProjectReadinessCard, type ReadinessFacts } from "./ProjectReadinessCard";
+import { ResourcesPage, SettingsPage } from "./ProjectSessionPages";
+import { useProjectSources } from "./useProjectSources";
+import { executionReadiness, workspaceGate } from "./WorkspaceGate";
+import { useSelectionReconcile, useWorkspaceSelection, type Page, type RowOrigin, type TraceRowRef } from "./workspaceSelection";
 import {
   isTimelineExampleRequested,
   TIMELINE_EXAMPLE_SOURCES,
   timelineExampleStatus,
 } from "../api/timelineExample";
-
-type Page = "research" | "resources" | "records" | "trace" | "raw-records" | "settings" | "capabilities";
 
 function TimelineExamplePane() {
   return (
@@ -107,10 +95,6 @@ function ProjectForm({ onCreated }: { onCreated: (projectId: string) => void }) 
   </div>;
 }
 
-type TraceRowRef = { kind: string; id: string };
-/** The trace row a question was started from: held here until it is sent, so the next request carries it. */
-type RowOrigin = { threadId: string; origin: PendingOrigin };
-
 function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, onUserInput, hosted = false, workspaceId = null, browserScopeId = null, executionReady = true, readSuspended = false, setupIssue = null,
   consent, modelConnected, rowOrigin = null, onOriginDone, onInvestigate, traceFocus = null, onOpenTrace }: {
   project: ProjectSummary; threadId: string; epoch: RefObject<number>; page: Page; onPage: (page: Page) => void; onAdmitted: (threadId: string) => void; onUserInput: () => void;
@@ -137,20 +121,21 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
   }, [session.researchReadDenied]);
   const [sideTab,setSideTab] = useState<SidePanelTab>("files");
   const [panelOpen,setPanelOpen] = useState(false);
-  const [developerOpen,setDeveloperOpen] = useState(false);
-  const [projectDetailsOpen,setProjectDetailsOpen] = useState(false);
-  const [artifactDetailsId,setArtifactDetailsId] = useState("");
   const opener = useRef<HTMLElement|null>(null);
   const openDetail = (value:ResearchDetail) => {detailFromResearch.current = value.result === session.research.data?.value.current_result?.result || value.result === session.research.data?.value.previous_result?.result;opener.current=document.activeElement instanceof HTMLElement?document.activeElement:null;setDetail(value);setSideTab(value.kind==="actions"?"actions":value.kind==="hypotheses"?"hypotheses":value.kind==="history"||value.kind==="memory"?"history":value.kind==="evidence"?"evidence":sideTab);setPanelOpen(true);};
   const closeDetail = () => {setDetail(null);setPanelOpen(false);opener.current?.focus();};
   const openResourcePanel = () => {opener.current=document.activeElement instanceof HTMLElement?document.activeElement:null;setDetail(null);setSideTab("files");setPanelOpen(true);};
   const capturedEpoch = epoch.current;
   const citation=useCitationGate(project.project_id, session.isCurrentScope);
-  const sources = useQuery({queryKey:["sources",project.project_id],queryFn:({signal})=>rpc<{artifacts:ConnectedArtifact[]; source_times?:Array<{artifact_id:string; source_version_id:string; byte_sha256:string; cutoff_state:string; revision:number; assessment_digest:string; metadata_digest?:string; reason_code:string; cutoff_at:string; mode:string}>; cutoff_basis?:{cutoff_at:string; project_revision:number}}>("project/source/list",{project_id:project.project_id},crypto.randomUUID(),signal)});
+  const sources = useProjectSources(project.project_id);
   const sourcesDenied = useReadAccessProtection(["sources", project.project_id], sources.error);
   const sourceData = sourcesDenied ? undefined : sources.data;
   const status = session.research.data?.value;
   const queryError = session.research.error ?? sources.error;
+  const openSettings = (target?: "consent") => { setFocusConsent(target === "consent"); onPage("settings"); };
+  // A thread with nothing sent yet: the readiness card carries the setup notice, so the composer does not repeat it.
+  const freshConversation = !threadId && !status?.request && status?.operation_state !== "RUNNING";
+  const readiness: ReadinessFacts = { sourceCount: sourceData ? sourceData.value.artifacts.length : null, modelConnected, consent, cutoffAt: project.cutoff_at, executionReady, hosted };
   if (readSuspended) return <section className="workspace-content conversation-page">
     {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} {t("workspace.authorizedRead")}</Callout>}
     {page==="research"&&<ResearchComposer session={session} projectId={project.project_id} threadId={threadId} epoch={capturedEpoch}
@@ -160,33 +145,21 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
     {page==="research" ? <div className={`conversation-layout ${panelOpen?"detail-open":""}`}><div className="conversation-center">
       <header className="conversation-heading"><h1>{status?.problem??(threadId?t("workspace.continue"):t("workspace.newQuestion"))}</h1></header>
       {import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Callout compact intent="warning" className="test-mode-banner">{t("workspace.testModeNotice")}</Callout>}
-      <div className="conversation-scroll"><ConversationTimeline projectId={project.project_id} threadId={threadId} status={status} sourceUris={(sourceData?.value.artifacts??[]).map(item=>item.source_uri)} onDetail={openDetail} queuedInstruction={session.queuedNotice} onContinue={()=>document.getElementById("live-problem")?.focus()} onRetry={question=>{session.setProblem(question);document.getElementById("live-problem")?.focus();}} onResume={operationId=>session.resume.mutate(operationId)} resuming={session.resume.isPending} onOpenHistory={()=>onPage("records")} onOpenTrace={onOpenTrace}/>
+      <div className="conversation-scroll"><ConversationTimeline projectId={project.project_id} threadId={threadId} status={status} sourceUris={(sourceData?.value.artifacts??[]).map(item=>item.source_uri)} onDetail={openDetail} queuedInstruction={session.queuedNotice} onContinue={()=>document.getElementById("live-problem")?.focus()} onRetry={question=>{session.setProblem(question);document.getElementById("live-problem")?.focus();}} onResume={operationId=>session.resume.mutate(operationId)} resuming={session.resume.isPending} onOpenHistory={()=>onPage("records")} onOpenTrace={onOpenTrace}
+        emptyNotice={<ProjectReadinessCard facts={readiness} onOpenSettings={openSettings} onManageSources={()=>onPage("resources")}/>}/>
         {session.resume.error&&<Callout intent="danger" role="alert">{t("workspace.resumeFailed")} {session.resume.error.message}</Callout>}
         {(queryError || sourcesDenied || session.researchReadDenied)&&<Callout intent="danger" role="alert">{queryError?.message ?? t("workspace.accessFailed")}<Button small onClick={()=>{void session.research.refetch();void sources.refetch();}}>{t("workspace.reload")}</Button></Callout>}
       </div>
       <ResearchComposer session={session} projectId={project.project_id} threadId={threadId} epoch={capturedEpoch} onAttach={openResourcePanel}
-        onOpenSettings={target=>{setFocusConsent(target==="consent");onPage("settings");}} hosted={hosted} executionReady={executionReady}
+        onOpenSettings={openSettings} hosted={hosted} executionReady={executionReady} setupNoticeShown={freshConversation}
         consentMissing={!hosted && consent==="UNDECIDED"} modelConnected={modelConnected}/>
     </div>{panelOpen && !(session.researchReadDenied && detailFromResearch.current)&&<ResearchSidePanel tab={sideTab} onTab={setSideTab} detail={detail} onClose={closeDetail} sources={sourceData?.value.artifacts??[]} project={project} thread={{thread_id:threadId,problem:status?.problem??t("workspace.research"),current_object_ids:status?.current_object_ids??[]}} onOpenRecords={()=>onPage("records")} onManageResources={()=>{closeDetail();onPage("resources");}}/>}</div> :
     page==="capabilities" && !hosted ? <><Button minimal icon="arrow-left" onClick={()=>onPage("settings")}>{t("workspace.backSettings")}</Button><CapabilityWorkbench projectId={project.project_id} threadId={threadId} initialNamespace={catalogNamespace}/></> :
     page==="trace" ? <TracePage projectId={project.project_id} responseLanguage={session.responseLanguage} onInvestigate={onInvestigate} focusRow={traceFocus}/> : page==="records" ? <ResearchHistoryWorkspace key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId}
       onUseQuestion={session.problem.trim() ? undefined : question=>{session.setProblem(question);onPage("research");}}/> :
     page==="raw-records" && !hosted ? <><Button minimal icon="arrow-left" onClick={()=>onPage("settings")}>{t("workspace.backSettings")}</Button><DomainRecords key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId} operationId={status?.request?.operation_id} onOpenCatalog={namespace=>{setCatalogNamespace(namespace);onPage("capabilities");}}/></> :
-    page==="resources" ? <><header className="workspace-heading"><div><h1>{t("workspace.resources")}</h1><p>{t("workspace.resourcesNotice")}</p></div><Button minimal icon="arrow-left" onClick={()=>onPage("research")}>{t("workspace.backConversation")}</Button></header><ProjectWebSetup projectId={project.project_id}/><FileConnectionPanel projectId={project.project_id} hosted={hosted}/><h2>{t("workspace.connectedSources")}</h2>
-      {citation.dialog}{citation.message&&<Callout compact>{citation.message}</Callout>}{(sourceData?.value.artifacts??[]).map(artifact=>{ const assessment=(sourceData?.value.source_times??[]).find(item=>item.artifact_id===artifact.artifact_id); const detailsOpen=artifactDetailsId===artifact.artifact_id; return <article className="detail-card" key={artifact.artifact_id}><h3>{isHttpUrl(artifact.source_uri)?<a href={artifact.source_uri} target="_blank" rel="noreferrer">{sourceCardTitle(artifact.source_uri)}</a>:sourceCardTitle(artifact.source_uri)}</h3>{sourceCardHost(artifact.source_uri)?<p>{sourceCardHost(artifact.source_uri)}</p>:null}<p>{artifact.media_type}</p><p>{cutoffLabel(assessment?.cutoff_state ?? artifact.cutoff_state ?? "UNKNOWN_TIME")}</p><Button small onClick={()=>void citation.ask(artifact.artifact_id)}>{t("workspace.cite")}</Button>{!hosted&&<SourceTimeAdvanced projectId={project.project_id} artifactId={artifact.artifact_id} assessment={assessment} cutoff={sourceData?.value.cutoff_basis}/>} {!hosted&&<><Button small minimal icon={detailsOpen?"chevron-up":"info-sign"} onClick={()=>setArtifactDetailsId(detailsOpen?"":artifact.artifact_id)} aria-expanded={detailsOpen}>{t("workspace.sourceDetails")}</Button><Collapse isOpen={detailsOpen}><RecordInspector value={artifact}/></Collapse></>}</article>})}
-      {(sources.error || sourcesDenied)&&<Callout intent="danger">{sources.error?.message ?? t("workspace.accessFailed")}</Callout>}
-    </> : <><header className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel(hosted?"REVIEW WORKSPACE":"LOCAL WORKSPACE")}</p><h1>{hosted?t("workspace.operations"):t("workspace.settings")}</h1><p>{hosted?t("workspace.reviewInfo"):t("workspace.localToolsInfo")}</p></div></header>
-      {hosted ? (
-        <section className="detail-card"><h2>{t("workspace.reviewModel")}</h2><p>{t("workspace.operatorModel")}</p></section>
-      ) : (
-        <section className="detail-card"><h2>{t("workspace.modelDefaults")}</h2><ModelSettings projectId={project.project_id} threadId={threadId||undefined} selection={session.modelSelection} onSelect={session.chooseModel} onSaved={()=>session.clearModel(session.renderedRevision,capturedEpoch)}/><AutoRetrySwitch projectId={project.project_id}/><HypothesisContractSwitch projectId={project.project_id}/><ModelCredentialPanel projectId={project.project_id} workspaceId={workspaceId ?? undefined}/></section>
-      )}
-      <LanguageSettingsCard scope={storageScope}/>
-      {!hosted && consent !== undefined && <WorkspaceInternetConsent consent={consent} focus={focusConsent} onFocused={clearConsentFocus}/>}
-      <LocalRetrievalSettingsCard workspaceId={workspaceId ?? "UNBOUND"} projectId={project.project_id} hosted={hosted}/>
-      <section className="detail-card"><h2>{t("workspace.usage")}</h2><p>{message("reportedTokens", status?.usage?.total_tokens?.toLocaleString(localeTag())??t("workspace.noUsage"), status?.usage?.state==="PARTIAL"?t("workspace.partialUsage"):"")}</p><p>{t("workspace.usagePending")}</p>{!hosted&&<><Button small minimal icon={projectDetailsOpen?"chevron-up":"settings"} onClick={()=>setProjectDetailsOpen(value=>!value)} aria-expanded={projectDetailsOpen}>{t("workspace.projectSettings")}</Button><Collapse isOpen={projectDetailsOpen}><RecordInspector value={project}/></Collapse></>}</section>
-      <section className="detail-card"><h2>{hosted?t("workspace.recordsSources"):t("workspace.recordsTools")}</h2><Button minimal icon="folder-open" onClick={()=>onPage("resources")}>{t("workspace.manageSources")}</Button><Button minimal icon="history" onClick={()=>onPage("records")}>{t("workspace.history")}</Button>{!hosted&&<><Button minimal icon={developerOpen?"chevron-up":"chevron-down"} onClick={()=>setDeveloperOpen(value=>!value)} aria-expanded={developerOpen}>{t("workspace.devTools")}</Button><Collapse isOpen={developerOpen}><div className="local-developer-tools"><Button minimal icon="database" onClick={()=>onPage("raw-records")}>{t("workspace.detailedRecords")}</Button><Button minimal icon="code" onClick={()=>{setCatalogNamespace("all");onPage("capabilities");}}>{t("workspace.apiTools")}</Button><RecordInspector value={{request:status?.request,attempt:status?.attempt,budget:status?.budget,usage:status?.usage,cleanup:status?.cleanup}}/></div></Collapse></>}</section>
-    </>}
+    page==="resources" ? <ResourcesPage project={project} hosted={hosted} citation={citation} sourceData={sourceData} sourcesError={sources.error} sourcesDenied={sourcesDenied} onPage={onPage}/> :
+    <SettingsPage project={project} threadId={threadId} hosted={hosted} workspaceId={workspaceId} storageScope={storageScope} session={session} capturedEpoch={capturedEpoch} status={status} consent={consent} focusConsent={focusConsent} onConsentFocused={clearConsentFocus} onPage={onPage} onOpenCatalog={()=>{setCatalogNamespace("all");onPage("capabilities");}}/>}
   </section>;
 }
 
@@ -235,24 +208,16 @@ export function ProjectLanding({ projects, loading = false, contextRestoreIssue 
   </div>;
 }
 
+/** What the project holds, from values the shell already reads: sessions from the thread list, sources from the shared sources read. */
+function WorkspaceCounts({ sessions, sources }: { sessions: number | null; sources: number | null }) {
+  const chips: Array<[string, number | null]> = [[t("workspace.sessionsCount"), sessions], [t("workspace.sourcesCount"), sources]];
+  return <div className="workspace-counts" role="group" aria-label={t("workspace.countsLabel")}>{chips.filter(([, n]) => n !== null).map(([label, n]) => <Tag key={label} minimal>{message("tabCount", label, n as number)}</Tag>)}</div>;
+}
+
 export function LiveProjectWorkspace() {
   useTranslation();
-  const [context, setContext] = useState({ projectId: "", threadId: "" });
-  const [restoredFor, setRestoredFor] = useState<string | null>(null);
-  const [contextStoreFailed, setContextStoreFailed] = useState(false);
-  const [contextRestoreIssue, setContextRestoreIssue] = useState<"CORRUPT" | "UNAVAILABLE" | null>(null);
-  const [missingSelection, setMissingSelection] = useState<"project" | "thread" | null>(null);
-  const [page, setPage] = useState<Page>("research");
   const [search, setSearch] = useState("");
-  const [selectionVersion,setSelectionVersion] = useState(0);
-  const [rowOrigin,setRowOrigin] = useState<RowOrigin|null>(null);
-  const [traceFocus,setTraceFocus] = useState<TraceRowRef|null>(null);
   const [openCreate,setOpenCreate] = useState(false);
-  const epoch = useRef(0);
-  const previousScope = useRef<string | null>(null);
-  const pendingAdmission = useRef<string | null>(null);
-  const openLatestWork = useRef(false);
-  const renderedEpoch = epoch.current;
   const client = useQueryClient();
   const readyQuery = useQuery({queryKey:["workspace-ready"],queryFn:({signal})=>rpc<WorkspaceReady>("workspace/ready",{}, "ws-ready", signal)});
   const ready = readyQuery.error ? undefined : readyQuery.data?.value;
@@ -265,77 +230,20 @@ export function LiveProjectWorkspace() {
   const projectsQuery = useQuery({queryKey:["projects",scopeKey],enabled:Boolean(scopeKey),queryFn:({signal})=>rpc<{projects:ProjectSummary[]}>("project/list",{project_id:"system:projects"},crypto.randomUUID(),signal)});
   const projects = useMemo(() => projectsQuery.error ? [] : projectsQuery.data?.value.projects ?? [],
     [projectsQuery.error, projectsQuery.data]);
+  const selection = useWorkspaceSelection(scopeKey, storageScope, client);
+  const { context, page, setPage, restoredFor, contextStoreFailed, contextRestoreIssue, missingSelection, selectionVersion, rowOrigin, traceFocus, epoch, pendingAdmission,
+    chooseProject, openProject, chooseThread, cancelOpenLatest, openTraceRow, admit, clearRowOrigin } = selection;
   const project = projects.find(item=>item.project_id===context.projectId);
   const threadsQuery = useQuery({queryKey:["threads",scopeKey,context.projectId],enabled:Boolean(scopeKey && project),queryFn:({signal})=>rpc<{threads:WorkThread[]}>("thread/list",{project_id:context.projectId},crypto.randomUUID(),signal)});
   const threads = useMemo(() => threadsQuery.error ? [] : threadsQuery.data?.value.threads ?? [],
     [threadsQuery.error, threadsQuery.data]);
+  const { investigate } = useSelectionReconcile(selection, { projects, project, threads,
+    projectsSettled: projectsQuery.isSuccess && !projectsQuery.isFetching, threadsSettled: threadsQuery.isSuccess && !threadsQuery.isFetching });
+  const renderedEpoch = epoch.current;
   const visibleProjects = projectsQuery.isFetching ? [] : projects;
   const visibleThreads = threadsQuery.isFetching ? [] : threads;
   const health = useQuery({queryKey:["health"],queryFn:async()=>{const response=await fetch("/healthz",{credentials:"same-origin"});if(!response.ok)throw new Error(`HTTP ${response.status}`);return await response.json() as {status:string;version:string};},retry:false,refetchInterval:30000});
-  useEffect(() => {
-    if (!scopeKey || restoredFor === scopeKey) return;
-    if (previousScope.current !== scopeKey) {
-      client.removeQueries({ predicate: query => !["workspace-ready", "health"].includes(String(query.queryKey[0])) && !query.queryKey.includes(scopeKey) });
-    }
-    previousScope.current = scopeKey;
-    const restored = storageScope.mode === "LOCAL" ? inspectLocalContext(storageScope.workspaceId) : null;
-    setContext(restored?.context ?? readWorkspaceContext(storageScope));
-    setContextRestoreIssue(restored?.kind === "CORRUPT" || restored?.kind === "UNAVAILABLE" ? restored.kind : null);
-    setContextStoreFailed(false);
-    setRestoredFor(scopeKey);
-    setMissingSelection(null);
-    setPage("research");
-    epoch.current += 1;
-    setSelectionVersion(value => value + 1);
-  }, [scopeKey, restoredFor, storageScope, client]);
-  useEffect(() => {
-    if (!scopeKey || restoredFor !== scopeKey || contextRestoreIssue) return;
-    const saved = saveWorkspaceContext(context.projectId, context.threadId, storageScope);
-    if (storageScope.mode === "LOCAL") setContextStoreFailed(!saved);
-  }, [scopeKey, restoredFor, context, storageScope, contextRestoreIssue]);
-  useEffect(() => {
-    if (!scopeKey || restoredFor !== scopeKey) return;
-    if (context.projectId && projectsQuery.isSuccess && !projectsQuery.isFetching && !projects.some(item => item.project_id === context.projectId)) {
-      client.removeQueries({ predicate: query => query.queryKey.includes(context.projectId) });
-      epoch.current += 1; pendingAdmission.current = null; setSelectionVersion(value => value + 1);
-      setContext({ projectId: "", threadId: "" }); setMissingSelection("project"); return;
-    }
-    if (pendingAdmission.current && threads.some(item => item.thread_id === pendingAdmission.current)) pendingAdmission.current = null;
-    if (context.threadId && project && threadsQuery.isSuccess && !threadsQuery.isFetching &&
-        !threads.some(item => item.thread_id === context.threadId) && pendingAdmission.current !== context.threadId) {
-      client.removeQueries({ predicate: query => query.queryKey.includes(context.threadId) });
-      epoch.current += 1; pendingAdmission.current = null; setSelectionVersion(value => value + 1);
-      setContext({ projectId: context.projectId, threadId: "" }); setMissingSelection("thread");
-    }
-  }, [scopeKey, restoredFor, context, projects, project, projectsQuery.isSuccess, projectsQuery.isFetching, threads, threadsQuery.isSuccess, threadsQuery.isFetching, client]);
-  const chooseProject = (projectId:string, nextPage:Page="research") => {setRowOrigin(null);setTraceFocus(null);epoch.current+=1;pendingAdmission.current=null;setMissingSelection(null);setContextRestoreIssue(null);setSelectionVersion(v=>v+1);setContext({projectId,threadId:""});setPage(projectId?nextPage:"research");};
-  const openProject = (projectId:string) => {
-    if (projectId===context.projectId) {setPage("research");return;}
-    chooseProject(projectId);
-    openLatestWork.current = Boolean(projectId);
-  };
-  const chooseThread = (threadId:string) => {setRowOrigin(null);openLatestWork.current=false;epoch.current+=1;pendingAdmission.current=null;setMissingSelection(null);setContextRestoreIssue(null);setSelectionVersion(v=>v+1);setContext(current=>({...current,threadId}));setPage("research");};
-  const cancelOpenLatest = useCallback(() => { openLatestWork.current = false; }, []);
-  // "원인 조사" on a trace row: open the conversation of that row (a new one when it has none) with the question filled in.
-  // Nothing is sent; the user sends it, and the request then carries the row.
-  const investigate = (item: RowInvestigation) => {
-    if (!project) return;
-    const target = threadForRow(threads, item.origin.subject_kind, item.origin.subject_id)?.thread_id ?? "";
-    const draft = readDraft(project.project_id, target, storageScope);
-    // The question is written in the response language set in Settings (the question's own language when automatic).
-    const question = item.questionForLanguage ? item.questionForLanguage(readResponseLanguageDefault(storageScope)) : item.question;
-    writeDraft(project.project_id, target, fillQuestion(draft, question), storageScope);
-    chooseThread(target);
-    setRowOrigin({ threadId: target, origin: item.origin });
-  };
-  const openTraceRow = (row: TraceRowRef) => { setTraceFocus(row); setPage("trace"); };
-  // Opening a project lands on its most recently updated work instead of an empty question screen.
-  useEffect(() => {
-    if (!openLatestWork.current || !project || context.threadId || !threadsQuery.isSuccess || threadsQuery.isFetching) return;
-    openLatestWork.current = false;
-    const latest = threads.reduce<WorkThread | null>((best, item) => !best || (item.updated_at ?? "") > (best.updated_at ?? "") ? item : best, null);
-    if (latest) chooseThread(latest.thread_id);
-  }, [project, context.threadId, threads, threadsQuery.isSuccess, threadsQuery.isFetching]);
+  const shellSources = useProjectSources(project?.project_id ?? "", Boolean(project));
   const archiveProject = useMutation({
     mutationFn: (target: ProjectSummary) => rpc<ProjectSummary>("project/archive", {project_id: target.project_id, expected_revision: target.revision}, crypto.randomUUID()),
     onSuccess: async (_response, target) => {
@@ -350,41 +258,11 @@ export function LiveProjectWorkspace() {
     if (!window.confirm(message("archiveProject", target.name))) return;
     archiveProject.mutate(target);
   };
-  if (readyQuery.isPending || (readyQuery.isSuccess && !ready)) {
-    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">{t("workspace.preparing")}</p></main>;
-  }
-  if (readyQuery.error) {
-    return <main className="first-run-shell bp6-dark"><section className="first-run-card"><Callout intent="danger" title={t("workspace.readinessFailed")}>{t("workspace.readinessAdvice")}<Button small onClick={()=>void readyQuery.refetch()}>{t("workspace.checkAgain")}</Button></Callout></section></main>;
-  }
-  if (!ready || !scopeKey || restoredFor !== scopeKey) {
-    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">{t("workspace.loadingSaved")}</p></main>;
-  }
-  if (hosted && !ready.ready) return <FirstRunSetup onDone={()=>void readyQuery.refetch()}/>;
-  if (projectsQuery.isPending && !projectsQuery.data) {
-    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">{t("workspace.checkingProjects")}</p></main>;
-  }
-  if (projectsQuery.error) {
-    return <main className="first-run-shell bp6-dark"><section className="first-run-card"><Callout intent="warning" role="alert">{t("workspace.accessFailed")}<Button small onClick={()=>void projectsQuery.refetch()}>{t("workspace.checkAgain")}</Button></Callout></section></main>;
-  }
-  const workspaceReadable = hosted || ready.workspace_readable !== false;
-  const setupComplete = ready.setup_complete ?? (ready.setup?.internet_consent !== undefined && ready.setup.internet_consent !== "UNDECIDED");
-  const executionReady = hosted ? ready.ready : (ready.execution_ready ?? ready.ready);
-  if (!workspaceReadable) {
-    return <main className="first-run-shell bp6-dark"><section className="first-run-card"><Callout intent="warning" role="alert">{t("workspace.savedUnavailable")}<Button small onClick={()=>void readyQuery.refetch()}>{t("workspace.checkAgain")}</Button></Callout></section></main>;
-  }
-  if (!hosted && ready.workspace_readable === undefined && !ready.ready) return <FirstRunSetup onDone={()=>void readyQuery.refetch()}/>;
-  if (!hosted && !setupComplete && projects.length === 0) {
-    return <FirstRunSetup onDone={()=>void readyQuery.refetch()}/>;
-  }
-  if (context.threadId && project && threadsQuery.isPending && !threadsQuery.data) {
-    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">{t("workspace.checkingAccess")}</p></main>;
-  }
-  if (context.threadId && project && threadsQuery.error) {
-    return <main className="first-run-shell bp6-dark"><section className="first-run-card"><Callout intent="warning" role="alert">{t("workspace.taskUnavailable")}<Button small onClick={()=>void threadsQuery.refetch()}>{t("workspace.checkAgain")}</Button></Callout></section></main>;
-  }
-  if (context.threadId && project && !threads.some(item=>item.thread_id===context.threadId) && pendingAdmission.current!==context.threadId) {
-    return <main className="first-run-shell bp6-dark"><p className="empty-copy" role="status">{t("workspace.selectionCheck")}</p></main>;
-  }
+  const gate = workspaceGate({ readyQuery, ready, hosted, scopeKey, restoredFor, projectsQuery, projectsCount: projects.length, threadsQuery, hasProject: Boolean(project),
+    threadId: context.threadId, threadListed: threads.some(item=>item.thread_id===context.threadId), admissionPending: pendingAdmission.current===context.threadId });
+  if (gate || !ready || !scopeKey) return gate;
+  const executionReady = executionReadiness(ready, hosted);
+  const sourceCount = project && shellSources.data ? shellSources.data.value.artifacts.length : null;
   return <main className="workstation conversation-workstation bp6-dark">
     <aside className="navigation-rail"><div className="brand"><div className="brand-mark"><Icon icon="layout-grid" size={20}/></div><div><strong>THOTH</strong><span>RESEARCH WORKSTATION</span></div><Tag minimal>{hosted ? "REVIEW" : "LOCAL"}</Tag></div>
       <Button icon="plus" intent="primary" className="new-project-button" onClick={()=>{chooseProject("");setOpenCreate(true);}}>{t("workspace.newProject")}</Button>
@@ -406,15 +284,18 @@ export function LiveProjectWorkspace() {
       <div className="sidebar-bottom"><Button minimal alignText="left" icon={hosted?"info-sign":"settings"} onClick={()=>setPage("settings")}>{hosted?t("workspace.operations"):t("workspace.settingsTools")}</Button></div>
     </aside>
     <header className="workstation-topbar"><div className="context-path"><Icon icon="projects"/><span>Workspace</span>{import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Tag intent="warning">{t("workspace.testMode")}</Tag>}<span>/</span><strong>{projectsQuery.isFetching?t("workspace.checkingProject"):project?.name??t("workspace.selectProject")}</strong>{context.threadId&&<><span>/</span><small>{threadsQuery.isFetching?t("workspace.checkingTask"):visibleThreads.find(item=>item.thread_id===context.threadId)?.problem??t("workspace.selectedTask")}</small></>}</div>
-      <div className="header-status">{project&&projectCutoffText(project.cutoff_at)&&<Tag minimal icon="time" title={t("workspace.cutoffHint")}>{message("cutoff", projectCutoffText(project.cutoff_at))}</Tag>}<Tag minimal intent={health.data?.status==="ok"?"success":health.error?"danger":"none"}>{health.data?.status==="ok"?t("workspace.serverConnected"):health.error?t("workspace.serverFailed"):t("workspace.checkingConnection")}</Tag>{!hosted&&!executionReady&&<Tag minimal intent="warning">{t("workspace.setupNeeded")}</Tag>}{!hosted&&contextStoreFailed&&<Tag minimal intent="warning">{t("workspace.locationUnsaved")}</Tag>}{missingSelection&&<Tag minimal intent="warning">{message("missingSelection", missingSelection)}</Tag>}<Button small minimal icon="refresh" aria-label={t("workspace.refreshContext")} onClick={()=>void client.invalidateQueries()}/></div></header>
-    <div className="workspace-navigation"><WorkspaceLocationNotice location={ready.workspace_location} /><Tabs id="workspace-tabs" selectedTabId={page} onChange={value=>setPage(value as Page)}><Tab id="research" title={t("workspace.conversation")}/><Tab id="resources" title={t("workspace.resources")} disabled={!project}/><Tab id="records" title={t("workspace.history")} disabled={!project}/><Tab id="trace" title={t("workspace.trace")} disabled={!project}/><Tab id="settings" title={t("workspace.settings")}/></Tabs>
-      {project&&<div className="context-policy"><HTMLSelect aria-label={t("workspace.chooseTask")} disabled={threadsQuery.isFetching} value={context.threadId} onChange={event=>chooseThread(event.target.value)} options={[{value:"",label:t("workspace.newTask")},...visibleThreads.map(item=>({value:item.thread_id,label:(item.problem||t("workspace.untitledTask")).slice(0,40)}))]}/></div>}</div>
+      <div className="header-status">{project&&projectCutoffText(project.cutoff_at)&&<Tag minimal icon="time" title={t("workspace.cutoffHint")}>{message("cutoff", projectCutoffText(project.cutoff_at)!)}</Tag>}<Tag minimal intent={health.data?.status==="ok"?"success":health.error?"danger":"none"}>{health.data?.status==="ok"?t("workspace.serverConnected"):health.error?t("workspace.serverFailed"):t("workspace.checkingConnection")}</Tag>
+        {!hosted&&!executionReady&&<Button small intent="warning" className="setup-needed-button" icon="warning-sign" endIcon="arrow-right" title={t("workspace.openSetup")} onClick={()=>setPage("settings")}>{t("workspace.setupNeeded")}</Button>}
+        {!hosted&&contextStoreFailed&&<Tag minimal intent="warning">{t("workspace.locationUnsaved")}</Tag>}{missingSelection&&<Tag minimal intent="warning">{message("missingSelection", missingSelection)}</Tag>}<Button small minimal icon="refresh" aria-label={t("workspace.refreshContext")} onClick={()=>void client.invalidateQueries()}/></div></header>
+    <div className="workspace-navigation"><WorkspaceLocationNotice location={ready.workspace_location} /><Tabs id="workspace-tabs" selectedTabId={page} onChange={value=>setPage(value as Page)}>
+      <Tab id="research" title={t("workspace.conversation")}/><Tab id="resources" title={t("workspace.resources")} disabled={!project}/>
+      <Tab id="records" title={t("workspace.history")} disabled={!project}/><Tab id="trace" title={t("workspace.trace")} disabled={!project}/><Tab id="settings" title={t("workspace.settings")}/></Tabs>
+      {project&&<WorkspaceCounts sessions={threadsQuery.isPending ? null : threads.length} sources={sourceCount}/>}</div>
     {project ? <WorkspaceErrorBoundary resetKey={`${scopeKey}:${project.project_id}:${context.threadId}:${page}`} onRetry={()=>client.invalidateQueries()}><ProjectSession key={`${scopeKey}:${project.project_id}:${selectionVersion}`} project={project} threadId={context.threadId} epoch={epoch} page={page} onPage={setPage} hosted={hosted} workspaceId={workspaceId} browserScopeId={browserScopeId} executionReady={executionReady && !threadsQuery.error} consent={ready.setup?.internet_consent} modelConnected={ready.model_connected}
       readSuspended={readyQuery.isFetching || projectsQuery.isFetching || threadsQuery.isFetching} setupIssue={setupIssue}
-      onUserInput={cancelOpenLatest} onAdmitted={threadId=>{pendingAdmission.current=threadId;setContext(current=>({...current,threadId}));}}
-      rowOrigin={rowOrigin} onOriginDone={()=>setRowOrigin(null)} onInvestigate={investigate} traceFocus={traceFocus} onOpenTrace={openTraceRow}/></WorkspaceErrorBoundary> :
+      onUserInput={cancelOpenLatest} onAdmitted={admit}
+      rowOrigin={rowOrigin} onOriginDone={clearRowOrigin} onInvestigate={investigate} traceFocus={traceFocus} onOpenTrace={openTraceRow}/></WorkspaceErrorBoundary> :
       isTimelineExampleRequested() && page === "research" ? <TimelineExamplePane /> :
       <section className="workspace-content">{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?t("workspace.missingProject"):t("workspace.taskSelectionNeeded")} {t("workspace.draftNotSent")}</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">{t("workspace.locationFailure")}</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">{t("workspace.identityMissing")}</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title={t("workspace.chooseProjectNotice")}>{t("workspace.selectForInfo")}</Callout>:<section className="detail-card"><h2>{t("workspace.connectModel")}</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">{t("workspace.selectForDefaults")}</p></section>}<LanguageSettingsCard scope={storageScope}/></>:<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</section>}
   </main>;
 }
-

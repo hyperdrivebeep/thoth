@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-05T16:29:11.033593+00:00",
+  "created_at": "2026-11-06T02:50:21.970026+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -708,8 +708,8 @@
     },
     {
       "path": "apps/web/src/components/ConversationTimeline.tsx",
-      "sha256": "01be1ed7beba27877ef958beff4b96f96e12736e8ebcd971968047ba0b69cb84",
-      "bytes": 12582
+      "sha256": "ed9d8ec566175458a8a82155a64d952d74c10aa8987a79343d038ff9f4df60ce",
+      "bytes": 12774
     },
     {
       "path": "apps/web/src/components/ConversationTimelineLegacyEmpty.test.tsx",
@@ -923,8 +923,8 @@
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspace.tsx",
-      "sha256": "2e1e197495f99cc3c646ce959c8ab0daeb73a54a1506270b80910a3635881c83",
-      "bytes": 44131
+      "sha256": "e146209a1c2f1493dd0a804aedde9cd3a86d85f1ef86d8929fcfc6f627394eb7",
+      "bytes": 31683
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspaceConsent.test.tsx",
@@ -935,6 +935,11 @@
       "path": "apps/web/src/components/LiveProjectWorkspaceInvestigate.test.tsx",
       "sha256": "eb9d8af3a645fffa139434dd4dadf13443ef896aacb5c6d0ff7937e4cbf4ee67",
       "bytes": 11599
+    },
+    {
+      "path": "apps/web/src/components/LiveProjectWorkspaceReadiness.test.tsx",
+      "sha256": "9237e25834a63382aa718f89a826e2b398332fe63035ded3f6ad9a6dec294dd5",
+      "bytes": 6736
     },
     {
       "path": "apps/web/src/components/LiveProjectWorkspaceRestart.test.tsx",
@@ -998,8 +1003,8 @@
     },
     {
       "path": "apps/web/src/components/ModelSettings.test.tsx",
-      "sha256": "01effebc73c57ce53a798271c69b7c43e4dafb0b355e79908acf0da852a96a74",
-      "bytes": 23845
+      "sha256": "4f24b00d94b07fa807caddfab8d8c8eb9a6b7bc2badfc679dc51dce453cff5e8",
+      "bytes": 23258
     },
     {
       "path": "apps/web/src/components/ModelSettings.tsx",
@@ -1045,6 +1050,16 @@
       "path": "apps/web/src/components/ProjectPermanentDelete.tsx",
       "sha256": "dad0d8d4b909785f77fc974aa4d2cba32f5a0efdf232d55663a9daca09a9cbf4",
       "bytes": 3027
+    },
+    {
+      "path": "apps/web/src/components/ProjectReadinessCard.tsx",
+      "sha256": "7ee012b9fdd189d4c54214c36765cae0bae023182b1310f14b2a0d1bfeffcc0a",
+      "bytes": 3323
+    },
+    {
+      "path": "apps/web/src/components/ProjectSessionPages.tsx",
+      "sha256": "2f591e37617f67438157dc406686f362c35b221110bd1b5822df52a6876c4584",
+      "bytes": 7912
     },
     {
       "path": "apps/web/src/components/ProjectWebSetup.test.tsx",
@@ -1098,8 +1113,8 @@
     },
     {
       "path": "apps/web/src/components/ResearchComposer.tsx",
-      "sha256": "e1953a084c742bace4632756eb7312daf388e08af76f7e514e67c15865c9b06b",
-      "bytes": 6653
+      "sha256": "e72ce2f3905d781ef15d92e473af3b1c9a2278c708eb906ea532b9b8c285919b",
+      "bytes": 6947
     },
     {
       "path": "apps/web/src/components/ResearchDetailPane.tsx",
@@ -1320,6 +1335,11 @@
       "path": "apps/web/src/components/WorkspaceErrorBoundary.tsx",
       "sha256": "ca2b835244e784b19b4f952fa38be36053c2e54e909293484a571ac0c3a9f754",
       "bytes": 1018
+    },
+    {
+      "path": "apps/web/src/components/WorkspaceGate.tsx",
+      "sha256": "5aff5943f09ef8e0dd543ce93f2b7e8c3fb11c3d83f52f9efeb07258d963d5b2",
+      "bytes": 4361
     },
     {
       "path": "apps/web/src/components/WorkspaceInternetConsent.tsx",
@@ -1592,6 +1612,11 @@
       "bytes": 2568
     },
     {
+      "path": "apps/web/src/components/readinessText.ts",
+      "sha256": "9ea89510f70bf7e8daa3050b39ac13e3e239f64cd99abd00edd6fd948f4ca740",
+      "bytes": 438
+    },
+    {
       "path": "apps/web/src/components/resultInterruption.ts",
       "sha256": "7ce7881541e3d0e2b3b545b258015c40e970887d4346b8fcac5f51a2d2b9f55f",
       "bytes": 3355
@@ -1722,6 +1747,11 @@
       "bytes": 2365
     },
     {
+      "path": "apps/web/src/components/useProjectSources.ts",
+      "sha256": "2a696821c7d8724d6f505d682332ae37c449fa3e2d5b11eddfe43b2fbfc7fef5",
+      "bytes": 1075
+    },
+    {
       "path": "apps/web/src/components/useReadAccessProtection.ts",
       "sha256": "380496b8711bcb1ed22fcf3b5acc85096eb96381fcda3b69e2202e38c122416b",
       "bytes": 1403
@@ -1740,6 +1770,11 @@
       "path": "apps/web/src/components/useResultEvidenceProtection.ts",
       "sha256": "4d58a66d76517539d3696e602ea10631f9f9a7a5825782cb4797d67e0e058c6b",
       "bytes": 2010
+    },
+    {
+      "path": "apps/web/src/components/workspaceSelection.ts",
+      "sha256": "5538d516f5d1d296b75159e7201292625ce55e7291bd48929c62fed8c7e514a5",
+      "bytes": 8535
     },
     {
       "path": "apps/web/src/components/workspaceSetupIssue.ts",
@@ -1988,8 +2023,8 @@
     },
     {
       "path": "apps/web/src/i18n/ja/workspaceMessagesJa.ts",
-      "sha256": "22937b8269aa98b9979a7afae2752407a13aacf01d7482cbcb84374df8c29bfc",
-      "bytes": 7467
+      "sha256": "1d5859dd149a710139ee15d51350d410217e3fafe59b00b3f00efedca5ac8c04",
+      "bytes": 8208
     },
     {
       "path": "apps/web/src/i18n/jaScreen.test.ts",
@@ -2023,8 +2058,8 @@
     },
     {
       "path": "apps/web/src/i18n/metricFormatMessages.ts",
-      "sha256": "b253f596cf344efb7412bb218cc34480c912fc683848fddd76baf37da12a27ca",
-      "bytes": 14779
+      "sha256": "2a7f83d0194e4ce56ab06dec565f863044005354a93d4b9925654c8bb14fdbcf",
+      "bytes": 15207
     },
     {
       "path": "apps/web/src/i18n/modelHelpMessages.ts",
@@ -2188,8 +2223,8 @@
     },
     {
       "path": "apps/web/src/i18n/workspaceMessages.ts",
-      "sha256": "59a1d39aa4fa5a6f6724712bcaeec86ebb9d54c7e3bbc8fda0a74ff5f0986fed",
-      "bytes": 12265
+      "sha256": "77bd263575eee377a90079db7b8b73acd564c2c4d8a7c0798c80cd305ccc4a3a",
+      "bytes": 13440
     },
     {
       "path": "apps/web/src/i18n/zh/activityMessagesZh.ts",
@@ -2323,8 +2358,8 @@
     },
     {
       "path": "apps/web/src/i18n/zh/workspaceMessagesZh.ts",
-      "sha256": "19470d65e3c3d47270f712a226e783076c1fc7549913779890e81ebf0ff53973",
-      "bytes": 5860
+      "sha256": "d746175439e9309284049bb16cf3d1d783e7fdb3902c4b9e658e5c66703163fd",
+      "bytes": 6484
     },
     {
       "path": "apps/web/src/i18n/zhScreen.test.ts",
@@ -2383,8 +2418,8 @@
     },
     {
       "path": "apps/web/src/workstation.css",
-      "sha256": "adf08511c539543614b7cfd7d0a858780c8ad365982f61d00c6a37b67b363aad",
-      "bytes": 62930
+      "sha256": "4a0370429578e69f40c957c718f386189a9ae3a82da7613dc18fe8c61fddf5bb",
+      "bytes": 63570
     },
     {
       "path": "apps/web/timeline-preview.html",
@@ -2433,7 +2468,7 @@
     },
     {
       "path": "config/complexity-budget.json",
-      "sha256": "e9bc11960db1de06317182063171db50ff28120d3f258825b84c02a87228f5e2",
+      "sha256": "25dea1f1b2c66732bcb6b0ce9de140e2a5c106b59bc5e89b4c82dbc64fb35c18",
       "bytes": 5436
     },
     {
@@ -2523,8 +2558,8 @@
     },
     {
       "path": "docs/BETA.md",
-      "sha256": "a0b121e2bf0b54afa7d31ac09a0dc5eee17209fe3be5b41a3aa4c79e04d0125d",
-      "bytes": 13172
+      "sha256": "4e64af14908f3509aaf46f608e14e60b40e5a38f4cf0bef63cbfc648b01aa4e4",
+      "bytes": 13267
     },
     {
       "path": "docs/DEPENDENCY_LICENSES.json",
@@ -2623,8 +2658,8 @@
     },
     {
       "path": "docs/architecture/local-retrieval-preparation.md",
-      "sha256": "8e00b07034d5a5b97e2a24c0fa2c52431cbae3f860aab88bcf6c8836ccbb3c2b",
-      "bytes": 7780
+      "sha256": "d06d67fbd0da2ff0033976af05a4e33530e01e39e939bd6daab3b0bb94fef977",
+      "bytes": 9059
     },
     {
       "path": "docs/architecture/memory-terms.md",
@@ -4023,18 +4058,18 @@
     },
     {
       "path": "src/thoth/adapters/embeddings/onnx_encoder.py",
-      "sha256": "f4f3dcefc3e6292139e9bc5c0920a531d237434a137ddfd8840c1ca6b45a1b9f",
-      "bytes": 8350
+      "sha256": "2f37928a8b74123609317c22f0282bff835d6d23bb4194a6deb38ed54de4577c",
+      "bytes": 9812
     },
     {
       "path": "src/thoth/adapters/embeddings/process_worker.py",
-      "sha256": "98ca4701e401e9b43244a1f2cd7d8aa595683301146da67629b4c61250f9aab5",
-      "bytes": 16793
+      "sha256": "f5ee5369853b8d7b369a8c46c438474088a02678e07846362e5d1a89807205e9",
+      "bytes": 17495
     },
     {
       "path": "src/thoth/adapters/embeddings/worker_main.py",
-      "sha256": "50a48b33391a7bb41a14078d09284746bccbf604ebbe5cf5e009e4c0b5b9bbae",
-      "bytes": 3849
+      "sha256": "86508b15d5baf72ed57b4acc9ab859efe5e6856a2e41b07a81040188f18b7de9",
+      "bytes": 5093
     },
     {
       "path": "src/thoth/adapters/environment.py",
@@ -4743,8 +4778,8 @@
     },
     {
       "path": "src/thoth/adapters/storage/embedding_index.py",
-      "sha256": "8a974a2ed645a55329267a035a61c04ffe1455c0af1a5b752ab08b7d8cf51aa8",
-      "bytes": 19860
+      "sha256": "27eda458f182c21000ebb07bbc43eefd4bb60cc1d5b8ab143bdec86990a7da7f",
+      "bytes": 22198
     },
     {
       "path": "src/thoth/adapters/storage/embedding_schema.py",
@@ -5778,8 +5813,8 @@
     },
     {
       "path": "src/thoth/application/services/embedding_index_service.py",
-      "sha256": "344fc0184d26adb030ae501da9ee939aa3bb188d948e187c0fd58ebe76654035",
-      "bytes": 14089
+      "sha256": "efd187f1b96bfb2a190e8192fdeeed8359d075440c5c2ce14e357d806d7ad07f",
+      "bytes": 15832
     },
     {
       "path": "src/thoth/application/services/english_prose.py",
@@ -7413,8 +7448,8 @@
     },
     {
       "path": "src/thoth/domain/embedding_index.py",
-      "sha256": "60e9ecfa9e47f3c63f92d284b1ac0337f6692c0062e7a4c201cbc9be052ca497",
-      "bytes": 5934
+      "sha256": "91b4a9011b2a69b4cf8f83e6ead9228a58942909ee0b811f55c99987639024cd",
+      "bytes": 7649
     },
     {
       "path": "src/thoth/domain/enums.py",
@@ -7913,8 +7948,8 @@
     },
     {
       "path": "src/thoth/domain/retrieval_embedding.py",
-      "sha256": "50e562fcf7c7762e16f54f29a1c44337e2802ea664a4616812b23f4d9f3214ae",
-      "bytes": 5884
+      "sha256": "7035b450371aa2f8aa5b9d8cbfcaaa16fd48f5eef4ae81ff98adda0c5aa4c87f",
+      "bytes": 8013
     },
     {
       "path": "src/thoth/domain/retrieval_fused_selection.py",
@@ -8138,13 +8173,13 @@
     },
     {
       "path": "src/thoth/ports/embedding.py",
-      "sha256": "a7f609c80406a086e5915c225bd4423ce2ecc34644d6ca36e57d56d65c5b5282",
-      "bytes": 398
+      "sha256": "45f7af7ff08b6c3387d7ed3e65aae9c593d36837a02d80240a2c0ddcc6a0b7ce",
+      "bytes": 824
     },
     {
       "path": "src/thoth/ports/embedding_index.py",
-      "sha256": "46467ebecb40aa6383d87cb207cb8274188cbbe41144ed5f5d423d71f3854843",
-      "bytes": 2215
+      "sha256": "06c095715ab4f6ded53a556021044c777cf4480fc6ba17a21416dde44cc081f4",
+      "bytes": 2408
     },
     {
       "path": "src/thoth/ports/evaluation_runner.py",
@@ -8903,8 +8938,8 @@
     },
     {
       "path": "tests/embedding_fixtures.py",
-      "sha256": "6a06ad438b6c209efa446c4aff732dfc50e90a912a936e7709d6009278736241",
-      "bytes": 7511
+      "sha256": "46fcd8551bc573a72c949b69d78e1167265dadb5016f82de22850444ce7480d7",
+      "bytes": 8029
     },
     {
       "path": "tests/fixtures/action_response_golden.json",
@@ -9803,8 +9838,8 @@
     },
     {
       "path": "tests/integration/test_embedding_preprocess_version.py",
-      "sha256": "c0a79758b614324adacf702150c1e4969359056ce730929b3b89a6d68d8c0547",
-      "bytes": 13066
+      "sha256": "b8acdce621adeef5d09812451a77fd2b43dbc0cfc09af66911a83563920045c2",
+      "bytes": 13374
     },
     {
       "path": "tests/integration/test_embedding_publication_paths.py",
@@ -9813,8 +9848,8 @@
     },
     {
       "path": "tests/integration/test_embedding_recovery.py",
-      "sha256": "f32ee1e85d8e2b1e03661ce9c3c2a18c95336bf1b884828b8df452328d716fce",
-      "bytes": 10948
+      "sha256": "bea9301d5d4d2a65ae7818b2e06aa3bc902b9be052f3b68063e23fdc11d88aa3",
+      "bytes": 10980
     },
     {
       "path": "tests/integration/test_embedding_runtime.py",
@@ -9825,6 +9860,11 @@
       "path": "tests/integration/test_embedding_runtime_process.py",
       "sha256": "b96dd308a1e340bc938d8bd1c7a8b71da4a1f8579c19fcba4f5ecd37737d28a6",
       "bytes": 2879
+    },
+    {
+      "path": "tests/integration/test_embedding_windows.py",
+      "sha256": "e47650ce05c63306b4402be1e568c851485df26366f2af9d3a3592c4275809e3",
+      "bytes": 17472
     },
     {
       "path": "tests/integration/test_evaluation_execution_limits.py",
@@ -12653,8 +12693,13 @@
     },
     {
       "path": "tests/unit/test_embedding_token_cap.py",
-      "sha256": "15cddfb184b9085051f29ddf8cbc8807df86958c83ac38490237620a3680d733",
-      "bytes": 5101
+      "sha256": "789803550d9c20ae99c0d4d491e619874c156d6b34d036271e8f39cd0cfa1416",
+      "bytes": 5202
+    },
+    {
+      "path": "tests/unit/test_embedding_window_geometry.py",
+      "sha256": "6c97c0d9be8d04315a769860ca54d3764b6ad1f21856cf0db862e02bb3fd2bc0",
+      "bytes": 7197
     },
     {
       "path": "tests/unit/test_embedding_worker.py",

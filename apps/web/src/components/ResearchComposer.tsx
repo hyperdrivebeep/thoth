@@ -1,5 +1,6 @@
 import { Button, Callout, TextArea } from "@blueprintjs/core";
 import { useTranslation, t } from "../i18n/locale";
+import { blockedReason } from "./readinessText";
 import { message } from "../i18n/formatMessages";
 import { isResponseLanguage, responseLanguageLabel } from "../api/responseLanguages";
 import { ModelSettings } from "./ModelSettings";
@@ -7,9 +8,11 @@ import { ResearchProgress, UsageSummary } from "./ResearchProgress";
 import { useCitationGate } from "./SourceCitationGate";
 import type { useResearchSession } from "./useResearchSession";
 
-export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOpenSettings,hosted=false,executionReady=true,readSuspended=false,consentMissing=false,modelConnected}: {
+export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOpenSettings,hosted=false,executionReady=true,readSuspended=false,consentMissing=false,modelConnected,setupNoticeShown=false}: {
   session:ReturnType<typeof useResearchSession>;projectId:string;threadId:string;epoch:number;onAttach:()=>void;onOpenSettings?:(target?:"consent")=>void;
   hosted?:boolean;executionReady?:boolean;readSuspended?:boolean;consentMissing?:boolean;modelConnected?:boolean;
+  /** The readiness card above already says what blocks a new run; do not repeat it here. */
+  setupNoticeShown?:boolean;
 }) {
   useTranslation();
   const citation=useCitationGate(projectId, session.isCurrentScope);
@@ -33,10 +36,7 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
     {session.pendingRead.kind === "INVALID" && <Callout compact intent="danger" role="alert">{t("composer.invalidPending")}</Callout>}
     {session.pendingStorageError && <Callout compact intent="warning" role="alert">{t(session.pendingStorageError)}</Callout>}
     {readSuspended && <Callout compact intent="warning" role="status">{t("composer.accessChecking")}</Callout>}
-    {!readSuspended && !hosted && !executionReady && <Callout compact intent="warning" role="status">{t("composer.savedResearch")} {blockedReason(consentMissing,modelConnected)}
-      {onOpenSettings && (consentMissing && modelConnected!==false
-        ? <Button small minimal onClick={()=>onOpenSettings("consent")}>{t("composer.chooseConsent")}</Button>
-        : <Button small minimal onClick={()=>onOpenSettings()}>{t("composer.checkModel")}</Button>)}</Callout>}
+    <SetupNotice hidden={readSuspended || hosted || executionReady || setupNoticeShown} consentMissing={consentMissing} modelConnected={modelConnected} onOpenSettings={onOpenSettings}/>
     {!hosted && session.draftRestoreIssue && <Callout compact intent="warning" role="alert">{session.draftRestoreIssue === "CORRUPT"
       ? t("composer.corruptDraft")
       : t("composer.unavailableDraft")}
@@ -65,8 +65,12 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
   </div>;
 }
 
-/** What actually blocks a new research: an empty internet consent, the model, both, or something the screen cannot name. */
-function blockedReason(consentMissing: boolean, modelConnected: boolean | undefined): string {
-  if (consentMissing) return modelConnected === false ? t("composer.needBoth") : t("composer.needConsent");
-  return modelConnected === false ? t("composer.needModel") : t("composer.needSetup");
+/** Why a new run cannot start yet, with the one button that opens the setting in question. */
+function SetupNotice({ hidden, consentMissing, modelConnected, onOpenSettings }: { hidden: boolean; consentMissing: boolean; modelConnected: boolean | undefined; onOpenSettings?: (target?: "consent") => void }) {
+  if (hidden) return null;
+  const consentFirst = consentMissing && modelConnected !== false;
+  return <Callout compact intent="warning" role="status">{t("composer.savedResearch")} {blockedReason(consentMissing, modelConnected)}
+    {onOpenSettings && (consentFirst
+      ? <Button small minimal onClick={() => onOpenSettings("consent")}>{t("composer.chooseConsent")}</Button>
+      : <Button small minimal onClick={() => onOpenSettings()}>{t("composer.checkModel")}</Button>)}</Callout>;
 }

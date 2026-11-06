@@ -97,6 +97,14 @@ async function startNewSession() {
   await act(async () => {container.querySelector<HTMLButtonElement>("button.new-session-button")!.click();});
   await flush();
 }
+/** Pick a thread the way the shell now offers it: the session button under the active project in the sidebar (the top select is gone). */
+async function chooseThread(threadId: string) {
+  await act(async () => {
+    const button = [...container.querySelectorAll<HTMLButtonElement>(".project-sessions .thread-button")].find(item => item.textContent?.includes(threadId))!;
+    button.click();
+  });
+}
+
 afterEach(async () => { if (root) await act(async () => root.unmount()); client?.clear(); container?.remove(); fixture.catalogStatus = []; fixture.optionExtra = {}; });
 
 it("one-shot high returns to low visibly and in the next same-thread request", async () => {
@@ -155,10 +163,7 @@ it("does not silently replace an unsupported saved effort", async () => {
 
 it("describes an empty thread selection as project inheritance without writing a replacement", async () => {
   await mount(true, { inheritThread: true });
-  await act(async () => {
-    const selector = container.querySelector<HTMLSelectElement>('[aria-label="현재 작업 선택"]')!;
-    selector.value = "t"; selector.dispatchEvent(new Event("change", { bubbles: true }));
-  });
+  await chooseThread("t");
   await flush();
   expect(container.textContent).toContain("이 작업은 프로젝트 모델 설정을 상속하며 별도 선택으로 대체하지 않았습니다");
   expect(container.textContent).toContain("상속한 프로젝트 선택: retired / old-model · 추론강도 high");
@@ -168,10 +173,7 @@ it("describes an empty thread selection as project inheritance without writing a
 it("hides inherited project model details when the separate project read is denied", async () => {
   await mount(true, { inheritThread: true });
   fixture.projectSettingsDenied = true;
-  await act(async () => {
-    const selector = container.querySelector<HTMLSelectElement>('[aria-label="현재 작업 선택"]')!;
-    selector.value = "t"; selector.dispatchEvent(new Event("change", { bubbles: true }));
-  });
+  await chooseThread("t");
   await flush(); await flush();
   expect(container.textContent).toContain("이 작업은 프로젝트 모델 설정을 상속하며 별도 선택으로 대체하지 않았습니다");
   expect(container.textContent).toContain("상속한 프로젝트 모델을 읽지 못했습니다");
@@ -181,10 +183,7 @@ it("hides inherited project model details when the separate project read is deni
 
 it("removes cached inherited details when the actor loses thread settings access", async () => {
   await mount(true, { inheritThread: true });
-  await act(async () => {
-    const selector = container.querySelector<HTMLSelectElement>('[aria-label="현재 작업 선택"]')!;
-    selector.value = "t"; selector.dispatchEvent(new Event("change", { bubbles: true }));
-  });
+  await chooseThread("t");
   await flush(); await flush();
   expect(container.textContent).toContain("상속한 프로젝트 선택: retired / old-model");
   fixture.threadDenied = true;
@@ -196,10 +195,7 @@ it("removes cached inherited details when the actor loses thread settings access
 
 it("rechecks and hides cached parent details after project scope is revoked", async () => {
   await mount(true, { inheritThread: true });
-  await act(async () => {
-    const selector = container.querySelector<HTMLSelectElement>('[aria-label="현재 작업 선택"]')!;
-    selector.value = "t"; selector.dispatchEvent(new Event("change", { bubbles: true }));
-  });
+  await chooseThread("t");
   await flush(); await flush();
   await openPage("설정");
   expect(container.textContent).toContain("상속한 프로젝트 선택: retired / old-model");
@@ -281,10 +277,7 @@ it("same-draft transport retry reuses the idempotency key and double-submit is b
 
 it("a late admission cannot replace a different selected thread",async()=>{
   await mount();await submit();fixture.delay=true;await select("high");await submit();
-  await act(async()=>{
-    const selector=container.querySelector<HTMLSelectElement>('[aria-label="현재 작업 선택"]')!;
-    selector.value="other";selector.dispatchEvent(new Event("change",{bubbles:true}));
-  });
+  await chooseThread("other");
   await flush();await select("low");
   await act(async()=>{fixture.pending!();await tick();});
   fixture.delay=false;await submit();

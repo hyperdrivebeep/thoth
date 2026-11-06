@@ -26,7 +26,7 @@ from thoth.domain.governance import ProjectPolicy, SourceBinding
 from thoth.domain.model_asset import AssetFile, EmbeddingAssetDescriptor, ModelAssetManifest
 from thoth.domain.project import Project
 from thoth.domain.resource_scope import ResourceScopeTemplate
-from thoth.domain.retrieval_embedding import DenseModelPin
+from thoth.domain.retrieval_embedding import DenseModelPin, window_cut
 
 PROJECT = "project:codec"
 
@@ -84,16 +84,27 @@ class FakeWorker:
 
     def __init__(self) -> None:
         self.calls: list[str] = []
+        # Per text, the size a real worker would report for a passage that needs several windows.
+        self.sizes: dict[str, int] = {}
+        self.window_calls: list[tuple[str, int]] = []
         self.entered = asyncio.Event()
         self.release: asyncio.Event | None = None
         self.closed = False
 
-    async def encode_one(self, text: str, *, role: Literal["QUERY", "PASSAGE"]) -> EmbeddingVector:
+    async def encode_one(
+        self, text: str, *, role: Literal["QUERY", "PASSAGE"], window: int = 0
+    ) -> EmbeddingVector:
         self.calls.append(text)
+        self.window_calls.append((text, window))
         self.entered.set()
         if self.release is not None:
             await self.release.wait()
-        return EmbeddingVector.from_values(unit_vector(text))
+        data = EmbeddingVector.from_values(unit_vector(text if window == 0 else f"{text}#{window}"))
+        if text not in self.sizes:
+            return data
+        return EmbeddingVector(
+            data.data, truncated=window_cut(self.sizes[text]), source_tokens=self.sizes[text]
+        )
 
     def close(self) -> None:
         self.closed = True

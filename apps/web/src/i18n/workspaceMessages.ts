@@ -315,6 +315,17 @@ export const workspaceMessages = {
     "ko": "새 연구 준비 필요",
     "en": "Research setup needed"
   },
+  "readiness.title": { "ko": "이 프로젝트에서 바로 쓸 수 있는 것", "en": "Ready to use in this project" },
+  "readiness.modelConnected": { "ko": "모델 연결됨", "en": "Model connected" },
+  "readiness.modelMissing": { "ko": "모델 미연결", "en": "Model not connected" },
+  "readiness.consentOn": { "ko": "인터넷 사용 허용", "en": "Internet use allowed" },
+  "readiness.consentOff": { "ko": "인터넷 사용 안 함", "en": "Internet use off" },
+  "readiness.consentUndecided": { "ko": "인터넷 사용 미결정", "en": "Internet use undecided" },
+  "readiness.readyNotice": { "ko": "질문을 보내면 연결된 자료에서 근거를 찾고, 가능한 설명과 다음 행동을 함께 정리합니다.", "en": "Send a question and THOTH finds evidence in the connected sources, with possible explanations and next actions." },
+  "workspace.openSetup": { "ko": "설정으로 이동", "en": "Open settings" },
+  "workspace.sessionsCount": { "ko": "세션", "en": "Sessions" },
+  "workspace.sourcesCount": { "ko": "자료", "en": "Sources" },
+  "workspace.countsLabel": { "ko": "이 프로젝트의 개수", "en": "Counts for this project" },
   "workspace.locationUnsaved": {
     "ko": "작업 위치 저장 실패",
     "en": "Workspace location not saved"

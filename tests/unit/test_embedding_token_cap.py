@@ -77,7 +77,8 @@ def encoder() -> GraniteOnnxEncoder:
 @pytest.mark.parametrize(
     ("role", "count", "expected_count", "expected_truncated"),
     [
-        ("PASSAGE", 3000, PASSAGE_TOKEN_CAP, True),
+        # 3000 tokens now fit in eight windows (see test_embedding_window_geometry.py); 5000 do not.
+        ("PASSAGE", 5000, PASSAGE_TOKEN_CAP, True),
         ("PASSAGE", 40, 40, False),
         ("PASSAGE", PASSAGE_TOKEN_CAP, PASSAGE_TOKEN_CAP, False),
         ("QUERY", 3000, 3000, False),
