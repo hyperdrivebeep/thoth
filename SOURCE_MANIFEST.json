@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-06T02:50:21.970026+00:00",
+  "created_at": "2026-11-06T04:41:58.407100+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -1177,9 +1177,14 @@
       "bytes": 3131
     },
     {
+      "path": "apps/web/src/components/ResultInterruptionNotice.test.tsx",
+      "sha256": "b5670aa84dc5bb65deef32e8d7db1f407fcdcd87ae91e3b6751ea6ba33319590",
+      "bytes": 6033
+    },
+    {
       "path": "apps/web/src/components/ResultInterruptionNotice.tsx",
-      "sha256": "be0c35b5f4a85b0f736be4aad163c73efd75e28ca8b7d5811b9e1507ca479c18",
-      "bytes": 4056
+      "sha256": "1802bda5f99d7deb2265202ebd24dc8e6b70bf2c407bf594f261af264fb6296b",
+      "bytes": 4337
     },
     {
       "path": "apps/web/src/components/ResultScreen.test.tsx",
@@ -1618,8 +1623,8 @@
     },
     {
       "path": "apps/web/src/components/resultInterruption.ts",
-      "sha256": "7ce7881541e3d0e2b3b545b258015c40e970887d4346b8fcac5f51a2d2b9f55f",
-      "bytes": 3355
+      "sha256": "805e54c14c27a494713e7f82f68077ce3285752514a7b82326bec180d62e9d5f",
+      "bytes": 3920
     },
     {
       "path": "apps/web/src/components/resultUsage.ts",
@@ -1988,8 +1993,8 @@
     },
     {
       "path": "apps/web/src/i18n/ja/researchMessagesJa.ts",
-      "sha256": "e351e9482f6258766ca2b46e4b555a8d77a9f216aea523d528b8f59e7295d0cd",
-      "bytes": 6212
+      "sha256": "4880bcba25adb7554e9fbbf3e304a7579a29deb31afbb186518edecd830add71",
+      "bytes": 6596
     },
     {
       "path": "apps/web/src/i18n/ja/researchPanelsMessagesJa.ts",
@@ -2123,8 +2128,8 @@
     },
     {
       "path": "apps/web/src/i18n/researchMessages.ts",
-      "sha256": "92ead87d17ff226ad9b8e9fb77b75538602f67241c74c07944a0f46821001fef",
-      "bytes": 10893
+      "sha256": "379c7965bb42ad08e1f90836b8c0ac40e12ac3624f8ace6914f701bea3571488",
+      "bytes": 11518
     },
     {
       "path": "apps/web/src/i18n/researchPanelsMessages.ts",
@@ -2323,8 +2328,8 @@
     },
     {
       "path": "apps/web/src/i18n/zh/researchMessagesZh.ts",
-      "sha256": "fc56e705f567b1027cf48c08c476e0cfa6969d70c0fe38eaa69e4c8dde9545f0",
-      "bytes": 4927
+      "sha256": "90ad4cefa404b91411d3f4c478555e6d9b02017924a4e477690f16af47467dbe",
+      "bytes": 5200
     },
     {
       "path": "apps/web/src/i18n/zh/researchPanelsMessagesZh.ts",
@@ -2703,8 +2708,8 @@
     },
     {
       "path": "docs/architecture/research-context-completion-contract.md",
-      "sha256": "7cbe8094a1cff0327b50cbb95302d8662cccc018c25f59e720c9894243c2dad8",
-      "bytes": 8136
+      "sha256": "da818b423cb7fc434d12c53d728c4457b3282b71ed602221d10bcb27a7d9ab96",
+      "bytes": 9309
     },
     {
       "path": "docs/architecture/research-dispatch-controls.md",
@@ -4368,8 +4373,8 @@
     },
     {
       "path": "src/thoth/adapters/models/receive_stats.py",
-      "sha256": "d1896ddd98277629a9852e4c0a2a3bb6361d7c8cdbb95169347f51e6d8dccf78",
-      "bytes": 5815
+      "sha256": "c362c93db35b39f88d15ff42db474c74fdb58d51d58b0b8220e1c45e940ba06b",
+      "bytes": 6129
     },
     {
       "path": "src/thoth/adapters/models/reference_schema.py",
@@ -4383,8 +4388,8 @@
     },
     {
       "path": "src/thoth/adapters/models/response_events.py",
-      "sha256": "b7b62507be567e20fcf07969708f2d2f3cba02d670352c80e5213ddc9889b6aa",
-      "bytes": 833
+      "sha256": "a1877bd6b119f4e3ae947ce4543078493bc26c42dbfc2cb103e5acba09ae7e91",
+      "bytes": 4038
     },
     {
       "path": "src/thoth/adapters/models/scripted.py",
@@ -4393,13 +4398,13 @@
     },
     {
       "path": "src/thoth/adapters/models/sse_stream.py",
-      "sha256": "bb53a64b8f007c3bd26546cc85ed904557672ca87fd8d7e4d98004e0b2be89ad",
-      "bytes": 5566
+      "sha256": "d6d446a4e1efec3603e16b4f836155146e2696e9d3fb7150329db66de150343d",
+      "bytes": 5656
     },
     {
       "path": "src/thoth/adapters/models/stream_pace.py",
-      "sha256": "2ea38d7db4371b1557ffa543f5beeabe0a6bf2925777a25773c6eeab314bf150",
-      "bytes": 5758
+      "sha256": "ed933fbbc61c23de9482b2dc7af2b0dcda4aacc252b9f3330d2ec31160740809",
+      "bytes": 6997
     },
     {
       "path": "src/thoth/adapters/models/tool_installers.py",
@@ -7713,8 +7718,8 @@
     },
     {
       "path": "src/thoth/domain/model_dispatch.py",
-      "sha256": "157b754b73560ce9c1af44e55395d1092898a085ff7b2a67b940745763d94418",
-      "bytes": 8640
+      "sha256": "215786ff0f2a39b4ba9fdecc8a3625431c537d64760aa04871928fcd78f3051f",
+      "bytes": 9732
     },
     {
       "path": "src/thoth/domain/model_interpretation.py",
@@ -12160,6 +12165,11 @@
       "path": "tests/unit/models/test_scripted_model.py",
       "sha256": "5a564a4efa1d465ce9181de8115bd716c1c5244379feff55d56a8ca075f38f46",
       "bytes": 2380
+    },
+    {
+      "path": "tests/unit/models/test_stall_observation.py",
+      "sha256": "0d127d481ca582583d238c81e253931b12f2c69322e712434cfb6ba7aad9f628",
+      "bytes": 10001
     },
     {
       "path": "tests/unit/models/test_stream_pace.py",

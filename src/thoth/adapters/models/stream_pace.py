@@ -81,8 +81,13 @@ class StreamPace:
             None if limits.dispatch_total_seconds is None else float(limits.dispatch_total_seconds)
         )
         self._clock = clock
+        # The pace is built just before the request is sent, so the times below count from the same
+        # moment as the observation's elapsed time.
+        self._started_at = clock()
         self._first_at: float | None = None
         self._last_ok_at: float | None = None
+        self._last_event_at: float | None = None
+        self._max_gap: float | None = None
         self._buckets: deque[list[float]] = deque()
         self.events = 0
         self.max_output_events = limits.runaway_max_output_events
@@ -97,6 +102,11 @@ class StreamPace:
 
     def observe(self, count: int = 1) -> None:
         now = self._clock()
+        if self._last_event_at is not None:
+            gap = now - self._last_event_at
+            if self._max_gap is None or gap > self._max_gap:
+                self._max_gap = gap
+        self._last_event_at = now
         if self._first_at is None:
             self._first_at = self._last_ok_at = now
         self.events += count
@@ -105,6 +115,26 @@ class StreamPace:
             self._buckets[-1][1] += count
         else:
             self._buckets.append([second, float(count)])
+
+    @property
+    def last_output_event_ms(self) -> int | None:
+        """Milliseconds from the start of the call to the last output event; None before any."""
+
+        if self._last_event_at is None:
+            return None
+        return max(0, round((self._last_event_at - self._started_at) * 1000))
+
+    @property
+    def max_output_gap_ms(self) -> int | None:
+        """Longest wait between two output events in a row; None for one event or none.
+
+        The silence after the last output event is not a gap between events: it is the call's
+        elapsed time minus last_output_event_ms.
+        """
+
+        if self.events <= 1 or self._max_gap is None:
+            return None
+        return max(0, round(self._max_gap * 1000))
 
     def observe_output(self, delta: str) -> str | None:
         """Count one output delta; returns the runaway limit it crossed, if any (and records it)."""

@@ -82,6 +82,19 @@ reported as a model-call failure with no answer; the operation itself stays a pu
   Their JSON representation is decimal text, as with transport timeout controls; older numeric
   observations remain readable. Recording an interrupted dispatch preserves its diagnostic
   instead of failing while serializing the observation.
+- **When a stream went quiet, and why a remote ended it.** The receive observation also records
+  `last_output_event_ms` (from the start of the call to the last output event) and
+  `max_output_gap_ms` (the longest wait between two output events in a row; null for one event or
+  none). The silence after the last output event is the observation's `elapsed_ms` minus
+  `last_output_event_ms`, not a gap. Neither value is read by the stall rule. When the remote
+  sends an `error` event or a `response.failed`, `remote_error_code` keeps its code only if it is
+  in a short list (`server_error`, `rate_limit_exceeded`, `invalid_prompt`,
+  `data_residency_mismatch`, `bio_policy`, `vector_store_timeout`, `insufficient_quota`,
+  `usage_limit_reached`), otherwise `OTHER`; it is null when there was no code or no such event.
+  The first six are the non-image values of the OpenAI SDK's response error code and the last two
+  are already classified for HTTP rejections; the SDK types the code of an `error` event only as
+  text, so the list is not a promise about that event. The error message is never read or stored.
+  Records written before these fields existed read as null.
 - **Automatic retry is a project setting, on by default (user decision 20261010-01).** `model/callSettings/read|update`
   (`auto_retry_interrupted_model_call`, digest-checked; the default is one line in
   `domain/model_call_settings.py`). When on, a cut-off, slowed, over-long or runaway call (not a 429,
