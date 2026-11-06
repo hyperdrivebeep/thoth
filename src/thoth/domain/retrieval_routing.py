@@ -5,7 +5,11 @@ from typing import TYPE_CHECKING
 
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.evidence import connected_retrieval_spans
-from thoth.domain.retrieval_embedding import DenseUnavailable, RoutingObservation
+from thoth.domain.retrieval_embedding import (
+    DenseUnavailable,
+    RoutingObservation,
+    dense_material_digest,
+)
 from thoth.domain.retrieval_fusion import FusedChunk, admit_chunks, reciprocal_rank_fusion
 from thoth.domain.retrieval_routing_policy import RetrievalRoutingPolicy
 
@@ -77,11 +81,7 @@ def select_routed(request: "RetrievalRequest", policy: RetrievalRoutingPolicy) -
         fallback_reason=fallback,
         dense_material_digest=None
         if request.dense is None
-        else domain_digest(
-            "DENSE_MATERIAL",
-            "1.0.0",
-            canonical_payload(request.dense),
-        ),
+        else dense_material_digest(request.dense),
     )
     provenance = (
         ("routing", "eligible-artifact-count:1.0.0"),

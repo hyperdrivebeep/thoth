@@ -9,6 +9,7 @@ from pydantic import BaseModel, ValidationError
 from thoth.application.services import research_review_context as review_contexts
 from thoth.application.services import research_source_queries as source_queries
 from thoth.application.services.connector_service import ConnectorService
+from thoth.application.services.dense_material import DenseMaterialSource
 from thoth.application.services.document_calculation import DocumentCalculationService
 from thoth.application.services.full_project_memory import FullProjectMemoryService
 from thoth.application.services.memory_query_expansion import ModelMemoryQueryExpander, widen_query
@@ -33,7 +34,7 @@ from thoth.application.services.research_assembly import assemble_research_conte
 from thoth.application.services.research_coverage import assess_coverage
 from thoth.application.services.research_discovery import discover_sources
 from thoth.application.services.research_gaps import gap_targets, validate_gaps
-from thoth.application.services.research_retrieval import work_candidates
+from thoth.application.services.research_retrieval import dense_for, work_candidates
 from thoth.application.services.research_role_context import bundle_view, role_context
 from thoth.application.services.research_source_digest import versioned_source_digest
 from thoth.application.services.research_stage_reuse import reuse_stage_if_exact
@@ -81,13 +82,12 @@ class ResearchAnalysis:
     ) -> None:
         self.records, self.artifacts, self.governance = records, artifacts, governance
         self.criteria, self.connectors = criteria, connectors
-        self.memory = memory
-        self.evidence_graph = evidence_graph
-        self.profiles = profiles
-        self.calculations = calculations
+        self.memory, self.evidence_graph = memory, evidence_graph
+        self.profiles, self.calculations = profiles, calculations
+        self.dense_source: DenseMaterialSource | None = None  # set when local retrieval is composed
         # (project, artifact, version, stored structure metadata) -> (observation, nodes digest).
-        # A stored structure does not change, so its digest is computed once per process; the scoped
-        # metadata read that forms the key still checks access on every use.
+        # A stored structure does not change, so its digest is computed once per process; the
+        # scoped metadata read that forms the key still checks access on every use.
         self._structure_summaries: dict[
             tuple[str, str, str, str], source_queries.StructureSummary
         ] = {}
@@ -250,7 +250,8 @@ class ResearchAnalysis:
         )
         # Start with admissible connected source candidates; no fake evidence is needed.
         all_evidence = self.evidence(project.project_id)
-        shortlist = work_candidates(work, (), all_evidence, self.artifacts)
+        dense = await dense_for(self.dense_source, work, project.project_id, all_evidence)
+        shortlist = work_candidates(work, (), all_evidence, self.artifacts, dense)
         if shortlist and all(span.cutoff_state == CutoffState.UNKNOWN_TIME for span in shortlist):
             work.context["source_time_limitation"] = "SOURCE_TIME_UNCONFIRMED"
         assembly = self.assemble(work, tuple(s.span_id for s in shortlist), shortlist, all_evidence)
@@ -402,7 +403,8 @@ class ResearchAnalysis:
         source: tuple[EvidenceSpan, ...],
     ) -> tuple[CoverageAssessment, str]:
         # Rank the original bounded candidates: expanding first spends the budget on prose.
-        candidates = work_candidates(work, proposal.expanded_queries, source, self.artifacts)
+        dense = await dense_for(self.dense_source, work, project.project_id, source)
+        candidates = work_candidates(work, proposal.expanded_queries, source, self.artifacts, dense)
         ranking_context = review_contexts.ranking_context(context, work, ref, candidates)
         if work.retrieval_selection is not None and work.retrieval_selection.contextual_refs:
             preview = self.assemble(work, tuple(s.span_id for s in candidates), candidates, source)

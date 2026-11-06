@@ -7,6 +7,14 @@ import httpx
 import pytest
 
 
+def pytest_configure(config: pytest.Config) -> None:
+    config.addinivalue_line(
+        "markers",
+        "local_retrieval: needs numpy from the local-retrieval extra; the python-local-retrieval "
+        "job runs it and the other Python jobs deselect it",
+    )
+
+
 @pytest.fixture(autouse=True)
 def no_real_claude_binary(monkeypatch: pytest.MonkeyPatch) -> Generator[None]:
     """Default tests never start the developer's real Claude Code executable.

@@ -190,7 +190,7 @@ jobs:
           .\.venv\Scripts\python.exe -m playwright install --only-shell chromium
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Non-integration Python tests
-        run: .\.venv\Scripts\python.exe -m pytest --ignore=tests/integration -q -rfE -p no:cacheprovider --junitxml=test-results/python-fast.xml
+        run: .\.venv\Scripts\python.exe -m pytest --ignore=tests/integration -m "not local_retrieval" -q -rfE -p no:cacheprovider --junitxml=test-results/python-fast.xml
       - name: Upload Python test results
         if: ${{ always() }}
         uses: actions/upload-artifact@v7
@@ -243,7 +243,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $thothFiles = @($thothFilesJson | ConvertFrom-Json)
           if ($thothFiles.Count -eq 0) { throw 'Integration shard is empty.' }
-          & .\.venv\Scripts\python.exe -m pytest @thothFiles -q -rfE -p no:cacheprovider --junitxml=test-results/python-integration-${{ matrix.shard }}.xml
+          & .\.venv\Scripts\python.exe -m pytest @thothFiles -m "not local_retrieval" -q -rfE -p no:cacheprovider --junitxml=test-results/python-integration-${{ matrix.shard }}.xml
           exit $LASTEXITCODE
       - name: Upload Python test results
         if: ${{ always() }}
@@ -253,8 +253,42 @@ jobs:
           path: test-results/python-integration-${{ matrix.shard }}.xml
           if-no-files-found: error
 
+  python-local-retrieval:
+    # The only job that installs numpy (the local-retrieval extra). It runs every test marked
+    # local_retrieval; python-fast and python-integration deselect them, so none runs twice.
+    needs: changes
+    if: needs.changes.outputs.docs_only != 'true'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.5"
+      - name: Install locked test dependencies with the local-retrieval extra
+        run: |
+          python -m venv --copies --without-pip .venv
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev --extra browser --extra local-retrieval
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Local-retrieval Python tests
+        run: .\.venv\Scripts\python.exe -m pytest tests -m local_retrieval -q -rfEs -p no:cacheprovider --junitxml=test-results/python-local-retrieval.xml
+      - name: Upload Python test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-junit-local-retrieval
+          path: test-results/python-local-retrieval.xml
+          if-no-files-found: error
+
   python-summary:
-    needs: [changes, python-fast, python-integration]
+    needs: [changes, python-fast, python-integration, python-local-retrieval]
     if: ${{ always() }}
     runs-on: windows-latest
     timeout-minutes: 10
@@ -290,9 +324,10 @@ jobs:
         env:
           FAST_RESULT: ${{ needs.python-fast.result }}
           INTEGRATION_RESULT: ${{ needs.python-integration.result }}
+          LOCAL_RETRIEVAL_RESULT: ${{ needs.python-local-retrieval.result }}
         run: >-
           python scripts/ci_test_summary.py --reports test-results/aggregate --shards 16
-          --job-results "$env:FAST_RESULT" "$env:INTEGRATION_RESULT"
+          --job-results "$env:FAST_RESULT" "$env:INTEGRATION_RESULT" "$env:LOCAL_RETRIEVAL_RESULT"
           --markdown-output "$env:GITHUB_STEP_SUMMARY"
 
 

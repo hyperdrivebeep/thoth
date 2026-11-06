@@ -1,13 +1,16 @@
 """Bound, precomputed dense evidence. No encoder, files or provider I/O in selection."""
 
 import hashlib
+import json
+from collections.abc import Iterable
 from decimal import Decimal
+from operator import is_
 from typing import Literal
 
 from pydantic import Field, model_validator
 
 from thoth.domain.base import DomainModel
-from thoth.domain.canonical import canonical_payload, domain_digest
+from thoth.domain.canonical import domain_digest, normalize_text
 from thoth.domain.evidence import EvidenceSpan
 from thoth.domain.ids import Sha256
 
@@ -90,6 +93,21 @@ class DenseScore(DomainModel):
     score: Decimal = Field(allow_inf_nan=False, ge=Decimal("-1.00001"), le=Decimal("1.00001"))
 
 
+DenseUnavailableReason = Literal[
+    "MODEL_NOT_INSTALLED",
+    "MODEL_HASH_MISMATCH",
+    "EMBEDDING_DEPENDENCY_UNAVAILABLE",
+    "INDEX_PENDING",
+    "INDEX_STALE",
+    "INDEX_INCOMPLETE",
+    "INDEX_TOO_LARGE",
+    "QUERY_TOO_LONG",
+    "EMBEDDING_TIMEOUT",
+    "EMBEDDING_FAILED",
+    "EMBEDDING_NOT_PREPARED",
+]
+
+
 class DenseMaterial(DomainModel):
     """Host-prepared scores, bound to the original question and exact eligible source set.
 
@@ -105,20 +123,7 @@ class DenseMaterial(DomainModel):
     onnx_sha256: Sha256 = GRANITE_ONNX_SHA
     preprocessing: str = GRANITE_PREPROCESSING
     scores: tuple[DenseScore, ...] = Field(default=(), max_length=20_000)
-    unavailable_reason: (
-        Literal[
-            "MODEL_NOT_INSTALLED",
-            "MODEL_HASH_MISMATCH",
-            "EMBEDDING_DEPENDENCY_UNAVAILABLE",
-            "INDEX_PENDING",
-            "INDEX_STALE",
-            "INDEX_INCOMPLETE",
-            "QUERY_TOO_LONG",
-            "EMBEDDING_TIMEOUT",
-            "EMBEDDING_FAILED",
-        ]
-        | None
-    ) = None
+    unavailable_reason: DenseUnavailableReason | None = None
 
     @model_validator(mode="after")
     def _unique_scores(self) -> "DenseMaterial":
@@ -127,6 +132,31 @@ class DenseMaterial(DomainModel):
         if self.unavailable_reason is not None and self.scores:
             raise ValueError("DENSE_UNAVAILABLE_WITH_SCORES")
         return self
+
+    @classmethod
+    def prepared(
+        cls,
+        *,
+        project_id: str,
+        question_sha256: str,
+        source_digest: str,
+        scores: tuple[DenseScore, ...] = (),
+        unavailable_reason: DenseUnavailableReason | None = None,
+    ) -> "DenseMaterial":
+        """A material whose producer has already guaranteed what validation would check.
+
+        The producer (see dense_material) builds one score per distinct eligible span, each rounded
+        to nine places inside [-1, 1] and at most 20,000 of them, so the per-score validation that
+        costs about 20 ms on a large frame is skipped. Anything outside a producer goes through
+        the normal constructor.
+        """
+        return cls.model_construct(
+            project_id=project_id,
+            question_sha256=question_sha256,
+            source_digest=source_digest,
+            scores=scores,
+            unavailable_reason=unavailable_reason,
+        )
 
 
 class RoutingObservation(DomainModel):
@@ -146,19 +176,69 @@ def dense_question_digest(question: str) -> str:
     return hashlib.sha256(question.encode("utf-8")).hexdigest()
 
 
+def _nfc(value: str) -> str:
+    """normalize_text, skipping the call for ASCII, which NFC never changes."""
+    return value if value.isascii() else normalize_text(value)
+
+
+def _canonical_json(value: object) -> bytes:
+    """The bytes canonical_payload gives a structure of dicts, lists and NFC-normalized strings."""
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+
+
+# The digest of the last frame, so the producer that bound it and dense_rank that checks it do
+# the work once. A hit needs the very same span objects in the same order, which makes the digest
+# the same by construction; a different frame, even an equal one, is simply computed again.
+_source_memo: tuple[tuple[EvidenceSpan, ...], str] | None = None
+
+
+def remembered_frame() -> tuple[EvidenceSpan, ...] | None:
+    """The frame whose digest is remembered, for tests and diagnostics."""
+    return None if _source_memo is None else _source_memo[0]
+
+
+def forget_remembered_frame() -> None:
+    global _source_memo
+    _source_memo = None
+
+
 def dense_source_digest(evidence: tuple[EvidenceSpan, ...]) -> str:
-    return domain_digest(
-        "DENSE_SOURCE",
-        "1.0.0",
-        canonical_payload(
-            {
-                "sources": tuple(
-                    (s.project_id, s.artifact_id, s.source_version_id, s.span_id, s.text_sha256)
-                    for s in evidence
-                )
-            }
-        ),
+    global _source_memo
+    memo = _source_memo
+    if memo is not None and len(memo[0]) == len(evidence) and all(map(is_, memo[0], evidence)):
+        return memo[1]
+    rows = [
+        [
+            _nfc(s.project_id),
+            _nfc(s.artifact_id),
+            _nfc(s.source_version_id),
+            _nfc(s.span_id),
+            _nfc(s.text_sha256),
+        ]
+        for s in evidence
+    ]
+    digest = domain_digest("DENSE_SOURCE", "1.0.0", _canonical_json({"sources": rows}))
+    _source_memo = (evidence, digest)
+    return digest
+
+
+def dense_material_digest(material: DenseMaterial) -> str:
+    """Digest of a material: the bytes canonical_payload(material) gives, built directly."""
+    scores: Iterable[dict[str, str]] = (
+        {"score": format(s.score, "f"), "span_id": _nfc(s.span_id)} for s in material.scores
     )
+    payload = {
+        "model_id": _nfc(material.model_id),
+        "onnx_sha256": _nfc(material.onnx_sha256),
+        "preprocessing": _nfc(material.preprocessing),
+        "project_id": _nfc(material.project_id),
+        "question_sha256": _nfc(material.question_sha256),
+        "revision": _nfc(material.revision),
+        "scores": list(scores),
+        "source_digest": _nfc(material.source_digest),
+        "unavailable_reason": material.unavailable_reason,
+    }
+    return domain_digest("DENSE_MATERIAL", "1.0.0", _canonical_json(payload))
 
 
 def dense_rank(

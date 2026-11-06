@@ -6,9 +6,12 @@ import argparse
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+# Tests marked local_retrieval need numpy from the local-retrieval extra; only one job installs it.
+LOCAL_RETRIEVAL = "python-local-retrieval"
+
 
 def summarize(directory: Path, shards: int, job_results: list[str]) -> tuple[str, bool]:
-    names = ["python-fast", *(f"python-integration-{i}" for i in range(shards))]
+    names = ["python-fast", *(f"python-integration-{i}" for i in range(shards)), LOCAL_RETRIEVAL]
     lines = [
         "## Python test results",
         "",
@@ -35,13 +38,15 @@ def summarize(directory: Path, shards: int, job_results: list[str]) -> tuple[str
         totals = [a + b for a, b in zip(totals, counts, strict=True)]
         if not cases:
             problems.append(f"Empty report: {name}")
+        if name == LOCAL_RETRIEVAL and counts[3]:
+            problems.append("numpy 없음(local-retrieval extra): local_retrieval tests were skipped")
         for case in cases:
             identity = (case.get("classname", ""), case.get("name", ""))
             if identity in seen:
                 problems.append(f"Duplicate test identity in {name}")
             seen.add(identity)
     lines.append("| **Total** | " + " | ".join(str(n) for n in totals) + " |")
-    if len(job_results) != 2 or any(status != "success" for status in job_results):
+    if len(job_results) != 3 or any(status != "success" for status in job_results):
         problems.append("At least one Python job did not succeed.")
     if totals[1] or totals[2]:
         problems.append("JUnit reports contain failures or errors.")
@@ -54,7 +59,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reports", type=Path, required=True)
     parser.add_argument("--shards", type=int, default=16)
-    parser.add_argument("--job-results", nargs=2, required=True)
+    parser.add_argument("--job-results", nargs=3, required=True)
     parser.add_argument("--markdown-output", type=Path)
     args = parser.parse_args()
     if args.shards < 1:

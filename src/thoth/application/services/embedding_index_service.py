@@ -55,9 +55,15 @@ class EmbeddingIndexService:
         self.worker, self.uow, self.clock, self.ids, self.fault = worker, uow, clock, ids, fault
         self._active: dict[str, tuple[str, asyncio.Task[object] | None]] = {}
         self._closed = False
+        # Told the project whenever its index may have changed, so a resident copy can be dropped.
+        self.on_change: Callable[[str], None] | None = None
 
     def _now(self) -> int:
         return int(self.clock.now().timestamp() * 1000)
+
+    def _changed(self, project: str) -> None:
+        if self.on_change is not None:
+            self.on_change(project)
 
     def _actor(self, project: str, *, manage: bool = False) -> str:
         if self.projects.read(project) is None:
@@ -80,6 +86,7 @@ class EmbeddingIndexService:
         for p, task in self._active.values():
             if p == project and task is not None:
                 task.cancel()
+        self._changed(project)
         return result
 
     def _owner(self, project: str) -> EmbeddingIndexConfig:
@@ -171,6 +178,7 @@ class EmbeddingIndexService:
                 )
                 if self.store.is_current(intent):
                     ids.append(self.store.stage_intent(intent))
+        self._changed(project)
         return tuple(ids)
 
     async def run_one(
@@ -239,6 +247,7 @@ class EmbeddingIndexService:
             raise
         finally:
             self._active.pop(job_id, None)
+            self._changed(project)
 
     async def drain(
         self, project: str, *, deadline: float | None = None
@@ -326,6 +335,37 @@ class EmbeddingIndexService:
                     raise EmbeddingIndexError("INDEX_INCOMPLETE")
                 vectors.append(windows)
         return tuple(vectors)
+
+    def ready_sources(self, project: str) -> tuple[tuple[str, str], ...]:
+        """The (artifact, version) pairs that have a READY job and a live source binding."""
+        self._actor(project)
+        active = {
+            b.artifact_id
+            for b in self.governance.list_source_bindings(project)
+            if b.state == "ACTIVE"
+        }
+        pairs = {
+            (job.intent.artifact_id, job.intent.source_version_id)
+            for job in self.store.jobs(project)
+            if job.state == "READY" and job.intent.artifact_id in active
+        }
+        return tuple(sorted(pairs))
+
+    def read_source_windows(
+        self, project: str, artifact: str, version: str
+    ) -> tuple[tuple[str, str, tuple[EmbeddingVector, ...]], ...]:
+        """(span, text hash, windows) of every passage of one READY source."""
+        self._actor(project)
+        job = self.store.ready(project, artifact, version)
+        if job is None:
+            raise EmbeddingIndexError("INDEX_INCOMPLETE")
+        rows: list[tuple[str, str, tuple[EmbeddingVector, ...]]] = []
+        for ref in job.intent.refs:
+            windows = self.store.cached_windows(project, ref.text_sha256)
+            if windows is None:
+                raise EmbeddingIndexError("INDEX_INCOMPLETE")
+            rows.append((ref.span_id, ref.text_sha256, windows))
+        return tuple(rows)
 
     async def aclose(self) -> None:
         tasks = [t for _, t in self._active.values() if t is not None]
