@@ -5,7 +5,7 @@ from __future__ import annotations
 import httpx
 
 from thoth.adapters.models.receive_stats import ReceiveStats
-from thoth.adapters.models.response_events import ResponseEvent
+from thoth.adapters.models.response_events import ResponseEvent, observed_error_code
 from thoth.domain.model_dispatch import ModelTransportReply, PreparedModelDispatch
 from thoth.ports.model import ModelExecutionHold
 
@@ -67,6 +67,7 @@ async def parse_responses_sse(
             ):
                 raise ModelExecutionHold(f"{reason_prefix}_UNEXPECTED_TOOL_OUTPUT")
             if kind in {"error", "response.failed", "response.incomplete"}:
+                stats.remote_error_code = observed_error_code(event)
                 raise ModelExecutionHold(f"{reason_prefix}_INCOMPLETE_RESPONSE")
             if kind == "response.completed":
                 completed = event.response

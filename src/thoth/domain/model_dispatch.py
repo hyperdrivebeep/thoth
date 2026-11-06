@@ -11,6 +11,20 @@ from pydantic import Field
 from thoth.domain.base import DomainModel
 from thoth.domain.model_settings import ResolvedModelSettings
 
+# Error codes a remote may report that are kept as they are (see adapters/models/response_events.py
+# for where each comes from); any other code is kept as OTHER.
+RemoteErrorCode = Literal[
+    "server_error",
+    "rate_limit_exceeded",
+    "invalid_prompt",
+    "data_residency_mismatch",
+    "bio_policy",
+    "vector_store_timeout",
+    "insufficient_quota",
+    "usage_limit_reached",
+    "OTHER",
+]
+
 
 class ModelControlCapability(DomainModel):
     capability_id: str
@@ -178,6 +192,15 @@ class ModelReceiveObservation(DomainModel):
     runaway_max_output_events: int | None = None
     runaway_max_visible_bytes: int | None = None
     runaway_blank_run: int | None = None
+    # When the last output event arrived and the longest wait between two output events, both in
+    # milliseconds from the start of the call (None before an event, and for a single event).
+    # They show when a stream went quiet; the stall rule does not read them.
+    last_output_event_ms: int | None = Field(default=None, ge=0)
+    max_output_gap_ms: int | None = Field(default=None, ge=0)
+    # The code a remote reported in an error or failed-response event: one of a short list of known
+    # codes, OTHER for any other code, None when there was no error event or it had no code.
+    # The error message itself is never kept.
+    remote_error_code: RemoteErrorCode | None = None
 
 
 UNVERIFIED_MODEL_CONTROL = ModelControlCapability(

@@ -12,9 +12,10 @@ const AUTH_LIKE = /AUTH_REQUIRED|OAUTH_REQUEST_REJECTED|MODEL_NOT_SUPPORTED|CLAU
 const TIME_LIKE = /TIME_BUDGET|DEADLINE/;
 
 /** The sentences that explain an interrupted run, in display order; each is shown only when its code matches. */
-function interruptionReasons({ code, cause, failed, publication }: InterruptionView): string[] {
+function interruptionReasons({ code, cause, failed, publication, savedBeforeCut: stalled }: InterruptionView): string[] {
+  const incompleteResponse = code === "OAUTH_INCOMPLETE_RESPONSE";
   const lines: Array<[boolean, string]> = [
-    [TIME_LIKE.test(code), t("result.timeLimit")],
+    [TIME_LIKE.test(code) && !stalled, t("result.timeLimit")],
     [code === "TOTAL_RESEARCH_BUDGET_EXHAUSTED", t("result.researchLimit")],
     [/OAUTH_REQUEST_REJECTED_429/.test(code), t("result.quota")],
     [code === "CLAUDE_CODE_LOGIN_REQUIRED", reasonText(code) ?? code],
@@ -23,7 +24,9 @@ function interruptionReasons({ code, cause, failed, publication }: InterruptionV
     [/OAUTH_REQUEST_REJECTED_400/.test(code), t("result.requestRejected")],
     [publication, t("result.storageFailed")],
     [failed && !publication && !TIME_LIKE.test(code) && !AUTH_LIKE.test(code), t("result.internalFailed")],
-    [(!cause || cause.remote_observation === "UNKNOWN") && !AUTH_LIKE.test(code), t("result.remoteUnknown")],
+    [stalled, t("result.stalled")],
+    [incompleteResponse, t("result.incompleteResponse")],
+    [(!cause || cause.remote_observation === "UNKNOWN") && !AUTH_LIKE.test(code) && !stalled && !incompleteResponse, t("result.remoteUnknown")],
   ];
   return lines.filter(([shown]) => shown).map(([, text]) => text);
 }
@@ -56,7 +59,7 @@ export function ResultInterruptionNotice({ unavailable, hasSavedResult, ...props
     {view.content ? <strong>{t("result.beforeCancel")}</strong> : <p>{t("result.noSavedAnswer")}</p>}
   </div>;
   if (!view.interrupted) return null;
-  return <div className="result-notice" role="alert"><p>{t("result.incomplete")}</p>
+  return <div className="result-notice" role="alert"><p>{t(view.savedBeforeCut ? "result.savedBeforeCut" : "result.incomplete")}</p>
     {interruptionReasons(view).map(line => <p key={line}>{line}</p>)}
     <CutOffActions {...props}/>
     {view.content && <strong>{t("result.beforeFailure")}</strong>}

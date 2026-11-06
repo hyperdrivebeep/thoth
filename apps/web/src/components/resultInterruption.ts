@@ -23,6 +23,10 @@ export type InterruptionView = {
   cutOffKind: CutOffKind | null;
   /** A cut-off model call that left no answer text at all. */
   cutOff: boolean;
+  /** The result carries answer text (a partial draft counts). */
+  hasAnswer: boolean;
+  /** The connection was cut (stalled stream or per-call deadline) after an answer was saved. */
+  savedBeforeCut: boolean;
 };
 
 const CUT_OFF: Array<[RegExp, CutOffKind]> = [
@@ -43,6 +47,9 @@ function hasAnswerText(result: Record<string, unknown> | null): boolean {
   return typeof result?.answer === "string" && result.answer.trim() !== "";
 }
 
+/** Exact codes only: the model call was cut off by our own stall or time rule, not ended by an error. */
+const CUT_AFTER_ANSWER_CODES = new Set(["OAUTH_STALLED_STREAM_REMOTE_STOP_UNKNOWN", "OAUTH_DISPATCH_DEADLINE_REMOTE_STOP_UNKNOWN"]);
+
 /**
  * How a result ended, read from the operation state, the recorded failure and the terminal reason. The web does not
  * decide this on its own: a SUCCEEDED operation whose terminal reason is a stalled model call is still reported as
@@ -59,5 +66,6 @@ export function interruptionView(input: InterruptionInput): InterruptionView {
   const publication = cause?.primary.origin === "RESULT_PUBLICATION" || cause?.secondary?.origin === "HOLD_PUBLICATION";
   const cutOffKind = cutOffKindOf(code);
   return { code, cause, failed, cancelled, groundingHold, interrupted: cancelled || failed || groundingHold || stoppedEarly, publication,
-    content: hasResearchContent(result), cutOffKind, cutOff: cutOffKind !== null && !hasAnswerText(result) };
+    content: hasResearchContent(result), cutOffKind, cutOff: cutOffKind !== null && !hasAnswerText(result), hasAnswer: hasAnswerText(result),
+    savedBeforeCut: CUT_AFTER_ANSWER_CODES.has(code) && hasAnswerText(result) };
 }

@@ -103,6 +103,10 @@ export const researchMessages = {
     "ko": "연구를 완료하지 못했습니다. 마지막으로 저장된 자료와 질문은 보존돼 있습니다.",
     "en": "Research could not finish. The last saved sources and question are preserved."
   },
+  "result.savedBeforeCut": {
+    "ko": "연구 답은 저장됐지만 끝까지 확인하지 못했습니다.",
+    "en": "The research answer was saved, but it could not be checked to the end."
+  },
   "result.timeLimit": {
     "ko": "모델 응답 시간 제한에 도달했습니다.",
     "en": "The model response time limit was reached."
@@ -138,6 +142,14 @@ export const researchMessages = {
   "result.remoteUnknown": {
     "ko": "원격 모델의 종료 여부는 확인되지 않았습니다. 자동 재실행하지 않습니다.",
     "en": "It is unknown whether the remote model stopped. It will not restart automatically."
+  },
+  "result.stalled": {
+    "ko": "답은 저장됐지만 마지막 확인 전에 연결이 끊겼습니다. 모델 쪽에서는 계속 처리했을 수 있습니다.",
+    "en": "The answer was saved, but the connection was cut before the final check. The model may have kept processing."
+  },
+  "result.incompleteResponse": {
+    "ko": "모델 쪽 오류로 끝났습니다.",
+    "en": "The model ended with an error."
   },
   "result.beforeInterruption": {
     "ko": "중단 전까지 정리된 AI 검토 요약(인용 위치만 확인)",

@@ -16,6 +16,7 @@ from thoth.domain.model_dispatch import (
     HttpRejectionMetadata,
     ModelReceiveObservation,
     PreparedModelDispatch,
+    RemoteErrorCode,
     TransportDiagnostic,
     TransportTimeouts,
 )
@@ -51,6 +52,7 @@ class ReceiveStats:
     transport_diagnostic: TransportDiagnostic | None = None
     http_rejection: HttpRejectionMetadata | None = None
     pace: StreamPace | None = None
+    remote_error_code: RemoteErrorCode | None = None
 
     def capture_response(self, response: httpx.Response) -> None:
         try:
@@ -133,4 +135,7 @@ class ReceiveStats:
             runaway_max_output_events=None if self.pace is None else self.pace.max_output_events,
             runaway_max_visible_bytes=None if self.pace is None else self.pace.max_visible_bytes,
             runaway_blank_run=None if self.pace is None else self.pace.max_blank_run,
+            last_output_event_ms=None if self.pace is None else self.pace.last_output_event_ms,
+            max_output_gap_ms=None if self.pace is None else self.pace.max_output_gap_ms,
+            remote_error_code=self.remote_error_code,
         )
