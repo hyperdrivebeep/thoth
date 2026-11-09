@@ -16,7 +16,7 @@ from thoth.domain.embedding_index import EmbeddingIndexError
 async def test_runtime_close_fences_job_and_stops_active_owned_child(tmp_path: Path) -> None:
     (tmp_path / "inbox").mkdir()
     (tmp_path / "inbox" / "input.txt").write_text("sleep:30")
-    worker = ProcessEmbeddingWorker("tests.embedding_fixtures:ChildEncoder")
+    worker = ProcessEmbeddingWorker("tests.embedding_child_encoders:ChildEncoder")
     runtime = create_runtime(tmp_path, embedding_worker=worker)
     service = runtime.embedding_index
     assert service is not None
