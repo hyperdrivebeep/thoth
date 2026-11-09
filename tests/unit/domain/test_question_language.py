@@ -20,15 +20,19 @@ from thoth.domain.question_language import detect_question_language, resolve_res
         ("ｶﾀｶﾅ", "ja"),  # half-width katakana
         ("検出率の低下", "ja"),
         # Kanji only: no kana, so it follows the Simplified Chinese rule.
-        ("探測率的資料問題", None),
         ("検出率低下原因", "zh-Hans"),
         # Korean wins over kana and Hanja.
         ("레이더의 検出率 を 설명해 주세요", "ko"),
         # Simplified Chinese, plain and mixed with Latin terms.
         ("为什么雷达的检测率下降了?", "zh-Hans"),
         ("请解释 SNR 与 RCS 的关系", "zh-Hans"),
-        # Traditional Chinese is not guessed as Simplified.
-        ("為什麼雷達的檢測率下降了?這與軟體有關嗎", None),
+        # Traditional Chinese: more Traditional-only than Simplified-only characters.
+        ("探測率的資料問題", "zh-Hant"),
+        ("為什麼雷達的檢測率下降了?這與軟體有關嗎", "zh-Hant"),
+        # Traditional text that uses none of the listed characters is read as Simplified.
+        ("雷達偵測率下降原因", "zh-Hans"),
+        # Mixed text with more Simplified-only than Traditional-only characters is Simplified.
+        ("这个問题", "zh-Hans"),
         # English, including a stray Chinese term.
         ("Why did the detection rate of the radar drop?", "en"),
         ("What does 关系 mean in this paper about radar detection?", "en"),

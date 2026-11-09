@@ -3,11 +3,12 @@ import { getLocale } from "../i18n/locale";
 import * as ko from "../i18n/progressKo";
 import * as en from "../i18n/progressEn";
 import * as zh from "../i18n/progressZh";
+import * as zhHant from "../i18n/progressZhHant";
 import * as ja from "../i18n/progressJa";
 export type {ProgressScene, TimelineIcon, WorkFacts} from "../i18n/progressKo";
 export {clip, unique, compactPayload, locatorPayload} from "../i18n/progressKo";
 type Wording = Pick<typeof ko, "ACTION_COPY" | "formatDuration" | "formatBytes" | "sceneFor" | "waitLine" | "usageLine" | "missingFor" | "stageActionPayload" | "modelActionPayload" | "hypothesisActionPayload">;
-const wording: Record<ReturnType<typeof getLocale>, Wording> = { ko, en, "zh-Hans": zh, ja };
+const wording: Record<ReturnType<typeof getLocale>, Wording> = { ko, en, "zh-Hans": zh, "zh-Hant": zhHant, ja };
 const current = () => wording[getLocale()];
 export const ACTION_COPY: typeof ko.ACTION_COPY = Object.fromEntries(Object.keys(ko.ACTION_COPY).map(key => [key, {
   get label() { return current().ACTION_COPY[key].label; }, icon: ko.ACTION_COPY[key].icon,

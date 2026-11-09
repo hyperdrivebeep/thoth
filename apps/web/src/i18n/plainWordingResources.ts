@@ -62,6 +62,28 @@ const reasonZh: Record<keyof typeof reasonKo, string> = {
   "criterion semantics still require expert confirmation": "标准的确切含义还需要专家确认。",
   "no criterion semantics are available": "没有可用来了解标准含义的资料。",
 };
+
+const reasonZhHant: Record<keyof typeof reasonKo, string> = {
+  "decision scope is explicit": "要判斷什麼是明確的。",
+  "decision question is empty": "要判斷什麼的問題是空的。",
+  "official evaluator-ready criterion exists": "正式標準已具備用於評判的條件。",
+  "criteria exist but official evaluator inputs are incomplete": "標準已有，但正式評判所需的輸入還不齊全。",
+  "no criterion candidate exists": "沒有可作為標準的候選。",
+  "verified supporting evidence exists": "有經過確認的支援證據。",
+  "evidence is extracted but not support-verified": "證據已提取，但尚未確認是否支援。",
+  "no cutoff-eligible evidence exists": "在截止時間內沒有可用的證據。",
+  "comparison conditions are confirmed": "比較條件已確認。",
+  "comparison conditions conflict": "比較條件相互不一致。",
+  "comparison conditions have not been confirmed": "尚未確認比較條件是否相同。",
+  "counterevidence pass is recorded": "已有尋找反面證據的記錄。",
+  "counterevidence has not been checked": "尚未尋找反面證據。",
+  "measurement implementation is verified": "已確認測量方式是正確的。",
+  "measurement implementation failed verification": "已核對測量方式，但結果不正確。",
+  "measurement implementation is not verified": "尚未確認測量方式是否正確。",
+  "expert-confirmed semantics are bound to an official criterion": "專家已確認標準的含義，並與正式標準關聯。",
+  "criterion semantics still require expert confirmation": "標準的確切含義還需要專家確認。",
+  "no criterion semantics are available": "沒有可用來了解標準含義的資料。",
+};
 const reasonJa: Record<keyof typeof reasonKo, string> = {
   "decision scope is explicit": "何を判断するのかが明確です。",
   "decision question is empty": "何を判断するかの質問が空です。",
@@ -83,7 +105,7 @@ const reasonJa: Record<keyof typeof reasonKo, string> = {
   "criterion semantics still require expert confirmation": "基準が正確に何を意味するのか、専門家の確認がさらに必要です。",
   "no criterion semantics are available": "基準が何を意味するかを知るための資料がありません。",
 };
-export const plainReasons: Record<string,string> = bilingualRecord(reasonKo,reasonEn,reasonZh,reasonJa);
+export const plainReasons: Record<string,string> = bilingualRecord(reasonKo,reasonEn,reasonZh,reasonZhHant,reasonJa);
 
 const criteriaKo = {
   answer: { title: "요청한 대상과 위치", question: "요청한 대상, 항목, 원문 위치와 앞뒤 맥락을 확인했나?", english: "Requested target, fields, source locator and adjacent context" },
@@ -140,6 +162,16 @@ const criteriaZh: Record<keyof typeof criteriaKo, { title: string; question: str
   counterevidence: { title: "反面证据", question: "是否已核对能区分各种解释的预测和反面证据？", english: "Discriminating predictions and counterevidence" },
   test: { title: "要采用的测试", question: "在把某项当作原因之前，是否有可采用的测试？", english: "Applicable test profile before causal promotion" },
 };
+
+const criteriaZhHant: Record<keyof typeof criteriaKo, { title: string; question: string; english: string }> = {
+  answer: { title: "所問的物件和位置", question: "是否已核對所問的物件、專案、原文位置及其前後背景？", english: "Requested target, fields, source locator and adjacent context" },
+  time: { title: "時間與資料的適用性", question: "在所問的時間點，這份資料能用嗎？", english: "Requested time and source applicability" },
+  comparison: { title: "比較條件", question: "兩條記錄的方法、條件、單位和期間是否相同？", english: "Both records' method, conditions, units and period" },
+  conversion: { title: "換算依據", question: "所需的換算是否有官方依據且有效？", english: "Authority and validity of any required conversion" },
+  observation: { title: "問題與觀察範圍", question: "問題和觀察到的範圍是否明確？", english: "Problem and observed scope" },
+  counterevidence: { title: "反面證據", question: "是否已核對能區分各種解釋的預測和反面證據？", english: "Discriminating predictions and counterevidence" },
+  test: { title: "要採用的測試", question: "在把某項當作原因之前，是否有可採用的測試？", english: "Applicable test profile before causal promotion" },
+};
 const criteriaJa: Record<keyof typeof criteriaKo, { title: string; question: string; english: string }> = {
   answer: { title: "求められた対象と位置", question: "求められた対象、項目、元の資料の位置と前後の文脈を確認しましたか？", english: "Requested target, fields, source locator and adjacent context" },
   time: { title: "時点と資料の適用可能性", question: "求められた時点で、この資料を使えますか？", english: "Requested time and source applicability" },
@@ -149,4 +181,4 @@ const criteriaJa: Record<keyof typeof criteriaKo, { title: string; question: str
   counterevidence: { title: "反証の根拠", question: "説明を見分ける予測と、反証の根拠を確認しましたか？", english: "Discriminating predictions and counterevidence" },
   test: { title: "適用するテスト", question: "原因として挙げる前に、適用できるテストがありますか？", english: "Applicable test profile before causal promotion" },
 };
-export const builtinCriteria: Record<string,{title:string;question:string;english:string}> = bilingualRecord(criteriaKo,criteriaEn,criteriaZh,criteriaJa);
+export const builtinCriteria: Record<string,{title:string;question:string;english:string}> = bilingualRecord(criteriaKo,criteriaEn,criteriaZh,criteriaZhHant,criteriaJa);

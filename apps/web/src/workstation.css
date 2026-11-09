@@ -400,3 +400,10 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
   --bp-typography-family-default: "Segoe UI", "Yu Gothic UI", "Meiryo", "Hiragino Sans", "Noto Sans JP", sans-serif;
   font-family: var(--bp-typography-family-default);
 }
+
+/* Traditional Chinese screens: Traditional Chinese faces come first so that Han characters take their Traditional shapes and not the Korean or Simplified ones.
+   Blueprint sets its own font-family on body, so body is named too. The other screens keep the fonts above. */
+:root:lang(zh-Hant), :root:lang(zh-Hant) body {
+  --bp-typography-family-default: "Segoe UI", "Microsoft JhengHei UI", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", "Source Han Sans TC", sans-serif;
+  font-family: var(--bp-typography-family-default);
+}

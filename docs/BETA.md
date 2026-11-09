@@ -106,6 +106,14 @@ second question in the other language in the same conversation.
   machine translation from the Korean and English text and no native speaker has checked it, so some
   phrases may be stiff or wrong. Messages that the server writes itself appear in English on this
   screen.
+- **The Traditional Chinese screen is machine-converted and has not been reviewed.** Traditional
+  Chinese (中文(繁體)) can be chosen as the display language and as the answer language in Settings.
+  Its wording was made by converting the Simplified Chinese screen text with OpenCC
+  (opencc-python-reimplemented 0.1.7, configuration s2twp, Taiwan vocabulary) and then correcting
+  the terms that conversion gets wrong; no native speaker has checked it, so some phrases may be
+  stiff or wrong, and the model has not been checked to answer in Traditional Chinese. It follows
+  Taiwan usage: Hong Kong and Macau wording, Cantonese, and Hong Kong date and number formats are
+  not covered. Messages that the server writes itself appear in English on this screen.
 - **Model accounts.** The ChatGPT/Codex bridge is experimental and uses a private endpoint. Claude
   and xAI real-account use is unverified.
 - **Small display issues.** On Korean Windows a backslash can show as ₩ in some code or command
@@ -167,6 +175,8 @@ repository and read the [security policy](../SECURITY.md).
   한국어 Windows에서 일부 코드 상자의 역슬래시가 ₩로 보일 수 있습니다.
   중국어(간체) 화면은 기계 번역이며 검수되지 않았습니다.
   일본어 화면도 기계 번역이며 검수되지 않았습니다.
+  중국어(번체) 화면은 대만 표기 기준의 기계 변환(OpenCC s2twp)이며 검수되지 않았고, 모델이 번체로 답하는지도
+  실제로 확인하지 않았습니다. 홍콩·마카오 표현과 광둥어는 다루지 않습니다.
 - **개인정보·비용**: 질문하면 자료의 관련 부분이 연결한 모델 계정으로 전송되고 그 계정의 사용량을
   씁니다(합성 자료 기준 조사 한 번에 호출 8~9회, 토큰 33만~45만 개). 허락받은 자료만 쓰고,
   신고에는 개인 자료·로그인 정보·작업 공간 파일을 붙이지 마세요.

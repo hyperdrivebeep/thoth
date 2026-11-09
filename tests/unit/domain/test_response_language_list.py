@@ -17,7 +17,7 @@ from thoth.domain.response_language import (
 
 def test_the_list_is_the_literal_and_names_exactly_the_decided_languages():
     assert get_args(ResponseLanguage) == SUPPORTED_RESPONSE_LANGUAGES
-    assert SUPPORTED_RESPONSE_LANGUAGES == ("ko", "en", "zh-Hans", "ja")
+    assert SUPPORTED_RESPONSE_LANGUAGES == ("ko", "en", "zh-Hans", "ja", "zh-Hant")
     assert set(get_args(LegacyResponseLanguage)) <= set(SUPPORTED_RESPONSE_LANGUAGES)
 
 
@@ -28,7 +28,7 @@ def test_every_language_has_a_name_a_codec_and_an_accepted_value(language: Respo
     assert "response language to" in language_instruction(language)
 
 
-@pytest.mark.parametrize("value", ["fr", "zh", "zh-Hant", "ja-JP", "EN", "", None, 1])
+@pytest.mark.parametrize("value", ["fr", "zh", "zh-TW", "zh-hant", "ja-JP", "EN", "", None, 1])
 def test_anything_outside_the_list_is_refused_not_defaulted(value: object):
     with pytest.raises(ValueError, match="RESPONSE_LANGUAGE_UNSUPPORTED"):
         explicit_language(value)
@@ -38,3 +38,4 @@ def test_ko_and_en_keep_the_oldest_codec_so_their_bytes_never_change():
     assert {request_codec_version("ko"), request_codec_version("en")} == {"2.1.0"}
     assert request_codec_version("zh-Hans") == "2.2.0"
     assert request_codec_version("ja") == "2.3.0"
+    assert request_codec_version("zh-Hant") == "2.4.0"

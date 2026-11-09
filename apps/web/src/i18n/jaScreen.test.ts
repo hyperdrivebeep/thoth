@@ -95,7 +95,7 @@ it("puts Japanese fonts first on the Japanese screen only, on the page and on bo
   expect(faces.indexOf("Meiryo")).toBeGreaterThan(faces.indexOf("Yu Gothic UI"));
   expect(faces).toEqual(expect.arrayContaining(["Hiragino Sans", "Noto Sans JP"]));
   expect(faces.some(face => /Malgun|Pretendard|Noto Sans KR|Apple SD|YaHei|PingFang|Noto Sans SC/.test(face))).toBe(false);
-  expect(css.match(/:lang\(/g)).toHaveLength(4);
+  expect(css.match(/:lang\(/g)).toHaveLength(6);
   expect(rule![1]).not.toMatch(/code-font/);
 });
 

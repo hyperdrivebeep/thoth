@@ -111,6 +111,43 @@ const chinese: Record<keyof typeof korean, string> = {
   BOUNDED_RESEARCH_COMPLETE: "已完成限定范围内的调查。",
   RESEARCH_INTERNAL_ERROR: "调查期间发生了意料之外的内部错误。",
 };
+
+const traditional: Record<keyof typeof korean, string> = {
+  HEAD_UNAVAILABLE: "無法讀取當前記錄的最新狀態。",
+  DEPENDENCY_INVALIDATED: "此回答所依賴的另一條記錄已不再有效。",
+  DEPENDENCY_REVIEW_REQUIRED: "此回答所依賴的另一條記錄需要重新審查。",
+  LEGACY_BASIS_UNKNOWN: "這是較早的記錄，無法確認該回答是依據哪些資料生成的。",
+  RESULT_OPERATION_UNAVAILABLE: "找不到生成此回答的執行記錄。",
+  ATTEMPT_ENDED_WITH_CHECKPOINT: "調查沒有進行到底，停在了中間儲存的狀態。",
+  REQUEST_BASIS_CHANGED: "提問之後，問題的依據發生了變化。",
+  POLICY_OR_CUTOFF_CHANGED: "專案的策略或截止時間發生了變化。",
+  SOURCE_BASIS_CHANGED: "回答所用的資料後來發生了變化。",
+  MEMORY_CORRECTED_AFTER_RESULT: "此結果所用的記憶後來被更正過。",
+  BASIS_INCOMPLETE: "該回答的資料依據記錄不完整。",
+  OWNER_UNAVAILABLE: "無法讀取擁有這條記錄的專案。",
+  REQUEST_SOURCE_OR_ACCESS_BASIS_CHANGED: "提問之後，資料或訪問範圍發生了變化。",
+  UNKNOWN_BASIS: "無法確認當前的資料依據。",
+  RESULT_SUPERSEDED: "更新的回答已取代了此回答。",
+  MANDATORY_RULE_COVERAGE_MISSING: "有些必須核對的規則還沒有涉及。",
+  PROFILE_DECISION_REQUIRED: "必須先由使用者確定適用的標準。",
+  REQUIREMENT_INTERPRETATION_INCOMPLETE: "問題所要求的內容還沒有完全解讀清楚。",
+  REQUIREMENT_GAPS: "還有未滿足的要求項。",
+  GAP_MAPPING_INCOMPLETE: "缺少的部分還沒有與相應的要求項對應起來。",
+  REQUIRED_CONTEXT_OMITTED: "缺少回答所必需的背景。",
+  REQUIRED_SCOPE_UNEXAMINED: "必須檢視的範圍還沒有檢視。",
+  EVIDENCE_CONFLICT: "有些證據相互不一致。",
+  REVIEWED_CONFLICT_HISTORY: "曾出現證據衝突，並已經過審查。",
+  EXPLICIT_PUBLIC_SEARCH: "使用者明確要求了公共網路搜尋。",
+  ASSESSMENT_UNAVAILABLE: "無法讀取此專案的評估記錄。",
+  COVERAGE_UNAVAILABLE: "無法讀取證據是否充分的記錄。",
+  REQUIREMENT_SET_UNAVAILABLE: "無法讀取要求項記錄。",
+  RESULT_NOT_PRODUCED: "尚未生成回答。",
+  RESULT_COMPARE_REQUIRES_TWO_IDENTITIES: "比較需要兩個不同的回答。",
+  FAILED: "調查以失敗告終。",
+  CANCELLED: "調查已被取消。",
+  BOUNDED_RESEARCH_COMPLETE: "已完成限定範圍內的調查。",
+  RESEARCH_INTERNAL_ERROR: "調查期間發生了意料之外的內部錯誤。",
+};
 const japanese: Record<keyof typeof korean, string> = {
   HEAD_UNAVAILABLE: "現在の記録の最新の状態を読み込めません。",
   DEPENDENCY_INVALIDATED: "この回答が拠りどころにしている別の記録は、もう有効ではありません。",
@@ -147,4 +184,4 @@ const japanese: Record<keyof typeof korean, string> = {
   BOUNDED_RESEARCH_COMPLETE: "定められた範囲の調査を終えました。",
   RESEARCH_INTERNAL_ERROR: "調査中に、予期しない内部エラーが発生しました。",
 };
-export const historyReasons: Record<string, string> = bilingualRecord(korean, english, chinese, japanese);
+export const historyReasons: Record<string, string> = bilingualRecord(korean, english, chinese, traditional, japanese);

@@ -65,6 +65,19 @@ const chinese: Record<keyof typeof korean, { label: string; hint: string }> = {
   REQUIRED_INCOMPLETE: { label: "必要标准未完成", hint: "没有必要标准，或必要标准中还有尚未判定为满足或未满足的。" },
   BASIS_CHANGED: { label: "依据已变化", hint: "此评估所依据的规则、结果或链接已变化，需要重新计算。" },
 };
+
+const traditional: Record<keyof typeof korean, { label: string; hint: string }> = {
+  UNTESTED: { label: "未測試", hint: "已有測試與此標準關聯，但還沒有結果。" },
+  UNLINKED: { label: "未關聯", hint: "沒有測試與此標準關聯，因此沒有地方接收結果。" },
+  UNIT: { label: "單位錯誤", hint: "結果的單位與標準的單位不同，因此沒有進行比較。" },
+  DENOMINATOR: { label: "分母錯誤", hint: "結果的分母不大於 0，或其值與按分子/分母計算的值不一致，因此沒有進行比較。" },
+  VALUE: { label: "值錯誤", hint: "結果的值為空、不是數字或過大，因此沒有進行比較。" },
+  CONDITION_MISMATCH: { label: "條件不一致", hint: "有結果，但與標準的條件不同，因此沒有采用。" },
+  NO_RULE: { label: "沒有規則", hint: "此標準沒有評估規則，因此沒有進行比較。" },
+  VALID_MISS: { label: "有效但未達標", hint: "結果可以比較，並且沒有達到標準。" },
+  REQUIRED_INCOMPLETE: { label: "必要標準未完成", hint: "沒有必要標準，或必要標準中還有尚未判定為滿足或未滿足的。" },
+  BASIS_CHANGED: { label: "依據已變化", hint: "此評估所依據的規則、結果或連結已變化，需要重新計算。" },
+};
 const japanese: Record<keyof typeof korean, { label: string; hint: string }> = {
   UNTESTED: { label: "未テスト", hint: "この基準にテストが結びついていますが、まだ結果がありません。" },
   UNLINKED: { label: "未リンク", hint: "この基準に結びついたテストがなく、結果の入る場所がありません。" },
@@ -77,4 +90,4 @@ const japanese: Record<keyof typeof korean, { label: string; hint: string }> = {
   REQUIRED_INCOMPLETE: { label: "必須の基準が未完了", hint: "必須の基準がないか、必須の基準のうち、満たすか満たさないかがまだ決まっていないものがあります。" },
   BASIS_CHANGED: { label: "根拠の変更", hint: "この判定が拠りどころにしたルール・結果・リンクが変わったため、再計算が必要です。" },
 };
-export const traceReasonText = bilingualRecord(korean, english, chinese, japanese);
+export const traceReasonText = bilingualRecord(korean, english, chinese, traditional, japanese);
