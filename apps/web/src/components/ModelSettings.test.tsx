@@ -287,8 +287,8 @@ it("a late admission cannot replace a different selected thread",async()=>{
 
 it("ordinary navigation only automatically calls the actual nonmutating query surface",async()=>{
   await mount();
-  // A8: opening a project also reads its latest work (read-only thread queries), which hypotheses came from a trace row, and whether the trace is demo data for the conversation's synthetic-data line (read-only queries).
-  expect(fixture.calls.filter(call=>!["project/list","thread/list","project/source/list","evidence/list","model/settings/read","workspace/ready","thread/read","thread/activity/list","hypothesis/link/list","trace/read"].includes(call.method)).map(call=>call.method)).toEqual([]);
+  // The conversation also reads the project's call settings (read-only) to say when automatic retry is off. A8: opening a project also reads its latest work (read-only thread queries), which hypotheses came from a trace row, and whether the trace is demo data for the conversation's synthetic-data line (read-only queries).
+  expect(fixture.calls.filter(call=>!["project/list","thread/list","project/source/list","evidence/list","model/settings/read","workspace/ready","thread/read","thread/activity/list","hypothesis/link/list","trace/read","model/callSettings/read"].includes(call.method)).map(call=>call.method)).toEqual([]);
   await act(async()=>{container.querySelector<HTMLElement>('[role="tab"][data-tab-id="records"]')?.click();});
   expect(fixture.calls.some(call=>call.method==="receipt/verify")).toBe(false);
 });

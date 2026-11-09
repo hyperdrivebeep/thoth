@@ -114,4 +114,56 @@ it("has the two lines in every screen language", () => {
   expect(t("result.stalled")).toBe("The answer was saved, but the connection was cut before the final check. The model may have kept processing.");
   expect(t("result.incompleteResponse")).toBe("The model ended with an error.");
 });
+const AUTO_OFF = {
+  ko: ["끊긴 모델 호출 자동 다시 시도가 꺼져 있습니다.", "설정 열기"],
+  en: ["Automatic retry of an interrupted model call is turned off.", "Open settings"],
+  "zh-Hans": ["被中断的模型调用的自动重试已关闭。", "打开设置"],
+  "zh-Hant": ["被中斷的模型呼叫的自動重試已關閉。", "開啟設定"],
+  ja: ["中断されたモデル呼び出しの自動再試行はオフになっています。", "設定を開く"],
+} as const;
+
+function withRetry(code: string, answer: string | null, retry: { autoRetryOff?: boolean; onOpenSettings?: () => void }, state = "SUCCEEDED"): string {
+  const result: Record<string, unknown> = answer === null ? { terminal_reason: code } : { answer, terminal_reason: code };
+  const view = interruptionView({ state, result, terminalReason: code });
+  return renderToStaticMarkup(<ResultInterruptionNotice view={view} result={result} hasSavedResult={false} onDetail={() => {}} {...retry}/>);
+}
+
+it("says automatic retry is off, with a settings button, only for a cut-off model call and only when it is off", () => {
+  const open = () => {};
+  for (const code of [STALLED, DEADLINE, "OAUTH_TRANSPORT_FAILURE", "OAUTH_RUNAWAY_OUTPUT", "OAUTH_STALLED_STREAM"]) {
+    for (const answer of ["부분 답", null]) {
+      const html = withRetry(code, answer, { autoRetryOff: true, onOpenSettings: open });
+      expect(html, code + answer).toContain(t("result.autoRetryOff"));
+      expect(html, code + answer).toContain(t("result.autoRetryOpenSettings"));
+      const quiet = withRetry(code, answer, { autoRetryOff: false, onOpenSettings: open });
+      expect(quiet, code + answer).not.toContain(t("result.autoRetryOff"));
+      expect(quiet, code + answer).not.toContain(t("result.autoRetryOpenSettings"));
+    }
+  }
+  // Other reasons for an unfinished run are not a cut-off call.
+  for (const code of ["TOTAL_RESEARCH_BUDGET_EXHAUSTED", "OAUTH_INCOMPLETE_RESPONSE", "OAUTH_REQUEST_REJECTED_429"]) {
+    expect(withRetry(code, "부분 답", { autoRetryOff: true, onOpenSettings: open }), code).not.toContain(t("result.autoRetryOff"));
+  }
+  expect(withRetry("BOUNDED_RESEARCH_COMPLETE", "답", { autoRetryOff: true, onOpenSettings: open })).toBe("");
+  // Without the way to the settings, the sentence is shown without a button.
+  const noButton = withRetry(STALLED, "부분 답", { autoRetryOff: true });
+  expect(noButton).toContain(t("result.autoRetryOff"));
+  expect(noButton).not.toContain(t("result.autoRetryOpenSettings"));
+  // The default is silent.
+  expect(withRetry(STALLED, "부분 답", {})).not.toContain(t("result.autoRetryOff"));
+});
+
+it("has the retry-off sentence and button in every screen language", () => {
+  const seen = new Set<string>();
+  for (const [locale, [sentence, button]] of Object.entries(AUTO_OFF)) {
+    setLocale(locale as keyof typeof AUTO_OFF);
+    expect(t("result.autoRetryOff")).toBe(sentence);
+    expect(t("result.autoRetryOpenSettings")).toBe(button);
+    const html = withRetry(STALLED, "answer", { autoRetryOff: true, onOpenSettings: () => {} });
+    expect(html).toContain(sentence);
+    expect(html).toContain(button);
+    seen.add(sentence);
+  }
+  expect(seen.size).toBe(5);
+});
 

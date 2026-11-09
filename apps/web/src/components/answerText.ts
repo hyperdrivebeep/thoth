@@ -17,7 +17,7 @@ const LIST_ITEM = /^\s*- /;
  * (src/thoth/application/services/request_language.py, _PARTIAL_DRAFT_PREFIX). It is shown as its own line so that a
  * markdown heading the model wrote right after it still starts a line and is read as a heading.
  */
-const LEADS = ["검증 보류 · 부분 초안: ", "Review on hold · partial draft: ", "复核暂缓 · 部分草稿：", "検証保留・部分草稿："];
+export const LEADS = ["검증 보류 · 부분 초안: ", "Review on hold · partial draft: ", "复核暂缓 · 部分草稿：", "検証保留・部分草稿：", "複核暫緩 · 部分草稿："];
 
 export function splitAnswerLead(answer: string): { lead: string | null; body: string } {
   for (const lead of LEADS) if (answer.startsWith(lead)) return { lead: lead.trim(), body: answer.slice(lead.length) };

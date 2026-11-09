@@ -147,6 +147,14 @@ export const researchMessages = {
     "ko": "답은 저장됐지만 마지막 확인 전에 연결이 끊겼습니다. 모델 쪽에서는 계속 처리했을 수 있습니다.",
     "en": "The answer was saved, but the connection was cut before the final check. The model may have kept processing."
   },
+  "result.autoRetryOff": {
+    "ko": "끊긴 모델 호출 자동 다시 시도가 꺼져 있습니다.",
+    "en": "Automatic retry of an interrupted model call is turned off."
+  },
+  "result.autoRetryOpenSettings": {
+    "ko": "설정 열기",
+    "en": "Open settings"
+  },
   "result.incompleteResponse": {
     "ko": "모델 쪽 오류로 끝났습니다.",
     "en": "The model ended with an error."

@@ -39,6 +39,8 @@ export const researchZh: ColumnOf<typeof researchMessages> = {
   "result.internalFailed": "研究处理失败。",
   "result.remoteUnknown": "不清楚远程模型是否已经停止。不会自动重新开始。",
   "result.stalled": "答案已保存，但在最后确认前连接中断了。模型那边可能仍在继续处理。",
+  "result.autoRetryOff": "被中断的模型调用的自动重试已关闭。",
+  "result.autoRetryOpenSettings": "打开设置",
   "result.incompleteResponse": "模型端出错，处理已结束。",
   "result.beforeInterruption": "中断前的 AI 审查摘要（仅检查了引用位置）",
   "result.retryQuestion": "再次研究同一个问题",

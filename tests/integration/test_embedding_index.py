@@ -10,6 +10,8 @@ from thoth.adapters.storage import schema
 from thoth.adapters.storage.embedding_schema import embedding_jobs, embedding_vectors
 from thoth.domain.embedding_index import EmbeddingIndexConfig, EmbeddingIndexError, EmbeddingVector
 
+HANG_LIMIT = 60
+
 
 @pytest.fixture
 def index(tmp_path: Path) -> Iterator[IndexFixture]:
@@ -101,12 +103,29 @@ def test_lease_expiry_recovery_old_owner_fenced_and_no_autoretry(index: IndexFix
     assert store.publish(current, 60202).state == "READY"
 
 
+async def encoding_started(index: IndexFixture, task: "asyncio.Task[object]") -> None:
+    """Return once the worker is inside its first encode call (its own signal); never guess a time.
+
+    If the drain ends first, its own error is raised instead of a timeout that hides it. The limit
+    only ends a hang: under load from other test processes the first encode has been seen to start
+    late, and a short limit then failed a correct run.
+    """
+    entered = asyncio.create_task(index.worker.entered.wait())
+    try:
+        await asyncio.wait({task, entered}, timeout=HANG_LIMIT, return_when=asyncio.FIRST_COMPLETED)
+        if task.done():
+            task.result()
+        assert entered.done(), "the worker never started encoding"
+    finally:
+        entered.cancel()
+
+
 @pytest.mark.parametrize("change", ["disable", "detach", "revoke", "delete", "replace", "cancel"])
 async def test_change_during_encode_cannot_publish(index: IndexFixture, change: str):
     span = index.ingest()
     index.worker.release = asyncio.Event()
     task = asyncio.create_task(index.service.drain(PROJECT))
-    await asyncio.wait_for(index.worker.entered.wait(), 2)
+    await encoding_started(index, task)
     (job,) = index.stores.embedding_index.jobs(PROJECT)
     if change == "disable":
         index.service.configure(PROJECT, False, 1)
