@@ -8,13 +8,16 @@ wording in language_contract_text.py and request_language.py.
 
 from typing import Literal, get_args
 
-ResponseLanguage = Literal["ko", "en", "zh-Hans", "ja"]
+ResponseLanguage = Literal["ko", "en", "zh-Hans", "ja", "zh-Hant"]
 # The languages the 2.1.0 request codec can hold. Frozen: records written before zh-Hans decode
 # through it, and ko/en requests keep being written with it so their bytes never change.
 LegacyResponseLanguage = Literal["ko", "en"]
 # The languages the 2.2.0 request codec can hold. Frozen the same way: zh-Hans requests keep being
 # written with it, and a record written before ja decodes through it.
 ResponseLanguageV22 = Literal["ko", "en", "zh-Hans"]
+# The languages the 2.3.0 request codec can hold. Frozen the same way: ja requests keep being
+# written with it, and a record written before zh-Hant decodes through it.
+ResponseLanguageV23 = Literal["ko", "en", "zh-Hans", "ja"]
 SUPPORTED_RESPONSE_LANGUAGES: tuple[ResponseLanguage, ...] = get_args(ResponseLanguage)
 LANGUAGE_POLICY_VERSION = "1.0.0"
 
@@ -23,16 +26,19 @@ _ENGLISH_NAME: dict[ResponseLanguage, str] = {
     "en": "English",
     "zh-Hans": "Simplified Chinese",
     "ja": "Japanese",
+    "zh-Hant": "Traditional Chinese",
 }
 _REQUEST_CODEC_VERSION: dict[ResponseLanguage, str] = {
     "ko": "2.1.0",
     "en": "2.1.0",
     "zh-Hans": "2.2.0",
     "ja": "2.3.0",
+    "zh-Hant": "2.4.0",
 }
 _SCRIPT_NOTE: dict[ResponseLanguage, str] = {
     "zh-Hans": " Use Simplified Chinese characters, not Traditional Chinese characters.",
     "ja": " Write in Japanese (kanji and kana), not in Chinese.",
+    "zh-Hant": " Use Traditional Chinese characters, not Simplified Chinese characters.",
 }
 
 

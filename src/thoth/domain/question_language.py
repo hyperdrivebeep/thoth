@@ -1,13 +1,16 @@
 """Which answer language a question is written in, read from its scripts alone.
 
 An explicit choice always wins. Detection is only a hint for a request that made no choice, and it
-answers None whenever the script cannot say: Traditional Chinese and text with no letters are
-never guessed as one of the supported languages. Kana means Japanese, unless Hangul is present.
+answers None whenever the script cannot say: text with no letters is never guessed as one of the
+supported languages. Kana means Japanese, unless Hangul is present. Han text with more
+Traditional-only than Simplified-only characters is Traditional Chinese.
 
 Limits, stated so nobody trusts it too far: Han characters alone cannot tell Simplified from
 Traditional Chinese or from Japanese written only in kanji, so a kanji-only text follows the
 Simplified Chinese rule. The Traditional-only and Simplified-only character lists below are a
-small set of very common characters, not a classifier.
+small set of very common characters, not a classifier: on a synthetic sample of twelve-character
+Traditional Chinese strings about half contain none of them and are read as Simplified Chinese.
+Nothing calls this detection yet, so that limit matters only once an automatic mode does.
 """
 
 import re
@@ -27,7 +30,7 @@ _SIMPLIFIED_ONLY = frozenset("们个这来对时学国会后发体说与为从�
 
 
 def detect_question_language(text: str) -> ResponseLanguage | None:
-    """ko, ja, en or zh-Hans when the scripts say so; None when they do not."""
+    """ko, ja, en, zh-Hant or zh-Hans when the scripts say so; None when they do not."""
     if _HANGUL.search(text):
         return "ko"  # Hanja and quoted kana inside Korean text do not change the language
     if _KANA.search(text):
@@ -37,7 +40,7 @@ def detect_question_language(text: str) -> ResponseLanguage | None:
     if han >= 2 and han * _LATIN_PER_HAN >= latin:
         traditional = sum(char in _TRADITIONAL_ONLY for char in text)
         simplified = sum(char in _SIMPLIFIED_ONLY for char in text)
-        return None if traditional > simplified else "zh-Hans"
+        return "zh-Hant" if traditional > simplified else "zh-Hans"
     return "en" if latin else None
 
 

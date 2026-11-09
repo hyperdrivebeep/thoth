@@ -148,6 +148,20 @@ const guidanceZh: Record<string, string> = {
   "Finish the THOTH Codex sign-in, then check connection status": "请先完成 THOTH 专用的 Codex 登录，再检查连接状态。",
   "Check the isolated Codex connection and model catalog": "请检查 THOTH 专用 Codex 的连接和模型列表。",
 };
+
+const guidanceZhHant: Record<string, string> = {
+  "Use the saved THOTH workspace API key": "使用已儲存的 THOTH 工作區 API 金鑰。",
+  "Install the pinned Codex standalone package in the THOTH tools prefix": "請在 THOTH 工具資料夾中安裝指定版本的 Codex。",
+  "Connect the THOTH-only Codex profile": "請登入 THOTH 專用的 Codex 配置檔案。",
+  "Check the isolated Codex model catalog": "請檢查 THOTH 專用 Codex 的模型列表。",
+  "The Codex route is eligible; live execution has not been verified": "Codex 途徑可以嘗試使用，但實際執行尚未得到驗證。",
+  "Install the official Claude Code executable, then sign in from THOTH": "請先安裝官方的 Claude Code，再從 THOTH 登入。",
+  "Sign in with the official Claude Code executable in the THOTH profile": "請用 THOTH 專用配置檔案中的官方 Claude Code 登入。",
+  "Use a THOTH workspace API key for this provider": "此服務提供商請使用 THOTH 工作區 API 金鑰連線。",
+  "Use the THOTH workspace xAI device login; remote execution is unverified": "請使用 THOTH 工作區的 xAI 裝置碼登入。遠端執行尚未得到驗證。",
+  "Finish the THOTH Codex sign-in, then check connection status": "請先完成 THOTH 專用的 Codex 登入，再檢查連線狀態。",
+  "Check the isolated Codex connection and model catalog": "請檢查 THOTH 專用 Codex 的連線和模型列表。",
+};
 const guidanceJa: Record<string, string> = {
   "Use the saved THOTH workspace API key": "保存済みの THOTH ワークスペースの API キーを使います。",
   "Install the pinned Codex standalone package in the THOTH tools prefix": "THOTH のツールフォルダに、指定バージョンの Codex をインストールしてください。",
@@ -163,7 +177,7 @@ const guidanceJa: Record<string, string> = {
 };
 export function guidanceText(value: string | null | undefined): string | null {
   if (!value) return null;
-  if (guidanceKo[value]) return pickLocale({ ko: guidanceKo[value], en: value, "zh-Hans": guidanceZh[value], ja: guidanceJa[value] });
+  if (guidanceKo[value]) return pickLocale({ ko: guidanceKo[value], en: value, "zh-Hans": guidanceZh[value], "zh-Hant": guidanceZhHant[value], ja: guidanceJa[value] });
   // A terminal command stays literal; only the sentence around it is Korean.
   const command = /^Run (.+) in the server terminal$/.exec(value);
   if (command) return t("labels.command") + command[1];

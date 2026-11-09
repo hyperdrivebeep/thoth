@@ -12,6 +12,7 @@ from thoth.domain.response_language import (
     LegacyResponseLanguage,
     ResponseLanguage,
     ResponseLanguageV22,
+    ResponseLanguageV23,
     request_codec_version,
 )
 
@@ -57,19 +58,35 @@ class ThreadRequestRevisionV23(ThreadRequestRevision):
     """Same as 2.2.0 with Japanese added; the codec that holds languages added later."""
 
     schema_version: Literal["2.3.0"] = "2.3.0"  # type: ignore[reportIncompatibleVariableOverride]
+    # Frozen at ko, en, zh-Hans and ja: records written before zh-Hant decode as written. The
+    # docstring is the published schema description and stays as it was.
+    response_language: ResponseLanguageV23
+
+
+class ThreadRequestRevisionV24(ThreadRequestRevision):
+    """Same as 2.3.0 with Traditional Chinese added; the codec that holds languages added later."""
+
+    schema_version: Literal["2.4.0"] = "2.4.0"  # type: ignore[reportIncompatibleVariableOverride]
     response_language: ResponseLanguage
 
 
-LanguageRequest = ThreadRequestRevisionV21 | ThreadRequestRevisionV22 | ThreadRequestRevisionV23
+LanguageRequest = (
+    ThreadRequestRevisionV21
+    | ThreadRequestRevisionV22
+    | ThreadRequestRevisionV23
+    | ThreadRequestRevisionV24
+)
 LANGUAGE_REQUEST_CODECS: dict[str, type[LanguageRequest]] = {
     "2.1.0": ThreadRequestRevisionV21,
     "2.2.0": ThreadRequestRevisionV22,
     "2.3.0": ThreadRequestRevisionV23,
+    "2.4.0": ThreadRequestRevisionV24,
 }
 LANGUAGE_REQUEST_TYPES = (
     ThreadRequestRevisionV21,
     ThreadRequestRevisionV22,
     ThreadRequestRevisionV23,
+    ThreadRequestRevisionV24,
 )
 
 

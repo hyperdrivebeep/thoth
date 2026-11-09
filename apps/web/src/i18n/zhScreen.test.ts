@@ -46,13 +46,16 @@ it("does not leave Korean in the Chinese sentences", () => {
   expect(t("expected.unknown")).toBe("未知");
 });
 
-it("picks the language of each screen from the browser's language tags and never guesses Traditional Chinese", () => {
+it("picks the language of each screen from the browser's language tags, with Traditional tags choosing the Traditional screen", () => {
   expect(browserLanguage(["zh-CN", "en"])).toBe("zh-Hans");
   expect(browserLanguage(["zh-Hans-CN"])).toBe("zh-Hans");
   expect(browserLanguage(["zh"])).toBe("zh-Hans");
   expect(browserLanguage(["zh-SG"])).toBe("zh-Hans");
-  expect(browserLanguage(["zh-TW", "zh-HK", "en-US"])).toBe("en");
-  expect(browserLanguage(["zh-Hant", "ko-KR"])).toBe("ko");
+  expect(browserLanguage(["zh-TW", "zh-HK", "en-US"])).toBe("zh-Hant");
+  expect(browserLanguage(["zh-MO"])).toBe("zh-Hant");
+  expect(browserLanguage(["zh-Hant", "ko-KR"])).toBe("zh-Hant");
+  expect(browserLanguage(["zh-Hans-HK"])).toBe("zh-Hans");
+  expect(browserLanguage(["yue-HK", "ko-KR"])).toBe("ko");
   expect(browserLanguage(["fr-FR"])).toBe("ko");
   expect(browserLanguage(["en-GB", "zh-CN"])).toBe("en");
   expect(browserLanguage(["ko"])).toBe("ko");
@@ -91,7 +94,7 @@ it("puts Chinese fonts first on the Chinese screen only, on the page and on body
   expect(faces.indexOf("PingFang SC")).toBeGreaterThan(faces.indexOf("Microsoft YaHei UI"));
   expect(faces).toContain("Noto Sans SC");
   expect(faces.some(face => /Malgun|Pretendard|Noto Sans KR|Apple SD/.test(face))).toBe(false);
-  expect(workstationCss.match(/:lang\(/g)).toHaveLength(4);
+  expect(workstationCss.match(/:lang\(/g)).toHaveLength(6);
   expect(rule![1]).not.toMatch(/code-font/);
 });
 

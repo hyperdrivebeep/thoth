@@ -26,9 +26,10 @@ _PARTIAL_DRAFT_PREFIX: dict[ResponseLanguage, str] = {
     "en": "Review on hold · partial draft: ",
     "zh-Hans": "复核暂缓 · 部分草稿\uff1a",
     "ja": "検証保留・部分草稿\uff1a",
+    "zh-Hant": "複核暫緩 · 部分草稿\uff1a",
 }
 # Answers in these languages have no Hangul to demand: the Hangul-question script checks pass them.
-_NO_HANGUL_CHECK: frozenset[str] = frozenset({"zh-Hans", "ja"})
+_NO_HANGUL_CHECK: frozenset[str] = frozenset({"zh-Hans", "ja", "zh-Hant"})
 
 
 def apply_request_language(work: "ResearchWork", request: ThreadRequestRevision) -> None:

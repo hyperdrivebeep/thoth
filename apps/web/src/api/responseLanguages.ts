@@ -7,6 +7,7 @@ export const RESPONSE_LANGUAGE_CHOICES = [
   { code: "ko", label: "한국어" },
   { code: "en", label: "English" },
   { code: "zh-Hans", label: "中文(简体)" },
+  { code: "zh-Hant", label: "中文(繁體)" },
   { code: "ja", label: "日本語" },
 ] as const;
 

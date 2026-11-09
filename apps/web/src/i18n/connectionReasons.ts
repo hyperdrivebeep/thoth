@@ -95,6 +95,39 @@ const chinese: Record<keyof typeof korean, string> = {
   CATALOG_UNAVAILABLE: "登录成功，但模型列表暂时还不可用。",
   MODEL_CATALOG_REFRESH_TIMEOUT: "模型列表检查未能及时完成。请稍后重试。",
 };
+
+const traditional: Record<keyof typeof korean, string> = {
+  CODEX_STANDALONE_NOT_INSTALLED: "這臺電腦上沒有 ChatGPT 登入所需的 Codex 連線工具。",
+  CODEX_STANDALONE_PIN_UNAVAILABLE: "未找到所需版本（0.157.1）的 Codex 連線工具。",
+  CODEX_PACKAGE_INTEGRITY_UNAVAILABLE: "無法驗證 Codex 的安裝資訊。請重新安裝該工具。",
+  CODEX_PACKAGE_INTEGRITY_MISMATCH: "Codex 工具檔案與官方發行版不一致。請重新安裝該工具。",
+  CODEX_PACKAGE_ROOT_ABSOLUTE_REQUIRED: "Codex 工具的位置設定無效。",
+  UPDATE_REVIEW_REQUIRED: "Codex 工具的位置或版本已變化。請重新安裝該工具。",
+  CODEX_PINNED_PLATFORM_UNSUPPORTED: "此作業系統暫不支援 ChatGPT 登入。請使用 API 金鑰連線。",
+  CLAUDE_CLIENT_REGISTRATION_REQUIRED: "這臺電腦上尚未啟用 Claude 訂閱登入。目前可以使用 API 金鑰連線。",
+  CLAUDE_CODE_NOT_INSTALLED: "這臺電腦上沒有 Claude 登入所需的 Claude Code。",
+  CLAUDE_CODE_NATIVE_BINARY_REQUIRED: "未找到 Claude Code 可執行檔案。請將其安裝到 THOTH 工具資料夾中。",
+  CLAUDE_CODE_NOT_EXECUTABLE: "無法執行 Claude Code 可執行檔案。請重新安裝。",
+  CLAUDE_CODE_CAPABILITY_UNSUPPORTED: "已安裝的 Claude Code 版本過舊。請在 THOTH 工具資料夾中安裝受支援的版本。",
+  CLAUDE_CODE_LOGIN_START_FAILED: "Claude Code 無法開始登入。請稍後重試。",
+  CLAUDE_CODE_LOGIN_REQUIRED: "請在設定的模型連線中登入 Claude，然後重試。",
+  CLAUDE_CODE_LOGIN_FAILED: "Claude 登入沒有完成。只有在你選擇時才會開始新的登入。",
+  CLAUDE_CODE_LOGIN_NOT_CONFIRMED: "Claude Code 已退出，但無法確認登入狀態。請重試。",
+  LOGIN_REQUIRED: "需要登入。",
+  LOGIN_PENDING: "正在完成登入。",
+  XAI_LOGIN_REQUIRED: "需要登入 xAI。",
+  MODEL_CREDENTIAL_UNAVAILABLE: "沒有登記 API 金鑰。",
+  NODE_NPM_UNAVAILABLE: "自動安裝需要 Node.js (npm)。請安裝 Node.js LTS 後重試，或自己執行下面的命令。",
+  CODEX_TOOL_INSTALL_FAILED: "Codex 工具安裝失敗。請檢查網際網路連線後重試。",
+  CLAUDE_CODE_TOOL_INSTALL_FAILED: "Claude Code 安裝失敗。請檢查網際網路連線後重試。",
+  CODEX_TOOL_INSTALL_TIMEOUT: "安裝未能在五分鐘內完成。請稍後重試。",
+  CLAUDE_CODE_TOOL_INSTALL_TIMEOUT: "安裝未能在五分鐘內完成。請稍後重試。",
+  MODEL_TOOL_INSTALL_TIMEOUT: "安裝未能及時完成。請稍後檢查其狀態。",
+  MODEL_TOOL_INSTALL_IN_PROGRESS: "此工具正在安裝中。請等待其完成。",
+  MODEL_TOOL_PREFIX_UNAVAILABLE: "找不到 THOTH 工具資料夾 (LOCALAPPDATA)。請自己執行下面的命令。",
+  CATALOG_UNAVAILABLE: "登入成功，但模型列表暫時還不可用。",
+  MODEL_CATALOG_REFRESH_TIMEOUT: "模型列表檢查未能及時完成。請稍後重試。",
+};
 const japanese: Record<keyof typeof korean, string> = {
   CODEX_STANDALONE_NOT_INSTALLED: "ChatGPT のログインに必要な Codex 接続ツールが、このコンピューターにありません。",
   CODEX_STANDALONE_PIN_UNAVAILABLE: "必要なバージョン（0.157.1）の Codex 接続ツールが見つかりませんでした。",
@@ -129,6 +162,6 @@ const japanese: Record<keyof typeof korean, string> = {
 };
 
 export function connectionReason(code: string): string | undefined {
-  const values: Readonly<Record<string, string>> = pickLocale({ ko: korean, en: english, "zh-Hans": chinese, ja: japanese });
+  const values: Readonly<Record<string, string>> = pickLocale({ ko: korean, en: english, "zh-Hans": chinese, "zh-Hant": traditional, ja: japanese });
   return values[code];
 }

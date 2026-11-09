@@ -11,14 +11,14 @@ from thoth.domain.research_codec import decode_research_record
 
 
 @pytest.mark.asyncio
-async def test_legacy_ko_en_zh_ja_ko_revisions_round_trip_and_preserve_the_legacy_snapshot(
+async def test_legacy_ko_en_zh_ja_zh_hant_ko_revisions_round_trip_and_preserve_the_legacy_snapshot(
     tmp_path: Path,
 ):
     runtime = await setup(tmp_path, ControlledResearchModel(), source=False)
     thread_id = None
     saved = []
     try:
-        for index, language in enumerate((None, "ko", "en", "zh-Hans", "ja", "ko")):
+        for index, language in enumerate((None, "ko", "en", "zh-Hans", "ja", "zh-Hant", "ko")):
             payload = {
                 "project_id": "p",
                 "contract_version": 2,
@@ -62,7 +62,9 @@ async def test_legacy_ko_en_zh_ja_ko_revisions_round_trip_and_preserve_the_legac
             else:
                 assert (
                     record["schema_version"]
-                    == {"zh-Hans": "2.2.0", "ja": "2.3.0"}.get(language, "2.1.0")
+                    == {"zh-Hans": "2.2.0", "ja": "2.3.0", "zh-Hant": "2.4.0"}.get(
+                        language, "2.1.0"
+                    )
                     and record["response_language"] == language
                 )
                 assert view["current_result"]["result"]["response_language"] == language
@@ -71,7 +73,7 @@ async def test_legacy_ko_en_zh_ja_ko_revisions_round_trip_and_preserve_the_legac
             saved.append(encoded)
         revisions = runtime.ledger.read_revisions("p", "THREAD", f"request:{thread_id}")
         snapshots = [runtime.ledger.read_snapshot(revision.snapshot_id) for revision in revisions]
-        assert len(snapshots) == 6
+        assert len(snapshots) == 7
         assert {canonical_payload(snapshot.content) for snapshot in snapshots} == set(saved)
         assert all(
             canonical_payload(decode_research_record(dict(snapshot.content))) in saved

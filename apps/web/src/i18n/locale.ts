@@ -47,7 +47,7 @@ export function t(key: MessageKey, selectedLocale: Locale = locale): string { re
 export function useTranslation() { useLocale(); return t; }
 export function messageKey(key: MessageKey): MessageKey { return key; }
 const legacyUiText = new Map<string, MessageKey>(Object.entries(messages).flatMap(([key, pair]) =>
-  [[pair.ko, key as MessageKey], [pair.en, key as MessageKey], [pair["zh-Hans"], key as MessageKey]]));
+  [[pair.ko, key as MessageKey], [pair.en, key as MessageKey], [pair["zh-Hans"], key as MessageKey], [pair["zh-Hant"], key as MessageKey]]));
 /** Only call for application-owned notices/errors, never model answers or user/source text. */
 export function uiText(value: string): string {
   const key = Object.hasOwn(messages, value) ? value as MessageKey : legacyUiText.get(value);
@@ -61,8 +61,8 @@ export function formatDate(value: string | number | Date): string {
 export const localeTag = (selectedLocale: Locale = locale): string => LOCALE_TAGS[selectedLocale];
 export function formatNumber(value: number): string { return new Intl.NumberFormat(LOCALE_TAGS[locale]).format(value); }
 export function hypothesisLabel(number: string | number): string {
-  return { ko: `가설 ${number}`, en: `Hypothesis ${number}`, "zh-Hans": `假设 ${number}`, ja: `仮説 ${number}` }[locale];
+  return { ko: `가설 ${number}`, en: `Hypothesis ${number}`, "zh-Hans": `假设 ${number}`, "zh-Hant": `假設 ${number}`, ja: `仮説 ${number}` }[locale];
 }
 export function evidenceCount(count: number): string {
-  return { ko: `근거 ${formatNumber(count)}개`, en: `${formatNumber(count)} evidence ${count === 1 ? "reference" : "references"}`, "zh-Hans": `${formatNumber(count)} 条证据`, ja: `根拠 ${formatNumber(count)} 件` }[locale];
+  return { ko: `근거 ${formatNumber(count)}개`, en: `${formatNumber(count)} evidence ${count === 1 ? "reference" : "references"}`, "zh-Hans": `${formatNumber(count)} 条证据`, "zh-Hant": `${formatNumber(count)} 條證據`, ja: `根拠 ${formatNumber(count)} 件` }[locale];
 }

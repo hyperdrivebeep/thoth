@@ -7,8 +7,11 @@
 export const LANGUAGE_CHOICES = [
   { code: "ko", label: "한국어", tag: "ko-KR", browser: /^ko(-|$)/, title: "THOTH · 연구 작업 공간" },
   { code: "en", label: "English", tag: "en-US", browser: /^en(-|$)/, title: "THOTH · Research workspace" },
-  // Traditional Chinese tags (zh-TW, zh-HK, zh-MO, zh-Hant) are not matched: the text is Simplified.
+  // Traditional Chinese tags (zh-TW, zh-HK, zh-MO, zh-Hant) choose zh-Hant. A script subtag wins over a region:
+  // zh-Hans-HK is Simplified. Cantonese tags (yue) are not matched.
   { code: "zh-Hans", label: "中文(简体)", tag: "zh-CN", browser: /^zh(?!-(tw|hk|mo|hant))(-|$)/, title: "THOTH · 研究工作区" },
+  // The text follows Taiwan usage; Hong Kong and Macau wording and date formats are not covered.
+  { code: "zh-Hant", label: "中文(繁體)", tag: "zh-TW", browser: /^zh-(hant|tw|hk|mo)(-|$)/, title: "THOTH · 研究工作區" },
   { code: "ja", label: "日本語", tag: "ja-JP", browser: /^ja(-|$)/, title: "THOTH · 調査ワークスペース" },
 ] as const;
 

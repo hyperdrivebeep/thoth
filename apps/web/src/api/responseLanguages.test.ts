@@ -10,21 +10,24 @@ import { resultLanguage } from "../i18n/ResponseLanguageContext";
 afterEach(() => { localStorage.clear(); sessionStorage.clear(); });
 
 it("lists the answer languages in one place, apart from the screen languages", () => {
-  expect(RESPONSE_LANGUAGE_CHOICES.map(choice => choice.code)).toEqual(["ko", "en", "zh-Hans", "ja"]);
+  expect(RESPONSE_LANGUAGE_CHOICES.map(choice => choice.code)).toEqual(["ko", "en", "zh-Hans", "zh-Hant", "ja"]);
   expect(responseLanguageLabel("ja")).toBe("日本語");
   expect(responseLanguageLabel("zh-Hans")).toBe("中文(简体)");
-  expect(LANGUAGE_CHOICES.map(choice => choice.code)).toEqual(["ko", "en", "zh-Hans", "ja"]);
+  expect(responseLanguageLabel("zh-Hant")).toBe("中文(繁體)");
+  expect(LANGUAGE_CHOICES.map(choice => choice.code)).toEqual(["ko", "en", "zh-Hans", "zh-Hant", "ja"]);
   expect(RESPONSE_LANGUAGE_CHOICES.map(choice => choice.label)).toEqual(LANGUAGE_CHOICES.map(choice => choice.label));
 });
 
 it("accepts only listed languages, and keeps from a server's list only the ones this app can offer", () => {
-  expect(["ko", "en", "zh-Hans", "ja"].every(isResponseLanguage)).toBe(true);
-  expect(["fr", "zh", "zh-Hant", "ja-JP", "", null, 1].some(isResponseLanguage)).toBe(false);
-  expect(knownResponseLanguages(["ko", "fr", "zh-Hans", "ja", 3])).toEqual(["ko", "zh-Hans", "ja"]);
+  expect(["ko", "en", "zh-Hans", "zh-Hant", "ja"].every(isResponseLanguage)).toBe(true);
+  expect(["fr", "zh", "zh-TW", "zh-hant", "ja-JP", "", null, 1].some(isResponseLanguage)).toBe(false);
+  expect(knownResponseLanguages(["ko", "fr", "zh-Hans", "zh-Hant", "ja", 3])).toEqual(["ko", "zh-Hans", "zh-Hant", "ja"]);
+  expect(knownResponseLanguages(["ko", "en", "zh-Hans", "ja"])).toEqual(["ko", "en", "zh-Hans", "ja"]);
   expect(knownResponseLanguages(undefined)).toEqual([]);
   expect(resultLanguage({ response_language: "zh-Hans" })).toBe("zh-Hans");
   expect(resultLanguage({ response_language: "fr" })).toBeNull();
   expect(resultLanguage({ response_language: "ja" })).toBe("ja");
+  expect(resultLanguage({ response_language: "zh-Hant" })).toBe("zh-Hant");
 });
 
 it("keeps a Chinese default and a Chinese pending request, and refuses an unlisted language", () => {

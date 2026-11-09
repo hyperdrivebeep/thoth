@@ -29,6 +29,18 @@ const patterns: Record<Exclude<LanguageCode, "ko">, Pattern[]> = {
     [/^접근 범위를 벗어난 자료 (\d+)곳은 사용하지 않았습니다\.$/, m => `${m[1]} 处超出访问范围的资料没有被使用。`],
     [/^원격 종료 확인 상태는 (.+)입니다\.$/, m => `远程终止的确认状态：${m[1]}。`],
   ],
+  "zh-Hant": [
+    [/^연결된 자료(.*)을 읽었습니다\.$/, m => `已讀取${t("activity.sourceFallback")}${m[1]}。`],
+    [/^(.+)을 읽었습니다\.$/, m => `已讀取${m[1]}。`],
+    [/^가설 (\d+)개 중 (\d+)개를 검토했습니다\.$/, m => `已審查 ${m[1]} 個假設中的 ${m[2]} 個。`],
+    [/^지지 관계가 기록된 근거 (\d+)곳을 확인했습니다\.$/, m => `已檢查 ${m[1]} 處記錄了支持關係的證據位置。`],
+    [/^반례 관계가 기록된 근거 (\d+)곳을 확인했습니다\.$/, m => `已檢查 ${m[1]} 處記錄了反面證據關係的證據位置。`],
+    [/^판정이 끝나지 않은 근거 (\d+)곳을 보류했습니다\.$/, m => `已擱置 ${m[1]} 處評估尚未完成的證據位置。`],
+    [/^근거 후보 (\d+)곳이 결과 범위에 연결되었습니다\.$/, m => `${m[1]} 處候選證據已關聯到結果範圍。`],
+    [/^현재성이 달라진 자료 (\d+)곳은 다시 확인해야 합니다\.$/, m => `${m[1]} 處時效性已變化的資料需要重新檢查。`],
+    [/^접근 범위를 벗어난 자료 (\d+)곳은 사용하지 않았습니다\.$/, m => `${m[1]} 處超出存取範圍的資料沒有被使用。`],
+    [/^원격 종료 확인 상태는 (.+)입니다\.$/, m => `遠端終止的確認狀態：${m[1]}。`],
+  ],
   ja: [
     [/^연결된 자료(.*)을 읽었습니다\.$/, m => `${t("activity.sourceFallback")}${m[1]}を読み込みました。`],
     [/^(.+)을 읽었습니다\.$/, m => `${m[1]}を読み込みました。`],
@@ -70,6 +82,12 @@ const actionLabels: Record<Exclude<LanguageCode, "ko">, Record<string, string>> 
     adopt_counter: "采纳反面证据", run: "执行行动", call_model: "模型调用", retry: "重试",
     cancel: "取消", hold: "暂缓", stage_complete: "研究阶段",
   },
+  "zh-Hant": {
+    search: "搜尋資料", open: "開啟資料", fetch: "獲取資料", parse: "解析內容", read: "讀取資料",
+    screen: "審查相關性", select_candidate: "選出候選證據", adopt_support: "採納支援證據",
+    adopt_counter: "採納反面證據", run: "執行行動", call_model: "模型呼叫", retry: "重試",
+    cancel: "取消", hold: "暫緩", stage_complete: "研究階段",
+  },
   ja: {
     search: "資料を検索", open: "資料を開く", fetch: "資料を取得", parse: "内容を解析", read: "資料を読み込む",
     screen: "関連性をレビュー", select_candidate: "根拠の候補を選ぶ", adopt_support: "裏づける根拠を採用",
@@ -77,7 +95,7 @@ const actionLabels: Record<Exclude<LanguageCode, "ko">, Record<string, string>> 
     cancel: "キャンセル", hold: "保留", stage_complete: "調査の段階",
   },
 };
-const researchActivity: Record<Exclude<LanguageCode, "ko">, string> = { en: "Research activity", "zh-Hans": "研究活动", ja: "調査の活動" };
+const researchActivity: Record<Exclude<LanguageCode, "ko">, string> = { en: "Research activity", "zh-Hans": "研究活动", "zh-Hant": "研究活動", ja: "調査の活動" };
 
 /** The label of an activity action in a language other than Korean (Korean shows the server's own wording). */
 export function activityActionLabel(action: string): string {

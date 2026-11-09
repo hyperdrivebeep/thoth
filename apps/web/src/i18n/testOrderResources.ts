@@ -54,6 +54,16 @@ const chinese: Record<keyof typeof korean, { test: string; action: string; hint:
   RESULT_RECORDED: { test: "已记录结果的测试", action: "已记录结果的行动", hint: "这些测试已经做过，不再作为下一步要做的测试推荐。" },
   HYPOTHESIS_ELIMINATED: { test: "已排除假设的测试", action: "已排除假设的行动", hint: "多次测试结果已将这些假设排除。候选数量中已不计入它们，但记录仍然保留。" },
 };
+
+const traditional: Record<keyof typeof korean, { test: string; action: string; hint: string }> = {
+  READY: { test: "先嚐試的測試", action: "先檢視的行動", hint: "無論結果如何，剩下的可能原因最少的測試排在最前。" },
+  COST_UNKNOWN: { test: "成本未知的測試", action: "成本未知的行動", hint: "按同樣的規則排序，但因為沒有成本估計而單獨列出。不會把成本當作 0。" },
+  NO_DECISION_CHANGE: { test: "無論結果如何後續行動都相同的測試", action: "無論結果如何都相同的行動", hint: "無論出現什麼結果，後續行動都一樣，因此排在後面。" },
+  NOT_EXECUTABLE: { test: "目前無法進行的測試", action: "目前無法進行的行動", hint: "目前無法執行。" },
+  UNCOUNTABLE: { test: "尚無法計算區分程度的測試", action: "按順序檢視的行動", hint: "沒有寫明其他假設在這項測試中會得到什麼結果，因此無法計算區分程度。僅按風險、成本、可逆性的順序排列。" },
+  RESULT_RECORDED: { test: "已記錄結果的測試", action: "已記錄結果的行動", hint: "這些測試已經做過，不再作為下一步要做的測試推薦。" },
+  HYPOTHESIS_ELIMINATED: { test: "已排除假設的測試", action: "已排除假設的行動", hint: "多次測試結果已將這些假設排除。候選數量中已不計入它們，但記錄仍然保留。" },
+};
 const japanese: Record<keyof typeof korean, { test: string; action: string; hint: string }> = {
   READY: { test: "最初に試すテスト", action: "最初に見る行動", hint: "どの結果になっても、残る原因の候補が最も少なくなるテストから並べました。" },
   COST_UNKNOWN: { test: "コストがまだ分からないテスト", action: "コストがまだ分からない行動", hint: "同じルールで並べましたが、コストの見積もりがないため別に置きました。コストをゼロとは見なしません。" },
@@ -63,4 +73,4 @@ const japanese: Record<keyof typeof korean, { test: string; action: string; hint
   RESULT_RECORDED: { test: "結果をすでに記録したテスト", action: "結果をすでに記録した行動", hint: "すでに行ったテストなので、次に行うテストとしては出しません。" },
   HYPOTHESIS_ELIMINATED: { test: "除外された仮説のテスト", action: "除外された仮説の行動", hint: "テスト結果の繰り返しにより、これらの仮説は除外されました。候補の数からは外しましたが、記録は残っています。" },
 };
-export const testOrderTitles = bilingualRecord(korean, english, chinese, japanese);
+export const testOrderTitles = bilingualRecord(korean, english, chinese, traditional, japanese);
