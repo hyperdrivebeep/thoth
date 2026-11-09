@@ -49,8 +49,14 @@ function CutOffActions({ view, result, historySelection, onDetail, onRetry, onRe
   </>;
 }
 
+/** The project's automatic retry is off: say so next to a cut-off model call, with the way to the setting. */
+function AutoRetryOffNotice({ onOpenSettings }: { onOpenSettings?: () => void }) {
+  return <div role="status"><p>{t("result.autoRetryOff")}</p>
+    {onOpenSettings && <Button small minimal icon="settings" onClick={onOpenSettings}>{t("result.autoRetryOpenSettings")}</Button>}</div>;
+}
+
 /** Why a research run did not finish its bounded scope, and what the user can do with what was saved. */
-export function ResultInterruptionNotice({ unavailable, hasSavedResult, ...props }: CutOffProps & { unavailable?: string; hasSavedResult: boolean }) {
+export function ResultInterruptionNotice({ unavailable, hasSavedResult, autoRetryOff = false, onOpenSettings, ...props }: CutOffProps & { unavailable?: string; hasSavedResult: boolean; autoRetryOff?: boolean; onOpenSettings?: () => void }) {
   const { view } = props;
   if (unavailable) return null;
   if (view.groundingHold) return <GroundingHoldNotice hasSavedResult={hasSavedResult}/>;
@@ -62,6 +68,7 @@ export function ResultInterruptionNotice({ unavailable, hasSavedResult, ...props
   return <div className="result-notice" role="alert"><p>{t(view.savedBeforeCut ? "result.savedBeforeCut" : "result.incomplete")}</p>
     {interruptionReasons(view).map(line => <p key={line}>{line}</p>)}
     <CutOffActions {...props}/>
+    {autoRetryOff && (view.cutOffKind !== null || view.savedBeforeCut) && <AutoRetryOffNotice onOpenSettings={onOpenSettings}/>}
     {view.content && <strong>{t("result.beforeFailure")}</strong>}
   </div>;
 }

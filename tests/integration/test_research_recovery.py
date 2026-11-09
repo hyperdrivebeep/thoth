@@ -7,6 +7,13 @@ from tests.integration.test_research_request_v2 import ControlledResearchModel, 
 
 from thoth.apps.runtime import AppRuntime, create_runtime
 
+# Each wait in the pause/resume test ends on a signal (the model started, the bus drained). The
+# limit only ends a hang. Measured in eight runs while eight other test processes kept the
+# machine busy, the steps usually took 0.3 to 0.4 s, 0.15 to 0.3 s and 1.2 to 1.9 s, but one run
+# took 9.1 s to pause and 12.5 s to resume: that run would have failed on the earlier limits of
+# 8 s and 10 s although nothing was wrong.
+HANG_LIMIT = 60
+
 
 def operation_state(runtime: AppRuntime, operation_id: str) -> str:
     operation = runtime.bus.read_operation(operation_id)
@@ -28,16 +35,16 @@ async def test_pause_is_nonterminal_and_resume_dispatches_same_operation(tmp_pat
                 )
             )
         )
-        await asyncio.wait_for(model.started.wait(), 4)
+        await asyncio.wait_for(model.started.wait(), HANG_LIMIT)
         scope: dict[str, object] = {"project_id": "p", "thread_id": accepted["thread_id"]}
         value(await runtime.bus.dispatch(request("thread/pause", "pause", scope)))
         model.release.set()
-        await asyncio.wait_for(runtime.bus.drain(), 8)
+        await asyncio.wait_for(runtime.bus.drain(), HANG_LIMIT)
         state = value(await runtime.bus.dispatch(request("thread/read", "paused", scope)))
         assert state["execution_state"] == "PAUSED", state
         assert operation_state(runtime, accepted["operation_id"]) == "RUNNING"
         value(await runtime.bus.dispatch(request("thread/resume", "resume", scope)))
-        await asyncio.wait_for(runtime.bus.drain(), 10)
+        await asyncio.wait_for(runtime.bus.drain(), HANG_LIMIT)
         assert operation_state(runtime, accepted["operation_id"]) == "SUCCEEDED"
     finally:
         runtime.close()

@@ -39,6 +39,8 @@ export const researchZhHant: ColumnOf<typeof researchMessages> = {
   "result.internalFailed": "研究處理失敗。",
   "result.remoteUnknown": "不清楚遠端模型是否已經停止。不會自動重新開始。",
   "result.stalled": "答案已儲存，但在最後確認前連線中斷了。模型那邊可能仍在繼續處理。",
+  "result.autoRetryOff": "被中斷的模型呼叫的自動重試已關閉。",
+  "result.autoRetryOpenSettings": "開啟設定",
   "result.incompleteResponse": "模型端出錯，處理已結束。",
   "result.beforeInterruption": "中斷前的 AI 審查摘要（僅檢查了引用位置）",
   "result.retryQuestion": "再次研究同一個問題",

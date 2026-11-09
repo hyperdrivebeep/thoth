@@ -3,8 +3,9 @@
 from collections.abc import Callable
 from typing import Literal
 
-from sqlalchemy import Engine, delete, select, update
+from sqlalchemy import Connection, Engine, delete, select, update
 from sqlalchemy.dialects.sqlite import insert
+from sqlalchemy.engine import RowMapping
 
 from thoth.adapters.storage import embedding_source as source
 from thoth.adapters.storage.embedding_schema import (
@@ -119,12 +120,7 @@ class SqliteEmbeddingIndex:
             return identifier
 
     @staticmethod
-    def _job(row: object) -> EmbeddingJob:
-        from typing import cast
-
-        from sqlalchemy.engine import RowMapping
-
-        r = cast(RowMapping, row)
+    def _job(r: RowMapping) -> EmbeddingJob:
         return EmbeddingJob.model_validate(
             {
                 "job_id": r["job_id"],
@@ -155,14 +151,9 @@ class SqliteEmbeddingIndex:
                 ).mappings()
             )
 
-    def _current(self, c: object, project: str, job_id: str) -> EmbeddingJob:
-        from typing import cast
-
-        from sqlalchemy import Connection
-
+    def _current(self, c: Connection, project: str, job_id: str) -> EmbeddingJob:
         row = (
-            cast(Connection, c)
-            .execute(
+            c.execute(
                 select(embedding_jobs).where(
                     embedding_jobs.c.project_id == project, embedding_jobs.c.job_id == job_id
                 )
@@ -200,14 +191,9 @@ class SqliteEmbeddingIndex:
             )
             return self._current(c, project, job_id)
 
-    def _lease(self, c: object, job: EmbeddingJob, now_ms: int) -> None:
-        from typing import cast
-
-        from sqlalchemy import Connection
-
+    def _lease(self, c: Connection, job: EmbeddingJob, now_ms: int) -> None:
         current = (
-            cast(Connection, c)
-            .execute(
+            c.execute(
                 select(
                     embedding_jobs.c.state,
                     embedding_jobs.c.generation,
@@ -236,7 +222,7 @@ class SqliteEmbeddingIndex:
             or now_ms >= current["deadline_ms"]
         ):
             raise EmbeddingIndexError("EMBEDDING_LEASE_EXPIRED")
-        if not source.header_matches(cast(Connection, c), job.intent):
+        if not source.header_matches(c, job.intent):
             raise EmbeddingIndexError("EMBEDDING_SOURCE_CHANGED")
 
     def checkpoint(
@@ -298,14 +284,9 @@ class SqliteEmbeddingIndex:
             return self._vector(c, project, content_key(text_sha, config.model, window))
 
     @staticmethod
-    def _vector(c: object, project: str, key: str) -> EmbeddingVector | None:
-        from typing import cast
-
-        from sqlalchemy import Connection
-
+    def _vector(c: Connection, project: str, key: str) -> EmbeddingVector | None:
         row = (
-            cast(Connection, c)
-            .execute(
+            c.execute(
                 select(embedding_vectors).where(
                     embedding_vectors.c.project_id == project,
                     embedding_vectors.c.content_key == key,

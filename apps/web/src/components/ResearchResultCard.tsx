@@ -33,7 +33,7 @@ import { ResultHoldDetails } from "./ResultHoldDetails";
  * One research result, read top to bottom: state tags next to the heading, the answer, the detail buttons, then why
  * the answer is in that state (folding), the alternative explanations and the next actions.
  */
-export function ResearchResultCard({ result, state, unavailable, error, failure, terminalReason, onDetail, onRetry, onResume, resumeCompleted, resuming, historySelection, currentness, progressSummary, coverageMatrix, nextUserAction, decisionDelta, usageLine, executionHold, projectId, holdCauseRef, onOpenTrace, hypothesisLinks, linkDistribution, hasSavedResult = false }: {
+export function ResearchResultCard({ result, state, unavailable, error, failure, terminalReason, onDetail, onRetry, onResume, resumeCompleted, resuming, historySelection, currentness, progressSummary, coverageMatrix, nextUserAction, decisionDelta, usageLine, executionHold, projectId, holdCauseRef, onOpenTrace, hypothesisLinks, linkDistribution, hasSavedResult = false, autoRetryOff, onOpenSettings }: {
   result: Record<string, unknown> | null; state: string; unavailable?: string; error?:ExecutionError | null; failure?:ResearchFailure | null; terminalReason?:string | null; onDetail: (detail: ResearchDetail) => void; onRetry?: () => void;
   /** Continue the interrupted run from where it stopped; only offered with the number of stages it had finished. */
   onResume?: () => void; resumeCompleted?: number; resuming?: boolean; historySelection?: HistorySelection; currentness?: Currentness;
@@ -45,6 +45,8 @@ export function ResearchResultCard({ result, state, unavailable, error, failure,
   /** Which of this answer's hypotheses came from a trace row and whether that row's verdict has changed since. */
   hypothesisLinks?: HypothesisLink[]; linkDistribution?: ReasonDistribution;
   hasSavedResult?: boolean;
+  /** The project's automatic retry of an interrupted model call is off (read by the timeline, which has the query client). */
+  autoRetryOff?: boolean; onOpenSettings?: () => void;
 }) {
   useTranslation();
   const languageCheck = objectValue(result?.hypothesis_language_check);
@@ -58,7 +60,7 @@ export function ResearchResultCard({ result, state, unavailable, error, failure,
   const cite = (spanId: string, citations: Record<string, number>) => onDetail({ kind: "evidence", result: result ?? {}, historySelection, focusSpanId: spanId, citations });
   return <ResponseLanguageContext.Provider value={resultLanguage(result)}><article className="assistant-message">
     <header>THOTH{shown && result && <ResultStatusStrip result={result} coverage={coverageMatrix}/>}</header>
-    <ResultInterruptionNotice view={view} result={result} unavailable={unavailable} hasSavedResult={hasSavedResult} historySelection={historySelection}
+    <ResultInterruptionNotice view={view} result={result} unavailable={unavailable} hasSavedResult={hasSavedResult} historySelection={historySelection} autoRetryOff={autoRetryOff} onOpenSettings={onOpenSettings}
       onDetail={onDetail} onRetry={onRetry} onResume={onResume} resumeCompleted={resumeCompleted} resuming={resuming}/>
     {content && !unavailable && (currentness && currentness.state !== "CURRENT" ? <p className="result-notice">{currentnessLabel(currentness)}{" "}{t("labels.pastAnswer")}{currentnessReasonNote(currentness) && ` ${currentnessReasonNote(currentness)}.`}</p>
       : state === "STALE" && <p className="result-notice">{t("result.stale")}</p>)}

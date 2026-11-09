@@ -39,6 +39,8 @@ export const researchJa: ColumnOf<typeof researchMessages> = {
   "result.internalFailed": "調査の処理に失敗しました。",
   "result.remoteUnknown": "リモートのモデルが停止したかどうかは不明です。自動では再開しません。",
   "result.stalled": "答えは保存されましたが、最後の確認の前に接続が切れました。モデル側では処理が続いていた可能性があります。",
+  "result.autoRetryOff": "中断されたモデル呼び出しの自動再試行はオフになっています。",
+  "result.autoRetryOpenSettings": "設定を開く",
   "result.incompleteResponse": "モデル側のエラーで終了しました。",
   "result.beforeInterruption": "中断前の AI レビュー要約（引用位置のみ確認）",
   "result.retryQuestion": "同じ質問をもう一度調べる",

@@ -73,7 +73,7 @@ it("keeps the saved answer with a stale-read warning after window refocus fails 
   expect(container.textContent).toContain("저장된 답변 1");
   expect(container.textContent).not.toContain("연구를 완료하지 못했습니다");
   // only reads; the marks for hypotheses that came from a trace row and the synthetic-data line (a trace read) are more read-only queries
-  expect(vi.mocked(rpc).mock.calls.every(([method]) => ["thread/activity/list", "operation/result/read", "hypothesis/link/list", "trace/read"].includes(method))).toBe(true);
+  expect(vi.mocked(rpc).mock.calls.every(([method]) => ["thread/activity/list", "operation/result/read", "hypothesis/link/list", "trace/read", "model/callSettings/read"].includes(method))).toBe(true);
   await returnToWindow("success");
   await settle(() => !container.textContent?.includes("최신 상태는 확인되지 않았습니다"));
   expect(container.textContent).toContain("저장된 답변 1");

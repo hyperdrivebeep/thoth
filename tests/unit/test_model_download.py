@@ -11,6 +11,12 @@ from tests.embedding_fixtures import sample_assets
 from thoth.adapters.embeddings.download import FixedModelDownload
 from thoth.domain.model_asset import ModelAssetDownloadGrant, ModelAssetError
 
+# The install deadline in these tests only bounds a hang. Every response is synthetic, so an
+# install takes milliseconds on an idle machine, but the file hashing and copying run in
+# threads: on a machine busy with other test processes, 5 s was sometimes not enough and the
+# install raised TimeoutError. The one test that wants the deadline to fire uses its own 0.1 s.
+INSTALL_WINDOW = 60
+
 
 class Bytes(httpx.AsyncByteStream):
     def __init__(self, data: bytes, stall: bool = False):
@@ -47,7 +53,7 @@ async def test_mock_download_verifies_bytes_and_fixed_url(tmp_path: Path):
     progress: list[tuple[str, int]] = []
     result = await downloader.install(
         grant(assets.manifest.digest),
-        deadline=time.monotonic() + 5,
+        deadline=time.monotonic() + INSTALL_WINDOW,
         progress=lambda state, count: progress.append((state, count)),
         check_authority=lambda: None,
     )
@@ -100,7 +106,7 @@ async def test_redirect_denied_before_second_request(tmp_path: Path, destination
     with pytest.raises(ModelAssetError, match="DESTINATION_DENIED"):
         await downloader.install(
             grant(assets.manifest.digest),
-            deadline=time.monotonic() + 5,
+            deadline=time.monotonic() + INSTALL_WINDOW,
             progress=lambda _state, _count: None,
             check_authority=lambda: None,
         )
@@ -140,7 +146,7 @@ async def test_redirect_to_a_hugging_face_cdn_name_installs(tmp_path: Path, cdn:
     downloader = FixedModelDownload(assets, httpx.MockTransport(transport))
     result = await downloader.install(
         grant(assets.manifest.digest),
-        deadline=time.monotonic() + 5,
+        deadline=time.monotonic() + INSTALL_WINDOW,
         progress=lambda _state, _count: None,
         check_authority=lambda: None,
     )
@@ -167,7 +173,7 @@ async def test_a_second_cdn_name_inside_one_file_is_denied(tmp_path: Path):
     with pytest.raises(ModelAssetError, match="DESTINATION_DENIED"):
         await downloader.install(
             grant(assets.manifest.digest),
-            deadline=time.monotonic() + 5,
+            deadline=time.monotonic() + INSTALL_WINDOW,
             progress=lambda _state, _count: None,
             check_authority=lambda: None,
         )
@@ -213,7 +219,7 @@ async def test_corrupt_bytes_never_published(
     with pytest.raises(ModelAssetError, match="HASH_MISMATCH"):
         await downloader.install(
             grant(assets.manifest.digest),
-            deadline=time.monotonic() + 5,
+            deadline=time.monotonic() + INSTALL_WINDOW,
             progress=lambda _state, _count: None,
             check_authority=lambda: None,
         )

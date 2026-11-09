@@ -18,6 +18,7 @@ import { ResearchResultCard, type ResearchDetail } from "./ResearchResultCard";
 import { ResearchLiveProgress } from "./ResearchLiveProgress";
 import { resultUsageLine } from "./resultUsage";
 import { useHypothesisLinks } from "./useHypothesisLinks";
+import { useAutoRetryOff } from "./useAutoRetryOff";
 import { SyntheticDataNotice } from "./SyntheticDataNotice";
 import { ConversationTurnView, QuestionBubble } from "./ConversationTurnView";
 import { collectTurns, savedBeforeSet, turnTally } from "./timelineTurns";
@@ -32,11 +33,16 @@ type TimelineProps = {
   onResume?: (operationId: string) => void;
   resuming?: boolean;
   onOpenHistory?: () => void;
+  /** Open the project's Settings page (where automatic retry is switched). */
+  onOpenSettings?: () => void;
   /** Back to the trace row an investigation started from. */
   onOpenTrace?: (row: { kind: string; id: string }) => void;
   /** Shown under the empty-thread greeting: what the project offers before the first question. */
   emptyNotice?: ReactNode;
 };
+
+/** What a result card needs to say that automatic retry is off. */
+type RetryNotice = { autoRetryOff: boolean; onOpenSettings?: () => void };
 
 /** The follow-up fields of the live status belong to exactly one request revision. */
 function followupFor(liveStatus: ResearchStatus | undefined, requestDigest?: string) {
@@ -75,7 +81,8 @@ function currentCardProps(liveStatus: ResearchStatus | undefined, projectId: str
 }
 
 /** The current request: its question (when no saved turn carries it yet), live progress, and the card of what it produced. */
-function CurrentTurn({ projectId, threadId, liveStatus, liveSources, example, question, running, onDetail, onRetry, onResume, resuming, queuedInstruction, onOpenTrace, linked }: {
+function CurrentTurn({ projectId, threadId, liveStatus, liveSources, example, question, running, onDetail, onRetry, onResume, resuming, queuedInstruction, onOpenTrace, linked, retry }: {
+  retry: RetryNotice;
   projectId: string; threadId: string; liveStatus?: ResearchStatus; liveSources?: string[]; example: boolean; question?: string; running: boolean;
   onDetail: TimelineProps["onDetail"]; onRetry?: TimelineProps["onRetry"]; onResume?: TimelineProps["onResume"]; resuming: boolean; queuedInstruction: boolean;
   onOpenTrace?: TimelineProps["onOpenTrace"]; linked: ReturnType<typeof useHypothesisLinks>;
@@ -86,27 +93,29 @@ function CurrentTurn({ projectId, threadId, liveStatus, liveSources, example, qu
     {question && <QuestionBubble heading={message("questionExample", example)} time={example ? TIMELINE_EXAMPLE_ASKED_AT : null} text={question}/>}
     <ResearchLiveProgress status={liveStatus} sourceUris={liveSources} />
     {queuedInstruction && <Callout compact icon="time" className="queued-instruction-notice" role="status">{t("timeline.queued")}</Callout>}
-    {!running && <ResearchResultCard {...currentCardProps(liveStatus, projectId, threadId)} onOpenTrace={onOpenTrace} hypothesisLinks={linked.links} linkDistribution={linked.distribution} projectId={projectId} onDetail={onDetail}
+    {!running && <ResearchResultCard {...currentCardProps(liveStatus, projectId, threadId)} {...retry} onOpenTrace={onOpenTrace} hypothesisLinks={linked.links} linkDistribution={linked.distribution} projectId={projectId} onDetail={onDetail}
       onRetry={onRetry && authored ? () => onRetry(authored) : undefined}
       onResume={onResume && resumeOperation ? () => onResume(resumeOperation) : undefined} resuming={resuming}/>}
   </div>;
 }
 
 /** A saved turn's full result card, with the live follow-up fields when they belong to this request. */
-function SavedTurnCard({ turn, projectId, threadId, status, liveStatus, savedBefore, onDetail, onRetry, onOpenTrace, linked }: {
+function SavedTurnCard({ turn, projectId, threadId, status, liveStatus, savedBefore, onDetail, onRetry, onOpenTrace, linked, retry }: {
+  retry: RetryNotice;
   turn: ConversationTurn; projectId: string; threadId: string; status?: ResearchStatus; liveStatus?: ResearchStatus; savedBefore: Set<string>;
   onDetail: TimelineProps["onDetail"]; onRetry?: TimelineProps["onRetry"]; onOpenTrace?: TimelineProps["onOpenTrace"]; linked: ReturnType<typeof useHypothesisLinks>;
 }) {
   const requestDigest = turn.input.request_revision_digest;
-  return <ResearchResultCard onOpenTrace={onOpenTrace} projectId={projectId} hypothesisLinks={linked.links} linkDistribution={linked.distribution} result={turn.result} state={turn.state} unavailable={turn.unavailable} error={turn.error} failure={turn.failure} terminalReason={turn.terminalReason} onDetail={onDetail} onRetry={onRetry ? () => onRetry(turn.input.text) : undefined} usageLine={resultUsageLine(liveStatus, turn.input.operation_id)}
+  return <ResearchResultCard {...retry} onOpenTrace={onOpenTrace} projectId={projectId} hypothesisLinks={linked.links} linkDistribution={linked.distribution} result={turn.result} state={turn.state} unavailable={turn.unavailable} error={turn.error} failure={turn.failure} terminalReason={turn.terminalReason} onDetail={onDetail} onRetry={onRetry ? () => onRetry(turn.input.text) : undefined} usageLine={resultUsageLine(liveStatus, turn.input.operation_id)}
     hasSavedResult={savedBefore.has(requestDigest) || Boolean(liveStatus?.request?.operation_id === turn.input.operation_id && liveStatus.previous_result)}
     currentness={turn.currentness} historySelection={{ kind: "result", scope: { projectId, threadId, requestDigest }, operationId: turn.input.operation_id,
       resultDigest: currentResultDigest(status, { projectId, threadId, requestDigest }, turn.input.operation_id) }} {...followupFor(liveStatus, requestDigest)}/>;
 }
 
 export function ConversationTimeline(props: TimelineProps) {
-  const { projectId, threadId, status, sourceUris, onDetail, onContinue, onOpenHistory, onOpenTrace, onRetry, onResume, resuming = false, queuedInstruction = false, emptyNotice } = props;
+  const { projectId, threadId, status, sourceUris, onDetail, onContinue, onOpenHistory, onOpenTrace, onOpenSettings, onRetry, onResume, resuming = false, queuedInstruction = false, emptyNotice } = props;
   const example = isTimelineExampleRequested();
+  const retry: RetryNotice = { autoRetryOff: useAutoRetryOff(projectId, !example), onOpenSettings };
   const liveStatus = example ? timelineExampleStatus : status;
   const liveSources = example ? TIMELINE_EXAMPLE_SOURCES : sourceUris;
   const protection = useConversationReadProtection(projectId, threadId);
@@ -145,11 +154,11 @@ export function ConversationTimeline(props: TimelineProps) {
     {query.error && <Callout intent="warning" role="alert">{query.data ? t("timeline.refreshFailed") : t("timeline.loadFailedSpace")}<Button small onClick={() => void query.refetch()}>{t("workspace.reload")}</Button></Callout>}
     {query.data?.pages.some(page => page.limited) && <Callout compact>{t("timeline.limited")}</Callout>}
     {turns.map((turn, index) => <ConversationTurnView key={turn.input.request_revision_digest} turn={turn} index={index + 1} expanded={index === openIndex} onRetry={onRetry ? () => onRetry(turn.input.text) : undefined}>
-      <SavedTurnCard turn={turn} projectId={projectId} threadId={threadId} status={status} liveStatus={liveStatus} savedBefore={savedBefore} onDetail={onDetail} onRetry={onRetry} onOpenTrace={onOpenTrace} linked={linked}/>
+      <SavedTurnCard turn={turn} projectId={projectId} threadId={threadId} status={status} liveStatus={liveStatus} savedBefore={savedBefore} onDetail={onDetail} onRetry={onRetry} onOpenTrace={onOpenTrace} linked={linked} retry={retry}/>
     </ConversationTurnView>)}
     {unavailableHistory && <Callout compact>{t("timeline.unsupported")}</Callout>}
     {(currentQuestion || running) && <CurrentTurn projectId={projectId} threadId={threadId} liveStatus={liveStatus} liveSources={liveSources} example={example} question={currentQuestion} running={running}
-      onDetail={onDetail} onRetry={onRetry} onResume={onResume} resuming={resuming} queuedInstruction={queuedInstruction} onOpenTrace={onOpenTrace} linked={linked}/>}
+      onDetail={onDetail} onRetry={onRetry} onResume={onResume} resuming={resuming} queuedInstruction={queuedInstruction} onOpenTrace={onOpenTrace} linked={linked} retry={retry}/>}
     {emptyExistingThread && <div className="conversation-empty legacy-thread-empty"><Icon icon="chat" size={36}/><h1>{t("timeline.unavailable")}</h1><p>{t("timeline.recoverAdvice")}</p><div className="legacy-thread-actions"><Button intent="primary" icon="edit" onClick={onContinue}>{t("timeline.newQuestion")}</Button><Button icon="history" onClick={onOpenHistory}>{t("timeline.openHistory")}</Button></div></div>}
     {!threadId && turns.length === 0 && !currentQuestion && !running && <div className="conversation-empty"><span>THOTH</span><h1>{t("timeline.emptyTitle")}</h1><p>{t("timeline.emptyNotice")}</p>{emptyNotice}</div>}
     {query.isPending && threadId && !example && <p className="muted" role="status">{t("timeline.loading")}</p>}
