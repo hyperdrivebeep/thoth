@@ -32,7 +32,10 @@ class RetrievalRoutingPolicy(DomainModel):
     version: Literal["5.0.0"] = "5.0.0"
     max_spans: int = Field(default=160, ge=1, le=160)
     character_budget: int = Field(default=50000, ge=1, le=50000)
-    exposure: Literal["SHADOW_ONLY"] = "SHADOW_ONLY"
+    # SHADOW_ONLY is the only value an artifact or an exposure can carry. PROJECT_OPT_IN is made
+    # only by the snapshot service for a project that switched local retrieval on and whose index
+    # is ready; the routing handler refuses it in artifact content, so no candidate can ask for it.
+    exposure: Literal["SHADOW_ONLY", "PROJECT_OPT_IN"] = "SHADOW_ONLY"
     routing: Literal["ELIGIBLE_ARTIFACT_COUNT"] = "ELIGIBLE_ARTIFACT_COUNT"
     model: DenseModelPin = DenseModelPin()
     fusion: FusionMethodSpec = FusionMethodSpec(method_id="RRF", k=60)

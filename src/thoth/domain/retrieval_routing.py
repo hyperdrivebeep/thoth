@@ -14,7 +14,35 @@ from thoth.domain.retrieval_fusion import FusedChunk, admit_chunks, reciprocal_r
 from thoth.domain.retrieval_routing_policy import RetrievalRoutingPolicy
 
 if TYPE_CHECKING:
+    from thoth.domain.evidence import EvidenceSpan
     from thoth.domain.retrieval_lane import LaneSelection, RetrievalRequest
+
+
+def _lexical_fallback(
+    request: "RetrievalRequest", policy: RetrievalRoutingPolicy, count: int, reason: str
+) -> "LaneSelection":
+    """The lexical selection of a project whose dense scores cannot be used, with the reason."""
+    from thoth.domain.behavior_policy import RetrievalBehaviorPolicy
+    from thoth.domain.retrieval_lane import select_retrieval_context
+
+    selected = select_retrieval_context(
+        request,
+        RetrievalBehaviorPolicy(
+            max_spans=policy.max_spans, character_budget=policy.character_budget
+        ),
+    )
+    return replace(
+        selected,
+        routing=RoutingObservation(
+            artifact_count=count,
+            route="LEXICAL",
+            dense_used=False,
+            fallback_reason=reason,
+            dense_material_digest=None
+            if request.dense is None
+            else dense_material_digest(request.dense),
+        ),
+    )
 
 
 def select_routed(request: "RetrievalRequest", policy: RetrievalRoutingPolicy) -> "LaneSelection":
@@ -57,12 +85,24 @@ def select_routed(request: "RetrievalRequest", policy: RetrievalRoutingPolicy) -
                 artifact_count=count, route="FULL_CATALOG", dense_used=False
             ),
         )
-    lanes = [LANES[name](request, eligible) for name in ("LEXICAL_SUBSTRING_V1", "GROUPED_BM25")]
+    opt_in = policy.exposure == "PROJECT_OPT_IN"
+    dense: tuple[EvidenceSpan, ...] | None = None
     fallback = None
-    try:
-        lanes.append(LANES["DENSE"](request, eligible))
-    except DenseUnavailable as exc:
-        fallback = str(exc)
+    if opt_in:
+        # A project that switched local retrieval on gets a different result only when dense scores
+        # were actually used. Without them the selection is the unchanged lexical one.
+        try:
+            dense = LANES["DENSE"](request, eligible)
+        except DenseUnavailable as exc:
+            return _lexical_fallback(request, policy, count, str(exc))
+    lanes = [LANES[name](request, eligible) for name in ("LEXICAL_SUBSTRING_V1", "GROUPED_BM25")]
+    if dense is not None:
+        lanes.append(dense)
+    elif not opt_in:
+        try:
+            lanes.append(LANES["DENSE"](request, eligible))
+        except DenseUnavailable as exc:
+            fallback = str(exc)
     pinned = set(request.pinned_refs)
     selected = [s for s in eligible if s.span_id in pinned][: policy.max_spans]
     by_id = {s.span_id: s for s in eligible}

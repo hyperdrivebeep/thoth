@@ -1,12 +1,18 @@
 """Resolve immutable executable baseline content without treating legacy pointers as approval."""
 
+from collections.abc import Callable
+
 from thoth.domain.behavior_artifact import BehaviorArtifactKind
 from thoth.domain.behavior_execution import (
     ActiveBehaviorSnapshot,
     BehaviorExecutionRecord,
     BehaviorSelection,
 )
-from thoth.domain.behavior_policy import BehaviorPolicyError
+from thoth.domain.behavior_policy import (
+    BehaviorPolicyError,
+    RetrievalBehaviorPolicy,
+    RetrievalRoutingPolicy,
+)
 from thoth.domain.canonical import canonical_payload, domain_digest
 from thoth.domain.evaluation_run import sealed_payload
 from thoth.ports.behavior_artifact import BehaviorArtifactStorePort
@@ -23,6 +29,9 @@ class BehaviorSnapshotService:
     ) -> None:
         self._store, self._registry, self._environment = store, registry, environment
         self.control: BehaviorWorkControlPort | None = None
+        # Says whether a project switched local retrieval on and its index is ready. Set once local
+        # retrieval is composed; None (and False) leave every snapshot as the baseline made it.
+        self.retrieval_opt_in: Callable[[str], bool] | None = None
 
     def capture(
         self, project_id: str, thread_id: str | None = None
@@ -33,10 +42,65 @@ class BehaviorSnapshotService:
 
     def prepare_work(self, project: str, thread: str, execution_id: str) -> BehaviorSelection:
         baselines = self.capture(project, thread)
-        return (
+        selection = (
             BehaviorSelection(snapshots=baselines)
             if self.control is None
             else self.control.begin(project, thread, execution_id, baselines)
+        )
+        return self._with_project_opt_in(project, selection)
+
+    def _with_project_opt_in(self, project: str, selection: BehaviorSelection) -> BehaviorSelection:
+        """Give the project its own routing policy in place of the plain baseline, when it opted in.
+
+        Only the retrieval snapshot of this one execution changes, and only when it is still the
+        plain 2.0.0 baseline (a canary, or a baseline the project promoted, is left alone). capture
+        and baseline_snapshot stay what the baseline is, so evaluation compares against it.
+        """
+        current = next(
+            (
+                s
+                for s in selection.snapshots
+                if s.component == BehaviorArtifactKind.RETRIEVAL_POLICY
+            ),
+            None,
+        )
+        if (
+            self.retrieval_opt_in is None
+            or current is None
+            or current.origin not in ("BASELINE", "BUILTIN_DEFAULT")
+            or not isinstance(current.policy, RetrievalBehaviorPolicy)
+        ):
+            return selection
+        try:
+            if not self.retrieval_opt_in(project):
+                return selection
+        except Exception:
+            # Reading the index state must never fail a request: it keeps its baseline.
+            return selection
+        policy = RetrievalRoutingPolicy(
+            max_spans=current.policy.max_spans,
+            character_budget=current.policy.character_budget,
+            exposure="PROJECT_OPT_IN",
+        )
+        data = current.model_dump(mode="python", exclude={"snapshot_digest"})
+        data.update(
+            artifact_ref=None,
+            content_digest=domain_digest(
+                "BEHAVIOR_ARTIFACT_CONTENT",
+                "1.0.0",
+                canonical_payload(policy.model_dump(mode="python")),
+            ),
+            policy=policy,
+            origin="PROJECT_OPT_IN",
+            exposure_ref=None,
+            reason_code="LOCAL_RETRIEVAL_ENABLED",
+        )
+        replaced = ActiveBehaviorSnapshot.model_validate(
+            sealed_payload("ACTIVE_BEHAVIOR_SNAPSHOT", "snapshot_digest", data)
+        )
+        return BehaviorSelection(
+            snapshots=tuple(replaced if s is current else s for s in selection.snapshots),
+            shadows=selection.shadows,
         )
 
     def baseline_snapshot(

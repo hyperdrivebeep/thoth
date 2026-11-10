@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-09T17:16:32.559923+00:00",
+  "created_at": "2026-11-09T21:33:55.955481+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -58,13 +58,13 @@
     },
     {
       "path": "README.ko.md",
-      "sha256": "ae75de36f1bd88738985cfacba3e7b26420870d13d73db921fb44b4c5433fc65",
-      "bytes": 18260
+      "sha256": "18874a1149681d60660b0d448e814db4c2c3a719eb076f75abf744a8b9357cb7",
+      "bytes": 18389
     },
     {
       "path": "README.md",
-      "sha256": "7e7b429301ed11c4af0800732dbf48f9f104b5125be0225bf00c76cffe8ca542",
-      "bytes": 16305
+      "sha256": "c240594ac8ee35cfaf8b2692f4eabbcc77ed45c4a0292eada05eda3c5f5e89d6",
+      "bytes": 16410
     },
     {
       "path": "SECURITY.md",
@@ -1978,8 +1978,8 @@
     },
     {
       "path": "apps/web/src/i18n/ja/localRetrievalMessagesJa.ts",
-      "sha256": "830abc16e84d8e3e8e6b00bebd7f1166708a6c08adae25529a92ee5fa4814125",
-      "bytes": 12912
+      "sha256": "fafce4bb046c21b94bdd5bc948cbb25c05f64faa6b2770985a0197d4f87b7c4c",
+      "bytes": 13296
     },
     {
       "path": "apps/web/src/i18n/ja/modelHelpMessagesJa.ts",
@@ -2067,9 +2067,14 @@
       "bytes": 2591
     },
     {
+      "path": "apps/web/src/i18n/localRetrievalClaims.test.ts",
+      "sha256": "85b8b086fc03306a391b21b197f335ca9786b9bb6c3288e2a6e831a7d6453e07",
+      "bytes": 2100
+    },
+    {
       "path": "apps/web/src/i18n/localRetrievalMessages.ts",
-      "sha256": "be22aeb558f184253ddbdc089a4cb9eccb8f66f4d44f6da7de354c33fbe456ec",
-      "bytes": 21720
+      "sha256": "143017fb281d98085afe03fed5c6ca75030fa61a2d6d1668eaf003cae5b34e0b",
+      "bytes": 22312
     },
     {
       "path": "apps/web/src/i18n/locale.ts",
@@ -2328,8 +2333,8 @@
     },
     {
       "path": "apps/web/src/i18n/zh/localRetrievalMessagesZh.ts",
-      "sha256": "a7b6c45464ff996f451a3dd06e785297d2ae741b038ca60385946f123cf5f122",
-      "bytes": 9304
+      "sha256": "8914ae798a1db685f32493050ab4570cf42ca01d55effa62e350bdf1118e7604",
+      "bytes": 9541
     },
     {
       "path": "apps/web/src/i18n/zh/modelHelpMessagesZh.ts",
@@ -2463,8 +2468,8 @@
     },
     {
       "path": "apps/web/src/i18n/zhHant/localRetrievalMessagesZhHant.ts",
-      "sha256": "15dc4ed1afd9839f9c271f9582e2952ef7aa9662d14660d5340e6f9ef87fac66",
-      "bytes": 9324
+      "sha256": "715c6c510e4da975c7046471a4375c20e70091759460948ea21d2d598f431d35",
+      "bytes": 9558
     },
     {
       "path": "apps/web/src/i18n/zhHant/modelHelpMessagesZhHant.ts",
@@ -2738,8 +2743,8 @@
     },
     {
       "path": "docs/BETA.md",
-      "sha256": "e45870f4a2c3265a1c947b0159028cf9b4ca7db9296075b3ab57f8dec559e9f5",
-      "bytes": 14287
+      "sha256": "013c3ba767dcead0324cff86fe8132a8a86a15d5864c211cf0157dcf10fc57a3",
+      "bytes": 14405
     },
     {
       "path": "docs/DEPENDENCY_LICENSES.json",
@@ -2793,8 +2798,8 @@
     },
     {
       "path": "docs/architecture/backend-runtime-boundaries.md",
-      "sha256": "67435177969f4b31ba7ebe66d03fc4050efe4c969feefd38036c98285d3401ff",
-      "bytes": 8187
+      "sha256": "3add69b8cc25206a033e891487b01b9bdd0ece118d088ff470399ad7a17392f1",
+      "bytes": 8356
     },
     {
       "path": "docs/architecture/canonical-owner-matrix.md",
@@ -2838,8 +2843,8 @@
     },
     {
       "path": "docs/architecture/local-retrieval-preparation.md",
-      "sha256": "9db587b9bb197ea5f03361c5ef6da39881015bb9c23c5a585b94467b63bdb53c",
-      "bytes": 12219
+      "sha256": "c4e01e0c20c300430d2a47adc35fb90bc59dbb382c6625179a9e33c87672dfce",
+      "bytes": 15011
     },
     {
       "path": "docs/architecture/memory-terms.md",
@@ -2903,8 +2908,8 @@
     },
     {
       "path": "docs/architecture/retrieval-lanes.md",
-      "sha256": "c8453d2519e3f3e7b81c49559545eb5af19ced1c017109927f4380c8334808d1",
-      "bytes": 32564
+      "sha256": "bea2e9d53aed2f7f24b45d6caad19fee02cc64dacecf285bd67413b10b29a0d5",
+      "bytes": 33281
     },
     {
       "path": "docs/architecture/rpc-method-catalog.md",
@@ -4083,8 +4088,8 @@
     },
     {
       "path": "src/thoth/adapters/behavior/registry.py",
-      "sha256": "2149211ed70363c4a1d02ca72b3df59800484bf476ba6b2f3efe1945af6e0a03",
-      "bytes": 12241
+      "sha256": "2becef42a26422b8b8e771ad6ec9bda83e8636b02220156fd9c6ebf1da42048b",
+      "bytes": 12622
     },
     {
       "path": "src/thoth/adapters/behavior_catalog.py",
@@ -5823,8 +5828,8 @@
     },
     {
       "path": "src/thoth/application/services/behavior_context.py",
-      "sha256": "21acec54fda9a84b4f4240d2623c37630c6139d905282ef659d2c1f1a966710a",
-      "bytes": 9087
+      "sha256": "00fd39f1d0b4c1247e2e155df254856538c2e81a223a9f6b69fb8c26169a0998",
+      "bytes": 9300
     },
     {
       "path": "src/thoth/application/services/behavior_exposure_compilation.py",
@@ -5843,8 +5848,8 @@
     },
     {
       "path": "src/thoth/application/services/behavior_snapshot_service.py",
-      "sha256": "94da83ad3172c273405325119e7ccd02adea056fca64bc2180564e1ba70aeba5",
-      "bytes": 5875
+      "sha256": "1e4762a4e20afe9e143923f94b31a2f6147cd6c58d4b472e563056678315dcb0",
+      "bytes": 8539
     },
     {
       "path": "src/thoth/application/services/browser_submission_scope.py",
@@ -5985,6 +5990,11 @@
       "path": "src/thoth/application/services/dense_material.py",
       "sha256": "ad2f44b1c78031396b83be3a5bf1a44c44629a5163d708c5b42a9b0c83b9c467",
       "bytes": 13984
+    },
+    {
+      "path": "src/thoth/application/services/dense_opt_in.py",
+      "sha256": "ef0d0192890f360ed873e26821e1d7c20590125966e3971b5c2606b55f0c4ad3",
+      "bytes": 2096
     },
     {
       "path": "src/thoth/application/services/discrimination_ledger.py",
@@ -7203,8 +7213,8 @@
     },
     {
       "path": "src/thoth/apps/behavior_composition.py",
-      "sha256": "7226d9c4f31e6b9f746e619b1c7372d12ec5a394abe618c5850c0e40da7b2f41",
-      "bytes": 4068
+      "sha256": "cf7a7971183020b5ba3cd98106bf0c01f1f10c0ad183a45be3cec68e2f1d4c1b",
+      "bytes": 4519
     },
     {
       "path": "src/thoth/apps/cli_workspace_composition.py",
@@ -7308,8 +7318,8 @@
     },
     {
       "path": "src/thoth/apps/local_retrieval_composition.py",
-      "sha256": "bfebe7333c578fa6bf87d05b689d60c30c4c5bf4001108441e7b3768282b8273",
-      "bytes": 4400
+      "sha256": "ccf2df4ce7b50a8c7b73fc4128341ed266307067b9fe7d01b9ba3f9b4bf69df0",
+      "bytes": 4363
     },
     {
       "path": "src/thoth/apps/management_routes.py",
@@ -7543,8 +7553,8 @@
     },
     {
       "path": "src/thoth/domain/behavior_execution.py",
-      "sha256": "1b281eaa4c608f61fcf996b4a4919024b7b541e0ae1fb716bbc4666fb9ff10aa",
-      "bytes": 10155
+      "sha256": "107b9fa804553bc32e51d53736de16948532a98264afb4f92535c1e5ffbd5256",
+      "bytes": 10173
     },
     {
       "path": "src/thoth/domain/behavior_policy.py",
@@ -8158,13 +8168,13 @@
     },
     {
       "path": "src/thoth/domain/retrieval_routing.py",
-      "sha256": "2bb4ca59dd4fe934ec868bcba62cc7379d8e0c9750b558cb89fafe577f2b2a01",
-      "bytes": 3693
+      "sha256": "c1ef27d24e97f6a7934eb2208b7153f1bff60c9d6ef3ca18e1ab3bbaa4a13978",
+      "bytes": 5226
     },
     {
       "path": "src/thoth/domain/retrieval_routing_policy.py",
-      "sha256": "e9f2bbcbdf3c8479c60ad01a745632394fcb0c69002968a3cc3836ae293932f4",
-      "bytes": 1727
+      "sha256": "3e76bd7cbd45483cd611f81f5fc5adecadd5dc627ff44c8c163321a476daf07c",
+      "bytes": 2040
     },
     {
       "path": "src/thoth/domain/retrieval_terms.py",
@@ -10020,6 +10030,16 @@
       "path": "tests/integration/test_dense_material_store.py",
       "sha256": "cada646d1249b03219de225be2978fdfcf0be471eafb05502fa7faf264ee7c76",
       "bytes": 3896
+    },
+    {
+      "path": "tests/integration/test_dense_opt_in_normal_entry.py",
+      "sha256": "0adbd8572111da4165097eff16f84cd8221e8cf0ca7452bb011cff46d7253889",
+      "bytes": 4145
+    },
+    {
+      "path": "tests/integration/test_dense_opt_in_ready.py",
+      "sha256": "4b3902b5c7caf537602ded128befb1d6630014f9198f35b683311bdf386abc76",
+      "bytes": 3156
     },
     {
       "path": "tests/integration/test_discovery_cleanup_cancel.py",
@@ -12900,6 +12920,11 @@
       "path": "tests/unit/test_dense_material_resident.py",
       "sha256": "4e72516f19f9b3e3308e088d919ecf05b6603ec19999fcbf39df45068a555301",
       "bytes": 12163
+    },
+    {
+      "path": "tests/unit/test_dense_opt_in.py",
+      "sha256": "44932f3751cb0240c16341e1186b28d02b65ea53424949f50f4457410d8d559a",
+      "bytes": 16150
     },
     {
       "path": "tests/unit/test_docling_locations_characterization.py",
