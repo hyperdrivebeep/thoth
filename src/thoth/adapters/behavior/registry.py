@@ -220,6 +220,13 @@ class RetrievalRoutingHandler(TypedBehaviorHandler):
     def __init__(self) -> None:
         super().__init__(BehaviorArtifactKind.RETRIEVAL_POLICY, RetrievalRoutingPolicy, "5.0.0")
 
+    def compile(self, content: dict[str, object]) -> BehaviorPolicy:
+        policy = super().compile(content)
+        # Only the snapshot service makes a PROJECT_OPT_IN policy; stored content cannot.
+        if isinstance(policy, RetrievalRoutingPolicy) and policy.exposure != "SHADOW_ONLY":
+            raise BehaviorPolicyError("BEHAVIOR_POLICY_INVALID")
+        return policy
+
     def evaluate(
         self, policy: BehaviorPolicy, payload: dict[str, JsonValue]
     ) -> dict[str, JsonValue]:

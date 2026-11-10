@@ -19,7 +19,7 @@ class ActiveBehaviorSnapshot(DomainModel):
     artifact_ref: str | None
     content_digest: Sha256
     policy: BehaviorPolicy
-    origin: Literal["BASELINE", "BUILTIN_DEFAULT", "CANARY", "SHADOW"]
+    origin: Literal["BASELINE", "BUILTIN_DEFAULT", "CANARY", "SHADOW", "PROJECT_OPT_IN"]
     registry_revision: int = Field(ge=0)
     exposure_ref: str | None = None
     ignored_registry_digest: Sha256 | None = None

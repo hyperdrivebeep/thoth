@@ -79,7 +79,9 @@ def select_evidence_for_behavior(
     policy = snapshot.policy
     if not is_retrieval_policy(policy):
         raise BehaviorPolicyError("BEHAVIOR_POLICY_KIND_MISMATCH")
-    if isinstance(policy, RetrievalRoutingPolicy):
+    # This older entry has no dense scores. A project's own routing policy is lexical here, with its
+    # budgets; a routing policy that is only a shadow is still refused.
+    if isinstance(policy, RetrievalRoutingPolicy) and policy.exposure != "PROJECT_OPT_IN":
         raise BehaviorPolicyError("RETRIEVAL_ROUTING_UNSUPPORTED_ENTRY")
     if isinstance(policy, RetrievalCjkPolicy):
         raise BehaviorPolicyError("RETRIEVAL_CJK_UNSUPPORTED_ENTRY")

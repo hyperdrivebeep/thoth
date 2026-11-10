@@ -74,8 +74,9 @@ second question in the other language in the same conversation.
 - **Search experiment is off by default and did not pass.** The experimental retrieval rule that
   uses the local index was tested on a held-out set of 30 cases and failed our promotion criteria
   (it helped when many documents were mixed, but not inside one project's own documents, and it was
-  too slow). So it stays an experiment. Preparing the index does not change how evidence is chosen for
-  your questions.
+  too slow). So it stays an experiment. Switching a project on applies the index to that project's
+  questions only when every source is indexed, and whenever the index scores cannot be used for a
+  question, evidence is chosen as before.
 - **Local retrieval parts are optional.** They need the extra install above and a model download
   of about 124 MB per workspace. A passage longer than 512 tokens is embedded as several
   overlapping windows (at most eight, about 3,200 tokens in all), and a passage scores as its best

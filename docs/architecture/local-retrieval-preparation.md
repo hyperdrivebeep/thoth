@@ -1,8 +1,9 @@
 # Local retrieval preparation
 
 The local settings page prepares fixed model files and a project's derived embedding index.
-This is opt-in and defaults to OFF. Preparation does not select a research retrieval policy,
-activate a shadow or canary, or run a research request.
+This is opt-in and defaults to OFF. Preparation does not activate a shadow or canary or run a
+research request. Switching a project on is also what lets its research use the index: see
+"Applying the index to a project's research" below.
 
 ## Install and import
 
@@ -113,6 +114,41 @@ Interrupted operations are not automatically rerun. Files can be checked indepen
 explicit prepare recovers expired S2 leases and reconciles sources. An old operation receipt
 can remain unresolved after a server crash. Current file/index state does not prove that
 receipt succeeded. Recovery never automatically calls a research model.
+
+## Applying the index to a project's research
+
+A project that switched local retrieval on gets its own retrieval policy for a research request,
+and only while every active source of the project has a current READY index. The check
+(`application/services/dense_opt_in.py`, `ProjectDenseOptIn`) is made for each request: local
+retrieval enabled in the project's configuration, the optional runtime installed, and every ACTIVE
+source binding has a READY job of the current configuration whose source is still current. A project
+that is off, has no index, has an index in progress or failed, has a source that changed after
+indexing or was added after it, or has any source not yet READY, is not applied: it keeps its
+baseline and its journal entries and digests are the ones it had before this existed.
+
+When the check passes, `BehaviorSnapshotService.prepare_work` replaces the retrieval snapshot of
+that one execution, after exposures were selected, with a `RetrievalRoutingPolicy` 5.0.0 whose
+`exposure` is `PROJECT_OPT_IN` and whose origin is `PROJECT_OPT_IN` (reason
+`LOCAL_RETRIEVAL_ENABLED`). `max_spans` and `character_budget` are those of the baseline it replaces.
+The replacement is made only when the selected snapshot is the plain 2.0.0 baseline: an armed
+canary, or a baseline the project promoted, is left as it is. `capture` and `baseline_snapshot`
+never change, so evaluation still compares against the baseline. Only the snapshot service makes a
+`PROJECT_OPT_IN` policy; the routing handler refuses it in stored content, so no artifact or
+exposure can carry it. Switching off, a stale index or a new unindexed source takes effect on the
+next question; a request already running keeps the snapshot it started with, and the execution
+record shows it.
+
+For a project in this state, a question whose dense scores cannot be used (the encoder is not
+running yet, it timed out, the question is too long, the resident copy is over its limit, a source
+of the frame is not in the index, the optional runtime is missing) is answered with the lexical
+selection the baseline would have made, byte for byte, and the routing observation records the
+reason (route `LEXICAL`, `dense_used` false, the `fallback_reason`). The result differs from the
+baseline only for a question whose dense scores were actually used. The older analysis entry has no
+dense scores and treats this policy as the lexical baseline with the same budgets.
+
+Applying the index changes the retrieval snapshot digest, so a stage saved before a project was
+switched on is not reused after it. This experiment did not meet its promotion criteria on a
+held-out set (see `docs/BETA.md`); the project switch is the only way it is applied.
 
 ## Dense scores in the research path
 

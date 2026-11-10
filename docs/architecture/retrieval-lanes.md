@@ -356,13 +356,22 @@ default policy, journal exactly the bytes they journaled before. The dense sourc
 fall-back reasons are described in `local-retrieval-preparation.md`; whatever reason it gives is
 the `fallback_reason` of the routing observation.
 
+A project that switched local retrieval on can have this policy as its own active policy with
+`exposure: PROJECT_OPT_IN` (see `local-retrieval-preparation.md`). That value is not an artifact
+or exposure value: the routing handler refuses it, and the only stages that can carry a 5.0.0
+policy remain SHADOW. For such a policy, when the dense lane is unavailable `select_routed` returns
+the lexical baseline selection (route `LEXICAL`, `fallback_reason` set) instead of RRF(LEX, GB),
+so the project's result changes only where dense scores were used. The one-artifact and
+whole-catalog paths are unchanged.
+
 The evaluation codec carries optional dense material, omitted entirely for earlier cases.
 The evaluator checks its binding but does not certify that a host actually ran a model.
 Only 5.0.0 adds a `routing` output. Runtime journals also record the routing observation and
 material digest; earlier policies preserve their input/output bytes. The dispatcher algorithm
 ID stays version 1: the distinct policy content/version identifies this new rule. The older
-analysis entry cannot execute this route and records a held shadow instead of pretending to
-run it with the old analysis scorer.
+analysis entry cannot execute this route for a shadow and records a held shadow instead of
+pretending to run it with the old analysis scorer; for a `PROJECT_OPT_IN` policy it selects
+lexically with the policy's budgets and records the use.
 
 This first slice provides domain contracts, a local single-text encoder port, evaluation and
 shadow behavior only. It does not provide indexing, workers, model loading, installation or UI.

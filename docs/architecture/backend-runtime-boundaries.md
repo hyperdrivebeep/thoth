@@ -78,7 +78,9 @@ R0-R2 stay reversible/read-only/isolated as defined by policy. R3 uses an exact-
 The embedding index is a project-local, rebuildable projection, never a source of research truth.
 Normal runtime construction has no embedding worker and project indexing defaults to disabled.
 An explicitly injected `BoundedEmbeddingWorkerPort` exposes the managed `embedding_index` service;
-this capability does not change retrieval policy or permit CANARY exposure. Model installation,
+the service itself does not change retrieval policy or permit CANARY exposure. A project that turns
+local retrieval on and whose sources are all indexed uses the routing policy for its own research
+requests (see local-retrieval-preparation.md). Model installation,
 ORT execution and UI activation are separate integration stages.
 
 Source publication stages only an immutable intent in the existing SQLite UoW. This includes

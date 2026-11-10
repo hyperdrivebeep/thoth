@@ -16,8 +16,8 @@ export const localRetrievalMessages = {
     en: "This is available only in a local workspace. Nothing is prepared in a review workspace.",
   },
   "localRetrieval.intro": {
-    ko: "고정된 로컬 모델로 자료를 미리 색인합니다. 기본은 꺼짐이며, 색인이 준비돼도 기존 검색 방식은 그대로입니다.",
-    en: "Indexes sources ahead of time with one fixed local model. Off by default; even when an index is ready, the existing search method stays as it is.",
+    ko: "고정된 로컬 모델로 자료를 미리 색인합니다. 기본은 꺼짐입니다. 켜고 모든 자료의 색인이 준비되면 연구에서 뜻이 비슷한 문단도 함께 찾습니다(실험 기능). 준비되지 않았거나 이번 질문에서 쓸 수 없으면 기존 검색 방식 그대로입니다.",
+    en: "Indexes sources ahead of time with one fixed local model. Off by default. When it is on and every source is indexed, research also looks for passages with a similar meaning (experimental). When the index is not ready, or cannot be used for a question, the existing search method is used as before.",
   },
   "localRetrieval.readFailed": { ko: "상태를 불러오지 못했습니다.", en: "The status could not be loaded." },
   "localRetrieval.unsupported": {
@@ -78,8 +78,8 @@ export const localRetrievalMessages = {
   },
   "localRetrieval.enableLabel": { ko: "이 프로젝트에서 로컬 색인 사용", en: "Use local indexing in this project" },
   "localRetrieval.enableHelp": {
-    ko: "켜도 검색 결과는 바뀌지 않습니다. 색인은 '색인 준비'를 눌러야만 시작됩니다.",
-    en: "Turning this on does not change search results. Indexing starts only when you choose 'Prepare index'.",
+    ko: "켜면 이 프로젝트의 모든 자료에 색인이 준비된 뒤부터 연구가 색인을 함께 씁니다(실험 기능). 색인은 '색인 준비'를 눌러야만 시작됩니다.",
+    en: "Turning this on lets research in this project also use the index once every source is indexed (experimental). Indexing starts only when you choose 'Prepare index'.",
   },
   "localRetrieval.prepareNotAllowed": { ko: "이 프로젝트의 색인을 바꿀 권한이 없습니다.", en: "You cannot change this project's index." },
   "localRetrieval.configureConflict": {
@@ -102,8 +102,8 @@ export const localRetrievalMessages = {
     en: "No index can be prepared because the runtime component is missing.",
   },
   "localRetrieval.readyNote": {
-    ko: "자료 색인이 준비돼도 기존 검색 방식은 그대로입니다. 실제 검색에 쓰는 기능은 아직 없습니다.",
-    en: "Even when the source index is ready, the existing search method stays as it is. Nothing uses it in real searches yet.",
+    ko: "모든 자료의 색인이 준비되면 연구에서 뜻이 비슷한 문단도 함께 찾습니다(실험 기능). 이번 질문에서 쓸 수 없으면 기존 검색 방식 그대로입니다.",
+    en: "Once every source is indexed, research also looks for passages with a similar meaning (experimental). When it cannot be used for a question, the existing search method is used as before.",
   },
   "localRetrieval.outdatedIndex": {
     ko: "검색 준비 방식이 바뀌어 색인을 다시 만들어야 합니다. '색인 준비'를 누르세요. 모델 파일은 다시 받지 않아도 됩니다.",

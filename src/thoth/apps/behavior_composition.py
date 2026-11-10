@@ -11,10 +11,12 @@ from thoth.application.services.behavior_exposure_runtime import BehaviorExposur
 from thoth.application.services.behavior_models import BehaviorBoundModels
 from thoth.application.services.behavior_snapshot_service import BehaviorSnapshotService
 from thoth.application.services.control_record_service import ControlRecordService
+from thoth.application.services.dense_opt_in import ProjectDenseOptIn
 from thoth.application.services.improvement_exposure_service import ImprovementExposureService
 from thoth.application.services.improvement_runner import ImprovementRunner
 from thoth.ports.behavior_artifact import BehaviorArtifactStorePort
 from thoth.ports.behavior_resolver import BehaviorComponentRegistryPort
+from thoth.ports.embedding_index import EmbeddingIndexProviderPort
 from thoth.ports.ledger import ManagedLedgerPort
 from thoth.ports.model import ModelResolverPort
 from thoth.ports.runtime import ClockPort, IdGeneratorPort
@@ -46,6 +48,11 @@ class BehaviorRuntime:
         )
         self.runner = ImprovementRunner(store=self.store, clock=clock)
         self.snapshots = BehaviorSnapshotService(self.store, components)
+        if isinstance(stores, EmbeddingIndexProviderPort):
+            # A project that switched local retrieval on, with its index ready, gets its own policy.
+            self.snapshots.retrieval_opt_in = ProjectDenseOptIn(
+                store=stores.embedding_index, governance=stores.governance
+            )
         self._controls = ControlRecordService(store=stores.controls, clock=clock, ids=ids)
         self._ledger, self._clock, self._ids = ledger, clock, ids
 

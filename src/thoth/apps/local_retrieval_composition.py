@@ -1,7 +1,6 @@
 """Wire the optional local preparation capability without loading native dependencies."""
 
 import asyncio
-from importlib.util import find_spec
 from pathlib import Path
 
 from thoth.adapters.embeddings.assets import LocalModelAssets
@@ -9,6 +8,7 @@ from thoth.adapters.embeddings.download import FixedModelDownload
 from thoth.adapters.embeddings.process_worker import ProcessEmbeddingWorker
 from thoth.application.commands.local_retrieval import LocalRetrievalHandlers
 from thoth.application.services.dense_material import DenseMaterialProvider, IndexStampSource
+from thoth.application.services.dense_opt_in import runtime_dependencies_available
 from thoth.application.services.embedding_index_service import EmbeddingIndexService
 from thoth.application.services.local_retrieval import LocalRetrievalService
 from thoth.application.services.research_analysis import ResearchAnalysis
@@ -81,9 +81,7 @@ def create_local_retrieval(
         sessions=stores.auth,
         governance=stores.governance,
         clock=clock,
-        dependency_available=lambda: all(
-            find_spec(name) is not None for name in ("numpy", "onnxruntime", "tokenizers")
-        ),
+        dependency_available=runtime_dependencies_available,
         factory=factory,
     )
     handlers = LocalRetrievalHandlers(service)
