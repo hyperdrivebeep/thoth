@@ -54,6 +54,26 @@ def progress_thread_read(payload: dict[str, JsonValue]) -> dict[str, JsonValue]:
     return progress
 
 
+def summarize_result(result: dict[str, JsonValue]) -> dict[str, JsonValue]:
+    """The result as a screen shows it: internals left out, two records replaced by summaries.
+
+    One function for every reader that has to agree on what the screen shows: thread/read sends
+    this view, and thread/result/read sends the same view of the result it returns (shown_result),
+    so a screen can check that what it displays is the stored answer without holding the full
+    records the summaries were made from.
+    """
+    shown = {k: v for k, v in result.items() if k not in OMITTED_RESULT_KEYS}
+    if "checked_observations" in result:
+        shown["checked_observations"] = cast(
+            JsonValue, summarize_checked_observations(result["checked_observations"])
+        )
+    if "absence_assessments" in result:
+        shown["absence_assessments"] = cast(
+            JsonValue, summarize_absence_assessments(result["absence_assessments"])
+        )
+    return shown
+
+
 def summarize_thread_read(payload: dict[str, JsonValue]) -> dict[str, JsonValue]:
     summary = dict(payload)
     for key in ("current_result", "previous_result"):
@@ -63,15 +83,7 @@ def summarize_thread_read(payload: dict[str, JsonValue]) -> dict[str, JsonValue]
         slim = {k: v for k, v in manifest.items() if k not in OMITTED_MANIFEST_FIELDS}
         result = slim.get("result")
         if isinstance(result, dict):
-            slim["result"] = {k: v for k, v in result.items() if k not in OMITTED_RESULT_KEYS}
-            if "checked_observations" in result:
-                slim["result"]["checked_observations"] = cast(
-                    JsonValue, summarize_checked_observations(result["checked_observations"])
-                )
-            if "absence_assessments" in result:
-                slim["result"]["absence_assessments"] = cast(
-                    JsonValue, summarize_absence_assessments(result["absence_assessments"])
-                )
+            slim["result"] = summarize_result(result)
         summary[key] = cast(JsonValue, slim)
     if summary.get("operation_state") in TERMINAL_OPERATION_STATES:
         # The activity log only drives the panel shown while research runs.

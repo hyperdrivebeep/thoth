@@ -38,6 +38,9 @@ function isShownPartOf(shown: Record<string, unknown>, stored: Record<string, un
   return Object.entries(shown).every(([key, value]) => Object.hasOwn(stored, key) && resultContentKey(value) === resultContentKey(stored[key]));
 }
 function mismatch(): never { throw new UiError("evidence.binding"); }
+function without(value: Record<string, unknown>, keys: readonly string[]): Record<string, unknown> {
+  return keys.length === 0 ? value : Object.fromEntries(Object.entries(value).filter(([key]) => !keys.includes(key)));
+}
 
 function answerContent(value: Record<string, unknown>, thread: string, epoch: unknown, terminal: unknown) {
   // research_threads publication adds these four fields only to operation.result.
@@ -45,6 +48,27 @@ function answerContent(value: Record<string, unknown>, thread: string, epoch: un
   if (("thread_id" in value && value.thread_id !== thread) || ("request_epoch" in value && value.request_epoch !== epoch) ||
       ("contract_version" in value && value.contract_version !== 2) || ("terminal_reason" in value && value.terminal_reason !== terminal)) mismatch();
   return Object.fromEntries(Object.entries(value).filter(([key]) => !["thread_id", "request_epoch", "contract_version", "terminal_reason"].includes(key)));
+}
+
+type Response = z.infer<typeof responseSchema>;
+type Manifest = z.infer<typeof manifestSchema>;
+/** The answer on the screen, the result the server returned and the immutable manifest must be the same stored answer. */
+function bindAnswer(selection: ResultSelection, displayed: Record<string, unknown>, value: Response, manifest: Manifest, result: Record<string, unknown>) {
+  const { scope } = selection;
+  const [thread, epoch, terminal] = [scope.threadId, value.request.request_epoch, value.manifest?.terminal_reason];
+  const displayedContent = answerContent(displayed, thread!, epoch, terminal);
+  const resultBody = answerContent(result, thread!, epoch, terminal);
+  const manifestBody = answerContent(manifest.result, thread!, epoch, terminal);
+  // The server's read view of a result stored in an older form changes some top-level keys of the result (never the manifest); it
+  // names them, and only those keys may differ from the manifest. Without that list (an older server) the two must be identical.
+  const projected = value.projected_keys ?? [];
+  // What the screen shows is the summary view of the stored answer. The server makes that same view of the result it returns;
+  // it may only hold keys the result has. An older server sends none: the screen is then compared with the manifest itself.
+  const shownBody = value.shown_result ? answerContent(value.shown_result, thread!, epoch, terminal) : manifestBody;
+  if (value.shown_result && !Object.keys(shownBody).every(key => Object.hasOwn(resultBody, key))) mismatch();
+  if (manifest.operation_id !== selection.operationId || manifest.request_ref.project_id !== scope.projectId ||
+      manifest.request_ref.entity_type !== "THREAD" || manifest.request_ref.entity_id !== `request:${thread}` || manifest.request_ref.revision_digest !== scope.requestDigest ||
+      resultContentKey(without(resultBody, projected)) !== resultContentKey(without(manifestBody, projected)) || !isShownPartOf(displayedContent, shownBody)) mismatch();
 }
 
 async function read(selection: ResultSelection, displayed: Record<string, unknown>, digest: string | undefined, offset: number, expand: boolean, signal?: AbortSignal) {
@@ -62,13 +86,7 @@ async function read(selection: ResultSelection, displayed: Record<string, unknow
   if (!value.manifest || !value.result_revision_digest) throw new UiError("evidence.versionUnknown");
   if (value.request.project_id !== scope.projectId || value.request.thread_id !== scope.threadId || value.request.operation_id !== selection.operationId || !value.result) mismatch();
   const manifest = manifestSchema.parse(value.manifest);
-  const displayedContent = answerContent(displayed, scope.threadId, value.request.request_epoch, value.manifest.terminal_reason);
-  const resultBody = answerContent(value.result, scope.threadId, value.request.request_epoch, value.manifest.terminal_reason);
-  const manifestBody = answerContent(manifest.result, scope.threadId, value.request.request_epoch, value.manifest.terminal_reason);
-  if (manifest.operation_id !== selection.operationId || manifest.request_ref.project_id !== scope.projectId ||
-      manifest.request_ref.entity_type !== "THREAD" || manifest.request_ref.entity_id !== `request:${scope.threadId}` ||
-      manifest.request_ref.revision_digest !== scope.requestDigest ||
-      resultContentKey(resultBody) !== resultContentKey(manifestBody) || !isShownPartOf(displayedContent, manifestBody)) mismatch();
+  bindAnswer(selection, displayed, value, manifest, value.result);
   return { value, manifest };
 }
 

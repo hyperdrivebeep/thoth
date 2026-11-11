@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "thoth-rnd-agent"
-version = "0.2.0b2"
+version = "0.2.0b3"
 description = "AI-native R&D program agent reference implementation"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"

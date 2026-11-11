@@ -195,6 +195,10 @@ class HistoricalResultView(DomainModel):
     basis_currentness: BasisCurrentness
     coverage: HistoryCoverage
     selected_evidence: SelectedEvidencePage | None = None
+    # The summary view of result, as thread/read shows it, and the top-level keys of result that
+    # expected_result_view changed from the stored manifest (empty when it changed none).
+    shown_result: dict[str, object] | None = None
+    projected_keys: tuple[str, ...] | None = None
 
 
 class SemanticChangeGroup(DomainModel):

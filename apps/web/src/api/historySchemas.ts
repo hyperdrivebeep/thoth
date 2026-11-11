@@ -51,6 +51,10 @@ export const historicalResultSchema = z.object({
   manifest: contentSchema.nullable(), result: contentSchema.nullable(), error: contentSchema.nullable(),
   operation_state: z.string().nullable().optional(), availability: z.enum(["AVAILABLE", "PARTIAL", "UNAVAILABLE"]),
   basis_currentness: currentnessSchema, coverage: coverageSchema,
+  // thread/result/read: how the server's read view of the result relates to the stored manifest. Absent from an older server.
+  expected_result_view: z.string().nullable().optional(),
+  shown_result: contentSchema.nullable().optional(),
+  projected_keys: z.array(z.string()).nullable().optional(),
 });
 export const diffEntrySchema = z.object({
   path: z.string(), before_present: z.boolean(), after_present: z.boolean(), before: z.unknown(), after: z.unknown(),

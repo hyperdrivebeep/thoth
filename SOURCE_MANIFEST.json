@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-11T11:57:04.903968+00:00",
+  "created_at": "2026-11-11T16:25:32.016776+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -103,7 +103,7 @@
     },
     {
       "path": "apps/web/package.json",
-      "sha256": "a7a95d97cc7eb5bbbeb6d00fd1e4194d4f56a52639ba2d3ce3620cef6a3890d2",
+      "sha256": "a7dfe39164c338a07064d6db46ab3cefbc66c4c19afb6df445308c3a6f26e7b5",
       "bytes": 1055
     },
     {
@@ -207,6 +207,11 @@
       "bytes": 749
     },
     {
+      "path": "apps/web/src/api/fixtures/result-evidence-runtime.json",
+      "sha256": "3c1aff5edc6c807a571fe59f50103853495fd17b2b74cf6360f5afdef177982f",
+      "bytes": 221297
+    },
+    {
       "path": "apps/web/src/api/forgetProject.test.ts",
       "sha256": "2606ff8275fa8897157d87342cfcacfa0827f1128c6f12e306deabc88c385c2c",
       "bytes": 1727
@@ -248,8 +253,8 @@
     },
     {
       "path": "apps/web/src/api/historySchemas.ts",
-      "sha256": "eff96431efe1199a0901b86860f87ebb4fcbe0bcd400ce3cc97e3942d9bc5404",
-      "bytes": 4263
+      "sha256": "242be5c08ddf48d468dc8bc8e915a82dc36aceed274e2c5283880abb8004f0de",
+      "bytes": 4562
     },
     {
       "path": "apps/web/src/api/historyServerContract.test.ts",
@@ -473,8 +478,8 @@
     },
     {
       "path": "apps/web/src/api/resultEvidence.ts",
-      "sha256": "0f794c748ce807f0321b71e4ad4a656b40fc6e58a96a15f31fda164eb5701a2a",
-      "bytes": 8122
+      "sha256": "f1155987d8b7b4151754a72daef1d541194ae974ec491087f8ab99f93b153e47",
+      "bytes": 9588
     },
     {
       "path": "apps/web/src/api/resultEvidenceIdentity.test.ts",
@@ -485,6 +490,11 @@
       "path": "apps/web/src/api/resultEvidenceIdentity.ts",
       "sha256": "7a1ce9cf49128806639a4d8ada09ec225393731ce5b16fee1783dafc5acc96cc",
       "bytes": 1117
+    },
+    {
+      "path": "apps/web/src/api/resultEvidenceRuntime.test.ts",
+      "sha256": "d7f95bf35c84e6ca15d40a1828aef2ec9b552a487d0f3dc033a756167310abac",
+      "bytes": 4282
     },
     {
       "path": "apps/web/src/api/resultEvidenceServerContract.test.ts",
@@ -2653,7 +2663,7 @@
     },
     {
       "path": "config/complexity-budget.json",
-      "sha256": "25dea1f1b2c66732bcb6b0ce9de140e2a5c106b59bc5e89b4c82dbc64fb35c18",
+      "sha256": "10804aa318df4b01be1476689e08c1dccdc125f56ef8405de6eb6017adb80a83",
       "bytes": 5436
     },
     {
@@ -2743,7 +2753,7 @@
     },
     {
       "path": "docs/BETA.md",
-      "sha256": "dd178124e662949b03966382c361970e3d62e49b648fb7d32f4811a57520eacd",
+      "sha256": "8412bd5199797a4a85095aa4251b78cdb2122b11b518ef8c638642b02bc584dd",
       "bytes": 14781
     },
     {
@@ -2913,8 +2923,8 @@
     },
     {
       "path": "docs/architecture/rpc-method-catalog.md",
-      "sha256": "0b415fa9d39676d22cd7d017162836f40355a596b5375bfb93d4f629097c652c",
-      "bytes": 21218
+      "sha256": "07d748c44017b4beef1f4c1beaa4593aa8dc2fa7816f450416d16d98f3cbeb89",
+      "bytes": 21804
     },
     {
       "path": "docs/architecture/user-activity-projection.md",
@@ -2970,6 +2980,11 @@
       "path": "docs/releases/v0.2.0-beta.2.md",
       "sha256": "80a33afe99fbc7818ec5182cf1c32173d154ea72e8803d807045cf5c0dd0ff05",
       "bytes": 6073
+    },
+    {
+      "path": "docs/releases/v0.2.0-beta.3.md",
+      "sha256": "6bbec26ab2474fa97bf481422a5a453de77f10de7eab03f9ce9a22876bb78df2",
+      "bytes": 2299
     },
     {
       "path": "docs/screenshots/01-trace-verdict.png",
@@ -3653,7 +3668,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "887b404a7e26f5c9bb149819cc7e7a22f375a43e82d0210985b56e693623f889",
+      "sha256": "7ebec460cfd37636034bb196caf162451358e5be0962fa19e36a5bb89e1f88be",
       "bytes": 106
     },
     {
@@ -3668,7 +3683,7 @@
     },
     {
       "path": "pyproject.toml",
-      "sha256": "214c6daf7c67f9b78d7939ec5bd0c0ef6bad9d62bb1ba24b20efd0033c434c89",
+      "sha256": "46eb245f7bf107b5d6489ccb7ca3a5927151f78d60d4d2ed160b4d63247b78a7",
       "bytes": 1989
     },
     {
@@ -3718,8 +3733,8 @@
     },
     {
       "path": "schemas/protocol/historical-result-view.schema.json",
-      "sha256": "c97bfc01e3773b44d38ebcb0201b649e45d20e799b3b28459895a222c2f2bd33",
-      "bytes": 15973
+      "sha256": "7a9e31e2576bd7cd4d1e4b7bbdf3eae0ea9cd5dbf915df7e0a488975be05c5ba",
+      "bytes": 16481
     },
     {
       "path": "schemas/protocol/history-detail.schema.json",
@@ -4073,7 +4088,7 @@
     },
     {
       "path": "src/thoth/__init__.py",
-      "sha256": "6c1d9b963e2485d2038618cbee7571589d9aa1d15e53a403a1835acd14d0ebfa",
+      "sha256": "c36f5a2c2fd12d07d37f18e6ca5f0715f4a8a5c069984a38c336d8631663b899",
       "bytes": 56
     },
     {
@@ -5583,8 +5598,8 @@
     },
     {
       "path": "src/thoth/application/commands/research_history.py",
-      "sha256": "e0f99864136bf397d15e563cd3cf860c00ed764cc6ea8bea98b7d1689bc73ba0",
-      "bytes": 3195
+      "sha256": "efe689a0d4d1d9154b008b6ec65eaa64a0e2b9de52b57310139c37158aebbaa9",
+      "bytes": 3348
     },
     {
       "path": "src/thoth/application/commands/research_operations.py",
@@ -6853,8 +6868,8 @@
     },
     {
       "path": "src/thoth/application/services/research_read_summary.py",
-      "sha256": "1faaa4f26664e9547dc82e01dfde8bf2d937d3bc93431587ea680d303381d16c",
-      "bytes": 3312
+      "sha256": "75b13c8d1faa7c6f102e0e9ecfa6b418755085bca9e17de33a9ce9a4c2f9a8c4",
+      "bytes": 3797
     },
     {
       "path": "src/thoth/application/services/research_read_view.py",
@@ -7010,6 +7025,11 @@
       "path": "src/thoth/application/services/restore_source_basis.py",
       "sha256": "dcb510f04a515818c272e62c5a3496e6fd3d605b125425ce4f3b500fc3535c4c",
       "bytes": 4759
+    },
+    {
+      "path": "src/thoth/application/services/result_shown_view.py",
+      "sha256": "67e7f664ff7a7ed06467d53ff8a10c461076971a657c6793e492e624d462a35d",
+      "bytes": 1858
     },
     {
       "path": "src/thoth/application/services/retrieval_coverage_view.py",
@@ -8083,8 +8103,8 @@
     },
     {
       "path": "src/thoth/domain/research_history.py",
-      "sha256": "7e601e44b67ed45af29b23a271aaf2dd8b5350a7df3667ee2ce28ddab2616317",
-      "bytes": 7154
+      "sha256": "e821aa6aada02edb9eaf4ba35f571d27ff610e9a8aab4bcaf2f0a589991e7c6d",
+      "bytes": 7441
     },
     {
       "path": "src/thoth/domain/research_identity.py",
@@ -9570,6 +9590,11 @@
       "path": "tests/integration/resource_scope_helpers.py",
       "sha256": "8b8453c4ca92859e0eaca5cb5998791e2e635103bb54fe69bc7e3b0654d8a765",
       "bytes": 10314
+    },
+    {
+      "path": "tests/integration/result_evidence_runtime.py",
+      "sha256": "a4f6da9eced58bf0a7197979b3eb73d56a7673cc630ad435c37c3a74dff8bbab",
+      "bytes": 9032
     },
     {
       "path": "tests/integration/schema_contract_probe.py",
@@ -11227,6 +11252,11 @@
       "bytes": 4513
     },
     {
+      "path": "tests/integration/test_result_shown_view.py",
+      "sha256": "53991f667c0048b9a76d97083f54c4d2027257177eec493b3619d6c34c1faa48",
+      "bytes": 5149
+    },
+    {
       "path": "tests/integration/test_result_usage_read.py",
       "sha256": "0741348bc846555cfd21d129eb85070a81bf4a1dd0d1b01999f7defd0f5292e1",
       "bytes": 2825
@@ -11648,7 +11678,7 @@
     },
     {
       "path": "tests/test_foundation.py",
-      "sha256": "ac07c4b67530e1614d7d5f77721f4b974fa83f6666c0e70c578a27fd332b9eae",
+      "sha256": "868a8f79901f0aee47bedcfae8cf2ce234d33bc32811d577833567981628f5db",
       "bytes": 1422
     },
     {
@@ -13503,7 +13533,7 @@
     },
     {
       "path": "uv.lock",
-      "sha256": "55c225ea025d6a303b40d5a3d5e7501ea17c7df6957fec1fc12865c34ebd68a1",
+      "sha256": "62ad4f0cb97c5af0566a2532bff9ec92ae218714205e1456d5b3d9bca801c021",
       "bytes": 429530
     }
   ],
