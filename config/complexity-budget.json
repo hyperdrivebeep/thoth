@@ -21,7 +21,7 @@
       "src/thoth/application/services/research_gaps.py::validate_gaps": 28,
       "src/thoth/application/services/restore_impact.py::RestoreImpactPlanner.build": 23,
       "src/thoth/application/services/scoped_memory_controls.py::ScopedMemoryControls._require": 30,
-      "src/thoth/protocol/bus.py::CommandBus._execute": 28
+      "src/thoth/protocol/bus.py::CommandBus._execute": 24
     }
   },
   "web": {

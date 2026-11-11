@@ -331,6 +331,22 @@ bytes or rerun the provider. An active database copy is not a consistent cold ba
 changes, `workspace_id` changes and browser drafts/selections stored under the old origin/root do
 not automatically merge; preserve browser storage separately when needed.
 
+### Server log
+
+While `serve` or `desktop` runs, warnings and unexpected failures are written to the console and
+to `logs\thoth.log` inside the selected workspace (about 1 MB per file; three older files are
+kept). The file appears with the first record. When the screen shows
+`internal command failure [-32603] (operation:...)`, the record with that operation id names the
+method, the exception types and where they were raised. A failure of background indexing or of the
+local retrieval scores is written once per distinct failure, not on every retry.
+
+The record of a failed command leaves out the string values of its request. Every record removes
+token-shaped text, cuts an exception message at 300 characters and shortens file paths.
+Identifiers, file names and short words can still appear, so read the lines before you share
+them. Typed refusals (a rejected request, a held model call) are answers and are not logged as
+failures. The other commands (`run`, `rpc`, the interactive shell) do not write the file; their
+warnings go to the console as before.
+
 ## Checks
 
 ```powershell

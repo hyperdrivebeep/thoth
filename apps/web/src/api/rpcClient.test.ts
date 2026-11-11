@@ -18,3 +18,37 @@ it("preserves the bilingual reference notice and saved-record metadata from an R
     name: "RpcError", code: -32030, message: `${notice} [-32030]`, details: data,
   });
 });
+
+it("shows the operation id of an unexpected server failure, because the server log is found by it", async () => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({
+    jsonrpc: "2.0",
+    id: "internal",
+    error: { code: -32603, message: "internal command failure", data: { operation_id: "operation:42" } },
+  })));
+  await expect(rpc("thread/input", { project_id: "p" }, "internal-failure")).rejects.toMatchObject({
+    name: "RpcError",
+    code: -32603,
+    message: "internal command failure [-32603] (operation:42)",
+  });
+});
+
+it("adds no operation id to other errors, or when the server gave none", async () => {
+  const fetchMock = vi.fn()
+    .mockResolvedValueOnce(Response.json({
+      jsonrpc: "2.0",
+      id: "refused",
+      error: { code: -32030, message: "refused", data: { operation_id: "operation:43" } },
+    }))
+    .mockResolvedValueOnce(Response.json({
+      jsonrpc: "2.0",
+      id: "bare",
+      error: { code: -32603, message: "internal command failure" },
+    }));
+  vi.stubGlobal("fetch", fetchMock);
+  await expect(rpc("thread/input", { project_id: "p" }, "refused")).rejects.toMatchObject({
+    message: "refused [-32030]",
+  });
+  await expect(rpc("thread/input", { project_id: "p" }, "bare")).rejects.toMatchObject({
+    message: "internal command failure [-32603]",
+  });
+});

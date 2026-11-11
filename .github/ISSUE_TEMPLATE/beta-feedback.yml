@@ -38,6 +38,18 @@ body:
       description: Drag an image here. Remove or blur private content first. Optional but very helpful.
     validations:
       required: false
+  - type: textarea
+    id: log
+    attributes:
+      label: Server log lines (서버 로그)
+      description: >-
+        If the screen showed "internal command failure [-32603] (operation:...)", paste the lines of
+        that operation id from logs\thoth.log in your workspace. Read them first; do not attach the
+        whole file. 화면에 operation id가 보였다면 작업 공간의 logs\thoth.log에서 그 기록의 줄만
+        붙여 주세요.
+      render: text
+    validations:
+      required: false
   - type: input
     id: version
     attributes:

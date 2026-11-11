@@ -11,10 +11,12 @@ runtime or the model files are missing, and a project that is switched off is ne
 
 import asyncio
 import contextlib
+import logging
 from typing import TYPE_CHECKING
 
 from thoth.domain.embedding_index import EmbeddingIndexError
 from thoth.domain.enums import ProjectLifecycle
+from thoth.domain.failure_text import BackgroundFailureLog
 from thoth.domain.model_asset import ModelAssetError
 
 if TYPE_CHECKING:
@@ -31,6 +33,7 @@ class AutoIndexer:
         self._task: asyncio.Task[None] | None = None
         self._wake: asyncio.Event | None = None
         self._retry_at: dict[str, float] = {}
+        self._failures = BackgroundFailureLog(logging.getLogger(__name__))
 
     @property
     def started(self) -> bool:
@@ -66,8 +69,9 @@ class AutoIndexer:
                 await self.run_pass()
             except asyncio.CancelledError:
                 raise
-            except Exception:
-                pass  # background work never fails a request; the next tick looks again
+            except Exception as exc:
+                # Background work never fails a request; the next tick looks again.
+                self._failures.note("auto-index pass", exc)
             with contextlib.suppress(TimeoutError):
                 await asyncio.wait_for(wake.wait(), AUTO_INDEX_TICK_SECONDS)
 
@@ -84,7 +88,8 @@ class AutoIndexer:
                 service.store.resume_interrupted(project.project_id, now_ms)
                 if service.store.needs_indexing(project.project_id):
                     found.append(project.project_id)
-            except Exception:
+            except Exception as exc:
+                self._failures.note(f"auto-index check project_id={project.project_id}", exc)
                 continue
         return found
 
@@ -118,9 +123,13 @@ class AutoIndexer:
         error = task.exception()
         if error is None:
             self._retry_at.pop(project, None)
+            self._failures.clear(f"auto-index project_id={project}")
         elif isinstance(error, TimeoutError):
             self.kick()  # a long project goes on in the next pass; its finished jobs are kept
         elif not isinstance(error, ModelAssetError):
+            # Missing model files are a normal state the settings card shows; anything else is
+            # written down, because the retry below would otherwise hide a failure that repeats.
+            self._failures.note(f"auto-index project_id={project}", error)
             self._retry_at[project] = loop.time() + AUTO_INDEX_RETRY_SECONDS
 
     async def run_project(self, project: str) -> None:

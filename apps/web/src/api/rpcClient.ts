@@ -16,9 +16,18 @@ export const readQueries = new Set(["thread/read", "thread/list", "thread/activi
   "revision/diff/read", "revision/restore/preview", "revision/read", "revision/content/read",
   "revision/head/read", "revision/history/read", "trace/read", "trace/export", "trace/importPreview", "trace/history", "hypothesis/link/list", "hypothesis/test/result/list", "hypothesis/same/list", "trace/closure/list", "trace/lesson/list"]);
 
+const INTERNAL_ERROR = -32603;
+
+/** The server logs an unexpected failure under its operation id; showing the id lets a report name it. */
+function internalFailureRef(code: number, details: Record<string, unknown> | undefined): string {
+  const operationId = details?.operation_id;
+  if (code !== INTERNAL_ERROR || typeof operationId !== "string" || !operationId) return "";
+  return ` (${operationId})`;
+}
+
 export class RpcError extends Error {
   constructor(message: string, readonly code: number, readonly details: Record<string, unknown>) {
-    super(`${message} [${code}]`);
+    super(`${message} [${code}]${internalFailureRef(code, details)}`);
     this.name = "RpcError";
   }
 }

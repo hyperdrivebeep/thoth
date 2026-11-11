@@ -8,6 +8,7 @@ numpy-free reference for a passage score is embedding_index.max_window_score.
 
 import asyncio
 import importlib
+import logging
 import threading
 import time
 from collections.abc import Awaitable, Callable
@@ -18,6 +19,7 @@ from typing import Any, Protocol, runtime_checkable
 from thoth.application.services.embedding_index_service import EmbeddingIndexService
 from thoth.domain.embedding_index import EmbeddingIndexError
 from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
+from thoth.domain.failure_text import BackgroundFailureLog
 from thoth.domain.retrieval_embedding import (
     DenseMaterial,
     DenseScore,
@@ -101,6 +103,7 @@ class DenseMaterialProvider:
         self._clock, self._build_wait = clock, build_wait
         self._residents: dict[str, Resident] = {}
         self._failed: dict[str, tuple[IndexStamp, DenseUnavailableReason]] = {}
+        self._failures = BackgroundFailureLog(logging.getLogger(__name__))
         self._building: dict[str, tuple[IndexStamp, asyncio.Task[Resident]]] = {}
         self.warming: asyncio.Task[None] | None = None
         self._cooldown_until = 0.0
@@ -232,8 +235,9 @@ class DenseMaterialProvider:
     async def _run_warm(self, warm: Callable[[], Awaitable[None]]) -> None:
         try:
             await warm()
-        except Exception:
-            pass
+        except Exception as exc:
+            # The question goes on with the lexical selection; the log says why dense was not up.
+            self._failures.note("local retrieval encoder warm-up", exc)
         finally:
             # A worker that is still not up is retried later, not on every request.
             self._cooldown_until = self._clock() + WARM_COOLDOWN_SECONDS
@@ -343,7 +347,8 @@ class DenseMaterialProvider:
             return None  # routing refuses a mixed frame itself
         try:
             stamp = self._stamp(project_id)
-        except Exception:
+        except Exception as exc:
+            self._failures.note(f"dense index stamp project_id={project_id}", exc)
             return self._unavailable(project_id, question, eligible, "EMBEDDING_FAILED")
         if not stamp[0]:
             self.invalidate(project_id)
@@ -352,7 +357,9 @@ class DenseMaterialProvider:
             values = await self._compute(project_id, question, eligible, stamp)
         except _Unavailable as exc:
             return self._unavailable(project_id, question, eligible, exc.reason)
-        except Exception:
+        except Exception as exc:
+            place = f"dense scores project_id={project_id}"
+            self._failures.note(place, exc, redact=(question,))
             return self._unavailable(project_id, question, eligible, "EMBEDDING_FAILED")
         return DenseMaterial.prepared(
             project_id=project_id,

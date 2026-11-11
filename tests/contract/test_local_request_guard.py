@@ -118,3 +118,19 @@ def test_future_websocket_without_origin_is_allowed(local_environment: Path) -> 
     ):
         assert socket.receive_text() == "synthetic"
     assert not local_environment.exists()
+
+
+async def test_a_cancel_body_that_is_not_json_is_a_client_error_not_a_server_error(
+    local_environment: Path,
+) -> None:
+    transport = httpx.ASGITransport(app=create_app(), raise_app_exceptions=False)
+    async with httpx.AsyncClient(transport=transport, base_url="http://localhost:8765") as client:
+        response = await client.post(
+            "/operations/operation:1/cancel",
+            content=b"not json",
+            headers={"content-type": "application/json"},
+        )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "invalid JSON"}
+    # The body is refused before the workspace is opened.
+    assert not local_environment.exists()

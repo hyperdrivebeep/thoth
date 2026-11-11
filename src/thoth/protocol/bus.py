@@ -43,6 +43,7 @@ from thoth.protocol.deferred import (
     PendingExecution,
     current_operation,
 )
+from thoth.protocol.failure_log import log_internal_failure
 from thoth.protocol.journal_completion import (
     JournalCompletion,
     journal_tail_guard,
@@ -376,41 +377,14 @@ class CommandBus:
                 },
             )
         except (RpcApplicationError, ResourceScopeError) as exc:
-            error = self._application_error(exc)
-            failed = self._operations.fail(
-                operation.operation_id,
-                error.model_dump(mode="json"),
-                completed_at=self._clock.now(),
-            )
-            if failed.error != error.model_dump(mode="json"):
-                return self._replay(request.id, failed)
-            self._append_event(
-                operation,
-                "operation.failed",
-                {"code": error.code, "message": error.message},
-            )
-            self._measure(request, operation.project_id, "FAILED")
-            return JsonRpcResponse(id=request.id, error=error)
+            return self._seal_failure(request, operation, self._application_error(exc))
         except PermissionError as exc:
             error = JsonRpcError(
                 code=RpcErrorCode.AUTHORIZATION_DENIED,
                 message="authenticated authority identity mismatch",
                 data={"reason_code": str(exc), "pre_io": True},
             )
-            failed = self._operations.fail(
-                operation.operation_id,
-                error.model_dump(mode="json"),
-                completed_at=self._clock.now(),
-            )
-            if failed.error != error.model_dump(mode="json"):
-                return self._replay(request.id, failed)
-            self._append_event(
-                operation,
-                "operation.failed",
-                {"code": error.code, "message": error.message},
-            )
-            self._measure(request, operation.project_id, "FAILED")
-            return JsonRpcResponse(id=request.id, error=error)
+            return self._seal_failure(request, operation, error)
         except ValidationError as exc:
             error = JsonRpcError(
                 code=RpcErrorCode.INVALID_PARAMS,
@@ -422,21 +396,9 @@ class CommandBus:
                     )
                 },
             )
-            failed = self._operations.fail(
-                operation.operation_id,
-                error.model_dump(mode="json"),
-                completed_at=self._clock.now(),
-            )
-            if failed.error != error.model_dump(mode="json"):
-                return self._replay(request.id, failed)
-            self._append_event(
-                operation,
-                "operation.failed",
-                {"code": error.code, "message": error.message},
-            )
-            self._measure(request, operation.project_id, "FAILED")
-            return JsonRpcResponse(id=request.id, error=error)
+            return self._seal_failure(request, operation, error)
         except Exception as exc:
+            log_internal_failure(request, operation, exc)
             self._persist_internal_failure(
                 operation=operation,
                 request=request,
@@ -448,20 +410,7 @@ class CommandBus:
                 message="internal command failure",
                 data={"operation_id": operation.operation_id},
             )
-            failed = self._operations.fail(
-                operation.operation_id,
-                error.model_dump(mode="json"),
-                completed_at=self._clock.now(),
-            )
-            if failed.error != error.model_dump(mode="json"):
-                return self._replay(request.id, failed)
-            self._append_event(
-                operation,
-                "operation.failed",
-                {"code": error.code, "message": error.message},
-            )
-            self._measure(request, operation.project_id, "FAILED")
-            return JsonRpcResponse(id=request.id, error=error)
+            return self._seal_failure(request, operation, error)
         with journal_tail_guard(self._journal_completion, operation):
             completed = self._operations.complete(
                 operation.operation_id,
@@ -600,6 +549,25 @@ class CommandBus:
             {"code": error.code, "message": error.message},
         )
         self._measure(request, failed.project_id, "FAILED")
+        return JsonRpcResponse(id=request.id, error=error)
+
+    def _seal_failure(
+        self, request: JsonRpcRequest, operation: OperationRecord, error: JsonRpcError
+    ) -> JsonRpcResponse:
+        """Close the operation as FAILED with this error; an already sealed one is replayed."""
+        failed = self._operations.fail(
+            operation.operation_id,
+            error.model_dump(mode="json"),
+            completed_at=self._clock.now(),
+        )
+        if failed.error != error.model_dump(mode="json"):
+            return self._replay(request.id, failed)
+        self._append_event(
+            operation,
+            "operation.failed",
+            {"code": error.code, "message": error.message},
+        )
+        self._measure(request, operation.project_id, "FAILED")
         return JsonRpcResponse(id=request.id, error=error)
 
     def _replay(self, request_id: str | int, operation: OperationRecord) -> JsonRpcResponse:
