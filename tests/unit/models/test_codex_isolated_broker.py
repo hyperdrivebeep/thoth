@@ -594,6 +594,14 @@ def test_web_login_listener_has_bounded_owner_cleanup(
     assert server.closed and not broker.profile.login_pending_path.exists()
 
 
+# The cap on each child process only ends a hang. What the test checks is the child's own 0.2 s
+# lock wait: the child prints CODEX_PROFILE_BUSY while this process holds the lock and ACQUIRED
+# once it is released, however slow the machine is. Almost all of a child's time goes to starting
+# Python and importing thoth.adapters.models (about 1,300 modules), which takes seconds by itself,
+# so the earlier 3 s cap ended correct runs while other test processes kept the machine busy.
+CHILD_HANG_LIMIT = 60
+
+
 def test_profile_lock_serializes_two_python_processes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -608,8 +616,12 @@ def test_profile_lock_serializes_two_python_processes(
     args = [sys.executable, "-B", "-c", snippet, str(broker.profile.workspace)]
     env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
     with broker.profile.lock():
-        blocked = subprocess.run(args, env=env, capture_output=True, text=True, timeout=3)
-    allowed = subprocess.run(args, env=env, capture_output=True, text=True, timeout=3)
+        blocked = subprocess.run(
+            args, env=env, capture_output=True, text=True, timeout=CHILD_HANG_LIMIT
+        )
+    allowed = subprocess.run(
+        args, env=env, capture_output=True, text=True, timeout=CHILD_HANG_LIMIT
+    )
     assert blocked.returncode == allowed.returncode == 0
     assert blocked.stdout.strip() == "CODEX_PROFILE_BUSY"
     assert allowed.stdout.strip() == "ACQUIRED"

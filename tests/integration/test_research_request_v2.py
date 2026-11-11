@@ -52,6 +52,11 @@ from thoth.domain.hypothesis import DiscriminatingTest, Hypothesis, HypothesisPo
 from thoth.domain.model import ModelRequest, ModelResult
 from thoth.domain.model_dispatch import CONTROLLED_MODEL_CONTROL
 
+# The wait for the first model call ends on the model's own signal, ControlledResearchModel.started.
+# The limit only ends a hang: under the full suite on eight workers a correct run reached that
+# call later than the earlier 10 s, while the same test alone passed three times out of three.
+HANG_LIMIT = 60
+
 
 class ControlledResearchModel:
     control_capability = CONTROLLED_MODEL_CONTROL
@@ -385,7 +390,7 @@ async def test_first_tui_input_is_durably_accepted_then_researched(tmp_path: Pat
         running = runtime.bus.read_operation(operation)
         assert running is not None and running.state.value == "RUNNING"
         try:
-            await asyncio.wait_for(model.started.wait(), 10)
+            await asyncio.wait_for(model.started.wait(), HANG_LIMIT)
         except TimeoutError:
             pytest.fail(str(runtime.bus.read_operation(operation)))
         status = value(

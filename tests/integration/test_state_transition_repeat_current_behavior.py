@@ -275,7 +275,16 @@ async def test_the_research_path_answers_a_repeated_pause_and_stop_unchanged(
                 )
             )
         )
-        await asyncio.wait_for(model.started.wait(), 8)
+
+        def moved() -> object:
+            return len(model.calls)
+
+        # The waits end on what they wait for (the first model call, the drained bus), as in
+        # _research_calls below. A fixed 8 or 12 s around the same work failed a correct run
+        # while other test processes kept the machine busy.
+        await wait_for_event_while_progressing(
+            model.started, moved, label="the research request reaches its first model call"
+        )
         scope: dict[str, object] = {"project_id": "p", "thread_id": accepted["thread_id"]}
 
         async def send(method: str, key: str) -> dict[str, Any]:
@@ -290,7 +299,7 @@ async def test_the_research_path_answers_a_repeated_pause_and_stop_unchanged(
         assert second["unchanged"] is True and second["unchanged_reason"] == "THREAD_ALREADY_PAUSED"
         assert await _thread_state(runtime, scope) == ("PAUSE_PENDING", revision)
         model.release.set()
-        await asyncio.wait_for(runtime.bus.drain(), 12)
+        await wait_while_progressing(runtime.bus.drain(), moved, label="drain after the pause")
         state, revision = await _thread_state(runtime, scope)
         assert state == "PAUSED"
         # Already paused: a pause is answered unchanged and the revision does not move.
@@ -300,7 +309,7 @@ async def test_the_research_path_answers_a_repeated_pause_and_stop_unchanged(
         assert await _thread_state(runtime, scope) == ("PAUSED", revision)
 
         await send("thread/resume", "resume-1")
-        await asyncio.wait_for(runtime.bus.drain(), 12)
+        await wait_while_progressing(runtime.bus.drain(), moved, label="drain after the resume")
         operation = runtime.bus.read_operation(str(accepted["operation_id"]))
         assert operation is not None and operation.state.value == "SUCCEEDED"
         finished = await _thread_state(runtime, scope)

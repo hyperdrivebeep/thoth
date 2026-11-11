@@ -12,6 +12,10 @@ import { captureProjectCreation } from "./projectCreation";
 
 // Full-stack contract integration: requires the repository's installed Python environment.
 // Pure import/reflection only; never constructs a runtime, database, model, or connector.
+// The time limit only ends a hang. The child does nothing but import the server's command and bus
+// modules and print their schemas; on a busy GitHub runner that import outlasted the earlier 20 s
+// (spawnSync ETIMEDOUT) although nothing was wrong.
+const pythonHangLimitMs=120_000;
 const repository=fileURLToPath(new URL("../../../../",import.meta.url));
 const python=[join(repository,".venv","Scripts","python.exe"),join(repository,".venv","bin","python")].find(existsSync);
 if(!python)throw new Error("Web/backend contract integration requires the repository .venv Python environment.");
@@ -21,7 +25,7 @@ const backendContract=JSON.parse(execFileSync(python,["-c",[
   "from thoth.application.commands.projects import ProjectCreateInput",
   "from thoth.protocol.bus import READ_QUERY_METHODS",
   "print(json.dumps({'source':SourceConnectInput.model_json_schema(),'project':ProjectCreateInput.model_json_schema(),'queries':sorted(READ_QUERY_METHODS)}))",
-].join("\n")],{shell:false,encoding:"utf8",timeout:20000,cwd:repository,
+].join("\n")],{shell:false,encoding:"utf8",timeout:pythonHangLimitMs,cwd:repository,
   env:{...process.env,PYTHONPATH:join(repository,"src"),PYTHONDONTWRITEBYTECODE:"1"},
 })) as {source:{$defs:Record<string,{enum?:string[]}>};project:{properties:{policy_binding_ref:{default:string}}};queries:string[]};
 
