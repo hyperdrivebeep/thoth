@@ -8,6 +8,7 @@ numpy-free reference for a passage score is embedding_index.max_window_score.
 
 import asyncio
 import importlib
+import threading
 import time
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
@@ -122,10 +123,19 @@ class DenseMaterialProvider:
             if building is not None:
                 building[1].cancel()
 
-    async def _build(
-        self, project: str, stamp: IndexStamp, index: EmbeddingIndexService
+    def _assemble(
+        self,
+        np: Any,
+        index: EmbeddingIndexService,
+        project: str,
+        stamp: IndexStamp,
+        stop: threading.Event,
     ) -> Resident:
-        np = self._numpy_loader()
+        """The blocking half of a build: every SQLite read and the matrix itself.
+
+        It runs in a worker thread so the event loop keeps serving other requests while a large
+        project is read, and it looks at stop between sources so a dropped build ends early.
+        """
         chunks: list[bytes] = []
         rows: dict[str, int] = {}
         shas: list[str] = []
@@ -133,6 +143,8 @@ class DenseMaterialProvider:
         ends: list[int] = []
         offset = 0
         for artifact, version in index.ready_sources(project):
+            if stop.is_set():
+                raise _Unavailable("INDEX_PENDING")
             for span_id, sha, windows in index.read_source_windows(project, artifact, version):
                 if span_id in rows:
                     continue
@@ -144,11 +156,10 @@ class DenseMaterialProvider:
                 offset += len(windows)
                 ends.append(offset)
                 chunks.append(b"".join(w.data for w in windows))
-            await asyncio.sleep(0)
         if not shas:
             raise _Unavailable("INDEX_PENDING")
         matrix = np.frombuffer(b"".join(chunks), dtype="<f4").reshape(-1, 384).astype(np.float64)
-        resident = Resident(
+        return Resident(
             stamp,
             matrix,
             np.asarray(starts, dtype=np.int64),
@@ -156,6 +167,17 @@ class DenseMaterialProvider:
             rows,
             shas,
         )
+
+    async def _build(
+        self, project: str, stamp: IndexStamp, index: EmbeddingIndexService
+    ) -> Resident:
+        np = self._numpy_loader()
+        stop = threading.Event()
+        try:
+            resident = await asyncio.to_thread(self._assemble, np, index, project, stamp, stop)
+        except asyncio.CancelledError:
+            stop.set()
+            raise
         self._residents.pop(project, None)
         self._residents[project] = resident
         while len(self._residents) > RESIDENT_PROJECT_CAP:
