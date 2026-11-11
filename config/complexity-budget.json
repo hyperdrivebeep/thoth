@@ -40,7 +40,7 @@
       "apps/web/src/api/localRetrieval.ts::runLocalOperation": 30,
       "apps/web/src/api/localWorkspacePersistence.ts::readLocalPending": 43,
       "apps/web/src/api/researchProgress.ts::timelineFromPublished.<anon1>": 22,
-      "apps/web/src/api/resultEvidence.ts::read": 28,
+      "apps/web/src/api/resultEvidence.ts::read": 21,
       "apps/web/src/api/resultEvidenceIdentity.ts::currentResultDigest": 22,
       "apps/web/src/components/CapabilityWorkbench.tsx::MethodDetail": 23,
       "apps/web/src/components/ConversationTimeline.tsx::ConversationTimeline": 50,

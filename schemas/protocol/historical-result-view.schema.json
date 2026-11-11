@@ -648,6 +648,21 @@
       "title": "Project Id",
       "type": "string"
     },
+    "projected_keys": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Projected Keys"
+    },
     "request": {
       "additionalProperties": true,
       "title": "Request",
@@ -694,6 +709,19 @@
         }
       ],
       "default": null
+    },
+    "shown_result": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Shown Result"
     },
     "thread_id": {
       "title": "Thread Id",
