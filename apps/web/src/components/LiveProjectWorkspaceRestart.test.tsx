@@ -182,7 +182,7 @@ it("shows unreadable LOCAL setup without offering a fresh consent write on first
   await mount();
   await settle(() => fixture.calls.some(call => call.method === "project/list") && Boolean(container.querySelector(".first-run-card")));
   expect(container.textContent).toContain("설정 파일을 읽지 못");
-  expect(container.textContent).not.toContain("공개 웹을 이 워크스페이스에서 쓸까요");
+  expect(container.textContent).not.toContain("공개 웹을 이 작업 공간에서 쓸까요");
   expect(fixture.calls.some(call => call.method === "workspace/setup/update" || call.method === "model/credential/register")).toBe(false);
 });
 
@@ -444,7 +444,7 @@ it("reopens a lost accepted response without auto-submit and reuses the original
     editor.dispatchEvent(new Event("input", { bubbles: true }));
   });
   expect((container.querySelector('[aria-label="첫 조사 시작"]') as HTMLButtonElement).disabled).toBe(true);
-  const retry = [...container.querySelectorAll("button")].find(button => button.textContent === "이전 요청 같은 key로 확인")!;
+  const retry = [...container.querySelectorAll("button")].find(button => button.textContent === "이전 요청 다시 확인")!;
   await act(async () => retry.click());
   await settle(() => readLocalPending(ids.A, "p", "").kind === "NONE");
   const calls = fixture.calls.filter(call => call.method === "thread/start");
@@ -479,7 +479,7 @@ it("retries the persisted model choice instead of replacing it with a new draft'
     signature: submissionSignature("p", "t", problem, selection), key: "22222222-2222-4222-8222-222222222222", createdAt: 1 })).toBe("SAVED");
   await mount(); await settle(() => Boolean(container.textContent?.includes("이전 요청이 접수됐을 수 있습니다")));
   expect((container.querySelector('[aria-label="보내기"]') as HTMLButtonElement).disabled).toBe(true);
-  const retry = [...container.querySelectorAll("button")].find(button => button.textContent === "이전 요청 같은 key로 확인")!;
+  const retry = [...container.querySelectorAll("button")].find(button => button.textContent === "이전 요청 다시 확인")!;
   await act(async () => retry.click());
   await settle(() => fixture.calls.some(call => call.method === "thread/input"));
   const call = fixture.calls.find(item => item.method === "thread/input")!;

@@ -86,7 +86,7 @@ export const remainingJa: ColumnOf<typeof remainingMessages> = {
   "workspaceError.notice": "サーバーの応答が表示形式と合っていない可能性があります。これは成功や完了とは扱われず、正式な記録は変更されません。タブやプロジェクトから、ほかの記録を見てください。",
   "workspaceError.retry": "サーバーの状態を再読み込みして、もう一度試す",
   "labels.userCode": "ユーザーコード：",
-  "xai.enterCode": "— 開いたページに、上のコードを入力してください。",
+  "xai.enterCode": "開いたページに、上のコードを入力してください。",
   "evidenceUse.direct": "そのまま使える",
   "evidenceUse.conditional": "条件付き、または参考として使える",
   "evidenceUse.missing": "資料が欠けている、または不十分",

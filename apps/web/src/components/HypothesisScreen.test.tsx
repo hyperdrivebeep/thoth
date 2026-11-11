@@ -29,7 +29,7 @@ async function mount(value: Record<string, unknown>) {
   node = document.createElement("div"); document.body.append(node); root = createRoot(node);
   await act(async () => root!.render(<HypothesisCompare result={value}/>));
 }
-const NOTICE = "원인 미확인 — 지지된 가설이 없습니다(원인이 없다는 뜻이 아닙니다)";
+const NOTICE = "원인 미확인: 지지된 가설이 없습니다(원인이 없다는 뜻이 아닙니다)";
 /** The IRIS fixture carries model-written sentences and its own missing-evidence lists; strip them to leave only what the screen words itself. */
 const plain = (hyps: Record<string, unknown>[]) => {
   for (const hyp of hyps) {

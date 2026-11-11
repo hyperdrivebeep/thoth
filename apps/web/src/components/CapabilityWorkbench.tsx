@@ -6,6 +6,7 @@ import { useDeferredValue, useState } from "react";
 import { capabilityCatalog, filterCapabilities, namespaceLabels, namespaces, parseInvocation, transportFor, type Capability } from "../api/capabilities";
 import { rpc, RpcError } from "../api/rpcClient";
 import { RecordInspector } from "./RecordInspector";
+import { eyebrowLabel } from "./statusLabels";
 
 function MethodDetail({ method, projectId, threadId }: { method: Capability; projectId: string; threadId?: string }) {
   const client = useQueryClient();
@@ -65,7 +66,7 @@ export function CapabilityWorkbench({ projectId, threadId, initialNamespace = "a
   );
   const method = methods.find(item => item.name === selected) ?? methods[0];
   return <section className="capability-workbench">
-    <header className="workspace-heading"><div><p className="eyebrow">CAPABILITY WORKBENCH</p><h1>{t("advanced.title")}</h1><p>{t("advanced.intro")}</p></div>
+    <header className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel("CAPABILITY WORKBENCH")}</p><h1>{t("advanced.title")}</h1><p>{t("advanced.intro")}</p></div>
       <Tag minimal>{capabilityCatalog.canonical_method_count} canonical + {capabilityCatalog.compatibility_alias_count} aliases</Tag></header>
     <div className="catalog-toolbar"><InputGroup leftIcon="search" aria-label={t("advanced.search")} placeholder={t("advanced.searchPlaceholder")} value={search} onChange={event => setSearch(event.target.value)} />
       <HTMLSelect aria-label={t("advanced.namespace")} value={namespace} onChange={event => setNamespace(event.target.value)} options={[{value:"all", label:formatMessage("namespaceCount", visibleNamespaces.length)}, ...visibleNamespaces.map(value => ({value, label:`${value} · ${namespaceLabels[value] ?? value}`}))]} />

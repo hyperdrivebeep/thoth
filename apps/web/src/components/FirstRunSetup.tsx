@@ -1,5 +1,6 @@
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
+import { sentenceGap } from "../i18n/sentences";
 import { Button, Callout, InputGroup, Tag } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -95,7 +96,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
     <section className="first-run-card" aria-labelledby="first-run-title">
       <p className="eyebrow">{t("setup.checkNeeded")}</p>
       <h1 id="first-run-title">{t("setup.checkWorkspace")}</h1>
-      <Callout intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} {t("setup.researchIndependent")}</Callout>
+      <Callout intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)}{sentenceGap()}{t("setup.researchIndependent")}</Callout>
       <Button small minimal icon="refresh" loading={ready.isFetching} onClick={() => void ready.refetch()}>{t("setup.checkAgain")}</Button>
     </section>
   </main>;

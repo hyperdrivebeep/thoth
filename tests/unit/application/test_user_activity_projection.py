@@ -157,6 +157,9 @@ def test_source_lifecycle_only_uses_justified_stored_states() -> None:
     serialized = json.dumps(events, ensure_ascii=False)
     assert "C:\\Users" not in serialized
     assert "report.pdf" not in serialized
+    # The screen translates this line by its wording (apps/web/src/i18n/activityDisplay.ts).
+    stale = next(event for event in events if event["research_relation"] == "stale")
+    assert stale["label_ko"] == "최신 상태가 달라진 자료 1곳은 다시 확인해야 합니다."
 
 
 @pytest.mark.parametrize(

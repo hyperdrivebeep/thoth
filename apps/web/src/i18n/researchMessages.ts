@@ -236,7 +236,7 @@ export const researchMessages = {
     "en": "Counterevidence not searched"
   },
   "result.holdDetailsPlain": {
-    "ko": "검토 근거 — 기준과 남은 확인 사항",
+    "ko": "검토 근거: 기준과 남은 확인 사항",
     "en": "Review basis — criteria and open checks"
   },
   "timeline.turnAnswered": { "ko": "답변 있음", "en": "Answered" },

@@ -5,7 +5,7 @@ export const setupJa: ColumnOf<typeof setupMessages> = {
   "setup.checkNeeded": "設定の確認が必要です",
   "setup.checkWorkspace": "既存のワークスペース設定を確認",
   "setup.checkAgain": "設定をもう一度確認",
-  "setup.reviewWorkspace": "ワークスペースを確認",
+  "setup.reviewWorkspace": "レビュー用ワークスペース",
   "setup.connectModel": "調査のためにモデルを接続",
   "setup.oneModelEnough": "接続は1つで十分です。ほかのものは、あとから設定で追加できます。",
   "setup.closeKey": "キーの入力を閉じる",

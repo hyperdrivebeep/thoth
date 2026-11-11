@@ -5,7 +5,7 @@ export const setupZh: ColumnOf<typeof setupMessages> = {
   "setup.checkNeeded": "设置需要处理",
   "setup.checkWorkspace": "检查已有的工作区设置",
   "setup.checkAgain": "重新检查设置",
-  "setup.reviewWorkspace": "查看工作区",
+  "setup.reviewWorkspace": "审查工作区",
   "setup.connectModel": "为你的研究连接一个模型",
   "setup.oneModelEnough": "连接一个就够了。以后可以在设置中添加其他的。",
   "setup.closeKey": "关闭密钥输入",

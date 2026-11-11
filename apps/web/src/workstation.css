@@ -435,6 +435,26 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 }
 
 /* Text for a screen reader that the screen says more briefly. */
+/* The small labels of the project list keep their capital look in English; other scripts are unaffected. */
+.workstation .brand span,
+.workstation .brand .bp6-tag,
+.workstation .nav-label {
+  text-transform: uppercase;
+}
+
+/* Each note about an account is its own line (they used to run together: "…로그인하세요.API 키"). */
+.company-account small {
+  display: block;
+}
+
+/* A long explanation is shown one sentence per line. */
+.sentence-line {
+  display: block;
+}
+.sentence-line + .sentence-line {
+  margin-top: 2px;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

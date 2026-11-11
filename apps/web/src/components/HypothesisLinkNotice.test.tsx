@@ -49,7 +49,7 @@ it("shows nothing for a current hypothesis or one without a link", async () => {
 it("marks a hypothesis on a changed verdict as the old basis, with what it was and what it is, and says it is not used for approval", async () => {
   await mount(link());
   const text = container.textContent!;
-  expect(text).toContain("이전 근거 기준 — 판정이 바뀌었습니다(이전: 보류 · 결과 없음 → 지금: 기준 미달)");
+  expect(text).toContain("이전 근거 기준: 판정이 바뀌었습니다(이전: 보류 · 결과 없음 → 지금: 기준 미달)");
   expect(text).toContain("「비 조건 탐지율」 기준");
   expect(text).toContain("행동 승인과 실행에 쓰이지 않습니다");
   expect(button("다시 확인")).toBeTruthy();
@@ -110,13 +110,13 @@ it("covers the other old hypotheses of the same change in one decision, unless t
 it("shows a kept hypothesis as rechecked with who and why, and a research request as still old", async () => {
   const event = { reason_code: "STILL_MATCHES" as const, note: "원자료로 확인", actor_id: "human:local-user", created_at: "2026-10-06T01:02:03+00:00", flipped: false };
   await mount(link({ state: "RECHECKED", recheck: event }));
-  expect(container.textContent).toContain("다시 확인됨 — 새 결과도 이 가설과 맞음(근거 확인함)");
+  expect(container.textContent).toContain("다시 확인됨: 새 결과도 이 가설과 맞음(근거 확인함)");
   expect(container.textContent).toContain("원자료로 확인");
   expect(container.textContent).not.toContain("이전 근거 기준");
   expect(button("다시 확인")).toBeUndefined();
   await act(async () => root!.unmount()); container.remove(); root = undefined;
   await mount(link({ recheck: { ...event, reason_code: "NEEDS_RESEARCH", note: "" } }));
-  expect(container.textContent).toContain("이전 근거 기준 — 판정이 바뀌었습니다");
+  expect(container.textContent).toContain("이전 근거 기준: 판정이 바뀌었습니다");
   expect(container.textContent).toContain("이유 기록: 다시 조사가 필요함");
   expect(button("다시 확인")).toBeTruthy();
 });

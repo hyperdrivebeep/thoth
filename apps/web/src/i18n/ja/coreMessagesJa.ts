@@ -2,6 +2,10 @@ import type { ColumnOf } from "../withColumns";
 import type { coreMessages } from "../coreMessages";
 
 export const coreJa: ColumnOf<typeof coreMessages> = {
+  "brand.tagline": "リサーチワークステーション",
+  "nav.projects": "プロジェクト",
+  "nav.workspaceRoot": "ワークスペース",
+  "rpc.internalFailure": "サーバーがこのリクエストを処理できませんでした。",
   "usage.memoryExpansion": "記憶の検索語の拡張",
   "language.display": "表示言語",
   "language.acceptedShort": "送信済み",

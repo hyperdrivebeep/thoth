@@ -83,7 +83,7 @@ export const hypothesisActionsJa: ColumnOf<typeof hypothesisActionsMessages> = {
   "reviewList.open": "回答を開く",
   "reviewList.pageFailed": "レビュー一覧の次のページを読み込めませんでした。",
   "reviewList.next": "さらにレビューの項目を見る",
-  "reviewList.scope": "未読の状態、割り当て、コメントの通知は、この一覧の契約の対象外です。",
+  "reviewList.scope": "この一覧は、未読の状態、割り当て、コメントの通知を扱いません。",
   "actions.costUnknown": "コストは不明",
   "actions.timeUnknown": "所要時間は不明",
   "actions.empty": "まだ行動は提案されていません。",

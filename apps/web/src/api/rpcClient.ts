@@ -1,5 +1,6 @@
 import { jsonRpcResponseSchema } from "./protocol";
 import { expectedResultContract } from "./expectedResultContract";
+import { t } from "../i18n/locale";
 
 export type RpcResult<T> = {
   operation_id: string;
@@ -17,6 +18,12 @@ export const readQueries = new Set(["thread/read", "thread/list", "thread/activi
   "revision/head/read", "revision/history/read", "trace/read", "trace/export", "trace/importPreview", "trace/history", "hypothesis/link/list", "hypothesis/test/result/list", "hypothesis/same/list", "trace/closure/list", "trace/lesson/list"]);
 
 const INTERNAL_ERROR = -32603;
+/** What the server answers for any unexpected failure. The screen says it in the person's language. */
+const INTERNAL_FAILURE_TEXT = "internal command failure";
+
+function shownMessage(message: string, code: number): string {
+  return code === INTERNAL_ERROR && message === INTERNAL_FAILURE_TEXT ? t("rpc.internalFailure") : message;
+}
 
 /** The server logs an unexpected failure under its operation id; showing the id lets a report name it. */
 function internalFailureRef(code: number, details: Record<string, unknown> | undefined): string {
@@ -27,7 +34,7 @@ function internalFailureRef(code: number, details: Record<string, unknown> | und
 
 export class RpcError extends Error {
   constructor(message: string, readonly code: number, readonly details: Record<string, unknown>) {
-    super(`${message} [${code}]${internalFailureRef(code, details)}`);
+    super(`${shownMessage(message, code)} [${code}]${internalFailureRef(code, details)}`);
     this.name = "RpcError";
   }
 }

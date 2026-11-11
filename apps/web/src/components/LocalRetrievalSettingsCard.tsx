@@ -1,4 +1,5 @@
 import { Button, Callout, Checkbox, InputGroup, ProgressBar, Switch, Tag } from "@blueprintjs/core";
+import { Sentences } from "./Sentences";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -180,7 +181,7 @@ export function LocalRetrievalSettingsCard({ workspaceId, projectId, hosted = fa
 
   return <section className="detail-card local-retrieval-card" aria-labelledby="local-retrieval-title">
     <h2 id="local-retrieval-title">{text("localRetrieval.title")}</h2>
-    <p className="muted">{text("localRetrieval.intro")}</p>
+    <p className="muted"><Sentences text={text("localRetrieval.intro")} /></p>
 
     {asset.isPending && <p className="muted" role="status">…</p>}
     {asset.error && <Callout intent="warning" role="alert">{text("localRetrieval.readFailed")}</Callout>}

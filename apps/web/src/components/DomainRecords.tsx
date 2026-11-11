@@ -6,6 +6,7 @@ import { useState } from "react";
 import { rpc } from "../api/rpcClient";
 import { transportFor } from "../api/capabilities";
 import { RecordInspector } from "./RecordInspector";
+import { eyebrowLabel } from "./statusLabels";
 import { visibleRecordViews, type RecordView } from "../api/recordViews";
 
 function DomainRecordDetail({projectId,threadId,operationId,view,onOpenCatalog}: {projectId:string;threadId:string;operationId:string;view:RecordView;onOpenCatalog:(namespace:string)=>void}) {
@@ -31,7 +32,7 @@ function DomainRecordDetail({projectId,threadId,operationId,view,onOpenCatalog}:
 export function DomainRecords({ projectId, threadId, operationId = "", onOpenCatalog }: { projectId: string; threadId: string; operationId?:string; onOpenCatalog: (namespace:string) => void }) {
   const [selected, setSelected] = useState("object");
   const view = visibleRecordViews.find(item => item.namespace === selected) ?? visibleRecordViews[0];
-  return <section className="domain-records"><header className="workspace-heading"><div><p className="eyebrow">CANONICAL RECORDS</p><h1>{t("records.title")}</h1><p>{t("records.intro")}</p></div></header>
+  return <section className="domain-records"><header className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel("CANONICAL RECORDS")}</p><h1>{t("records.title")}</h1><p>{t("records.intro")}</p></div></header>
     <div className="domain-grid" aria-label={t("records.area")}>{visibleRecordViews.map(item=><Button minimal active={selected===item.namespace} alignText="left" className="domain-card" key={item.namespace} onClick={()=>setSelected(item.namespace)}>
       <Icon icon={item.method?"database":"lock"}/><span><strong>{item.label}</strong><small>{item.namespace}</small></span></Button>)}</div>
     <DomainRecordDetail key={`${projectId}:${threadId}:${view.namespace}`} projectId={projectId} threadId={threadId} operationId={operationId} view={view} onOpenCatalog={onOpenCatalog}/>

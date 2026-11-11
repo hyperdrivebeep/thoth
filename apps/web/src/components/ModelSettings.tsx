@@ -1,5 +1,6 @@
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
+import { joinSentences, sentenceGap } from "../i18n/sentences";
 import { Button, HTMLSelect } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -37,22 +38,27 @@ function UnavailableNotice({ compact, reasonCode, saved, inheritsProject }: {
   inheritsProject: boolean;
 }) {
   const label = savedLabel(saved);
-  const detail = [
+  const detail = joinSentences([
     unavailableReason(reasonCode),
     label ? message("savedSelection", label) : "",
     inheritsProject ? t("model.inheritedUnchanged") : "",
-  ].join("");
+  ]);
   if (compact) {
     return (
-      <p role="status" className="result-notice" title={detail.trim()}>
-        {t("model.unavailable")} <span className="visually-hidden">{detail} </span>
+      <p role="status" className="result-notice" title={detail}>
+        {t("model.unavailable")}
+        <span className="visually-hidden">
+          {sentenceGap()}
+          {detail}
+        </span>
+        {sentenceGap()}
         {t("model.keepSelection")}
       </p>
     );
   }
   return (
     <p role="status" className="result-notice">
-      {t("model.unavailable")} {detail} {t("model.keepSelection")}
+      {joinSentences([t("model.unavailable"), detail, t("model.keepSelection")])}
     </p>
   );
 }

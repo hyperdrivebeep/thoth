@@ -83,7 +83,7 @@ export const hypothesisActionsZhHant: ColumnOf<typeof hypothesisActionsMessages>
   "reviewList.open": "開啟回答",
   "reviewList.pageFailed": "無法讀取審查列表的下一頁。",
   "reviewList.next": "檢視更多審查項目",
-  "reviewList.scope": "未讀狀態、指派和評論通知不在此列表的契約範圍內。",
+  "reviewList.scope": "此列表不包含未讀狀態、指派和評論通知。",
   "actions.costUnknown": "成本未知",
   "actions.timeUnknown": "時長未知",
   "actions.empty": "尚未提出任何行動。",

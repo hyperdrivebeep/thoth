@@ -1,5 +1,9 @@
 /** Messages of the shell, language settings, composer and expected-result sections. */
 export const coreMessages = {
+  "brand.tagline": { ko: "연구 작업대", en: "Research workstation" },
+  "nav.projects": { ko: "프로젝트", en: "Projects" },
+  "nav.workspaceRoot": { ko: "작업 공간", en: "Workspace" },
+  "rpc.internalFailure": { ko: "서버가 이 요청을 처리하지 못했습니다.", en: "The server could not complete this request." },
   "usage.memoryExpansion": { ko: "기억 검색어 넓히기", en: "Memory query expansion" },
   "language.display": { ko: "화면 언어", en: "Display language" },
   "language.acceptedShort": { ko: "보낸 요청", en: "Submitted" },
@@ -30,10 +34,10 @@ export const coreMessages = {
   "composer.followup": { ko: "보내기", en: "Send" },
   "composer.start": { ko: "첫 조사 시작", en: "Start research" },
   "composer.checkOriginal": { ko: "원 요청 확인", en: "Check original request" },
-  "composer.retryOriginal": { ko: "이전 요청 같은 key로 확인", en: "Check the original submission" },
+  "composer.retryOriginal": { ko: "이전 요청 다시 확인", en: "Check the original submission" },
   "composer.checking": { ko: "원 요청의 접수 상태를 확인하는 중입니다. 초안은 유지합니다.", en: "Checking whether the original request was accepted. Your draft is preserved." },
   "composer.uncertain": { ko: "이전 요청이 접수됐을 수 있습니다. 재시작 뒤 자동 재전송하지 않았습니다. 새 입력은 원 요청을 확인한 뒤 보내세요.", en: "Your previous request may have been accepted. It was not automatically resent after reopening. Check it before submitting another request." },
-  "composer.invalidPending": { ko: "이전 요청의 복구 정보를 확인하지 못했습니다. 원 작업을 확인하기 전에는 새 key로 제출하지 않습니다.", en: "The saved submission could not be verified. Check the original operation before creating another submission." },
+  "composer.invalidPending": { ko: "이전 요청의 복구 정보를 확인하지 못했습니다. 이전 요청을 확인하기 전에는 새로 보내지 않습니다.", en: "The saved submission could not be verified. Check the original operation before creating another submission." },
   "composer.accessChecking": { ko: "접근 범위를 다시 확인하는 중입니다. 초안은 계속 쓸 수 있으며 확인이 끝나기 전에는 제출하지 않습니다.", en: "Checking access. You can keep editing your draft; submission is paused until access is confirmed." },
   "composer.savedResearch": { ko: "저장된 연구는 계속 볼 수 있습니다.", en: "Saved research is still available." },
   "composer.chooseConsent": { ko: "동의 고르기", en: "Choose internet consent" },

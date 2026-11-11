@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { stageFile, type StagedFile, type UploadProgress } from "../api/files";
 import { UiError } from "../i18n/UiError";
+import { sentenceGap } from "../i18n/sentences";
 import { rpc } from "../api/rpcClient";
 import { eyebrowLabel } from "./statusLabels";
 import { authorityOptions, sourceConnectSchema } from "../api/sourcePolicy";
@@ -97,7 +98,7 @@ export function FileConnectionPanel({ projectId, hosted = false }: { projectId: 
       <Button icon="upload" intent="primary" disabled={!files.length || !visibility || connect.isPending} loading={connect.isPending} onClick={()=>connect.mutate({files,authority,visibility,version:selectionVersion.current,projectId})}>{t("composer.attach")}</Button>
       {canCancel && <Button onClick={() => upload.current?.abort()}>{t("sources.fileUploadCancel")}</Button>}</div>
     {files.length > 0 && <p className="muted">{files.map(file=>file.name).join(" · ")}</p>}{progress && <p role="status">{progress}</p>}
-    {notice?.kind === "error" && <Callout compact intent="danger" title={t("sources.connectFailed")}>{connectFailure(notice.error)} {t("sources.checkConnected")}</Callout>}
+    {notice?.kind === "error" && <Callout compact intent="danger" title={t("sources.connectFailed")}>{connectFailure(notice.error)}{sentenceGap()}{t("sources.checkConnected")}</Callout>}
     {notice?.kind === "success" && <Callout compact intent="success">{t("sources.connected")}</Callout>}
   </section>;
 }

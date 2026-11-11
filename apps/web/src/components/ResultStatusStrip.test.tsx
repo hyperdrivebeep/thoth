@@ -38,7 +38,7 @@ it("keeps the unresolved count in the header while the review basis is folded", 
   const html = renderToStaticMarkup(<ResearchResultCard state="SUCCEEDED" result={{ answer: "a", answer_status: "PARTIAL_HOLD" }} coverageMatrix={coverage([row("UNRESOLVED"), row("UNRESOLVED")])} onDetail={() => {}}/>);
   const header = html.slice(0, html.indexOf("answer-text"));
   expect(visible(header)).toContain("기준 2개 중 충족 0 · 확인 필요 2");
-  expect(html).toContain("검토 근거 — 판단 보류 · 기준 2개와 남은 확인 사항");
+  expect(html).toContain("검토 근거: 판단 보류 · 기준 2개와 남은 확인 사항");
   expect(html).toContain("답변 점검 항목 2개 중 충족 0 · 확인 필요 2");
 });
 

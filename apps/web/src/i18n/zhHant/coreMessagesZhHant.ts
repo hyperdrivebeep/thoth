@@ -2,6 +2,10 @@ import type { ColumnOf } from "../withColumns";
 import type { coreMessages } from "../coreMessages";
 
 export const coreZhHant: ColumnOf<typeof coreMessages> = {
+  "brand.tagline": "研究工作台",
+  "nav.projects": "專案",
+  "nav.workspaceRoot": "工作區",
+  "rpc.internalFailure": "伺服器未能處理此請求。",
   "usage.memoryExpansion": "記憶檢索詞擴充",
   "language.display": "顯示語言",
   "language.acceptedShort": "已提交",

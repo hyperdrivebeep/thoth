@@ -2,6 +2,10 @@ import type { ColumnOf } from "../withColumns";
 import type { coreMessages } from "../coreMessages";
 
 export const coreZh: ColumnOf<typeof coreMessages> = {
+  "brand.tagline": "研究工作台",
+  "nav.projects": "项目",
+  "nav.workspaceRoot": "工作区",
+  "rpc.internalFailure": "服务器未能处理此请求。",
   "usage.memoryExpansion": "记忆检索词扩展",
   "language.display": "显示语言",
   "language.acceptedShort": "已提交",

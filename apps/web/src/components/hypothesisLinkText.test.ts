@@ -11,13 +11,13 @@ const link = (patch: Partial<HypothesisLink> = {}): HypothesisLink => ({
 
 describe("what a changed verdict says on a hypothesis", () => {
   it("says the old basis, what it was and what it is now", () => {
-    expect(linkChangeLine(link())).toBe("이전 근거 기준 — 판정이 바뀌었습니다(이전: 보류 · 결과 없음 → 지금: 기준 미달)");
+    expect(linkChangeLine(link())).toBe("이전 근거 기준: 판정이 바뀌었습니다(이전: 보류 · 결과 없음 → 지금: 기준 미달)");
   });
   it("says so when met and failed swapped, and when the row is gone", () => {
     const flipped = linkChangeLine(link({ change: "FLIPPED", link_state: "PASS_COMPUTED", current_state: "FAIL_COMPUTED" }));
     expect(flipped).toContain("이전: 기준 충족 → 지금: 기준 미달");
     expect(flipped).toContain("충족과 미달이 뒤바뀌었습니다");
-    expect(linkChangeLine(link({ change: "SUBJECT_MISSING", current_state: null }))).toBe("이전 근거 기준 — 이 가설이 나온 추적표 줄이 지금은 없습니다(이전: 보류 · 결과 없음)");
+    expect(linkChangeLine(link({ change: "SUBJECT_MISSING", current_state: null }))).toBe("이전 근거 기준: 이 가설이 나온 추적표 줄이 지금은 없습니다(이전: 보류 · 결과 없음)");
   });
   it("has no line for a current link, none for a link-less hypothesis and a rechecked one is not called old", () => {
     expect(linkChangeLine(link({ state: "CURRENT", change: null }))).toBeNull();
@@ -70,7 +70,7 @@ describe("hypotheses of the same change", () => {
 describe("a changed basis under the same verdict", () => {
   it("says the verdict state is the same and only the basis changed", () => {
     const line = linkChangeLine(link({ change: "EVIDENCE_ONLY", link_state: "PASS_COMPUTED", current_state: "PASS_COMPUTED" }));
-    expect(line).toBe("이전 근거 기준 — 판정 상태는 같고 근거만 바뀌었습니다(판정: 기준 충족)");
+    expect(line).toBe("이전 근거 기준: 판정 상태는 같고 근거만 바뀌었습니다(판정: 기준 충족)");
     expect(line).not.toMatch(BANNED);
     expect(line).not.toMatch(LEAK);
   });

@@ -335,8 +335,8 @@ not automatically merge; preserve browser storage separately when needed.
 
 While `serve` or `desktop` runs, warnings and unexpected failures are written to the console and
 to `logs\thoth.log` inside the selected workspace (about 1 MB per file; three older files are
-kept). The file appears with the first record. When the screen shows
-`internal command failure [-32603] (operation:...)`, the record with that operation id names the
+kept). The file appears with the first record. When an error on the screen ends in
+`[-32603] (operation:...)`, the record with that operation id names the
 method, the exception types and where they were raised. A failure of background indexing or of the
 local retrieval scores is written once per distinct failure, not on every retry.
 

@@ -324,8 +324,8 @@ export const hypothesisActionsMessages = {
     "en": "View more review items"
   },
   "reviewList.scope": {
-    "ko": "읽지 않음, 배정, 댓글 알림은 이 목록의 계약에 포함되지 않습니다.",
-    "en": "Unread state, assignment, and comment notifications are outside this list's contract."
+    "ko": "이 목록은 읽지 않음 표시, 담당자 배정, 댓글 알림을 다루지 않습니다.",
+    "en": "This list does not track unread state, assignment, or comment notifications."
   },
   "actions.costUnknown": {
     "ko": "비용 미확인",

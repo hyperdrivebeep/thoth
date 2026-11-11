@@ -42,7 +42,7 @@ THOTH is an AI-assisted R&D workbench that connects research questions to source
 
 ### Korean description
 
-THOTH는 연구 질문부터 원문 근거, 경쟁 가설, 다음 행동, 변경 이력까지 한 흐름에서 살펴보는 AI 연구 워크벤치입니다. 근거가 모자라면 결론을 확정하지 않고 미해결 상태로 남깁니다.
+THOTH는 연구 질문부터 근거 원문, 경쟁 가설, 다음 행동, 변경 이력까지 한 흐름에서 살펴보는 AI 연구 워크벤치입니다. 근거가 모자라면 결론을 확정하지 않고 미해결 상태로 남깁니다.
 
 ## Asset provenance
 

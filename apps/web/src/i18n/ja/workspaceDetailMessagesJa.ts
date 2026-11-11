@@ -20,7 +20,7 @@ export const workspaceDetailJa: ColumnOf<typeof workspaceDetailMessages> = {
   "workspace.draftNotSent": "保存済みの下書きは自動では送信されません。",
   "setup.researchIndependent": "保存済みの調査はこの設定ファイルとは別で、必要な権限があれば引き続きアクセスできます。",
   "model.unavailable": "保存済みのモデルの選択は、現在利用できません。",
-  "model.inheritedUnchanged": " このタスクはプロジェクトのモデル設定を引き継いでおり、個別の選択で置き換えられてはいません。",
+  "model.inheritedUnchanged": "このタスクはプロジェクトのモデル設定を引き継いでおり、個別の選択で置き換えられてはいません。",
   "model.keepSelection": "現在の選択は保持されます。変更するには、下でモデルを選んでください。",
   "model.modelLabel": "モデル",
   "model.effortLabel": "推論の強度",

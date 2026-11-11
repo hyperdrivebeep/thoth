@@ -236,7 +236,7 @@ export const oauthMessages = {
     "en": "Execution: unavailable"
   },
   "web.execution.consent": {
-    "ko": "실행: 워크스페이스 미허용",
+    "ko": "실행: 작업 공간 동의 없음",
     "en": "Execution: workspace consent missing"
   },
   "web.execution.blocked": {

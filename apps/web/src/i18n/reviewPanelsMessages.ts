@@ -1,5 +1,5 @@
 export const reviewPanelsMessages = {
-  "absence.title": { "ko": "없다는 주장에 대한 문자 검사", "en": "Literal checks of absence claims" },
+  "absence.title": { "ko": "자료에 없다고 한 내용의 글자 검색", "en": "Literal checks of absence claims" },
   "absence.limitation": { "ko": "AI가 선언한 문자열을 기록된 추출 범위에서만 검사했습니다. 자료 전체에 없다는 뜻이나 의미·사실의 검증이 아닙니다.", "en": "Only strings declared by the model were checked within the recorded extracted scopes. This does not establish absence from the whole source or verify meaning or facts." },
   "absence.empty": { "ko": "검사할 부재 주장이 선언되지 않았습니다. 모든 문장을 검사했다는 뜻은 아닙니다.", "en": "No absence claims were declared for checking. This does not mean every sentence was checked." },
   "absence.inInput": { "ko": "AI가 받은 자료에 있는데 없다고 함", "en": "The model claimed absence of a string present in its input" },
@@ -46,7 +46,7 @@ export const reviewPanelsMessages = {
     "en": "Send review request"
   },
   "hypothesisFields.unconfirmed": {
-    "ko": "원인 미확인 — 지지된 가설이 없습니다(원인이 없다는 뜻이 아닙니다)",
+    "ko": "원인 미확인: 지지된 가설이 없습니다(원인이 없다는 뜻이 아닙니다)",
     "en": "Cause unconfirmed — no hypothesis is supported; this does not mean no cause exists"
   },
   "hypothesisFields.gaps": {

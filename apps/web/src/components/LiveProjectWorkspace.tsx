@@ -1,5 +1,6 @@
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
+import { sentenceGap } from "../i18n/sentences";
 import { Button, Callout, Collapse, Icon, InputGroup, PopoverNext, Tab, Tabs, Tag } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
@@ -26,6 +27,7 @@ import { eyebrowLabel } from "./statusLabels";
 import { WorkspaceErrorBoundary } from "./WorkspaceErrorBoundary";
 import { ConversationTimeline } from "./ConversationTimeline";
 import { ArchivedProjects } from "./ArchivedProjects";
+import { Brand } from "./Brand";
 import { ResearchComposer } from "./ResearchComposer";
 import { ResearchSidePanel, type SidePanelTab } from "./ResearchSidePanel";
 import { TracePage } from "./TracePage";
@@ -137,17 +139,17 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
   const freshConversation = !threadId && !status?.request && status?.operation_state !== "RUNNING";
   const readiness: ReadinessFacts = { sourceCount: sourceData ? sourceData.value.artifacts.length : null, modelConnected, consent, cutoffAt: project.cutoff_at, executionReady, hosted };
   if (readSuspended) return <section className="workspace-content conversation-page">
-    {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} {t("workspace.authorizedRead")}</Callout>}
+    {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)}{sentenceGap()}{t("workspace.authorizedRead")}</Callout>}
     {page==="research"&&<ResearchComposer session={session} projectId={project.project_id} threadId={threadId} epoch={capturedEpoch}
       onAttach={openResourcePanel} hosted={hosted} executionReady={false} readSuspended/>}</section>;
   return <section ref={contentRef} className={`workspace-content ${page==="research"?"conversation-page":""}`}>
-    {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} {t("workspace.readOnlyHold")}</Callout>}
+    {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)}{sentenceGap()}{t("workspace.readOnlyHold")}</Callout>}
     {page==="research" ? <div className={`conversation-layout ${panelOpen?"detail-open":""}`}><div className="conversation-center">
       <header className="conversation-heading"><h1>{status?.problem??(threadId?t("workspace.continue"):t("workspace.newQuestion"))}</h1></header>
       {import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Callout compact intent="warning" className="test-mode-banner">{t("workspace.testModeNotice")}</Callout>}
       <div className="conversation-scroll"><ConversationTimeline projectId={project.project_id} threadId={threadId} status={status} sourceUris={(sourceData?.value.artifacts??[]).map(item=>item.source_uri)} onDetail={openDetail} queuedInstruction={session.queuedNotice} onContinue={()=>document.getElementById("live-problem")?.focus()} onRetry={question=>{session.setProblem(question);document.getElementById("live-problem")?.focus();}} onResume={operationId=>session.resume.mutate(operationId)} resuming={session.resume.isPending} onOpenHistory={()=>onPage("records")} onOpenSettings={()=>openSettings()} onOpenTrace={onOpenTrace}
         emptyNotice={<ProjectReadinessCard facts={readiness} onOpenSettings={openSettings} onManageSources={()=>onPage("resources")}/>}/>
-        {session.resume.error&&<Callout intent="danger" role="alert">{t("workspace.resumeFailed")} {session.resume.error.message}</Callout>}
+        {session.resume.error&&<Callout intent="danger" role="alert">{t("workspace.resumeFailed")}{sentenceGap()}{session.resume.error.message}</Callout>}
         {(queryError || sourcesDenied || session.researchReadDenied)&&<Callout intent="danger" role="alert">{queryError?.message ?? t("workspace.accessFailed")}<Button small onClick={()=>{void session.research.refetch();void sources.refetch();}}>{t("workspace.reload")}</Button></Callout>}
       </div>
       <ResearchComposer session={session} projectId={project.project_id} threadId={threadId} epoch={capturedEpoch} onAttach={openResourcePanel}
@@ -196,8 +198,8 @@ export function ProjectLanding({ projects, loading = false, contextRestoreIssue 
   const restoreNotice = contextRestoreIssue && <Callout compact intent="warning" role="alert">{contextRestoreIssue === "CORRUPT"
     ? t("workspace.contextCorrupt")
     : t("workspace.contextUnavailable")}
-    {" "}{t("workspace.restoreScope")}</Callout>;
-  const setupNotice = setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} {t("workspace.existingRead")}</Callout>;
+    {sentenceGap()}{t("workspace.restoreScope")}</Callout>;
+  const setupNotice = setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)}{sentenceGap()}{t("workspace.existingRead")}</Callout>;
   if (creating) return <>{setupNotice}{restoreNotice}<Button minimal icon="arrow-left" disabled={projects.length===0} onClick={()=>setCreating(false)}>{t("workspace.backProjects")}</Button><ProjectForm onCreated={onCreated}/></>;
   return <div className="start-page project-home">{setupNotice}{restoreNotice}<div className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel("RESEARCH WORKSPACE")}</p><h1>{t("workspace.continueHeading")}</h1><p>{t("workspace.openOrCreate")}</p></div><Icon icon="projects" size={50}/></div>
     <section className="project-home-list" aria-label={t("workspace.continueProject")}><div className="section-title-row"><h2>{t("workspace.projects")}</h2><Button icon="plus" intent="primary" onClick={()=>setCreating(true)}>{t("workspace.newProject")}</Button></div>
@@ -264,10 +266,11 @@ export function LiveProjectWorkspace() {
   const executionReady = executionReadiness(ready, hosted);
   const sourceCount = project && shellSources.data ? shellSources.data.value.artifacts.length : null;
   return <main className="workstation conversation-workstation bp6-dark">
-    <aside className="navigation-rail"><div className="brand"><div className="brand-mark"><Icon icon="layout-grid" size={20}/></div><div><strong>THOTH</strong><span>RESEARCH WORKSTATION</span></div><Tag minimal>{hosted ? "REVIEW" : "LOCAL"}</Tag></div>
+    <aside className="navigation-rail">
+      <Brand hosted={hosted} />
       <Button icon="plus" intent="primary" className="new-project-button" onClick={()=>{chooseProject("");setOpenCreate(true);}}>{t("workspace.newProject")}</Button>
       <InputGroup small leftIcon="search" aria-label={t("workspace.searchProjects")} placeholder={t("workspace.searchPlaceholder")} value={search} onChange={event=>setSearch(event.target.value)}/>
-      <section className="nav-section"><div className="nav-section-heading"><p className="nav-label">PROJECTS</p><Button small minimal icon="refresh" aria-label={t("workspace.refreshProjects")} onClick={()=>void projectsQuery.refetch()}/></div>
+      <section className="nav-section"><div className="nav-section-heading"><p className="nav-label">{t("nav.projects")}</p><Button small minimal icon="refresh" aria-label={t("workspace.refreshProjects")} onClick={()=>void projectsQuery.refetch()}/></div>
         <ProjectActionNotice error={archiveProject.error} fallbackKey="archive.archiveFailed"/>
         {visibleProjects.filter(item=>`${item.name} ${item.project_id}`.toLowerCase().includes(search.toLowerCase())).flatMap(item=>[
           <ProjectNavItem project={item} active={item.project_id===context.projectId} removing={archiveProject.isPending} key={item.project_id} onOpen={()=>openProject(item.project_id)} onRemove={()=>removeProject(item)}/>,
@@ -283,7 +286,7 @@ export function LiveProjectWorkspace() {
       </section>
       <div className="sidebar-bottom"><Button minimal alignText="left" icon={hosted?"info-sign":"settings"} onClick={()=>setPage("settings")}>{hosted?t("workspace.operations"):t("workspace.settingsTools")}</Button></div>
     </aside>
-    <header className="workstation-topbar"><div className="context-path"><Icon icon="projects"/><span>Workspace</span>{import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Tag intent="warning">{t("workspace.testMode")}</Tag>}<span>/</span><strong>{projectsQuery.isFetching?t("workspace.checkingProject"):project?.name??t("workspace.selectProject")}</strong>{context.threadId&&<><span>/</span><small>{threadsQuery.isFetching?t("workspace.checkingTask"):visibleThreads.find(item=>item.thread_id===context.threadId)?.problem??t("workspace.selectedTask")}</small></>}</div>
+    <header className="workstation-topbar"><div className="context-path"><Icon icon="projects"/><span>{t("nav.workspaceRoot")}</span>{import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Tag intent="warning">{t("workspace.testMode")}</Tag>}<span>/</span><strong>{projectsQuery.isFetching?t("workspace.checkingProject"):project?.name??t("workspace.selectProject")}</strong>{context.threadId&&<><span>/</span><small>{threadsQuery.isFetching?t("workspace.checkingTask"):visibleThreads.find(item=>item.thread_id===context.threadId)?.problem??t("workspace.selectedTask")}</small></>}</div>
       <div className="header-status">{project&&projectCutoffText(project.cutoff_at)&&<Tag minimal icon="time" title={t("workspace.cutoffHint")}>{message("cutoff", projectCutoffText(project.cutoff_at)!)}</Tag>}<Tag minimal intent={health.data?.status==="ok"?"success":health.error?"danger":"none"}>{health.data?.status==="ok"?t("workspace.serverConnected"):health.error?t("workspace.serverFailed"):t("workspace.checkingConnection")}</Tag>
         {!hosted&&!executionReady&&<Button small intent="warning" className="setup-needed-button" icon="warning-sign" endIcon="arrow-right" title={t("workspace.openSetup")} onClick={()=>setPage("settings")}>{t("workspace.setupNeeded")}</Button>}
         {!hosted&&contextStoreFailed&&<Tag minimal intent="warning">{t("workspace.locationUnsaved")}</Tag>}{missingSelection&&<Tag minimal intent="warning">{message("missingSelection", missingSelection)}</Tag>}<Button small minimal icon="refresh" aria-label={t("workspace.refreshContext")} onClick={()=>void client.invalidateQueries()}/></div></header>
@@ -296,6 +299,6 @@ export function LiveProjectWorkspace() {
       onUserInput={cancelOpenLatest} onAdmitted={admit}
       rowOrigin={rowOrigin} onOriginDone={clearRowOrigin} onInvestigate={investigate} traceFocus={traceFocus} onOpenTrace={openTraceRow}/></WorkspaceErrorBoundary> :
       isTimelineExampleRequested() && page === "research" ? <TimelineExamplePane /> :
-      <section className="workspace-content">{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?t("workspace.missingProject"):t("workspace.taskSelectionNeeded")} {t("workspace.draftNotSent")}</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">{t("workspace.locationFailure")}</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">{t("workspace.identityMissing")}</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title={t("workspace.chooseProjectNotice")}>{t("workspace.selectForInfo")}</Callout>:<section className="detail-card"><h2>{t("workspace.connectModel")}</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">{t("workspace.selectForDefaults")}</p></section>}<LanguageSettingsCard scope={storageScope}/></>:<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</section>}
+      <section className="workspace-content">{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?t("workspace.missingProject"):t("workspace.taskSelectionNeeded")}{sentenceGap()}{t("workspace.draftNotSent")}</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">{t("workspace.locationFailure")}</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">{t("workspace.identityMissing")}</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title={t("workspace.chooseProjectNotice")}>{t("workspace.selectForInfo")}</Callout>:<section className="detail-card"><h2>{t("workspace.connectModel")}</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">{t("workspace.selectForDefaults")}</p></section>}<LanguageSettingsCard scope={storageScope}/></>:<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</section>}
   </main>;
 }

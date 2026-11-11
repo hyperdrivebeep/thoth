@@ -50,9 +50,13 @@ const titlesJa: Record<string, Readonly<Record<string, string>>> = {
   RESTORE: { "연구 항목 복원": "調査項目を復元しました" },
   RESULT: { "연구 진행 중간 저장": "調査のチェックポイント", "당시 연구 답변": "保存された調査の回答" },
 };
-const titles = { en: titlesEn, "zh-Hans": titlesZh, "zh-Hant": titlesZhHant, ja: titlesJa } as const;
+/** The server writes these titles in Korean; the one that names an internal object is said plainly. */
+const titlesKo: Record<string, Readonly<Record<string, string>>> = {
+  REVISION: { "결정 객체 변경": "결정 변경" },
+};
+const titles = { ko: titlesKo, en: titlesEn, "zh-Hans": titlesZh, "zh-Hant": titlesZhHant, ja: titlesJa } as const;
 
 export function historyTitle(item: { kind: string; title: string }): string {
   const locale = getLocale();
-  return locale === "ko" ? item.title : titles[locale][item.kind]?.[item.title] ?? item.title;
+  return titles[locale][item.kind]?.[item.title] ?? item.title;
 }

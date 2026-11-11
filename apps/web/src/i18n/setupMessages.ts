@@ -12,7 +12,7 @@ export const setupMessages = {
     "en": "Check setup again"
   },
   "setup.reviewWorkspace": {
-    "ko": "심사 워크스페이스",
+    "ko": "심사 작업 공간",
     "en": "Review workspace"
   },
   "setup.connectModel": {
@@ -124,7 +124,7 @@ export const setupMessages = {
     "en": "Next"
   },
   "setup.webQuestion": {
-    "ko": "공개 웹을 이 워크스페이스에서 쓸까요?",
+    "ko": "공개 웹을 이 작업 공간에서 쓸까요?",
     "en": "Allow public web access in this workspace?"
   },
   "setup.hostedDisclosure": {
@@ -204,11 +204,11 @@ export const setupMessages = {
     "en": "Model settings"
   },
   "model.parentLoading": {
-    "ko": "상속한 프로젝트 모델을 확인하는 중…",
+    "ko": "프로젝트의 모델 설정을 확인하는 중…",
     "en": "Checking the inherited project model…"
   },
   "model.parentFailed": {
-    "ko": "상속한 프로젝트 모델을 읽지 못했습니다.",
+    "ko": "프로젝트의 모델 설정을 읽지 못했습니다.",
     "en": "The inherited project model could not be read."
   },
   "model.noProjectModel": {
@@ -216,7 +216,7 @@ export const setupMessages = {
     "en": "No project model specified"
   },
   "model.inheritsProject": {
-    "ko": "이 작업은 프로젝트 모델 설정을 상속합니다.",
+    "ko": "이 작업은 프로젝트의 모델 설정을 따릅니다.",
     "en": "This task inherits the project's model settings."
   },
   "model.researchModel": {

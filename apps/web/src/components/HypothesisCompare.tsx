@@ -1,4 +1,5 @@
 import { message as formatMessage } from "../i18n/formatMessages";
+import { Sentences } from "./Sentences";
 import { t } from "../i18n/locale";
 import { Button, HTMLTable, Tag } from "@blueprintjs/core";
 import { useState } from "react";
@@ -88,7 +89,7 @@ export function HypothesisCompare({ result, review, projectId, links, distributi
     </section>)}
     {table && shown && <section className="detail-card" aria-label={t("hypotheses.relationships")}>
       <h3>{t("hypotheses.relationships")}</h3>
-      <p className="muted">{t("hypotheses.relationshipNotice")}</p>
+      <p className="muted"><Sentences text={t("hypotheses.relationshipNotice")} /></p>
       {counterNote && <p className="muted">{counterNote}</p>}
       <div className="relation-filter">
         <Button small minimal active={onlyOpen} onClick={() => setOnlyOpen(true)}>{t("hypotheses.filter")}</Button>

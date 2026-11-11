@@ -52,7 +52,7 @@ export const workspaceMessages = {
     "en": "A continuing research record"
   },
   "workspace.historyNotice": {
-    "ko": "결과·기억·revision·복구의 근거를 추적합니다.",
+    "ko": "결과, 기억, 변경 기록, 복구의 근거를 확인합니다.",
     "en": "Trace the basis of results, memory, revisions, and recovery."
   },
   "workspace.chooseOrCreate": {
@@ -363,7 +363,7 @@ export const workspaceMessages = {
     "en": "The last workspace location could not be saved in this browser. Automatic restoration may be limited after reopening."
   },
   "workspace.identityMissing": {
-    "ko": "워크스페이스 식별자를 확인하지 못해 브라우저 재시작용 초안 저장을 사용할 수 없습니다.",
+    "ko": "작업 공간 식별자를 확인하지 못해 브라우저 재시작용 초안 저장을 사용할 수 없습니다.",
     "en": "The workspace identity could not be verified, so draft restoration after reopening is unavailable."
   },
   "workspace.chooseProjectNotice": {

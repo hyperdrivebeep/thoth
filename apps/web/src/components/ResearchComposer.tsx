@@ -1,5 +1,6 @@
 import { Button, Callout, TextArea } from "@blueprintjs/core";
 import { useTranslation, t } from "../i18n/locale";
+import { sentenceGap } from "../i18n/sentences";
 import { blockedReason } from "./readinessText";
 import { message } from "../i18n/formatMessages";
 import { isResponseLanguage, responseLanguageLabel } from "../api/responseLanguages";
@@ -44,7 +45,7 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
     {!hosted && session.draftRestoreIssue && <Callout compact intent="warning" role="alert">{session.draftRestoreIssue === "CORRUPT"
       ? t("composer.corruptDraft")
       : t("composer.unavailableDraft")}
-      {" "}{t("composer.draftScope")}</Callout>}
+      {sentenceGap()}{t("composer.draftScope")}</Callout>}
     {!hosted && session.draftSaveState !== "SAVED" && <Callout compact intent="warning" role="status">{session.draftSaveState === "TOO_LARGE"
       ? t("composer.draftTooLarge")
       : t("composer.draftUnsaved")}</Callout>}
@@ -142,7 +143,7 @@ function SendButton({ followup, checkingOriginal, disabled, loading, blockedReas
 function SetupNotice({ hidden, consentMissing, modelConnected, onOpenSettings }: { hidden: boolean; consentMissing: boolean; modelConnected: boolean | undefined; onOpenSettings?: (target?: "consent") => void }) {
   if (hidden) return null;
   const consentFirst = consentMissing && modelConnected !== false;
-  return <Callout compact intent="warning" role="status" id={BLOCKED_REASON_ID}>{t("composer.savedResearch")} {blockedReason(consentMissing, modelConnected)}
+  return <Callout compact intent="warning" role="status" id={BLOCKED_REASON_ID}>{t("composer.savedResearch")}{sentenceGap()}{blockedReason(consentMissing, modelConnected)}
     {onOpenSettings && (consentFirst
       ? <Button small minimal onClick={() => onOpenSettings("consent")}>{t("composer.chooseConsent")}</Button>
       : <Button small minimal onClick={() => onOpenSettings()}>{t("composer.checkModel")}</Button>)}</Callout>;

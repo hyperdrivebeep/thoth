@@ -209,7 +209,7 @@ export function XaiDeviceLogin({ projectId, workspaceId, account, method, method
       <p role="status">{stateMessage(shownState!)}</p>
       {!terminalStates.has(shownState!) && <>
         <p className="device-code-row">{t("labels.userCode")}{" "}<code className="device-code">{session.userCode}</code></p>
-        <p><a href={session.verificationUri} target="_blank" rel="noopener noreferrer">{t("xai.openApproval")}</a>{" "}{t("xai.enterCode")}</p>
+        <p><a href={session.verificationUri} target="_blank" rel="noopener noreferrer">{t("xai.openApproval")}</a><br />{t("xai.enterCode")}</p>
         <p className="connection-timer" aria-live="off">{message("expiry", Math.max(0, Math.ceil(session.expiresAt - now)), false)}</p>
         <div>
           <Button small minimal disabled={checking || cancelling} onClick={() => {
