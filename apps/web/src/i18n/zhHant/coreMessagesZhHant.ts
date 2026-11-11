@@ -29,7 +29,7 @@ export const coreZhHant: ColumnOf<typeof coreMessages> = {
   "composer.followupPlaceholder": "補充問題、新證據或變化的條件…",
   "composer.startPlaceholder": "你想調查什麼問題？",
   "composer.attach": "連線資料",
-  "composer.followup": "傳送補充指示",
+  "composer.followup": "傳送",
   "composer.start": "開始調查",
   "composer.checkOriginal": "檢查原始請求",
   "composer.retryOriginal": "檢查原始提交",

@@ -64,7 +64,7 @@ afterEach(async () => {
 
 it("names the empty internet consent as the reason, and the settings page lets the user choose it", async () => {
   await mount();
-  const submit = () => container.querySelector('[aria-label="지시 추가"]') as HTMLButtonElement;
+  const submit = () => container.querySelector('[aria-label="보내기"]') as HTMLButtonElement;
   expect(container.textContent).toContain("인터넷 사용 동의를 고르세요");
   expect(container.textContent).not.toContain("모델 연결과 초기 설정을 확인하세요");
   expect(submit().disabled).toBe(true);

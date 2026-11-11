@@ -29,7 +29,7 @@ export const coreJa: ColumnOf<typeof coreMessages> = {
   "composer.followupPlaceholder": "追加の質問、新しい根拠、変わった条件を入力してください…",
   "composer.startPlaceholder": "どんな問題を調べたいですか？",
   "composer.attach": "資料を接続",
-  "composer.followup": "追加の指示を送る",
+  "composer.followup": "送信",
   "composer.start": "調査を開始",
   "composer.checkOriginal": "元のリクエストを確認",
   "composer.retryOriginal": "元の送信を確認",

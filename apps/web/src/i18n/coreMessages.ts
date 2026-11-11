@@ -27,7 +27,7 @@ export const coreMessages = {
   "composer.followupPlaceholder": { ko: "추가 질문, 새 근거, 바뀐 조건을 적어주세요…", en: "Add a question, new evidence, or changed conditions…" },
   "composer.startPlaceholder": { ko: "어떤 문제를 해결하고 싶으신가요?", en: "What problem would you like to investigate?" },
   "composer.attach": { ko: "자료 연결", en: "Connect sources" },
-  "composer.followup": { ko: "지시 추가", en: "Send follow-up" },
+  "composer.followup": { ko: "보내기", en: "Send" },
   "composer.start": { ko: "첫 조사 시작", en: "Start research" },
   "composer.checkOriginal": { ko: "원 요청 확인", en: "Check original request" },
   "composer.retryOriginal": { ko: "이전 요청 같은 key로 확인", en: "Check the original submission" },

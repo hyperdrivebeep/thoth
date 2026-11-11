@@ -26,6 +26,37 @@ function savedLabel(value?: SavedSelection): string | null {
   return `${value.provider ?? t("model.providerUnset")} / ${value.model ?? t("model.modelUnset")}${value.reasoning_effort ? message("effort", value.reasoning_effort) : ""}`;
 }
 
+/**
+ * Says that the saved model cannot be used. Next to the question box it is one short line and the
+ * reason stays available to a screen reader and as the tooltip; the settings page spells it out.
+ */
+function UnavailableNotice({ compact, reasonCode, saved, inheritsProject }: {
+  compact: boolean;
+  reasonCode?: string | null;
+  saved?: SavedSelection;
+  inheritsProject: boolean;
+}) {
+  const label = savedLabel(saved);
+  const detail = [
+    unavailableReason(reasonCode),
+    label ? message("savedSelection", label) : "",
+    inheritsProject ? t("model.inheritedUnchanged") : "",
+  ].join("");
+  if (compact) {
+    return (
+      <p role="status" className="result-notice" title={detail.trim()}>
+        {t("model.unavailable")} <span className="visually-hidden">{detail} </span>
+        {t("model.keepSelection")}
+      </p>
+    );
+  }
+  return (
+    <p role="status" className="result-notice">
+      {t("model.unavailable")} {detail} {t("model.keepSelection")}
+    </p>
+  );
+}
+
 export function ModelSettings({ projectId, threadId, selection, onSelect, onSaved, compact = false }: {
   projectId: string; threadId?: string; selection: ModelSelection | null;
   onSelect: (selection: ModelSelection) => void; onSaved: () => void; compact?: boolean;
@@ -82,10 +113,14 @@ export function ModelSettings({ projectId, threadId, selection, onSelect, onSave
   } });
   return <fieldset className={`model-settings ${compact ? "compact" : ""}`}>
     <legend>{t("model.settings")}</legend>
-    {data?.availability === "UNAVAILABLE" && <p role="status" className="result-notice">{t("model.unavailable")} {unavailableReason(data.reason_code)}
-      {savedLabel(saved) ? message("savedSelection", savedLabel(saved) ?? "") : ""}
-      {inheritsProject ? t("model.inheritedUnchanged") : ""}
-      {" "}{t("model.keepSelection")}</p>}
+    {data?.availability === "UNAVAILABLE" && (
+      <UnavailableNotice
+        compact={compact}
+        reasonCode={data.reason_code}
+        saved={saved}
+        inheritsProject={inheritsProject}
+      />
+    )}
     {inheritsProject && data?.availability === "UNAVAILABLE" && (inherited.isPending || inherited.isFetching ? <small role="status">{t("model.parentLoading")}</small>
       : inherited.error ? <small role="alert">{t("model.parentFailed")}</small>
         : <small>{message("inheritedSelection", inheritedLabel ?? t("model.noProjectModel"))}</small>)}

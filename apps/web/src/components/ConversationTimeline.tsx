@@ -22,6 +22,7 @@ import { useAutoRetryOff } from "./useAutoRetryOff";
 import { SyntheticDataNotice } from "./SyntheticDataNotice";
 import { ConversationTurnView, QuestionBubble } from "./ConversationTurnView";
 import { collectTurns, savedBeforeSet, turnTally } from "./timelineTurns";
+import { useOpenAtLatestTurn } from "./useOpenAtLatestTurn";
 
 type TimelineProps = {
   projectId: string; threadId: string; status?: ResearchStatus; sourceUris?: string[]; queuedInstruction?: boolean;
@@ -127,6 +128,7 @@ export function ConversationTimeline(props: TimelineProps) {
     queryFn: ({ pageParam, signal }) => readConversation(projectId, threadId, pageParam, signal, protection.block),
     getNextPageParam: page => page.next ?? undefined,
   });
+  const timelineRef = useOpenAtLatestTurn(threadId, Boolean(query.data));
   if (!example && threadId && (protection.blocked || query.data?.pages.some(page => page.redacted) || (query.error && !canRetainConversation(query.error)))) {
     return <section className="conversation-timeline" aria-label={t("timeline.title")}><Callout intent="warning" role="alert">
       {t("timeline.accessUnverified")}
@@ -147,7 +149,7 @@ export function ConversationTimeline(props: TimelineProps) {
   const emptyExistingThread = Boolean(threadId && query.data && turns.length === 0 && !currentQuestion && !running);
   // The newest saved turn stays open unless a live block follows it; earlier turns start folded.
   const openIndex = currentQuestion || running ? -1 : turns.length - 1;
-  return <section className="conversation-timeline" aria-label={t("timeline.title")}>
+  return <section ref={timelineRef} className="conversation-timeline" aria-label={t("timeline.title")}>
     {!example && <SyntheticDataNotice projectId={projectId}/>}
     {turns.length > 1 && <p className="turn-tally muted" role="status">{message("turnTally", tally.total, tally.answered, tally.interrupted)}</p>}
     {query.hasNextPage && <Button minimal loading={query.isFetchingNextPage} onClick={() => void query.fetchNextPage()}>{t("timeline.older")}</Button>}

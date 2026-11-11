@@ -29,7 +29,7 @@ export const coreZh: ColumnOf<typeof coreMessages> = {
   "composer.followupPlaceholder": "补充问题、新证据或变化的条件…",
   "composer.startPlaceholder": "你想调查什么问题？",
   "composer.attach": "连接资料",
-  "composer.followup": "发送补充指示",
+  "composer.followup": "发送",
   "composer.start": "开始调查",
   "composer.checkOriginal": "检查原始请求",
   "composer.retryOriginal": "检查原始提交",

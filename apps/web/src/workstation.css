@@ -407,3 +407,39 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
   --bp-typography-family-default: "Segoe UI", "Microsoft JhengHei UI", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", "Source Han Sans TC", sans-serif;
   font-family: var(--bp-typography-family-default);
 }
+
+/* The question box shows where the keyboard is (the caret alone is easy to miss). */
+.composer-dock .prompt-composer:focus-within {
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 0 1px var(--accent-bright), 0 6px 24px #0002;
+}
+
+/* The question box is one line until someone types (it grows to 160px), so a saved answer keeps
+   the screen. Only the vertical spacing is set here; the narrow-window rules keep their sides. */
+.composer-dock {
+  padding-top: 8px;
+  padding-bottom: 10px;
+}
+.composer-dock .prompt-composer {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.workstation .composer-dock .prompt-composer textarea {
+  min-height: 32px;
+}
+.composer-tools {
+  margin-top: 4px;
+}
+.usage-summary {
+  padding-top: 4px;
+}
+
+/* Text for a screen reader that the screen says more briefly. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

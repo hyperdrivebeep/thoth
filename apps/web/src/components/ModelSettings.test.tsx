@@ -130,7 +130,19 @@ it("offers the explicit xai-oauth model without replacing an existing selection"
 
 it("keeps an unavailable saved model and effort visible until a user selects a new option", async () => {
   await mount(true);
+  // Next to the question box the notice is one short line; the reason stays in its tooltip and for a screen reader.
+  const brief = container.querySelector<HTMLParagraphElement>(".composer-dock .model-settings.compact p.result-notice")!;
+  const shown = [...brief.childNodes].filter(node => !(node instanceof HTMLElement && node.className === "visually-hidden"));
+  expect(shown.map(node => node.textContent).join("").replace(/\s+/g, " ").trim())
+    .toBe("저장된 모델 선택을 현재 사용할 수 없습니다. 기존 선택은 유지됩니다. 변경하려면 아래에서 모델을 직접 고르세요.");
+  expect(brief.title).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
+  expect(brief.title).toContain("저장된 선택: retired / old-model · 추론강도 high");
+  expect(brief.querySelector(".visually-hidden")?.textContent).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
   await openPage("설정");
+  // The settings page spells the reason out in the text itself.
+  const full = container.querySelector<HTMLParagraphElement>(".model-settings:not(.compact) p.result-notice")!;
+  expect(full.querySelector(".visually-hidden")).toBeNull();
+  expect(full.textContent).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
   expect(container.textContent).toContain("저장된 선택: retired / old-model · 추론강도 high");
   expect(container.textContent).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
   const model = container.querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
