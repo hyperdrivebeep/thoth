@@ -13,7 +13,7 @@ from thoth.domain.deployment_mode import DeploymentMode
 from thoth.protocol.jsonrpc import RpcErrorCode
 
 
-async def test_default_off_read_configure_cas_and_no_worker(tmp_path: Path) -> None:
+async def test_default_on_read_configure_cas_and_no_worker(tmp_path: Path) -> None:
     runtime = create_runtime(tmp_path / "workspace", model_catalog=StaticModelCatalog())
     try:
         service = runtime.local_retrieval
@@ -37,7 +37,9 @@ async def test_default_off_read_configure_cas_and_no_worker(tmp_path: Path) -> N
                 request("project/retrieval/experiment/read", "read", {"project_id": project})
             )
         )
-        assert before["state"] == "OFF" and before["generation"] == 0
+        # Nobody configured this project: local retrieval reads as on (generation 1), no index yet.
+        assert before["state"] == "NO_SOURCES" and before["generation"] == 1
+        assert before["enabled"] is True
         asset = value(
             await runtime.bus.query(
                 request("model/localAsset/read", "asset", {"project_id": "system:workspace"})
@@ -47,24 +49,25 @@ async def test_default_off_read_configure_cas_and_no_worker(tmp_path: Path) -> N
         assert not (tmp_path / "workspace/models").exists()
         command = request(
             "project/retrieval/experiment/configure",
-            "enable",
+            "disable",
             {
                 "project_id": project,
-                "enabled": True,
-                "expected_generation": 0,
+                "enabled": False,
+                "expected_generation": 1,
             },
         )
-        enabled = value(await runtime.bus.dispatch(command))
-        assert enabled["state"] == "NO_SOURCES" and enabled["generation"] == 1
-        assert value(await runtime.bus.dispatch(command)) == enabled
+        disabled = value(await runtime.bus.dispatch(command))
+        assert disabled["state"] == "OFF" and disabled["generation"] == 2
+        assert disabled["enabled"] is False
+        assert value(await runtime.bus.dispatch(command)) == disabled
         stale = await runtime.bus.dispatch(
             request(
                 "project/retrieval/experiment/configure",
                 "stale",
                 {
                     "project_id": project,
-                    "enabled": False,
-                    "expected_generation": 0,
+                    "enabled": True,
+                    "expected_generation": 1,
                 },
             )
         )

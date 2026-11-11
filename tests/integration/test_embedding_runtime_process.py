@@ -37,7 +37,6 @@ async def test_runtime_close_fences_job_and_stops_active_owned_child(tmp_path: P
                 )
             )
         )
-        service.configure(project, True, 0)
         value(
             await runtime.bus.dispatch(
                 request(

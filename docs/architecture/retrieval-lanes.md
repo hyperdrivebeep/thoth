@@ -350,13 +350,13 @@ an explicit routing/fallback observation. A wrong project is a scope error, not 
 The full-catalog and one-artifact paths do not need dense material.
 
 In the research path (`lexical_selection`), the request carries a `DenseMaterial` only when the
-project switched local retrieval on and a routing policy is the active policy or a shadow. The
-default policies ignore it, so a project without the experiment, and a project with it under the
+project has local retrieval on (the default) and a routing policy is the active policy or a shadow. The
+default policies ignore it, so a project switched off, and a project with it under the
 default policy, journal exactly the bytes they journaled before. The dense source and its
 fall-back reasons are described in `local-retrieval-preparation.md`; whatever reason it gives is
 the `fallback_reason` of the routing observation.
 
-A project that switched local retrieval on can have this policy as its own active policy with
+A project that has local retrieval on can have this policy as its own active policy with
 `exposure: PROJECT_OPT_IN` (see `local-retrieval-preparation.md`). That value is not an artifact
 or exposure value: the routing handler refuses it, and the only stages that can carry a 5.0.0
 policy remain SHADOW. For such a policy, when the dense lane is unavailable `select_routed` returns

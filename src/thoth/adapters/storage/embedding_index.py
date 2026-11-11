@@ -3,11 +3,12 @@
 from collections.abc import Callable
 from typing import Literal
 
-from sqlalchemy import Connection, Engine, delete, select, update
+from sqlalchemy import Connection, Engine, select, update
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.engine import RowMapping
 
 from thoth.adapters.storage import embedding_source as source
+from thoth.adapters.storage import embedding_upkeep as upkeep
 from thoth.adapters.storage.embedding_schema import (
     embedding_configs,
     embedding_jobs,
@@ -27,15 +28,16 @@ from thoth.domain.embedding_index import (
     EmbeddingJob,
     EmbeddingVector,
     content_key,
-    embedding_key,
 )
-from thoth.domain.retrieval_embedding import MAX_PASSAGE_WINDOWS, window_count
+from thoth.domain.retrieval_embedding import window_count
 
 
 class SqliteEmbeddingIndex:
     def __init__(self, engine: Engine, *, fault: Callable[[str], None] | None = None) -> None:
         self.engine = engine
         self.uow = SqliteAtomicUnitOfWork(engine, immediate=True)
+        # Manifests read ahead of publishing, by (job, generation, owner) of one run of a job.
+        self._prepared: dict[tuple[str, int, str | None], str] = {}
         self.fault = fault
 
     def _fault(self, point: str) -> None:
@@ -98,7 +100,16 @@ class SqliteEmbeddingIndex:
             if config.generation != intent.config_generation or config.model != intent.model:
                 raise EmbeddingIndexError("EMBEDDING_CONFIG_CONFLICT")
             identifier = source.stage(c, intent)
-            if identifier and source.matches(c, intent):
+            # Comparing with the source reads all its spans, so only a job that is waiting to be
+            # revived (STALE) is compared, not every job that is merely confirmed as present.
+            state = (
+                c.execute(
+                    select(embedding_jobs.c.state).where(embedding_jobs.c.job_id == identifier)
+                ).scalar()
+                if identifier
+                else None
+            )
+            if state == "STALE" and source.matches(c, intent):
                 # Only explicit reconciliation can revive invalidated links; failed/cancelled
                 # attempts still require the separate generation-fenced retry command.
                 c.execute(
@@ -326,12 +337,32 @@ class SqliteEmbeddingIndex:
                 windows.append(vector)
             return tuple(windows)
 
-    def publish(self, job: EmbeddingJob, now_ms: int) -> EmbeddingJob:
-        with self.uow.transaction(), write_connection(self.engine) as c:
-            self._lease(c, job, now_ms)
+    def prepare_publication(self, job: EmbeddingJob) -> None:
+        """Do the slow reads of publishing a job without holding the database write lock.
+
+        Compares the job with every span of its source and reads the stored vectors for the
+        manifest (seconds for a large source). The result is remembered for this run of the job, so
+        that publish only has to check, inside its short write transaction, that the source is
+        still the one that was read (same configuration, binding, latest version and hash, which
+        fixes the spans). Raises what publish would raise for a source that no longer matches.
+        """
+        with read_connection(self.engine) as c:
             if not source.matches(c, job.intent):
                 raise EmbeddingIndexError("EMBEDDING_SOURCE_CHANGED")
-            digest = self._manifest(job)
+        self._prepared[(job.job_id, job.generation, job.owner)] = self._manifest(job)
+
+    def publish(self, job: EmbeddingJob, now_ms: int) -> EmbeddingJob:
+        prepared = self._prepared.pop((job.job_id, job.generation, job.owner), None)
+        with self.uow.transaction(), write_connection(self.engine) as c:
+            self._lease(c, job, now_ms)
+            if prepared is None:
+                if not source.matches(c, job.intent):
+                    raise EmbeddingIndexError("EMBEDDING_SOURCE_CHANGED")
+                digest = self._manifest(job)
+            else:
+                # The slow comparison was done in prepare_publication; _lease above has just
+                # checked, under the write lock, that the source is still the one that was read.
+                digest = prepared
             self._fault("before_ready_cas")
             changed = c.execute(
                 update(embedding_jobs)
@@ -416,11 +447,21 @@ class SqliteEmbeddingIndex:
                 )
             ).rowcount
 
+    def interrupt(self, project: str, job_id: str) -> None:
+        """A running job was stopped by the system (time limit of a pass): it waits again."""
+        upkeep.interrupt(self, project, job_id)
+
+    def resume_interrupted(self, project: str, now_ms: int) -> int:
+        """Queue again the jobs the system itself stopped (a crash, a shutdown)."""
+        return upkeep.resume_interrupted(self, project, now_ms)
+
     def invalidate(self, project: str, artifact: str) -> None:
         with write_connection(self.engine) as c:
             source.invalidate(c, project, artifact)
 
-    def cancel(self, project: str, job_id: str) -> None:
+    def cancel(self, project: str, job_id: str, reason: str = "USER_CANCELLED") -> None:
+        """Cancel a waiting or running job. The reason tells a person's decision (the default)
+        from a stop the system made, which resume_interrupted takes up again."""
         with write_connection(self.engine) as c:
             c.execute(
                 update(embedding_jobs)
@@ -435,13 +476,30 @@ class SqliteEmbeddingIndex:
                     owner=None,
                     lease_until_ms=None,
                     manifest_digest=None,
-                    reason="USER_CANCELLED",
+                    reason=reason,
                 )
             )
 
     def is_current(self, intent: EmbeddingIntent) -> bool:
         with read_connection(self.engine) as c:
             return source.matches(c, intent)
+
+    def is_current_header(self, intent: EmbeddingIntent) -> bool:
+        """The same question as is_current without reading the source's spans.
+
+        Configuration, active binding and the latest version's identity and hash. A source whose
+        hash and version are unchanged has the same spans, and a request that scores against the
+        index checks every span's text hash again, so this is enough to decide whether an index
+        is worth using for a question.
+        """
+        with read_connection(self.engine) as c:
+            return source.header_matches(c, intent)
+
+    def needs_indexing(self, project: str) -> bool:
+        """Whether the project is on and has a source with pending work or no job yet."""
+        jobs = self.jobs(project)
+        with read_connection(self.engine) as c:
+            return source.needs_indexing(c, project, jobs)
 
     def index_stamp(self, project: str) -> tuple[bool, int, tuple[tuple[str, int], ...]]:
         """What a resident copy of the READY index depends on, read without parsing any job.
@@ -459,28 +517,7 @@ class SqliteEmbeddingIndex:
         return config.enabled, config.generation, tuple((str(r[0]), int(r[1])) for r in rows)
 
     def reconcile(self, project: str) -> int:
-        changed = 0
-        with self.uow.transaction(), write_connection(self.engine) as c:
-            for job in self.jobs(project):
-                if job.state in ("PENDING", "RUNNING", "READY") and not source.matches(
-                    c, job.intent
-                ):
-                    changed += c.execute(
-                        update(embedding_jobs)
-                        .where(
-                            embedding_jobs.c.job_id == job.job_id,
-                            embedding_jobs.c.generation == job.generation,
-                        )
-                        .values(
-                            state="STALE",
-                            generation=job.generation + 1,
-                            owner=None,
-                            lease_until_ms=None,
-                            manifest_digest=None,
-                            reason="SOURCE_INVALIDATED",
-                        )
-                    ).rowcount
-        return changed
+        return upkeep.reconcile(self, project)
 
     def _manifest(self, job: EmbeddingJob) -> str:
         entries: list[tuple[str, ...]] = []
@@ -516,37 +553,4 @@ class SqliteEmbeddingIndex:
         return None
 
     def collect_orphans(self, project: str) -> int:
-        with self.uow.transaction(), write_connection(self.engine) as c:
-            jobs = self.jobs(project)
-            if any(j.state == "RUNNING" for j in jobs):
-                return 0
-            retained: set[str] = set()
-            # The first window of a long passage records its size, which says how many more
-            # windows there are and so which keys must stay.
-            sizes = {
-                row[0]: row[1]
-                for row in c.execute(
-                    select(
-                        embedding_vectors.c.content_key, embedding_vectors.c.source_tokens
-                    ).where(
-                        embedding_vectors.c.project_id == project,
-                        embedding_vectors.c.source_tokens.is_not(None),
-                    )
-                )
-            }
-            for j in jobs:
-                if j.state not in ("PENDING", "RUNNING", "READY", "FAILED") or not source.matches(
-                    c, j.intent
-                ):
-                    continue
-                for ref in j.intent.refs:
-                    first = embedding_key(ref.text_sha256, j.intent.model)
-                    retained.add(first)
-                    for window in range(
-                        1, min(window_count(sizes.get(first)), MAX_PASSAGE_WINDOWS)
-                    ):
-                        retained.add(content_key(ref.text_sha256, j.intent.model, window))
-            statement = delete(embedding_vectors).where(embedding_vectors.c.project_id == project)
-            if retained:
-                statement = statement.where(embedding_vectors.c.content_key.not_in(retained))
-            return c.execute(statement).rowcount
+        return upkeep.collect_orphans(self, project)

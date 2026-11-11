@@ -27,11 +27,12 @@ claim that answers are correct or useful on your data.
 3. Back up your workspace before opening it with the beta. Opening an existing workspace runs
    database migrations, and THOTH has no downgrade command (see [Upgrading](#upgrading)).
 4. Check what you installed: `.\.venv\Scripts\python.exe -m thoth.cli version`. The beta prints
-   `THOTH 0.2.0b1` (the release is named `v0.2.0-beta.1`; Python writes the same version as
-   `0.2.0b1`). The earlier preview prints `0.1.0`. Put that line in any report.
+   `THOTH 0.2.0b2` (the release is named `v0.2.0-beta.2`; Python writes the same version as
+   `0.2.0b2`). The earlier preview prints `0.1.0`. Put that line in any report.
 
 **Optional: local retrieval preparation.** Settings has a card, *Local retrieval preparation*
-(로컬 검색 준비). It is off by default and needs an extra install:
+(로컬 검색 준비). Once installed it applies to every project (a project can be switched off), and it
+needs an extra install:
 
 ```powershell
 uv sync --python .\.venv\Scripts\python.exe --no-managed-python --no-python-downloads --frozen --extra dev --dev --extra local-retrieval
@@ -71,12 +72,14 @@ second question in the other language in the same conversation.
 
 ## Known limits in this beta
 
-- **Search experiment is off by default and did not pass.** The experimental retrieval rule that
-  uses the local index was tested on a held-out set of 30 cases and failed our promotion criteria
-  (it helped when many documents were mixed, but not inside one project's own documents, and it was
-  too slow). So it stays an experiment. Switching a project on applies the index to that project's
-  questions only when every source is indexed, and whenever the index scores cannot be used for a
-  question, evidence is chosen as before.
+- **Semantic search applies to every project once installed, and its evaluation did not pass.**
+  The retrieval rule that uses the local index failed our promotion criteria on a held-out set of
+  30 cases and again on a new AI-labelled set of 64 cases (one mixed-document condition gained 2.81
+  recall points against a 3.0 target, and the measured memory increase exceeded our 600 MB limit in
+  the test harness). It is applied anyway in this beta and the evaluation continues. It acts on a
+  project's questions only when every source is indexed; until then, and whenever the index scores
+  cannot be used for a question, evidence is chosen as before. A project can be switched off in
+  Settings.
 - **Local retrieval parts are optional.** They need the extra install above and a model download
   of about 124 MB per workspace. A passage longer than 512 tokens is embedded as several
   overlapping windows (at most eight, about 3,200 tokens in all), and a passage scores as its best
@@ -167,7 +170,8 @@ repository and read the [security policy](../SECURITY.md).
 - **시험할 흐름 5개**: 새 프로젝트 만들기 → 자료 연결 → 질문 → 결과 읽기(근거를 따라가 보기) →
   프로젝트 보관 후 "보관한 프로젝트 보기"에서 영구 삭제(프로젝트 이름 입력). 영구 삭제는
   되돌릴 수 없습니다.
-- **알려진 한계**: 로컬 검색 준비는 기본 꺼짐이고 실험이며, 보류 평가에서 기준을 넘지 못했습니다.
+- **알려진 한계**: 로컬 의미 검색은 모델 파일과 부품을 설치하면 모든 프로젝트에 자동 적용되며(프로젝트별로 끌 수 있음)
+  평가 기준은 넘지 못했습니다(한 조건의 재현율 이득 +2.81 < +3.0, 메모리 증가가 한도 초과).
   부품은 선택 설치(약 110MB + 모델 약 124MB)입니다. 영구 삭제해도 다른 프로젝트와 공유하는 파일은
   남고, 작업이 실행 중이면 삭제가 거절될 수 있습니다. 비정상 종료로 남은 실행 기록은 THOTH를 다시
   시작해도 그대로 남지만, 그 프로젝트를 삭제할 때 맡았던 프로세스가 사라진 것이 확인되면 먼저 실패로

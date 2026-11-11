@@ -29,7 +29,7 @@ async def test_publication_stages_only_intent_in_original_uow(
     observed: list[tuple[str, int]] = []
     original = SqliteArtifactLedger.persist_ingestion
 
-    # Enable only the synthetic fixture's project at its first published source. The actual
+    # Switch off only the synthetic fixture's project at its first published source. The actual
     # application caller, scope admission, UoW, storage hook and binding logic remain real.
     def publish(
         self: SqliteArtifactLedger,
@@ -44,10 +44,11 @@ async def test_publication_stages_only_intent_in_original_uow(
         store = SqliteEmbeddingIndex(cast(Engine, vars(self)["_engine"]))
         project = document.artifact.project_id
         assert has_ambient_transaction()
-        if enabled and not store.configuration(project).enabled:
+        if not enabled and store.configuration(project).enabled:
+            # Local retrieval is on by default; this run is a project a person switched off.
             store.configure(
-                EmbeddingIndexConfig(project_id=project, enabled=True, actor_ref="local:operator"),
-                0,
+                EmbeddingIndexConfig(project_id=project, enabled=False, actor_ref="local:operator"),
+                store.configuration(project).generation,
             )
         original(self, document, source_version_id, evidence_candidates)
         jobs = tuple(

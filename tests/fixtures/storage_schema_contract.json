@@ -33390,6 +33390,8 @@
         "thoth.adapters.storage.embedding_schema.embedding_vectors": "embedding_vectors",
         "thoth.adapters.storage.embedding_source.embedding_configs": "embedding_configs",
         "thoth.adapters.storage.embedding_source.embedding_jobs": "embedding_jobs",
+        "thoth.adapters.storage.embedding_upkeep.embedding_jobs": "embedding_jobs",
+        "thoth.adapters.storage.embedding_upkeep.embedding_vectors": "embedding_vectors",
         "thoth.adapters.storage.evaluation_run.evaluation_runs": "evaluation_runs",
         "thoth.adapters.storage.evaluation_run_schema.evaluation_runs": "evaluation_runs",
         "thoth.adapters.storage.events.checkpoints": "checkpoints",

@@ -31,7 +31,9 @@ async def test_a_project_counts_only_while_every_active_source_has_a_current_rea
         ready = checker(x)
         first = x.ingest("a")
         assert ready(PROJECT) is False  # switched off
-        x.service.configure(PROJECT, True, 0)
+        x.service.configure(
+            PROJECT, True, x.stores.embedding_index.configuration(PROJECT).generation
+        )
         assert ready(PROJECT) is False  # switched on, nothing indexed yet
         await index(x)
         assert ready(PROJECT) is True

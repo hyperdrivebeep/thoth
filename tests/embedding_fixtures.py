@@ -158,8 +158,9 @@ def fixture(path: Path, *, enabled: bool = True) -> IndexFixture:
         clock=clock,
         ids=ids,
     )
-    if enabled:
-        service.configure(PROJECT, True, 0)
+    if not enabled:
+        # Local retrieval is on for every project; a person switched this one off (generation 2).
+        service.configure(PROJECT, False, 1)
     return IndexFixture(stores, service, worker)
 
 

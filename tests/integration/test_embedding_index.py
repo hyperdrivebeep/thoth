@@ -31,7 +31,9 @@ async def test_off_has_no_intent_or_encoding_and_explicit_reconcile_is_idempoten
         assert x.worker.calls == []
         with pytest.raises(EmbeddingIndexError, match="DISABLED"):
             await x.service.drain(PROJECT)
-        x.service.configure(PROJECT, True, 0)
+        x.service.configure(
+            PROJECT, True, x.stores.embedding_index.configuration(PROJECT).generation
+        )
         first = x.service.reconcile(PROJECT)
         assert len(first) == 1 and x.service.reconcile(PROJECT) == first
         (ready,) = await x.service.drain(PROJECT)
@@ -179,7 +181,7 @@ async def test_project_cache_isolation_and_blob_corruption(index: IndexFixture):
     await index.service.drain(PROJECT)
     index.stores.embedding_index.configure(
         EmbeddingIndexConfig(project_id="project:other", enabled=True, actor_ref="local:operator"),
-        0,
+        1,
     )
     assert index.stores.embedding_index.cached("project:other", span.text_sha256) is None
     with index.stores.ledger.engine.begin() as conn:

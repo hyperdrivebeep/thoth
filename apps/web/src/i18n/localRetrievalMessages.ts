@@ -16,8 +16,8 @@ export const localRetrievalMessages = {
     en: "This is available only in a local workspace. Nothing is prepared in a review workspace.",
   },
   "localRetrieval.intro": {
-    ko: "고정된 로컬 모델로 자료를 미리 색인합니다. 기본은 꺼짐입니다. 켜고 모든 자료의 색인이 준비되면 연구에서 뜻이 비슷한 문단도 함께 찾습니다(실험 기능). 준비되지 않았거나 이번 질문에서 쓸 수 없으면 기존 검색 방식 그대로입니다.",
-    en: "Indexes sources ahead of time with one fixed local model. Off by default. When it is on and every source is indexed, research also looks for passages with a similar meaning (experimental). When the index is not ready, or cannot be used for a question, the existing search method is used as before.",
+    ko: "모델 파일과 로컬 실행 구성 요소를 설치하면 모든 프로젝트의 자료가 백그라운드에서 자동으로 색인되고, 연구가 뜻이 비슷한 문단도 함께 찾습니다. 색인이 준비되기 전이거나 이번 질문에서 쓸 수 없으면 기존 검색 방식 그대로입니다. 프로젝트별로 끌 수 있습니다.",
+    en: "Once the model files and the local runtime component are installed, every project's sources are indexed automatically in the background and research also looks for passages with a similar meaning. Until an index is ready, or when it cannot be used for a question, the existing search method is used. You can switch it off per project.",
   },
   "localRetrieval.readFailed": { ko: "상태를 불러오지 못했습니다.", en: "The status could not be loaded." },
   "localRetrieval.unsupported": {
@@ -78,8 +78,8 @@ export const localRetrievalMessages = {
   },
   "localRetrieval.enableLabel": { ko: "이 프로젝트에서 로컬 색인 사용", en: "Use local indexing in this project" },
   "localRetrieval.enableHelp": {
-    ko: "켜면 이 프로젝트의 모든 자료에 색인이 준비된 뒤부터 연구가 색인을 함께 씁니다(실험 기능). 색인은 '색인 준비'를 눌러야만 시작됩니다.",
-    en: "Turning this on lets research in this project also use the index once every source is indexed (experimental). Indexing starts only when you choose 'Prepare index'.",
+    ko: "기본값은 켜짐입니다. 끄면 이 프로젝트는 색인을 만들지 않고 기존 검색만 씁니다. 색인은 백그라운드에서 자동으로 만들어지며, '색인 준비'로 지금 바로 시작할 수도 있습니다.",
+    en: "On by default. Turn it off and this project builds no index and uses the existing search only. The index is built automatically in the background; 'Prepare index' starts it right away.",
   },
   "localRetrieval.prepareNotAllowed": { ko: "이 프로젝트의 색인을 바꿀 권한이 없습니다.", en: "You cannot change this project's index." },
   "localRetrieval.configureConflict": {
@@ -102,12 +102,12 @@ export const localRetrievalMessages = {
     en: "No index can be prepared because the runtime component is missing.",
   },
   "localRetrieval.readyNote": {
-    ko: "모든 자료의 색인이 준비되면 연구에서 뜻이 비슷한 문단도 함께 찾습니다(실험 기능). 이번 질문에서 쓸 수 없으면 기존 검색 방식 그대로입니다.",
-    en: "Once every source is indexed, research also looks for passages with a similar meaning (experimental). When it cannot be used for a question, the existing search method is used as before.",
+    ko: "모든 자료의 색인이 준비되면 연구에서 뜻이 비슷한 문단도 함께 찾습니다. 이번 질문에서 쓸 수 없으면 기존 검색 방식 그대로입니다.",
+    en: "Once every source is indexed, research also looks for passages with a similar meaning. When it cannot be used for a question, the existing search method is used as before.",
   },
   "localRetrieval.outdatedIndex": {
-    ko: "검색 준비 방식이 바뀌어 색인을 다시 만들어야 합니다. '색인 준비'를 누르세요. 모델 파일은 다시 받지 않아도 됩니다.",
-    en: "The way passages are prepared for search changed, so the index must be rebuilt. Choose 'Prepare index'. The model files do not need to be downloaded again.",
+    ko: "검색 준비 방식이 바뀌어 색인을 다시 만들고 있습니다. 자동으로 진행되며, '색인 준비'로 지금 바로 시작할 수도 있습니다. 모델 파일은 다시 받지 않아도 됩니다.",
+    en: "The way passages are prepared for search changed, so the index is being rebuilt. This happens automatically; 'Prepare index' starts it right away. The model files do not need to be downloaded again.",
   },
   "localRetrieval.jobsTitle": { ko: "색인 작업", en: "Index jobs" },
   "localRetrieval.job.PENDING": { ko: "대기", en: "Pending" },

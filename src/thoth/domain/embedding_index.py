@@ -16,6 +16,10 @@ from thoth.domain.evidence import EvidenceSpan, connected_retrieval_spans
 from thoth.domain.ids import Sha256
 from thoth.domain.retrieval_embedding import MAX_PASSAGE_WINDOWS, DenseModelPin
 
+# Why a job was cancelled because the service shut down: not a person's cancellation, so the
+# background indexer takes it up again at the next start.
+SERVICE_CLOSED_REASON = "SERVICE_CLOSED"
+
 
 class EmbeddingBudget(DomainModel):
     version: Literal["embedding-budget:1.0.0"] = "embedding-budget:1.0.0"

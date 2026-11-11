@@ -32,8 +32,8 @@ async def test_normal_source_connect_commit_then_explicit_worker(tmp_path: Path,
                 )
             )
         )
-        if enabled:
-            service.configure(project, True, 0)
+        if not enabled:
+            service.configure(project, False, 1)  # on by default: this project was switched off
         value(
             await runtime.bus.dispatch(
                 request(
@@ -103,7 +103,6 @@ async def test_acquisition_fault_rolls_back_source_and_intent(tmp_path: Path, po
                 )
             )
         )
-        service.configure("project:rollback", True, 0)
         result = await runtime.bus.dispatch(
             request(
                 "project/source/connect",

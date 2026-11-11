@@ -49,8 +49,9 @@ function useScopedState<T>(scope: string, initial: T): [T, (update: T | ((previo
 
 /**
  * "Local retrieval preparation": fixed model files, optional runtime component and one project's
- * derived index. Off by default; nothing here starts work on its own, and a ready index does not
- * change how searches run. In a hosted (review) workspace it only explains that, with no requests.
+ * derived index. Once the parts and the model are installed every project is indexed in the
+ * background; this card shows that, switches a project off and starts or repeats the work by hand.
+ * In a hosted (review) workspace it only explains that, with no requests.
  */
 export function LocalRetrievalSettingsCard({ workspaceId, projectId, hosted = false, timeouts }: {
   workspaceId: string; projectId?: string; hosted?: boolean;
@@ -215,6 +216,15 @@ export function LocalRetrievalSettingsCard({ workspaceId, projectId, hosted = fa
 
 type Text = (key: LocalRetrievalMessageKey) => string;
 
+/**
+ * Whether to say that an index made under an earlier preprocessing version is being rebuilt. That
+ * is only true when something can run it: the parts and the model are installed, the project is on
+ * and no source is waiting for a retry.
+ */
+function rebuildIsRunning(project: RetrievalExperimentRead, asset: LocalAssetRead | null): boolean {
+  return Boolean(project.outdated_index) && project.enabled && project.failed_sources === 0
+    && asset?.asset_state === "READY" && asset.dependency_available;
+}
 /** Shown only until the sources are indexed again under the current preprocessing version. */
 function OutdatedIndexNotice({ outdated, text }: { outdated: boolean | undefined; text: Text }) {
   return outdated ? <Callout compact intent="warning">{text("localRetrieval.outdatedIndex")}</Callout> : null;
@@ -267,6 +277,10 @@ function ProjectSection({ project, asset, text, running, configuring, configureN
   onRetry: (job: RetrievalJob) => void; reason: (code: string | null) => string; counts: string;
 }) {
   const indexActive = ACTIVE_INDEX_STATES.has(project.state) || Boolean(project.active_operation_id);
+  // Work started by a person (it has an operation id) holds the controls. The background indexer
+  // does not: the server takes "switch off" (it stops the run) and "prepare" (it waits for the job
+  // in hand) while it works, so the controls stay usable.
+  const explicitActive = Boolean(project.active_operation_id);
   const blocked: LocalRetrievalMessageKey | null = !project.can_prepare ? "localRetrieval.prepareNotAllowed"
     : !project.enabled ? "localRetrieval.prepareBlockedOff"
     : asset?.asset_state !== "READY" ? "localRetrieval.prepareBlockedAsset"
@@ -274,7 +288,7 @@ function ProjectSection({ project, asset, text, running, configuring, configureN
   const failedJobs = project.jobs.filter(job => job.state === "FAILED");
   return <div className="local-retrieval-project">
     <Switch id="local-retrieval-enable" checked={project.enabled} label={text("localRetrieval.enableLabel")}
-      disabled={!project.can_prepare || configuring || running || indexActive} onChange={event => onToggle(event.currentTarget.checked)} />
+      disabled={!project.can_prepare || configuring || running || explicitActive} onChange={event => onToggle(event.currentTarget.checked)} />
     <small className="muted">{text("localRetrieval.enableHelp")}</small>
     {configureNotice && <p className="result-notice" role="alert">{text(configureNotice === "CONFLICT" ? "localRetrieval.configureConflict" : "localRetrieval.configureFailed")}</p>}
     <p>
@@ -283,9 +297,9 @@ function ProjectSection({ project, asset, text, running, configuring, configureN
     </p>
     {project.total_sources > 0 && <ProgressBar intent={project.state === "READY" ? "success" : "primary"} animate={indexActive} stripes={indexActive}
       value={Math.min(1, project.ready_sources / project.total_sources)} />}
-    <OutdatedIndexNotice outdated={project.outdated_index} text={text} />
+    <OutdatedIndexNotice outdated={rebuildIsRunning(project, asset)} text={text} />
     <p>
-      <Button intent="primary" onClick={onPrepare} disabled={Boolean(blocked) || running || indexActive}>{text("localRetrieval.prepareButton")}</Button>
+      <Button intent="primary" onClick={onPrepare} disabled={Boolean(blocked) || running || explicitActive}>{text("localRetrieval.prepareButton")}</Button>
       {blocked && <small className="muted" role="status"> {text(blocked)}</small>}
     </p>
     <p className="muted">{text("localRetrieval.readyNote")}</p>
@@ -296,7 +310,7 @@ function ProjectSection({ project, asset, text, running, configuring, configureN
           <Tag minimal round intent={job.state === "READY" ? "success" : job.state === "FAILED" ? "danger" : "none"}>{text(`localRetrieval.job.${job.state}`)}</Tag>{" "}
           <code>{job.job_id.slice(0, 12)}</code>
           {job.reason_code && <small className="muted"> · {reason(job.reason_code)}</small>}
-          {job.state === "FAILED" && <Button small minimal icon="repeat" disabled={!project.can_prepare || running || indexActive || Boolean(blocked)}
+          {job.state === "FAILED" && <Button small minimal icon="repeat" disabled={!project.can_prepare || running || explicitActive || Boolean(blocked)}
             onClick={() => onRetry(job)}>{text("localRetrieval.retryButton")}</Button>}
         </li>)}
       </ul>

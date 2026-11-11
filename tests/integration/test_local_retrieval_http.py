@@ -90,18 +90,21 @@ async def test_project_authentication_cannot_mutate_another_scope(tmp_path: Path
             "alpha",
             "project/retrieval/experiment/configure",
             "workstream-denied",
-            {"enabled": True, "expected_generation": 0},
+            {"enabled": False, "expected_generation": 1},
         )
         assert denied.json()["error"]["data"]["reason_code"] == "LOCAL_RETRIEVAL_SCOPE_DENIED"
         wrong = await harness.call(
             "owner",
             "project/retrieval/experiment/configure",
             "wrong-project",
-            {"project_id": "project:other", "enabled": True, "expected_generation": 0},
+            {"project_id": "project:other", "enabled": False, "expected_generation": 1},
         )
         assert "error" in wrong.json()
         service = harness.runtime.local_retrieval
-        assert service is not None and service.store.configuration(harness.project).enabled is False
+        assert service is not None
+        # Neither call changed anything: the project still reads as the untouched default (on).
+        config = service.store.configuration(harness.project)
+        assert (config.enabled, config.generation) == (True, 1)
 
 
 async def test_role_revoked_during_encoding_prevents_ready_publication(tmp_path: Path):
@@ -132,7 +135,7 @@ async def test_role_revoked_during_encoding_prevents_ready_publication(tmp_path:
                 "enable",
                 {
                     "enabled": True,
-                    "expected_generation": 0,
+                    "expected_generation": 1,
                 },
             )
         )

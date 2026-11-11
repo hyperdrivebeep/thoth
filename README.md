@@ -195,9 +195,11 @@ is distributed here; successful login alone does not establish a successful mode
 
 See [installation and credentials](docs/INSTALL.md).
 
-Local settings also offer opt-in [model and index preparation](docs/architecture/local-retrieval-preparation.md).
-It defaults to OFF. Switching a project on is an experiment: its research uses the local index only
-when every source of the project is indexed, and otherwise searches as before.
+Local settings offer [model and index preparation](docs/architecture/local-retrieval-preparation.md).
+Once the model files and the optional local runtime are installed, every project's sources are
+indexed automatically in the background and its research also uses the index. Until all of a
+project's sources are indexed, and for any question where the index cannot be used, it searches
+as before. A project can be switched off in Settings.
 
 </details>
 
