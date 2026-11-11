@@ -7,6 +7,7 @@ from pathlib import Path
 from pydantic import JsonValue, TypeAdapter
 
 from thoth.application.services.actor_authority import current_actor_for
+from thoth.application.services.auto_index import AutoIndexer
 from thoth.application.services.embedding_index_service import EmbeddingIndexService
 from thoth.domain.deployment_mode import DeploymentMode
 from thoth.domain.embedding_index import EmbeddingBudget, EmbeddingIndexConfig, EmbeddingIndexError
@@ -54,7 +55,10 @@ class LocalRetrievalService:
         self._index_task: asyncio.Task[object] | None = None
         self._index_project: str | None = None
         self._index_operation: str | None = None
+        self._index_auto = False
+        self._prepare_waiting = False
         self._closed = False
+        self.auto = AutoIndexer(self)
         self._status_task: asyncio.Task[ModelAssetStatus] | None = None
         self._descriptor_task: asyncio.Task[EmbeddingAssetDescriptor] | None = None
 
@@ -71,6 +75,66 @@ class LocalRetrievalService:
             if not required.issubset(actor.capabilities) or "PROJECT" not in actor.data_scopes:
                 raise ModelAssetError("LOCAL_RETRIEVAL_SCOPE_DENIED")
         return "local:operator" if actor is None else actor.actor_id
+
+    @property
+    def closed(self) -> bool:
+        return self._closed
+
+    @property
+    def is_local(self) -> bool:
+        return self.mode is DeploymentMode.LOCAL
+
+    @property
+    def index_busy(self) -> bool:
+        return self._index_task is not None
+
+    @property
+    def prepare_waiting(self) -> bool:
+        return self._prepare_waiting
+
+    def start_auto_index(self) -> None:
+        self.auto.start()
+
+    def kick_auto_index(self) -> None:
+        self.auto.kick()
+
+    def claim_index_slot(self, task: "asyncio.Task[object]", project: str, *, auto: bool) -> None:
+        if self._index_task is not None:
+            raise EmbeddingIndexError("EMBEDDING_INDEX_BUSY")
+        self._index_task, self._index_project, self._index_operation = task, project, None
+        self._index_auto = auto
+
+    def release_index_slot(self, task: "asyncio.Task[object]") -> None:
+        if self._index_task is task:
+            self._index_task = None
+            self._index_project = None
+            self._index_operation = None
+            self._index_auto = False
+
+    async def reconcile_project(self, project: str) -> None:
+        """Close what a crash left running and queue what is missing. Reads every span of the
+        project, off the event loop, so a caller with a time budget starts it after this."""
+        index = self.index
+        if index is None:
+            raise EmbeddingIndexError("EMBEDDING_NOT_PREPARED")
+        index.recover(project)
+        await index.areconcile(project)
+
+    async def drain_project(
+        self,
+        project: str,
+        deadline: float,
+        *,
+        stop: Callable[[], bool] | None = None,
+        resumable: bool = False,
+    ) -> None:
+        """Run the queued jobs of one project, then drop vectors no job refers to any more."""
+        index = self.index
+        if index is None:
+            raise EmbeddingIndexError("EMBEDDING_NOT_PREPARED")
+        await index.drain(project, deadline=deadline, stop=stop, resumable=resumable)
+        if stop is None or not stop():
+            await asyncio.to_thread(self.store.collect_orphans, project)
 
     def bind_index(self, service: EmbeddingIndexService) -> None:
         if self.index is not None and self.index is not service:
@@ -208,6 +272,8 @@ class LocalRetrievalService:
             )
         if not enabled and self._index_project == project and self._index_task is not None:
             self._index_task.cancel()
+        if enabled:
+            self.kick_auto_index()
         return {**self.read_project(project), "unchanged": unchanged}
 
     async def asset_action(
@@ -265,6 +331,7 @@ class LocalRetrievalService:
                 )
             else:
                 raise ModelAssetError("MODEL_SOURCE_REQUIRED")
+            self.kick_auto_index()  # the model may just have become usable
             return _JSON.validate_python(status.model_dump(mode="json"))
         finally:
             self._asset_task = None
@@ -285,16 +352,29 @@ class LocalRetrievalService:
             raise EmbeddingIndexError("EMBEDDING_CONFIG_CONFLICT")
         if not config.enabled:
             raise EmbeddingIndexError("EMBEDDING_DISABLED")
-        if self._index_task is not None:
+        if self._index_task is not None and not self._index_auto:
             raise EmbeddingIndexError("EMBEDDING_INDEX_BUSY")
         if not self.dependency_available():
             raise EmbeddingIndexError("EMBEDDING_DEPENDENCY_UNAVAILABLE")
         deadline = asyncio.get_running_loop().time() + config.budget.job_timeout_ms / 1000
+        if self._index_task is not None:
+            # The background indexer is working: it stops after the job in hand, then this command
+            # takes the slot. Nothing is cancelled, so no job is left in a cancelled state.
+            self._prepare_waiting = True
+            try:
+                async with asyncio.timeout_at(deadline):
+                    while self.index_busy and self._index_auto:
+                        await asyncio.sleep(0.1)
+            finally:
+                self._prepare_waiting = False
+            if self.index_busy:
+                raise EmbeddingIndexError("EMBEDDING_INDEX_BUSY")
         self._index_task, self._index_project, self._index_operation = (
             asyncio.current_task(),
             project,
             operation_id,
         )
+        self._index_auto = False
         try:
             async with asyncio.timeout_at(deadline):
                 if self._descriptor_task is not None and not self._descriptor_task.done():
@@ -320,9 +400,8 @@ class LocalRetrievalService:
                     self.index.retry(project, job_id, job_generation)
                     await self.index.run_one(project, job_id, deadline=deadline)
                 else:
-                    self.index.recover(project)
-                    self.index.reconcile(project)
-                    await self.index.drain(project, deadline=deadline)
+                    await self.reconcile_project(project)
+                    await self.drain_project(project, deadline)
         finally:
             self._index_task = None
             self._index_project = None
@@ -331,6 +410,7 @@ class LocalRetrievalService:
 
     def close(self) -> None:
         self._closed = True
+        self.auto.stop()
         if self._asset_task is not None:
             self._asset_task.cancel()
         if self._index_task is not None:

@@ -1,9 +1,12 @@
 # Local retrieval preparation
 
 The local settings page prepares fixed model files and a project's derived embedding index.
-This is opt-in and defaults to OFF. Preparation does not activate a shadow or canary or run a
-research request. Switching a project on is also what lets its research use the index: see
-"Applying the index to a project's research" below.
+Local retrieval is ON for every project unless a person switched it off: a project with no stored
+setting reads as enabled (generation 1), and a stored setting, on or off, is never replaced by that
+default. Preparation does not activate a shadow or canary or run a research request. A project
+that has it on, with its index ready, uses the index in its research: see "Applying the index to a
+project's research" below. Indexing needs the optional runtime and the model files; without them
+nothing is indexed and research uses the lexical selection.
 
 ## Install and import
 
@@ -117,11 +120,14 @@ receipt succeeded. Recovery never automatically calls a research model.
 
 ## Applying the index to a project's research
 
-A project that switched local retrieval on gets its own retrieval policy for a research request,
-and only while every active source of the project has a current READY index. The check
+A project that has local retrieval on (the default) gets its own retrieval policy for a research
+request, and only while every active source of the project has a current READY index. The check
 (`application/services/dense_opt_in.py`, `ProjectDenseOptIn`) is made for each request: local
 retrieval enabled in the project's configuration, the optional runtime installed, and every ACTIVE
-source binding has a READY job of the current configuration whose source is still current. A project
+source binding has a READY job of the current configuration whose source is still current (`is_current_header`:
+configuration, active binding, and the latest version's identity and hash; reading every span for
+this check took 1.3-1.5 s per question for a 19,803-span project, and the request checks each span's
+text hash again when it scores). A project
 that is off, has no index, has an index in progress or failed, has a source that changed after
 indexing or was added after it, or has any source not yet READY, is not applied: it keeps its
 baseline and its journal entries and digests are the ones it had before this existed.
@@ -147,16 +153,65 @@ baseline only for a question whose dense scores were actually used. The older an
 dense scores and treats this policy as the lexical baseline with the same budgets.
 
 Applying the index changes the retrieval snapshot digest, so a stage saved before a project was
-switched on is not reused after it. This experiment did not meet its promotion criteria on a
-held-out set (see `docs/BETA.md`); the project switch is the only way it is applied.
+switched on, or before its index became ready, is not reused after it. The rule did not meet its
+promotion criteria on two evaluation sets (see `docs/BETA.md`); it is applied to every project with
+local retrieval on by decision, and the per-project switch is the way to turn it off.
+
+## Automatic indexing
+
+Nothing has to be clicked. `AutoIndexer` (`application/services/auto_index.py`) looks at every
+project that is not closing or archived when the HTTP server first builds the runtime (the first
+request after the server starts; the TUI and the CLI do not start it), when the model files were
+just installed or imported, when local retrieval is switched on again, and every 60 s (a source that
+was just connected is found at the next tick, so within about a minute). A project needs work when
+it is on and has a pending job or an active source with no job of the current configuration
+(`needs_indexing`, which reads no span). A job that failed with a real error or that a person
+cancelled counts as covered and waits for a retry; a project whose run failed is left alone for
+300 s. It does nothing while the optional runtime is missing, and it reads the model descriptor only
+when it has work and no encoder is bound yet.
+
+Work that the system itself interrupted is taken up again without a click, and is told apart from
+the cases above:
+
+- A pass has a time limit (the budget's `job_timeout_ms`, counted after the jobs are queued). A job
+  the limit cuts off goes back to `PENDING` with its stored vectors (`store.interrupt`) instead of
+  `FAILED`, and the next pass goes on. A job's own time limit still fails it.
+- Closing the service cancels the running jobs with the reason `SERVICE_CLOSED`, apart from
+  `USER_CANCELLED`, the mark of a person's cancellation.
+- A job a crash left `RUNNING` once its lease ended, one already recorded as
+  `LEASE_EXPIRED_NO_AUTORETRY` and one cancelled with `SERVICE_CLOSED` are queued again by
+  `resume_interrupted`, which every pass runs before it asks which projects need work.
+
+It runs one project at a time in the one indexing slot of `LocalRetrievalService`, shared with the
+explicit "Prepare index" command. It never starts while the slot is taken. An explicit command that
+arrives while it works waits for the job in hand (the indexer stops between jobs, nothing is
+cancelled) and then takes the slot; two explicit commands still conflict
+(`EMBEDDING_INDEX_BUSY`). Switching a project off cancels its run, and closing the service stops the
+loop. After a project's jobs are all run it drops the vectors no job refers to any more
+(`collect_orphans`).
+
+`reconcile` and the read of a job's source read every span of the project one by one; for a
+19,803-span project that held the event loop for 45 s. `reconcile` now reads the project's evidence
+once and groups it by source, `areconcile` and the read of a job's spans run in a worker thread, and
+the change notice that touches loop-owned state is given back on the loop.
+
+The event loop is free meanwhile, so what runs in those threads must not hold the database write
+lock while it reads: a write the loop makes would wait for the lock and fail with "database is
+locked" after 5 s. Publishing a job reads the source and the stored vectors first
+(`prepare_publication`, no lock) and the short write transaction only checks that the binding, the
+latest version and its hash are still the ones that were read before it marks the job `READY`; a
+source that changed meanwhile is not published. `store.reconcile` and `collect_orphans` compare the
+jobs with their sources before taking the lock (`collect_orphans` deletes only if no job moved in
+between). What still happens under the lock on the loop is the per-span checkpoint commit of a
+running job and `claim`.
 
 ## Dense scores in the research path
 
 `DenseMaterialProvider` (`application/services/dense_material.py`) gives the research path a
 `DenseMaterial` for the original question. It is asked only when the project has local retrieval
-switched on and the active or a shadow retrieval policy is a `RetrievalRoutingPolicy`; it is not
+on and the active or a shadow retrieval policy is a `RetrievalRoutingPolicy`; it is not
 asked for a frame with one source (routing sends it to the lexical lane). Nothing else changes:
-a project without the experiment gets no material and its selections, journal entries and digests
+a project switched off gets no material and its selections, journal entries and digests
 are the ones it had before.
 
 Scoring reads a resident matrix: all windows of the READY sources of a project as float64, one

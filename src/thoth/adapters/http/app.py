@@ -453,6 +453,8 @@ def _resolve_bus(application: FastAPI) -> CommandBus:
     if hosted_mode():
         mark_workspace_live(workspace)
     _bind_operation_task_canceller(application, runtime.bus)
+    if runtime.local_retrieval is not None:
+        runtime.local_retrieval.start_auto_index()
     return runtime.bus
 
 

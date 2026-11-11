@@ -48,6 +48,6 @@ class ProjectDenseOptIn:
             and job.intent.config_generation == config.generation
             and job.intent.model == config.model
             and job.intent.artifact_id in active
-            and self._store.is_current(job.intent)
+            and self._store.is_current_header(job.intent)
         }
         return active <= ready

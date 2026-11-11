@@ -69,7 +69,7 @@ reportlab for fixtures. Optional extras are separate:
 - `connectors`: PostgreSQL, S3 and MCP SDKs.
 - `managed`: managed sandbox SDK.
 - `local-retrieval`: ONNX Runtime, tokenizers and NumPy for Settings → Local retrieval preparation
-  (opt-in, off by default). It adds about 110 MB to the environment. The model files are separate:
+  (applied to every project once installed; a project can be switched off). It adds about 110 MB to the environment. The model files are separate:
   about 124 MB per workspace, downloaded or imported from that settings card.
 
 Without `local-retrieval` the settings card still lets you import or download the model files, but

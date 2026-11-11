@@ -452,6 +452,55 @@ describe("project index", () => {
     expect(server.starts[1].input).toEqual({ project_id: "p1", job_id: "job:a", generation: 2 });
   });
 
+  it("while the background indexer works on the project, switching off, prepare and retry stay usable", async () => {
+    const working = (): RetrievalExperimentRead => ({
+      ...projectEnabled(), state: "INDEXING", active_operation_id: null, failed_sources: 1, pending_sources: 1,
+      jobs: [{ job_id: "job:a", generation: 2, state: "FAILED", reason_code: "EMBEDDING_TIMEOUT" }, { job_id: "job:b", generation: 1, state: "PENDING", reason_code: null }],
+    });
+    fixture.project = working;
+    fixture.configure = input => ({ operation_id: "configure", state: "SUCCEEDED", value: { ...working(), generation: 2, enabled: Boolean(input.enabled), state: "OFF" } });
+    await render({ projectId: "p1" });
+    expect(inputById("local-retrieval-enable")!.disabled).toBe(false);
+    expect(isDisabled(button(ko("localRetrieval.prepareButton")))).toBe(false);
+    expect(isDisabled(button(ko("localRetrieval.retryButton")))).toBe(false);
+    await click(inputById("local-retrieval-enable")!);
+    expect(reads("project/retrieval/experiment/configure")).toHaveLength(1);
+    expect(reads("project/retrieval/experiment/configure")[0].input).toEqual({ project_id: "p1", enabled: false, expected_generation: 1 });
+  });
+
+  it("work a person started still holds the switch, prepare and retry", async () => {
+    fixture.project = () => ({
+      ...projectEnabled(), state: "INDEXING", active_operation_id: "op:started", failed_sources: 1, pending_sources: 1,
+      jobs: [{ job_id: "job:a", generation: 2, state: "FAILED", reason_code: "EMBEDDING_TIMEOUT" }],
+    });
+    await render({ projectId: "p1" });
+    expect(inputById("local-retrieval-enable")!.disabled).toBe(true);
+    expect(isDisabled(button(ko("localRetrieval.prepareButton")))).toBe(true);
+    expect(isDisabled(button(ko("localRetrieval.retryButton")))).toBe(true);
+  });
+
+  it("does not say the index is being rebuilt when nothing can run it", async () => {
+    const outdated = (): RetrievalExperimentRead => ({ ...projectEnabled(), outdated_index: true });
+    for (const [asset, project] of [
+      [() => ({ ...assetReady(), dependency_available: false }), outdated],
+      [assetMissing, outdated],
+      [assetReady, () => ({ ...outdated(), failed_sources: 1, pending_sources: 1 })],
+    ] as const) {
+      fixture.asset = asset;
+      fixture.project = project;
+      await act(async () => { root.unmount(); await tick(); });
+      root = createRoot(container);
+      await render({ projectId: "p1" });
+      expect(body()).not.toContain(ko("localRetrieval.outdatedIndex"));
+    }
+    fixture.asset = assetReady;
+    fixture.project = outdated;
+    await act(async () => { root.unmount(); await tick(); });
+    root = createRoot(container);
+    await render({ projectId: "p1" });
+    expect(body()).toContain(ko("localRetrieval.outdatedIndex"));
+  });
+
   it("a late result never reaches the screen of another project", async () => {
     fixture.project = projectEnabled;
     let release!: () => void;

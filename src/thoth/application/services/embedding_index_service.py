@@ -7,6 +7,7 @@ from typing import Literal
 
 from thoth.domain.auth import current_authenticated_actor
 from thoth.domain.embedding_index import (
+    SERVICE_CLOSED_REASON,
     EmbeddingIndexConfig,
     EmbeddingIndexError,
     EmbeddingIntent,
@@ -140,6 +141,19 @@ class EmbeddingIndexService:
             raise EmbeddingIndexError("EMBEDDING_SOURCE_CHANGED")
 
     def reconcile(self, project: str) -> tuple[str, ...]:
+        ids = self._reconcile(project)
+        self._changed(project)
+        return ids
+
+    async def areconcile(self, project: str) -> tuple[str, ...]:
+        """reconcile() in a worker thread: it reads every span of the project one by one, which
+        took 45 s of event-loop time for a 19,803-span project. The change notice (it touches
+        loop-owned state) is given back on the loop."""
+        ids = await asyncio.to_thread(self._reconcile, project)
+        self._changed(project)
+        return ids
+
+    def _reconcile(self, project: str) -> tuple[str, ...]:
         config = self._owner(project)
         ids: list[str] = []
         self.store.assert_worker_boundary()
@@ -152,6 +166,11 @@ class EmbeddingIndexService:
         for job in self.store.jobs(project):
             if job.intent.artifact_id not in active:
                 self.store.invalidate(project, job.intent.artifact_id)
+        # One read of the project's evidence, grouped by source (it used to be read again for every
+        # version of every source). Nothing in the loop below changes the evidence.
+        by_source: dict[tuple[str, str], list[EvidenceSpan]] = {}
+        for span in self.artifacts.list_evidence(project):
+            by_source.setdefault((span.artifact_id, span.source_version_id), []).append(span)
         for artifact in self.artifacts.list_artifacts(project):
             if artifact.artifact_id not in active:
                 continue
@@ -159,11 +178,7 @@ class EmbeddingIndexService:
                 document = self.artifacts.read_structure(project, artifact.artifact_id, version)
                 if document is None:
                     continue
-                candidates = tuple(
-                    s
-                    for s in self.artifacts.list_evidence(project)
-                    if s.artifact_id == artifact.artifact_id and s.source_version_id == version
-                )
+                candidates = tuple(by_source.get((artifact.artifact_id, version), ()))
                 # Do not index a partially visible source as complete.
                 for s in candidates:
                     self.artifacts.read_evidence(s.span_id)
@@ -178,18 +193,29 @@ class EmbeddingIndexService:
                 )
                 if self.store.is_current(intent):
                     ids.append(self.store.stage_intent(intent))
-        self._changed(project)
         return tuple(ids)
 
     async def run_one(
-        self, project: str, job_id: str, *, deadline: float | None = None
+        self,
+        project: str,
+        job_id: str,
+        *,
+        deadline: float | None = None,
+        resumable: bool = False,
     ) -> EmbeddingJob:
+        """Run one job.
+
+        With resumable, a time limit that comes from deadline (the limit of the whole pass) puts the
+        job back to PENDING instead of failing it: its stored vectors are kept and the next pass
+        goes on. The job's own time limit still fails it.
+        """
         config = self._owner(project)
         self.store.assert_worker_boundary()
         loop = asyncio.get_running_loop()
-        stop_at = loop.time() + config.budget.job_timeout_ms / 1000
+        job_stop = loop.time() + config.budget.job_timeout_ms / 1000
+        stop_at = job_stop
         if deadline is not None:
-            stop_at = min(stop_at, deadline)
+            stop_at = min(job_stop, deadline)
         if loop.time() >= stop_at:
             raise TimeoutError("EMBEDDING_REQUEST_DEADLINE")
         if isinstance(self.worker, PreparableEmbeddingWorkerPort):
@@ -200,7 +226,8 @@ class EmbeddingIndexService:
         self._active[job_id] = (project, asyncio.current_task())
         try:
             async with asyncio.timeout_at(stop_at):
-                spans = self._read_source(job.intent)
+                # Reading every span of a large source is seconds of blocking work.
+                spans = await asyncio.to_thread(self._read_source, job.intent)
                 _require_deadline(stop_at)
                 for span in spans:
                     # A passage longer than one window is stored window by window. The first
@@ -226,18 +253,22 @@ class EmbeddingIndexService:
                             self._checkpoint(job, span, vector, window)
                             _require_deadline(stop_at)
                         window += 1
-                with self.uow.transaction():
-                    self._read_source(job.intent)
-                    _require_deadline(stop_at)
-                    published = self.store.publish(job, self._now())
-                    # Raise inside the publication UoW so an overdue READY rolls back.
-                    _require_deadline(stop_at)
-                    return published
+                return await self._publish_off_loop(job, stop_at)
         except asyncio.CancelledError:
             if not self._closed:
                 self.store.finish(job, "CANCELLED", "CALLER_CANCELLED")
             raise
         except Exception as exc:
+            if (
+                resumable
+                and isinstance(exc, TimeoutError)
+                and deadline is not None
+                and deadline <= job_stop
+                and loop.time() >= stop_at
+            ):
+                if not self._closed:
+                    self.store.interrupt(project, job_id)
+                raise
             reason = str(exc) if isinstance(exc, EmbeddingIndexError) else type(exc).__name__
             state: Literal["FAILED", "STALE"] = (
                 "STALE" if reason == "EMBEDDING_SOURCE_CHANGED" else "FAILED"
@@ -249,18 +280,63 @@ class EmbeddingIndexService:
             self._active.pop(job_id, None)
             self._changed(project)
 
+    async def _publish_off_loop(self, job: EmbeddingJob, stop_at: float) -> EmbeddingJob:
+        """The last read of the source and the READY publication, in a thread.
+
+        Reading every span again is seconds of blocking work for a large source (16 s for 12,961
+        spans), so it must not run on the event loop, and it must not run while the database write
+        lock is held either: the loop is free meanwhile and its own writes would wait for the lock
+        (and fail after 5 s). So the source and the stored vectors are read first, with no lock,
+        and the short write transaction only checks that the source is still the one that was read
+        (same binding, version and hash) before it marks the job READY. A publication that has
+        started cannot be interrupted: if the caller is cancelled meanwhile, it finishes first,
+        and a job it made READY stays READY (the cancel only marks jobs that are still RUNNING).
+        """
+        loop = asyncio.get_running_loop()
+
+        def publish() -> EmbeddingJob:
+            self._read_source(job.intent)
+            self.store.prepare_publication(job)
+            if loop.time() >= stop_at:
+                raise TimeoutError("EMBEDDING_REQUEST_DEADLINE")
+            with self.uow.transaction():
+                self._owner(job.intent.project_id)
+                published = self.store.publish(job, self._now())
+                # Raise inside the publication UoW so an overdue READY rolls back.
+                if loop.time() >= stop_at:
+                    raise TimeoutError("EMBEDDING_REQUEST_DEADLINE")
+                return published
+
+        running = asyncio.ensure_future(asyncio.to_thread(publish))
+        try:
+            return await asyncio.shield(running)
+        except asyncio.CancelledError:
+            await asyncio.wait({running})
+            raise
+
     async def drain(
-        self, project: str, *, deadline: float | None = None
+        self,
+        project: str,
+        *,
+        deadline: float | None = None,
+        stop: Callable[[], bool] | None = None,
+        resumable: bool = False,
     ) -> tuple[EmbeddingJob, ...]:
+        """Run the pending jobs in turn. stop() is asked between jobs, never inside one."""
         config = self._owner(project)
+        self.store.assert_worker_boundary()
+        await asyncio.to_thread(self.store.reconcile, project)
+        # The time budget is for running jobs: queueing them (reading every source) is not counted.
         own_deadline = asyncio.get_running_loop().time() + config.budget.job_timeout_ms / 1000
         deadline = min(deadline, own_deadline) if deadline is not None else own_deadline
-        self.store.assert_worker_boundary()
-        self.store.reconcile(project)
         done: list[EmbeddingJob] = []
         for job in self.store.jobs(project):
             if job.state == "PENDING":
-                done.append(await self.run_one(project, job.job_id, deadline=deadline))
+                if stop is not None and stop():
+                    break
+                done.append(
+                    await self.run_one(project, job.job_id, deadline=deadline, resumable=resumable)
+                )
         return tuple(done)
 
     def recover(self, project: str) -> int:
@@ -381,7 +457,9 @@ class EmbeddingIndexService:
         try:
             for job_id, (project, task) in tuple(self._active.items()):
                 try:
-                    self.store.cancel(project, job_id)
+                    # Shutting down is not a person's decision: the reason says so, and the
+                    # background indexer takes the job up again at the next start.
+                    self.store.cancel(project, job_id, SERVICE_CLOSED_REASON)
                 finally:
                     if task is not None:
                         task.cancel()

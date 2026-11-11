@@ -10,6 +10,7 @@ from thoth.domain.artifact import StructuralDocument
 from thoth.domain.embedding_index import (
     EmbeddingIndexConfig,
     EmbeddingIntent,
+    EmbeddingJob,
     source_refs,
 )
 from thoth.domain.evidence import EvidenceSpan
@@ -26,7 +27,12 @@ def configuration(connection: Connection, project: str) -> EmbeddingIndexConfig:
         select(embedding_configs.c.content_json).where(embedding_configs.c.project_id == project)
     ).first()
     if row is None:
-        return EmbeddingIndexConfig(project_id=project, actor_ref="local:operator")
+        # Never configured: local retrieval is on. Generation 1 because an intent needs one; the
+        # first explicit change (including switching it off) is written as generation 2. A stored
+        # row, on or off, is always what a person chose and is never replaced by this default.
+        return EmbeddingIndexConfig(
+            project_id=project, enabled=True, generation=1, actor_ref="local:operator"
+        )
     stored = EmbeddingIndexConfig.model_validate_json(row[0])
     if stored.model == DenseModelPin():
         return stored
@@ -86,6 +92,35 @@ def project_ingestion(
             config_generation=config.generation,
         ),
     )
+
+
+def needs_indexing(connection: Connection, project: str, jobs: tuple[EmbeddingJob, ...]) -> bool:
+    """Whether the project is on and a source has pending work or no job of the current kind.
+
+    Cheap on purpose (no span is read), because it is asked for every project on a timer. A job
+    that already failed or was cancelled still counts as covered: it waits for an explicit retry
+    instead of being tried again every minute.
+    """
+    if not configuration(connection, project).enabled:
+        return False
+    current = [j for j in jobs if header_matches(connection, j.intent)]
+    if any(j.state == "PENDING" for j in current):
+        return True
+    active = {
+        row[0]
+        for row in connection.execute(
+            select(schema.source_bindings.c.artifact_id).where(
+                schema.source_bindings.c.project_id == project,
+                schema.source_bindings.c.state == "ACTIVE",
+            )
+        )
+    }
+    covered = {
+        j.intent.artifact_id
+        for j in current
+        if j.state in ("PENDING", "RUNNING", "READY", "FAILED", "CANCELLED")
+    }
+    return bool(active - covered)
 
 
 def invalidate(connection: Connection, project: str, artifact: str) -> None:

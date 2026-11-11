@@ -68,10 +68,16 @@ def _old_config_json(x: IndexFixture) -> str:
 
 def _store_old_config(x: IndexFixture) -> None:
     stored = _old_config_json(x)
+    generation = x.stores.embedding_index.configuration(PROJECT).generation
     with x.stores.ledger.engine.begin() as connection:
+        # A workspace saved by 1.0.0 has a stored row; a project nobody configured has none yet.
         connection.execute(
-            text("UPDATE embedding_configs SET content_json = :json WHERE project_id = :p"),
-            {"json": stored, "p": PROJECT},
+            text(
+                "INSERT INTO embedding_configs (project_id, generation, enabled, content_json)"
+                " VALUES (:p, :g, 1, :json)"
+                " ON CONFLICT(project_id) DO UPDATE SET content_json = :json"
+            ),
+            {"json": stored, "p": PROJECT, "g": generation},
         )
 
 
@@ -190,7 +196,9 @@ async def test_connecting_a_source_to_a_project_saved_under_1_0_0_works(tmp_path
 async def test_the_screen_is_told_while_only_older_indexes_exist(tmp_path: Path) -> None:
     x, service = await retrieval_setup(tmp_path)
     try:
-        x.service.configure(PROJECT, True, 0)
+        x.service.configure(
+            PROJECT, True, x.stores.embedding_index.configuration(PROJECT).generation
+        )
         span = x.ingest("a")
         (new_job,) = x.stores.embedding_index.jobs(PROJECT)
         _forget_staged_job(x, new_job.job_id)
