@@ -57,17 +57,50 @@ def test_unlisted_or_malformed_host_is_rejected(host: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "origin",
+    ("host", "origin"),
     (
-        None,
-        "http://localhost",
-        "HTTP://LOCALHOST:5173",
-        "http://127.0.0.1:8765",
-        "http://[::1]:5173",
+        ("localhost", None),
+        # the page the server itself served: same name and port (80 when none is written)
+        ("localhost", "http://localhost"),
+        ("localhost", "http://localhost:80"),
+        ("127.0.0.1:8765", "http://127.0.0.1:8765"),
+        ("LOCALHOST:8765", "HTTP://localhost:8765"),
+        ("[::1]:8765", "http://[::1]:8765"),
+        # the web development server on its default port, behind either loopback name
+        ("localhost", "HTTP://LOCALHOST:5173"),
+        ("127.0.0.1:8765", "http://127.0.0.1:5173"),
     ),
 )
-def test_allowed_origins(origin: str | None) -> None:
-    assert check_local_request("POST", "/rpc", headers(origin=origin)) is None
+def test_allowed_origins(host: str, origin: str | None) -> None:
+    assert check_local_request("POST", "/rpc", headers(host, origin=origin)) is None
+
+
+@pytest.mark.parametrize(
+    ("host", "origin"),
+    (
+        # another local web server, a notebook, another THOTH: local name, not this server
+        ("127.0.0.1:8765", "http://localhost:3000"),
+        ("127.0.0.1:8765", "http://127.0.0.1:8888"),
+        ("localhost", "http://localhost:8765"),
+        # the same port under another loopback name is another origin to a browser
+        ("localhost:8765", "http://127.0.0.1:8765"),
+        ("127.0.0.1:8765", "http://[::1]:5173"),
+    ),
+)
+def test_other_local_origins_are_rejected(host: str, origin: str) -> None:
+    rejection = check_local_request("POST", "/rpc", headers(host, origin=origin))
+    assert rejection is not None and rejection.code == "LOCAL_ORIGIN_REJECTED"
+
+
+def test_operator_names_more_local_origins_but_cannot_open_the_server_to_other_hosts(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("THOTH_ALLOWED_ORIGINS", " http://localhost:3000 ,http://evil.example,")
+    listed = check_local_request("POST", "/rpc", headers("127.0.0.1:8765", "http://LOCALHOST:3000"))
+    assert listed is None
+    for origin in ("http://evil.example", "http://localhost:3001", ""):
+        rejection = check_local_request("POST", "/rpc", headers("127.0.0.1:8765", origin))
+        assert rejection is not None and rejection.code == "LOCAL_ORIGIN_REJECTED"
 
 
 @pytest.mark.parametrize(

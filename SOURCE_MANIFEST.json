@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-12T00:31:53.624699+00:00",
+  "created_at": "2026-11-12T01:01:24.783934+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -68,8 +68,8 @@
     },
     {
       "path": "SECURITY.md",
-      "sha256": "09100240bfbb820168f8963fb429639478ba2eb0c1729b0b7b717562936b62cc",
-      "bytes": 3056
+      "sha256": "f1ea20ee15fbb43b8f4ad248ad13da3e97e8a7d881ec0ef4305df74d41b7734c",
+      "bytes": 4281
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -1038,8 +1038,8 @@
     },
     {
       "path": "apps/web/src/components/ModelCredentialPanel.tsx",
-      "sha256": "9a7c5d70079cc3fd0781d1854a36c0251af9491d8ac0e80fa1387ceaf05221d6",
-      "bytes": 7117
+      "sha256": "9416b4bdfac6f4c1f5ea67c2d46d66fd96bbb054ee7cd795fbd12f896c79870e",
+      "bytes": 7209
     },
     {
       "path": "apps/web/src/components/ModelSettings.test.tsx",
@@ -1963,8 +1963,8 @@
     },
     {
       "path": "apps/web/src/i18n/connectionReasons.ts",
-      "sha256": "630c060f55e3bc905ee4c22155a547c6b6e05a271839b99f5417b44a7049f354",
-      "bytes": 17598
+      "sha256": "58012595415f8d8754b875a46c30df817c2509b61a94f4df5f13cc2528d9371e",
+      "bytes": 19907
     },
     {
       "path": "apps/web/src/i18n/coreMessages.ts",
@@ -2383,8 +2383,8 @@
     },
     {
       "path": "apps/web/src/i18n/wordingRules.test.ts",
-      "sha256": "f427e0e9da5681a87143f3934f52b76ca90a69331bbc383fcb30d147e0c0e92d",
-      "bytes": 4856
+      "sha256": "dae5b3539d063daa8b86f566e3a4699bc83df9911bcb571d25b0d1fd4576cfd6",
+      "bytes": 5614
     },
     {
       "path": "apps/web/src/i18n/workspaceDetailMessages.ts",
@@ -2878,8 +2878,8 @@
     },
     {
       "path": "docs/INSTALL.md",
-      "sha256": "f5277bc0b6a10569652598d09575495a1ecbd63ecf18b728473a3a5d05035f16",
-      "bytes": 23919
+      "sha256": "e5d36424a2b0afa76ae5a434f67247438b7deb54cac23acdaf46ee033cddaf33",
+      "bytes": 24292
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.ko.md",
@@ -2888,8 +2888,8 @@
     },
     {
       "path": "docs/KNOWN_LIMITATIONS.md",
-      "sha256": "00083b15e4018f8914ec6001f96d3995d6166b255671ec48f3fb7828fdcfb60b",
-      "bytes": 11542
+      "sha256": "e15646b2697b67a28e647ccb576fd2db06eb24fcdf954d82abd6c64e95d706f0",
+      "bytes": 12405
     },
     {
       "path": "docs/KNOWN_TEST_FAILURES.json",
@@ -4463,8 +4463,8 @@
     },
     {
       "path": "src/thoth/adapters/http/app.py",
-      "sha256": "98396f72352ac5e9aacbbbaa1711f6e72f6d7b0a445a6e6829b3bf2122179a7a",
-      "bytes": 21194
+      "sha256": "db76b16d31254f0f3472b479e60d927520235275d9eaffc4bf788955d165f4ac",
+      "bytes": 22569
     },
     {
       "path": "src/thoth/adapters/http/async_routes.py",
@@ -4473,8 +4473,8 @@
     },
     {
       "path": "src/thoth/adapters/http/file_staging.py",
-      "sha256": "19b844a3bada1b54b499e3b126880a98267ba8fe99bc6db722cbb8eab13e3c9e",
-      "bytes": 5267
+      "sha256": "476b69ee7fb880a69ffa42c2e218b736bc07817f733628ba999aab986bb54c7a",
+      "bytes": 5531
     },
     {
       "path": "src/thoth/adapters/http/hosted_review.py",
@@ -4488,8 +4488,13 @@
     },
     {
       "path": "src/thoth/adapters/http/local_request_guard.py",
-      "sha256": "c9c961d282adb9dcbd0f5fea6373224c45ab25f9407d2afdbdd320bd2fdac8fa",
-      "bytes": 4455
+      "sha256": "f5c925d5c8905091cb9115c86acfffa9ea034387ba436e8e8644bfb1b912fcd3",
+      "bytes": 5695
+    },
+    {
+      "path": "src/thoth/adapters/http/security_headers.py",
+      "sha256": "d92355d88717ef0cf7376c9281461e8c270fdb13ba689e6c940916cc5fd9cd65",
+      "bytes": 1704
     },
     {
       "path": "src/thoth/adapters/improvement.py",
@@ -4603,8 +4608,8 @@
     },
     {
       "path": "src/thoth/adapters/models/claude_profile.py",
-      "sha256": "e5a2d87425556edc274d15b0683cd2daecf3002642ca7ea33db8625fde0f409d",
-      "bytes": 10656
+      "sha256": "8f5f00ec802bd43bb07da4c6a2559aa48aa25fc348e98742425da7c2005e730f",
+      "bytes": 9491
     },
     {
       "path": "src/thoth/adapters/models/close_within.py",
@@ -4683,13 +4688,18 @@
     },
     {
       "path": "src/thoth/adapters/models/local_credentials.py",
-      "sha256": "70cb60feb7a523018c6f20001903b26f9429be3b91b9d2916a80953bfa5275bf",
-      "bytes": 22578
+      "sha256": "dd4886d369a1945f95d74a1a5f67eaf3618610931c51f2acba643b660e0f77d5",
+      "bytes": 22814
     },
     {
       "path": "src/thoth/adapters/models/openai_responses.py",
       "sha256": "e4216a03c355ccf8690bb9754f064a0f2d47c1ba84c2dbabb2761c410f4f0d01",
       "bytes": 12688
+    },
+    {
+      "path": "src/thoth/adapters/models/private_file.py",
+      "sha256": "d5caf9dd12531734cff50c934efe804fca57396649081652b50a3622f4a30ad1",
+      "bytes": 4088
     },
     {
       "path": "src/thoth/adapters/models/receive_stats.py",
@@ -4783,8 +4793,8 @@
     },
     {
       "path": "src/thoth/adapters/models/xai_profile.py",
-      "sha256": "16b354e306dc952f1f1986b779beed72ca44e290003fc8bf0534c096ca686586",
-      "bytes": 8238
+      "sha256": "53c7407bf5a1e2def2d15ac832bd1f57a44683036cb0b1803e9b785051d10456",
+      "bytes": 7091
     },
     {
       "path": "src/thoth/adapters/models/xai_responses.py",
@@ -9282,6 +9292,11 @@
       "bytes": 661
     },
     {
+      "path": "tests/contract/test_request_boundary.py",
+      "sha256": "98cc3509933784826ff4840343de4b2406073880818825b72b003f056db8d80f",
+      "bytes": 7667
+    },
+    {
       "path": "tests/contract/test_schema_snapshots.py",
       "sha256": "f8734d8199c3298f0b80fca0348cc03ec0bebc5b84f6a00a8248f802b47b50e6",
       "bytes": 483
@@ -12557,6 +12572,11 @@
       "bytes": 3600
     },
     {
+      "path": "tests/unit/models/test_private_file.py",
+      "sha256": "91b93d81f11b463965532dbbe73e1a4676bb53d9617f4bd3ae48b812d4b95296",
+      "bytes": 4312
+    },
+    {
       "path": "tests/unit/models/test_ranking_reference_contract.py",
       "sha256": "300693ce307872584006fd59a7acceba6a3fb924fe4391365aca747156bd4394",
       "bytes": 11189
@@ -13293,8 +13313,8 @@
     },
     {
       "path": "tests/unit/test_local_request_guard_unit.py",
-      "sha256": "4e70edd31bc1a7316799a8fa96a6050185b6cc8f5605ea6d570273d4b96b63a1",
-      "bytes": 7865
+      "sha256": "f2b92c8a1279af4406c743af828ca6b3f5a229183afef5382c0abc0345f493a4",
+      "bytes": 9639
     },
     {
       "path": "tests/unit/test_memory_eval_families.py",

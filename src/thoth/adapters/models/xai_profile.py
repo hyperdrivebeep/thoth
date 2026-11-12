@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import cast
 
 from thoth.adapters.models.async_file_lock import async_file_lock
-from thoth.adapters.models.windows_user_sid import UserSidUnavailable, current_user_sid
+from thoth.adapters.models.private_file import PrivatePathError, make_private
 from thoth.ports.model import ModelExecutionHold
 
 
@@ -43,37 +43,10 @@ class XaiProfile:
             raise XaiProfileHold("XAI_PROFILE_BOUNDARY_INVALID")
 
     def _private(self, path: Path, *, directory: bool = False) -> None:
-        if os.name == "nt":
-            try:
-                sid = current_user_sid()
-            except UserSidUnavailable as exc:
-                raise XaiProfileHold("XAI_PROFILE_PERMISSION_UNAVAILABLE") from exc
-            try:
-                result = subprocess.run(
-                    [
-                        "icacls",
-                        str(path),
-                        "/inheritance:r",
-                        "/grant:r",
-                        f"*{sid}:(OI)(CI)F" if directory else f"*{sid}:F",
-                    ],
-                    capture_output=True,
-                    text=True,
-                    encoding="oem",
-                    errors="replace",
-                    timeout=5,
-                    check=False,
-                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-                )
-            except (OSError, subprocess.SubprocessError) as exc:
-                raise XaiProfileHold("XAI_PROFILE_PERMISSION_UNAVAILABLE") from exc
-            if result.returncode != 0:
-                raise XaiProfileHold("XAI_PROFILE_PERMISSION_UNAVAILABLE")
-        else:
-            try:
-                os.chmod(path, 0o700 if directory else 0o600)
-            except OSError as exc:
-                raise XaiProfileHold("XAI_PROFILE_PERMISSION_UNAVAILABLE") from exc
+        try:
+            make_private(path, directory=directory)
+        except PrivatePathError as exc:
+            raise XaiProfileHold("XAI_PROFILE_PERMISSION_UNAVAILABLE") from exc
 
     def prepare(self) -> None:
         self._guard(self.workspace / "model-registry")

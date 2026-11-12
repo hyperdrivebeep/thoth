@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import unicodedata
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from hashlib import sha256
 from os import replace
 from pathlib import Path
@@ -70,6 +70,7 @@ async def stage_file_upload(
     file: UploadFile,
     *,
     _workspace_path_for_request: Callable[[Request], Path],
+    _project_known: Callable[[Request, str], Awaitable[bool]] | None = None,
 ) -> dict[str, object]:
     workspace = _workspace_path_for_request(request)
     authenticated_project_id = request.headers.get("x-thoth-project-id", "")
@@ -86,6 +87,8 @@ async def stage_file_upload(
         except PermissionError as exc:
             raise HTTPException(status_code=403, detail=str(exc)) from exc
         authenticated_project_id = authenticated.project_id
+    if _project_known is not None and not await _project_known(request, authenticated_project_id):
+        raise HTTPException(status_code=404, detail="project was not found")
     filename = Path(file.filename or "upload.bin").name
     suffix = Path(filename).suffix.lower()
     media_type = MEDIA_TYPES.get(suffix)

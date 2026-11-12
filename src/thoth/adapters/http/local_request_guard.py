@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -15,6 +16,10 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from thoth.adapters.http.hosted_review import hosted_mode
 
 _NAMES = frozenset({"127.0.0.1", "localhost", "::1"})
+# A page may call the server it was loaded from. The one other origin accepted without setup is the
+# web development server (Vite) on its default port; more local origins are named in the variable.
+_DEV_ORIGINS = frozenset({"http://127.0.0.1:5173", "http://localhost:5173"})
+ALLOWED_ORIGINS_ENV = "THOTH_ALLOWED_ORIGINS"
 _SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
 _JSON_PATHS = frozenset({"/rpc", "/rpc/query", "/rpc/async"})
 _CANCEL_PATH = re.compile(r"/operations/[^/]+/cancel")
@@ -69,6 +74,24 @@ def _local_authority(value: str, *, origin: bool) -> bool:
         return False
 
 
+def _allowed_origin(origin: str, host: str) -> bool:
+    """A local origin that is this server itself, the development server, or named by the operator.
+
+    Any other page on this computer (another local web server, a notebook) is refused even though
+    its host name is local: it could otherwise call every method, from reading research to
+    registering a key. Entries of the variable must be local origins too; it cannot open the server
+    to the network.
+    """
+    if not _local_authority(origin, origin=True):
+        return False
+    normalized = origin.lower()
+    page, server = urlsplit(normalized), urlsplit("//" + host.lower())
+    if page.hostname == server.hostname and (page.port or 80) == (server.port or 80):
+        return True
+    named = {item.strip().lower() for item in os.environ.get(ALLOWED_ORIGINS_ENV, "").split(",")}
+    return normalized in _DEV_ORIGINS or normalized in named
+
+
 def check_local_request(
     method: str,
     path: str,
@@ -82,7 +105,7 @@ def check_local_request(
     if not websocket and method.upper() in _SAFE_METHODS:
         return None
     origins = _header_values(headers, b"origin")
-    if origins and (len(origins) != 1 or not _local_authority(origins[0], origin=True)):
+    if origins and (len(origins) != 1 or not _allowed_origin(origins[0], hosts[0])):
         return _ORIGIN
     normalized = path.rstrip("/")
     if not websocket and (normalized in _JSON_PATHS or _CANCEL_PATH.fullmatch(normalized)):

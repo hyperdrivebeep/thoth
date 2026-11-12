@@ -7,6 +7,7 @@ import { useState } from "react";
 import { rpc } from "../api/rpcClient";
 import { canStartCredentialMethod, credentialAccountLabel, credentialAuthMethod, credentialAvailabilityNote, credentialCompanies, credentialGuideUrl, credentialResultMessage, loginSupported, loginUnavailable,
   xaiDeviceLoginSupported, type CredentialAccount, type CredentialRegisterResult } from "./modelCredentialPresentation";
+import { connectionErrorText } from "./connectionCopy";
 import { XaiDeviceLogin } from "./XaiDeviceLogin";
 import { OAuthLoginFlow } from "./OAuthLoginFlow";
 
@@ -65,7 +66,7 @@ export function ModelCredentialPanel({ projectId, workspaceId }: { projectId: st
         {guideUrl && <p><a href={guideUrl} target="_blank" rel="noopener noreferrer">{t("setup.openKeySite")}</a></p>}</Callout>}
       {connect.error && (
         <Callout compact intent="danger" role="alert">
-          {connect.error.message}
+          {connectionErrorText(connect.error, connect.error.message)}
         </Callout>
       )}
       {listed.error && <Callout compact intent="warning" role="alert">{t("credential.methodsFailed")}</Callout>}

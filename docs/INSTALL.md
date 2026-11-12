@@ -119,6 +119,15 @@ After building, the local backend also serves the built UI on its own origin. Th
 used port 18765 to avoid an existing server and confirmed its HTML, JavaScript asset and first-run
 screen. No existing workspace is needed for that check.
 
+The backend accepts browser requests from its own page and from the Vite development server on its
+default port 5173. If you run Vite (or another local front end) on a different port, name that
+origin before starting the backend; otherwise its requests are answered with 403
+`LOCAL_ORIGIN_REJECTED`:
+
+```powershell
+$env:THOTH_ALLOWED_ORIGINS = "http://localhost:5174"
+```
+
 ## Model usage and cost
 
 Recorded synthetic-demo investigations used roughly **8–9 model calls and 330,000–450,000 tokens per

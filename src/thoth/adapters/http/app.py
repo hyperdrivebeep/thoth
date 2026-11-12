@@ -30,6 +30,7 @@ from thoth.adapters.http.hosted_review import (
 )
 from thoth.adapters.http.internal_routes import mount_internal_routes
 from thoth.adapters.http.local_request_guard import LocalRequestGuard
+from thoth.adapters.http.security_headers import SecurityHeaders
 from thoth.adapters.storage.workspace_owner import WorkspaceInUse
 from thoth.apps.hosted_review_dispatch import hosted_dispatch
 from thoth.apps.hosted_review_snapshot import (
@@ -47,11 +48,11 @@ from thoth.protocol.jsonrpc import (
     JsonRpcResponse,
     RpcErrorCode,
 )
+from thoth.protocol.read_queries import READ_QUERY_METHODS
 from thoth.protocol.stdio import encode_response, handle_json_line
 
 LOCAL_ACTOR_ID = "human:local-user"
 _LOCAL_ACTOR_FIELDS = frozenset({"actor_id", "actor_or_agent_ref", "actor_ref"})
-_READ_ONLY_METHOD_MARKERS = ("/read", "/list", "/status", "/audit", "/history")
 
 
 def _hosted_transport_denial(request_id: str | int | None = None) -> Response | None:
@@ -94,7 +95,9 @@ def _local_identity_denial(
     *,
     local_actor_id: str,
 ) -> JsonRpcResponse | None:
-    if any(marker in request.method for marker in _READ_ONLY_METHOD_MARKERS):
+    # Only the methods on the non-changing read list skip the check. A name that merely looks like a
+    # read ("closure/readiness/assess", "action/preflight/read") is a command and records an actor.
+    if request.method in READ_QUERY_METHODS:
         return None
     supplied = {
         field: request.params.input[field]
@@ -222,6 +225,7 @@ def create_app(
     )
     if not hosted_mode():
         application.add_middleware(LocalRequestGuard)
+    application.add_middleware(SecurityHeaders)
     application.state.bus = bus
     application.state.runtime = None
     application.state.session_runtimes = {}
@@ -385,7 +389,32 @@ async def _stage_file(
         request,
         file,
         _workspace_path_for_request=lambda request: _workspace_path_for_request(request),
+        _project_known=_project_known,
     )
+
+
+async def _project_known(request: Request, project_id: str) -> bool:
+    """False when the open local workspace has no such project.
+
+    Staging does not open the workspace itself (it has to work before any request has), so before
+    the first request nothing is known and the upload goes on. The web screen always lists the
+    projects first, so from there an upload for an unknown project id is refused instead of filling
+    the inbox.
+    """
+    application: FastAPI | None = request.scope.get("app")
+    bus: CommandBus | None = None if application is None else application.state.bus
+    if bus is None or hosted_mode():
+        return True
+    check = {
+        "id": "stage-project-check",
+        "method": "project/read",
+        "params": {
+            "_meta": {"idempotencyKey": "stage-project-check"},
+            "input": {"project_id": project_id},
+        },
+    }
+    response = await bus.query(JsonRpcRequest.model_validate(check))
+    return response.error is None or response.error.code != RpcErrorCode.PROJECT_NOT_FOUND
 
 
 def _resolve_bus_for_request(application: FastAPI, request: Request) -> CommandBus:

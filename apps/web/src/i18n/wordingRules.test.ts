@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { afterEach, expect, it } from "vitest";
 import { activityDisplay } from "./activityDisplay";
+import { connectionReason } from "./connectionReasons";
 import { formatCatalog } from "./formatMessages";
 import { historyTitle } from "./historyTitle";
 import { setLocale } from "./locale";
@@ -94,4 +95,20 @@ it("puts a space between sentences in Korean and English and none in Japanese an
     expect(sentenceGap(), code).toBe("");
     expect(joinSentences(["一。", " 二。"]), code).toBe("一。二。");
   }
+});
+
+it("says in every screen language why a key was not saved, without the reason code", () => {
+  for (const code of ["MODEL_CREDENTIAL_STORE_UNREADABLE", "MODEL_CREDENTIAL_STORE_UNWRITABLE"]) {
+    const texts = (["ko", "en", "ja", "zh-Hans", "zh-Hant"] as const).map(language => {
+      setLocale(language);
+      return connectionReason(code) ?? "";
+    });
+    expect(new Set(texts).size, code).toBe(5);
+    for (const text of texts) {
+      expect(text.length, code).toBeGreaterThan(20);
+      expect(text, code).not.toContain("MODEL_CREDENTIAL");
+    }
+  }
+  setLocale("ko");
+  expect(connectionReason("MODEL_CREDENTIAL_STORE_UNREADABLE")).toContain("새 키를 저장하지 않았습니다");
 });
