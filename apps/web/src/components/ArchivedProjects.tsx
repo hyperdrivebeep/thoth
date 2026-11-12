@@ -1,6 +1,6 @@
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
-import { Button, Callout } from "@blueprintjs/core";
+import { Button, Callout, PopoverNext } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { rpc } from "../api/rpcClient";
@@ -11,6 +11,45 @@ import type { BrowserScope } from "../api/localWorkspacePersistence";
 import type { ProjectSummary } from "../types";
 import { ProjectPermanentDelete } from "./ProjectPermanentDelete";
 import { useReadAccessProtection } from "./useReadAccessProtection";
+
+/**
+ * One archived project: its name and the same kind of menu the open projects have. Restoring and deleting
+ * sit in the menu, so a permanent delete is not one slip away from a restore.
+ */
+function ArchivedProjectRow({ project, restoring, busy, onRestore, onDelete }: {
+  project: ProjectSummary;
+  restoring: boolean;
+  busy: boolean;
+  onRestore: () => void;
+  /** Left out where projects cannot be deleted (the hosted review environment). */
+  onDelete?: () => void;
+}) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const choose = (action: () => void) => () => {
+    setMenuOpen(false);
+    action();
+  };
+  const menu = (
+    <div className="project-inline-menu archived-project-menu" role="menu">
+      <Button fill alignText="left" minimal role="menuitem" icon="reset" disabled={busy} onClick={choose(onRestore)}>
+        {t("archive.restore")}
+      </Button>
+      {onDelete && (
+        <Button fill alignText="left" minimal role="menuitem" intent="danger" icon="trash" disabled={busy} onClick={choose(onDelete)}>
+          {t("archive.delete")}
+        </Button>
+      )}
+    </div>
+  );
+  return (
+    <div className="archived-project-row">
+      <span className="archived-project-name" title={project.name}>{project.name}</span>
+      <PopoverNext isOpen={menuOpen} onInteraction={setMenuOpen} placement="right-start" arrow={false} content={menu}>
+        <Button small minimal icon="more" aria-label={message("projectMenu", project.name)} aria-expanded={menuOpen} loading={restoring} />
+      </PopoverNext>
+    </div>
+  );
+}
 
 /** Archived projects are read-only and hidden from the list; this shows them on demand so one can be restored. */
 export function ArchivedProjects({ scopeKey, hosted = false, storageScope, onDeleted }: {
@@ -47,15 +86,16 @@ export function ArchivedProjects({ scopeKey, hosted = false, storageScope, onDel
       {!blocked && archived.isPending && <p className="empty-copy" role="status">{t("archive.loading")}</p>}
       {(archived.error || blocked) && <Callout compact intent="danger" role="alert">{t("archive.failed")}</Callout>}
       {!blocked && archived.isSuccess && rows.length === 0 && <p className="empty-copy">{t("archive.empty")}</p>}
-      {rows.map(item => <div className="archived-project-row" key={item.project_id}>
-        <span className="archived-project-name" title={item.name}>{item.name}</span>
-        <span className="archived-project-actions">
-          <Button small minimal icon="reset" aria-label={message("restoreProject", item.name)} loading={restore.isPending && restore.variables?.project_id === item.project_id}
-            disabled={restore.isPending} onClick={() => restore.mutate(item)}>{t("archive.restore")}</Button>
-          {!hosted && <Button small minimal intent="danger" icon="trash" aria-label={message("deleteProjectLabel", item.name)}
-            disabled={restore.isPending} onClick={() => { setDeleted(false); setDeleting(item); }}>{t("archive.delete")}</Button>}
-        </span>
-      </div>)}
+      {rows.map(item => (
+        <ArchivedProjectRow
+          key={item.project_id}
+          project={item}
+          restoring={restore.isPending && restore.variables?.project_id === item.project_id}
+          busy={restore.isPending}
+          onRestore={() => restore.mutate(item)}
+          onDelete={hosted ? undefined : () => { setDeleted(false); setDeleting(item); }}
+        />
+      ))}
       {!blocked && <ProjectActionNotice error={restore.error} fallbackKey="archive.restoreFailed"/>}
       {deleted && !deleting && <p className="empty-copy" role="status">{t("archive.deleteDone")}</p>}
     </div>}

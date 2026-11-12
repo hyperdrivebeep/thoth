@@ -1419,3 +1419,53 @@ it("shows the server's English guidance in Korean and keeps unknown English out 
   expect(text).not.toContain("Some brand new English hint");
 });
 
+it("lets a first-time user go on without a model and reach the workspace", async () => {
+  fixture.ready = { ready: false, deployment_mode: "LOCAL", model_connected: false, setup: { internet_consent: "UNDECIDED" } };
+  await mount(true);
+  const named = (label: string) => [...container.querySelectorAll("button")].find(button => button.textContent === label) as HTMLButtonElement | undefined;
+  expect(named("다음")!.disabled).toBe(true);
+  // What "later" means is said next to it.
+  expect(container.textContent).toContain("나중에 연결하면 질문을 보낼 때 연결을 요청합니다.");
+  await act(async () => named("나중에 연결")!.click()); await flush();
+  expect(container.textContent).toContain("2 / 2");
+  expect(fixture.calls.some(call => call.method === "model/credential/register")).toBe(false);
+  const deny = [...container.querySelectorAll("button")].find(button => button.textContent?.includes("거부"));
+  await act(async () => deny!.click()); await flush();
+  await flush();
+  expect(container.querySelector(".first-run-shell")).toBeNull();
+  expect(container.querySelector("main.conversation-workstation")).not.toBeNull();
+  // The one thing that was decided is the internet question; no model was registered on the way.
+  expect(fixture.calls.some(call => call.method === "workspace/setup/update" && call.input.internet_consent === "DENIED")).toBe(true);
+  expect(fixture.calls.some(call => call.method === "model/credential/register")).toBe(false);
+});
+
+it("offers 'connect later' only while no model is connected", async () => {
+  fixture.ready = { ready: false, deployment_mode: "LOCAL", model_connected: true, setup: { internet_consent: "UNDECIDED" } };
+  fixture.accounts = [{ provider: "openai", label: "ChatGPT", connected: true, has_key: true, oauth: false,
+    login_supported: true, login_kind: "codex_isolated_browser", remote_auth_verified: null, available_model_providers: ["openai"],
+    connection_state: "API_KEY_AVAILABLE", profile_mode: "THOTH_LOCAL_KEY", execution_eligible: true, execution_verified: false }];
+  await mount();
+  for (let i = 0; i < 12 && ![...container.querySelectorAll("button")].some(button => button.textContent === "다음" && !button.disabled); i++) await flush();
+  expect([...container.querySelectorAll("button")].some(button => button.textContent === "나중에 연결")).toBe(false);
+});
+
+it("tells the three providers apart by a mark of their own, not by a first letter two of them share", async () => {
+  fixture.ready = { ready: false, deployment_mode: "LOCAL", model_connected: false, setup: { internet_consent: "UNDECIDED" } };
+  await mount();
+  const marks = [...container.querySelectorAll(".first-run-provider .provider-mark")];
+  expect(marks.map(mark => mark.getAttribute("data-provider"))).toEqual(["openai", "anthropic", "xai"]);
+  expect(marks.every(mark => mark.textContent === "" && mark.getAttribute("aria-hidden") === "true")).toBe(true);
+});
+
+it("opens this computer's settings from the sidebar when no project is open, and keeps the project's settings tab off", async () => {
+  fixture.ready = localReady({ ready: true, execution_ready: true, model_connected: true, setup_complete: true, setup: { internet_consent: "DENIED" } });
+  await mount(true);
+  const settingsTab = [...container.querySelectorAll('[role="tab"]')].find(tab => tab.textContent === "설정")!;
+  expect(settingsTab.getAttribute("aria-disabled")).toBe("true");
+  const open = [...container.querySelectorAll(".sidebar-bottom button")].find(button => button.textContent === "이 컴퓨터 설정") as HTMLButtonElement;
+  await act(async () => open.click()); await flush();
+  expect(container.querySelector(".workspace-heading h1")?.textContent).toBe("이 컴퓨터 설정");
+  expect(container.textContent).toContain("계정 연결");
+  expect(container.textContent).toContain("화면 언어");
+  expect(container.querySelector("fieldset.model-settings")).toBeNull();
+});

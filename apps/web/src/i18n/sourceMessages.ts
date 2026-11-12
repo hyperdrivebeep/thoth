@@ -62,12 +62,12 @@ export const sourceMessages = {
     "en": "Explicitly permitted tasks only"
   },
   "sources.connectFailed": {
-    "ko": "자료 연결 실패 / 부분 연결 가능",
-    "en": "Source connection failed / some files may be connected"
+    "ko": "자료를 연결하지 못했습니다",
+    "en": "The source was not connected"
   },
-  "sources.checkConnected": {
-    "ko": "이미 연결된 파일은 자료 목록에서 확인하세요.",
-    "en": "Check the source list for files already connected."
+  "sources.scopeHelp": {
+    "ko": "'이 프로젝트에서 함께 사용'은 이 프로젝트의 모든 작업이 이 자료를 근거로 쓸 수 있게 합니다. '명시적으로 허용된 작업만'은 따로 허용한 작업에서만 쓰게 합니다.",
+    "en": "'Shared within this project' lets every task in this project use the source as evidence. 'Explicitly permitted tasks only' limits it to tasks that were given permission."
   },
   "sources.connected": {
     "ko": "자료 연결이 완료되었습니다. 분석은 새 질문이나 지시로 시작합니다.",
@@ -140,6 +140,11 @@ export const sourceMessages = {
   "web.registerFirst": {
     "ko": "조회할 수 있는 도메인을 먼저 등록하세요. 저장하거나 켜는 것만으로 검색이 시작되지는 않습니다.",
     "en": "Register permitted domains first. Saving or enabling them does not start a search."
+  },
+  "web.allowInSettings": { "ko": "설정에서 허용", "en": "Allow in settings" },
+  "web.deniedNext": {
+    "ko": "허용하면 여기서 조회할 도메인을 등록할 수 있습니다.",
+    "en": "Once it is allowed, you can register the domains to look up here."
   },
   "web.workspaceDenied": {
     "ko": "이 작업 공간에서는 인터넷 사용을 허용하지 않았습니다.",

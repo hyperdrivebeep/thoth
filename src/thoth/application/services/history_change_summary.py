@@ -35,7 +35,7 @@ _LABELS = {
     "risk_tier": "위험 등급",
     "scope": "적용 조건",
     "cutoff_at": "기준시점",
-    "authority_status": "출처 권위",
+    "authority_status": "자료 성격",
     "support_status": "근거 충분성",
     "assertion": "기억 내용",
     "transition": "검토 결과",

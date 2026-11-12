@@ -116,9 +116,10 @@ export const setupMessages = {
     "en": "Connected. Next, choose whether to allow web access."
   },
   "setup.modelNeeded": {
-    "ko": "모델을 하나 연결하면 다음으로 넘어갈 수 있습니다.",
-    "en": "Connect one model to continue."
+    "ko": "모델을 하나 연결하면 바로 질문할 수 있습니다. 나중에 연결하면 질문을 보낼 때 연결을 요청합니다.",
+    "en": "Connect one model to ask questions right away. If you connect later, you are asked when you send a question."
   },
+  "setup.connectLater": { "ko": "나중에 연결", "en": "Connect later" },
   "setup.next": {
     "ko": "다음",
     "en": "Next"
@@ -216,8 +217,8 @@ export const setupMessages = {
     "en": "No project model specified"
   },
   "model.inheritsProject": {
-    "ko": "이 작업은 프로젝트의 모델 설정을 따릅니다.",
-    "en": "This task inherits the project's model settings."
+    "ko": "이 대화는 프로젝트의 모델 설정을 따릅니다.",
+    "en": "This conversation follows the project's model settings."
   },
   "model.researchModel": {
     "ko": "연구 모델",
@@ -236,11 +237,11 @@ export const setupMessages = {
     "en": "Default"
   },
   "model.saveThread": {
-    "ko": "이 작업의 기본값으로 저장",
-    "en": "Save as this task's default"
+    "ko": "이 대화의 기본값으로 저장",
+    "en": "Save as this conversation's default"
   },
   "model.saveProject": {
-    "ko": "프로젝트 기본값으로 저장",
+    "ko": "이 프로젝트의 기본값으로 저장",
     "en": "Save as the project default"
   },
   "model.nextRequestOnly": {

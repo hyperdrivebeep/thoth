@@ -257,7 +257,8 @@ it("discards a late comparison after ordinary selection or actor scope changes",
   actorChanged = true;
   await act(async () => { await client.invalidateQueries({ queryKey: ["research-history", ids.project] }); }); await flush();
   expect(container.querySelector(".decision-delta-view")).toBeNull();
-  expect(container.textContent).toContain("비교 전: 선택 전");
+  // The pair is dropped with it: the comparison section is shown only while a side is chosen.
+  expect(container.querySelector(".history-decision-comparison")).toBeNull();
 });
 
 it("discards a late detail response after a different record was selected", async () => {
@@ -407,4 +408,84 @@ it("reopens a lost response using its original key and verifies the new head", a
   expect(applies[0].key).toBe(applies[1].key);
   expect(applies[0].input).toEqual(applies[1].input);
   expect(fixture.appliedCount).toBe(1);
+});
+
+const withoutReviewItems = (fetcher: typeof fetch): typeof fetch => async (url, init) => {
+  const response = await fetcher(url, init);
+  if (JSON.parse(String(init?.body)).method !== "project/review/list") return response;
+  const envelope = await response.json(); envelope.result.value.items = [];
+  return new Response(JSON.stringify(envelope));
+};
+const position = (selector: string) => {
+  const found = container.querySelector(selector);
+  if (!found) throw new Error("not on screen: " + selector);
+  return [...container.querySelectorAll("*")].indexOf(found);
+};
+
+it("starts with the records: nothing to review is one line and no empty comparison card sits above them", async () => {
+  const fixture = createHistoryFixtureTransport(); await mount(withoutReviewItems(fixture.fetch));
+  // One line, without the card's heading and explanation.
+  expect(container.querySelector(".project-review-empty")?.textContent).toBe("현재 프로젝트에 표시할 검토 필요 답변이 없습니다.");
+  expect(container.querySelector(".project-review-list")).toBeNull();
+  expect(container.textContent).not.toContain("읽지 않음 표시, 담당자 배정");
+  expect(container.querySelector(".history-decision-comparison")).toBeNull();
+  expect(position(".project-review-empty")).toBeLessThan(position(".history-layout"));
+  // One button reads the screen again.
+  expect([...container.querySelectorAll("button")].filter(item => item.textContent === "새로 읽기")).toHaveLength(1);
+  // The comparison appears above the records once a side is chosen there.
+  await choose("첫 질문에 대한 답변", "비교 전");
+  expect(container.querySelector(".history-decision-comparison")?.textContent).toContain("비교 후: 선택 전");
+  expect(position(".history-decision-comparison")).toBeLessThan(position(".history-layout"));
+  await click("비교 해제");
+  expect(container.querySelector(".history-decision-comparison")).toBeNull();
+});
+
+it("shows the answers that need review as a card, and reads them again with the one reload button", async () => {
+  const fixture = createHistoryFixtureTransport(); await mount(fixture.fetch);
+  expect(container.querySelector(".project-review-list h2")?.textContent).toBe("검토 필요");
+  expect([...container.querySelectorAll("button")].filter(item => item.textContent === "새로 읽기")).toHaveLength(1);
+  const reads = () => fixture.calls.filter(call => call.method === "project/review/list").length;
+  const before = reads();
+  await click("새로 읽기");
+  expect(reads()).toBe(before + 1);
+});
+
+it("does not colour the note about how much of the history is covered as a warning", async () => {
+  const fixture = createHistoryFixtureTransport();
+  const partial: typeof fetch = async (url, init) => {
+    const response = await fixture.fetch(url, init);
+    if (JSON.parse(String(init?.body)).method !== "revision/timeline/read") return response;
+    const envelope = await response.json(); envelope.result.value.coverage = { ...envelope.result.value.coverage, association: "PARTIAL" };
+    return new Response(JSON.stringify(envelope));
+  };
+  await mount(partial);
+  const note = container.querySelector(".history-timeline [role='status']")!;
+  expect(note.textContent).toContain("현재 읽을 수 있는 기록입니다.");
+  expect(note.className).toBe("history-coverage-note");
+});
+
+it("shows only the answer's own record in the panel next to it, with one way to the whole history", async () => {
+  const fixture = createHistoryFixtureTransport(); const openFull = vi.fn();
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+  vi.stubGlobal("fetch", fixture.fetch);
+  container = document.createElement("div"); document.body.append(container);
+  root = createRoot(container);
+  client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+  const selection = { kind: "result" as const, scope: { projectId: ids.project, threadId: ids.thread, requestDigest: ids.request2 }, resultDigest: ids.result2, title: "추가 질문에 대한 답변" };
+  await act(async () => root!.render(<QueryClientProvider client={client}>
+    <ResearchHistoryWorkspace compact projectId={ids.project} threadId={ids.thread} initialSelection={selection} onOpenFull={openFull} />
+  </QueryClientProvider>));
+  await flush();
+  expect(container.querySelector(".history-detail")?.textContent).toContain("두 번째 답변:");
+  // No second title, no list of every record, no comparison picker, no reload bar: those belong to the history tab.
+  expect(container.querySelector("h1")).toBeNull();
+  expect(container.textContent).not.toContain("연구 이력연구 이력");
+  expect(container.querySelector(".history-timeline")).toBeNull();
+  expect(container.querySelector(".history-decision-comparison")).toBeNull();
+  expect(container.querySelector(".history-toolbar")).toBeNull();
+  expect(container.querySelector(".project-review-list, .project-review-empty")).toBeNull();
+  const links = [...container.querySelectorAll("button")].filter(item => item.textContent === "연구 이력 열기");
+  expect(links).toHaveLength(1);
+  await act(async () => links[0].click());
+  expect(openFull).toHaveBeenCalledTimes(1);
 });

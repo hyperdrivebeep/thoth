@@ -54,8 +54,10 @@ function useScopedState<T>(scope: string, initial: T): [T, (update: T | ((previo
  * background; this card shows that, switches a project off and starts or repeats the work by hand.
  * In a hosted (review) workspace it only explains that, with no requests.
  */
-export function LocalRetrievalSettingsCard({ workspaceId, projectId, hosted = false, timeouts }: {
+export function LocalRetrievalSettingsCard({ workspaceId, projectId, hosted = false, timeouts, part = "all" }: {
   workspaceId: string; projectId?: string; hosted?: boolean;
+  /** "computer": the model files and the runtime part, which every project shares. "project": this project's index. */
+  part?: "all" | "computer" | "project";
   /** Test seam only: shorter waits for the long-operation wrapper. */
   timeouts?: Partial<OperationTimeouts>;
 }) {
@@ -179,14 +181,13 @@ export function LocalRetrievalSettingsCard({ workspaceId, projectId, hosted = fa
   const importInput = { project_id: WORKSPACE_PROJECT_ID, source_path: sourcePath.trim(), manifest_digest: assetValue?.manifest_digest ?? "" };
   const installConfirmed = Boolean(assetValue) && confirmedDigest === assetValue?.manifest_digest;
 
+  const shown = PARTS[part];
   return <section className="detail-card local-retrieval-card" aria-labelledby="local-retrieval-title">
-    <h2 id="local-retrieval-title">{text("localRetrieval.title")}</h2>
-    <p className="muted"><Sentences text={text("localRetrieval.intro")} /></p>
+    <h2 id="local-retrieval-title">{text(shown.title)}</h2>
+    {shown.asset && <p className="muted"><Sentences text={text("localRetrieval.intro")} /></p>}
 
-    {asset.isPending && <p className="muted" role="status">…</p>}
-    {asset.error && <Callout intent="warning" role="alert">{text("localRetrieval.readFailed")}</Callout>}
-    {assetValue && !assetValue.supported && <Callout intent="warning" role="status">{text("localRetrieval.unsupported")}</Callout>}
-    {assetValue?.supported && <AssetSection
+    <AssetReadStatus read={asset} text={text} />
+    {shown.asset && assetValue?.supported && <AssetSection
       asset={assetValue} text={text} running={running} sourcePath={sourcePath} onSourcePath={setSourcePath}
       installConfirmed={installConfirmed}
       onConfirmInstall={checked => setConfirmedDigest(checked ? assetValue.manifest_digest : null)}
@@ -197,10 +198,9 @@ export function LocalRetrievalSettingsCard({ workspaceId, projectId, hosted = fa
       bytes={localRetrievalBytes(assetValue.total_bytes, locale)}
     />}
 
-    <h3>{text("localRetrieval.projectTitle")}</h3>
-    {!projectId && <p className="muted">{text("localRetrieval.noProject")}</p>}
-    {projectId && project.error && <Callout intent="warning" role="alert">{text("localRetrieval.readFailed")}</Callout>}
-    {projectId && projectValue && <ProjectSection
+    {shown.projectHeading && <h3>{text("localRetrieval.projectTitle")}</h3>}
+    {shown.project && <ProjectReadStatus hasProject={Boolean(projectId)} failed={Boolean(project.error)} text={text} />}
+    {shown.project && projectValue && <ProjectSection
       project={projectValue} asset={assetValue ?? null} text={text} running={running} configuring={configure.isPending}
       configureNotice={configureNotice}
       onToggle={enabled => configure.mutate({ enabled, expectedGeneration: projectValue.generation, ticket: ownership.capture() })}
@@ -216,6 +216,26 @@ export function LocalRetrievalSettingsCard({ workspaceId, projectId, hosted = fa
 }
 
 type Text = (key: LocalRetrievalMessageKey) => string;
+
+/** What each form of the card shows. "all" is the whole card, as before it could be split over two screens. */
+const PARTS = {
+  all: { asset: true, project: true, projectHeading: true, title: "localRetrieval.title" },
+  computer: { asset: true, project: false, projectHeading: false, title: "localRetrieval.title" },
+  project: { asset: false, project: true, projectHeading: false, title: "localRetrieval.projectTitle" },
+} as const;
+
+/** Whether the model files could be read at all: still reading, failed, or not supported on this computer. */
+function AssetReadStatus({ read, text }: { read: { isPending: boolean; error: unknown; data?: { value: LocalAssetRead } }; text: Text }) {
+  if (read.isPending) return <p className="muted" role="status">…</p>;
+  if (read.error) return <Callout intent="warning" role="alert">{text("localRetrieval.readFailed")}</Callout>;
+  return read.data?.value.supported === false ? <Callout intent="warning" role="status">{text("localRetrieval.unsupported")}</Callout> : null;
+}
+
+/** The project's index could not be shown: no project is open, or its read failed. */
+function ProjectReadStatus({ hasProject, failed, text }: { hasProject: boolean; failed: boolean; text: Text }) {
+  if (!hasProject) return <p className="muted">{text("localRetrieval.noProject")}</p>;
+  return failed ? <Callout intent="warning" role="alert">{text("localRetrieval.readFailed")}</Callout> : null;
+}
 
 /**
  * Whether to say that an index made under an earlier preprocessing version is being rebuilt. That

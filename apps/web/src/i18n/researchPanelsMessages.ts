@@ -291,10 +291,6 @@ export const researchPanelsMessages = {
     "ko": "실제 조사에서 어떤 기억을 불러올지는 질문마다 달라서 이 화면에서 정하지 않습니다. 기억은 직접 고치지 않고 수정 제안으로 새 버전을 만들며, 원래 기억은 이력에 남습니다.",
     "en": "Memory recall depends on each research question and is not decided by this screen. Corrections create proposed new versions; the original memory remains in history."
   },
-  "historyWorkspace.intro": {
-    "ko": "질문과 답변, 판단이 달라진 과정을 확인하세요.",
-    "en": "Review questions, answers, and how assessments changed."
-  },
   "historyWorkspace.checkpoints": {
     "ko": "중간 저장 포함",
     "en": "Include checkpoints"

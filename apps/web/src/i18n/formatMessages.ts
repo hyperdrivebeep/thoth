@@ -34,7 +34,6 @@ const formats = {
   },
   cutoff: { ko: (value: string | null) => `기준시점 ${value}`, en: (value: string | null) => `Cutoff ${value}`, "zh-Hans": (value: string | null)=>`截止时间 ${value}`, "zh-Hant": (value: string | null)=>`截止時間 ${value}`, ja: (value: string | null)=>`基準時点 ${value}` },
   deleteProjectTitle: { ko: (name: string) => `프로젝트 "${name}" 영구 삭제`, en: (name: string) => `Delete project "${name}" permanently`, "zh-Hans": (name: string)=>`永久删除项目“${name}”`, "zh-Hant": (name: string)=>`永久刪除專案“${name}”`, ja: (name: string)=>`プロジェクト「${name}」を完全に削除` },
-  deleteProjectLabel: { ko: (name: string) => `${name} 영구 삭제`, en: (name: string) => `Delete ${name} permanently`, "zh-Hans": (name: string)=>`永久删除 ${name}`, "zh-Hant": (name: string)=>`永久刪除 ${name}`, ja: (name: string)=>`${name} を完全に削除` },
   deleteReferenced: {
     ko: (ids: string) => `다른 프로젝트가 이 프로젝트를 참조하고 있어 삭제할 수 없습니다. 참조하는 프로젝트: ${ids}`,
     en: (ids: string) => `Other projects reference this project, so it cannot be deleted. Referencing projects: ${ids}`, "zh-Hans": (ids: string)=>`其他项目引用了此项目，因此无法删除。引用它的项目：${ids}`, "zh-Hant": (ids: string)=>`其他專案引用了此專案，因此無法刪除。引用它的專案：${ids}`, ja: (ids: string)=>`ほかのプロジェクトがこのプロジェクトを参照しているため、削除できません。参照しているプロジェクト：${ids}`,

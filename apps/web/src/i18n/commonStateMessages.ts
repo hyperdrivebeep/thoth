@@ -28,7 +28,7 @@ export const commonStateMessages = {
     "en": "Authoritative source"
   },
   "state.authorityNeeded": {
-    "ko": "출처 권위 확인 필요",
+    "ko": "자료 성격 확인 필요",
     "en": "Source authority needs checking"
   },
   "state.short": {

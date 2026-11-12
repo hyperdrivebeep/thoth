@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import httpx
 import pytest
 
 from thoth.adapters.http.app import create_app
+from thoth.adapters.http.file_staging import MAX_UPLOAD_BYTES, MEDIA_TYPES, UPLOAD_ERROR_HEADER
 
 
 @pytest.mark.asyncio
@@ -70,6 +72,46 @@ async def test_file_stage_rejects_unsupported_type(
         )
 
     assert response.status_code == 415
+    # The sentence is unchanged; the reason also travels as a code the screen can translate.
+    assert response.json() == {"detail": "unsupported research file type"}
+    assert response.headers["x-thoth-upload-error"] == "UPLOAD_UNSUPPORTED_TYPE"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("size", "status", "detail", "code"),
+    [
+        (0, 400, "empty research file", "UPLOAD_EMPTY"),
+        (MAX_UPLOAD_BYTES + 1, 413, "research file exceeds 64 MiB", "UPLOAD_TOO_LARGE"),
+    ],
+)
+async def test_file_stage_names_the_reason_for_an_empty_or_oversized_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, size: int, status: int, detail: str, code: str
+) -> None:
+    monkeypatch.setenv("THOTH_WORKSPACE", str(tmp_path / "workspace"))
+    transport = httpx.ASGITransport(app=create_app())
+    async with httpx.AsyncClient(transport=transport, base_url="http://127.0.0.1:8765") as client:
+        response = await client.post(
+            "/files/stage",
+            files={"file": ("notes.md", b"x" * size, "text/markdown")},
+            headers={"x-thoth-project-id": "project:file-upload"},
+        )
+
+    assert (response.status_code, response.json()) == (status, {"detail": detail})
+    assert response.headers[UPLOAD_ERROR_HEADER] == code
+
+
+def test_the_file_picker_offers_exactly_the_types_the_server_stages() -> None:
+    """The screen filters the file dialog and refuses a wrong type before sending it. Its list is a
+    copy of the server's, so the two are compared here."""
+    source = (
+        Path(__file__).parents[2] / "apps" / "web" / "src" / "api" / "uploadTypes.ts"
+    ).read_text(encoding="utf-8")
+    listed = re.search(r"UPLOAD_EXTENSIONS = \[([^\]]*)\]", source)
+    limit = re.search(r"MAX_UPLOAD_BYTES = (\d+) \* 1024 \* 1024;", source)
+    assert listed is not None and limit is not None
+    assert sorted(re.findall(r'"(\.[a-z]+)"', listed.group(1))) == sorted(MEDIA_TYPES)
+    assert int(limit.group(1)) * 1024 * 1024 == MAX_UPLOAD_BYTES
 
 
 @pytest.mark.asyncio

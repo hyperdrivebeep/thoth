@@ -65,8 +65,6 @@ async function openSourcesAndConnect() {
   const input = container.querySelector<HTMLInputElement>('.source-connect-panel input[type="file"]')!;
   Object.defineProperty(input, "files", { configurable: true, value: [new File(["x"], "gb.txt")] });
   await act(async () => { input.dispatchEvent(new Event("change", { bubbles: true })); });
-  const scope = container.querySelector<HTMLSelectElement>('.source-connect-panel select[aria-label="사용 범위"]') ?? [...container.querySelectorAll<HTMLSelectElement>(".source-connect-panel select")].at(-1)!;
-  await act(async () => { scope.value = "PROJECT_SHARED"; scope.dispatchEvent(new Event("change", { bubbles: true })); });
   await act(async () => { ([...container.querySelectorAll(".source-connect-panel button")].find(item => item.textContent === "자료 연결") as HTMLButtonElement).click(); });
 }
 

@@ -2,8 +2,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, expect, it, vi } from "vitest";
 import { setLocale } from "../i18n/locale";
+import { answerTopLayerSelectorsWithNo } from "../test/jsdomTopLayer";
 import { ArchivedProjects } from "./ArchivedProjects";
 
 const WORKSPACE = `workspace:${"b".repeat(32)}`;
@@ -32,6 +33,10 @@ let root: Root | undefined;
 let container: HTMLDivElement;
 let client: QueryClient;
 const onDeleted = vi.fn();
+// The row menu is a popover; see jsdomTopLayer for why jsdom needs this answer.
+let restoreMatches: () => void;
+beforeAll(() => { restoreMatches = answerTopLayerSelectorsWithNo(); });
+afterAll(() => restoreMatches());
 const archived = () => ({ project_id: "q", name: NAME, overlay: "x", lifecycle: "ARCHIVED_READ_ONLY", revision: 4, cutoff_at: "2026-09-26T00:00:00Z" });
 async function settle(check: () => boolean) {
   for (let i = 0; i < 60; i++) {
@@ -44,6 +49,13 @@ const buttons = (scope: ParentNode, label: string) => [...scope.querySelectorAll
 const dialog = () => document.body.querySelector(".project-delete-dialog") as HTMLElement | null;
 const nameInput = () => dialog()?.querySelector("input") as HTMLInputElement;
 const confirm = () => buttons(dialog()!, "영구 삭제")[0];
+const openArchivedMenu = () => act(async () => { (container.querySelector(".archived-project-row button") as HTMLButtonElement).click(); });
+const archivedMenuItems = () => [...document.querySelectorAll('.archived-project-menu [role="menuitem"]')] as HTMLButtonElement[];
+/** Restore and delete are in the row's menu, which is drawn outside the list. */
+const chooseArchived = async (label: string) => {
+  await openArchivedMenu();
+  await act(async () => { archivedMenuItems().find(item => item.textContent === label)!.click(); });
+};
 async function typeName(value: string) {
   await act(async () => {
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(nameInput(), value);
@@ -69,7 +81,7 @@ afterEach(async () => {
 
 it("keeps the confirm button off until the exact project name is typed", async () => {
   await openDialog();
-  await act(async () => buttons(container, "영구 삭제")[0].click());
+  await chooseArchived("영구 삭제");
   await settle(() => dialog() !== null);
   expect(dialog()!.textContent).toContain("복구할 수 없습니다.");
   expect(dialog()!.textContent).toContain("대화, 자료 기록, 업로드한 원본 파일");
@@ -86,7 +98,7 @@ it("keeps the confirm button off until the exact project name is typed", async (
 
 it("sends the typed name, removes the project from the list and tells the caller", async () => {
   await openDialog();
-  await act(async () => buttons(container, "영구 삭제")[0].click());
+  await chooseArchived("영구 삭제");
   await settle(() => dialog() !== null);
   await typeName(NAME);
   await act(async () => confirm().click());
@@ -104,7 +116,7 @@ it("forgets the drafts and last place this browser kept for the deleted project 
   localStorage.setItem(`thoth:local-workspace:v1:context:${WORKSPACE}`, JSON.stringify({ version: 1, workspaceId: WORKSPACE, projectId: "q", threadId: "t" }));
   sessionStorage.setItem(`thoth:draft:v1:${JSON.stringify(["q", "t"])}`, "unsent");
   await openDialog();
-  await act(async () => buttons(container, "영구 삭제")[0].click());
+  await chooseArchived("영구 삭제");
   await settle(() => dialog() !== null);
   await typeName(NAME);
   await act(async () => confirm().click());
@@ -129,7 +141,7 @@ it.each([
 ])("shows a readable reason when the server refuses (%s %j)", async (code, details, korean, english) => {
   fixture.failure = { code, details };
   await openDialog();
-  await act(async () => buttons(container, "영구 삭제")[0].click());
+  await chooseArchived("영구 삭제");
   await settle(() => dialog() !== null);
   await typeName(NAME);
   await act(async () => confirm().click());
@@ -144,7 +156,7 @@ it.each([
 it("keeps the dialog open when files are left, and trying again finishes the same request", async () => {
   fixture.cleanup = ["inbox/web/projects/abc"];
   await openDialog();
-  await act(async () => buttons(container, "영구 삭제")[0].click());
+  await chooseArchived("영구 삭제");
   await settle(() => dialog() !== null);
   await typeName(NAME);
   await act(async () => confirm().click());
@@ -161,14 +173,14 @@ it("keeps the dialog open when files are left, and trying again finishes the sam
 
 it("offers no delete button in the hosted review environment", async () => {
   await openDialog(true);
-  expect(buttons(container, "영구 삭제")).toHaveLength(0);
-  expect(buttons(container, "되살리기")).toHaveLength(1);
+  await openArchivedMenu();
+  expect(archivedMenuItems().map(item => item.textContent)).toEqual(["되살리기"]);
 });
 
 it("shows the delete wording in English too", async () => {
   setLocale("en");
   await openDialog(false, "View archived projects");
-  await act(async () => buttons(container, "Delete permanently")[0].click());
+  await chooseArchived("Delete permanently");
   await settle(() => dialog() !== null);
   expect(dialog()!.textContent).toContain("This cannot be undone.");
   expect(dialog()!.textContent).toContain('Delete project "Archived demo" permanently');
@@ -178,7 +190,7 @@ it("shows the delete wording in English too", async () => {
 it("shows the delete wording in Simplified Chinese too", async () => {
   setLocale("zh-Hans");
   await openDialog(false, "查看已归档的项目");
-  await act(async () => buttons(container, "永久删除")[0].click());
+  await chooseArchived("永久删除");
   await settle(() => dialog() !== null);
   expect(dialog()!.textContent).toContain("此操作无法撤销。");
   expect(dialog()!.textContent).toContain("永久删除项目“Archived demo”");
@@ -192,7 +204,7 @@ it("shows the delete wording in Simplified Chinese too", async () => {
 it("shows the delete wording in Japanese too", async () => {
   setLocale("ja");
   await openDialog(false, "アーカイブ済みのプロジェクトを見る");
-  await act(async () => buttons(container, "完全に削除")[0].click());
+  await chooseArchived("完全に削除");
   await settle(() => dialog() !== null);
   expect(dialog()!.textContent).toContain("この操作は元に戻せません。");
   expect(dialog()!.textContent).toContain("プロジェクト「Archived demo」を完全に削除");

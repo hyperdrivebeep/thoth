@@ -13,7 +13,8 @@ import { joinSentences, sentenceGap } from "./sentences";
 afterEach(() => setLocale("ko"));
 
 // One word for one thing, and no words of the people who built it (04-ideal I-35, I-36).
-const NOT_IN_KOREAN = ["워크스페이스", "작업공간", "원문 근거", "revision", "결정 객체", "계약에 포함"];
+// "권위": the kind of a source is called "자료 성격" everywhere, on the upload form and in the history alike.
+const NOT_IN_KOREAN = ["워크스페이스", "작업공간", "원문 근거", "revision", "결정 객체", "계약에 포함", "권위"];
 // A dash between a label and its sentence is a habit of machine-written Korean; a colon or a full stop is used.
 const DASH = "\u2014";
 
@@ -35,6 +36,13 @@ it("uses one Korean word for the workspace and for the original text, and no int
     if (written.includes(DASH)) found.push(key + ": dash");
   }
   expect(found).toEqual([]);
+});
+
+it("calls the kind of a source by one Korean word in the status labels too", () => {
+  // The Korean status labels are a table of their own, outside the two lists checked above.
+  const labels = readFileSync(resolve(import.meta.dirname, "statusResources.ts"), "utf8");
+  expect(labels).toContain("자료 성격이 확인되지 않음");
+  expect(labels).not.toContain("권위");
 });
 
 // Text between tags that is written in capitals or as a bare English word is not in the translation

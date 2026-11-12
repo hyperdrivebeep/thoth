@@ -68,20 +68,35 @@ it("shows the readiness card on a fresh conversation from values the shell alrea
   // the top task select is gone; sessions are chosen in the sidebar
   expect(container.querySelector('[aria-label="현재 작업 선택"]')).toBeNull();
   expect(container.querySelectorAll(".project-sessions .thread-button")).toHaveLength(1);
-  // the card's action opens the settings page
+  // the card's action opens this computer's settings, where the model accounts are
   await act(async () => buttons().find(item => item.textContent === "모델 연결 확인")!.click());
-  await settle(() => container.textContent?.includes("모델 기본값") === true);
+  await settle(() => container.querySelector(".workspace-heading h1")?.textContent === "이 컴퓨터 설정");
+  expect(container.textContent).toContain("모델 연결");
+  expect(container.textContent).not.toContain("모델 기본값");
 });
 
-it("makes the setup-needed status in the header a button that opens the settings page", async () => {
+it("makes the setup-needed status in the header a button that opens this computer's settings", async () => {
   await mount("t");
   const setup = buttons().find(item => item.textContent?.includes("새 연구 준비 필요"))!;
   expect(setup).toBeDefined();
-  expect(setup.getAttribute("title")).toBe("설정으로 이동");
+  expect(setup.getAttribute("title")).toBe("새 연구를 실행하려면 설정이 필요합니다. 누르면 설정으로 이동합니다.");
   // a stored session keeps the composer's own notice (no readiness card there)
   expect(container.querySelector(".project-readiness")).toBeNull();
   expect(container.textContent).toContain("새 연구를 실행하려면 모델 연결을 확인하세요");
   await act(async () => setup.click());
-  await settle(() => container.textContent?.includes("모델 기본값") === true);
-  expect(([...container.querySelectorAll('[role="tab"]')].find(tab => tab.getAttribute("aria-selected") === "true") as HTMLElement).textContent).toBe("설정");
+  await settle(() => container.querySelector(".workspace-heading h1")?.textContent === "이 컴퓨터 설정");
+  // It is not one of the project's tabs: the project's own "설정" tab is a different screen.
+  expect([...container.querySelectorAll('[role="tab"]')].filter(tab => tab.getAttribute("aria-selected") === "true")).toHaveLength(0);
+});
+
+it("says once on the project's settings that no model is connected, instead of two switched-off model choices", async () => {
+  await mount("t");
+  await act(async () => ([...container.querySelectorAll('[role="tab"]')].find(tab => tab.textContent === "설정") as HTMLElement).click());
+  await settle(() => container.querySelector(".workspace-heading h1")?.textContent === "프로젝트 설정");
+  const card = [...container.querySelectorAll(".workspace-content .detail-card")].find(item => item.querySelector("h2")?.textContent === "모델 기본값")!;
+  expect(card.textContent).toContain("연결된 모델이 없습니다. 모델을 연결하면 여기서 기본 모델을 고를 수 있습니다.");
+  expect(card.querySelector("fieldset.model-settings")).toBeNull();
+  expect((container.textContent!.match(/연결된 모델이 없습니다/g) ?? []).length).toBe(1);
+  await act(async () => ([...card.querySelectorAll("button")].find(item => item.textContent === "이 컴퓨터 설정 열기") as HTMLButtonElement).click());
+  await settle(() => container.querySelector(".workspace-heading h1")?.textContent === "이 컴퓨터 설정");
 });

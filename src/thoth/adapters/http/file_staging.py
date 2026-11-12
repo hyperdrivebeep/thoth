@@ -22,6 +22,9 @@ from thoth.ports.auth import HttpAuthenticationPort
 from thoth.protocol.jsonrpc import RpcApplicationError
 
 MAX_UPLOAD_BYTES = 64 * 1024 * 1024
+# A refused upload names its reason in this response header. The sentence in the body stays as it
+# was for programs that read it; the code lets the screen say the reason in its own language.
+UPLOAD_ERROR_HEADER = "x-thoth-upload-error"
 MEDIA_TYPES = {
     ".html": "text/html",
     ".htm": "text/html",
@@ -64,6 +67,12 @@ def safe_upload_name(filename: str, suffix: str) -> str:
     return f"{safe_stem}{suffix}"
 
 
+def _refused(status_code: int, detail: str, code: str) -> HTTPException:
+    return HTTPException(
+        status_code=status_code, detail=detail, headers={UPLOAD_ERROR_HEADER: code}
+    )
+
+
 async def stage_file_upload(
     auth: HttpAuthenticationPort | None,
     request: Request,
@@ -93,12 +102,12 @@ async def stage_file_upload(
     suffix = Path(filename).suffix.lower()
     media_type = MEDIA_TYPES.get(suffix)
     if media_type is None:
-        raise HTTPException(status_code=415, detail="unsupported research file type")
+        raise _refused(415, "unsupported research file type", "UPLOAD_UNSUPPORTED_TYPE")
     payload = await file.read(MAX_UPLOAD_BYTES + 1)
     if not payload:
-        raise HTTPException(status_code=400, detail="empty research file")
+        raise _refused(400, "empty research file", "UPLOAD_EMPTY")
     if len(payload) > MAX_UPLOAD_BYTES:
-        raise HTTPException(status_code=413, detail="research file exceeds 64 MiB")
+        raise _refused(413, "research file exceeds 64 MiB", "UPLOAD_TOO_LARGE")
     if hosted_mode():
         try:
             reject_if_upload_exceeds(

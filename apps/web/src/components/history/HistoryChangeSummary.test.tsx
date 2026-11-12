@@ -31,7 +31,7 @@ it("opens the before and after text by itself when a number, negation, status, c
   const toggle = node.querySelector("button[aria-expanded]") as HTMLButtonElement;
   expect(toggle.getAttribute("aria-expanded")).toBe("true");
   expect(node.textContent).toContain("지연이 12 ms 늘어난다"); expect(node.textContent).toContain("지연이 20 ms 늘어난다");
-  expect(node.textContent).toContain("숫자·부정·상태·인용·권위·시점");
+  expect(node.textContent).toContain("숫자·부정·상태·인용·자료 성격·시점");
 });
 
 it("reads a human estimate as one Korean line and keeps unnamed fields as a count with the raw form folded under technical info", async () => {

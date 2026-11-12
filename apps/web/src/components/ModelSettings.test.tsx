@@ -61,7 +61,9 @@ async function openPage(label: string) {
   await flush(); await flush();
 }
 
-function effort() { return container.querySelector<HTMLSelectElement>('[aria-label="연구 추론강도"]')!; }
+/** The settings screen shows the project's default model and the open conversation's; these tests are about the conversation's. */
+const modelScope = (): ParentNode => container.querySelector('fieldset.model-settings[data-scope="conversation"]:not(.compact)') ?? container;
+function effort() { return modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 추론강도"]')!; }
 async function select(value: string) { await act(async () => {effort().value = value; effort().dispatchEvent(new Event("change", {bubbles: true}));}); }
 async function submit() {
   await act(async () => {
@@ -118,7 +120,7 @@ it("one-shot high returns to low visibly and in the next same-thread request", a
 
 it("offers the explicit xai-oauth model without replacing an existing selection", async () => {
   await mount(false, { includeXaiModel: true });
-  const model = container.querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
+  const model = modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
   expect([...model.options].map(option => option.value)).toContain("xai-oauth/grok-4.6");
   expect(model.value).toBe("test/test");
   expect(effort().value).toBe("low");
@@ -140,14 +142,14 @@ it("keeps an unavailable saved model and effort visible until a user selects a n
   expect(brief.querySelector(".visually-hidden")?.textContent).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
   await openPage("설정");
   // The settings page spells the reason out in the text itself.
-  const full = container.querySelector<HTMLParagraphElement>(".model-settings:not(.compact) p.result-notice")!;
+  const full = modelScope().querySelector<HTMLParagraphElement>("p.result-notice")!;
   expect(full.querySelector(".visually-hidden")).toBeNull();
   expect(full.textContent).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
   expect(container.textContent).toContain("저장된 선택: retired / old-model · 추론강도 high");
   expect(container.textContent).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
-  const model = container.querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
+  const model = modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
   expect(model.value).toBe("");
-  const save = container.querySelector<HTMLButtonElement>("button.model-defaults")!;
+  const save = modelScope().querySelector<HTMLButtonElement>("button.model-defaults")!;
   expect(save.disabled).toBe(true);
   expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
   await act(async () => { model.value = "test/test"; model.dispatchEvent(new Event("change", { bubbles: true })); });
@@ -165,7 +167,7 @@ it("does not silently replace an unsupported saved effort", async () => {
   await mount(true, { reason: "MODEL_REASONING_EFFORT_UNSUPPORTED", saved: { provider: "test", model: "test", reasoning_effort: "ultra" } });
   await openPage("설정");
   expect(container.textContent).toContain("저장된 선택: test / test · 추론강도 ultra");
-  const save = container.querySelector<HTMLButtonElement>("button.model-defaults")!;
+  const save = modelScope().querySelector<HTMLButtonElement>("button.model-defaults")!;
   expect(save.disabled).toBe(true);
   expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
   await select("high");
@@ -177,7 +179,7 @@ it("describes an empty thread selection as project inheritance without writing a
   await mount(true, { inheritThread: true });
   await chooseThread("t");
   await flush();
-  expect(container.textContent).toContain("이 작업은 프로젝트의 모델 설정을 그대로 씁니다");
+  expect(container.textContent).toContain("이 대화는 프로젝트의 모델 설정을 그대로 씁니다");
   expect(container.textContent).toContain("프로젝트에서 고른 모델: retired / old-model · 추론강도 high");
   expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
 });
@@ -187,7 +189,7 @@ it("hides inherited project model details when the separate project read is deni
   fixture.projectSettingsDenied = true;
   await chooseThread("t");
   await flush(); await flush();
-  expect(container.textContent).toContain("이 작업은 프로젝트의 모델 설정을 그대로 씁니다");
+  expect(container.textContent).toContain("이 대화는 프로젝트의 모델 설정을 그대로 씁니다");
   expect(container.textContent).toContain("프로젝트의 모델 설정을 읽지 못했습니다");
   expect(container.textContent).not.toContain("프로젝트에서 고른 모델: retired / old-model");
   expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
@@ -214,15 +216,15 @@ it("rechecks and hides cached parent details after project scope is revoked", as
   fixture.projectSettingsDenied = true;
   await act(async () => { await client.invalidateQueries({ queryKey: ["model-settings", "p", "t"], exact: true }); });
   await flush(); await flush();
-  expect(container.textContent).toContain("이 작업은 프로젝트의 모델 설정을 그대로 씁니다");
+  expect(container.textContent).toContain("이 대화는 프로젝트의 모델 설정을 그대로 씁니다");
   expect(container.textContent).toContain("프로젝트의 모델 설정을 읽지 못했습니다");
   expect(container.textContent).not.toContain("프로젝트에서 고른 모델: retired / old-model");
-  expect(container.querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')?.value).toBe("");
-  expect(container.querySelector<HTMLSelectElement>('[aria-label="연구 추론강도"]')?.value).toBe("");
-  expect(container.querySelector<HTMLButtonElement>("button.model-defaults")?.disabled).toBe(true);
-  const model = container.querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
+  expect(modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')?.value).toBe("");
+  expect(modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 추론강도"]')?.value).toBe("");
+  expect(modelScope().querySelector<HTMLButtonElement>("button.model-defaults")?.disabled).toBe(true);
+  const model = modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
   await act(async () => { model.value = "test/test"; model.dispatchEvent(new Event("change", { bubbles: true })); });
-  const save = container.querySelector<HTMLButtonElement>("button.model-defaults")!;
+  const save = modelScope().querySelector<HTMLButtonElement>("button.model-defaults")!;
   expect(effort().value).toBe("");
   expect(save.disabled).toBe(true);
   await select("high");
@@ -248,8 +250,7 @@ it("saved defaults survive reload and apply to successive requests", async () =>
   expect(container.querySelector("button.model-defaults")).toBeNull();
   await openPage("설정");
   await act(async () => {
-    const save = Array.from(container.querySelectorAll<HTMLButtonElement>("fieldset button"))[0];
-    save.click();
+    modelScope().querySelector<HTMLButtonElement>("button.model-defaults")!.click();
   });
   await flush();
   expect(fixture.effort).toBe("high");
@@ -339,7 +340,7 @@ it("warns in one line when the refresh failed, without emptying the list or chan
   await mount();
   expect(container.textContent).toContain("마지막 확인 목록 · 갱신 실패");
   expect(container.textContent).toContain("모델 목록을 새로 받지 못해 마지막으로 확인한 목록을 보여 줍니다");
-  const model = container.querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
+  const model = modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
   expect([...model.options].map(option => option.value)).toContain("test/test");
   expect(model.value).toBe("test/test");
   expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
@@ -358,4 +359,57 @@ it("marks a refused model and a model not yet checked against the account, and f
   expect(folded).not.toBeNull();
   expect(folded!.hasAttribute("open")).toBe(false);
   expect(folded!.textContent).toContain("gpt-5.4");
+});
+
+it("shows the project's default model and the open conversation's model as two named settings, and saves each to its own scope", async () => {
+  await mount();
+  await openPage("설정");
+  const legends = [...container.querySelectorAll("fieldset.model-settings:not(.compact) legend")].map(item => item.textContent);
+  expect(legends).toEqual(["이 프로젝트의 기본 모델", "이 대화의 모델"]);
+  const project = container.querySelector('fieldset.model-settings[data-scope="project"]:not(.compact)')!;
+  expect(project.querySelector("button.model-defaults")!.textContent).toBe("이 프로젝트의 기본값으로 저장");
+  expect(modelScope().querySelector("button.model-defaults")!.textContent).toBe("이 대화의 기본값으로 저장");
+  // A choice made for the project does not change what the conversation's setting shows.
+  const projectEffort = project.querySelector<HTMLSelectElement>('[aria-label="연구 추론강도"]')!;
+  await act(async () => { projectEffort.value = "high"; projectEffort.dispatchEvent(new Event("change", { bubbles: true })); });
+  expect(effort().value).toBe("low");
+  await act(async () => { project.querySelector<HTMLButtonElement>("button.model-defaults")!.click(); });
+  await flush();
+  const saved = fixture.calls.filter(call => call.method === "model/settings/update").at(-1)!;
+  expect(saved.input.project_id).toBe("p");
+  expect(saved.input).not.toHaveProperty("thread_id");
+  expect((saved.input.selection as { reasoning_effort: string }).reasoning_effort).toBe("high");
+});
+
+it("says what is wrong with the saved model in at most four sentences on the settings screen", async () => {
+  await mount(true);
+  await openPage("설정");
+  const notice = modelScope().querySelector("p.result-notice")!.textContent!;
+  expect(notice).toBe("저장된 모델 선택을 현재 사용할 수 없습니다. 현재 모델 목록에서 저장된 모델을 찾지 못했습니다. 저장된 선택: retired / old-model · 추론강도 high. 바꾸려면 아래에서 모델을 고르세요.");
+});
+
+it("shows this project's settings on the project tab and this computer's from the sidebar, with no setting on both", async () => {
+  await mount();
+  await openPage("설정");
+  const titles = () => [...container.querySelectorAll(".workspace-content h2")].map(item => item.textContent);
+  expect(container.querySelector(".workspace-heading h1")?.textContent).toBe("프로젝트 설정");
+  expect(container.querySelector(".workspace-heading .eyebrow")?.textContent).toBe("이 프로젝트");
+  const projectTitles = titles();
+  expect(projectTitles).toContain("모델 기본값");
+  expect(projectTitles).not.toContain("모델 연결");
+  expect(projectTitles).not.toContain("언어");
+  await act(async () => { ([...container.querySelectorAll(".sidebar-bottom button")].find(item => item.textContent === "이 컴퓨터 설정") as HTMLButtonElement).click(); });
+  await flush(); await flush();
+  expect(container.querySelector(".workspace-heading h1")?.textContent).toBe("이 컴퓨터 설정");
+  expect(container.querySelector(".workspace-heading .eyebrow")?.textContent).toBe("이 컴퓨터");
+  const computerTitles = titles();
+  expect(computerTitles).toContain("모델 연결");
+  expect(computerTitles).toContain("언어");
+  expect(computerTitles.filter(title => projectTitles.includes(title))).toEqual([]);
+  expect(container.querySelector("fieldset.model-settings:not(.compact)")).toBeNull();
+  // The project's screen has a way to this one.
+  await openPage("설정");
+  await act(async () => { ([...container.querySelectorAll(".workspace-heading button")].find(item => item.textContent === "이 컴퓨터 설정 열기") as HTMLButtonElement).click(); });
+  await flush();
+  expect(container.querySelector(".workspace-heading h1")?.textContent).toBe("이 컴퓨터 설정");
 });

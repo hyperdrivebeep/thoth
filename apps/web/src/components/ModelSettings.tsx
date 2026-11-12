@@ -56,16 +56,19 @@ function UnavailableNotice({ compact, reasonCode, saved, inheritsProject }: {
       </p>
     );
   }
+  // On the settings screen: what is wrong, why, and what to do.
   return (
     <p role="status" className="result-notice">
-      {joinSentences([t("model.unavailable"), detail, t("model.keepSelection")])}
+      {joinSentences([t("model.unavailable"), detail, t("model.chooseBelow")])}
     </p>
   );
 }
 
-export function ModelSettings({ projectId, threadId, selection, onSelect, onSaved, compact = false }: {
+export function ModelSettings({ projectId, threadId, selection, onSelect, onSaved, compact = false, legend = t("model.settings") }: {
   projectId: string; threadId?: string; selection: ModelSelection | null;
   onSelect: (selection: ModelSelection) => void; onSaved: () => void; compact?: boolean;
+  /** Whose setting this is, where a screen shows more than one ("this project's default model"). */
+  legend?: string;
 }) {
   useTranslation();
   const client = useQueryClient();
@@ -117,8 +120,9 @@ export function ModelSettings({ projectId, threadId, selection, onSelect, onSave
       ? captured.key : ["model-settings", captured.scope.project_id] });
     captured.onSaved();
   } });
-  return <fieldset className={`model-settings ${compact ? "compact" : ""}`}>
-    <legend>{t("model.settings")}</legend>
+  const failure = query.error ?? save.error;
+  return <fieldset className={`model-settings ${compact ? "compact" : ""}`} data-scope={scope.thread_id ? "conversation" : "project"}>
+    <legend>{legend}</legend>
     {data?.availability === "UNAVAILABLE" && (
       <UnavailableNotice
         compact={compact}
@@ -151,6 +155,6 @@ export function ModelSettings({ projectId, threadId, selection, onSelect, onSave
       {excluded.map(item => <small key={`${item.provider}/${item.model}`}>{item.model} · {excludedReasonLabels[item.reason] ?? item.reason}</small>)}</details>}
     <small>{t("model.nextRequestOnly")}</small>
     {save.isSuccess && <small role="status">{t("model.saved")}</small>}
-    {(query.error || save.error) && <span role="alert">{(query.error ?? save.error)?.message}</span>}
+    {failure && <span role="alert">{failure.message}</span>}
   </fieldset>;
 }

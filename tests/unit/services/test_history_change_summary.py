@@ -58,6 +58,12 @@ def test_status_authority_and_time_changes_are_flagged() -> None:
     assert (changed(cutoff_at="2026-09-15T00:00:00Z") or object()).flags == ("TIME",)  # type: ignore[attr-defined]
 
 
+def test_the_kind_of_a_source_has_the_same_name_as_on_the_upload_form() -> None:
+    summary = changed(authority_status="OFFICIAL")
+    assert summary is not None
+    assert [line.label for line in summary.lines] == ["자료 성격"]
+
+
 def test_an_unlisted_field_is_counted_as_other_and_its_raw_name_stays_in_technical_info() -> None:
     summary = summarize_change({"scope_note": "a"}, {"scope_note": "b"})
     assert summary is not None and summary.flags == () and summary.lines == ()

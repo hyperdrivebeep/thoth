@@ -99,34 +99,6 @@ export const workspaceMessages = {
     "ko": "프로젝트 만들기",
     "en": "Create project"
   },
-  "workspace.sourcesFirst": {
-    "ko": "연결 자료 우선",
-    "en": "Connected sources first"
-  },
-  "workspace.sourceNotice": {
-    "ko": "원문 위치와 출처·기준시점을 함께 확인합니다.",
-    "en": "Check the original location, source, and cutoff together."
-  },
-  "workspace.alternatives": {
-    "ko": "반증과 대안",
-    "en": "Counterevidence and alternatives"
-  },
-  "workspace.alternativesNotice": {
-    "ko": "미확인·부분 결과를 보존하고 가설과 행동을 비교합니다.",
-    "en": "Preserve uncertainty and partial results while comparing hypotheses and actions."
-  },
-  "workspace.historyTitle": {
-    "ko": "이어지는 연구 기록",
-    "en": "A continuing research record"
-  },
-  "workspace.historyNotice": {
-    "ko": "결과, 기억, 변경 기록, 복구의 근거를 확인합니다.",
-    "en": "Trace the basis of results, memory, revisions, and recovery."
-  },
-  "workspace.chooseOrCreate": {
-    "ko": "왼쪽에서 프로젝트를 이어가거나 새로운 연구 맥락을 만드세요.",
-    "en": "Continue a project on the left or create a new research context."
-  },
   "workspace.continue": {
     "ko": "연구 이어가기",
     "en": "Continue research"
@@ -163,6 +135,10 @@ export const workspaceMessages = {
     "ko": "대화로 돌아가기",
     "en": "Back to conversation"
   },
+  "workspace.noConnectedSources": {
+    "ko": "연결한 자료가 없습니다. 아래에서 파일을 올려 연결하세요.",
+    "en": "No sources are connected yet. Upload a file below to connect one."
+  },
   "workspace.connectedSources": {
     "ko": "연결한 자료",
     "en": "Connected sources"
@@ -179,6 +155,25 @@ export const workspaceMessages = {
     "ko": "운영 정보",
     "en": "Workspace information"
   },
+  "settings.thisProject": { "ko": "이 프로젝트", "en": "This project" },
+  "settings.projectTitle": { "ko": "프로젝트 설정", "en": "Project settings" },
+  "settings.projectNotice": {
+    "ko": "이 프로젝트의 모델 기본값과 자료 색인을 정합니다. 계정, 언어, 인터넷 허용은 이 컴퓨터 설정에 있습니다.",
+    "en": "Set this project's default model and source index. Accounts, language and internet permission are in this computer's settings."
+  },
+  "settings.projectModel": { "ko": "이 프로젝트의 기본 모델", "en": "This project's default model" },
+  "settings.conversationModel": { "ko": "이 대화의 모델", "en": "This conversation's model" },
+  "settings.computerTitle": { "ko": "이 컴퓨터 설정", "en": "This computer's settings" },
+  "settings.computerNotice": {
+    "ko": "모델 계정, 화면 언어, 인터넷 허용, 로컬 검색 구성 요소를 정합니다. 모든 프로젝트에 적용됩니다.",
+    "en": "Model accounts, display language, internet permission and local search components. These apply to every project."
+  },
+  "settings.noModel": {
+    "ko": "연결된 모델이 없습니다. 모델을 연결하면 여기서 기본 모델을 고를 수 있습니다.",
+    "en": "No model is connected. Connect one to choose a default model here."
+  },
+  "settings.openComputer": { "ko": "이 컴퓨터 설정 열기", "en": "Open this computer's settings" },
+  "model.chooseBelow": { "ko": "바꾸려면 아래에서 모델을 고르세요.", "en": "To change it, choose a model below." },
   "workspace.settings": {
     "ko": "설정",
     "en": "Settings"
@@ -186,10 +181,6 @@ export const workspaceMessages = {
   "workspace.reviewInfo": {
     "ko": "심사 환경의 모델과 사용 현황을 확인합니다.",
     "en": "View the review environment's model and usage."
-  },
-  "workspace.localToolsInfo": {
-    "ko": "이 컴퓨터에서 사용할 모델과 프로젝트 도구를 관리합니다.",
-    "en": "Manage models and project tools on this computer."
   },
   "workspace.reviewModel": {
     "ko": "심사 모델",
@@ -339,10 +330,6 @@ export const workspaceMessages = {
     "ko": "아직 프로젝트가 없습니다.",
     "en": "No projects yet."
   },
-  "workspace.settingsTools": {
-    "ko": "설정 · 로컬 도구",
-    "en": "Settings and local tools"
-  },
   "workspace.testMode": {
     "ko": "검증 모드",
     "en": "Verification mode"
@@ -390,7 +377,6 @@ export const workspaceMessages = {
   "readiness.consentOff": { "ko": "인터넷 사용 안 함", "en": "Internet use off" },
   "readiness.consentUndecided": { "ko": "인터넷 사용 미결정", "en": "Internet use undecided" },
   "readiness.readyNotice": { "ko": "질문을 보내면 연결된 자료에서 근거를 찾고, 가능한 설명과 다음 행동을 함께 정리합니다.", "en": "Send a question and THOTH finds evidence in the connected sources, with possible explanations and next actions." },
-  "workspace.openSetup": { "ko": "설정으로 이동", "en": "Open settings" },
   "workspace.sessionsCount": { "ko": "세션", "en": "Sessions" },
   "workspace.sourcesCount": { "ko": "자료", "en": "Sources" },
   "workspace.countsLabel": { "ko": "이 프로젝트의 개수", "en": "Counts for this project" },
@@ -401,6 +387,11 @@ export const workspaceMessages = {
   "workspace.taskSelectionNeeded": {
     "ko": "저장된 작업 선택 확인 필요",
     "en": "Check the saved task selection"
+  },
+  "workspace.projectList": { "ko": "프로젝트 목록", "en": "Project list" },
+  "workspace.setupNeededHint": {
+    "ko": "새 연구를 실행하려면 설정이 필요합니다. 누르면 설정으로 이동합니다.",
+    "en": "New research needs setup. Opens settings."
   },
   "workspace.refreshContext": {
     "ko": "현재 맥락 새로고침",
@@ -445,10 +436,6 @@ export const workspaceMessages = {
   "workspace.connectModel": {
     "ko": "모델 연결",
     "en": "Model connection"
-  },
-  "workspace.selectForDefaults": {
-    "ko": "프로젝트별 기본 모델은 프로젝트를 선택한 뒤 설정합니다.",
-    "en": "Select a project to set its default model."
   },
   "workspace.checkingAccess": {
     "ko": "선택한 작업의 접근 범위를 확인하는 중…",

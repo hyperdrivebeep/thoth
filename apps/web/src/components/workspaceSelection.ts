@@ -7,7 +7,10 @@ import { readDraft, writeDraft } from "../api/conversation";
 import { fillQuestion, threadForRow, type RowInvestigation } from "./traceInvestigation";
 import type { WorkThread } from "../types";
 
-export type Page = "research" | "resources" | "records" | "trace" | "raw-records" | "settings" | "capabilities";
+/** "settings" is the open project's settings; "computer" is this computer's (accounts, language, internet, local search parts). */
+export type Page = "research" | "resources" | "records" | "trace" | "raw-records" | "settings" | "computer" | "capabilities";
+/** Which settings screen a link opens. The hosted review environment has one screen for both. */
+export const settingsPageFor = (hosted: boolean, target?: "consent" | "project"): Page => (hosted || target === "project" ? "settings" : "computer");
 export type TraceRowRef = { kind: string; id: string };
 /** The trace row a question was started from: held here until it is sent, so the next request carries it. */
 export type RowOrigin = { threadId: string; origin: PendingOrigin };

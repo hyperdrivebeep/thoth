@@ -36,6 +36,7 @@ export function ResearchSidePanel({
         project={project}
         thread={thread}
         onClose={onClose}
+        onOpenRecords={onOpenRecords}
       />
     );
   }

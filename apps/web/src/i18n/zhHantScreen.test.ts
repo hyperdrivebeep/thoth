@@ -111,7 +111,9 @@ it("puts Traditional Chinese fonts first on the Traditional screen only, on the 
   expect(faces.indexOf("PingFang TC")).toBeGreaterThan(faces.indexOf("Microsoft JhengHei UI"));
   expect(faces).toEqual(expect.arrayContaining(["Noto Sans TC", "Source Han Sans TC"]));
   expect(faces.some(face => /Malgun|Pretendard|Noto Sans KR|Apple SD|YaHei|PingFang SC|Noto Sans SC|Yu Gothic|Meiryo|Noto Sans JP/.test(face))).toBe(false);
-  expect(css.match(/:lang\(/g)).toHaveLength(6);
+  // No other language gets a font rule. (Korean has a line-breaking rule, which sets no font.)
+  const fontRules = [...css.matchAll(/([^{}]*:lang\([^{}]*)\{([^}]*)\}/g)].filter(found => /font/.test(found[2]));
+  expect(fontRules).toHaveLength(3);
   expect(rule![1]).not.toMatch(/code-font/);
 });
 

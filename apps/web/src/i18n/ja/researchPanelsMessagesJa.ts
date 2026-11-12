@@ -75,7 +75,6 @@ export const researchPanelsJa: ColumnOf<typeof researchPanelsMessages> = {
   "memory.original": "元のバージョン",
   "memory.fingerprint": "記録のフィンガープリント",
   "memory.notice": "記憶の呼び出しは調査の質問ごとに決まり、この画面では決まりません。訂正は新しいバージョンの案を作り、元の記憶は履歴に残ります。",
-  "historyWorkspace.intro": "質問、回答、判定がどう変わったかを確認します。",
   "historyWorkspace.checkpoints": "チェックポイントを含める",
   "historyWorkspace.reload": "再読み込み",
   "historyWorkspace.cursorExpired": "このページはこれ以上続けられません。再読み込みして、最初のページから始めてください。",

@@ -17,8 +17,10 @@ import { hypothesisRows } from "./hypothesisView";
 import { selectionKey } from "../api/historyModels";
 
 const titles={get evidence() { return t("detail.evidence"); },get hypotheses() { return t("result.compareHypotheses"); },get reference() { return t("detail.references"); },get actions() { return t("detail.actions"); },get map() { return t("result.map"); },get outcome() { return t("detail.outcomes"); },get memory() { return t("result.memory"); },get history() { return t("result.changes"); },get diagnostics() { return t("detail.diagnostics"); }};
-export function ResearchDetailPane({detail,project,thread,onClose}: {
+export function ResearchDetailPane({detail,project,thread,onClose,onOpenRecords}: {
   detail:ResearchDetail;project:PackRunResult["project"];thread:PackRunResult["thread"];onClose:()=>void;
+  /** Opens the history tab from the change-history panel. */
+  onOpenRecords?:()=>void;
 }) {
   const close=useRef<HTMLButtonElement>(null);
   const [mapView,setMapView]=useState<"evidence"|"execution"|"revision">("evidence");
@@ -31,7 +33,7 @@ export function ResearchDetailPane({detail,project,thread,onClose}: {
   const selectedEvidence = evidenceSelection
     ? <ResultEvidencePanel key={selectionKey(evidenceSelection)} selection={evidenceSelection} result={result} focusSpanId={detail.focusSpanId} citations={detail.citations}/>
     : <p role="alert">{t("detail.evidenceLinkMissing")}</p>;
-  const history=detail.historySelection ? <ResearchHistoryWorkspace compact projectId={project.project_id} threadId={thread.thread_id} initialSelection={detail.historySelection}/>
+  const history=detail.historySelection ? <ResearchHistoryWorkspace compact projectId={project.project_id} threadId={thread.thread_id} initialSelection={detail.historySelection} onOpenFull={onOpenRecords}/>
     : <p>{t("detail.historyLinkMissing")}</p>;
   return <ResponseLanguageContext.Provider value={resultLanguage(result)}><aside className="research-detail-pane" aria-label={titles[detail.kind]} onKeyDown={e=>{if(e.key==="Escape"){e.stopPropagation();onClose();}}}>
     <header><h2>{titles[detail.kind]}</h2><Button ref={close} minimal small icon="cross" onClick={onClose} aria-label={t("delta.closeDetails")} /></header>

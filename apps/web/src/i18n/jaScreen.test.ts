@@ -95,7 +95,9 @@ it("puts Japanese fonts first on the Japanese screen only, on the page and on bo
   expect(faces.indexOf("Meiryo")).toBeGreaterThan(faces.indexOf("Yu Gothic UI"));
   expect(faces).toEqual(expect.arrayContaining(["Hiragino Sans", "Noto Sans JP"]));
   expect(faces.some(face => /Malgun|Pretendard|Noto Sans KR|Apple SD|YaHei|PingFang|Noto Sans SC/.test(face))).toBe(false);
-  expect(css.match(/:lang\(/g)).toHaveLength(6);
+  // No other language gets a font rule. (Korean has a line-breaking rule, which sets no font.)
+  const fontRules = [...css.matchAll(/([^{}]*:lang\([^{}]*)\{([^}]*)\}/g)].filter(found => /font/.test(found[2]));
+  expect(fontRules).toHaveLength(3);
   expect(rule![1]).not.toMatch(/code-font/);
 });
 

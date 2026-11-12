@@ -24,6 +24,24 @@ const toneIntent: Record<ProviderTone, "success" | "primary" | "none" | "warning
 };
 const keyPlaceholder: Record<string, string> = { openai: "sk-...", anthropic: "sk-ant-...", xai: "xai-..." };
 
+/**
+ * The way on from the model step. With a model: "next". Without one: "connect later", because saved research
+ * can be read without a model and sending a question asks for one.
+ */
+function ModelStepFooter({ modelConnected, onNext }: { modelConnected: boolean; onNext: () => void }) {
+  return (
+    <div className="first-run-footer">
+      <span>{modelConnected ? t("setup.modelReady") : t("setup.modelNeeded")}</span>
+      <span className="first-run-footer-actions">
+        {!modelConnected && <Button minimal onClick={onNext}>{t("setup.connectLater")}</Button>}
+        <Button intent="primary" disabled={!modelConnected} onClick={onNext}>
+          {t("setup.next")}
+        </Button>
+      </span>
+    </div>
+  );
+}
+
 export function FirstRunSetup({ onDone }: { onDone: () => void }) {
   useTranslation();
   const client = useQueryClient();
@@ -131,7 +149,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                 return (
                   <article className={`first-run-provider tone-${status.tone}`} key={company.provider}>
                     <header className="first-run-provider-head">
-                      <span className="provider-mark" aria-hidden="true">{company.label.slice(0, 1)}</span>
+                      <span className="provider-mark" data-provider={company.provider} aria-hidden="true" />
                       <strong>{company.label}</strong>
                       <Tag minimal round intent={toneIntent[status.tone]}>{status.label}</Tag>
                       <Button className="provider-key-toggle" small minimal icon="key" aria-expanded={keyOpen}
@@ -202,12 +220,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
             {listed.error && <Callout compact intent="warning" role="alert">{t("setup.methodsFailed")}</Callout>}
             <Button small minimal icon="refresh" loading={ready.isFetching || listed.isFetching}
               onClick={() => { void ready.refetch(); void listed.refetch(); }}>{t("setup.refreshConnection")}</Button>
-            <div className="first-run-footer">
-              <span>{modelConnected ? t("setup.modelReady") : t("setup.modelNeeded")}</span>
-              <Button intent="primary" disabled={!modelConnected} onClick={() => setStep("internet")}>
-                {t("setup.next")}
-              </Button>
-            </div>
+            <ModelStepFooter modelConnected={modelConnected} onNext={() => setStep("internet")} />
           </>
         ) : (
           <>
