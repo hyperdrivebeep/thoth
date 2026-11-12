@@ -88,42 +88,138 @@ windows_only = pytest.mark.skipif(
     os.name != "nt", reason="the ACL is the Windows form of mode 0600"
 )
 
-# SYSTEM, Administrators and OWNER RIGHTS in the short names icacls writes. An entry for one of them
-# may stay on a private file: they are not other ordinary accounts, and an administrator can read it
-# anyway. Which of them a new file starts with depends on the machine (a folder made by Python 3.13
-# with mode 0o700, the way pytest makes tmp_path, carries all three).
-_SYSTEM_SIDE = {"SY", "BA", "OW"}
+# SYSTEM, Administrators and OWNER RIGHTS. An entry for one of them may stay on a private file: they
+# are not other ordinary accounts, and an administrator can read it anyway. Which of them a new file
+# starts with depends on the machine (a folder made by Python 3.13 with mode 0o700, the way pytest
+# makes tmp_path, carries all three).
+_SYSTEM, _ADMINISTRATORS, _OWNER_RIGHTS = "S-1-5-18", "S-1-5-32-544", "S-1-3-4"
+_SYSTEM_SIDE = {_SYSTEM, _ADMINISTRATORS, _OWNER_RIGHTS}
+
+# The saved form writes well-known accounts by a two-letter name instead of their SID.
+_NAMED = {
+    "SY": _SYSTEM,
+    "BA": _ADMINISTRATORS,
+    "OW": _OWNER_RIGHTS,
+    "WD": "S-1-1-0",  # Everyone
+    "AU": "S-1-5-11",  # Authenticated Users
+    "BU": "S-1-5-32-545",  # Users
+    "BG": "S-1-5-32-546",  # Guests
+    "IU": "S-1-5-4",  # INTERACTIVE
+    "NU": "S-1-5-2",  # NETWORK
+    "AN": "S-1-5-7",  # ANONYMOUS LOGON
+}
+# Two accounts of the machine itself are also written by name. Their SID is the machine's own number
+# followed by a fixed last part: 500 for the built-in Administrator, 501 for Guest.
+_NAMED_ON_THIS_MACHINE = {"LA": "500", "LG": "501"}
+
+Entry = tuple[str, str, str]
+
+
+def _named_sid(trustee: str, user_sid: str) -> str:
+    """The SID a saved entry names, so that an account is the same whichever way it was written.
+
+    A hosted runner works as the built-in Administrator; its entry is saved as "LA", not as the SID
+    that whoami reports. The machine's number is taken from the current user's SID, which is right
+    when that user is an account of this machine. For a domain user "LA" then becomes a SID that is
+    not theirs, and the entry counts as another account, which it is.
+    """
+    if trustee in _NAMED:
+        return _NAMED[trustee]
+    if trustee in _NAMED_ON_THIS_MACHINE:
+        return f"{user_sid.rsplit('-', 1)[0]}-{_NAMED_ON_THIS_MACHINE[trustee]}"
+    return trustee
+
+
+def _entries(sddl: str, user_sid: str) -> tuple[str, list[Entry]]:
+    """The control flags of a saved access list and (flags, rights, SID) for each of its entries."""
+    control, _, rest = sddl.removeprefix("D:").partition("(")
+    parts = [entry.split(";") for entry in ("(" + rest).strip("()").split(")(")]
+    assert all(len(part) == 6 and part[0] == "A" for part in parts), sddl
+    return control, [(part[1], part[2], _named_sid(part[5], user_sid)) for part in parts]
+
+
+def _not_private(sddl: str, user_sid: str, *, inheritable: bool = False) -> list[str]:
+    """Why this access list does not keep a secret from other ordinary accounts (empty: it does)."""
+    control, entries = _entries(sddl, user_sid)
+    problems: list[str] = []
+    if "P" not in control:
+        problems.append("later changes to the folder can flow in")
+    if any("ID" in flags for flags, _, _ in entries):
+        problems.append("an entry passed down by the folder is left")
+    if ("OICI" if inheritable else "", "FA", user_sid) not in entries:
+        problems.append("the current user does not have full control")
+    others = {sid for _, _, sid in entries} - _SYSTEM_SIDE - {user_sid}
+    if others:
+        problems.append(f"another account or group is named: {sorted(others)}")
+    return problems
 
 
 def _icacls(*arguments: str) -> None:
     subprocess.run(["icacls", *arguments], capture_output=True, check=True)
 
 
-def _acl(path: Path) -> tuple[str, list[tuple[str, str, str]]]:
-    """The access list as icacls saves it: its control flags and (flags, rights, trustee) per entry.
-
-    The saved form is the same in every display language, and it tells an inherited entry (flag ID)
-    from one set on the file itself.
-    """
+def _saved_acl(path: Path) -> str:
+    """The access list as icacls saves it. The saved form is the same in every display language, and
+    it tells an inherited entry (flag ID) from one set on the file itself."""
     saved = path.with_name(path.name + ".saved-acl")
     _icacls(str(path), "/save", str(saved))
     sddl = saved.read_text(encoding="utf-16-le").splitlines()[1]
     saved.unlink()
-    control, _, rest = sddl.removeprefix("D:").partition("(")
-    entries = [entry.split(";") for entry in ("(" + rest).strip("()").split(")(")]
-    assert all(len(entry) == 6 and entry[0] == "A" for entry in entries), sddl
-    return control, [(entry[1], entry[2], entry[5]) for entry in entries]
+    return sddl
+
+
+def _acl(path: Path) -> tuple[str, list[Entry]]:
+    return _entries(_saved_acl(path), current_user_sid())
 
 
 def _assert_private(path: Path, *, inheritable: bool = False) -> None:
-    control, entries = _acl(path)
-    # Later changes to the folder cannot flow in, and nothing the folder passed down is left.
-    assert "P" in control
-    assert [entry for entry in entries if "ID" in entry[0]] == []
-    # The current user has full control.
-    assert ("OICI" if inheritable else "", "FA", current_user_sid()) in entries
-    # No other ordinary account or group is named: not Users, not Everyone, not anything else.
-    assert {trustee for _, _, trustee in entries} - _SYSTEM_SIDE == {current_user_sid()}
+    sddl = _saved_acl(path)
+    assert _not_private(sddl, current_user_sid(), inheritable=inheritable) == [], sddl
+
+
+_USER = "S-1-5-21-1111111111-2222222222-3333333333-1001"
+_BUILT_IN_ADMINISTRATOR = "S-1-5-21-3289802278-1561746829-1498425070-500"
+
+
+def test_an_account_written_by_name_is_the_same_account_as_its_sid() -> None:
+    # What a hosted Windows runner saved: the current user is the built-in Administrator, written
+    # "LA", next to the three entries the temporary folder passes on.
+    runner = "D:P(A;;FA;;;LA)(A;;FA;;;SY)(A;;FA;;;BA)(A;;FA;;;OW)"
+    assert _not_private(runner, _BUILT_IN_ADMINISTRATOR) == []
+    assert _entries(runner, _BUILT_IN_ADMINISTRATOR)[1] == [
+        ("", "FA", _BUILT_IN_ADMINISTRATOR),
+        ("", "FA", _SYSTEM),
+        ("", "FA", _ADMINISTRATORS),
+        ("", "FA", _OWNER_RIGHTS),
+    ]
+    # An ordinary account is saved by its SID.
+    assert _not_private(f"D:PAI(A;;FA;;;{_USER})", _USER) == []
+    assert _not_private(f"D:P(A;OICI;FA;;;{_USER})(A;OICI;FR;;;SY)", _USER, inheritable=True) == []
+
+
+def test_a_saved_access_list_that_is_not_private_says_why() -> None:
+    other_user = _USER[:-4] + "1002"
+    for sddl, problem in (
+        (
+            f"D:P(A;;FA;;;{_USER})(A;;FR;;;BU)",
+            "another account or group is named: ['S-1-5-32-545']",
+        ),
+        (f"D:P(A;;FA;;;{_USER})(A;;FR;;;WD)", "another account or group is named: ['S-1-1-0']"),
+        (
+            f"D:P(A;;FA;;;{_USER})(A;;FR;;;{other_user})",
+            f"another account or group is named: ['{other_user}']",
+        ),
+        # The built-in Administrator is another account when the current user is someone else.
+        (
+            f"D:P(A;;FA;;;{_USER})(A;;FA;;;LA)",
+            f"another account or group is named: ['{_USER[:-4]}500']",
+        ),
+        (f"D:P(A;;FA;;;{_USER})(A;ID;FA;;;SY)", "an entry passed down by the folder is left"),
+        (f"D:AI(A;;FA;;;{_USER})", "later changes to the folder can flow in"),
+        (f"D:P(A;;FR;;;{_USER})", "the current user does not have full control"),
+        ("D:P(A;;FA;;;SY)(A;;FA;;;BA)", "the current user does not have full control"),
+    ):
+        assert _not_private(sddl, _USER) == [problem], sddl
 
 
 @windows_only
@@ -157,7 +253,7 @@ def test_entries_for_system_administrators_and_owner_rights_stay(tmp_path: Path)
     make_private(secret)
 
     _assert_private(secret)
-    assert {trustee for _, _, trustee in _acl(secret)[1]} == {current_user_sid(), "SY", "BA", "OW"}
+    assert {sid for _, _, sid in _acl(secret)[1]} == {current_user_sid(), *_SYSTEM_SIDE}
 
 
 @windows_only
@@ -171,7 +267,7 @@ def test_a_private_folder_loses_broad_groups_and_keeps_system_entries(tmp_path: 
 
     _assert_private(profile, inheritable=True)
     # SYSTEM and Administrators were named on the folder itself and are not taken away.
-    assert {trustee for _, _, trustee in _acl(profile)[1]} >= {"SY", "BA"}
+    assert {sid for _, _, sid in _acl(profile)[1]} >= {_SYSTEM, _ADMINISTRATORS}
 
 
 @pytest.mark.skipif(os.name == "nt", reason="file modes are the POSIX form")
