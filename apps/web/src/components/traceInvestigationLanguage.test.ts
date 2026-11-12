@@ -8,8 +8,10 @@ import { setLocale } from "../i18n/locale";
 afterEach(() => setLocale("ko"));
 it("uses the outgoing response language independently of the display language", () => {
   const view = demo.phase2 as unknown as TraceView;
-  const verdict = view.verdicts.find(item => item.subject_kind === "CRITERION" && item.state === "FAIL_COMPUTED")!;
-  const title = view.items.find(item => item.item_id === verdict.subject_id)!.title;
+  const verdict = view.verdicts.find(
+    (item) => item.subject_kind === "CRITERION" && item.state === "FAIL_COMPUTED",
+  )!;
+  const title = view.items.find((item) => item.item_id === verdict.subject_id)!.title;
   setLocale("ko");
   const english = investigationFor("p", "CRITERION", verdict, view, "en")!;
   expect(english.question).toContain("Find possible causes and tests that distinguish them.");
@@ -27,11 +29,14 @@ it("uses the outgoing response language independently of the display language", 
 });
 
 it.each([
-  ["en", undefined], ["en", null], ["ko", undefined], ["ko", null],
+  ["en", undefined],
+  ["en", null],
+  ["ko", undefined],
+  ["ko", null],
 ] as const)("uses display %s when the response choice is %s", (display, response) => {
   setLocale(display);
   const view = demo.phase2 as unknown as TraceView;
-  const verdict = view.verdicts.find(item => item.subject_id === "SYN-C-DET-RAIN")!;
+  const verdict = view.verdicts.find((item) => item.subject_id === "SYN-C-DET-RAIN")!;
   const generated = investigationFor("p", "CRITERION", verdict, view, response)!;
   if (display === "en") {
     expect(generated.question).toContain("Find possible causes and tests that distinguish them.");
@@ -45,27 +50,37 @@ it.each([
   expect(generated.origin.verdict_revision).toBe(verdict.revision_digest);
 });
 
-it.each(["ko", "en", "zh-Hans"] as const)("a Chinese answer language writes the question in Chinese on the %s screen", display => {
-  setLocale(display);
-  const view = demo.phase2 as unknown as TraceView;
-  const verdict = view.verdicts.find(item => item.subject_id === "SYN-C-DET-RAIN")!;
-  const chinese = investigationFor("p", "CRITERION", verdict, view, "zh-Hans")!;
-  expect(chinese.responseLanguage).toBe("zh-Hans");
-  expect(chinese.question).toContain("请找出可能的原因，以及能区分这些原因的测试。");
-  expect(chinese.question).not.toMatch(/[가-힣]/);
-  expect(chinese.question).not.toMatch(/FAIL_COMPUTED|THRESHOLD_NOT_MET/);
-  expect(chinese.questionForLanguage?.("zh-Hans")).toBe(chinese.question);
-  expect(chinese.questionForLanguage?.(null)).toBe(investigationFor("p", "CRITERION", verdict, view, null)!.question);
-});
+it.each(["ko", "en", "zh-Hans"] as const)(
+  "a Chinese answer language writes the question in Chinese on the %s screen",
+  (display) => {
+    setLocale(display);
+    const view = demo.phase2 as unknown as TraceView;
+    const verdict = view.verdicts.find((item) => item.subject_id === "SYN-C-DET-RAIN")!;
+    const chinese = investigationFor("p", "CRITERION", verdict, view, "zh-Hans")!;
+    expect(chinese.responseLanguage).toBe("zh-Hans");
+    expect(chinese.question).toContain("请找出可能的原因，以及能区分这些原因的测试。");
+    expect(chinese.question).not.toMatch(/[가-힣]/);
+    expect(chinese.question).not.toMatch(/FAIL_COMPUTED|THRESHOLD_NOT_MET/);
+    expect(chinese.questionForLanguage?.("zh-Hans")).toBe(chinese.question);
+    expect(chinese.questionForLanguage?.(null)).toBe(
+      investigationFor("p", "CRITERION", verdict, view, null)!.question,
+    );
+  },
+);
 
-it.each(["ko", "en", "zh-Hans", "ja"] as const)("a Japanese answer language writes the question in Japanese on the %s screen", display => {
-  setLocale(display);
-  const view = demo.phase2 as unknown as TraceView;
-  const verdict = view.verdicts.find(item => item.subject_id === "SYN-C-DET-RAIN")!;
-  const japanese = investigationFor("p", "CRITERION", verdict, view, "ja")!;
-  expect(japanese.responseLanguage).toBe("ja");
-  expect(japanese.question).toContain("考えられる原因と、それらを見分けるテストを探してください。");
-  expect(japanese.question).not.toMatch(/[가-힣]/);
-  expect(japanese.question).not.toMatch(/FAIL_COMPUTED|THRESHOLD_NOT_MET/);
-  expect(japanese.questionForLanguage?.("ja")).toBe(japanese.question);
-});
+it.each(["ko", "en", "zh-Hans", "ja"] as const)(
+  "a Japanese answer language writes the question in Japanese on the %s screen",
+  (display) => {
+    setLocale(display);
+    const view = demo.phase2 as unknown as TraceView;
+    const verdict = view.verdicts.find((item) => item.subject_id === "SYN-C-DET-RAIN")!;
+    const japanese = investigationFor("p", "CRITERION", verdict, view, "ja")!;
+    expect(japanese.responseLanguage).toBe("ja");
+    expect(japanese.question).toContain(
+      "考えられる原因と、それらを見分けるテストを探してください。",
+    );
+    expect(japanese.question).not.toMatch(/[가-힣]/);
+    expect(japanese.question).not.toMatch(/FAIL_COMPUTED|THRESHOLD_NOT_MET/);
+    expect(japanese.questionForLanguage?.("ja")).toBe(japanese.question);
+  },
+);

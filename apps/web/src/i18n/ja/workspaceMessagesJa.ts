@@ -6,17 +6,22 @@ export const workspaceJa: ColumnOf<typeof workspaceMessages> = {
   "manage.renameProjectTitle": "プロジェクト名を変更",
   "manage.renameThreadTitle": "会話の名前を変更",
   "manage.nameLabel": "新しい名前",
-  "manage.threadNameNotice": "元の質問は変わりません。一覧とタイトルに表示される名前だけが変わります。",
+  "manage.threadNameNotice":
+    "元の質問は変わりません。一覧とタイトルに表示される名前だけが変わります。",
   "manage.save": "保存",
   "manage.cancel": "キャンセル",
   "manage.renameFailed": "名前を変更できませんでした。",
-  "manage.threadChanged": "その間に会話が変更されました。一覧を読み込み直しましたので、もう一度お試しください。",
+  "manage.threadChanged":
+    "その間に会話が変更されました。一覧を読み込み直しましたので、もう一度お試しください。",
   "manage.archiveConfirm": "アーカイブ",
   "sources.disconnect": "接続を解除",
-  "sources.disconnectKeeps": "この資料は新しい質問には使われません。ファイルと作成済みの回答は削除されません。",
-  "sources.disconnectReview": "このプロジェクトで作成済みの回答は、すべて「再確認が必要」と表示されます。もう一度使うには、同じファイルを再度接続します。",
+  "sources.disconnectKeeps":
+    "この資料は新しい質問には使われません。ファイルと作成済みの回答は削除されません。",
+  "sources.disconnectReview":
+    "このプロジェクトで作成済みの回答は、すべて「再確認が必要」と表示されます。もう一度使うには、同じファイルを再度接続します。",
   "sources.disconnectFailed": "接続を解除できませんでした。",
-  "sources.detachedNotice": "新しい質問には使われません。もう一度使うには、同じファイルを再度接続してください。",
+  "sources.detachedNotice":
+    "新しい質問には使われません。もう一度使うには、同じファイルを再度接続してください。",
   "evidenceRail.detached": "現在は接続解除済み",
   "progress.stopTitle": "調査を停止",
   "workspace.newProject": "新しいプロジェクト",
@@ -25,7 +30,8 @@ export const workspaceJa: ColumnOf<typeof workspaceMessages> = {
   "workspace.advanced": "基準時点と詳細設定",
   "workspace.cutoff": "判定の基準時点",
   "workspace.profile": "ドメインプロファイル",
-  "workspace.createNotice": "プロジェクトを作成したら、質問をして、関連する資料を接続してください。",
+  "workspace.createNotice":
+    "プロジェクトを作成したら、質問をして、関連する資料を接続してください。",
   "workspace.create": "プロジェクトを作成",
   "workspace.continue": "調査を続ける",
   "workspace.newQuestion": "新しい質問",
@@ -36,25 +42,30 @@ export const workspaceJa: ColumnOf<typeof workspaceMessages> = {
   "workspace.resources": "資料と接続",
   "workspace.resourcesNotice": "調査用のファイルと、許可された公開ウェブの資料を管理します。",
   "workspace.backConversation": "会話に戻る",
-  "workspace.noConnectedSources": "接続した資料はまだありません。下でファイルをアップロードして接続してください。",
+  "workspace.noConnectedSources":
+    "接続した資料はまだありません。下でファイルをアップロードして接続してください。",
   "workspace.connectedSources": "接続済みの資料",
   "workspace.cite": "引用として使う",
   "workspace.sourceDetails": "資料と抽出の状態",
   "workspace.operations": "ワークスペース情報",
   "settings.thisProject": "このプロジェクト",
   "settings.projectTitle": "プロジェクトの設定",
-  "settings.projectNotice": "このプロジェクトの既定モデルと資料の索引を設定します。アカウント、言語、インターネットの許可は、このコンピューターの設定にあります。",
+  "settings.projectNotice":
+    "このプロジェクトの既定モデルと資料の索引を設定します。アカウント、言語、インターネットの許可は、このコンピューターの設定にあります。",
   "settings.projectModel": "このプロジェクトの既定モデル",
   "settings.conversationModel": "この会話のモデル",
   "settings.computerTitle": "このコンピューターの設定",
-  "settings.computerNotice": "モデルのアカウント、表示言語、インターネットの許可、ローカル検索の構成要素を設定します。すべてのプロジェクトに適用されます。",
-  "settings.noModel": "接続されたモデルがありません。モデルを接続すると、ここで既定のモデルを選べます。",
+  "settings.computerNotice":
+    "モデルのアカウント、表示言語、インターネットの許可、ローカル検索の構成要素を設定します。すべてのプロジェクトに適用されます。",
+  "settings.noModel":
+    "接続されたモデルがありません。モデルを接続すると、ここで既定のモデルを選べます。",
   "settings.openComputer": "このコンピューターの設定を開く",
   "model.chooseBelow": "変更するには、下でモデルを選んでください。",
   "workspace.settings": "設定",
   "workspace.reviewInfo": "レビュー環境のモデルと使用状況を確認します。",
   "workspace.reviewModel": "レビュー用のモデル",
-  "workspace.operatorModel": "このワークスペースは、運営者の OpenAI モデルを使います。ブラウザにキーを入力しないでください。",
+  "workspace.operatorModel":
+    "このワークスペースは、運営者の OpenAI モデルを使います。ブラウザにキーを入力しないでください。",
   "workspace.modelDefaults": "モデルの既定値",
   "workspace.usage": "使用量",
   "workspace.noUsage": "まだ報告はありません",
@@ -69,13 +80,16 @@ export const workspaceJa: ColumnOf<typeof workspaceMessages> = {
   "workspace.detailedRecords": "詳細な記録を開く",
   "workspace.apiTools": "API ツールを開く",
   "workspace.removeProject": "プロジェクトをアーカイブ",
-  "workspace.contextCorrupt": "最後のワークスペースの場所を読み込めませんでした。元の記録は削除されていません。",
-  "workspace.contextUnavailable": "このブラウザから最後のワークスペースの場所を読み込めませんでした。ストレージへのアクセスとワークスペースの識別子を確認してください。",
+  "workspace.contextCorrupt":
+    "最後のワークスペースの場所を読み込めませんでした。元の記録は削除されていません。",
+  "workspace.contextUnavailable":
+    "このブラウザから最後のワークスペースの場所を読み込めませんでした。ストレージへのアクセスとワークスペースの識別子を確認してください。",
   "workspace.backProjects": "プロジェクトの選択に戻る",
   "workspace.projects": "プロジェクト",
   "workspace.loadingProjects": "プロジェクトを読み込んでいます…",
   "workspace.openProject": "プロジェクトを開く",
-  "workspace.noReplacement": "利用できない記録が、新しく生成された回答で置き換えられることはありません。",
+  "workspace.noReplacement":
+    "利用できない記録が、新しく生成された回答で置き換えられることはありません。",
   "workspace.searchProjects": "プロジェクトを検索",
   "workspace.searchPlaceholder": "プロジェクトを探す…",
   "workspace.refreshProjects": "プロジェクト一覧を更新",
@@ -103,7 +117,8 @@ export const workspaceJa: ColumnOf<typeof workspaceMessages> = {
   "readiness.consentOn": "インターネット使用を許可",
   "readiness.consentOff": "インターネットを使わない",
   "readiness.consentUndecided": "インターネット使用は未決定",
-  "readiness.readyNotice": "質問を送ると、接続した資料から根拠を探し、考えられる説明と次の行動をまとめて整理します。",
+  "readiness.readyNotice":
+    "質問を送ると、接続した資料から根拠を探し、考えられる説明と次の行動をまとめて整理します。",
   "workspace.sessionsCount": "会話",
   "workspace.sourcesCount": "資料",
   "workspace.countsLabel": "このプロジェクトの件数",
@@ -114,9 +129,12 @@ export const workspaceJa: ColumnOf<typeof workspaceMessages> = {
   "workspace.refreshContext": "現在の文脈を更新",
   "workspace.conversation": "会話",
   "workspace.trace": "追跡表",
-  "workspace.missingProject": "保存されていたプロジェクトが現在の一覧にないため、選択をクリアしました。",
-  "workspace.locationFailure": "このブラウザに最後のワークスペースの場所を保存できませんでした。再度開いたあとの自動復元が制限される場合があります。",
-  "workspace.identityMissing": "ワークスペースの識別子を検証できなかったため、再度開いたあとの下書きの復元はできません。",
+  "workspace.missingProject":
+    "保存されていたプロジェクトが現在の一覧にないため、選択をクリアしました。",
+  "workspace.locationFailure":
+    "このブラウザに最後のワークスペースの場所を保存できませんでした。再度開いたあとの自動復元が制限される場合があります。",
+  "workspace.identityMissing":
+    "ワークスペースの識別子を検証できなかったため、再度開いたあとの下書きの復元はできません。",
   "workspace.chooseProjectNotice": "プロジェクトを選択",
   "workspace.selectForInfo": "プロジェクトを選ぶと、ワークスペース情報と使用量を確認できます。",
   "workspace.connectModel": "モデルの接続",

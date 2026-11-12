@@ -68,19 +68,13 @@ async def connect_local_measurement_contract(
     spans_before = {item["span_id"]: item for item in evidence_before["spans"]}
     artifact = artifacts_before[artifact_id]
     assessment = times_before[artifact_id]
-    contract_spans = [
-        item for item in spans_before.values() if item["artifact_id"] == artifact_id
-    ]
+    contract_spans = [item for item in spans_before.values() if item["artifact_id"] == artifact_id]
     assert artifact["cutoff_state"] == assessment["cutoff_state"] == "UNKNOWN_TIME"
     assert assessment["reason_code"] == "NO_DOCUMENT_DATE"
     assert assessment["source_version_id"] == source_version_id
-    assert contract_spans and all(
-        item["cutoff_state"] == "UNKNOWN_TIME" for item in contract_spans
-    )
+    assert contract_spans and all(item["cutoff_state"] == "UNKNOWN_TIME" for item in contract_spans)
     assert all(item["authority_state"] == "INFORMAL" for item in contract_spans)
-    assert any(
-        "RESEARCH_MEASUREMENT_CONTRACT" in item["exact_text"] for item in contract_spans
-    )
+    assert any("RESEARCH_MEASUREMENT_CONTRACT" in item["exact_text"] for item in contract_spans)
     if not confirm_source_time:
         return artifact_id
 

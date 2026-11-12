@@ -9,7 +9,7 @@ from thoth import __version__
 
 
 def test_version_is_explicit() -> None:
-    assert __version__ == "0.2.0b3"
+    assert __version__ == "0.2.0b4"
 
 
 def test_health_endpoint() -> None:

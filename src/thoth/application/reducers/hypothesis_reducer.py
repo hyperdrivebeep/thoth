@@ -22,9 +22,13 @@ def validate_hypothesis_portfolio(
             raise InvariantViolation("hypothesis references evidence outside the context pack")
         if not hypothesis.counterevidence_refs and not hypothesis.counterevidence_queries:
             raise InvariantViolation("hypothesis requires an independent counterevidence query")
-    if require_unknown_alternative and portfolio.uncertainty_reserve == "UNASSESSED" and not any(
-        hypothesis.primary_locus == CausalLocus.OTHER_WITH_DESCRIPTION
-        for hypothesis in portfolio.hypotheses
+    if (
+        require_unknown_alternative
+        and portfolio.uncertainty_reserve == "UNASSESSED"
+        and not any(
+            hypothesis.primary_locus == CausalLocus.OTHER_WITH_DESCRIPTION
+            for hypothesis in portfolio.hypotheses
+        )
     ):
         raise InvariantViolation("insufficient evidence requires an OTHER/UNKNOWN alternative")
     return portfolio

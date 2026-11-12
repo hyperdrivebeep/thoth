@@ -76,7 +76,9 @@ class PostgresReadConnector:
         if limit_value < 1 or limit_value > 100_000:
             raise ConnectorFailure(ConnectorErrorCode.SCOPE_DENIED, "limit is outside policy")
         quoted_view = ".".join(f'"{part}"' for part in view.split("."))
-        query = f"SELECT * FROM {quoted_view} LIMIT {limit_value}"
+        # The view is one of the operator's allowed views (checked above) and the limit is a checked
+        # integer; a view name cannot be a bound parameter.
+        query = f"SELECT * FROM {quoted_view} LIMIT {limit_value}"  # noqa: S608
         return view, query
 
     async def discover(

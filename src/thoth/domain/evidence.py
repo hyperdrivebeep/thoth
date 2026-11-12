@@ -50,8 +50,7 @@ def connected_retrieval_spans(evidence: tuple[EvidenceSpan, ...]) -> tuple[Evide
         span
         for span in evidence
         if span.authority_state != AuthorityState.NOT_ADMISSIBLE
-        and span.cutoff_state
-        not in {CutoffState.AFTER_CUTOFF, CutoffState.PROHIBITED_CONTEXT}
+        and span.cutoff_state not in {CutoffState.AFTER_CUTOFF, CutoffState.PROHIBITED_CONTEXT}
     )
     eligible = tuple(span for span in usable if span.cutoff_state == CutoffState.ELIGIBLE)
     return eligible or tuple(

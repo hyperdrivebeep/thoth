@@ -61,7 +61,5 @@ def pending_attempt(
                     expected_revision=thread.revision,
                 )
         current = current.model_copy(update={"status": status, "phase": status})
-        host.records.journal(
-            attempt.request_ref.project_id, attempt.operation_id, current, status
-        )
+        host.records.journal(attempt.request_ref.project_id, attempt.operation_id, current, status)
     return PendingExecution({**accepted_attempt_value(current), "status": status})

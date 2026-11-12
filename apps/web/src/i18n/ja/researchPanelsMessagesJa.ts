@@ -5,9 +5,11 @@ export const researchPanelsJa: ColumnOf<typeof researchPanelsMessages> = {
   "tracePage.notComputed": "まだ計算されていません",
   "tracePage.reasons": "詳しい理由",
   "tracePage.nextCheck": "次のチェック",
-  "tracePage.investigateHint": "この行の調査を開き、質問を入力します。調査は、送信したときにだけ始まります。",
+  "tracePage.investigateHint":
+    "この行の調査を開き、質問を入力します。調査は、送信したときにだけ始まります。",
   "tracePage.investigate": "原因を調べる",
-  "tracePage.staleHint": "この行の判定が変わったため、その仮説は以前の基準に基づいたものになっています。会話で確認してください。",
+  "tracePage.staleHint":
+    "この行の判定が変わったため、その仮説は以前の基準に基づいたものになっています。会話で確認してください。",
   "tracePage.stale": "基準が変更されました · 再計算が必要",
   "tracePage.current": "現在の入力に基づく",
   "tracePage.unconfirmed": "まだ確認はありません",
@@ -17,17 +19,21 @@ export const researchPanelsJa: ColumnOf<typeof researchPanelsMessages> = {
   "tracePage.confirmed": "確認が記録されました。判定は変わりません。",
   "tracePage.loading": "追跡表を読み込んでいます…",
   "tracePage.failed": "追跡表を読み込めませんでした。空であるという意味ではありません。",
-  "tracePage.exportFailed": "CSV のエクスポートに失敗しました。しばらくしてからもう一度お試しください。",
+  "tracePage.exportFailed":
+    "CSV のエクスポートに失敗しました。しばらくしてからもう一度お試しください。",
   "tracePage.applied": "変更を適用しました。",
   "tracePage.unchanged": "変更がなかったため、何も適用されませんでした。",
   "tracePage.collapse": "折りたたむ",
   "tracePage.expand": "展開",
   "tracePage.synthetic": "これは合成データです。",
-  "tracePage.syntheticNotice": "これらの値は測定も承認もされておらず、エンジニアリングには使えません。",
-  "tracePage.explanation": "各行には、要件を判定するのに使った基準と結果が表示されます。判定はルールが計算するもので、モデルは決めません。",
+  "tracePage.syntheticNotice":
+    "これらの値は測定も承認もされておらず、エンジニアリングには使えません。",
+  "tracePage.explanation":
+    "各行には、要件を判定するのに使った基準と結果が表示されます。判定はルールが計算するもので、モデルは決めません。",
   "tracePage.export": "CSV をエクスポート",
   "tracePage.import": "CSV をインポート",
-  "tracePage.empty": "追跡表はまだありません。「新しい表を作成」で CSV をインポートすると、ここに要件と基準が表示されます。",
+  "tracePage.empty":
+    "追跡表はまだありません。「新しい表を作成」で CSV をインポートすると、ここに要件と基準が表示されます。",
   "tracePage.tableLabel": "要件ごとの基準、選ばれた結果、判定、最新性、人による確認、根拠の位置",
   "tracePage.history": "履歴",
   "tracePage.subject": "要件 / 基準（条件）",
@@ -39,29 +45,35 @@ export const researchPanelsJa: ColumnOf<typeof researchPanelsMessages> = {
   "tracePage.unlinked": "要件に結びついていない基準",
   "tracePage.noSelectedResult": "選ばれた結果なし",
   "tracePage.observation": "観察",
-  "tracePage.confirmFailed": "確認を記録できませんでした。表示を更新しましたので、もう一度お試しください。",
+  "tracePage.confirmFailed":
+    "確認を記録できませんでした。表示を更新しましたので、もう一度お試しください。",
   "hypotheses.support": "裏づける",
   "hypotheses.refute": "反証する",
   "hypotheses.notApplicable": "該当なし",
   "hypotheses.uncompared": "未比較",
   "hypotheses.empty": "この回答では仮説は提案されませんでした。",
   "hypotheses.counterNotRun": "反証の根拠は未検索",
-  "hypotheses.noCounter": "反証する根拠は見つかりませんでした（裏づけが成り立つわけではありません）",
+  "hypotheses.noCounter":
+    "反証する根拠は見つかりませんでした（裏づけが成り立つわけではありません）",
   "hypotheses.supporting": "裏づける根拠",
   "hypotheses.uncomparedEvidence": "根拠はまだ比較されていません",
   "hypotheses.counterQuestions": "反証の根拠を探すための質問",
   "hypotheses.refutationDraft": "AI が提案した反証条件（未確認）",
-  "hypotheses.refutationNotice": "これらはモデルの提案です。人が確認するまでは、受け入れられた反証条件ではなく、人が書いた条件とは別に扱われます。",
+  "hypotheses.refutationNotice":
+    "これらはモデルの提案です。人が確認するまでは、受け入れられた反証条件ではなく、人が書いた条件とは別に扱われます。",
   "hypotheses.tests": "判別のためのテスト",
   "hypotheses.relationships": "根拠と仮説の関係",
-  "hypotheses.relationshipNotice": "これらの関係は AI が判定したものです。セルを直接編集するのではなく、資料や指示を追加して、もう一度調査してください。未確認のセルは「未比較」と表示されます。各仮説カードの未確認の根拠の数は、選ばれた資料のうち、その仮説とまだ比較されていないものの数を示します。",
+  "hypotheses.relationshipNotice":
+    "これらの関係は AI が判定したものです。セルを直接編集するのではなく、資料や指示を追加して、もう一度調査してください。未確認のセルは「未比較」と表示されます。各仮説カードの未確認の根拠の数は、選ばれた資料のうち、その仮説とまだ比較されていないものの数を示します。",
   "hypotheses.filter": "反証と未確認のみ",
   "hypotheses.all": "すべて表示",
   "hypotheses.hypothesis": "仮説",
-  "hypotheses.discriminatingHint": "この根拠は仮説ごとに関係が異なり、説明を見分ける助けになるかもしれません。",
+  "hypotheses.discriminatingHint":
+    "この根拠は仮説ごとに関係が異なり、説明を見分ける助けになるかもしれません。",
   "hypotheses.discriminating": "仮説を見分ける",
   "memory.loading": "記憶を読み込んでいます…",
-  "memory.failed": "プロジェクトの記憶を読み込めませんでした。記憶が存在しないという意味ではありません。",
+  "memory.failed":
+    "プロジェクトの記憶を読み込めませんでした。記憶が存在しないという意味ではありません。",
   "memory.empty": "この一覧には、記憶の記録が保存されていません。",
   "memory.current": "現在のバージョン",
   "memory.superseded": "新しいバージョンに置き換えられました",
@@ -74,12 +86,16 @@ export const researchPanelsJa: ColumnOf<typeof researchPanelsMessages> = {
   "memory.version": "記憶のバージョン",
   "memory.original": "元のバージョン",
   "memory.fingerprint": "記録のフィンガープリント",
-  "memory.notice": "記憶の呼び出しは調査の質問ごとに決まり、この画面では決まりません。訂正は新しいバージョンの案を作り、元の記憶は履歴に残ります。",
+  "memory.notice":
+    "記憶の呼び出しは調査の質問ごとに決まり、この画面では決まりません。訂正は新しいバージョンの案を作り、元の記憶は履歴に残ります。",
   "historyWorkspace.checkpoints": "チェックポイントを含める",
   "historyWorkspace.reload": "再読み込み",
-  "historyWorkspace.cursorExpired": "このページはこれ以上続けられません。再読み込みして、最初のページから始めてください。",
-  "historyWorkspace.failed": "調査履歴を読み込めませんでした。サーバーの接続と履歴機能の対応状況を確認してください。",
-  "historyWorkspace.scopeChanged": "ログインまたはアクセス範囲が変わりました。履歴を再読み込みしてください。",
+  "historyWorkspace.cursorExpired":
+    "このページはこれ以上続けられません。再読み込みして、最初のページから始めてください。",
+  "historyWorkspace.failed":
+    "調査履歴を読み込めませんでした。サーバーの接続と履歴機能の対応状況を確認してください。",
+  "historyWorkspace.scopeChanged":
+    "ログインまたはアクセス範囲が変わりました。履歴を再読み込みしてください。",
   "historyWorkspace.selection": "回答の比較の選択",
   "historyWorkspace.compare": "2つの回答を比較",
   "historyWorkspace.choosePair": "調査履歴から、変更前と変更後の回答を選んでください。",
@@ -92,7 +108,8 @@ export const researchPanelsJa: ColumnOf<typeof researchPanelsMessages> = {
   "historyWorkspace.compareNotice": "過去の結果を読み、現在の状態と比較します。",
   "historyWorkspace.restoreNotice": "復元は、変更を確認したあとに別に適用されます。",
   "historyWorkspace.projectMismatch": "選択した記録は、別のプロジェクトのものです。",
-  "historyWorkspace.testMode": "検証モード：この画面は、制御された資料とモデルを使います。実際の調査結果は検証しません。",
+  "historyWorkspace.testMode":
+    "検証モード：この画面は、制御された資料とモデルを使います。実際の調査結果は検証しません。",
   "historyWorkspace.preserve": "判定の変化を確認するあいだ、元の回答と根拠を保持します。",
   "historyWorkspace.scope": "履歴の範囲",
   "historyWorkspace.session": "現在の会話",

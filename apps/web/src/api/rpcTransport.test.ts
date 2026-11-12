@@ -12,9 +12,19 @@ it.each([
   await expect(read()).rejects.toMatchObject({ name: "RpcTransportError", kind, retryable: true });
 });
 
-it.each([[429, true], [504, true], [403, false], [401, false]] as const)("classifies HTTP %i without parsing its message", async (status, retryable) => {
+it.each([
+  [429, true],
+  [504, true],
+  [403, false],
+  [401, false],
+] as const)("classifies HTTP %i without parsing its message", async (status, retryable) => {
   vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status })));
-  await expect(read()).rejects.toMatchObject({ name: "RpcTransportError", kind: "HTTP", status, retryable });
+  await expect(read()).rejects.toMatchObject({
+    name: "RpcTransportError",
+    kind: "HTTP",
+    status,
+    retryable,
+  });
 });
 
 it("does not turn response corruption into a retryable transport failure", async () => {
@@ -23,9 +33,20 @@ it("does not turn response corruption into a retryable transport failure", async
 });
 
 it("retains an application access denial as RpcError", async () => {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ jsonrpc: "2.0", id: "read", error: {
-    code: -32040, message: "denied", data: { reason_code: "RESOURCE_SCOPE_ACCESS_DENIED" },
-  }})));
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(
+      Response.json({
+        jsonrpc: "2.0",
+        id: "read",
+        error: {
+          code: -32040,
+          message: "denied",
+          data: { reason_code: "RESOURCE_SCOPE_ACCESS_DENIED" },
+        },
+      }),
+    ),
+  );
   await expect(read()).rejects.toBeInstanceOf(RpcError);
 });
 
@@ -37,9 +58,18 @@ it("does not reclassify the caller's cancellation as a network failure", async (
   await expect(read(controller.signal)).rejects.toBe(cancellation);
 });
 
-it.each(["thread/result/compare/read", "project/review/list"] as const)("uses the read endpoint for %s", async (method) => {
-  const fetch = vi.fn().mockResolvedValue(Response.json({ jsonrpc: "2.0", id: "read", result: { operation_id: "op", state: "SUCCEEDED", value: {} } }));
-  vi.stubGlobal("fetch", fetch);
-  await rpc(method, { project_id: "project:p" }, "followup-read-route");
-  expect(fetch).toHaveBeenCalledWith("/rpc/query", expect.objectContaining({ method: "POST" }));
-});
+it.each(["thread/result/compare/read", "project/review/list"] as const)(
+  "uses the read endpoint for %s",
+  async (method) => {
+    const fetch = vi.fn().mockResolvedValue(
+      Response.json({
+        jsonrpc: "2.0",
+        id: "read",
+        result: { operation_id: "op", state: "SUCCEEDED", value: {} },
+      }),
+    );
+    vi.stubGlobal("fetch", fetch);
+    await rpc(method, { project_id: "project:p" }, "followup-read-route");
+    expect(fetch).toHaveBeenCalledWith("/rpc/query", expect.objectContaining({ method: "POST" }));
+  },
+);

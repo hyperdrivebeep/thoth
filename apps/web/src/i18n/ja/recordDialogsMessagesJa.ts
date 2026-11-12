@@ -19,16 +19,21 @@ export const recordDialogsJa: ColumnOf<typeof recordDialogsMessages> = {
   "traceImport.issues": "適用を妨げている問題",
   "traceImport.untouched": "CSV に含まれておらず、このインポートでは変更されないもの",
   "traceImport.noChange": "変更はありません。",
-  "traceImport.recompute": "変更を適用すると、影響を受ける判定がアトミックに再計算されます。以前の判定は履歴に残ります。",
+  "traceImport.recompute":
+    "変更を適用すると、影響を受ける判定がアトミックに再計算されます。以前の判定は履歴に残ります。",
   "traceImport.apply": "これらの変更を適用",
-  "traceEvidence.notice": "根拠の位置は、この判定に結びついた資料内の場所を示します。リンクがあるだけでは、THOTH がその箇所を裏づけ根拠として検証したことにはなりません。",
+  "traceEvidence.notice":
+    "根拠の位置は、この判定に結びついた資料内の場所を示します。リンクがあるだけでは、THOTH がその箇所を裏づけ根拠として検証したことにはなりません。",
   "traceEvidence.loading": "資料の中から該当箇所を探しています…",
-  "traceEvidence.failed": "資料の一覧を読み込めなかったため、この位置を開けません。その位置が存在しないという意味ではありません。",
-  "traceEvidence.notFound": "この位置は、プロジェクトに接続された資料の中に見つかりませんでした。資料が接続されていないか、位置の指定が THOTH によって作られたものではない可能性があります。",
+  "traceEvidence.failed":
+    "資料の一覧を読み込めなかったため、この位置を開けません。その位置が存在しないという意味ではありません。",
+  "traceEvidence.notFound":
+    "この位置は、プロジェクトに接続された資料の中に見つかりませんでした。資料が接続されていないか、位置の指定が THOTH によって作られたものではない可能性があります。",
   "traceEvidence.passage": "この位置の箇所（ハイライト）",
   "traceConfirm.reasonNeeded": "確認の理由を入力してください。",
   "traceConfirm.title": "判定の確認を記録",
-  "traceConfirm.notice": "確認は、人がこの判定をレビューしたことを記録します。判定は変わらず、あとの再計算には引き継がれません。",
+  "traceConfirm.notice":
+    "確認は、人がこの判定をレビューしたことを記録します。判定は変わらず、あとの再計算には引き継がれません。",
   "traceConfirm.reason": "確認の理由",
   "traceConfirm.record": "確認を記録",
   "traceHistory.all": "すべての結果が基準を満たす必要があります",
@@ -47,23 +52,28 @@ export const recordDialogsJa: ColumnOf<typeof recordDialogsMessages> = {
   "traceHistory.previousRevision": "前の改訂版",
   "traceHistory.none": "判定はまだ計算されていません。",
   "traceHistory.title": "判定の履歴",
-  "traceHistory.failed": "以前の履歴を読み込めませんでした。履歴が存在しないという意味ではありません。",
+  "traceHistory.failed":
+    "以前の履歴を読み込めませんでした。履歴が存在しないという意味ではありません。",
   "traceHistory.more": "以前の履歴を読み込む",
   "recheck.reasonNeeded": "理由を選んでください。",
   "recheck.writtenNeeded": "この理由には文章での説明が必要です。",
-  "recheck.notice": "判定が変わったあとの、この仮説に対する人の見解を記録します。仮説と判定は変わりません。誰がいつ、なぜレビューしたかが保持されます。",
-  "recheck.basisOnly": "判定の状態は変わらず、結果や根拠の位置だけが変わりました。理由を選ぶ前に、変わった根拠を確認してください。",
+  "recheck.notice":
+    "判定が変わったあとの、この仮説に対する人の見解を記録します。仮説と判定は変わりません。誰がいつ、なぜレビューしたかが保持されます。",
+  "recheck.basisOnly":
+    "判定の状態は変わらず、結果や根拠の位置だけが変わりました。理由を選ぶ前に、変わった根拠を確認してください。",
   "recheck.writtenLabel": "文章での理由（必須）",
   "recheck.optionalNote": "メモ（任意）",
   "recheck.writeReason": "理由を書く",
   "recheck.note": "メモ",
-  "recheck.flipped": "判定が「満たす」と「満たさない」の間で切り替わりました。仮説を残すには、文章での説明が必要です。",
+  "recheck.flipped":
+    "判定が「満たす」と「満たさない」の間で切り替わりました。仮説を残すには、文章での説明が必要です。",
   "testResult.choose": "結果に合っていた説明を選んでください。",
   "testResult.observationNeeded": "観察を入力してください。",
   "testResult.rerecord": "別の結果を記録",
   "testResult.record": "結果を記録",
   "testResult.title": "テスト結果を記録",
-  "testResult.notice": "人が行ったテストを記録します。仮説と以前の記録は保持されます。同じテストをもう一度記録すると、最新の記録が有効になります。",
+  "testResult.notice":
+    "人が行ったテストを記録します。仮説と以前の記録は保持されます。同じテストをもう一度記録すると、最新の記録が有効になります。",
   "testResult.match": "どの説明が合っていましたか？",
   "testResult.requiredObservation": "観察（必須）",
   "testResult.observation": "観察",
@@ -80,14 +90,17 @@ export const recordDialogsJa: ColumnOf<typeof recordDialogsMessages> = {
   "closure.basisExample": "文書番号、議事録、変更依頼など",
   "closure.requiredScope": "適用される条件の範囲（必須）",
   "closure.scope": "適用される条件の範囲",
-  "closure.failed": "記録を保存できませんでした。判定が変わった可能性があります。表示を更新してから、もう一度お試しください。",
+  "closure.failed":
+    "記録を保存できませんでした。判定が変わった可能性があります。表示を更新してから、もう一度お試しください。",
   "refutation.conditions": "反証条件",
   "refutation.empty": "反証条件はまだ記録されていません。",
   "refutation.record": "反証条件を記録",
-  "refutation.notice": "この仮説を覆す結果を表す条件を、1行に1件ずつ入力してください。新しい記録が表示される一覧になり、以前の記録は保持されます。",
+  "refutation.notice":
+    "この仮説を覆す結果を表す条件を、1行に1件ずつ入力してください。新しい記録が表示される一覧になり、以前の記録は保持されます。",
   "memoryEdit.required": "訂正後の内容と理由の両方を入力してください。",
   "memoryEdit.title": "記憶の訂正を提案",
-  "memoryEdit.notice": "レビューで承認されると、この提案は新しいバージョンになります。元の記憶は履歴に残ります。",
+  "memoryEdit.notice":
+    "レビューで承認されると、この提案は新しいバージョンになります。元の記憶は履歴に残ります。",
   "memoryEdit.content": "訂正後の内容",
   "memoryEdit.send": "訂正の提案を送信",
 };

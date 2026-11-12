@@ -1,37 +1,307 @@
 export const uiFormats = {
-  openExpectedEvidence: {ko: (number: number) => `근거 ${number} 열기`, en: (number: number) => `Open evidence ${number}`, "zh-Hans": (number: number)=>`打开证据 ${number}`, "zh-Hant": (number: number)=>`開啟證據 ${number}`, ja: (number: number)=>`根拠 ${number} を開く`},
-  openHypothesisEvidence: {ko: (hypothesis: number | string, number: number) => `가설 ${hypothesis}의 근거 ${number} 열기`, en: (hypothesis: number | string, number: number) => `Open evidence ${number} for Hypothesis ${hypothesis}`, "zh-Hans": (hypothesis: number | string, number: number)=>`打开假设 ${hypothesis} 的证据 ${number}`, "zh-Hant": (hypothesis: number | string, number: number)=>`開啟假設 ${hypothesis} 的證據 ${number}`, ja: (hypothesis: number | string, number: number)=>`仮説 ${hypothesis} の根拠 ${number} を開く`},
-  uploadUnsupported: {ko: (name: string, formats: string) => `"${name}" 파일은 올릴 수 없는 형식입니다. 올릴 수 있는 형식: ${formats}.`, en: (name: string, formats: string) => `"${name}" is not a file type that can be uploaded. Supported types: ${formats}.`, "zh-Hans": (name: string, formats: string) => `“${name}”的格式无法上传。可上传的格式：${formats}。`, "zh-Hant": (name: string, formats: string) => `「${name}」的格式無法上傳。可上傳的格式：${formats}。`, ja: (name: string, formats: string) => `「${name}」はアップロードできない形式です。アップロードできる形式：${formats}。`},
-  uploadEmpty: {ko: (name: string) => `"${name}" 파일이 비어 있습니다. 내용이 있는 파일을 올리세요.`, en: (name: string) => `"${name}" is empty. Upload a file that has content.`, "zh-Hans": (name: string) => `“${name}”是空文件。请上传有内容的文件。`, "zh-Hant": (name: string) => `「${name}」是空檔案。請上傳有內容的檔案。`, ja: (name: string) => `「${name}」は空のファイルです。内容のあるファイルをアップロードしてください。`},
-  uploadTooLarge: {ko: (name: string) => `"${name}" 파일이 64MB를 넘습니다. 더 작은 파일로 나눠 올리세요.`, en: (name: string) => `"${name}" is larger than 64 MB. Split it into smaller files.`, "zh-Hans": (name: string) => `“${name}”超过 64MB。请拆分成较小的文件后上传。`, "zh-Hant": (name: string) => `「${name}」超過 64MB。請拆分成較小的檔案後上傳。`, ja: (name: string) => `「${name}」は 64MB を超えています。小さいファイルに分けてアップロードしてください。`},
-  batchNoneConnected: {ko: (total: number) => `선택한 파일 ${total}개 가운데 연결된 것은 없습니다.`, en: (total: number) => `None of the ${total} selected files was connected.`, "zh-Hans": (total: number) => `所选的 ${total} 个文件都没有连接。`, "zh-Hant": (total: number) => `所選的 ${total} 個檔案都沒有連線。`, ja: (total: number) => `選択した ${total} 件のファイルは、どれも接続されていません。`},
-  batchSomeConnected: {ko: (connected: number, total: number) => `선택한 파일 ${total}개 가운데 앞의 ${connected}개는 연결됐습니다. 자료 목록에서 확인하세요.`, en: (connected: number, total: number) => `${connected} of the ${total} selected files ${connected === 1 ? "was" : "were"} connected before this one. Check the source list.`, "zh-Hans": (connected: number, total: number) => `所选的 ${total} 个文件中，前 ${connected} 个已连接。请在资料列表中确认。`, "zh-Hant": (connected: number, total: number) => `所選的 ${total} 個檔案中，前 ${connected} 個已連線。請在資料列表中確認。`, ja: (connected: number, total: number) => `選択した ${total} 件のうち、先の ${connected} 件は接続されました。資料の一覧で確認してください。`},
-  scopeNow: {ko: (scope: string) => `사용 범위: ${scope}`, en: (scope: string) => `Usage scope: ${scope}`, "zh-Hans": (scope: string) => `使用范围：${scope}`, "zh-Hant": (scope: string) => `使用範圍：${scope}`, ja: (scope: string) => `利用範囲：${scope}`},
-  filesSelected: {ko: (count: number) => `${count}개 선택`, en: (count: number) => `${count} ${count === 1 ? "file" : "files"} selected`, "zh-Hans": (count: number)=>`已选择 ${count} 个`, "zh-Hant": (count: number)=>`已選擇 ${count} 個`, ja: (count: number)=>`${count} 件を選択`},
-  fileStaging: {ko: (name: string) => `${name} · 업로드 준비 / 구조 파싱`, en: (name: string) => `${name} · Preparing upload / parsing structure`, "zh-Hans": (name: string)=>`${name} · 正在准备上传 / 解析结构`, "zh-Hant": (name: string)=>`${name} · 正在準備上傳 / 解析結構`, ja: (name: string)=>`${name} · アップロードの準備 / 構造の解析`},
-  fileUploadProgress: {ko: (name: string, percent: number) => `${name} 보내는 중 (${percent}%)`, en: (name: string, percent: number) => `Uploading ${name} (${percent}%)`, "zh-Hans": (name: string, percent: number)=>`正在上传 ${name}（${percent}%）`, "zh-Hant": (name: string, percent: number)=>`正在上傳 ${name}（${percent}%）`, ja: (name: string, percent: number)=>`${name} を送信中（${percent}%）`},
-  fileUploadWaiting: {ko: (name: string) => `${name} 파일을 다 보냈습니다. 서버가 처리하는 중입니다…`, en: (name: string) => `${name} was sent. The server is processing it…`, "zh-Hans": (name: string)=>`${name} 已发送完毕。服务器正在处理…`, "zh-Hant": (name: string)=>`${name} 已傳送完畢。伺服器正在處理…`, ja: (name: string)=>`${name} を送信し終えました。サーバーが処理しています…`},
-  currentSetting: {ko: (state: string) => `현재: ${state}`, en: (state: string) => `Current: ${state}`, "zh-Hans": (state: string)=>`当前：${state}`, "zh-Hant": (state: string)=>`目前：${state}`, ja: (state: string)=>`現在：${state}`},
-  errorCode: {ko: (code: string) => ` 오류 코드: ${code}`, en: (code: string) => ` Error code: ${code}`, "zh-Hans": (code: string)=>` 错误代码：${code}`, "zh-Hant": (code: string)=>` 錯誤程式碼：${code}`, ja: (code: string)=>` エラーコード：${code}`},
-  loginButton: {ko: (provider: string, connected: boolean) => connected ? `${provider} 로그인됨` : `${provider}로 로그인`, en: (provider: string, connected: boolean) => connected ? `Logged in to ${provider}` : `Log in to ${provider}`, "zh-Hans": (provider: string, connected: boolean) => connected ? `已登录 ${provider}` : `登录 ${provider}`, "zh-Hant": (provider: string, connected: boolean) => connected ? `已登入 ${provider}` : `登入 ${provider}`, ja: (provider: string, connected: boolean) => connected ? `${provider} にログイン済み` : `${provider} にログイン`},
-  expiry: {ko: (seconds: number, estimated: boolean) => `${estimated ? "남은 상태 확인 시간" : "남은 유효 시간"}: ${seconds}초`, en: (seconds: number, estimated: boolean) => `${estimated ? "Status check time remaining" : "Time until expiry"}: ${seconds}s`, "zh-Hans": (seconds: number, estimated: boolean) => `${estimated ? "状态检查剩余时间" : "距离过期的时间"}：${seconds} 秒`, "zh-Hant": (seconds: number, estimated: boolean) => `${estimated ? "狀態檢查剩餘時間" : "距離過期的時間"}：${seconds} 秒`, ja: (seconds: number, estimated: boolean) => `${estimated ? "状態確認の残り時間" : "有効期限までの時間"}：${seconds} 秒`},
-  loginSnapshot: {ko: (state: string, auth: string, catalog: string) => `로그인 시도: ${state} · 저장 인증: ${auth} · 모델 목록: ${catalog}`, en: (state: string, auth: string, catalog: string) => `Login attempt: ${state} · Stored authentication: ${auth} · Model list: ${catalog}`, "zh-Hans": (state: string, auth: string, catalog: string)=>`登录尝试：${state} · 已存储的身份验证：${auth} · 模型列表：${catalog}`, "zh-Hant": (state: string, auth: string, catalog: string)=>`登入嘗試：${state} · 已儲存的身分驗證：${auth} · 模型列表：${catalog}`, ja: (state: string, auth: string, catalog: string)=>`ログインの試行：${state} · 保存済みの認証：${auth} · モデル一覧：${catalog}`},
-  keyRouteStatus: {ko: (registered: string) => `API 키: ${registered} · OAuth와 별도 경로`, en: (registered: string) => `API key: ${registered} · Separate from OAuth`, "zh-Hans": (registered: string)=>`API 密钥：${registered} · 与 OAuth 是分开的途径`, "zh-Hant": (registered: string)=>`API 金鑰：${registered} · 與 OAuth 是分開的途徑`, ja: (registered: string)=>`API キー：${registered} · OAuth とは別の経路`},
-  questionHeading: {ko: (kind: string) => `질문 ${kind === "REPLACE" ? "수정" : kind === "STEER" ? "· 방향 변경" : ""}`, en: (kind: string) => `Question${kind === "REPLACE" ? " · Edited" : kind === "STEER" ? " · Direction changed" : ""}`, "zh-Hans": (kind: string) => `问题${kind === "REPLACE" ? " · 已编辑" : kind === "STEER" ? " · 方向已更改" : ""}`, "zh-Hant": (kind: string) => `問題${kind === "REPLACE" ? " · 已編輯" : kind === "STEER" ? " · 方向已更改" : ""}`, ja: (kind: string) => `質問${kind === "REPLACE" ? " · 編集済み" : kind === "STEER" ? " · 方向を変更" : ""}`},
-  questionExample: {ko: (example: boolean) => `질문${example ? " · 예시" : ""}`, en: (example: boolean) => `Question${example ? " · Example" : ""}`, "zh-Hans": (example: boolean) => `问题${example ? " · 示例" : ""}`, "zh-Hant": (example: boolean) => `問題${example ? " · 範例" : ""}`, ja: (example: boolean) => `質問${example ? " · 例" : ""}`},
-  terminationReason: {ko: (code: string) => `기록된 종료 사유: ${code}`, en: (code: string) => `Recorded termination reason: ${code}`, "zh-Hans": (code: string)=>`记录的终止原因：${code}`, "zh-Hant": (code: string)=>`記錄的終止原因：${code}`, ja: (code: string)=>`記録された終了の理由：${code}`},
-  interruptedAnswer: {ko: (reason: string | null) => `모델 호출이 중간에 끊겨 이 조사의 답이 없습니다(${reason}).`, en: (reason: string | null) => `This investigation has no answer because the model call was interrupted (${reason}).`, "zh-Hans": (reason: string | null)=>`模型调用中途中断，因此这次调查没有回答（${reason}）。`, "zh-Hant": (reason: string | null)=>`模型呼叫中途中斷，因此這次調查沒有回答（${reason}）。`, ja: (reason: string | null)=>`モデル呼び出しが途中で途切れたため、この調査には回答がありません（${reason}）。`},
-  resumeStages: {ko: (count: number | undefined) => ` 끝낸 ${count}단계는 그대로 쓰고 끊긴 곳부터 다시 부릅니다. 자료나 설정이 바뀐 단계는 새로 부릅니다. 누르면 바로 시작합니다.`, en: (count: number | undefined) => ` Continue from the interruption, reusing the ${count} completed stages where inputs are unchanged. Stages with changed sources or settings run again. Pressing this starts immediately.`, "zh-Hans": (count: number | undefined) => ` 从中断处继续，在输入未变化的情况下复用已完成的 ${count} 个阶段。资料或设置已变化的阶段会重新运行。点击后立即开始。`, "zh-Hant": (count: number | undefined) => ` 從中斷處繼續，在輸入未變化的情況下複用已完成的 ${count} 個階段。資料或設定已變化的階段會重新執行。點選後立即開始。`, ja: (count: number | undefined) => ` 中断した箇所から再開し、入力が変わっていない完了済みの ${count} 段階はそのまま再利用します。資料や設定が変わった段階は、もう一度実行します。押すとすぐに始まります。`},
-  usageTooltip: {ko: (input: string, output: string) => `이 대화의 제공자 보고값: 입력 ${input}, 출력 ${output}. 적용 가능한 단가·비용 근거가 없어 추정 비용은 미확인입니다. 계정 잔여량이나 추가 청구액이 아닙니다.`, en: (input: string, output: string) => `Provider-reported usage for this conversation: input ${input}, output ${output}. Estimated cost is unknown without applicable pricing and cost evidence. This is not remaining account quota or an additional charge.`, "zh-Hans": (input: string, output: string)=>`服务提供商报告的此对话用量：输入 ${input}，输出 ${output}。由于没有适用的价格和成本依据，估计成本未知。这不是账户的剩余额度，也不是额外的费用。`, "zh-Hant": (input: string, output: string)=>`服務提供商報告的此對話用量：輸入 ${input}，輸出 ${output}。由於沒有適用的價格和成本依據，估計成本未知。這不是帳戶的剩餘額度，也不是額外的費用。`, ja: (input: string, output: string)=>`この会話についてプロバイダーが報告した使用量：入力 ${input}、出力 ${output}。適用できる単価やコストの根拠がないため、見積もりコストは不明です。アカウントの残り枠や追加の請求額ではありません。`},
-  usageCaption: {ko: (total: string, partial: boolean) => `이 대화의 사용 토큰 ${total}${partial ? " (부분 관측)" : ""} · 추정 비용 미확인`, en: (total: string, partial: boolean) => `Tokens used in this conversation ${total}${partial ? " (partially observed)" : ""} · Estimated cost unknown`, "zh-Hans": (total: string, partial: boolean) => `此对话已用 token ${total}${partial ? "（部分观察到）" : ""} · 估计成本未知`, "zh-Hant": (total: string, partial: boolean) => `此對話已用 token ${total}${partial ? "（部分觀察到）" : ""} · 估計成本未知`, ja: (total: string, partial: boolean) => `この会話の使用トークン ${total}${partial ? "（一部のみ観測）" : ""} · 見積もりコストは不明`},
-  evidenceButton: {ko: (n: number | string) => `근거 ${n} 보기`, en: (n: number | string) => `View evidence ${n}`, "zh-Hans": (n: number | string)=>`查看证据 ${n}`, "zh-Hant": (n: number | string)=>`檢視證據 ${n}`, ja: (n: number | string)=>`根拠 ${n} を見る`},
-  technicalPhrases: {ko: (count: number) => `기록된 상세 문구 ${count}개`, en: (count: number) => `${count} recorded technical ${count === 1 ? "phrase" : "phrases"}`, "zh-Hans": (count: number)=>`${count} 条已记录的详细措辞`, "zh-Hant": (count: number)=>`${count} 條已記錄的詳細措辭`, ja: (count: number)=>`記録された詳細な文言 ${count} 件`},
-  reviewStages: {ko: (count: number) => `검토 단계 ${count}개`, en: (count: number) => `${count} review ${count === 1 ? "stage" : "stages"}`, "zh-Hans": (count: number)=>`${count} 个审查阶段`, "zh-Hant": (count: number)=>`${count} 個審查階段`, ja: (count: number)=>`レビューの段階 ${count} 件`},
-  requirementAssessments: {ko: (count: number) => `조건별 평가 ${count}건`, en: (count: number) => `${count} condition ${count === 1 ? "assessment" : "assessments"}`, "zh-Hans": (count: number)=>`${count} 项按条件的评估`, "zh-Hant": (count: number)=>`${count} 項按條件的評估`, ja: (count: number)=>`条件ごとの評価 ${count} 件`},
-  technicalCodes: {ko: (count: number) => `기록된 상세 코드 ${count}개`, en: (count: number) => `${count} recorded technical ${count === 1 ? "code" : "codes"}`, "zh-Hans": (count: number)=>`${count} 个已记录的详细代码`, "zh-Hant": (count: number)=>`${count} 個已記錄的詳細程式碼`, ja: (count: number)=>`記録された詳細コード ${count} 件`},
-  linkedEvidence: {ko: (count: number) => `연결된 근거 ${count}개`, en: (count: number) => `${count} linked evidence ${count === 1 ? "reference" : "references"}`, "zh-Hans": (count: number)=>`${count} 条关联证据`, "zh-Hant": (count: number)=>`${count} 條關聯證據`, ja: (count: number)=>`結びついた根拠 ${count} 件`},
-  answerEvidence: {ko: (count: number) => ` 답변 근거 ${count}개는 '근거 원문'에서 볼 수 있습니다.`, en: (count: number) => ` The answer's ${count} evidence ${count === 1 ? "reference is" : "references are"} available under Original evidence.`, "zh-Hans": (count: number)=>`回答的 ${count} 条证据可在“原始证据”中查看。`, "zh-Hant": (count: number)=>`回答的 ${count} 條證據可在“原始證據”中檢視。`, ja: (count: number)=>`回答の根拠 ${count} 件は、「元の根拠」で見られます。`},
-  answerChecks: {ko: (count: number) => `답변 점검 항목 ${count}개`, en: (count: number) => `${count} answer ${count === 1 ? "check" : "checks"}`, "zh-Hans": (count: number)=>`${count} 项回答核查`, "zh-Hant": (count: number)=>`${count} 項回答核查`, ja: (count: number)=>`回答チェック ${count} 件`},
-  inputSame: {ko: (count: number) => `시험에 쓴 입력 파일은 이전과 같습니다(${count}개).`, en: (count: number) => `The test uses the same ${count} input ${count === 1 ? "file" : "files"} as before.`, "zh-Hans": (count: number)=>`测试使用的输入文件与之前相同（${count} 个）。`, "zh-Hant": (count: number)=>`測試使用的輸入檔案與之前相同（${count} 個）。`, ja: (count: number)=>`テストで使った入力ファイルは、以前と同じです（${count} 件）。`},
-  inputDifference: {ko: (before: number, after: number, removed: number, added: number) => `시험에 쓴 입력 파일이 이전과 다릅니다. 이전 ${before}개, 지금 ${after}개, 빠진 것 ${removed}개, 새로 들어온 것 ${added}개입니다.`, en: (before: number, after: number, removed: number, added: number) => `The test inputs changed: ${before} files before, ${after} now, ${removed} removed and ${added} added.`, "zh-Hans": (before: number, after: number, removed: number, added: number)=>`测试使用的输入文件与之前不同：之前 ${before} 个，现在 ${after} 个，移除了 ${removed} 个，新增了 ${added} 个。`, "zh-Hant": (before: number, after: number, removed: number, added: number)=>`測試使用的輸入檔案與之前不同：之前 ${before} 個，現在 ${after} 個，移除了 ${removed} 個，新增了 ${added} 個。`, ja: (before: number, after: number, removed: number, added: number)=>`テストで使った入力ファイルが以前と異なります。以前 ${before} 件、現在 ${after} 件、外れたもの ${removed} 件、新しく加わったもの ${added} 件です。`},
+  openExpectedEvidence: {
+    ko: (number: number) => `근거 ${number} 열기`,
+    en: (number: number) => `Open evidence ${number}`,
+    "zh-Hans": (number: number) => `打开证据 ${number}`,
+    "zh-Hant": (number: number) => `開啟證據 ${number}`,
+    ja: (number: number) => `根拠 ${number} を開く`,
+  },
+  openHypothesisEvidence: {
+    ko: (hypothesis: number | string, number: number) => `가설 ${hypothesis}의 근거 ${number} 열기`,
+    en: (hypothesis: number | string, number: number) =>
+      `Open evidence ${number} for Hypothesis ${hypothesis}`,
+    "zh-Hans": (hypothesis: number | string, number: number) =>
+      `打开假设 ${hypothesis} 的证据 ${number}`,
+    "zh-Hant": (hypothesis: number | string, number: number) =>
+      `開啟假設 ${hypothesis} 的證據 ${number}`,
+    ja: (hypothesis: number | string, number: number) =>
+      `仮説 ${hypothesis} の根拠 ${number} を開く`,
+  },
+  uploadUnsupported: {
+    ko: (name: string, formats: string) =>
+      `"${name}" 파일은 올릴 수 없는 형식입니다. 올릴 수 있는 형식: ${formats}.`,
+    en: (name: string, formats: string) =>
+      `"${name}" is not a file type that can be uploaded. Supported types: ${formats}.`,
+    "zh-Hans": (name: string, formats: string) =>
+      `“${name}”的格式无法上传。可上传的格式：${formats}。`,
+    "zh-Hant": (name: string, formats: string) =>
+      `「${name}」的格式無法上傳。可上傳的格式：${formats}。`,
+    ja: (name: string, formats: string) =>
+      `「${name}」はアップロードできない形式です。アップロードできる形式：${formats}。`,
+  },
+  uploadEmpty: {
+    ko: (name: string) => `"${name}" 파일이 비어 있습니다. 내용이 있는 파일을 올리세요.`,
+    en: (name: string) => `"${name}" is empty. Upload a file that has content.`,
+    "zh-Hans": (name: string) => `“${name}”是空文件。请上传有内容的文件。`,
+    "zh-Hant": (name: string) => `「${name}」是空檔案。請上傳有內容的檔案。`,
+    ja: (name: string) =>
+      `「${name}」は空のファイルです。内容のあるファイルをアップロードしてください。`,
+  },
+  uploadTooLarge: {
+    ko: (name: string) => `"${name}" 파일이 64MB를 넘습니다. 더 작은 파일로 나눠 올리세요.`,
+    en: (name: string) => `"${name}" is larger than 64 MB. Split it into smaller files.`,
+    "zh-Hans": (name: string) => `“${name}”超过 64MB。请拆分成较小的文件后上传。`,
+    "zh-Hant": (name: string) => `「${name}」超過 64MB。請拆分成較小的檔案後上傳。`,
+    ja: (name: string) =>
+      `「${name}」は 64MB を超えています。小さいファイルに分けてアップロードしてください。`,
+  },
+  batchNoneConnected: {
+    ko: (total: number) => `선택한 파일 ${total}개 가운데 연결된 것은 없습니다.`,
+    en: (total: number) => `None of the ${total} selected files was connected.`,
+    "zh-Hans": (total: number) => `所选的 ${total} 个文件都没有连接。`,
+    "zh-Hant": (total: number) => `所選的 ${total} 個檔案都沒有連線。`,
+    ja: (total: number) => `選択した ${total} 件のファイルは、どれも接続されていません。`,
+  },
+  batchSomeConnected: {
+    ko: (connected: number, total: number) =>
+      `선택한 파일 ${total}개 가운데 앞의 ${connected}개는 연결됐습니다. 자료 목록에서 확인하세요.`,
+    en: (connected: number, total: number) =>
+      `${connected} of the ${total} selected files ${connected === 1 ? "was" : "were"} connected before this one. Check the source list.`,
+    "zh-Hans": (connected: number, total: number) =>
+      `所选的 ${total} 个文件中，前 ${connected} 个已连接。请在资料列表中确认。`,
+    "zh-Hant": (connected: number, total: number) =>
+      `所選的 ${total} 個檔案中，前 ${connected} 個已連線。請在資料列表中確認。`,
+    ja: (connected: number, total: number) =>
+      `選択した ${total} 件のうち、先の ${connected} 件は接続されました。資料の一覧で確認してください。`,
+  },
+  scopeNow: {
+    ko: (scope: string) => `사용 범위: ${scope}`,
+    en: (scope: string) => `Usage scope: ${scope}`,
+    "zh-Hans": (scope: string) => `使用范围：${scope}`,
+    "zh-Hant": (scope: string) => `使用範圍：${scope}`,
+    ja: (scope: string) => `利用範囲：${scope}`,
+  },
+  filesSelected: {
+    ko: (count: number) => `${count}개 선택`,
+    en: (count: number) => `${count} ${count === 1 ? "file" : "files"} selected`,
+    "zh-Hans": (count: number) => `已选择 ${count} 个`,
+    "zh-Hant": (count: number) => `已選擇 ${count} 個`,
+    ja: (count: number) => `${count} 件を選択`,
+  },
+  fileStaging: {
+    ko: (name: string) => `${name} · 업로드 준비 / 구조 파싱`,
+    en: (name: string) => `${name} · Preparing upload / parsing structure`,
+    "zh-Hans": (name: string) => `${name} · 正在准备上传 / 解析结构`,
+    "zh-Hant": (name: string) => `${name} · 正在準備上傳 / 解析結構`,
+    ja: (name: string) => `${name} · アップロードの準備 / 構造の解析`,
+  },
+  fileUploadProgress: {
+    ko: (name: string, percent: number) => `${name} 보내는 중 (${percent}%)`,
+    en: (name: string, percent: number) => `Uploading ${name} (${percent}%)`,
+    "zh-Hans": (name: string, percent: number) => `正在上传 ${name}（${percent}%）`,
+    "zh-Hant": (name: string, percent: number) => `正在上傳 ${name}（${percent}%）`,
+    ja: (name: string, percent: number) => `${name} を送信中（${percent}%）`,
+  },
+  fileUploadWaiting: {
+    ko: (name: string) => `${name} 파일을 다 보냈습니다. 서버가 처리하는 중입니다…`,
+    en: (name: string) => `${name} was sent. The server is processing it…`,
+    "zh-Hans": (name: string) => `${name} 已发送完毕。服务器正在处理…`,
+    "zh-Hant": (name: string) => `${name} 已傳送完畢。伺服器正在處理…`,
+    ja: (name: string) => `${name} を送信し終えました。サーバーが処理しています…`,
+  },
+  currentSetting: {
+    ko: (state: string) => `현재: ${state}`,
+    en: (state: string) => `Current: ${state}`,
+    "zh-Hans": (state: string) => `当前：${state}`,
+    "zh-Hant": (state: string) => `目前：${state}`,
+    ja: (state: string) => `現在：${state}`,
+  },
+  errorCode: {
+    ko: (code: string) => ` 오류 코드: ${code}`,
+    en: (code: string) => ` Error code: ${code}`,
+    "zh-Hans": (code: string) => ` 错误代码：${code}`,
+    "zh-Hant": (code: string) => ` 錯誤程式碼：${code}`,
+    ja: (code: string) => ` エラーコード：${code}`,
+  },
+  loginButton: {
+    ko: (provider: string, connected: boolean) =>
+      connected ? `${provider} 로그인됨` : `${provider}로 로그인`,
+    en: (provider: string, connected: boolean) =>
+      connected ? `Logged in to ${provider}` : `Log in to ${provider}`,
+    "zh-Hans": (provider: string, connected: boolean) =>
+      connected ? `已登录 ${provider}` : `登录 ${provider}`,
+    "zh-Hant": (provider: string, connected: boolean) =>
+      connected ? `已登入 ${provider}` : `登入 ${provider}`,
+    ja: (provider: string, connected: boolean) =>
+      connected ? `${provider} にログイン済み` : `${provider} にログイン`,
+  },
+  expiry: {
+    ko: (seconds: number, estimated: boolean) =>
+      `${estimated ? "남은 상태 확인 시간" : "남은 유효 시간"}: ${seconds}초`,
+    en: (seconds: number, estimated: boolean) =>
+      `${estimated ? "Status check time remaining" : "Time until expiry"}: ${seconds}s`,
+    "zh-Hans": (seconds: number, estimated: boolean) =>
+      `${estimated ? "状态检查剩余时间" : "距离过期的时间"}：${seconds} 秒`,
+    "zh-Hant": (seconds: number, estimated: boolean) =>
+      `${estimated ? "狀態檢查剩餘時間" : "距離過期的時間"}：${seconds} 秒`,
+    ja: (seconds: number, estimated: boolean) =>
+      `${estimated ? "状態確認の残り時間" : "有効期限までの時間"}：${seconds} 秒`,
+  },
+  loginSnapshot: {
+    ko: (state: string, auth: string, catalog: string) =>
+      `로그인 시도: ${state} · 저장 인증: ${auth} · 모델 목록: ${catalog}`,
+    en: (state: string, auth: string, catalog: string) =>
+      `Login attempt: ${state} · Stored authentication: ${auth} · Model list: ${catalog}`,
+    "zh-Hans": (state: string, auth: string, catalog: string) =>
+      `登录尝试：${state} · 已存储的身份验证：${auth} · 模型列表：${catalog}`,
+    "zh-Hant": (state: string, auth: string, catalog: string) =>
+      `登入嘗試：${state} · 已儲存的身分驗證：${auth} · 模型列表：${catalog}`,
+    ja: (state: string, auth: string, catalog: string) =>
+      `ログインの試行：${state} · 保存済みの認証：${auth} · モデル一覧：${catalog}`,
+  },
+  keyRouteStatus: {
+    ko: (registered: string) => `API 키: ${registered} · OAuth와 별도 경로`,
+    en: (registered: string) => `API key: ${registered} · Separate from OAuth`,
+    "zh-Hans": (registered: string) => `API 密钥：${registered} · 与 OAuth 是分开的途径`,
+    "zh-Hant": (registered: string) => `API 金鑰：${registered} · 與 OAuth 是分開的途徑`,
+    ja: (registered: string) => `API キー：${registered} · OAuth とは別の経路`,
+  },
+  questionHeading: {
+    ko: (kind: string) =>
+      `질문 ${kind === "REPLACE" ? "수정" : kind === "STEER" ? "· 방향 변경" : ""}`,
+    en: (kind: string) =>
+      `Question${kind === "REPLACE" ? " · Edited" : kind === "STEER" ? " · Direction changed" : ""}`,
+    "zh-Hans": (kind: string) =>
+      `问题${kind === "REPLACE" ? " · 已编辑" : kind === "STEER" ? " · 方向已更改" : ""}`,
+    "zh-Hant": (kind: string) =>
+      `問題${kind === "REPLACE" ? " · 已編輯" : kind === "STEER" ? " · 方向已更改" : ""}`,
+    ja: (kind: string) =>
+      `質問${kind === "REPLACE" ? " · 編集済み" : kind === "STEER" ? " · 方向を変更" : ""}`,
+  },
+  questionExample: {
+    ko: (example: boolean) => `질문${example ? " · 예시" : ""}`,
+    en: (example: boolean) => `Question${example ? " · Example" : ""}`,
+    "zh-Hans": (example: boolean) => `问题${example ? " · 示例" : ""}`,
+    "zh-Hant": (example: boolean) => `問題${example ? " · 範例" : ""}`,
+    ja: (example: boolean) => `質問${example ? " · 例" : ""}`,
+  },
+  terminationReason: {
+    ko: (code: string) => `기록된 종료 사유: ${code}`,
+    en: (code: string) => `Recorded termination reason: ${code}`,
+    "zh-Hans": (code: string) => `记录的终止原因：${code}`,
+    "zh-Hant": (code: string) => `記錄的終止原因：${code}`,
+    ja: (code: string) => `記録された終了の理由：${code}`,
+  },
+  interruptedAnswer: {
+    ko: (reason: string | null) => `모델 호출이 중간에 끊겨 이 조사의 답이 없습니다(${reason}).`,
+    en: (reason: string | null) =>
+      `This investigation has no answer because the model call was interrupted (${reason}).`,
+    "zh-Hans": (reason: string | null) => `模型调用中途中断，因此这次调查没有回答（${reason}）。`,
+    "zh-Hant": (reason: string | null) => `模型呼叫中途中斷，因此這次調查沒有回答（${reason}）。`,
+    ja: (reason: string | null) =>
+      `モデル呼び出しが途中で途切れたため、この調査には回答がありません（${reason}）。`,
+  },
+  resumeStages: {
+    ko: (count: number | undefined) =>
+      ` 끝낸 ${count}단계는 그대로 쓰고 끊긴 곳부터 다시 부릅니다. 자료나 설정이 바뀐 단계는 새로 부릅니다. 누르면 바로 시작합니다.`,
+    en: (count: number | undefined) =>
+      ` Continue from the interruption, reusing the ${count} completed stages where inputs are unchanged. Stages with changed sources or settings run again. Pressing this starts immediately.`,
+    "zh-Hans": (count: number | undefined) =>
+      ` 从中断处继续，在输入未变化的情况下复用已完成的 ${count} 个阶段。资料或设置已变化的阶段会重新运行。点击后立即开始。`,
+    "zh-Hant": (count: number | undefined) =>
+      ` 從中斷處繼續，在輸入未變化的情況下複用已完成的 ${count} 個階段。資料或設定已變化的階段會重新執行。點選後立即開始。`,
+    ja: (count: number | undefined) =>
+      ` 中断した箇所から再開し、入力が変わっていない完了済みの ${count} 段階はそのまま再利用します。資料や設定が変わった段階は、もう一度実行します。押すとすぐに始まります。`,
+  },
+  usageTooltip: {
+    ko: (input: string, output: string) =>
+      `이 대화의 제공자 보고값: 입력 ${input}, 출력 ${output}. 적용 가능한 단가·비용 근거가 없어 추정 비용은 미확인입니다. 계정 잔여량이나 추가 청구액이 아닙니다.`,
+    en: (input: string, output: string) =>
+      `Provider-reported usage for this conversation: input ${input}, output ${output}. Estimated cost is unknown without applicable pricing and cost evidence. This is not remaining account quota or an additional charge.`,
+    "zh-Hans": (input: string, output: string) =>
+      `服务提供商报告的此对话用量：输入 ${input}，输出 ${output}。由于没有适用的价格和成本依据，估计成本未知。这不是账户的剩余额度，也不是额外的费用。`,
+    "zh-Hant": (input: string, output: string) =>
+      `服務提供商報告的此對話用量：輸入 ${input}，輸出 ${output}。由於沒有適用的價格和成本依據，估計成本未知。這不是帳戶的剩餘額度，也不是額外的費用。`,
+    ja: (input: string, output: string) =>
+      `この会話についてプロバイダーが報告した使用量：入力 ${input}、出力 ${output}。適用できる単価やコストの根拠がないため、見積もりコストは不明です。アカウントの残り枠や追加の請求額ではありません。`,
+  },
+  usageCaption: {
+    ko: (total: string, partial: boolean) =>
+      `이 대화의 사용 토큰 ${total}${partial ? " (부분 관측)" : ""} · 추정 비용 미확인`,
+    en: (total: string, partial: boolean) =>
+      `Tokens used in this conversation ${total}${partial ? " (partially observed)" : ""} · Estimated cost unknown`,
+    "zh-Hans": (total: string, partial: boolean) =>
+      `此对话已用 token ${total}${partial ? "（部分观察到）" : ""} · 估计成本未知`,
+    "zh-Hant": (total: string, partial: boolean) =>
+      `此對話已用 token ${total}${partial ? "（部分觀察到）" : ""} · 估計成本未知`,
+    ja: (total: string, partial: boolean) =>
+      `この会話の使用トークン ${total}${partial ? "（一部のみ観測）" : ""} · 見積もりコストは不明`,
+  },
+  evidenceButton: {
+    ko: (n: number | string) => `근거 ${n} 보기`,
+    en: (n: number | string) => `View evidence ${n}`,
+    "zh-Hans": (n: number | string) => `查看证据 ${n}`,
+    "zh-Hant": (n: number | string) => `檢視證據 ${n}`,
+    ja: (n: number | string) => `根拠 ${n} を見る`,
+  },
+  technicalPhrases: {
+    ko: (count: number) => `기록된 상세 문구 ${count}개`,
+    en: (count: number) => `${count} recorded technical ${count === 1 ? "phrase" : "phrases"}`,
+    "zh-Hans": (count: number) => `${count} 条已记录的详细措辞`,
+    "zh-Hant": (count: number) => `${count} 條已記錄的詳細措辭`,
+    ja: (count: number) => `記録された詳細な文言 ${count} 件`,
+  },
+  reviewStages: {
+    ko: (count: number) => `검토 단계 ${count}개`,
+    en: (count: number) => `${count} review ${count === 1 ? "stage" : "stages"}`,
+    "zh-Hans": (count: number) => `${count} 个审查阶段`,
+    "zh-Hant": (count: number) => `${count} 個審查階段`,
+    ja: (count: number) => `レビューの段階 ${count} 件`,
+  },
+  requirementAssessments: {
+    ko: (count: number) => `조건별 평가 ${count}건`,
+    en: (count: number) => `${count} condition ${count === 1 ? "assessment" : "assessments"}`,
+    "zh-Hans": (count: number) => `${count} 项按条件的评估`,
+    "zh-Hant": (count: number) => `${count} 項按條件的評估`,
+    ja: (count: number) => `条件ごとの評価 ${count} 件`,
+  },
+  technicalCodes: {
+    ko: (count: number) => `기록된 상세 코드 ${count}개`,
+    en: (count: number) => `${count} recorded technical ${count === 1 ? "code" : "codes"}`,
+    "zh-Hans": (count: number) => `${count} 个已记录的详细代码`,
+    "zh-Hant": (count: number) => `${count} 個已記錄的詳細程式碼`,
+    ja: (count: number) => `記録された詳細コード ${count} 件`,
+  },
+  linkedEvidence: {
+    ko: (count: number) => `연결된 근거 ${count}개`,
+    en: (count: number) => `${count} linked evidence ${count === 1 ? "reference" : "references"}`,
+    "zh-Hans": (count: number) => `${count} 条关联证据`,
+    "zh-Hant": (count: number) => `${count} 條關聯證據`,
+    ja: (count: number) => `結びついた根拠 ${count} 件`,
+  },
+  answerEvidence: {
+    ko: (count: number) => ` 답변 근거 ${count}개는 '근거 원문'에서 볼 수 있습니다.`,
+    en: (count: number) =>
+      ` The answer's ${count} evidence ${count === 1 ? "reference is" : "references are"} available under Original evidence.`,
+    "zh-Hans": (count: number) => `回答的 ${count} 条证据可在“原始证据”中查看。`,
+    "zh-Hant": (count: number) => `回答的 ${count} 條證據可在“原始證據”中檢視。`,
+    ja: (count: number) => `回答の根拠 ${count} 件は、「元の根拠」で見られます。`,
+  },
+  answerChecks: {
+    ko: (count: number) => `답변 점검 항목 ${count}개`,
+    en: (count: number) => `${count} answer ${count === 1 ? "check" : "checks"}`,
+    "zh-Hans": (count: number) => `${count} 项回答核查`,
+    "zh-Hant": (count: number) => `${count} 項回答核查`,
+    ja: (count: number) => `回答チェック ${count} 件`,
+  },
+  inputSame: {
+    ko: (count: number) => `시험에 쓴 입력 파일은 이전과 같습니다(${count}개).`,
+    en: (count: number) =>
+      `The test uses the same ${count} input ${count === 1 ? "file" : "files"} as before.`,
+    "zh-Hans": (count: number) => `测试使用的输入文件与之前相同（${count} 个）。`,
+    "zh-Hant": (count: number) => `測試使用的輸入檔案與之前相同（${count} 個）。`,
+    ja: (count: number) => `テストで使った入力ファイルは、以前と同じです（${count} 件）。`,
+  },
+  inputDifference: {
+    ko: (before: number, after: number, removed: number, added: number) =>
+      `시험에 쓴 입력 파일이 이전과 다릅니다. 이전 ${before}개, 지금 ${after}개, 빠진 것 ${removed}개, 새로 들어온 것 ${added}개입니다.`,
+    en: (before: number, after: number, removed: number, added: number) =>
+      `The test inputs changed: ${before} files before, ${after} now, ${removed} removed and ${added} added.`,
+    "zh-Hans": (before: number, after: number, removed: number, added: number) =>
+      `测试使用的输入文件与之前不同：之前 ${before} 个，现在 ${after} 个，移除了 ${removed} 个，新增了 ${added} 个。`,
+    "zh-Hant": (before: number, after: number, removed: number, added: number) =>
+      `測試使用的輸入檔案與之前不同：之前 ${before} 個，現在 ${after} 個，移除了 ${removed} 個，新增了 ${added} 個。`,
+    ja: (before: number, after: number, removed: number, added: number) =>
+      `テストで使った入力ファイルが以前と異なります。以前 ${before} 件、現在 ${after} 件、外れたもの ${removed} 件、新しく加わったもの ${added} 件です。`,
+  },
 } as const;

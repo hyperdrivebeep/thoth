@@ -3,20 +3,24 @@ import type { reviewPanelsMessages } from "../reviewPanelsMessages";
 
 export const reviewPanelsJa: ColumnOf<typeof reviewPanelsMessages> = {
   "absence.title": "「存在しない」という主張の文字列チェック",
-  "absence.limitation": "記録された抽出範囲の中で、モデルが宣言した文字列だけを確認しました。資料全体に存在しないことの証明にはならず、意味や事実の検証でもありません。",
-  "absence.empty": "確認の対象として宣言された「存在しない」という主張はありません。すべての文を確認したという意味ではありません。",
+  "absence.limitation":
+    "記録された抽出範囲の中で、モデルが宣言した文字列だけを確認しました。資料全体に存在しないことの証明にはならず、意味や事実の検証でもありません。",
+  "absence.empty":
+    "確認の対象として宣言された「存在しない」という主張はありません。すべての文を確認したという意味ではありません。",
   "absence.inInput": "モデルは、自分の入力に含まれる文字列が存在しないと主張しました",
   "absence.outsideInput": "モデルの入力の外にある許可された資料で見つかりました",
   "absence.inputUnchecked": "許可された資料で見つかりました。モデルの入力範囲は未確認です",
   "absence.notFound": "確認した範囲では見つかりませんでした",
   "absence.found": "見つかりました",
-  "absence.unsupported": "対応していないチェックです。資料の文字列の宣言または識別子を確認してください",
+  "absence.unsupported":
+    "対応していないチェックです。資料の文字列の宣言または識別子を確認してください",
   "absence.notChecked": "未確認 · 判断できません",
   "absence.inputScope": "モデルの入力",
   "absence.allowedScope": "調査開始時に許可されていた抽出済みの資料",
   "absence.notDelivered": "追加の裏づけは、次のモデルの入力に渡されませんでした。",
   "numeric.title": "資料の数値から計算した値",
-  "numeric.limitation": "因果関係や計算量の判定ではありません。印字された値の算術は、測定の妥当性や公式の基準への適合を示すものではありません。表示される値は小数第6位で丸められています。",
+  "numeric.limitation":
+    "因果関係や計算量の判定ではありません。印字された値の算術は、測定の妥当性や公式の基準への適合を示すものではありません。表示される値は小数第6位で丸められています。",
   "numeric.series": "系列",
   "numeric.interval": "サイズの区間",
   "numeric.operation": "演算",
@@ -26,14 +30,17 @@ export const reviewPanelsJa: ColumnOf<typeof reviewPanelsMessages> = {
   "numeric.difference": "値の差",
   "numeric.slope": "区間の両対数の傾き",
   "numeric.notCalculated": "未計算",
-  "numeric.unsupported": "グループ、数値、単位が不明確だったため、一部の項目は計算されませんでした。",
+  "numeric.unsupported":
+    "グループ、数値、単位が不明確だったため、一部の項目は計算されませんでした。",
   "numeric.notDelivered": "一部の計算記録は、モデルの入力に含まれませんでした。",
   "reviewDialog.required": "理由を1つ以上選んでください。",
   "reviewDialog.title": "判定のレビューを依頼",
-  "reviewDialog.notice": "AI が根拠をもう一度確認し、判定を維持するか、変更するか、保留にするかを決めます。依頼しただけでは、判定の値は変わりません。調査が実行中の場合は、その実行が終わったあとに適用されます。",
+  "reviewDialog.notice":
+    "AI が根拠をもう一度確認し、判定を維持するか、変更するか、保留にするかを決めます。依頼しただけでは、判定の値は変わりません。調査が実行中の場合は、その実行が終わったあとに適用されます。",
   "reviewDialog.failed": "レビューの依頼を送信できませんでした。",
   "reviewDialog.send": "レビューの依頼を送信",
-  "hypothesisFields.unconfirmed": "原因は未確認 — どの仮説も裏づけられていません。原因が存在しないという意味ではありません",
+  "hypothesisFields.unconfirmed":
+    "原因は未確認 — どの仮説も裏づけられていません。原因が存在しないという意味ではありません",
   "hypothesisFields.gaps": "残っている不足",
   "hypothesisFields.inference": "推論（仮説）",
   "hypothesisFields.assumptions": "前提",
@@ -46,14 +53,16 @@ export const reviewPanelsJa: ColumnOf<typeof reviewPanelsMessages> = {
   "reviewStatus.afterCurrent": "· 現在の調査のあとで適用されます",
   "reviewStatus.request": "レビューを依頼",
   "facts.title": "AI レビューの要約（引用位置のみ確認）",
-  "facts.documentOnly": "· AI のレビュアーが書いたものです。確認したのは引用された位置だけで、記述が正しいか、基準を満たすかは確認していません",
+  "facts.documentOnly":
+    "· AI のレビュアーが書いたものです。確認したのは引用された位置だけで、記述が正しいか、基準を満たすかは確認していません",
   "facts.legacy": "この古い結果の形式には、構造化された AI レビューの要約がありません。",
   "facts.empty": "構造化された AI レビューの要約なし",
   "facts.notFound": "AI が検索し、見つからなかったと報告しています",
   "sourceTime.correctReason": "日付の根拠を訂正",
   "sourceTime.advanced": "上級者向け · 資料の基準時点",
   "sourceTime.state": "基準時点の状態",
-  "sourceTime.notice": "状態のドロップダウンだけでは、あとの資料を対象にすることはできません。ユーザーが検証したあとでのみ変更してください。",
+  "sourceTime.notice":
+    "状態のドロップダウンだけでは、あとの資料を対象にすることはできません。ユーザーが検証したあとでのみ変更してください。",
   "sourceTime.eligible": "基準時点までに存在していたとして記録",
   "sourceTime.after": "基準時点より後として記録",
   "sourceTime.unknown": "未検証に戻す",
@@ -81,7 +90,8 @@ export const reviewPanelsJa: ColumnOf<typeof reviewPanelsMessages> = {
   "revision.current": "現在",
   "revision.difference": "選択した記録と現在のバージョンの違い",
   "revision.compare": "変更を比較",
-  "revision.notice": "保存されている2つのバージョンです。記録されていない変更の理由は推測しません。",
+  "revision.notice":
+    "保存されている2つのバージョンです。記録されていない変更の理由は推測しません。",
   "revision.partial": "一部の変更は分類できませんでした。検証できる違いだけを表示しています。",
   "revision.same": "検証済みの内容は変わっていません。",
   "revision.content": "内容の変更",
@@ -89,7 +99,8 @@ export const reviewPanelsJa: ColumnOf<typeof reviewPanelsMessages> = {
   "revision.diagnostics": "比較の診断",
   "citation.ready": "引用可能",
   "citation.afterCutoff": "この資料は基準時点より後のもので、引用には含まれません。",
-  "citation.prohibited": "この資料の使用は禁止されています。日付を検証しても、この制限は解除されません。",
+  "citation.prohibited":
+    "この資料の使用は禁止されています。日付を検証しても、この制限は解除されません。",
   "citation.confirmed": "時点を検証しました。引用可能です。",
   "actionDraft.fromTest": "このテストから行動のリクエストを準備",
   "actionDraft.noModel": "承認を与えず、モデルも呼び出さずに、リクエストを準備します。",

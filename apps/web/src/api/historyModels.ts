@@ -10,7 +10,15 @@ export type RecordReference = {
   entityId?: string;
 };
 export type HistorySelection =
-  | { kind: "result"; scope: HistoryScope & { threadId: string; requestDigest: string }; operationId?: string; resultDigest?: string; record?: RecordReference; occurredAt?: string; title?: string }
+  | {
+      kind: "result";
+      scope: HistoryScope & { threadId: string; requestDigest: string };
+      operationId?: string;
+      resultDigest?: string;
+      record?: RecordReference;
+      occurredAt?: string;
+      title?: string;
+    }
   | { kind: "record"; scope: HistoryScope; record: RecordReference };
 export type Currentness = { state: string; reasons: string[] };
 export type ChangeSummary = {
@@ -63,7 +71,12 @@ export type HistoryEntry = {
   availability: string;
   reasons: string[];
   currentHead: string | null;
-  capability: { restore: string; applyReady: boolean; previewSupported: boolean; reasons: string[] };
+  capability: {
+    restore: string;
+    applyReady: boolean;
+    previewSupported: boolean;
+    reasons: string[];
+  };
   restoreSelection: RestoreSelection | null;
   changeSummary?: ChangeSummary | null;
   technical: unknown;
@@ -101,11 +114,35 @@ export type RestoreResult = {
 };
 
 export function selectionKey(selection: HistorySelection): string {
-  return JSON.stringify(selection.kind === "result"
-    ? [selection.kind, selection.scope.projectId, selection.scope.threadId, selection.scope.requestDigest, selection.operationId, selection.resultDigest, selection.record?.id]
-    : [selection.kind, selection.scope.projectId, selection.scope.threadId, selection.scope.requestDigest, selection.record.owner, selection.record.id, selection.record.digest]);
+  return JSON.stringify(
+    selection.kind === "result"
+      ? [
+          selection.kind,
+          selection.scope.projectId,
+          selection.scope.threadId,
+          selection.scope.requestDigest,
+          selection.operationId,
+          selection.resultDigest,
+          selection.record?.id,
+        ]
+      : [
+          selection.kind,
+          selection.scope.projectId,
+          selection.scope.threadId,
+          selection.scope.requestDigest,
+          selection.record.owner,
+          selection.record.id,
+          selection.record.digest,
+        ],
+  );
 }
 
 export function restoreKey(selection: RestoreSelection): string {
-  return JSON.stringify([selection.projectId, selection.entityType, selection.entityId, selection.targetDigest, selection.expectedHead]);
+  return JSON.stringify([
+    selection.projectId,
+    selection.entityType,
+    selection.entityId,
+    selection.targetDigest,
+    selection.expectedHead,
+  ]);
 }

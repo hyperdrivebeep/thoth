@@ -2,9 +2,10 @@ import type { ColumnOf } from "../withColumns";
 import type { reviewPanelsMessages } from "../reviewPanelsMessages";
 
 export const reviewPanelsZhHant: ColumnOf<typeof reviewPanelsMessages> = {
-  "absence.title": "對\"不存在\"主張的字面檢查",
-  "absence.limitation": "只在記錄的提取範圍內檢查了模型聲明的字串。這並不能證明整個資料中不存在，也不能驗證含義或事實。",
-  "absence.empty": "沒有聲明任何需要檢查的\"不存在\"主張。這並不表示每一句話都被檢查過。",
+  "absence.title": '對"不存在"主張的字面檢查',
+  "absence.limitation":
+    "只在記錄的提取範圍內檢查了模型聲明的字串。這並不能證明整個資料中不存在，也不能驗證含義或事實。",
+  "absence.empty": '沒有聲明任何需要檢查的"不存在"主張。這並不表示每一句話都被檢查過。',
   "absence.inInput": "模型聲稱不存在的字串，實際存在於它的輸入中",
   "absence.outsideInput": "在模型輸入之外的允許材料中找到",
   "absence.inputUnchecked": "在允許材料中找到；模型輸入範圍未檢查",
@@ -16,7 +17,8 @@ export const reviewPanelsZhHant: ColumnOf<typeof reviewPanelsMessages> = {
   "absence.allowedScope": "調查開始時允許使用的提取材料",
   "absence.notDelivered": "附加的佐證沒有傳遞到下一次模型輸入中。",
   "numeric.title": "根據資料中的數字計算出的值",
-  "numeric.limitation": "這不是因果判斷，也不是計算複雜度的判定。對印出的數值做算術運算，並不能證明測量有效，也不能證明符合正式標準。顯示的值四捨五入到六位小數。",
+  "numeric.limitation":
+    "這不是因果判斷，也不是計算複雜度的判定。對印出的數值做算術運算，並不能證明測量有效，也不能證明符合正式標準。顯示的值四捨五入到六位小數。",
   "numeric.series": "序列",
   "numeric.interval": "規模區間",
   "numeric.operation": "運算",
@@ -30,7 +32,8 @@ export const reviewPanelsZhHant: ColumnOf<typeof reviewPanelsMessages> = {
   "numeric.notDelivered": "部分計算記錄沒有包含在模型輸入中。",
   "reviewDialog.required": "請至少選擇一個原因。",
   "reviewDialog.title": "請求審查評估",
-  "reviewDialog.notice": "AI 將重新審查證據，並決定保留、更改還是暫緩該評估。僅提出請求不會更改任何評估值。如果研究正在執行，則在這次執行結束後應用。",
+  "reviewDialog.notice":
+    "AI 將重新審查證據，並決定保留、更改還是暫緩該評估。僅提出請求不會更改任何評估值。如果研究正在執行，則在這次執行結束後應用。",
   "reviewDialog.failed": "無法傳送審查請求。",
   "reviewDialog.send": "傳送審查請求",
   "hypothesisFields.unconfirmed": "原因未確認 — 沒有任何假設得到支持；這並不表示不存在原因",
@@ -46,7 +49,8 @@ export const reviewPanelsZhHant: ColumnOf<typeof reviewPanelsMessages> = {
   "reviewStatus.afterCurrent": "· 在目前調查結束後應用",
   "reviewStatus.request": "請求審查",
   "facts.title": "AI 審查摘要（僅檢查了引用位置）",
-  "facts.documentOnly": "· 由 AI 審查員撰寫；只檢查了所引用的位置，沒有檢查陳述是否屬實，也沒有檢查標準是否滿足",
+  "facts.documentOnly":
+    "· 由 AI 審查員撰寫；只檢查了所引用的位置，沒有檢查陳述是否屬實，也沒有檢查標準是否滿足",
   "facts.legacy": "這個較早的結果格式沒有結構化的 AI 審查摘要。",
   "facts.empty": "沒有結構化的 AI 審查摘要",
   "facts.notFound": "AI 已搜尋並報告未找到",

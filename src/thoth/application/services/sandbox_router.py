@@ -33,9 +33,7 @@ class RegisteredSandboxRouter(SandboxCapabilityRouterPort):
             ),
         )
 
-    def resolve(
-        self, profile: SandboxRuntimeProfile
-    ) -> tuple[SandboxPort, SandboxCapability]:
+    def resolve(self, profile: SandboxRuntimeProfile) -> tuple[SandboxPort, SandboxCapability]:
         try:
             adapter, capability = self._values[profile]
         except KeyError as exc:

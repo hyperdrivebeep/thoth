@@ -35,18 +35,21 @@ export const setupZhHant: ColumnOf<typeof setupMessages> = {
   "setup.connectLater": "稍後連線",
   "setup.next": "下一步",
   "setup.webQuestion": "是否允許在此工作區存取公共網路？",
-  "setup.hostedDisclosure": "問題和用於分析的資料會傳送到運營方的 OpenAI API。網路同意只涵蓋資料檢索，與模型呼叫分開。",
-  "setup.localDisclosure": "這與模型呼叫是分開的。允許存取網路不會自動為各專案啟用。只有在專案中登記了網站之後，研究才會在網路上搜尋。",
+  "setup.hostedDisclosure":
+    "問題和用於分析的資料會傳送到運營方的 OpenAI API。網路同意只涵蓋資料檢索，與模型呼叫分開。",
+  "setup.localDisclosure":
+    "這與模型呼叫是分開的。允許存取網路不會自動為各專案啟用。只有在專案中登記了網站之後，研究才會在網路上搜尋。",
   "setup.operatorNotReady": "運營方的模型尚未就緒。請不要輸入金鑰。",
   "setup.allow": "允許",
-  "setup.allowedScope": "檢查完已連線的檔案之後，研究只能搜尋專案中登記的網站。允許存取並不會開始搜尋。",
+  "setup.allowedScope":
+    "檢查完已連線的檔案之後，研究只能搜尋專案中登記的網站。允許存取並不會開始搜尋。",
   "setup.deny": "拒絕",
   "setup.hostedDeny": "這隻會拒絕網路檢索。問題和分析仍會傳送到運營方的模型。",
   "setup.localDeny": "這隻會拒絕網路檢索。模型呼叫會繼續。",
   "setup.noCredential": "請不要輸入登入資訊或 API 金鑰。",
   "setup.backToModel": "返回模型連線",
   "setup.toProjects": "前往專案",
-  "setup.chooseConsent": "請選擇\"允許\"或\"拒絕\"以繼續前往專案。",
+  "setup.chooseConsent": '請選擇"允許"或"拒絕"以繼續前往專案。',
   "model.missingCapability": "已儲存的模型不在目前的模型列表中。",
   "model.unsupportedEffort": "已儲存的推理強度不受此模型支援。",
   "model.incompleteRoute": "已儲存的模型途徑不完整。",
@@ -64,6 +67,7 @@ export const setupZhHant: ColumnOf<typeof setupMessages> = {
   "model.default": "預設",
   "model.saveThread": "儲存為此對話的預設設定",
   "model.saveProject": "儲存為專案的預設設定",
-  "model.nextRequestOnly": "未儲存的選擇只對下一次請求有效。模型出現在列表中，並不表示服務提供商的身分驗證已透過或能成功執行。",
+  "model.nextRequestOnly":
+    "未儲存的選擇只對下一次請求有效。模型出現在列表中，並不表示服務提供商的身分驗證已透過或能成功執行。",
   "model.saved": "預設設定已儲存。",
 };

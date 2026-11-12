@@ -4,27 +4,89 @@ import type { DecisionDelta } from "../../api/researchFollowup";
 import { DecisionDeltaView } from "./DecisionDeltaComparison";
 
 const digest = "a".repeat(64);
-const state = (status: string, relation = "QUALIFIES", validation = "INCONCLUSIVE", blocker = "RESEARCH_GAP") => ({ status, relation, validation, blocker });
-const item = (requirement_id: string, question: string, match: "SAME" | "ADDED" | "REMOVED", before: object | null, after: object | null, extra: Record<string, unknown> = {}) =>
-  ({ requirement_id, target: "RESEARCH_GAP", question, match, before, after, evidence_refs_added: [], evidence_refs_removed: [], unchanged_hold: false, ...extra });
-const delta = (criteria: unknown[], criteria_state: "AVAILABLE" | "UNAVAILABLE" = "AVAILABLE"): DecisionDelta => ({
-  schema_version: "1.0.0", contract_version: 2, project_id: "p", thread_id: "t",
-  before: { request_revision_digest: digest, result_revision_digest: digest }, after: { request_revision_digest: digest, result_revision_digest: digest },
-  state: "CHANGED", reason_state: "UNKNOWN_REASON", reason_codes: [], reason_refs: [],
-  basis_currentness: { before: { state: "CURRENT", reasons: [], execution_eligible: true }, after: { state: "CURRENT", reasons: [], execution_eligible: true } },
-  groups: [{ kind: "CONTENT", trace_paths: ["/result/answer"], changes: [{ path: "/result/answer", before_present: true, after_present: true, before: "이전 답", after: "새 답" }] }],
-  criteria, criteria_state,
-}) as DecisionDelta;
-const render = (value: DecisionDelta) => renderToStaticMarkup(<DecisionDeltaView delta={value}/>);
+const state = (
+  status: string,
+  relation = "QUALIFIES",
+  validation = "INCONCLUSIVE",
+  blocker = "RESEARCH_GAP",
+) => ({ status, relation, validation, blocker });
+const item = (
+  requirement_id: string,
+  question: string,
+  match: "SAME" | "ADDED" | "REMOVED",
+  before: object | null,
+  after: object | null,
+  extra: Record<string, unknown> = {},
+) => ({
+  requirement_id,
+  target: "RESEARCH_GAP",
+  question,
+  match,
+  before,
+  after,
+  evidence_refs_added: [],
+  evidence_refs_removed: [],
+  unchanged_hold: false,
+  ...extra,
+});
+const delta = (
+  criteria: unknown[],
+  criteria_state: "AVAILABLE" | "UNAVAILABLE" = "AVAILABLE",
+): DecisionDelta =>
+  ({
+    schema_version: "1.0.0",
+    contract_version: 2,
+    project_id: "p",
+    thread_id: "t",
+    before: { request_revision_digest: digest, result_revision_digest: digest },
+    after: { request_revision_digest: digest, result_revision_digest: digest },
+    state: "CHANGED",
+    reason_state: "UNKNOWN_REASON",
+    reason_codes: [],
+    reason_refs: [],
+    basis_currentness: {
+      before: { state: "CURRENT", reasons: [], execution_eligible: true },
+      after: { state: "CURRENT", reasons: [], execution_eligible: true },
+    },
+    groups: [
+      {
+        kind: "CONTENT",
+        trace_paths: ["/result/answer"],
+        changes: [
+          {
+            path: "/result/answer",
+            before_present: true,
+            after_present: true,
+            before: "이전 답",
+            after: "새 답",
+          },
+        ],
+      },
+    ],
+    criteria,
+    criteria_state,
+  }) as DecisionDelta;
+const render = (value: DecisionDelta) => renderToStaticMarkup(<DecisionDeltaView delta={value} />);
 const visible = (html: string) => html.replace(/<details[\s\S]*?<\/details>/g, "");
 
 it("groups criteria into changed, still on hold, and new or gone", () => {
-  const html = render(delta([
-    item("check:0", "적용 문서 버전이 현재인가", "SAME", state("UNRESOLVED"), state("SATISFIED", "SUPPORTS", "APPLIED", ""), { evidence_refs_added: ["span:new-1", "span:new-2"] }),
-    item("check:1", "센서 조합이 명시되는가", "SAME", state("UNRESOLVED"), state("UNRESOLVED"), { unchanged_hold: true }),
-    item("check:2", "시험 환경이 적혀 있는가", "ADDED", null, state("UNRESOLVED")),
-    item("check:3", "옛 기준 질문", "REMOVED", state("UNRESOLVED"), null),
-  ]));
+  const html = render(
+    delta([
+      item(
+        "check:0",
+        "적용 문서 버전이 현재인가",
+        "SAME",
+        state("UNRESOLVED"),
+        state("SATISFIED", "SUPPORTS", "APPLIED", ""),
+        { evidence_refs_added: ["span:new-1", "span:new-2"] },
+      ),
+      item("check:1", "센서 조합이 명시되는가", "SAME", state("UNRESOLVED"), state("UNRESOLVED"), {
+        unchanged_hold: true,
+      }),
+      item("check:2", "시험 환경이 적혀 있는가", "ADDED", null, state("UNRESOLVED")),
+      item("check:3", "옛 기준 질문", "REMOVED", state("UNRESOLVED"), null),
+    ]),
+  );
   const text = visible(html);
   expect(text).toContain("바뀐 기준 1");
   expect(text).toContain("계속 보류 1");
@@ -50,8 +112,16 @@ it("counts a criterion that stayed fulfilled without listing it as a change", ()
 });
 
 it("keeps the answer-level diff folded under detail changes once criteria are shown", () => {
-  const html = render(delta([item("check:0", "기준", "SAME", state("UNRESOLVED"), state("UNRESOLVED"), { unchanged_hold: true })]));
-  expect(html).toMatch(/<details[^>]*class="decision-delta-details"[^>]*><summary>세부 변경<\/summary>[\s\S]*답변 전체 변경/);
+  const html = render(
+    delta([
+      item("check:0", "기준", "SAME", state("UNRESOLVED"), state("UNRESOLVED"), {
+        unchanged_hold: true,
+      }),
+    ]),
+  );
+  expect(html).toMatch(
+    /<details[^>]*class="decision-delta-details"[^>]*><summary>세부 변경<\/summary>[\s\S]*답변 전체 변경/,
+  );
   expect(visible(html)).not.toContain("서버 기록 변경");
 });
 
@@ -62,4 +132,3 @@ it("says criteria could not be compared instead of listing everything as new", (
   expect(html).not.toContain("decision-delta-details");
   expect(html).toContain("답변 전체 변경");
 });
-

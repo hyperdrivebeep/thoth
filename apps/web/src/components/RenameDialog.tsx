@@ -7,7 +7,15 @@ import { useReturnFocus } from "./returnFocus";
 const NAME_LIMIT = 500;
 
 /** Asks for a new name. Saving is off while the name is empty or unchanged. */
-export function RenameDialog({ title, current, notice, pending = false, error, onSave, onClose }: {
+export function RenameDialog({
+  title,
+  current,
+  notice,
+  pending = false,
+  error,
+  onSave,
+  onClose,
+}: {
   title: string;
   current: string;
   notice?: ReactNode;
@@ -27,7 +35,7 @@ export function RenameDialog({ title, current, notice, pending = false, error, o
   return (
     <Dialog isOpen onClose={close} title={title} className="rename-dialog">
       <form
-        onSubmit={event => {
+        onSubmit={(event) => {
           event.preventDefault();
           if (canSave) onSave(trimmed);
         }}
@@ -36,12 +44,13 @@ export function RenameDialog({ title, current, notice, pending = false, error, o
           <label>
             {t("manage.nameLabel")}
             <InputGroup
+              // eslint-disable-next-line jsx-a11y/no-autofocus -- the person has just opened this window to type the name; its only field takes the focus
               autoFocus
               aria-label={t("manage.nameLabel")}
               value={name}
               maxLength={NAME_LIMIT}
               disabled={pending}
-              onChange={event => setName(event.target.value)}
+              onChange={(event) => setName(event.target.value)}
             />
           </label>
           {notice && <p className="muted">{notice}</p>}

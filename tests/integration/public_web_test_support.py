@@ -48,6 +48,7 @@ def rpc_value(response: JsonRpcResponse) -> dict[str, object]:
     assert response.result is not None
     return record(response.result["value"])
 
+
 LISTING_URI = "https://arxiv.org/list/cs.LG/recent"
 PAPER_URI = "https://arxiv.org/abs/2609.00001"
 UNOBSERVED_URI = "https://arxiv.org/abs/9999.99999"

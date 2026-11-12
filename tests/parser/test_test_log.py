@@ -18,9 +18,7 @@ def test_jsonl_test_log_preserves_run_and_malformed_line(artifact_factory: Any) 
         }
     )
     raw = f"{valid}\nnot-json\n".encode()
-    artifact = artifact_factory(
-        raw, "application/vnd.thoth.test-log+jsonl", ".testlog.jsonl"
-    )
+    artifact = artifact_factory(raw, "application/vnd.thoth.test-log+jsonl", ".testlog.jsonl")
 
     document = default_parser_registry().parse(artifact, raw)
 

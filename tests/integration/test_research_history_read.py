@@ -47,6 +47,7 @@ def _history_host(runtime: AppRuntime) -> ResearchHistoryHandlers:
     assert isinstance(owner, ResearchHistoryHandlers)
     return owner
 
+
 async def test_history_query_is_read_only_and_scope_mismatch_is_rejected(tmp_path: Path) -> None:
     runtime = await setup(tmp_path, ControlledResearchModel(), source=False)
     try:
@@ -144,6 +145,7 @@ async def test_branch_read_and_watermark_exclude_later_insert_and_hidden_page_co
         assert detail.current_head_digest != branch.revision_digest
         service = _history_host(runtime).history
         service.scan_limit = 2
+
         def deny_revision(*args: object) -> bool:
             return False
 
@@ -153,11 +155,7 @@ async def test_branch_read_and_watermark_exclude_later_insert_and_hidden_page_co
             await runtime.bus.query(request("revision/timeline/read", "hidden", query)),
             HistoryPage,
         )
-        assert (
-            hidden.items == ()
-            and hidden.next_cursor
-            and hidden.coverage.scan == "LIMITED"
-        )
+        assert hidden.items == () and hidden.next_cursor and hidden.coverage.scan == "LIMITED"
         advanced = _rpc_model(
             await runtime.bus.query(
                 request(
@@ -178,19 +176,21 @@ async def test_exact_old_result_does_not_read_the_new_request(tmp_path: Path) ->
     model = ControlledResearchModel()
     runtime = await setup(tmp_path, model, source=False)
     try:
-        first = _record(value(
-            await runtime.bus.dispatch(
-                request(
-                    "thread/start",
-                    "first",
-                    {
-                        "project_id": "p",
-                        "problem": "First question",
-                        "contract_version": 2,
-                    },
+        first = _record(
+            value(
+                await runtime.bus.dispatch(
+                    request(
+                        "thread/start",
+                        "first",
+                        {
+                            "project_id": "p",
+                            "problem": "First question",
+                            "contract_version": 2,
+                        },
+                    )
                 )
             )
-        ))
+        )
         await runtime.bus.drain()
         value(
             await runtime.bus.dispatch(
@@ -208,18 +208,20 @@ async def test_exact_old_result_does_not_read_the_new_request(tmp_path: Path) ->
         )
         await runtime.bus.drain()
         calls = len(model.calls)
-        conversation = _record(value(
-            await runtime.bus.query(
-                request(
-                    "thread/activity/list",
-                    "conversation",
-                    {
-                        "project_id": "p",
-                        "thread_id": _text(first["thread_id"]),
-                    },
+        conversation = _record(
+            value(
+                await runtime.bus.query(
+                    request(
+                        "thread/activity/list",
+                        "conversation",
+                        {
+                            "project_id": "p",
+                            "thread_id": _text(first["thread_id"]),
+                        },
+                    )
                 )
             )
-        ))["conversation"]
+        )["conversation"]
         conversation = _record(conversation)
         first_turn = _record(_items(conversation["turns"])[0])
         old_request_digest = _text(first_turn["request_revision_digest"])
@@ -241,10 +243,7 @@ async def test_exact_old_result_does_not_read_the_new_request(tmp_path: Path) ->
         assert old.request["effective_question"] == "First question"
         assert old.operation_id == first["operation_id"]
         assert old.manifest is not None
-        assert (
-            _record(old.manifest["request_ref"])["revision_digest"]
-            == old_request_digest
-        )
+        assert _record(old.manifest["request_ref"])["revision_digest"] == old_request_digest
         assert len(model.calls) == calls
         assert_phase_delta(before, snapshot(runtime.ledger.engine))
     finally:

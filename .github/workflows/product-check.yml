@@ -93,6 +93,9 @@ jobs:
       - name: Python lint
         if: needs.changes.outputs.docs_only != 'true'
         run: .\.venv\Scripts\python.exe -m ruff check src apps tests migrations
+      - name: Python format
+        if: needs.changes.outputs.docs_only != 'true'
+        run: .\.venv\Scripts\python.exe -m ruff format --check src apps tests migrations
       - name: Runtime architecture
         if: needs.changes.outputs.docs_only != 'true'
         run: .\.venv\Scripts\python.exe scripts/check_architecture.py

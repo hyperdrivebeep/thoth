@@ -171,9 +171,7 @@ class InvestigationService:
                 "budget_usage": value.budget_usage + 1,
                 "observation_count": value.observation_count + observation_count,
                 "open_lead_count": value.open_lead_count + lead_count,
-                "claim_candidate_count": (
-                    value.claim_candidate_count + claim_candidate_count
-                ),
+                "claim_candidate_count": (value.claim_candidate_count + claim_candidate_count),
                 "gap_count": len(remaining_target_gaps),
                 "sufficiency": {
                     "remaining_target_gaps": remaining_target_gaps,

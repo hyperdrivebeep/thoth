@@ -3,20 +3,35 @@ import type { ResponseLanguage } from "./responseLanguages";
 import { z } from "zod";
 import type { Currentness } from "./historyModels";
 import type { CoverageMatrix, NextUserAction, UserProgressSummary } from "./researchFollowup";
-import { readLocalContext, writeLocalContext, type BrowserScope } from "./localWorkspacePersistence";
+import {
+  readLocalContext,
+  writeLocalContext,
+  type BrowserScope,
+} from "./localWorkspacePersistence";
 
 export type ThreadAnalysis = PackRunResult["cycle"] & { selected_evidence_refs: string[] };
 export type ResearchFailure = {
-  primary: {reason_code:string; origin:string; detail?:string | null};
-  secondary?: {reason_code:string; origin:string; detail?:string | null} | null;
+  primary: { reason_code: string; origin: string; detail?: string | null };
+  secondary?: { reason_code: string; origin: string; detail?: string | null } | null;
   remote_observation?: string;
 };
-export type ExecutionError = {message?:string; data?:{reason_code?:string; failure?:ResearchFailure}};
+export type ExecutionError = {
+  message?: string;
+  data?: { reason_code?: string; failure?: ResearchFailure };
+};
 export type ResultManifest = {
   request_ref?: { revision_digest: string };
-  operation_id: string; phase: string; state: string; completion: string; terminal_reason: string | null;
-  basis_digest: string; result: Record<string, unknown>; gaps: string[]; next_steps: string[];
-  source_refs: string[]; /** Not sent by the summary read; the result read has it. */ record_refs?: unknown[];
+  operation_id: string;
+  phase: string;
+  state: string;
+  completion: string;
+  terminal_reason: string | null;
+  basis_digest: string;
+  result: Record<string, unknown>;
+  gaps: string[];
+  next_steps: string[];
+  source_refs: string[];
+  /** Not sent by the summary read; the result read has it. */ record_refs?: unknown[];
 };
 export type CompletedStage = {
   role?: string;
@@ -58,7 +73,16 @@ export type UserActivityLocator = {
   line_end?: number | null;
 };
 export type UserActivityTarget = {
-  kind: "file" | "uri" | "artifact" | "span" | "table_cell" | "line_range" | "database_view" | "sandbox" | "model";
+  kind:
+    | "file"
+    | "uri"
+    | "artifact"
+    | "span"
+    | "table_cell"
+    | "line_range"
+    | "database_view"
+    | "sandbox"
+    | "model";
   title: string;
   display_ref?: string | null;
   host_alias?: string | null;
@@ -95,11 +119,50 @@ export type UserActivityEvent = {
   announce: "none" | "polite" | "assertive";
   phase?: string | null;
   activity_kind: "tool" | "source" | "model" | "sandbox" | "connector" | "judgement" | "control";
-  action: "search" | "open" | "fetch" | "parse" | "read" | "screen" | "select_candidate" | "adopt_support" | "adopt_counter" | "run" | "call_model" | "retry" | "cancel" | "hold" | "stage_complete";
+  action:
+    | "search"
+    | "open"
+    | "fetch"
+    | "parse"
+    | "read"
+    | "screen"
+    | "select_candidate"
+    | "adopt_support"
+    | "adopt_counter"
+    | "run"
+    | "call_model"
+    | "retry"
+    | "cancel"
+    | "hold"
+    | "stage_complete";
   label_ko: string;
   why_ko?: string | null;
-  state: "planned" | "running" | "succeeded" | "failed" | "blocked" | "cancel_requested" | "cancelled" | "timed_out" | "unknown_external_effect";
-  research_relation: "none" | "discovered" | "opened" | "fetched" | "parsed" | "read" | "screened" | "selected_candidate" | "supports" | "contradicts" | "inconclusive" | "held" | "excluded" | "stale" | "access_blocked";
+  state:
+    | "planned"
+    | "running"
+    | "succeeded"
+    | "failed"
+    | "blocked"
+    | "cancel_requested"
+    | "cancelled"
+    | "timed_out"
+    | "unknown_external_effect";
+  research_relation:
+    | "none"
+    | "discovered"
+    | "opened"
+    | "fetched"
+    | "parsed"
+    | "read"
+    | "screened"
+    | "selected_candidate"
+    | "supports"
+    | "contradicts"
+    | "inconclusive"
+    | "held"
+    | "excluded"
+    | "stale"
+    | "access_blocked";
   target?: UserActivityTarget | null;
   tool?: UserActivityTool | null;
   result?: UserActivityResult | null;
@@ -117,8 +180,15 @@ export type UserActivityEvent = {
   };
 };
 export type ResultUsage = {
-  operation_id: string; calls: number; input_tokens: number | null; output_tokens: number | null; total_tokens: number | null;
-  cached_input_tokens: number | null; unreported_calls: number; state: string; wall_ms: number | null;
+  operation_id: string;
+  calls: number;
+  input_tokens: number | null;
+  output_tokens: number | null;
+  total_tokens: number | null;
+  cached_input_tokens: number | null;
+  unreported_calls: number;
+  state: string;
+  wall_ms: number | null;
   /** Calls sent again on their own after an earlier call was cut off. */
   auto_retries?: number;
   /** Part of the figures above that a purpose-marked call used, such as widening the memory question. */
@@ -126,41 +196,107 @@ export type ResultUsage = {
 };
 /** A closed-loop test that was held instead of run. Only a hold with an unsettled earlier run has anything to clear (exits). */
 export type ExecutionHold = {
-  schema_version: string; reason_code: string | null; plan_execution_id: string | null; execution_revision: number | null;
-  attempt_id: string | null; attempt_state: string | null; exits: string[];
-  input_difference: { same?: boolean; previous_count?: number; current_count?: number; removed?: string[]; added?: string[] } | null;
+  schema_version: string;
+  reason_code: string | null;
+  plan_execution_id: string | null;
+  execution_revision: number | null;
+  attempt_id: string | null;
+  attempt_state: string | null;
+  exits: string[];
+  input_difference: {
+    same?: boolean;
+    previous_count?: number;
+    current_count?: number;
+    removed?: string[];
+    added?: string[];
+  } | null;
 };
 export type ResearchStatus = WorkThread & {
-  usage?: { input_tokens: number | null; output_tokens: number | null; total_tokens: number | null; state: string; unreported_calls: number; cumulative_token_limit_enforced: boolean; cached_input_tokens?: number | null };
-  operation_state?: string; operation_error?: ExecutionError | null; request_epoch?: number;
+  usage?: {
+    input_tokens: number | null;
+    output_tokens: number | null;
+    total_tokens: number | null;
+    state: string;
+    unreported_calls: number;
+    cumulative_token_limit_enforced: boolean;
+    cached_input_tokens?: number | null;
+  };
+  operation_state?: string;
+  operation_error?: ExecutionError | null;
+  request_epoch?: number;
   /** Usage per result (operation id), computed by the server when the status is read. */
   result_usage?: Record<string, ResultUsage>;
   failure?: ResearchFailure | null;
-  execution_summary?: {effective_execution_state:string;state_inconsistent:boolean;last_checkpoint_only:boolean;automatic_retry:boolean};
-  freshness?: string; current_result?: ResultManifest | null; previous_result?: ResultManifest | null;
+  execution_summary?: {
+    effective_execution_state: string;
+    state_inconsistent: boolean;
+    last_checkpoint_only: boolean;
+    automatic_retry: boolean;
+  };
+  freshness?: string;
+  current_result?: ResultManifest | null;
+  previous_result?: ResultManifest | null;
   basis_currentness?: Currentness;
   /** Present when the stored result carries a held closed-loop test. */
   execution_hold?: ExecutionHold | null;
   user_progress_summary?: UserProgressSummary | null;
   coverage_matrix?: CoverageMatrix | null;
   next_user_action?: NextUserAction | null;
-  request?: { response_language?: ResponseLanguage; operation_id: string; authored_text?: string; effective_question?: string; model_settings?: unknown; policy_digest?: string; cutoff_at?: string };
+  request?: {
+    response_language?: ResponseLanguage;
+    operation_id: string;
+    authored_text?: string;
+    effective_question?: string;
+    model_settings?: unknown;
+    policy_digest?: string;
+    cutoff_at?: string;
+  };
   completed_stages?: CompletedStage[];
   stage_reuse?: { reused: number; new: number };
   activity_events?: ActivityEvent[];
   user_activity_events?: UserActivityEvent[];
   model_dispatches?: ModelDispatch[];
-  attempt?: { operation_id: string; phase: string; status: string; draft_progress?: unknown; external_effect_state?: string; remote_observation?: string;
+  attempt?: {
+    operation_id: string;
+    phase: string;
+    status: string;
+    draft_progress?: unknown;
+    external_effect_state?: string;
+    remote_observation?: string;
     request_ref?: { revision_digest: string };
-    checkpoint_ref?: { project_id: string; entity_type: string; entity_id: string; revision_digest: string } | null;
+    checkpoint_ref?: {
+      project_id: string;
+      entity_type: string;
+      entity_id: string;
+      revision_digest: string;
+    } | null;
   } | null;
-  budget?: { calls: number; max_calls: number | null; reserved_tokens: number; max_reserved_tokens: number | null; actual_tokens?: number | null; actual_cost?: string | null; max_seconds: number | null; started_at: string } | null;
-  cleanup?: unknown; post_execution_learning_current?: unknown[]; inputs?: unknown[];
+  budget?: {
+    calls: number;
+    max_calls: number | null;
+    reserved_tokens: number;
+    max_reserved_tokens: number | null;
+    actual_tokens?: number | null;
+    actual_cost?: string | null;
+    max_seconds: number | null;
+    started_at: string;
+  } | null;
+  cleanup?: unknown;
+  post_execution_learning_current?: unknown[];
+  inputs?: unknown[];
 };
-export type ResearchAdmission = { contract_version: number; project_id?: string; thread_id: string; operation_id?: string;
-  status?: string; request_epoch?: number | null; terminal_reason?: string | null };
+export type ResearchAdmission = {
+  contract_version: number;
+  project_id?: string;
+  thread_id: string;
+  operation_id?: string;
+  status?: string;
+  request_epoch?: number | null;
+  terminal_reason?: string | null;
+};
 export type WorkspaceLocationInfo = {
-  classification: "KNOWN_LOCAL" | "KNOWN_SYNC" | "REMOTE_SHARE" | "UNSUPPORTED_BRIDGE" | "REMOVABLE" | "UNKNOWN";
+  classification:
+    "KNOWN_LOCAL" | "KNOWN_SYNC" | "REMOTE_SHARE" | "UNSUPPORTED_BRIDGE" | "REMOVABLE" | "UNKNOWN";
   reason_codes: string[];
   confirmed: boolean;
   message_ko: string;
@@ -184,44 +320,119 @@ export type WorkspaceReady = {
   workspace_id?: string;
 };
 
-const stringList=z.array(z.string());
-const dimension=z.object({status:z.string(),reason:z.string()});
-const analysisDisplaySchema=z.object({
-  assessment:z.object({assessment_id:z.string(),derived_status:stringList,missing_items:stringList,
-    scope_identity:dimension,criterion_authority:dimension,evidence_coverage:dimension,comparability:dimension}),
-  portfolio:z.object({portfolio_id:z.string(),hypotheses:z.array(z.object({
-    hypothesis_id:z.string(),statement:z.string(),primary_locus:z.string().nullable(),uncertainty:z.string(),
-    support_evidence_refs:stringList.optional(),evidence_refs:stringList.optional(),counterevidence_refs:stringList.optional(),
-    critical_review:z.object({terminal:z.string()}).passthrough().nullable().optional(),
-    counterevidence_queries:stringList,predicted_observations:stringList,
-    discriminating_tests:z.array(z.object({procedure_candidate:z.string(),expected_if_true:z.string(),expected_if_alternative:z.string(),risk_tier:z.string()})),
-  }))}),
-  action_plan:z.object({plan_id:z.string(),frontier:stringList,alternatives:z.array(z.object({
-    action_id:z.string(),action_family:z.string(),specification:z.string(),expected_information_value:z.string(),
-    risk_tier:z.string(),execution_authority:z.string(),reversibility:z.string(),state:z.string(),source_refs:stringList,missing_evidence:stringList,
-  }))}),
-  commit:z.object({disposition:z.string(),committed_revision_ids:stringList,receipt:z.object({
-    receipt_id:z.string(),receipt_digest:z.string(),claim_scopes:stringList,integrity_state:z.string(),provenance_state:z.string(),semantic_truth_certified:z.boolean(),
-  })}),
-  selected_evidence_refs:stringList,
+const stringList = z.array(z.string());
+const dimension = z.object({ status: z.string(), reason: z.string() });
+const analysisDisplaySchema = z.object({
+  assessment: z.object({
+    assessment_id: z.string(),
+    derived_status: stringList,
+    missing_items: stringList,
+    scope_identity: dimension,
+    criterion_authority: dimension,
+    evidence_coverage: dimension,
+    comparability: dimension,
+  }),
+  portfolio: z.object({
+    portfolio_id: z.string(),
+    hypotheses: z.array(
+      z.object({
+        hypothesis_id: z.string(),
+        statement: z.string(),
+        primary_locus: z.string().nullable(),
+        uncertainty: z.string(),
+        support_evidence_refs: stringList.optional(),
+        evidence_refs: stringList.optional(),
+        counterevidence_refs: stringList.optional(),
+        critical_review: z.object({ terminal: z.string() }).passthrough().nullable().optional(),
+        counterevidence_queries: stringList,
+        predicted_observations: stringList,
+        discriminating_tests: z.array(
+          z.object({
+            procedure_candidate: z.string(),
+            expected_if_true: z.string(),
+            expected_if_alternative: z.string(),
+            risk_tier: z.string(),
+          }),
+        ),
+      }),
+    ),
+  }),
+  action_plan: z.object({
+    plan_id: z.string(),
+    frontier: stringList,
+    alternatives: z.array(
+      z.object({
+        action_id: z.string(),
+        action_family: z.string(),
+        specification: z.string(),
+        expected_information_value: z.string(),
+        risk_tier: z.string(),
+        execution_authority: z.string(),
+        reversibility: z.string(),
+        state: z.string(),
+        source_refs: stringList,
+        missing_evidence: stringList,
+      }),
+    ),
+  }),
+  commit: z.object({
+    disposition: z.string(),
+    committed_revision_ids: stringList,
+    receipt: z.object({
+      receipt_id: z.string(),
+      receipt_digest: z.string(),
+      claim_scopes: stringList,
+      integrity_state: z.string(),
+      provenance_state: z.string(),
+      semantic_truth_certified: z.boolean(),
+    }),
+  }),
+  selected_evidence_refs: stringList,
 });
 
 /** Validate only: no default values, coercion or mutation of partial server records. */
-export function isThreadAnalysis(value: Record<string, unknown>): value is ThreadAnalysis & Record<string, unknown> {
+export function isThreadAnalysis(
+  value: Record<string, unknown>,
+): value is ThreadAnalysis & Record<string, unknown> {
   return analysisDisplaySchema.safeParse(value).success;
 }
 
 const contextKey = "thoth:web-context:v1";
-export function readWorkspaceContext(scope?: BrowserScope): { projectId: string; threadId: string } {
+export function readWorkspaceContext(scope?: BrowserScope): {
+  projectId: string;
+  threadId: string;
+} {
   if (scope?.mode === "LOCAL") return readLocalContext(scope.workspaceId);
   try {
-    const value = JSON.parse(sessionStorage.getItem(scope?.mode === "HOSTED" && scope.browserScopeId ? `${contextKey}:${scope.browserScopeId}` : contextKey) ?? "null");
-    if (value?.version === 1 && typeof value.projectId === "string" && typeof value.threadId === "string") return value;
-  } catch { /* Storage can be disabled; canonical data is always fetched from the server. */ }
+    const value = JSON.parse(
+      sessionStorage.getItem(
+        scope?.mode === "HOSTED" && scope.browserScopeId
+          ? `${contextKey}:${scope.browserScopeId}`
+          : contextKey,
+      ) ?? "null",
+    );
+    if (
+      value?.version === 1 &&
+      typeof value.projectId === "string" &&
+      typeof value.threadId === "string"
+    )
+      return value;
+  } catch {
+    /* Storage can be disabled; canonical data is always fetched from the server. */
+  }
   return { projectId: "", threadId: "" };
 }
 export function saveWorkspaceContext(projectId: string, threadId: string, scope?: BrowserScope) {
   if (scope?.mode === "LOCAL") return writeLocalContext(scope.workspaceId, { projectId, threadId });
-  try { sessionStorage.setItem(scope?.mode === "HOSTED" && scope.browserScopeId ? `${contextKey}:${scope.browserScopeId}` : contextKey, JSON.stringify({ version: 1, projectId, threadId })); return true; }
-  catch { return false; }
+  try {
+    sessionStorage.setItem(
+      scope?.mode === "HOSTED" && scope.browserScopeId
+        ? `${contextKey}:${scope.browserScopeId}`
+        : contextKey,
+      JSON.stringify({ version: 1, projectId, threadId }),
+    );
+    return true;
+  } catch {
+    return false;
+  }
 }

@@ -66,9 +66,7 @@ def test_unregistered_or_malformed_uris_never_reach_dns(
     "address",
     ["127.0.0.1", "10.0.0.1", "192.168.1.5", "169.254.169.254", "::1", "fd00::1"],
 )
-def test_private_dns_answers_are_rejected(
-    monkeypatch: pytest.MonkeyPatch, address: str
-) -> None:
+def test_private_dns_answers_are_rejected(monkeypatch: pytest.MonkeyPatch, address: str) -> None:
     monkeypatch.setattr(
         socket,
         "getaddrinfo",

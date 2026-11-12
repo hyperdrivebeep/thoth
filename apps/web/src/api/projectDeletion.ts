@@ -21,7 +21,8 @@ export function permanentDeleteFailure(error: unknown): string {
   const reason = String(error.details.reason_code ?? "");
   if (reason === "PROJECT_NOT_ARCHIVED") return t("archive.deleteNotArchived");
   if (reason === "PROJECT_NAME_MISMATCH") return t("archive.deleteNameMismatch");
-  if (reason === "PROJECT_HAS_ACTIVE_OPERATION" || reason === "PROJECT_EMBEDDING_JOB_RUNNING") return t("archive.deleteActive");
+  if (reason === "PROJECT_HAS_ACTIVE_OPERATION" || reason === "PROJECT_EMBEDDING_JOB_RUNNING")
+    return t("archive.deleteActive");
   if (reason === "PROJECT_REFERENCED_BY_OTHER_PROJECTS") {
     const ids = error.details.referencing_project_ids;
     return message("deleteReferenced", Array.isArray(ids) ? ids.map(String).join(", ") : "");
@@ -32,4 +33,5 @@ export function permanentDeleteFailure(error: unknown): string {
   return t("archive.deleteFailed");
 }
 
-export const projectAlreadyGone = (error: unknown) => error instanceof RpcError && error.code === PROJECT_NOT_FOUND;
+export const projectAlreadyGone = (error: unknown) =>
+  error instanceof RpcError && error.code === PROJECT_NOT_FOUND;

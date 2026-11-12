@@ -47,25 +47,34 @@ export function EvidenceRail({
       evidence.filter(
         (span) =>
           span.span_id === focusSpanId ||
-          (authority === "ALL" || span.authority_state === authority) &&
-          (!query.trim() ||
-            span.exact_text.toLowerCase().includes(query.trim().toLowerCase()) ||
-            span.span_id.toLowerCase().includes(query.trim().toLowerCase())),
+          ((authority === "ALL" || span.authority_state === authority) &&
+            (!query.trim() ||
+              span.exact_text.toLowerCase().includes(query.trim().toLowerCase()) ||
+              span.span_id.toLowerCase().includes(query.trim().toLowerCase()))),
       ),
     [authority, evidence, query, focusSpanId],
   );
   useEffect(() => {
     if (!focusSpanId) return;
-    const card = Array.from(listRef.current?.querySelectorAll<HTMLElement>("[data-span-id]") ?? [])
-      .find(item => item.getAttribute("data-span-id") === focusSpanId);
+    const card = Array.from(
+      listRef.current?.querySelectorAll<HTMLElement>("[data-span-id]") ?? [],
+    ).find((item) => item.getAttribute("data-span-id") === focusSpanId);
     card?.scrollIntoView?.({ block: "center", behavior: "smooth" });
   }, [focusSpanId, evidence.length]);
   return (
     <aside className="evidence-rail" aria-label={t("evidenceRail.title")}>
       <div className="panel-heading">
         <div>
-          <h2>{loading ? t("evidenceRail.loading") : error ? t("evidenceRail.failed") : heading ?? formatMessage("activeEvidence", evidence.length)}</h2>
-          {totalCount > evidence.length && <span>{formatMessage("evidenceTotal", totalCount.toLocaleString(localeTag()))}</span>}
+          <h2>
+            {loading
+              ? t("evidenceRail.loading")
+              : error
+                ? t("evidenceRail.failed")
+                : (heading ?? formatMessage("activeEvidence", evidence.length))}
+          </h2>
+          {totalCount > evidence.length && (
+            <span>{formatMessage("evidenceTotal", totalCount.toLocaleString(localeTag()))}</span>
+          )}
         </div>
       </div>
       {evidence.length > 0 && (
@@ -91,18 +100,37 @@ export function EvidenceRail({
         </div>
       )}
       <div className="evidence-list" ref={listRef}>
-        {loading ? <p className="empty-copy">{t("evidenceRail.reading")}</p> : error ? <Callout compact intent="danger" role="alert">{error}</Callout> : evidence.length === 0 ? (
+        {loading ? (
+          <p className="empty-copy">{t("evidenceRail.reading")}</p>
+        ) : error ? (
+          <Callout compact intent="danger" role="alert">
+            {error}
+          </Callout>
+        ) : evidence.length === 0 ? (
           <p className="empty-copy">{t("evidenceRail.empty")}</p>
         ) : (
           filtered.map((span) => (
-            <article className={`evidence-item${span.span_id === focusSpanId ? " focused" : ""}`} key={span.span_id} data-span-id={span.span_id}
-              aria-current={span.span_id === focusSpanId ? "true" : undefined}>
-              {citations?.[span.span_id] && <strong className="citation-number">[{citations[span.span_id]}]</strong>}
+            <article
+              className={`evidence-item${span.span_id === focusSpanId ? " focused" : ""}`}
+              key={span.span_id}
+              data-span-id={span.span_id}
+              aria-current={span.span_id === focusSpanId ? "true" : undefined}
+            >
+              {citations?.[span.span_id] && (
+                <strong className="citation-number">[{citations[span.span_id]}]</strong>
+              )}
               <p>{span.exact_text}</p>
               <code>{locator(span)}</code>
-              <details className="connection-tech"><summary>{t("oauth.technical")}</summary><small>{span.artifact_id} · {span.span_id}</small></details>
+              <details className="connection-tech">
+                <summary>{t("oauth.technical")}</summary>
+                <small>
+                  {span.artifact_id} · {span.span_id}
+                </small>
+              </details>
               <div className="badge-row">
-                {detached.has(span.artifact_id) && <span className="status-badge detached-source">{t("evidenceRail.detached")}</span>}
+                {detached.has(span.artifact_id) && (
+                  <span className="status-badge detached-source">{t("evidenceRail.detached")}</span>
+                )}
                 <StatusBadge value={span.authority_state} />
                 <StatusBadge value={span.cutoff_state} />
                 <StatusBadge value={span.support_state} />

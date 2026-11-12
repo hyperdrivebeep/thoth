@@ -19,9 +19,12 @@ def _historical_names() -> tuple[str, ...]:
     names = tuple(snapshot["names"])
     assert len(names) == len(set(names)) == 219
     assert list(names) == sorted(names)
-    assert hashlib.sha256(
-        json.dumps(names, ensure_ascii=False, separators=(",", ":")).encode()
-    ).hexdigest() == "03b79293bc2513d9f9f234ec0d50ec2372dcc4d8bd58838d3891afdcbe1aecca"
+    assert (
+        hashlib.sha256(
+            json.dumps(names, ensure_ascii=False, separators=(",", ":")).encode()
+        ).hexdigest()
+        == "03b79293bc2513d9f9f234ec0d50ec2372dcc4d8bd58838d3891afdcbe1aecca"
+    )
     return names
 
 

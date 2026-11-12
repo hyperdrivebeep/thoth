@@ -11,9 +11,17 @@ const DEADLINE = "OAUTH_DISPATCH_DEADLINE_REMOTE_STOP_UNKNOWN";
 
 /** A SUCCEEDED run whose research ended on a model-call reason, with or without a saved answer. */
 function notice(code: string, answer: string | null): string {
-  const result: Record<string, unknown> = answer === null ? { terminal_reason: code } : { answer, terminal_reason: code };
+  const result: Record<string, unknown> =
+    answer === null ? { terminal_reason: code } : { answer, terminal_reason: code };
   const view = interruptionView({ state: "SUCCEEDED", result, terminalReason: code });
-  return renderToStaticMarkup(<ResultInterruptionNotice view={view} result={result} hasSavedResult={false} onDetail={() => {}}/>);
+  return renderToStaticMarkup(
+    <ResultInterruptionNotice
+      view={view}
+      result={result}
+      hasSavedResult={false}
+      onDetail={() => {}}
+    />,
+  );
 }
 
 it("says the answer was saved when the connection was cut after a partial answer was stored", () => {
@@ -23,7 +31,9 @@ it("says the answer was saved when the connection was cut after a partial answer
     expect(html).not.toContain(t("result.remoteUnknown"));
     expect(html).not.toContain(t("result.timeLimit"));
   }
-  expect(t("result.stalled")).toBe("답은 저장됐지만 마지막 확인 전에 연결이 끊겼습니다. 모델 쪽에서는 계속 처리했을 수 있습니다.");
+  expect(t("result.stalled")).toBe(
+    "답은 저장됐지만 마지막 확인 전에 연결이 끊겼습니다. 모델 쪽에서는 계속 처리했을 수 있습니다.",
+  );
 });
 
 it("keeps today's wording when the cut-off call left no answer", () => {
@@ -42,11 +52,17 @@ it("does not call the answer saved when only other findings were kept", () => {
   const view = interruptionView({ state: "SUCCEEDED", result, terminalReason: STALLED });
   expect(view.content).toBe(true);
   expect(view.hasAnswer).toBe(false);
-  const html = renderToStaticMarkup(<ResultInterruptionNotice view={view} result={result} hasSavedResult={false} onDetail={() => {}}/>);
+  const html = renderToStaticMarkup(
+    <ResultInterruptionNotice
+      view={view}
+      result={result}
+      hasSavedResult={false}
+      onDetail={() => {}}
+    />,
+  );
   expect(html).not.toContain(t("result.stalled"));
   expect(html).toContain(t("result.remoteUnknown"));
 });
-
 
 it("says the model ended with an error for an incomplete response, in place of the unknown-stop line", () => {
   for (const answer of [null, "부분 답"]) {
@@ -68,14 +84,31 @@ it("leaves other model-call reasons as they were and compares codes exactly", ()
     expect(html).not.toContain(t("result.incompleteResponse"));
     expect(html).not.toContain(t("result.stalled"));
   }
-  expect(renderToStaticMarkup(<ResultInterruptionNotice view={interruptionView({ state: "SUCCEEDED", result: { answer: "a" }, terminalReason: "BOUNDED_RESEARCH_COMPLETE" })}
-    result={{ answer: "a" }} hasSavedResult={false} onDetail={() => {}}/>)).toBe("");
+  expect(
+    renderToStaticMarkup(
+      <ResultInterruptionNotice
+        view={interruptionView({
+          state: "SUCCEEDED",
+          result: { answer: "a" },
+          terminalReason: "BOUNDED_RESEARCH_COMPLETE",
+        })}
+        result={{ answer: "a" }}
+        hasSavedResult={false}
+        onDetail={() => {}}
+      />,
+    ),
+  ).toBe("");
 });
 
 it("replaces the headline only for a cut-off call after a saved answer", () => {
   const cases: Array<[string, string | null, boolean]> = [
-    [STALLED, "부분 답", true], [DEADLINE, "부분 답", true], [STALLED, null, false], [DEADLINE, "  ", false],
-    ["OAUTH_INCOMPLETE_RESPONSE", "부분 답", false], ["OAUTH_TRANSPORT_FAILURE", "부분 답", false], ["TOTAL_RESEARCH_BUDGET_EXHAUSTED", null, false],
+    [STALLED, "부분 답", true],
+    [DEADLINE, "부분 답", true],
+    [STALLED, null, false],
+    [DEADLINE, "  ", false],
+    ["OAUTH_INCOMPLETE_RESPONSE", "부분 답", false],
+    ["OAUTH_TRANSPORT_FAILURE", "부분 답", false],
+    ["TOTAL_RESEARCH_BUDGET_EXHAUSTED", null, false],
   ];
   for (const [code, answer, saved] of cases) {
     const html = notice(code, answer);
@@ -95,7 +128,9 @@ it("has the headline in every screen language", () => {
   }
   expect(seen.size).toBe(4);
   setLocale("en");
-  expect(t("result.savedBeforeCut")).toBe("The research answer was saved, but it could not be checked to the end.");
+  expect(t("result.savedBeforeCut")).toBe(
+    "The research answer was saved, but it could not be checked to the end.",
+  );
 });
 
 it("has the two lines in every screen language", () => {
@@ -111,7 +146,9 @@ it("has the two lines in every screen language", () => {
   }
   expect(seen.size).toBe(8);
   setLocale("en");
-  expect(t("result.stalled")).toBe("The answer was saved, but the connection was cut before the final check. The model may have kept processing.");
+  expect(t("result.stalled")).toBe(
+    "The answer was saved, but the connection was cut before the final check. The model may have kept processing.",
+  );
   expect(t("result.incompleteResponse")).toBe("The model ended with an error.");
 });
 const AUTO_OFF = {
@@ -122,15 +159,35 @@ const AUTO_OFF = {
   ja: ["中断されたモデル呼び出しの自動再試行はオフになっています。", "設定を開く"],
 } as const;
 
-function withRetry(code: string, answer: string | null, retry: { autoRetryOff?: boolean; onOpenSettings?: () => void }, state = "SUCCEEDED"): string {
-  const result: Record<string, unknown> = answer === null ? { terminal_reason: code } : { answer, terminal_reason: code };
+function withRetry(
+  code: string,
+  answer: string | null,
+  retry: { autoRetryOff?: boolean; onOpenSettings?: () => void },
+  state = "SUCCEEDED",
+): string {
+  const result: Record<string, unknown> =
+    answer === null ? { terminal_reason: code } : { answer, terminal_reason: code };
   const view = interruptionView({ state, result, terminalReason: code });
-  return renderToStaticMarkup(<ResultInterruptionNotice view={view} result={result} hasSavedResult={false} onDetail={() => {}} {...retry}/>);
+  return renderToStaticMarkup(
+    <ResultInterruptionNotice
+      view={view}
+      result={result}
+      hasSavedResult={false}
+      onDetail={() => {}}
+      {...retry}
+    />,
+  );
 }
 
 it("says automatic retry is off, with a settings button, only for a cut-off model call and only when it is off", () => {
   const open = () => {};
-  for (const code of [STALLED, DEADLINE, "OAUTH_TRANSPORT_FAILURE", "OAUTH_RUNAWAY_OUTPUT", "OAUTH_STALLED_STREAM"]) {
+  for (const code of [
+    STALLED,
+    DEADLINE,
+    "OAUTH_TRANSPORT_FAILURE",
+    "OAUTH_RUNAWAY_OUTPUT",
+    "OAUTH_STALLED_STREAM",
+  ]) {
     for (const answer of ["부분 답", null]) {
       const html = withRetry(code, answer, { autoRetryOff: true, onOpenSettings: open });
       expect(html, code + answer).toContain(t("result.autoRetryOff"));
@@ -141,10 +198,19 @@ it("says automatic retry is off, with a settings button, only for a cut-off mode
     }
   }
   // Other reasons for an unfinished run are not a cut-off call.
-  for (const code of ["TOTAL_RESEARCH_BUDGET_EXHAUSTED", "OAUTH_INCOMPLETE_RESPONSE", "OAUTH_REQUEST_REJECTED_429"]) {
-    expect(withRetry(code, "부분 답", { autoRetryOff: true, onOpenSettings: open }), code).not.toContain(t("result.autoRetryOff"));
+  for (const code of [
+    "TOTAL_RESEARCH_BUDGET_EXHAUSTED",
+    "OAUTH_INCOMPLETE_RESPONSE",
+    "OAUTH_REQUEST_REJECTED_429",
+  ]) {
+    expect(
+      withRetry(code, "부분 답", { autoRetryOff: true, onOpenSettings: open }),
+      code,
+    ).not.toContain(t("result.autoRetryOff"));
   }
-  expect(withRetry("BOUNDED_RESEARCH_COMPLETE", "답", { autoRetryOff: true, onOpenSettings: open })).toBe("");
+  expect(
+    withRetry("BOUNDED_RESEARCH_COMPLETE", "답", { autoRetryOff: true, onOpenSettings: open }),
+  ).toBe("");
   // Without the way to the settings, the sentence is shown without a button.
   const noButton = withRetry(STALLED, "부분 답", { autoRetryOff: true });
   expect(noButton).toContain(t("result.autoRetryOff"));
@@ -166,4 +232,3 @@ it("has the retry-off sentence and button in every screen language", () => {
   }
   expect(seen.size).toBe(5);
 });
-

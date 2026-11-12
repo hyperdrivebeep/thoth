@@ -38,11 +38,7 @@ class SqliteAuthSessionStore(AuthSessionStorePort):
 
     def _read(self, condition: ColumnElement[bool]) -> AuthSession | None:
         with self._engine.connect() as connection:
-            row = connection.execute(
-                select(auth_sessions.c.content_json).where(condition)
-            ).first()
+            row = connection.execute(select(auth_sessions.c.content_json).where(condition)).first()
         return (
-            None
-            if row is None
-            else AuthSession.model_validate(orjson.loads(str(row.content_json)))
+            None if row is None else AuthSession.model_validate(orjson.loads(str(row.content_json)))
         )

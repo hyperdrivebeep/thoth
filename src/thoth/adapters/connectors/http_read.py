@@ -132,8 +132,10 @@ class HttpReadConnector:
 
     def _open(self, url: str, method: str) -> tuple[bytes, dict[str, str], int]:
         try:
+            # The scheme is https (or loopback http) by the constructor, _url() refuses a route that
+            # leaves that origin, and redirects are not followed.
             with self._opener.open(
-                Request(url, method=method),
+                Request(url, method=method),  # noqa: S310
                 timeout=self._timeout,
             ) as response:
                 headers = {key.casefold(): value for key, value in response.headers.items()}

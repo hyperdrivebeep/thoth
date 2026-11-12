@@ -1,0 +1,10 @@
+# Build output and caches.
+dist
+*.tsbuildinfo
+
+# Recorded server responses and other fixtures keep the bytes they were recorded with.
+src/api/fixtures
+*.fixture.json
+
+# Static files that are served as they are.
+public

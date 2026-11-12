@@ -86,6 +86,7 @@ async def test_local_credential_rpc_returns_json_without_secret(
     from thoth.adapters.models.local_credentials import LocalModelCredentials
 
     monkeypatch.setenv("CODEX_HOME", str(tmp_path / "empty-codex"))
+
     def fake_account_connections(_self: LocalModelCredentials) -> list[dict[str, object]]:
         return [{"provider": "openai", "connected": False}]
 

@@ -46,9 +46,7 @@ async def test_changed_preview_basis_is_rejected_without_domain_publication(
                 {"description": "Independent newer action"},
             )
         elif drift == "source":
-            span = host.planner.artifacts.read_evidence(
-                _first_ref(snap.content["evidence_refs"])
-            )
+            span = host.planner.artifacts.read_evidence(_first_ref(snap.content["evidence_refs"]))
             assert span is not None
             host.planner.artifacts.update_evidence(
                 span.model_copy(update={"cutoff_state": CutoffState.AFTER_CUTOFF})

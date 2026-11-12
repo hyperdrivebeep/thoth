@@ -36,9 +36,9 @@ class BaselineCandidate(DomainModel):
     project_head_set_digest: Sha256
     policy_version: str
     evidence_refs: tuple[str, ...] = ()
-    state: Literal[
-        "PENDING_PROTECTED_DECISION", "APPROVED", "REJECTED", "STALE"
-    ] = "PENDING_PROTECTED_DECISION"
+    state: Literal["PENDING_PROTECTED_DECISION", "APPROVED", "REJECTED", "STALE"] = (
+        "PENDING_PROTECTED_DECISION"
+    )
     protected: Literal[True] = True
     candidate_digest: Sha256
     created_at: AwareDatetime

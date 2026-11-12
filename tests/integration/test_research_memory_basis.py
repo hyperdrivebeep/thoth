@@ -82,9 +82,7 @@ def _list(value: object) -> list[object]:
     return cast(list[object], value)
 
 
-def _candidate(
-    source: FullMemoryRevision, *, memory_id: str, project_id: str
-) -> MemoryRecord:
+def _candidate(source: FullMemoryRevision, *, memory_id: str, project_id: str) -> MemoryRecord:
     payload_mode = (
         MemoryPayloadMode.MEMORY_ASSERTION
         if source.assertion is not None
@@ -132,15 +130,17 @@ async def test_only_two_actually_rendered_memory_subsets_enter_consumed_basis(
 ) -> None:
     runtime, _connector, project = await prepare_thread(tmp_path, allow_connector=True)
     try:
-        first = _record(value(
-            await runtime.bus.dispatch(
-                request(
-                    "thread/input",
-                    "seed-memories",
-                    {"project_id": project, "thread_id": f"thread:{project}"},
+        first = _record(
+            value(
+                await runtime.bus.dispatch(
+                    request(
+                        "thread/input",
+                        "seed-memories",
+                        {"project_id": project, "thread_id": f"thread:{project}"},
+                    )
                 )
             )
-        ))
+        )
         memories = tuple(
             FullMemoryRevision.model_validate_json(json.dumps(_record(item)), strict=True)
             for item in _list(_record(first["full_project_memory"])["committed"])

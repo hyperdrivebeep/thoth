@@ -4,17 +4,35 @@ import { Button, Callout } from "@blueprintjs/core";
 import { WorkspaceContent } from "./WorkspaceContent";
 
 /** A rendering failure must not erase the project/navigation control plane. */
-export class WorkspaceErrorBoundary extends Component<{children:ReactNode;resetKey:string;onRetry?:()=>Promise<unknown>},{failed:boolean}> {
-  state={failed:false};
-  static getDerivedStateFromError(){return {failed:true};}
-  componentDidUpdate(previous:Readonly<{resetKey:string}>){
-    if(this.state.failed && previous.resetKey!==this.props.resetKey)this.setState({failed:false});
+export class WorkspaceErrorBoundary extends Component<
+  { children: ReactNode; resetKey: string; onRetry?: () => Promise<unknown> },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
   }
-  render(){
-    if(!this.state.failed)return this.props.children;
-    return <WorkspaceContent><Callout intent="danger" title={t("workspaceError.title")} role="alert">
-      <p>{t("workspaceError.notice")}</p>
-      <Button icon="refresh" onClick={async()=>{await this.props.onRetry?.();this.setState({failed:false});}}>{t("workspaceError.retry")}</Button>
-    </Callout></WorkspaceContent>;
+  componentDidUpdate(previous: Readonly<{ resetKey: string }>) {
+    if (this.state.failed && previous.resetKey !== this.props.resetKey)
+      this.setState({ failed: false });
+  }
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <WorkspaceContent>
+        <Callout intent="danger" title={t("workspaceError.title")} role="alert">
+          <p>{t("workspaceError.notice")}</p>
+          <Button
+            icon="refresh"
+            onClick={async () => {
+              await this.props.onRetry?.();
+              this.setState({ failed: false });
+            }}
+          >
+            {t("workspaceError.retry")}
+          </Button>
+        </Callout>
+      </WorkspaceContent>
+    );
   }
 }

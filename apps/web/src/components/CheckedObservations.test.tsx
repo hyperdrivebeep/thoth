@@ -7,11 +7,38 @@ import { setLocale } from "../i18n/locale";
 import { CheckedObservations } from "./CheckedObservations";
 import { ResearchResultCard, type ResearchDetail } from "./ResearchResultCard";
 
-const payload = { schema_version: "1.0.0", kind: "SOURCE_ARITHMETIC", display_rows: [
-  { calculation_ref: "calc:1", label: "measurement", context_label: "Release B", sizes: ["1000", "10000"], size_label: "columns", operation: "RATIO", status: "CALCULATED", display_value: "62.280000", operand_refs: ["span:a", "span:b"] },
-  { calculation_ref: "calc:2", label: "measurement", context_label: "Release B", sizes: ["1000", "10000"], operation: "LOG_LOG_SLOPE", status: "NOT_CALCULATED", operand_refs: ["span:a", "span:b"] },
-], diagnostic_count: 1, not_delivered: 1 };
-const render = (value: unknown) => renderToStaticMarkup(<CheckedObservations result={{ checked_observations: value }} onCite={() => {}}/>);
+const payload = {
+  schema_version: "1.0.0",
+  kind: "SOURCE_ARITHMETIC",
+  display_rows: [
+    {
+      calculation_ref: "calc:1",
+      label: "measurement",
+      context_label: "Release B",
+      sizes: ["1000", "10000"],
+      size_label: "columns",
+      operation: "RATIO",
+      status: "CALCULATED",
+      display_value: "62.280000",
+      operand_refs: ["span:a", "span:b"],
+    },
+    {
+      calculation_ref: "calc:2",
+      label: "measurement",
+      context_label: "Release B",
+      sizes: ["1000", "10000"],
+      operation: "LOG_LOG_SLOPE",
+      status: "NOT_CALCULATED",
+      operand_refs: ["span:a", "span:b"],
+    },
+  ],
+  diagnostic_count: 1,
+  not_delivered: 1,
+};
+const render = (value: unknown) =>
+  renderToStaticMarkup(
+    <CheckedObservations result={{ checked_observations: value }} onCite={() => {}} />,
+  );
 afterEach(() => setLocale("ko"));
 describe("source arithmetic display", () => {
   it("does not invent calculations for old or unsupported payloads", () => {
@@ -36,7 +63,13 @@ describe("source arithmetic display", () => {
     expect(html).toContain("Not calculated");
   });
   it("is consumed by the result card alongside the unmodified answer", () => {
-    const html = renderToStaticMarkup(<ResearchResultCard state="SUCCEEDED" result={{ answer: "Original answer", checked_observations: payload }} onDetail={() => {}}/>);
+    const html = renderToStaticMarkup(
+      <ResearchResultCard
+        state="SUCCEEDED"
+        result={{ answer: "Original answer", checked_observations: payload }}
+        onDetail={() => {}}
+      />,
+    );
     expect(html).toContain("Original answer");
     expect(html).toContain("62.280000");
   });
@@ -46,7 +79,15 @@ describe("source arithmetic display", () => {
     const root = createRoot(node);
     const opened: ResearchDetail[] = [];
     try {
-      await act(async () => root.render(<ResearchResultCard state="SUCCEEDED" result={{ checked_observations: payload }} onDetail={detail => opened.push(detail)}/>));
+      await act(async () =>
+        root.render(
+          <ResearchResultCard
+            state="SUCCEEDED"
+            result={{ checked_observations: payload }}
+            onDetail={(detail) => opened.push(detail)}
+          />,
+        ),
+      );
       const section = node.querySelector("details.checked-observations");
       expect(section?.hasAttribute("open")).toBe(false);
       const buttons = section!.querySelectorAll<HTMLButtonElement>("button.answer-citation");

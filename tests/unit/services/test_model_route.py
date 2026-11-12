@@ -37,9 +37,7 @@ def _service() -> ModelSettingsService:
                     capability_source="xai",
                 ),
             ),
-            ModelSelection(
-                provider="codex-oauth", model="gpt-5.6-terra", reasoning_effort="xhigh"
-            ),
+            ModelSelection(provider="codex-oauth", model="gpt-5.6-terra", reasoning_effort="xhigh"),
         ),
     )
 
@@ -67,9 +65,7 @@ def test_incomplete_route_is_rejected() -> None:
 
 
 def test_effort_only_keeps_current_route() -> None:
-    resolved = _service().resolve(
-        "project:1", None, ModelSelection(reasoning_effort="low")
-    )
+    resolved = _service().resolve("project:1", None, ModelSelection(reasoning_effort="low"))
     assert (resolved.provider, resolved.model, resolved.reasoning_effort) == (
         "codex-oauth",
         "gpt-5.6-terra",

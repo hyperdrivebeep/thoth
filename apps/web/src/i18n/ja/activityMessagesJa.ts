@@ -58,10 +58,13 @@ export const activityJa: ColumnOf<typeof activityMessages> = {
   "activity.hypothesisWhy": "提案された各説明の判定の状態を確認しました。",
   "activity.stageDone": "調査の段階が完了しました。",
   "activity.stageWhy": "保存された段階の結果を、次のレビューの段階に結びつけました。",
-  "activity.locationWhy": "関連する資料の位置を確認しました。これは、根拠が採用されたという意味ではありません。",
-  "activity.hypothesisCountWhy": "これらの数は仮説のレビューを表すもので、最終的な回答の妥当性を示すものではありません。",
+  "activity.locationWhy":
+    "関連する資料の位置を確認しました。これは、根拠が採用されたという意味ではありません。",
+  "activity.hypothesisCountWhy":
+    "これらの数は仮説のレビューを表すもので、最終的な回答の妥当性を示すものではありません。",
   "activity.modelTimeout": "モデルの応答待ちがタイムアウトしました。",
-  "activity.modelNotice": "これはモデル呼び出しの実行状態であり、根拠の採用や判定の成功ではありません。",
+  "activity.modelNotice":
+    "これはモデル呼び出しの実行状態であり、根拠の採用や判定の成功ではありません。",
   "activity.executionNotice": "実行の成功と調査の判定は、別に記録されます。",
   "activity.modelCancel": "モデル呼び出しの停止を要求しました。",
   "activity.modelWaiting": "モデルのレビューの応答を待っています。",
@@ -86,7 +89,8 @@ export const activityJa: ColumnOf<typeof activityMessages> = {
   "criteriaChange.added": "追加",
   "criteriaChange.removed": "削除",
   "criteriaChange.title": "基準ごとの判定の変化",
-  "criteriaChange.unavailable": "基準の変化を読み込めませんでした。比較するには、両方の回答の基準の記録が必要です。",
+  "criteriaChange.unavailable":
+    "基準の変化を読み込めませんでした。比較するには、両方の回答の基準の記録が必要です。",
   "criteriaChange.changed": "変化した基準",
   "criteriaChange.held": "引き続き保留",
   "criteriaChange.membership": "追加または削除された基準",
@@ -98,7 +102,8 @@ export const activityJa: ColumnOf<typeof activityMessages> = {
   "changeSummary.authority": "資料の権威性が変わった",
   "changeSummary.time": "時点が変わった",
   "changeSummary.title": "このバージョンでの変更",
-  "changeSummary.notice": "数値、否定、状態、引用、権威性、時点が変わったときは、原文が表示されます。",
+  "changeSummary.notice":
+    "数値、否定、状態、引用、権威性、時点が変わったときは、原文が表示されます。",
   "changeSummary.original": "変更された元の内容",
   "changeSummary.before": "変更前",
   "changeSummary.after": "変更後",
@@ -110,8 +115,10 @@ export const activityJa: ColumnOf<typeof activityMessages> = {
   "approval.role": "実行権限の役割",
   "approval.risk": "リスクの階層",
   "approval.state": "承認の状態",
-  "approval.previous": "以前の承認は、前のバージョンに対するものでした。その承認の記録は保持されます。",
-  "approval.basisChanged": "根拠が変わったため、確認が必要です。送信する内容は変わっていないので、承認は有効なままです。",
+  "approval.previous":
+    "以前の承認は、前のバージョンに対するものでした。その承認の記録は保持されます。",
+  "approval.basisChanged":
+    "根拠が変わったため、確認が必要です。送信する内容は変わっていないので、承認は有効なままです。",
   "approval.full": "全文を見る",
   "approval.recreate": "変更後の内容について、新しい承認リクエストを作成",
   "approval.notSent": "未送信",
@@ -127,7 +134,8 @@ export const activityJa: ColumnOf<typeof activityMessages> = {
   "evidenceRail.informal": "非公式の参考資料",
   "evidenceRail.unclassified": "未分類",
   "evidenceRail.reading": "根拠を読み込んでいます…",
-  "evidenceRail.empty": "利用できる根拠はまだありません。資料を接続するか調査を実行すると、原文と位置が表示されます。",
+  "evidenceRail.empty":
+    "利用できる根拠はまだありません。資料を接続するか調査を実行すると、原文と位置が表示されます。",
   "evidenceRail.noMatch": "これらの条件に一致する有効な根拠はありません。",
   "review.interpretation": "根拠の解釈が異なる",
   "review.missing": "重要な根拠が欠けている",

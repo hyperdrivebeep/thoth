@@ -33,9 +33,7 @@ async def test_denied_keeps_model_path_and_blocks_web(
                 {
                     "project_id": "p",
                     "expected_revision": project["revision"],
-                    "payload": {
-                        "public_web": {"enabled": True, "preferred_hosts": ["arxiv.org"]}
-                    },
+                    "payload": {"public_web": {"enabled": True, "preferred_hosts": ["arxiv.org"]}},
                 },
             )
         )

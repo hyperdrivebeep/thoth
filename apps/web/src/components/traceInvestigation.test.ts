@@ -9,18 +9,34 @@ const LEAK = /HOLD_|FAIL_|PASS_|NO_RESULT|THRESHOLD|VALUE_|UNIT_MISMATCH|\bundef
 const phase1 = demo.phase1 as unknown as TraceView;
 const phase2 = demo.phase2 as unknown as TraceView;
 const verdict = (view: TraceView, kind: string, title: string) => {
-  const id = view.items.find(item => item.title === title)!.item_id;
-  return view.verdicts.find(item => item.subject_kind === kind && item.subject_id === id) as Verdict;
+  const id = view.items.find((item) => item.title === title)!.item_id;
+  return view.verdicts.find(
+    (item) => item.subject_kind === kind && item.subject_id === id,
+  ) as Verdict;
 };
 
 describe("which rows can start an investigation", () => {
   it("offers it for held and failed rows and never for a met one, even a stale one", () => {
-    expect(canInvestigate("CRITERION", verdict(phase1, "CRITERION", "Detection rate in rain"))).toBe(true);
-    expect(canInvestigate("CRITERION", verdict(phase2, "CRITERION", "Detection rate in rain"))).toBe(true); // failed
-    expect(canInvestigate("REQUIREMENT", verdict(phase1, "REQUIREMENT", phase1.items.find(i => i.kind === "REQUIREMENT")!.title))).toBe(true);
+    expect(
+      canInvestigate("CRITERION", verdict(phase1, "CRITERION", "Detection rate in rain")),
+    ).toBe(true);
+    expect(
+      canInvestigate("CRITERION", verdict(phase2, "CRITERION", "Detection rate in rain")),
+    ).toBe(true); // failed
+    expect(
+      canInvestigate(
+        "REQUIREMENT",
+        verdict(phase1, "REQUIREMENT", phase1.items.find((i) => i.kind === "REQUIREMENT")!.title),
+      ),
+    ).toBe(true);
     const met = verdict(phase1, "CRITERION", "Detection rate in dry weather");
     expect(canInvestigate("CRITERION", met)).toBe(false);
-    expect(canInvestigate("CRITERION", { ...met, currentness: { state: "STALE_BASIS", changed_dependencies: [] } })).toBe(false);
+    expect(
+      canInvestigate("CRITERION", {
+        ...met,
+        currentness: { state: "STALE_BASIS", changed_dependencies: [] },
+      }),
+    ).toBe(false);
     expect(canInvestigate("CRITERION", { ...met, state: "SOMETHING_NEW" })).toBe(false); // an unknown state gets no button
   });
 });
@@ -29,11 +45,22 @@ describe("the origin and the question a row gives", () => {
   it("names the row and the revision it was looking at, and nothing the server writes", () => {
     const rain = verdict(phase2, "CRITERION", "Detection rate in rain");
     const found = investigationFor("project:radar", "CRITERION", rain, phase2)!;
-    expect(found.origin).toEqual({ kind: "TRACE_VERDICT", project_id: "project:radar", subject_kind: "CRITERION", subject_id: rain.subject_id, verdict_revision: rain.revision_digest });
+    expect(found.origin).toEqual({
+      kind: "TRACE_VERDICT",
+      project_id: "project:radar",
+      subject_kind: "CRITERION",
+      subject_id: rain.subject_id,
+      verdict_revision: rain.revision_digest,
+    });
   });
 
   it("asks in plain words for a failed row, with the measured value and the bar", () => {
-    const found = investigationFor("project:radar", "CRITERION", verdict(phase2, "CRITERION", "Detection rate in rain"), phase2)!;
+    const found = investigationFor(
+      "project:radar",
+      "CRITERION",
+      verdict(phase2, "CRITERION", "Detection rate in rain"),
+      phase2,
+    )!;
     expect(found.question).toContain("Detection rate in rain");
     expect(found.question).toMatch(/기준 미달/);
     expect(found.question).toMatch(/측정값 [0-9.]+[이가] 기준 [0-9.]+ 이상/);
@@ -41,21 +68,38 @@ describe("the origin and the question a row gives", () => {
   });
 
   it("asks what is missing for a held row, in words", () => {
-    const found = investigationFor("project:radar", "CRITERION", verdict(phase1, "CRITERION", "Detection rate in fog"), phase1)!;
+    const found = investigationFor(
+      "project:radar",
+      "CRITERION",
+      verdict(phase1, "CRITERION", "Detection rate in fog"),
+      phase1,
+    )!;
     expect(found.question).toContain("보류");
     expect(found.question).toContain("날씨: 안개 조건의 결과가 아직 없습니다.");
     expect(found.question).toContain("판정하려면 무엇이 더 필요한지");
   });
 
   it("covers a requirement row too", () => {
-    const title = phase1.items.find(item => item.kind === "REQUIREMENT")!.title;
-    const found = investigationFor("project:radar", "REQUIREMENT", verdict(phase1, "REQUIREMENT", title), phase1)!;
+    const title = phase1.items.find((item) => item.kind === "REQUIREMENT")!.title;
+    const found = investigationFor(
+      "project:radar",
+      "REQUIREMENT",
+      verdict(phase1, "REQUIREMENT", title),
+      phase1,
+    )!;
     expect(found.origin.subject_kind).toBe("REQUIREMENT");
     expect(found.question).toContain(title);
   });
 
   it("gives nothing for a met row", () => {
-    expect(investigationFor("project:radar", "CRITERION", verdict(phase1, "CRITERION", "Detection rate in dry weather"), phase1)).toBeNull();
+    expect(
+      investigationFor(
+        "project:radar",
+        "CRITERION",
+        verdict(phase1, "CRITERION", "Detection rate in dry weather"),
+        phase1,
+      ),
+    ).toBeNull();
   });
 
   it("never shows an internal code, a forbidden claim or a probability", () => {
@@ -73,11 +117,25 @@ describe("the origin and the question a row gives", () => {
 });
 
 describe("finding the thread of a row", () => {
-  const thread = (id: string, row: string | null, updated: string, revision = "r") => ({ thread_id: id, project_id: "p", cycle_id: "c", problem: "q", lifecycle: "OPEN",
-    execution_state: "IDLE", current_object_ids: [], working_head_digest: "d", updated_at: updated,
-    origin: row ? { subject_kind: "CRITERION", subject_id: row, verdict_revision: revision } : null });
+  const thread = (id: string, row: string | null, updated: string, revision = "r") => ({
+    thread_id: id,
+    project_id: "p",
+    cycle_id: "c",
+    problem: "q",
+    lifecycle: "OPEN",
+    execution_state: "IDLE",
+    current_object_ids: [],
+    working_head_digest: "d",
+    updated_at: updated,
+    origin: row ? { subject_kind: "CRITERION", subject_id: row, verdict_revision: revision } : null,
+  });
   it("picks the same row's thread, the newest one, and none for another row or an ordinary thread", () => {
-    const list = [thread("a", "C-1", "2026-10-01"), thread("b", "C-1", "2026-10-03"), thread("c", "C-2", "2026-10-05"), thread("d", null, "2026-10-06")];
+    const list = [
+      thread("a", "C-1", "2026-10-01"),
+      thread("b", "C-1", "2026-10-03"),
+      thread("c", "C-2", "2026-10-05"),
+      thread("d", null, "2026-10-06"),
+    ];
     expect(threadForRow(list, "CRITERION", "C-1")?.thread_id).toBe("b");
     expect(threadForRow(list, "CRITERION", "C-2")?.thread_id).toBe("c");
     expect(threadForRow(list, "CRITERION", "C-3")).toBeNull();

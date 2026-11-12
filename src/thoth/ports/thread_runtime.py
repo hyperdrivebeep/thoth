@@ -12,9 +12,7 @@ class ThreadRuntimeStorePort(Protocol):
 
     def put_checkpoint(self, value: ThreadCheckpoint) -> None: ...
 
-    def list_checkpoints(
-        self, project_id: str, thread_id: str
-    ) -> tuple[ThreadCheckpoint, ...]: ...
+    def list_checkpoints(self, project_id: str, thread_id: str) -> tuple[ThreadCheckpoint, ...]: ...
 
     def read_checkpoint(
         self, project_id: str, thread_id: str, checkpoint_id: str

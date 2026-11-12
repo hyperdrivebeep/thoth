@@ -159,15 +159,17 @@ async def test_apply_preserves_old_bytes_new_head_and_replays_once(
                 "action-portfolio.v1": ("action/portfolio/read", "portfolio_id", "portfolio"),
                 "action-plan.v1": ("action/plan/read", "plan_id", "plan"),
             }[profile]
-            owner = record(rpc_record(
-                await runtime.bus.dispatch(
-                    request(
-                        method,
-                        "restored-owner",
-                        {"project_id": "p", identifier: revision.entity_id},
+            owner = record(
+                rpc_record(
+                    await runtime.bus.dispatch(
+                        request(
+                            method,
+                            "restored-owner",
+                            {"project_id": "p", identifier: revision.entity_id},
+                        )
                     )
-                )
-            )[root])
+                )[root]
+            )
             assert owner["revision_digest"] == applied["new_revision_digest"]
         restore_audit_id = applied["restore_audit_id"]
         assert isinstance(restore_audit_id, str)

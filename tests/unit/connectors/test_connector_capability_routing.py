@@ -64,9 +64,7 @@ def test_registry_routes_new_rest_and_custom_contracts_without_core_changes() ->
     assert registry.route({"endpoint": "/v1", "resource_id": "42"}).connector_id == (
         "rest-extension"
     )
-    assert registry.route({"artifact_uri": "urn:test:42"}).connector_id == (
-        "custom-extension"
-    )
+    assert registry.route({"artifact_uri": "urn:test:42"}).connector_id == ("custom-extension")
 
 
 def test_registry_route_fails_closed_when_selector_is_ambiguous() -> None:

@@ -72,29 +72,25 @@ async def test_exact_partial_result_expands_only_on_opt_in_and_rejects_foreign_p
     model = PartialModel()
     runtime = await setup(tmp_path, model)
     try:
-        accepted_response = (
-            await runtime.bus.dispatch(
-                request(
-                    "thread/start",
-                    "partial",
-                    {"project_id": "p", "problem": "Explain alpha latency", "contract_version": 2},
-                )
+        accepted_response = await runtime.bus.dispatch(
+            request(
+                "thread/start",
+                "partial",
+                {"project_id": "p", "problem": "Explain alpha latency", "contract_version": 2},
             )
         )
         assert accepted_response.error is None and accepted_response.result is not None
         accepted = _record(accepted_response.result["value"])
         await runtime.bus.drain()
-        state_response = (
-            await runtime.bus.query(
-                request(
-                    "thread/read",
-                    "state",
-                    {
-                        "project_id": "p",
-                        "thread_id": _text(accepted["thread_id"]),
-                        "contract_version": 2,
-                    },
-                )
+        state_response = await runtime.bus.query(
+            request(
+                "thread/read",
+                "state",
+                {
+                    "project_id": "p",
+                    "thread_id": _text(accepted["thread_id"]),
+                    "contract_version": 2,
+                },
             )
         )
         assert state_response.error is None and state_response.result is not None
@@ -142,9 +138,8 @@ async def test_exact_partial_result_expands_only_on_opt_in_and_rejects_foreign_p
         page = selected.selected_evidence
         assert page is not None
         assert metadata.manifest is not None
-        assert (
-            page.selected_count > 0
-            and [x.span_id for x in page.items] == _strings(metadata.manifest["source_refs"])
+        assert page.selected_count > 0 and [x.span_id for x in page.items] == _strings(
+            metadata.manifest["source_refs"]
         )
         assert all(x.availability == "AVAILABLE" for x in page.items)
         for changed in (

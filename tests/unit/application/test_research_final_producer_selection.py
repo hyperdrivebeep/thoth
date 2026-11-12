@@ -88,9 +88,7 @@ def _basis(work: ResearchWork, ledger: _Ledger):
         policy_digest="f" * 64,
         cutoff_at="2026-09-05T00:00:00+00:00",
     )
-    return result_basis(
-        work, cast(ThreadRequestRevision, request), cast(LedgerPort, ledger)
-    )
+    return result_basis(work, cast(ThreadRequestRevision, request), cast(LedgerPort, ledger))
 
 
 def test_explicit_final_ref_preserves_pending_ref_and_receipts() -> None:

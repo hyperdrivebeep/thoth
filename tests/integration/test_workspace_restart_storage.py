@@ -201,9 +201,17 @@ def test_corrupt_setup_keeps_saved_result_and_evidence_readable(tmp_path: Path) 
     assert reopened["internet_consent"] is None
     assert reopened["model_calls"] == 0
     for key in (
-        "thread_id", "result_operation_id", "request_revision_id",
-        "request_revision_digest", "result_basis_digest", "settings_digest",
-        "selection", "result_digest", "source_digest", "evidence_digest", "object_digest",
+        "thread_id",
+        "result_operation_id",
+        "request_revision_id",
+        "request_revision_digest",
+        "result_basis_digest",
+        "settings_digest",
+        "selection",
+        "result_digest",
+        "source_digest",
+        "evidence_digest",
+        "object_digest",
     ):
         assert reopened[key] == written[key]
     assert source.read_bytes() == b"{damaged"
@@ -237,7 +245,8 @@ def test_xai_pair_interruption_holds_auth_but_preserves_saved_research(
         assert status["connection_state"] == "HOLD"
         assert status["reason_code"] == "XAI_AUTH_GENERATION_MISMATCH"
         account = next(
-            row for row in LocalModelCredentials(copied).account_connections()
+            row
+            for row in LocalModelCredentials(copied).account_connections()
             if row["provider"] == "xai"
         )
         assert account["connection_state"] == "HOLD"

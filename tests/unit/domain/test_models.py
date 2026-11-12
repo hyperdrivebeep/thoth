@@ -64,13 +64,22 @@ def test_portfolio_does_not_confuse_locus_count_with_semantic_diversity() -> Non
     first = _hypothesis("hypothesis:1", CausalLocus.MEASUREMENT_OBSERVATION)
     second = _hypothesis("hypothesis:2", CausalLocus.MEASUREMENT_OBSERVATION)
     portfolio = HypothesisPortfolio(
-        portfolio_id="portfolio:1", object_id="object:1", hypotheses=(first, second),
-        status=PortfolioStatus.DRAFT, generated_from_head_set=SHA)
+        portfolio_id="portfolio:1",
+        object_id="object:1",
+        hypotheses=(first, second),
+        status=PortfolioStatus.DRAFT,
+        generated_from_head_set=SHA,
+    )
     assert portfolio.status == PortfolioStatus.DRAFT
     assert portfolio.uncertainty_reserve == "UNASSESSED"
     with pytest.raises(ValidationError, match="0/1 portfolio"):
-        HypothesisPortfolio(portfolio_id="portfolio:1", object_id="object:1", hypotheses=(first,),
-            status=PortfolioStatus.DRAFT, generated_from_head_set=SHA)
+        HypothesisPortfolio(
+            portfolio_id="portfolio:1",
+            object_id="object:1",
+            hypotheses=(first,),
+            status=PortfolioStatus.DRAFT,
+            generated_from_head_set=SHA,
+        )
 
 
 def test_hypothesis_portfolio_accepts_distinct_loci() -> None:

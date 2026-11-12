@@ -12,7 +12,12 @@ function stateLabel(thread: WorkThread): string {
 }
 
 /** One conversation of the open project, with its menu: rename. */
-export function ThreadNavItem({ thread, active, onOpen, onRename }: {
+export function ThreadNavItem({
+  thread,
+  active,
+  onOpen,
+  onRename,
+}: {
   thread: WorkThread;
   active: boolean;
   onOpen: () => void;
@@ -41,7 +46,12 @@ export function ThreadNavItem({ thread, active, onOpen, onRename }: {
   );
   return (
     <div className={`thread-nav-row ${active ? "active" : ""}`}>
-      <Button minimal alignText="left" className={`thread-button ${active ? "active" : ""}`} onClick={onOpen}>
+      <Button
+        minimal
+        alignText="left"
+        className={`thread-button ${active ? "active" : ""}`}
+        onClick={onOpen}
+      >
         <Icon icon="chat" />
         <span>
           <strong>{name}</strong>
@@ -49,8 +59,20 @@ export function ThreadNavItem({ thread, active, onOpen, onRename }: {
         </span>
       </Button>
       {canRename && (
-        <PopoverNext isOpen={menuOpen} onInteraction={setMenuOpen} placement="right-start" arrow={false} content={menu}>
-          <Button small minimal icon="more" aria-label={message("threadMenu", name)} aria-expanded={menuOpen} />
+        <PopoverNext
+          isOpen={menuOpen}
+          onInteraction={setMenuOpen}
+          placement="right-start"
+          arrow={false}
+          content={menu}
+        >
+          <Button
+            small
+            minimal
+            icon="more"
+            aria-label={message("threadMenu", name)}
+            aria-expanded={menuOpen}
+          />
         </PopoverNext>
       )}
     </div>

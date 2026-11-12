@@ -63,5 +63,6 @@ export const commonStateZhHant: ColumnOf<typeof commonStateMessages> = {
   "tools.copied": "已複製",
   "tools.copy": "複製命令",
   "tools.codexTitle": "安裝 Codex 連線工具",
-  "tools.codexNotice": "將官方 OpenAI Codex CLI 0.157.1 安裝到 THOTH 工具資料夾。已有的 Codex 安裝和登入會保留。",
+  "tools.codexNotice":
+    "將官方 OpenAI Codex CLI 0.157.1 安裝到 THOTH 工具資料夾。已有的 Codex 安裝和登入會保留。",
 };

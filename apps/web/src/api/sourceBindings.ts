@@ -6,7 +6,7 @@ export type SourceBinding = { binding_id: string; artifact_id: string; state: st
 type SourcesRead = { artifacts: ConnectedArtifact[]; bindings?: SourceBinding[] } | undefined;
 
 function bindingOf(sources: SourcesRead, artifactId: string): SourceBinding | undefined {
-  return sources?.bindings?.find(binding => binding.artifact_id === artifactId);
+  return sources?.bindings?.find((binding) => binding.artifact_id === artifactId);
 }
 
 /**
@@ -20,12 +20,17 @@ function isConnected(sources: SourcesRead, artifactId: string): boolean {
 
 /** The sources a new question can use. */
 export function connectedArtifacts(sources: SourcesRead): ConnectedArtifact[] {
-  return (sources?.artifacts ?? []).filter(artifact => isConnected(sources, artifact.artifact_id));
+  return (sources?.artifacts ?? []).filter((artifact) =>
+    isConnected(sources, artifact.artifact_id),
+  );
 }
 
 /** The same file under another id: connecting a file again makes a new source row with the same bytes. */
 function connectedAgain(sources: SourcesRead, artifact: ConnectedArtifact): boolean {
-  return connectedArtifacts(sources).some(other => other.byte_sha256 === artifact.byte_sha256 && other.source_uri === artifact.source_uri);
+  return connectedArtifacts(sources).some(
+    (other) =>
+      other.byte_sha256 === artifact.byte_sha256 && other.source_uri === artifact.source_uri,
+  );
 }
 
 /**
@@ -33,11 +38,13 @@ function connectedAgain(sources: SourcesRead, artifact: ConnectedArtifact): bool
  * A file that was connected again afterwards is not listed: it is in use.
  */
 export function detachedArtifacts(sources: SourcesRead): ConnectedArtifact[] {
-  return (sources?.artifacts ?? []).filter(artifact => !isConnected(sources, artifact.artifact_id) && !connectedAgain(sources, artifact));
+  return (sources?.artifacts ?? []).filter(
+    (artifact) => !isConnected(sources, artifact.artifact_id) && !connectedAgain(sources, artifact),
+  );
 }
 
 export function detachedArtifactIds(sources: SourcesRead): ReadonlySet<string> {
-  return new Set(detachedArtifacts(sources).map(artifact => artifact.artifact_id));
+  return new Set(detachedArtifacts(sources).map((artifact) => artifact.artifact_id));
 }
 
 /** The binding to name when disconnecting a source; undefined when the source has none or is already off. */

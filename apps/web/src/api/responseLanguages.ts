@@ -14,12 +14,12 @@ export const RESPONSE_LANGUAGE_CHOICES = [
 export type ResponseLanguage = (typeof RESPONSE_LANGUAGE_CHOICES)[number]["code"];
 
 export function isResponseLanguage(value: unknown): value is ResponseLanguage {
-  return RESPONSE_LANGUAGE_CHOICES.some(choice => choice.code === value);
+  return RESPONSE_LANGUAGE_CHOICES.some((choice) => choice.code === value);
 }
 
 /** Languages are named in their own writing, the same on every screen language. */
 export function responseLanguageLabel(code: ResponseLanguage): string {
-  return RESPONSE_LANGUAGE_CHOICES.find(choice => choice.code === code)?.label ?? code;
+  return RESPONSE_LANGUAGE_CHOICES.find((choice) => choice.code === code)?.label ?? code;
 }
 
 /** The languages of a server's list that this app knows how to offer; a language only the server knows is left out. */

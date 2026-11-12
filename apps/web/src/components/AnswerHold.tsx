@@ -13,14 +13,34 @@ import { EvidenceUseSummary } from "./EvidenceUseSummary";
  * An earlier round never gets its checks (the server sends them for the latest request only), so it says that
  * instead of "not yet".
  */
-export function AnswerHold({ status, coverage, facts, earlierRound }: {
-  status: string; coverage?: CoverageMatrix | null; facts?: ReactNode; earlierRound?: boolean;
+export function AnswerHold({
+  status,
+  coverage,
+  facts,
+  earlierRound,
+}: {
+  status: string;
+  coverage?: CoverageMatrix | null;
+  facts?: ReactNode;
+  earlierRound?: boolean;
 }) {
   const { rows, total } = coverageCounts(coverage);
-  return <Callout compact className="answer-hold" intent={status === "PARTIAL_HOLD" ? "warning" : "none"} role="group" aria-label={t("answerHold.title")}>
-    {facts}
-    {rows.length > 0 && <EvidenceUseSummary rows={rows}/>}
-    {total === 0 && <p>{t("labels.answerScope")}{" "}{t(earlierRound ? "answerHold.coverageEarlier" : "answerHold.coverageMissing")}</p>}
-  </Callout>;
+  return (
+    <Callout
+      compact
+      className="answer-hold"
+      intent={status === "PARTIAL_HOLD" ? "warning" : "none"}
+      role="group"
+      aria-label={t("answerHold.title")}
+    >
+      {facts}
+      {rows.length > 0 && <EvidenceUseSummary rows={rows} />}
+      {total === 0 && (
+        <p>
+          {t("labels.answerScope")}{" "}
+          {t(earlierRound ? "answerHold.coverageEarlier" : "answerHold.coverageMissing")}
+        </p>
+      )}
+    </Callout>
+  );
 }
-

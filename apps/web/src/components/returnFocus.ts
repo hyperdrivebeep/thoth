@@ -12,7 +12,7 @@ const inWindow = (element: Element) => element.closest(".bp6-portal, .bp6-overla
 export function watchFocus(): void {
   if (watching) return;
   watching = true;
-  document.addEventListener("focusin", event => {
+  document.addEventListener("focusin", (event) => {
     if (event.target instanceof HTMLElement && !inWindow(event.target)) lastOutside = event.target;
   });
 }
@@ -22,7 +22,10 @@ export function useReturnFocus(): void {
   useEffect(() => {
     watchFocus();
     const active = document.activeElement;
-    const before = active instanceof HTMLElement && active !== document.body && !inWindow(active) ? active : lastOutside;
+    const before =
+      active instanceof HTMLElement && active !== document.body && !inWindow(active)
+        ? active
+        : lastOutside;
     return () => {
       // After the window is gone, and only when nothing else has taken the focus (a confirmed action may move it).
       setTimeout(() => {

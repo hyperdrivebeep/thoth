@@ -47,12 +47,8 @@ async def test_normal_thread_read_returns_safe_typed_user_activity_without_repla
         assert isinstance(status["user_activity_events"], list)
         assert status["user_activity_events"]
         event_payloads = cast(list[dict[str, JsonValue]], status["user_activity_events"])
-        assert [event["seq"] for event in event_payloads] == list(
-            range(1, len(event_payloads) + 1)
-        )
-        validated = [
-            UserActivityEvent.model_validate(event) for event in event_payloads
-        ]
+        assert [event["seq"] for event in event_payloads] == list(range(1, len(event_payloads) + 1))
+        validated = [UserActivityEvent.model_validate(event) for event in event_payloads]
         assert any(event.activity_kind == "source" for event in validated)
         assert any(event.activity_kind == "model" for event in validated)
         assert all(

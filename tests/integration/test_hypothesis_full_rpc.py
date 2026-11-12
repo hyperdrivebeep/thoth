@@ -81,9 +81,7 @@ async def test_hypothesis_prediction_validity_appraisal_and_portfolio(tmp_path: 
             )
         )
         source_times = cast(list[dict[str, JsonValue]], listed["source_times"])
-        assessment = next(
-            item for item in source_times if item["artifact_id"] == artifact_id
-        )
+        assessment = next(item for item in source_times if item["artifact_id"] == artifact_id)
         cutoff = cast(dict[str, JsonValue], listed["cutoff_basis"])
         assert assessment["source_version_id"] == source_version_id
         assert assessment["cutoff_state"] == "UNKNOWN_TIME"

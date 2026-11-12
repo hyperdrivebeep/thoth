@@ -114,9 +114,7 @@ def _client(
     profile.prepare_login(identity)
     owned = process or _Process()
 
-    def factory(
-        _identity: CodexExecutableIdentity, _profile: CodexProfile
-    ) -> AppServerProcessPort:
+    def factory(_identity: CodexExecutableIdentity, _profile: CodexProfile) -> AppServerProcessPort:
         return cast(AppServerProcessPort, owned)
 
     return (
@@ -131,14 +129,15 @@ def _client(
 
 def test_app_server_client_sends_only_auth_catalog_after_handshake(tmp_path: Path) -> None:
     client, process = _client(tmp_path)
-    assert client.call("account/read", {"refreshToken": True})["account"] == {
-        "type": "chatgpt"
-    }
+    assert client.call("account/read", {"refreshToken": True})["account"] == {"type": "chatgpt"}
     assert client.call("model/list", {"limit": 20})["data"] == []
     with pytest.raises(CodexProfileHold, match="CODEX_APP_SERVER_METHOD_FORBIDDEN"):
         client.call("thread/start", {})
     assert [row["method"] for row in process.sent] == [
-        "initialize", "initialized", "account/read", "model/list"
+        "initialize",
+        "initialized",
+        "account/read",
+        "model/list",
     ]
     client.close()
     assert process.terminated

@@ -8,24 +8,27 @@ import { credentialLocallyConfigured, type CredentialAccount } from "./modelCred
 
 /** Official pinned Codex package command, identical to docs/INSTALL.md. */
 export const CODEX_TOOL_INSTALL_COMMAND =
-  "npm.cmd install --prefix \"$env:LOCALAPPDATA\\THOTH\\tools\\codex\" --install-strategy=nested --save-exact @openai/codex@0.157.1";
+  'npm.cmd install --prefix "$env:LOCALAPPDATA\\THOTH\\tools\\codex" --install-strategy=nested --save-exact @openai/codex@0.157.1';
 
 /** Official Claude Code, pinned to the version this route was checked against. */
 export const CLAUDE_CODE_INSTALL_COMMAND =
-  "npm.cmd install --prefix \"$env:LOCALAPPDATA\\THOTH\\tools\\claude-code\" --install-strategy=nested --save-exact @anthropic-ai/claude-code@2.1.284";
+  'npm.cmd install --prefix "$env:LOCALAPPDATA\\THOTH\\tools\\claude-code" --install-strategy=nested --save-exact @anthropic-ai/claude-code@2.1.284';
 
 const claudeToolReasons = new Set([
-  "CLAUDE_CODE_NOT_INSTALLED", "CLAUDE_CODE_NATIVE_BINARY_REQUIRED",
-  "CLAUDE_CODE_CAPABILITY_UNSUPPORTED", "CLAUDE_CODE_NOT_EXECUTABLE",
+  "CLAUDE_CODE_NOT_INSTALLED",
+  "CLAUDE_CODE_NATIVE_BINARY_REQUIRED",
+  "CLAUDE_CODE_CAPABILITY_UNSUPPORTED",
+  "CLAUDE_CODE_NOT_EXECUTABLE",
 ]);
 
 const codexToolReasons = new Set([
-  "CODEX_STANDALONE_NOT_INSTALLED", "CODEX_STANDALONE_PIN_UNAVAILABLE",
-  "CODEX_PACKAGE_INTEGRITY_UNAVAILABLE", "CODEX_PACKAGE_INTEGRITY_MISMATCH",
-  "CODEX_PACKAGE_ROOT_ABSOLUTE_REQUIRED", "UPDATE_REVIEW_REQUIRED",
+  "CODEX_STANDALONE_NOT_INSTALLED",
+  "CODEX_STANDALONE_PIN_UNAVAILABLE",
+  "CODEX_PACKAGE_INTEGRITY_UNAVAILABLE",
+  "CODEX_PACKAGE_INTEGRITY_MISMATCH",
+  "CODEX_PACKAGE_ROOT_ABSOLUTE_REQUIRED",
+  "UPDATE_REVIEW_REQUIRED",
 ]);
-
-
 
 export function reasonCode(error: unknown): string | null {
   if (!(error instanceof RpcError)) return null;
@@ -42,14 +45,13 @@ export function isCodexToolReason(code: string | null | undefined): boolean {
 }
 
 export function reasonText(code: string | null | undefined): string | null {
-  return code ? connectionReason(code) ?? null : null;
+  return code ? (connectionReason(code) ?? null) : null;
 }
 
 /** Plain Korean text for a failed connection request; the original code stays in details. */
 export function connectionErrorText(error: unknown, fallback: string): string {
   if (error instanceof RpcTransportError) {
-    return error.kind === "TIMEOUT" ? t("connection.timeout")
-      : t("connection.offline");
+    return error.kind === "TIMEOUT" ? t("connection.timeout") : t("connection.offline");
   }
   return reasonText(reasonCode(error)) ?? fallback;
 }
@@ -67,7 +69,13 @@ const intro: Record<string, MessageKey> = {
 export function needsModelRefresh(account: CredentialAccount | undefined): boolean {
   if (!account?.oauth || credentialLocallyConfigured(account)) return false;
   const state = account.connection_state ?? "";
-  if (isCodexToolReason(state) || isClaudeToolReason(state) || state === "LOGIN_PENDING" || state === "ERROR") return false;
+  if (
+    isCodexToolReason(state) ||
+    isClaudeToolReason(state) ||
+    state === "LOGIN_PENDING" ||
+    state === "ERROR"
+  )
+    return false;
   return state === "CATALOG_UNAVAILABLE" || account.available_model_providers?.length === 0;
 }
 
@@ -80,7 +88,8 @@ const connectedSummaries: Record<LanguageCode, Record<ConnectedRoute, string>> =
   },
   en: {
     BOTH: "Connected via account login and API key. Actual responses will be verified on the first research run.",
-    LOGIN: "Connected via account login. Actual responses will be verified on the first research run.",
+    LOGIN:
+      "Connected via account login. Actual responses will be verified on the first research run.",
     KEY: "Connected via API key. Actual responses will be verified on the first research run.",
   },
   "zh-Hans": {
@@ -100,23 +109,44 @@ const connectedSummaries: Record<LanguageCode, Record<ConnectedRoute, string>> =
   },
 };
 function connectedSummary(account: CredentialAccount): string {
-  return pickLocale(connectedSummaries)[account.oauth && account.has_key ? "BOTH" : account.oauth ? "LOGIN" : "KEY"];
+  return pickLocale(connectedSummaries)[
+    account.oauth && account.has_key ? "BOTH" : account.oauth ? "LOGIN" : "KEY"
+  ];
 }
 
 /** One status per provider card; technical states stay in the details section. */
-export function providerStatus(provider: string, account: CredentialAccount | undefined, loading: boolean): ProviderStatus {
+export function providerStatus(
+  provider: string,
+  account: CredentialAccount | undefined,
+  loading: boolean,
+): ProviderStatus {
   const base = t(intro[provider] ?? "connection.intro.key");
-  if (loading && !account) return { tone: "pending", label: t("connection.checking"), summary: base };
+  if (loading && !account)
+    return { tone: "pending", label: t("connection.checking"), summary: base };
   if (!account) return { tone: "action", label: t("connection.disconnected"), summary: base };
   if (credentialLocallyConfigured(account)) {
     return { tone: "ready", label: t("connection.connected"), summary: connectedSummary(account) };
   }
   const state = account.connection_state ?? "";
-  if (isCodexToolReason(state) || isClaudeToolReason(state)) return { tone: "blocked", label: t("connection.toolNeeded"), summary: reasonText(state)! };
-  if (state === "LOGIN_PENDING") return { tone: "pending", label: t("connection.loggingIn"), summary: t("connection.browserLogin") };
+  if (isCodexToolReason(state) || isClaudeToolReason(state))
+    return { tone: "blocked", label: t("connection.toolNeeded"), summary: reasonText(state)! };
+  if (state === "LOGIN_PENDING")
+    return {
+      tone: "pending",
+      label: t("connection.loggingIn"),
+      summary: t("connection.browserLogin"),
+    };
   if (needsModelRefresh(account))
-    return { tone: "pending", label: t("connection.modelsNeeded"), summary: t("connection.loadAfterLogin") };
-  if (state === "ERROR") return { tone: "blocked", label: t("connection.checkFailed"), summary: t("connection.refreshAdvice") };
+    return {
+      tone: "pending",
+      label: t("connection.modelsNeeded"),
+      summary: t("connection.loadAfterLogin"),
+    };
+  if (state === "ERROR")
+    return {
+      tone: "blocked",
+      label: t("connection.checkFailed"),
+      summary: t("connection.refreshAdvice"),
+    };
   return { tone: "action", label: t("connection.disconnected"), summary: base };
 }
-

@@ -10,11 +10,24 @@ export function useDraftGeneration(scope: string) {
   useLayoutEffect(() => {
     currentScope.current = scope;
     active.current = true;
-    return () => { active.current = false; version.current += 1; };
+    return () => {
+      active.current = false;
+      version.current += 1;
+    };
   }, [scope]);
-  const advance = useCallback(() => { version.current += 1; }, []);
+  const advance = useCallback(() => {
+    version.current += 1;
+  }, []);
   const capture = useCallback((): DraftTicket => ({ scope, version: version.current }), [scope]);
-  const isCurrent = useCallback((ticket: DraftTicket | undefined) => Boolean(ticket && active.current
-    && ticket.scope === currentScope.current && ticket.version === version.current), []);
+  const isCurrent = useCallback(
+    (ticket: DraftTicket | undefined) =>
+      Boolean(
+        ticket &&
+        active.current &&
+        ticket.scope === currentScope.current &&
+        ticket.version === version.current,
+      ),
+    [],
+  );
   return { advance, capture, isCurrent };
 }

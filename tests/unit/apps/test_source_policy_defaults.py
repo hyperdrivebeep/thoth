@@ -23,7 +23,6 @@ class _Registry(ConnectorRegistryPort):
     def capabilities(self) -> tuple[ConnectorCapability, ...]:
         return self._items
 
-
     def resolve(self, connector_id: str) -> ConnectorPort:
         raise AssertionError("unexpected connector resolution")
 
@@ -56,6 +55,7 @@ def _allowlist(
     assert isinstance(result, tuple)
     assert all(isinstance(item, str) for item in cast(tuple[object, ...], result))
     return cast(tuple[str, ...], result)
+
 
 def test_default_allowlist_excludes_public_rest() -> None:
     registry = _Registry(

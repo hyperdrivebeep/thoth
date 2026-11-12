@@ -28,14 +28,17 @@ export const remainingZhHant: ColumnOf<typeof remainingMessages> = {
   "labels.answerScope": "可回答的範圍：",
   "approval.recreateFailed": "無法重新建立批准請求。",
   "approval.created": "批准請求已建立。批准人作出決定之前不會傳送任何內容。",
-  "approval.notSentNotice": "部分變更被標記為不傳送。此標記只作用於本螢幕；未經批准不會傳輸任何內容。",
+  "approval.notSentNotice":
+    "部分變更被標記為不傳送。此標記只作用於本螢幕；未經批准不會傳輸任何內容。",
   "labels.retryKey": "重試鍵：",
   "tools.claudeTitle": "安裝 Claude Code",
-  "tools.claudeNotice": "將官方 Anthropic Claude Code 安裝到 THOTH 工具資料夾。其他程式使用的現有安裝不受影響。",
+  "tools.claudeNotice":
+    "將官方 Anthropic Claude Code 安裝到 THOTH 工具資料夾。其他程式使用的現有安裝不受影響。",
   "closure.record": "記錄處置",
   "labels.disposition": "處置記錄 ·",
   "effects.title": "聲明此行動的影響",
-  "effects.rules": "規則根據所聲明的影響來確定風險和所需的權限。未作聲明時，該行動仍須接受影響審查。",
+  "effects.rules":
+    "規則根據所聲明的影響來確定風險和所需的權限。未作聲明時，該行動仍須接受影響審查。",
   "effects.readOnly": "不選擇任何影響，即聲明該行動為唯讀。",
   "evidenceUse.title": "證據使用情況",
   "evidenceUse.ai": " （基於 AI 審查）",
@@ -81,7 +84,8 @@ export const remainingZhHant: ColumnOf<typeof remainingMessages> = {
   "labels.confirmed": "已確認 ·",
   "labels.changedVerdicts": "變化的評估：",
   "workspaceError.title": "無法顯示此檢視",
-  "workspaceError.notice": "伺服器的回應可能與顯示格式不符。這不會被視為成功或完成，已儲存的記錄不受影響。請使用標籤頁或專案檢視其他記錄。",
+  "workspaceError.notice":
+    "伺服器的回應可能與顯示格式不符。這不會被視為成功或完成，已儲存的記錄不受影響。請使用標籤頁或專案檢視其他記錄。",
   "workspaceError.retry": "重新載入伺服器狀態並重試",
   "labels.userCode": "使用者程式碼：",
   "xai.enterCode": "請在開啟的頁面中輸入上面的程式碼。",

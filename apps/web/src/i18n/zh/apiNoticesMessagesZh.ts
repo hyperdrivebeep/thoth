@@ -26,7 +26,8 @@ export const apiNoticesZh: ColumnOf<typeof apiNoticesMessages> = {
   "sourceTime.skip": "未知 / 不使用此时间",
   "memorySwitch.help": "关闭后，已保存的记忆和更正会保留，但不再用于今后的调查。",
   "memorySwitch.expansion": "扩展检索词（每次调查额外调用一次模型）",
-  "memorySwitch.expansionHelp": "模型会补充检索词，以找到用不同措辞写成的记忆。关闭后，检索只使用问题中的词；已保存的记忆不变。",
+  "memorySwitch.expansionHelp":
+    "模型会补充检索词，以找到用不同措辞写成的记忆。关闭后，检索只使用问题中的词；已保存的记忆不变。",
   "memorySwitch.failed": "无法读取记忆使用设置。",
   "memorySwitch.label": "在研究中使用记忆",
   "answerHold.title": "已确认的事实与证据用途",

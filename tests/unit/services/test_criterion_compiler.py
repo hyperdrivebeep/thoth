@@ -107,9 +107,7 @@ def test_reference_proposal_never_becomes_evaluator_input() -> None:
 
 
 def test_unknown_evidence_reference_is_rejected() -> None:
-    draft = _draft().model_copy(
-        update={"field_evidence": {"name": ("span:missing",)}}
-    )
+    draft = _draft().model_copy(update={"field_evidence": {"name": ("span:missing",)}})
 
     result = compile_criterion(
         draft, evidence=(_evidence(),), signals=CriterionCompilationSignals()

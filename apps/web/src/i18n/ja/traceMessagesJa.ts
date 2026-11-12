@@ -6,19 +6,30 @@ export const traceJa: ColumnOf<typeof traceMessages> = {
   "trace.decider.validity": "指定された検証者",
   "trace.decider.rule": "要件の担当者",
   "trace.decider.disposition": "権限のある決定者",
-  "trace.next.stale": "変化した根拠に照らして、判定のレビューが必要か確認してください。以前の案内は以前の基準に基づいていました。",
+  "trace.next.stale":
+    "変化した根拠に照らして、判定のレビューが必要か確認してください。以前の案内は以前の基準に基づいていました。",
   "trace.next.investigate": "テストが有効だったか、ほかの原因がないかを確認してください。",
-  "trace.next.noResult": "この条件にテスト結果があるか、追跡表に結びついているかを確認してください。結果がない場合は、追加のテストの計画を確認してください。",
-  "trace.next.invalid": "結果の ID、単位、分母、テスト条件を元の資料と照合し、その結果を使えるかを判断してください。",
+  "trace.next.noResult":
+    "この条件にテスト結果があるか、追跡表に結びついているかを確認してください。結果がない場合は、追加のテストの計画を確認してください。",
+  "trace.next.invalid":
+    "結果の ID、単位、分母、テスト条件を元の資料と照合し、その結果を使えるかを判断してください。",
   "trace.next.rule": "元の要件で、承認された判定ルールとそのバージョンを確認してください。",
-  "trace.next.untested": "結びついたテストには、まだ結果がありません。実行されたかを確認してください。結果がない場合は、テストの計画を確認してください。",
-  "trace.next.unlinked": "この基準に結びついたテストはありません。テストが必要か判断し、適切であればテストを結びつけてください。",
-  "trace.next.condition": "結果はありますが、条件が異なるため使われませんでした。基準の条件と、別のテストが必要かを確認してください。",
-  "trace.next.unit": "結果と基準の単位が異なります。元の資料で正しい単位と、その結果を使えるかを確認してください。",
-  "trace.next.denominator": "分母が正でないか、値が分子/分母の計算結果と異なります。3つすべてを元の資料と照合して、誤りを見つけてください。",
-  "trace.next.value": "結果がないか、数値でないか、大きすぎます。元の値を確認し、結果を訂正するか判断してください。",
-  "trace.next.additionalTests": "テストされていない条件については、別にテストを計画してください。未達だった基準を調べたあとも、この作業は残ります。",
-  "trace.next.followRow": "結果がない条件については、各基準の行にある「次のチェック」に従ってください。",
+  "trace.next.untested":
+    "結びついたテストには、まだ結果がありません。実行されたかを確認してください。結果がない場合は、テストの計画を確認してください。",
+  "trace.next.unlinked":
+    "この基準に結びついたテストはありません。テストが必要か判断し、適切であればテストを結びつけてください。",
+  "trace.next.condition":
+    "結果はありますが、条件が異なるため使われませんでした。基準の条件と、別のテストが必要かを確認してください。",
+  "trace.next.unit":
+    "結果と基準の単位が異なります。元の資料で正しい単位と、その結果を使えるかを確認してください。",
+  "trace.next.denominator":
+    "分母が正でないか、値が分子/分母の計算結果と異なります。3つすべてを元の資料と照合して、誤りを見つけてください。",
+  "trace.next.value":
+    "結果がないか、数値でないか、大きすぎます。元の値を確認し、結果を訂正するか判断してください。",
+  "trace.next.additionalTests":
+    "テストされていない条件については、別にテストを計画してください。未達だった基準を調べたあとも、この作業は残ります。",
+  "trace.next.followRow":
+    "結果がない条件については、各基準の行にある「次のチェック」に従ってください。",
   "trace.next.required": "この要件に必須の基準が定義されているか確認してください。",
   "trace.trigger.initial": "最初の計算",
   "trace.trigger.import": "CSV のインポートを適用済み",
@@ -61,12 +72,17 @@ export const traceJa: ColumnOf<typeof traceMessages> = {
   "trace.loss.confirmation": "各判定を誰が確認したか",
   "trace.loss.policy": "結果の選択ポリシー",
   "trace.loss.pending": "再計算が必要な項目の印",
-  "trace.loss.closures": "処置の表示列（読み取り専用。編集は適用されません。処置は THOTH で記録してください。）",
-  "trace.import.stale": "このファイルは別の状態からエクスポートされたものです。その後、追跡表が変更されています。",
-  "trace.import.reexport": "現在の表を CSV としてエクスポートし、そのファイルを編集してから、インポートしてください。",
+  "trace.loss.closures":
+    "処置の表示列（読み取り専用。編集は適用されません。処置は THOTH で記録してください。）",
+  "trace.import.stale":
+    "このファイルは別の状態からエクスポートされたものです。その後、追跡表が変更されています。",
+  "trace.import.reexport":
+    "現在の表を CSV としてエクスポートし、そのファイルを編集してから、インポートしてください。",
   "trace.import.noBase": "このファイルには、どの状態からエクスポートされたかが示されていません。",
-  "trace.import.keepHeaders": "エクスポートした CSV を編集してください。ヘッダーと基準状態の列は残してください。",
-  "trace.import.mixedBase": "このファイルには、異なる状態からエクスポートされた行が混ざっています。",
+  "trace.import.keepHeaders":
+    "エクスポートした CSV を編集してください。ヘッダーと基準状態の列は残してください。",
+  "trace.import.mixedBase":
+    "このファイルには、異なる状態からエクスポートされた行が混ざっています。",
   "trace.import.oneFile": "同じエクスポートから得た1つのファイルだけを編集してください。",
   "trace.import.exists": "このプロジェクトにはすでに追跡表があるため、新しい表は作成できません。",
   "trace.import.chooseUpdate": "「既存の表を更新」を選んでください。",
@@ -88,7 +104,8 @@ export const traceJa: ColumnOf<typeof traceMessages> = {
   "trace.import.headerDuplicate": "ヘッダーに重複した列名があります。",
   "trace.import.removeColumn": "重複した列を削除してください。",
   "trace.import.useExport": "「CSV をエクスポート」で得たファイルを使ってください。",
-  "trace.import.allowedTypes": "行の種類は item、link、rule、result、deletion のいずれかにしてください。",
+  "trace.import.allowedTypes":
+    "行の種類は item、link、rule、result、deletion のいずれかにしてください。",
   "trace.import.fillId": "ID を入力するか、その行を削除してください。",
   "trace.import.empty": "ファイルが空です。",
   "trace.import.chooseNonempty": "データを含むファイルを選んでください。",
@@ -99,7 +116,8 @@ export const traceJa: ColumnOf<typeof traceMessages> = {
   "trace.import.unreadable": "ファイルを CSV として読み込めませんでした。",
   "trace.import.utf8": "UTF-8 の CSV ファイルか確認してください。",
   "trace.import.problem": "問題があるため、このファイルを適用できません。",
-  "trace.import.checkDetails": "技術的な詳細を確認し、ファイルを直してから、もう一度お試しください。",
+  "trace.import.checkDetails":
+    "技術的な詳細を確認し、ファイルを直してから、もう一度お試しください。",
   "trace.apply.stale": "プレビューのあとで追跡表が変更されたため、何も適用されませんでした。",
   "trace.apply.previewAgain": "ファイルをもう一度選んで、プレビューからやり直してください。",
   "trace.apply.fileChanged": "ファイルがプレビューしたものと異なるため、何も適用されませんでした。",
@@ -107,7 +125,8 @@ export const traceJa: ColumnOf<typeof traceMessages> = {
   "trace.apply.fixPreview": "プレビューの問題を直してから、もう一度お試しください。",
   "trace.apply.conflict": "追跡表が別の場所で変更されたため、何も適用されませんでした。",
   "trace.apply.reload": "表示を更新して、もう一度お試しください。",
-  "trace.apply.closed": "終了処理中またはアーカイブ済みのプロジェクトでは、追跡表を変更できません。",
+  "trace.apply.closed":
+    "終了処理中またはアーカイブ済みのプロジェクトでは、追跡表を変更できません。",
   "trace.apply.checkProject": "プロジェクトの状態を確認してください。",
   "trace.apply.failed": "変更を適用できませんでした。何も保存されていません。",
   "trace.apply.retry": "しばらくしてから、もう一度お試しください。",

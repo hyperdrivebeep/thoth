@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "thoth-rnd-agent"
-version = "0.2.0b3"
+version = "0.2.0b4"
 description = "AI-native R&D program agent reference implementation"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
@@ -71,11 +71,16 @@ line-length = 100
 src = ["src", "apps", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B", "UP", "SIM", "RUF", "T20", "ERA001", "ARG"]
+# S110/S112: an except that silently passes or continues. S310: opening a URL whose scheme was not
+# checked. S608: SQL put together from strings. The rest of the S (bandit) family stays off.
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF", "T20", "ERA001", "ARG", "S110", "S112", "S310", "S608"]
 ignore = ["B008"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["T20", "ARG"]
+# S608: tests and migrations put table and column names that are written in the same file (or read
+# from sqlite_master) into a statement. A name cannot be a bound parameter, and none comes from a request.
+"tests/**" = ["T20", "ARG", "S608"]
+"migrations/**" = ["S608"]
 
 [tool.ruff.format]
 quote-style = "double"

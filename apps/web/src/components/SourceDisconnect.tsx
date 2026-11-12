@@ -14,7 +14,8 @@ import type { ProjectSources } from "./useProjectSources";
 const REVISION_MISMATCH = -32030;
 
 function disconnectFailure(error: unknown): string {
-  if (error instanceof RpcError && error.code === REVISION_MISMATCH) return t("archive.revisionChanged");
+  if (error instanceof RpcError && error.code === REVISION_MISMATCH)
+    return t("archive.revisionChanged");
   return t("sources.disconnectFailed");
 }
 
@@ -22,7 +23,11 @@ function disconnectFailure(error: unknown): string {
  * "Disconnect" on one connected source. The source stays on disk and in the answers already made; it
  * is only left out of new questions. Nothing is sent before the person confirms.
  */
-export function SourceDisconnectButton({ projectId, artifact, sources }: {
+export function SourceDisconnectButton({
+  projectId,
+  artifact,
+  sources,
+}: {
   projectId: string;
   artifact: ConnectedArtifact;
   sources: ProjectSources | undefined;
@@ -94,7 +99,7 @@ export function DetachedSources({ sources }: { sources: ProjectSources | undefin
     <Disclosure label={message("detachedSources", detached.length)}>
       <p className="muted">{t("sources.detachedNotice")}</p>
       <ul className="detached-sources">
-        {detached.map(artifact => (
+        {detached.map((artifact) => (
           <li key={artifact.artifact_id}>{sourceCardTitle(artifact.source_uri)}</li>
         ))}
       </ul>

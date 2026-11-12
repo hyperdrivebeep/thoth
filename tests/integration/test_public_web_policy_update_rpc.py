@@ -129,9 +129,7 @@ async def test_stale_revision_is_rejected_without_changing_policy(
                 {
                     "project_id": "project:stale",
                     "expected_revision": created["revision"],
-                    "payload": {
-                        "public_web": {"enabled": False, "preferred_hosts": []}
-                    },
+                    "payload": {"public_web": {"enabled": False, "preferred_hosts": []}},
                 },
             )
         )

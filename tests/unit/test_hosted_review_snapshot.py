@@ -260,9 +260,7 @@ def test_restore_rejects_path_escape_and_symlink(tmp_path: Path) -> None:
         restore_workspace_archive(tmp_path / "linked", linked.getvalue())
 
 
-def test_restore_rejects_session_mismatch(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_restore_rejects_session_mismatch(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     source = tmp_path / "live"
     source.mkdir()
     (source / "inbox").mkdir()
@@ -274,9 +272,7 @@ def test_restore_rejects_session_mismatch(
         restore_workspace_archive(tmp_path / "other", archive)
 
 
-def test_restore_rejects_oversize_archive(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_restore_rejects_oversize_archive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     source = tmp_path / "live"
     source.mkdir()
     inbox = source / "inbox"

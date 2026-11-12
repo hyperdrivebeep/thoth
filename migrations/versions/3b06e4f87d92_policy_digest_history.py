@@ -55,11 +55,7 @@ def _check_shape(*, digest_unique: bool) -> None:
     if digest_unique:
         expected.add(("policy_digest",))
     indexes = tuple(connection.exec_driver_sql('PRAGMA index_list("project_policies")'))
-    explicit = {
-        str(row[1]): _index_columns(str(row[1]))
-        for row in indexes
-        if not row[2]
-    }
+    explicit = {str(row[1]): _index_columns(str(row[1])) for row in indexes if not row[2]}
     triggers = connection.exec_driver_sql(
         "SELECT name FROM sqlite_master WHERE type='trigger' AND tbl_name='project_policies'"
     ).first()
@@ -85,8 +81,7 @@ def _rebuild(*, digest_unique: bool) -> None:
         sa.UniqueConstraint("project_id", "version", name="uq_project_policy_version"),
     )
     op.execute(
-        f"INSERT INTO {temporary} ({_COLUMN_SQL}) "
-        f"SELECT {_COLUMN_SQL} FROM project_policies"
+        f"INSERT INTO {temporary} ({_COLUMN_SQL}) SELECT {_COLUMN_SQL} FROM project_policies"
     )
     op.drop_index("ix_project_policies_project_id", table_name="project_policies")
     op.drop_table("project_policies")
@@ -101,10 +96,14 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     _check_shape(digest_unique=False)
-    duplicate = op.get_bind().exec_driver_sql(
-        "SELECT policy_digest FROM project_policies "
-        "GROUP BY policy_digest HAVING count(*) > 1 LIMIT 1"
-    ).first()
+    duplicate = (
+        op.get_bind()
+        .exec_driver_sql(
+            "SELECT policy_digest FROM project_policies "
+            "GROUP BY policy_digest HAVING count(*) > 1 LIMIT 1"
+        )
+        .first()
+    )
     if duplicate is not None:
         raise RuntimeError(
             "cannot restore historical policy_digest uniqueness with repeated content"

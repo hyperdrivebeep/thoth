@@ -11,7 +11,7 @@ export function sentenceGap(): string {
 /** Sentences written one after another the way the current language writes them; empty ones are left out. */
 export function joinSentences(parts: readonly (string | null | undefined | false)[]): string {
   return parts
-    .map(part => (part ? part.trim() : ""))
+    .map((part) => (part ? part.trim() : ""))
     .filter(Boolean)
     .join(sentenceGap());
 }

@@ -3,47 +3,108 @@ import type { MessageKey } from "../i18n/messages";
 import { t, getLocale, formatDate, type Locale } from "../i18n/locale";
 import { criterionVerdicts, requirementVerdicts, reasonEnglish } from "../i18n/traceEnglish";
 import { criterionVerdictsZh, requirementVerdictsZh, reasonChinese } from "../i18n/traceChinese";
-import { criterionVerdictsZhHant, requirementVerdictsZhHant, reasonTraditional } from "../i18n/traceTraditional";
+import {
+  criterionVerdictsZhHant,
+  requirementVerdictsZhHant,
+  reasonTraditional,
+} from "../i18n/traceTraditional";
 import { criterionVerdictsJa, requirementVerdictsJa, reasonJapanese } from "../i18n/traceJapanese";
 import { iga } from "../api/koreanParticles";
-import type { ChangedDependency, ImportIssue, TraceResult, TraceRule, VerdictChange } from "../api/trace";
+import type {
+  ChangedDependency,
+  ImportIssue,
+  TraceResult,
+  TraceRule,
+  VerdictChange,
+} from "../api/trace";
 import { resultText, ruleText } from "./traceRows";
 import type { ReasonTagId } from "./traceReasonTags";
 
 /** Plain-language text for the trace table. Raw codes stay in the technical details, never in the main text. */
 
-export type Look = { text: string; intent: "success" | "danger" | "warning" | "none"; icon: "tick-circle" | "cross-circle" | "warning-sign" | "help" };
+export type Look = {
+  text: string;
+  intent: "success" | "danger" | "warning" | "none";
+  icon: "tick-circle" | "cross-circle" | "warning-sign" | "help";
+};
 
 const criterionLooks: Record<string, Look> = {
   PASS_COMPUTED: { text: "기준 충족", intent: "success", icon: "tick-circle" },
   FAIL_COMPUTED: { text: "기준 미달", intent: "danger", icon: "cross-circle" },
   HOLD_NO_RESULT: { text: "보류 · 결과 없음", intent: "warning", icon: "warning-sign" },
-  HOLD_INVALID_RESULT: { text: "보류 · 결과를 쓸 수 없음", intent: "warning", icon: "warning-sign" },
+  HOLD_INVALID_RESULT: {
+    text: "보류 · 결과를 쓸 수 없음",
+    intent: "warning",
+    icon: "warning-sign",
+  },
   HOLD_NO_RULE: { text: "보류 · 판정 규칙 없음", intent: "warning", icon: "warning-sign" },
 };
 const requirementLooks: Record<string, Look> = {
   PASS: { text: "모든 필수 기준 충족", intent: "success", icon: "tick-circle" },
   FAIL: { text: "기준 미달", intent: "danger", icon: "cross-circle" },
-  FAIL_WITH_INCOMPLETE_COVERAGE: { text: "기준 미달 · 결과 없는 조건도 있음", intent: "danger", icon: "cross-circle" },
-  HOLD_INCOMPLETE: { text: "보류 · 결과 없는 조건이 있음", intent: "warning", icon: "warning-sign" },
+  FAIL_WITH_INCOMPLETE_COVERAGE: {
+    text: "기준 미달 · 결과 없는 조건도 있음",
+    intent: "danger",
+    icon: "cross-circle",
+  },
+  HOLD_INCOMPLETE: {
+    text: "보류 · 결과 없는 조건이 있음",
+    intent: "warning",
+    icon: "warning-sign",
+  },
   HOLD_NO_CRITERIA: { text: "보류 · 필수 기준이 없음", intent: "warning", icon: "warning-sign" },
 };
 /** The verdict wording of the languages whose sentences live outside this file; Korean is written below. */
-const verdictTexts: Record<Exclude<Locale, "ko">, { criterion: Record<string, string>; requirement: Record<string, string>; unknown: string }> = {
-  en: { criterion: criterionVerdicts, requirement: requirementVerdicts, unknown: "Unknown assessment" },
-  "zh-Hans": { criterion: criterionVerdictsZh, requirement: requirementVerdictsZh, unknown: "未知的评估" },
-  "zh-Hant": { criterion: criterionVerdictsZhHant, requirement: requirementVerdictsZhHant, unknown: "未知的評估" },
+const verdictTexts: Record<
+  Exclude<Locale, "ko">,
+  { criterion: Record<string, string>; requirement: Record<string, string>; unknown: string }
+> = {
+  en: {
+    criterion: criterionVerdicts,
+    requirement: requirementVerdicts,
+    unknown: "Unknown assessment",
+  },
+  "zh-Hans": {
+    criterion: criterionVerdictsZh,
+    requirement: requirementVerdictsZh,
+    unknown: "未知的评估",
+  },
+  "zh-Hant": {
+    criterion: criterionVerdictsZhHant,
+    requirement: requirementVerdictsZhHant,
+    unknown: "未知的評估",
+  },
   ja: { criterion: criterionVerdictsJa, requirement: requirementVerdictsJa, unknown: "不明な判定" },
 };
 export const verdictLook = (kind: string, state: string, locale: Locale = getLocale()): Look => {
-  const look = (kind === "REQUIREMENT" ? requirementLooks : criterionLooks)[state] ?? { text: "알 수 없는 판정", intent: "none", icon: "help" };
+  const look = (kind === "REQUIREMENT" ? requirementLooks : criterionLooks)[state] ?? {
+    text: "알 수 없는 판정",
+    intent: "none",
+    icon: "help",
+  };
   if (locale === "ko") return look;
   const texts = verdictTexts[locale];
-  return { ...look, text: (kind === "REQUIREMENT" ? texts.requirement : texts.criterion)[state] ?? texts.unknown };
+  return {
+    ...look,
+    text: (kind === "REQUIREMENT" ? texts.requirement : texts.criterion)[state] ?? texts.unknown,
+  };
 };
 
 /** Who decides after the check. Provisional names, to be confirmed with the people who do this work. */
-export const NEXT_STEP_DECIDERS = { get test() { return t("trace.decider.test"); }, get validity() { return t("trace.decider.validity"); }, get rule() { return t("trace.decider.rule"); }, get disposition() { return t("trace.decider.disposition"); } } as const;
+export const NEXT_STEP_DECIDERS = {
+  get test() {
+    return t("trace.decider.test");
+  },
+  get validity() {
+    return t("trace.decider.validity");
+  },
+  get rule() {
+    return t("trace.decider.rule");
+  },
+  get disposition() {
+    return t("trace.decider.disposition");
+  },
+} as const;
 
 /** One thing to check, and who decides after it. A line can have its own decider; null when no one is named. */
 export type NextLine = { text: string; decider: string | null };
@@ -81,22 +142,49 @@ const requirementNext = (): Record<string, NextLine[]> => ({
   HOLD_NO_CRITERIA: [line(t("trace.next.required"), NEXT_STEP_DECIDERS.rule)],
 });
 const settled = new Set(["PASS_COMPUTED", "PASS"]);
-const TAG_ORDER: ReasonTagId[] = ["UNTESTED", "UNLINKED", "CONDITION_MISMATCH", "UNIT", "DENOMINATOR", "VALUE"];
+const TAG_ORDER: ReasonTagId[] = [
+  "UNTESTED",
+  "UNLINKED",
+  "CONDITION_MISMATCH",
+  "UNIT",
+  "DENOMINATOR",
+  "VALUE",
+];
 
 /**
  * What to check next for a held or failed line, from its state and its reason tags. A held criterion gets one line per tag it
  * carries (no tag, or none this table knows, gives the state's general check). A met line has none unless its basis changed.
  * An unknown state gets nothing, never a guess.
  */
-export function nextStep(kind: "CRITERION" | "REQUIREMENT", state: string, stale: boolean, tags: readonly ReasonTagId[] = []): NextStep | null {
+export function nextStep(
+  kind: "CRITERION" | "REQUIREMENT",
+  state: string,
+  stale: boolean,
+  tags: readonly ReasonTagId[] = [],
+): NextStep | null {
   const general = (kind === "REQUIREMENT" ? requirementNext() : criterionNext())[state];
   if (!general && !settled.has(state)) return null;
-  const specific = kind === "CRITERION" ? TAG_ORDER.flatMap(id => (tags.includes(id) && tagNext()[state]?.[id] ? [tagNext()[state]![id]!] : [])) : [];
-  const own = specific.length > 0 ? specific : general ?? [];
-  if (!stale) return own.length > 0 ? { lines: own.map(item => ({ ...item })) } : null;
-  return { lines: [line(STALE_CHECK(), null), ...own.map(item => ({ ...item }))] };
+  const specific =
+    kind === "CRITERION"
+      ? TAG_ORDER.flatMap((id) =>
+          tags.includes(id) && tagNext()[state]?.[id] ? [tagNext()[state]![id]!] : [],
+        )
+      : [];
+  const own = specific.length > 0 ? specific : (general ?? []);
+  if (!stale) return own.length > 0 ? { lines: own.map((item) => ({ ...item })) } : null;
+  return { lines: [line(STALE_CHECK(), null), ...own.map((item) => ({ ...item }))] };
 }
-const triggers: Record<string, string> = { get INITIAL_COMPUTE() { return t("trace.trigger.initial"); }, get CSV_IMPORT() { return t("trace.trigger.import"); }, get RECOMPUTE() { return t("trace.trigger.recompute"); } };
+const triggers: Record<string, string> = {
+  get INITIAL_COMPUTE() {
+    return t("trace.trigger.initial");
+  },
+  get CSV_IMPORT() {
+    return t("trace.trigger.import");
+  },
+  get RECOMPUTE() {
+    return t("trace.trigger.recompute");
+  },
+};
 export const triggerLabel = (trigger: string) => triggers[trigger] ?? t("trace.trigger.other");
 
 export function actorLabel(actorId: string) {
@@ -110,7 +198,12 @@ export const timeText = (iso: string) => {
 };
 
 /** One reason the rule found, as a sentence. `titleOf` names a criterion for the reasons a requirement carries. */
-export function reasonSentence(code: string, titleOf: (id: string) => string, condition?: string | null, locale: Locale = getLocale()): string {
+export function reasonSentence(
+  code: string,
+  titleOf: (id: string) => string,
+  condition?: string | null,
+  locale: Locale = getLocale(),
+): string {
   if (locale === "en") return reasonEnglish(code, titleOf, condition);
   if (locale === "zh-Hans") return reasonChinese(code, titleOf, condition);
   if (locale === "zh-Hant") return reasonTraditional(code, titleOf, condition);
@@ -125,7 +218,9 @@ export function reasonSentence(code: string, titleOf: (id: string) => string, co
   if (head === "NO_RESULT") {
     // The condition comes from the verdict's own condition field; the text after the colon is only the fallback.
     const text = condition ?? tail;
-    return text ? `${describeConditionText(text, locale)} 조건의 결과가 아직 없습니다.` : "결과가 아직 없습니다.";
+    return text
+      ? `${describeConditionText(text, locale)} 조건의 결과가 아직 없습니다.`
+      : "결과가 아직 없습니다.";
   }
   if (head === "THRESHOLD_NOT_MET") {
     const match = /value=(\S+) need (>=|<=) (\S+) (.*)$/.exec(tail);
@@ -137,7 +232,9 @@ export function reasonSentence(code: string, titleOf: (id: string) => string, co
   }
   if (head === "UNIT_MISMATCH") {
     const match = /:([^!]*)!=(.*)$/.exec(tail);
-    return match ? `결과의 단위(${match[1]})가 기준의 단위(${match[2]})와 달라 비교하지 않았습니다.` : "결과의 단위가 기준과 달라 비교하지 않았습니다.";
+    return match
+      ? `결과의 단위(${match[1]})가 기준의 단위(${match[2]})와 달라 비교하지 않았습니다.`
+      : "결과의 단위가 기준과 달라 비교하지 않았습니다.";
   }
   const simple: Record<string, string> = {
     VALUE_MISSING: "결과에 값이 비어 있어 비교하지 않았습니다.",
@@ -147,29 +244,92 @@ export function reasonSentence(code: string, titleOf: (id: string) => string, co
     VALUE_OUT_OF_RANGE: "결과의 값이 너무 커서 계산하지 못했습니다.",
   };
   if (simple[head]) return simple[head];
-  if (rest.length > 0 && criterionLooks[rest.join(":")]) return `${titleOf(head)}: ${criterionLooks[rest.join(":")].text}`;
+  if (rest.length > 0 && criterionLooks[rest.join(":")])
+    return `${titleOf(head)}: ${criterionLooks[rest.join(":")].text}`;
   return "이유를 문장으로 바꾸지 못했습니다. 기술 정보를 확인하세요.";
 }
 
 const fieldNames: Record<string, string> = {
-  get value() { return t("trace.field.value"); }, get unit() { return t("trace.field.unit"); }, get condition() { return t("trace.field.condition"); }, get numerator() { return t("trace.field.numerator"); }, get denominator() { return t("trace.field.denominator"); }, get result_revision() { return t("trace.field.resultRevision"); },
-  get source_span_refs() { return t("trace.field.sourceRefs"); }, get raw_value() { return t("trace.field.rawValue"); }, get observed_at() { return t("trace.field.observedAt"); }, get criterion_id() { return t("trace.field.criterion"); }, get threshold() { return t("trace.field.threshold"); },
-  get comparator() { return t("trace.field.comparator"); }, get required() { return t("trace.field.required"); }, get rounding() { return t("trace.field.rounding"); }, get measure() { return t("trace.field.measure"); }, get rule_revision() { return t("trace.field.ruleRevision"); }, get policy() { return t("trace.field.policy"); },
+  get value() {
+    return t("trace.field.value");
+  },
+  get unit() {
+    return t("trace.field.unit");
+  },
+  get condition() {
+    return t("trace.field.condition");
+  },
+  get numerator() {
+    return t("trace.field.numerator");
+  },
+  get denominator() {
+    return t("trace.field.denominator");
+  },
+  get result_revision() {
+    return t("trace.field.resultRevision");
+  },
+  get source_span_refs() {
+    return t("trace.field.sourceRefs");
+  },
+  get raw_value() {
+    return t("trace.field.rawValue");
+  },
+  get observed_at() {
+    return t("trace.field.observedAt");
+  },
+  get criterion_id() {
+    return t("trace.field.criterion");
+  },
+  get threshold() {
+    return t("trace.field.threshold");
+  },
+  get comparator() {
+    return t("trace.field.comparator");
+  },
+  get required() {
+    return t("trace.field.required");
+  },
+  get rounding() {
+    return t("trace.field.rounding");
+  },
+  get measure() {
+    return t("trace.field.measure");
+  },
+  get rule_revision() {
+    return t("trace.field.ruleRevision");
+  },
+  get policy() {
+    return t("trace.field.policy");
+  },
 };
-const shown = (value: string | null) => (value === null || value === "" ? t("trace.field.empty") : value);
+const shown = (value: string | null) =>
+  value === null || value === "" ? t("trace.field.empty") : value;
 
-const conditionKeys: Record<string, {name: MessageKey; values: Record<string, MessageKey>}> = {
-  weather: {name: "trace.condition.weather", values: {dry: "trace.condition.dry", rain: "trace.condition.rain", fog: "trace.condition.fog"}},
+const conditionKeys: Record<string, { name: MessageKey; values: Record<string, MessageKey> }> = {
+  weather: {
+    name: "trace.condition.weather",
+    values: {
+      dry: "trace.condition.dry",
+      rain: "trace.condition.rain",
+      fog: "trace.condition.fog",
+    },
+  },
 };
 /** A condition the user wrote as a key and a value, in plain words. A key or value this screen does not know is shown as written. */
-export function describeCondition(key: string, value: string, locale: Locale = getLocale()): string {
+export function describeCondition(
+  key: string,
+  value: string,
+  locale: Locale = getLocale(),
+): string {
   const known = conditionKeys[key];
   if (!known) return `${key} = ${value}`;
   return `${t(known.name, locale)}: ${known.values[value] ? t(known.values[value], locale) : value}`;
 }
 export function describeConditionText(text: string, locale: Locale = getLocale()): string {
   const at = text.indexOf("=");
-  return at < 0 ? text : describeCondition(text.slice(0, at).trim(), text.slice(at + 1).trim(), locale);
+  return at < 0
+    ? text
+    : describeCondition(text.slice(0, at).trim(), text.slice(at + 1).trim(), locale);
 }
 
 export type ChangeLookup = { results: TraceResult[]; rules: TraceRule[] };
@@ -177,28 +337,53 @@ export type ChangeLookup = { results: TraceResult[]; rules: TraceRule[] };
 /** One input change as a sentence. What was added is described from the stored result or rule, never from the text the server wrote. */
 export function changeSentence(change: ChangedDependency, lookup?: ChangeLookup): string {
   const name = change.ref_id;
-  const pair = (): [string | null, string | null] => (change.field === "condition"
-    ? [change.before, change.after].map(item => (item ? describeConditionText(item) : item)) as [string | null, string | null]
-    : [change.before, change.after]);
+  const pair = (): [string | null, string | null] =>
+    change.field === "condition"
+      ? ([change.before, change.after].map((item) =>
+          item ? describeConditionText(item) : item,
+        ) as [string | null, string | null])
+      : [change.before, change.after];
   if (change.kind === "RESULT") {
     if (change.field === "*") {
       if (change.before !== null) return message("traceResultRemoved", name);
-      const result = lookup?.results.find(item => item.result_id === name);
-      return result ? message("traceResultAdded", name, ` (${resultText(result)} · ${describeConditionText(result.condition)})`) : message("traceResultAdded", name, "");
+      const result = lookup?.results.find((item) => item.result_id === name);
+      return result
+        ? message(
+            "traceResultAdded",
+            name,
+            ` (${resultText(result)} · ${describeConditionText(result.condition)})`,
+          )
+        : message("traceResultAdded", name, "");
     }
     const [before, after] = pair();
-    return message("traceResultChanged", name, fieldNames[change.field] ?? t("trace.field.content"), shown(before), shown(after));
+    return message(
+      "traceResultChanged",
+      name,
+      fieldNames[change.field] ?? t("trace.field.content"),
+      shown(before),
+      shown(after),
+    );
   }
   if (change.kind === "RULE") {
     if (change.field === "*") {
       if (change.before !== null) return t("trace.change.ruleRemoved");
-      const rule = lookup?.rules.find(item => item.rule_id === name);
-      return rule ? message("traceRuleAdded", ruleText(rule), describeConditionText(rule.condition)) : t("trace.change.ruleAdded");
+      const rule = lookup?.rules.find((item) => item.rule_id === name);
+      return rule
+        ? message("traceRuleAdded", ruleText(rule), describeConditionText(rule.condition))
+        : t("trace.change.ruleAdded");
     }
     const [before, after] = pair();
-    return message("traceRuleChanged", fieldNames[change.field] ?? t("trace.field.content"), shown(before), shown(after));
+    return message(
+      "traceRuleChanged",
+      fieldNames[change.field] ?? t("trace.field.content"),
+      shown(before),
+      shown(after),
+    );
   }
-  if (change.kind === "LINK") return change.before === null ? message("traceLinkAdded", name) : message("traceLinkRemoved", name);
+  if (change.kind === "LINK")
+    return change.before === null
+      ? message("traceLinkAdded", name)
+      : message("traceLinkRemoved", name);
   return t("trace.change.policy");
 }
 
@@ -206,20 +391,38 @@ export const verdictChangeSentence = (change: VerdictChange, titleOf: (id: strin
   `${titleOf(change.subject_id)}: ${change.before === null ? t("trace.change.initial") : verdictLook(change.subject_kind, change.before).text} → ${verdictLook(change.subject_kind, change.after).text}`;
 
 export const resultReasonText = (reason: string) =>
-  reason === "SUPERSEDED_BY_LATER_RESULT" ? t("trace.result.superseded") : reason === "CONDITION_MISMATCH" ? t("trace.result.condition") : t("trace.result.excluded");
+  reason === "SUPERSEDED_BY_LATER_RESULT"
+    ? t("trace.result.superseded")
+    : reason === "CONDITION_MISMATCH"
+      ? t("trace.result.condition")
+      : t("trace.result.excluded");
 
 const lossTexts: Record<string, string> = {
-  get evidence_text() { return t("trace.loss.evidence"); },
-  get verdict_history() { return t("trace.loss.history"); },
-  get confirmations() { return t("trace.loss.confirmation"); },
-  get selection_policy() { return t("trace.loss.policy"); },
-  get pending_changes() { return t("trace.loss.pending"); },
-  get closures() { return t("trace.loss.closures"); },
+  get evidence_text() {
+    return t("trace.loss.evidence");
+  },
+  get verdict_history() {
+    return t("trace.loss.history");
+  },
+  get confirmations() {
+    return t("trace.loss.confirmation");
+  },
+  get selection_policy() {
+    return t("trace.loss.policy");
+  },
+  get pending_changes() {
+    return t("trace.loss.pending");
+  },
+  get closures() {
+    return t("trace.loss.closures");
+  },
 };
 export function lossText(line: string) {
   const key = line.split(":")[0];
   if (lossTexts[key]) return lossTexts[key];
-  return line.startsWith("column ignored:") ? message("traceIgnoredColumn", line.slice(line.indexOf(":") + 1).trim()) : line;
+  return line.startsWith("column ignored:")
+    ? message("traceIgnoredColumn", line.slice(line.indexOf(":") + 1).trim())
+    : line;
 }
 
 export type IssueText = { message: string; next: string };
@@ -228,44 +431,264 @@ const ref = (issue: ImportIssue) => (issue.ref ? ` ${issue.ref}` : "");
 
 export function issueText(issue: ImportIssue): IssueText {
   const table: Record<string, () => IssueText> = {
-    STALE_BASE: () => ({ get message() { return t("trace.import.stale"); }, get next() { return t("trace.import.reexport"); } }),
-    BASE_DIGEST_MISSING: () => ({ get message() { return t("trace.import.noBase"); }, get next() { return t("trace.import.keepHeaders"); } }),
-    BASE_DIGEST_INCONSISTENT: () => ({ get message() { return t("trace.import.mixedBase"); }, get next() { return t("trace.import.oneFile"); } }),
-    MODE_CREATE_NEEDS_EMPTY_PROJECT: () => ({ get message() { return t("trace.import.exists"); }, get next() { return t("trace.import.chooseUpdate"); } }),
-    UPDATE_NEEDS_EXISTING_TRACE: () => ({ get message() { return t("trace.import.noTable"); }, get next() { return t("trace.import.chooseCreate"); } }),
-    DUPLICATE_ID_IN_FILE: () => ({ message: message("traceDuplicate", ref(issue), where(issue)), get next() { return t("trace.import.deduplicate"); } }),
-    ROW_INVALID: () => ({ message: message("traceInvalidRow", issue.row ?? "?", ref(issue)), get next() { return t("trace.import.validFields"); } }),
-    ITEM_KEY_CHANGED: () => ({ message: message("traceKeyChanged", ref(issue), where(issue)), get next() { return t("trace.import.keepKey"); } }),
-    DELETE_TARGET_NOT_FOUND: () => ({ message: message("traceDeleteMissing", ref(issue), where(issue)), get next() { return t("trace.import.checkDelete"); } }),
-    DELETE_BLOCKED_BY_LINK: () => ({ message: message("traceDeleteLinks", ref(issue)), get next() { return t("trace.import.deleteLinks"); } }),
-    DELETE_BLOCKED_BY_RULE: () => ({ message: message("traceDeleteRule", ref(issue)), get next() { return t("trace.import.deleteRules"); } }),
-    DELETE_BLOCKED_BY_RESULT: () => ({ message: message("traceDeleteResult", ref(issue)), get next() { return t("trace.import.deleteResults"); } }),
-    DELETE_AND_UPSERT_SAME_TARGET: () => ({ message: message("traceDeleteAndUpdate", ref(issue), where(issue)), get next() { return t("trace.import.chooseOne"); } }),
-    DELETE_NOT_ALLOWED_IN_CREATE: () => ({ get message() { return t("trace.import.noDeleteCreate"); }, get next() { return t("trace.import.removeDelete"); } }),
-    DELETE_ROW_INCOMPLETE: () => ({ message: message("traceDeleteIncomplete", where(issue)), get next() { return t("trace.import.deleteIdentity"); } }),
-    EXCEL_ID_SUSPECTED: () => ({ message: message("traceSpreadsheetId", ref(issue), where(issue), issue.detail ?? ""), get next() { return t("trace.excelFix"); } }),
-    GRAPH_INVALID: () => ({ get message() { return t("trace.invalidGraph"); }, get next() { return t("trace.checkLinks"); } }),
-    HEADER_MISSING_COLUMNS: () => ({ get message() { return t("trace.import.headerMissing"); }, get next() { return t("trace.import.useExportHeader"); } }),
-    HEADER_DUPLICATE_COLUMN: () => ({ get message() { return t("trace.import.headerDuplicate"); }, get next() { return t("trace.import.removeColumn"); } }),
-    FORMAT_UNSUPPORTED: () => ({ message: message("traceFormatUnsupported", where(issue)), get next() { return t("trace.import.useExport"); } }),
-    ROW_TYPE_UNKNOWN: () => ({ message: message("traceUnknownRowType", where(issue)), get next() { return t("trace.import.allowedTypes"); } }),
-    ID_MISSING: () => ({ message: message("traceIdMissing", where(issue)), get next() { return t("trace.import.fillId"); } }),
-    CSV_EMPTY: () => ({ get message() { return t("trace.import.empty"); }, get next() { return t("trace.import.chooseNonempty"); } }),
-    CSV_HAS_NO_ROWS: () => ({ get message() { return t("trace.import.noRows"); }, get next() { return t("trace.import.chooseNonempty"); } }),
-    FILE_TOO_LARGE: () => ({ get message() { return t("trace.import.tooLarge"); }, get next() { return t("trace.import.split"); } }),
-    TOO_MANY_ROWS: () => ({ get message() { return t("trace.import.tooManyRows"); }, get next() { return t("trace.import.split"); } }),
-    CSV_UNREADABLE: () => ({ get message() { return t("trace.import.unreadable"); }, get next() { return t("trace.import.utf8"); } }),
+    STALE_BASE: () => ({
+      get message() {
+        return t("trace.import.stale");
+      },
+      get next() {
+        return t("trace.import.reexport");
+      },
+    }),
+    BASE_DIGEST_MISSING: () => ({
+      get message() {
+        return t("trace.import.noBase");
+      },
+      get next() {
+        return t("trace.import.keepHeaders");
+      },
+    }),
+    BASE_DIGEST_INCONSISTENT: () => ({
+      get message() {
+        return t("trace.import.mixedBase");
+      },
+      get next() {
+        return t("trace.import.oneFile");
+      },
+    }),
+    MODE_CREATE_NEEDS_EMPTY_PROJECT: () => ({
+      get message() {
+        return t("trace.import.exists");
+      },
+      get next() {
+        return t("trace.import.chooseUpdate");
+      },
+    }),
+    UPDATE_NEEDS_EXISTING_TRACE: () => ({
+      get message() {
+        return t("trace.import.noTable");
+      },
+      get next() {
+        return t("trace.import.chooseCreate");
+      },
+    }),
+    DUPLICATE_ID_IN_FILE: () => ({
+      message: message("traceDuplicate", ref(issue), where(issue)),
+      get next() {
+        return t("trace.import.deduplicate");
+      },
+    }),
+    ROW_INVALID: () => ({
+      message: message("traceInvalidRow", issue.row ?? "?", ref(issue)),
+      get next() {
+        return t("trace.import.validFields");
+      },
+    }),
+    ITEM_KEY_CHANGED: () => ({
+      message: message("traceKeyChanged", ref(issue), where(issue)),
+      get next() {
+        return t("trace.import.keepKey");
+      },
+    }),
+    DELETE_TARGET_NOT_FOUND: () => ({
+      message: message("traceDeleteMissing", ref(issue), where(issue)),
+      get next() {
+        return t("trace.import.checkDelete");
+      },
+    }),
+    DELETE_BLOCKED_BY_LINK: () => ({
+      message: message("traceDeleteLinks", ref(issue)),
+      get next() {
+        return t("trace.import.deleteLinks");
+      },
+    }),
+    DELETE_BLOCKED_BY_RULE: () => ({
+      message: message("traceDeleteRule", ref(issue)),
+      get next() {
+        return t("trace.import.deleteRules");
+      },
+    }),
+    DELETE_BLOCKED_BY_RESULT: () => ({
+      message: message("traceDeleteResult", ref(issue)),
+      get next() {
+        return t("trace.import.deleteResults");
+      },
+    }),
+    DELETE_AND_UPSERT_SAME_TARGET: () => ({
+      message: message("traceDeleteAndUpdate", ref(issue), where(issue)),
+      get next() {
+        return t("trace.import.chooseOne");
+      },
+    }),
+    DELETE_NOT_ALLOWED_IN_CREATE: () => ({
+      get message() {
+        return t("trace.import.noDeleteCreate");
+      },
+      get next() {
+        return t("trace.import.removeDelete");
+      },
+    }),
+    DELETE_ROW_INCOMPLETE: () => ({
+      message: message("traceDeleteIncomplete", where(issue)),
+      get next() {
+        return t("trace.import.deleteIdentity");
+      },
+    }),
+    EXCEL_ID_SUSPECTED: () => ({
+      message: message("traceSpreadsheetId", ref(issue), where(issue), issue.detail ?? ""),
+      get next() {
+        return t("trace.excelFix");
+      },
+    }),
+    GRAPH_INVALID: () => ({
+      get message() {
+        return t("trace.invalidGraph");
+      },
+      get next() {
+        return t("trace.checkLinks");
+      },
+    }),
+    HEADER_MISSING_COLUMNS: () => ({
+      get message() {
+        return t("trace.import.headerMissing");
+      },
+      get next() {
+        return t("trace.import.useExportHeader");
+      },
+    }),
+    HEADER_DUPLICATE_COLUMN: () => ({
+      get message() {
+        return t("trace.import.headerDuplicate");
+      },
+      get next() {
+        return t("trace.import.removeColumn");
+      },
+    }),
+    FORMAT_UNSUPPORTED: () => ({
+      message: message("traceFormatUnsupported", where(issue)),
+      get next() {
+        return t("trace.import.useExport");
+      },
+    }),
+    ROW_TYPE_UNKNOWN: () => ({
+      message: message("traceUnknownRowType", where(issue)),
+      get next() {
+        return t("trace.import.allowedTypes");
+      },
+    }),
+    ID_MISSING: () => ({
+      message: message("traceIdMissing", where(issue)),
+      get next() {
+        return t("trace.import.fillId");
+      },
+    }),
+    CSV_EMPTY: () => ({
+      get message() {
+        return t("trace.import.empty");
+      },
+      get next() {
+        return t("trace.import.chooseNonempty");
+      },
+    }),
+    CSV_HAS_NO_ROWS: () => ({
+      get message() {
+        return t("trace.import.noRows");
+      },
+      get next() {
+        return t("trace.import.chooseNonempty");
+      },
+    }),
+    FILE_TOO_LARGE: () => ({
+      get message() {
+        return t("trace.import.tooLarge");
+      },
+      get next() {
+        return t("trace.import.split");
+      },
+    }),
+    TOO_MANY_ROWS: () => ({
+      get message() {
+        return t("trace.import.tooManyRows");
+      },
+      get next() {
+        return t("trace.import.split");
+      },
+    }),
+    CSV_UNREADABLE: () => ({
+      get message() {
+        return t("trace.import.unreadable");
+      },
+      get next() {
+        return t("trace.import.utf8");
+      },
+    }),
   };
-  return (table[issue.code] ?? (() => ({ get message() { return t("trace.import.problem"); }, get next() { return t("trace.import.checkDetails"); } })))();
+  return (
+    table[issue.code] ??
+    (() => ({
+      get message() {
+        return t("trace.import.problem");
+      },
+      get next() {
+        return t("trace.import.checkDetails");
+      },
+    }))
+  )();
 }
 
 /** An apply that the server refused, in words and with what to do next. */
 export function applyFailureText(error: unknown): IssueText {
   const message = error instanceof Error ? error.message : "";
-  if (message.includes("TRACE_IMPORT_PREVIEW_STALE")) return { get message() { return t("trace.apply.stale"); }, get next() { return t("trace.apply.previewAgain"); } };
-  if (message.includes("TRACE_IMPORT_INPUT_CHANGED")) return { get message() { return t("trace.apply.fileChanged"); }, get next() { return t("trace.apply.previewAgain"); } };
-  if (message.includes("TRACE_IMPORT_NOT_APPLICABLE")) return { get message() { return t("trace.apply.unresolved"); }, get next() { return t("trace.apply.fixPreview"); } };
-  if (message.includes("TRACE_REVISION_CONFLICT")) return { get message() { return t("trace.apply.conflict"); }, get next() { return t("trace.apply.reload"); } };
-  if (message.includes("closing or archived")) return { get message() { return t("trace.apply.closed"); }, get next() { return t("trace.apply.checkProject"); } };
-  return { get message() { return t("trace.apply.failed"); }, get next() { return t("trace.apply.retry"); } };
+  if (message.includes("TRACE_IMPORT_PREVIEW_STALE"))
+    return {
+      get message() {
+        return t("trace.apply.stale");
+      },
+      get next() {
+        return t("trace.apply.previewAgain");
+      },
+    };
+  if (message.includes("TRACE_IMPORT_INPUT_CHANGED"))
+    return {
+      get message() {
+        return t("trace.apply.fileChanged");
+      },
+      get next() {
+        return t("trace.apply.previewAgain");
+      },
+    };
+  if (message.includes("TRACE_IMPORT_NOT_APPLICABLE"))
+    return {
+      get message() {
+        return t("trace.apply.unresolved");
+      },
+      get next() {
+        return t("trace.apply.fixPreview");
+      },
+    };
+  if (message.includes("TRACE_REVISION_CONFLICT"))
+    return {
+      get message() {
+        return t("trace.apply.conflict");
+      },
+      get next() {
+        return t("trace.apply.reload");
+      },
+    };
+  if (message.includes("closing or archived"))
+    return {
+      get message() {
+        return t("trace.apply.closed");
+      },
+      get next() {
+        return t("trace.apply.checkProject");
+      },
+    };
+  return {
+    get message() {
+      return t("trace.apply.failed");
+    },
+    get next() {
+      return t("trace.apply.retry");
+    },
+  };
 }

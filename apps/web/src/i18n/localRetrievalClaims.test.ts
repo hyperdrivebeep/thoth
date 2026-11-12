@@ -5,7 +5,12 @@ import { localRetrievalText } from "./localRetrievalMessages";
 /* Local retrieval is on for every project once the model files and the runtime component are installed. The texts
    next to the switch must say that, say that an index that is not ready (or cannot be used for a question) means the
    existing search, and must not keep calling it an experiment, off by default, or something started only by a click. */
-const KEYS = ["localRetrieval.intro", "localRetrieval.readyNote", "localRetrieval.enableHelp", "localRetrieval.outdatedIndex"] as const;
+const KEYS = [
+  "localRetrieval.intro",
+  "localRetrieval.readyNote",
+  "localRetrieval.enableHelp",
+  "localRetrieval.outdatedIndex",
+] as const;
 const OLD_CLAIMS: Record<string, RegExp[]> = {
   ko: [/실험/, /기본은 꺼짐/, /눌러야만/],
   en: [/experimental/i, /off by default/i, /only when you choose/i],
@@ -14,14 +19,25 @@ const OLD_CLAIMS: Record<string, RegExp[]> = {
   ja: [/実験/, /既定ではオフ/, /だけ始まります/],
 };
 const AUTOMATIC: Record<string, RegExp> = {
-  ko: /자동으로/, en: /automatically/i, "zh-Hans": /自动/, "zh-Hant": /自動/, ja: /自動/,
+  ko: /자동으로/,
+  en: /automatically/i,
+  "zh-Hans": /自动/,
+  "zh-Hant": /自動/,
+  ja: /自動/,
 };
 const DEFAULT_ON: Record<string, RegExp> = {
-  ko: /기본값은 켜짐/, en: /On by default/, "zh-Hans": /默认开启/, "zh-Hant": /預設開啟/, ja: /既定ではオン/,
+  ko: /기본값은 켜짐/,
+  en: /On by default/,
+  "zh-Hans": /默认开启/,
+  "zh-Hant": /預設開啟/,
+  ja: /既定ではオン/,
 };
 const FALLBACK: Record<string, RegExp> = {
-  ko: /기존 검색 방식 그대로/, en: /existing search method is used/, "zh-Hans": /仍使用现有的检索方式/,
-  "zh-Hant": /仍使用現有的檢索方式/, ja: /これまでの検索方法のまま/,
+  ko: /기존 검색 방식 그대로/,
+  en: /existing search method is used/,
+  "zh-Hans": /仍使用现有的检索方式/,
+  "zh-Hant": /仍使用現有的檢索方式/,
+  ja: /これまでの検索方法のまま/,
 };
 
 for (const { code } of LANGUAGE_CHOICES) {

@@ -7,15 +7,32 @@ import { NAVIGATION_ID, type NavigationDrawer } from "./useNavigationDrawer";
 export type ServerHealth = "ok" | "failed" | "checking";
 
 const healthLabel = (health: ServerHealth) =>
-  health === "ok" ? t("workspace.serverConnected") : health === "failed" ? t("workspace.serverFailed") : t("workspace.checkingConnection");
-const healthIntent = (health: ServerHealth) => (health === "ok" ? "success" : health === "failed" ? "danger" : "none");
+  health === "ok"
+    ? t("workspace.serverConnected")
+    : health === "failed"
+      ? t("workspace.serverFailed")
+      : t("workspace.checkingConnection");
+const healthIntent = (health: ServerHealth) =>
+  health === "ok" ? "success" : health === "failed" ? "danger" : "none";
 
 /**
  * The bar above the page: where you are, and what needs attention. Every item stays on one line. When the
  * window is narrow the names give way first (with the whole name in the tooltip) and the stylesheet folds
  * the tags down to their icons, so nothing is stacked one letter per line.
  */
-export function WorkspaceTopbar({ drawer, testMode, projectLabel, threadLabel, cutoff, health, setupNeeded, locationUnsaved, missingSelection, onOpenSettings, onRefresh }: {
+export function WorkspaceTopbar({
+  drawer,
+  testMode,
+  projectLabel,
+  threadLabel,
+  cutoff,
+  health,
+  setupNeeded,
+  locationUnsaved,
+  missingSelection,
+  onOpenSettings,
+  onRefresh,
+}: {
   drawer: NavigationDrawer;
   testMode: boolean;
   projectLabel: string;
@@ -52,13 +69,20 @@ export function WorkspaceTopbar({ drawer, testMode, projectLabel, threadLabel, c
         {threadLabel && (
           <>
             <span className="context-thread">/</span>
-            <small className="context-thread" title={threadLabel}>{threadLabel}</small>
+            <small className="context-thread" title={threadLabel}>
+              {threadLabel}
+            </small>
           </>
         )}
       </div>
       <div className="header-status">
         {cutoffText && (
-          <Tag minimal icon="time" className="header-cutoff" title={cutoffText + sentenceGap() + t("workspace.cutoffHint")}>
+          <Tag
+            minimal
+            icon="time"
+            className="header-cutoff"
+            title={cutoffText + sentenceGap() + t("workspace.cutoffHint")}
+          >
             {cutoffText}
           </Tag>
         )}
@@ -66,13 +90,25 @@ export function WorkspaceTopbar({ drawer, testMode, projectLabel, threadLabel, c
           {healthLabel(health)}
         </Tag>
         {setupNeeded && (
-          <Button small intent="warning" className="setup-needed-button" icon="warning-sign" endIcon="arrow-right"
-            title={t("workspace.setupNeededHint")} onClick={onOpenSettings}>
+          <Button
+            small
+            intent="warning"
+            className="setup-needed-button"
+            icon="warning-sign"
+            endIcon="arrow-right"
+            title={t("workspace.setupNeededHint")}
+            onClick={onOpenSettings}
+          >
             {t("workspace.setupNeeded")}
           </Button>
         )}
         {locationUnsaved && (
-          <Tag minimal intent="warning" className="header-warning" title={t("workspace.locationUnsaved")}>
+          <Tag
+            minimal
+            intent="warning"
+            className="header-warning"
+            title={t("workspace.locationUnsaved")}
+          >
             {t("workspace.locationUnsaved")}
           </Tag>
         )}
@@ -81,7 +117,13 @@ export function WorkspaceTopbar({ drawer, testMode, projectLabel, threadLabel, c
             {missingText}
           </Tag>
         )}
-        <Button small minimal icon="refresh" aria-label={t("workspace.refreshContext")} onClick={onRefresh} />
+        <Button
+          small
+          minimal
+          icon="refresh"
+          aria-label={t("workspace.refreshContext")}
+          onClick={onRefresh}
+        />
       </div>
     </header>
   );

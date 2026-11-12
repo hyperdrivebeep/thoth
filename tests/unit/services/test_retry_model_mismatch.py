@@ -139,9 +139,7 @@ def _session() -> TuiSessionState:
 
 @pytest.mark.asyncio
 async def test_retry_matching_xai_omits_codex_policy() -> None:
-    dispatcher = MatchingDispatcher(
-        "xai", "grok-4.6", "high", "fixture-xai/openai-responses-v1"
-    )
+    dispatcher = MatchingDispatcher("xai", "grok-4.6", "high", "fixture-xai/openai-responses-v1")
     service = TuiSessionService(
         session_id="tui:retry",
         store=MemoryStore(_session()),

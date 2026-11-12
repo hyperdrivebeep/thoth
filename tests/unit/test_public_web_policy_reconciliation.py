@@ -38,9 +38,7 @@ def _policy_view(payload: dict[str, object]) -> _PolicyView:
     assert grant is None or isinstance(grant, str)
     return {
         "connector_allowlist": _strings(payload["connector_allowlist"]),
-        "connector_allowed_egress_classes": _strings(
-            payload["connector_allowed_egress_classes"]
-        ),
+        "connector_allowed_egress_classes": _strings(payload["connector_allowed_egress_classes"]),
         "public_web": {
             "enabled": enabled,
             "preferred_hosts": _strings(web["preferred_hosts"]),

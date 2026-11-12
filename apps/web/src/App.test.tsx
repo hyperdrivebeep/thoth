@@ -19,8 +19,10 @@ describe("THOTH UI contracts", () => {
     expect(html).toContain("전체 42개 중 선택");
   });
 
-  it("renders a null scientific classification as unrecorded, never a fabricated status",()=>{
-    const html=renderToStaticMarkup(<StatusBadge value={null}/>);
-    expect(html).toContain("미기록");expect(html).not.toContain("PASS");expect(html).not.toContain("UNKNOWN");
+  it("renders a null scientific classification as unrecorded, never a fabricated status", () => {
+    const html = renderToStaticMarkup(<StatusBadge value={null} />);
+    expect(html).toContain("미기록");
+    expect(html).not.toContain("PASS");
+    expect(html).not.toContain("UNKNOWN");
   });
 });

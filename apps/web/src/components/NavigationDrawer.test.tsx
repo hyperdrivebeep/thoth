@@ -16,28 +16,60 @@ const fixture = vi.hoisted(() => ({
   projects: [] as Record<string, unknown>[],
   threads: [] as Record<string, unknown>[],
 }));
-vi.mock("../api/rpcClient", async importOriginal => {
+vi.mock("../api/rpcClient", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../api/rpcClient")>();
   return {
     ...actual,
     rpc: async (method: string, input: Record<string, unknown>) => {
       let value: unknown = {};
       if (method === "workspace/ready") {
-        value = { ready: true, execution_ready: true, workspace_readable: true, setup_complete: true, workspace_id: WORKSPACE,
-          deployment_mode: "LOCAL", model_connected: true, setup: { internet_consent: "ALLOWED" } };
+        value = {
+          ready: true,
+          execution_ready: true,
+          workspace_readable: true,
+          setup_complete: true,
+          workspace_id: WORKSPACE,
+          deployment_mode: "LOCAL",
+          model_connected: true,
+          setup: { internet_consent: "ALLOWED" },
+        };
       }
-      if (method === "project/list") value = { projects: fixture.projects.map(item => ({ ...item })) };
-      if (method === "thread/list") value = { threads: fixture.threads.filter(item => item.project_id === input.project_id).map(item => ({ ...item })) };
+      if (method === "project/list")
+        value = { projects: fixture.projects.map((item) => ({ ...item })) };
+      if (method === "thread/list")
+        value = {
+          threads: fixture.threads
+            .filter((item) => item.project_id === input.project_id)
+            .map((item) => ({ ...item })),
+        };
       if (method === "thread/read") {
-        const thread = fixture.threads.find(item => item.thread_id === input.thread_id)!;
-        value = { ...thread, current_object_ids: [], operation_state: "SUCCEEDED", current_result: null };
+        const thread = fixture.threads.find((item) => item.thread_id === input.thread_id)!;
+        value = {
+          ...thread,
+          current_object_ids: [],
+          operation_state: "SUCCEEDED",
+          current_result: null,
+        };
       }
-      if (method === "thread/activity/list") value = { conversation: { turns: [], next_before_epoch: null, history_limited: false } };
-      if (method === "project/source/list") value = { artifacts: [], bindings: [], source_times: [], cutoff_basis: { cutoff_at: "2026-09-26T00:00:00Z", project_revision: 3 } };
+      if (method === "thread/activity/list")
+        value = { conversation: { turns: [], next_before_epoch: null, history_limited: false } };
+      if (method === "project/source/list")
+        value = {
+          artifacts: [],
+          bindings: [],
+          source_times: [],
+          cutoff_basis: { cutoff_at: "2026-09-26T00:00:00Z", project_revision: 3 },
+        };
       if (method === "evidence/list") value = { evidence: [] };
       if (method === "model/settings/read") {
-        value = { settings_digest: null, selection: { provider: null, model: null, reasoning_effort: null }, effective_settings: null,
-          availability: "UNAVAILABLE", reason_code: "MODEL_CAPABILITY_UNKNOWN", model_options: [] };
+        value = {
+          settings_digest: null,
+          selection: { provider: null, model: null, reasoning_effort: null },
+          effective_settings: null,
+          availability: "UNAVAILABLE",
+          reason_code: "MODEL_CAPABILITY_UNKNOWN",
+          model_options: [],
+        };
       }
       if (method === "model/credential/list") value = { accounts: [] };
       return { value, state: "SUCCEEDED", operation_id: "op" };
@@ -49,31 +81,70 @@ let root: Root | undefined;
 let container: HTMLDivElement;
 let client: QueryClient;
 let restoreMatches: () => void;
-beforeAll(() => { restoreMatches = answerTopLayerSelectorsWithNo(); });
+beforeAll(() => {
+  restoreMatches = answerTopLayerSelectorsWithNo();
+});
 afterAll(() => restoreMatches());
 
 async function settle(check: () => boolean) {
   for (let i = 0; i < 40; i++) {
-    await act(async () => { await new Promise(resolve => setTimeout(resolve, 15)); });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 15));
+    });
     if (check()) return;
   }
   throw new Error("did not settle: " + container.textContent?.slice(0, 260));
 }
 async function mount() {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ status: "ok", version: "synthetic" }))));
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(new Response(JSON.stringify({ status: "ok", version: "synthetic" }))),
+  );
   fixture.projects = [
-    { project_id: "p", name: "레이더 지연 분석", overlay: "test", lifecycle: "ACTIVE", revision: 3, cutoff_at: "2026-09-26T00:00:00Z" },
-    { project_id: "q", name: "근거가 부족한 질문", overlay: "test", lifecycle: "ACTIVE", revision: 1, cutoff_at: null },
+    {
+      project_id: "p",
+      name: "레이더 지연 분석",
+      overlay: "test",
+      lifecycle: "ACTIVE",
+      revision: 3,
+      cutoff_at: "2026-09-26T00:00:00Z",
+    },
+    {
+      project_id: "q",
+      name: "근거가 부족한 질문",
+      overlay: "test",
+      lifecycle: "ACTIVE",
+      revision: 1,
+      cutoff_at: null,
+    },
   ];
-  fixture.threads = [{ project_id: "p", thread_id: "t", updated_at: "2026-09-20T00:00:00Z", problem: "LAB-42의 지연 원인은?", display_name: "LAB-42의 지연 원인은?",
-    revision: 4, execution_state: "IDLE", lifecycle: "OPEN" }];
+  fixture.threads = [
+    {
+      project_id: "p",
+      thread_id: "t",
+      updated_at: "2026-09-20T00:00:00Z",
+      problem: "LAB-42의 지연 원인은?",
+      display_name: "LAB-42의 지연 원인은?",
+      revision: 4,
+      execution_state: "IDLE",
+      lifecycle: "OPEN",
+    },
+  ];
   saveWorkspaceContext("p", "t", { mode: "LOCAL", workspaceId: WORKSPACE });
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
-  client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
-  await act(async () => root!.render(<QueryClientProvider client={client}><LiveProjectWorkspace /></QueryClientProvider>));
+  client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  await act(async () =>
+    root!.render(
+      <QueryClientProvider client={client}>
+        <LiveProjectWorkspace />
+      </QueryClientProvider>,
+    ),
+  );
   await settle(() => Boolean(container.querySelector("#live-problem")));
 }
 afterEach(async () => {
@@ -85,18 +156,27 @@ afterEach(async () => {
   localStorage.clear();
   sessionStorage.clear();
   vi.unstubAllGlobals();
-  fixture.projects = []; fixture.threads = [];
+  fixture.projects = [];
+  fixture.threads = [];
 });
 
-const listButton = () => container.querySelector(".workstation-topbar .nav-drawer-button") as HTMLButtonElement;
+const listButton = () =>
+  container.querySelector(".workstation-topbar .nav-drawer-button") as HTMLButtonElement;
 const list = () => container.querySelector("aside.navigation-rail") as HTMLElement;
 const isOpen = () => list().getAttribute("data-open") === "true";
 const backdrop = () => container.querySelector(".nav-drawer-backdrop") as HTMLElement | null;
-const click = (element: Element | null | undefined) => act(async () => { (element as HTMLElement).click(); });
+const click = (element: Element | null | undefined) =>
+  act(async () => {
+    (element as HTMLElement).click();
+  });
 const press = (key: string, target: Element | null = document.activeElement) =>
-  act(async () => { target!.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true })); });
+  act(async () => {
+    target!.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }));
+  });
 const projectButton = (name: string) =>
-  [...list().querySelectorAll(".project-button")].find(item => item.textContent?.includes(name)) as HTMLButtonElement;
+  [...list().querySelectorAll(".project-button")].find((item) =>
+    item.textContent?.includes(name),
+  ) as HTMLButtonElement;
 
 it("opens the project list from the top bar, moves the focus into it, and Escape closes it and gives the focus back", async () => {
   await mount();
@@ -113,6 +193,8 @@ it("opens the project list from the top bar, moves the focus into it, and Escape
   expect(listButton().getAttribute("aria-expanded")).toBe("true");
   expect(list().contains(document.activeElement)).toBe(true);
   expect(backdrop()).not.toBeNull();
+  // The dimmed page takes a click but is not a control: it is not offered to a screen reader as one.
+  expect(backdrop()!.getAttribute("role")).toBe("presentation");
 
   await press("Escape");
   expect(isOpen()).toBe(false);
@@ -134,7 +216,9 @@ it("closes after a project is chosen in it, and the top bar names that project",
   await click(listButton());
   await click(projectButton("근거가 부족한 질문"));
   expect(isOpen()).toBe(false);
-  await settle(() => container.querySelector(".context-path strong")?.textContent === "근거가 부족한 질문");
+  await settle(
+    () => container.querySelector(".context-path strong")?.textContent === "근거가 부족한 질문",
+  );
   expect(document.activeElement).toBe(listButton());
 });
 
@@ -154,7 +238,9 @@ it("closes when the focus moves on into the page, and does not pull the focus ba
   await mount();
   await click(listButton());
   const question = container.querySelector("#live-problem") as HTMLTextAreaElement;
-  await act(async () => { question.focus(); });
+  await act(async () => {
+    question.focus();
+  });
   expect(isOpen()).toBe(false);
   expect(document.activeElement).toBe(question);
 });
@@ -162,7 +248,10 @@ it("closes when the focus moves on into the page, and does not pull the focus ba
 it("leaves the focus alone when a project is chosen while the list was never opened (wide window)", async () => {
   await mount();
   const other = projectButton("근거가 부족한 질문");
-  await act(async () => { other.focus(); other.click(); });
+  await act(async () => {
+    other.focus();
+    other.click();
+  });
   expect(isOpen()).toBe(false);
   expect(document.activeElement).not.toBe(listButton());
 });
@@ -175,7 +264,9 @@ it("keeps the whole project name and cutoff in tooltips, for the widths where th
   const cutoff = container.querySelector(".header-status .header-cutoff") as HTMLElement;
   expect(cutoff.textContent).toContain("기준시점");
   expect(cutoff.title).toContain(cutoff.textContent!);
-  await settle(() => container.querySelector(".header-health")?.getAttribute("data-health") === "ok");
+  await settle(
+    () => container.querySelector(".header-health")?.getAttribute("data-health") === "ok",
+  );
 });
 
 it("gives the focus back to what opened a side panel only after the panel is gone", async () => {
@@ -183,12 +274,19 @@ it("gives the focus back to what opened a side panel only after the panel is gon
   // so the opener can only take the focus once the page has been drawn without the panel.
   await mount();
   const attach = container.querySelector(".composer-tools button") as HTMLButtonElement;
-  await act(async () => { attach.focus(); attach.click(); });
-  expect(container.querySelector(".conversation-layout")!.classList.contains("detail-open")).toBe(true);
+  await act(async () => {
+    attach.focus();
+    attach.click();
+  });
+  expect(container.querySelector(".conversation-layout")!.classList.contains("detail-open")).toBe(
+    true,
+  );
   const coveredWhenFocused: boolean[] = [];
   const focus = attach.focus.bind(attach);
   attach.focus = () => {
-    coveredWhenFocused.push(container.querySelector(".conversation-layout")!.classList.contains("detail-open"));
+    coveredWhenFocused.push(
+      container.querySelector(".conversation-layout")!.classList.contains("detail-open"),
+    );
     focus();
   };
   await click(container.querySelector(".research-side-panel header button:last-child"));
@@ -201,9 +299,18 @@ const escapesSeenByPage: string[] = [];
 function ListWithButton() {
   const drawer = useNavigationDrawer();
   return (
-    <main onKeyDown={event => { if (event.key === "Escape") escapesSeenByPage.push("Escape"); }}>
-      <aside {...drawer.railProps}><button type="button">in the list</button></aside>
-      <button type="button" ref={drawer.button} onClick={drawer.toggle}>list</button>
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- stands for a page that listens for the Escape that bubbles up to it; the test checks the drawer keeps that key to itself
+    <main
+      onKeyDown={(event) => {
+        if (event.key === "Escape") escapesSeenByPage.push("Escape");
+      }}
+    >
+      <aside {...drawer.railProps}>
+        <button type="button">in the list</button>
+      </aside>
+      <button type="button" ref={drawer.button} onClick={drawer.toggle}>
+        list
+      </button>
     </main>
   );
 }

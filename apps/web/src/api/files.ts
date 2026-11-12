@@ -21,7 +21,11 @@ export type StageFileOptions = {
 
 const STALL_MS = 120_000;
 
-export function stageFile(file: File, projectId: string, options: StageFileOptions = {}): Promise<StagedFile> {
+export function stageFile(
+  file: File,
+  projectId: string,
+  options: StageFileOptions = {},
+): Promise<StagedFile> {
   if (options.signal?.aborted) return Promise.reject(new UiError("sources.fileUploadCancelled"));
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -40,13 +44,18 @@ export function stageFile(file: File, projectId: string, options: StageFileOptio
       if (error !== undefined) reject(error);
       else resolve(result!);
     };
-    const stop = (error: Error) => { if (!settled) { finish(error); xhr.abort(); } };
+    const stop = (error: Error) => {
+      if (!settled) {
+        finish(error);
+        xhr.abort();
+      }
+    };
     const cancel = () => stop(new UiError("sources.fileUploadCancelled"));
     const renew = () => {
       clearTimeout(timer);
       timer = setTimeout(() => stop(new UiError("sources.fileUploadStalled")), STALL_MS);
     };
-    xhr.upload.onprogress = event => {
+    xhr.upload.onprogress = (event) => {
       if (settled || processing || event.loaded <= loaded) return;
       loaded = event.loaded;
       total = event.lengthComputable && event.total > 0 ? event.total : null;
@@ -70,12 +79,19 @@ export function stageFile(file: File, projectId: string, options: StageFileOptio
           return;
         }
         let detail: { detail?: string } | null = null;
-        try { detail = JSON.parse(xhr.responseText); } catch { /* Preserve the HTTP fallback. */ }
+        try {
+          detail = JSON.parse(xhr.responseText);
+        } catch {
+          /* Preserve the HTTP fallback. */
+        }
         finish(new Error(detail?.detail ?? formatMessage("filePrepareFailed", xhr.status)));
         return;
       }
-      try { finish(undefined, JSON.parse(xhr.responseText) as StagedFile); }
-      catch (error) { finish(error); }
+      try {
+        finish(undefined, JSON.parse(xhr.responseText) as StagedFile);
+      } catch (error) {
+        finish(error);
+      }
     };
     xhr.onerror = () => finish(new Error(formatMessage("filePrepareFailed", xhr.status)));
     xhr.onabort = () => finish(new UiError("sources.fileUploadCancelled"));
@@ -89,6 +105,8 @@ export function stageFile(file: File, projectId: string, options: StageFileOptio
       renew();
       options.onProgress?.({ phase: "uploading", loaded, total });
       if (!settled) xhr.send(body);
-    } catch (error) { finish(error); }
+    } catch (error) {
+      finish(error);
+    }
   });
 }

@@ -90,9 +90,9 @@ async def test_session_workspaces_do_not_share_grant_or_inbox(
         assert setup_b["internet_consent"] == "UNDECIDED"
         assert setup_b.get("internet_grant_id") in {None, ""}
         assert not (workspace_b / "inbox" / "private.txt").exists()
-        assert (
-            (workspace_a / "inbox" / "private.txt").read_text(encoding="utf-8") == "session-a-only"
-        )
+        assert (workspace_a / "inbox" / "private.txt").read_text(
+            encoding="utf-8"
+        ) == "session-a-only"
     finally:
         runtime_a.close()
         runtime_b.close()

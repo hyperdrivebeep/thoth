@@ -10,37 +10,65 @@ import { hypothesisRows } from "./hypothesisView";
 import { TestOrderSection } from "./TestOrderSection";
 
 const BANNED = /순위|\d\s*점|\d\s*%|통과|해결|승인 완료/;
-const LEAK = /expected_by_hypothesis|refutation_conditions|hypothesis_id|hypothesis:object|undefined|\bnull\b/;
+const LEAK =
+  /expected_by_hypothesis|refutation_conditions|hypothesis_id|hypothesis:object|undefined|\bnull\b/;
 
 type Json = Record<string, unknown>;
-const ids = () => (excerpt as unknown as { portfolio: { hypotheses: { hypothesis_id: string }[] } }).portfolio.hypotheses.map(item => item.hypothesis_id);
-const rows = (...pairs: [number, string, string[]?][]) => pairs.map(([at, expected, basis]) => ({ hypothesis_id: ids()[at], expected, basis: basis ?? [] }));
-const test = (id: string, procedure: string, table?: Json[], extra: Json = {}): Json => ({ test_id: id, procedure_candidate: procedure, expected_if_true: "맞으면", expected_if_alternative: "다르면", reversibility: "FULL", estimated_cost: "1",
-  ...(table ? { expected_by_hypothesis: table } : {}), ...extra });
+const ids = () =>
+  (
+    excerpt as unknown as { portfolio: { hypotheses: { hypothesis_id: string }[] } }
+  ).portfolio.hypotheses.map((item) => item.hypothesis_id);
+const rows = (...pairs: [number, string, string[]?][]) =>
+  pairs.map(([at, expected, basis]) => ({
+    hypothesis_id: ids()[at],
+    expected,
+    basis: basis ?? [],
+  }));
+const test = (id: string, procedure: string, table?: Json[], extra: Json = {}): Json => ({
+  test_id: id,
+  procedure_candidate: procedure,
+  expected_if_true: "맞으면",
+  expected_if_alternative: "다르면",
+  reversibility: "FULL",
+  estimated_cost: "1",
+  ...(table ? { expected_by_hypothesis: table } : {}),
+  ...extra,
+});
 // Three hypotheses; the tests are set on the first; the given conditions are the model's.
 const result = (tests: Json[], conditions?: string[]) => {
   const copy = structuredClone(excerpt) as unknown as { portfolio: { hypotheses: Json[] } };
-  copy.portfolio.hypotheses.forEach(item => { item.discriminating_tests = []; });
+  copy.portfolio.hypotheses.forEach((item) => {
+    item.discriminating_tests = [];
+  });
   copy.portfolio.hypotheses[0].discriminating_tests = tests;
   if (conditions) copy.portfolio.hypotheses[0].refutation_conditions = conditions;
   return copy as unknown as Record<string, unknown>;
 };
-const order = (html: string, names: string[]) => names.map(name => html.indexOf(name));
+const order = (html: string, names: string[]) => names.map((name) => html.indexOf(name));
 // Gives the first hypotheses a statement (an empty string means none was written).
 const named = (value: Record<string, unknown>, statements: string[]) => {
-  const hypotheses = (value as unknown as { portfolio: { hypotheses: Json[] } }).portfolio.hypotheses;
-  statements.forEach((statement, at) => { hypotheses[at].statement = statement; });
+  const hypotheses = (value as unknown as { portfolio: { hypotheses: Json[] } }).portfolio
+    .hypotheses;
+  statements.forEach((statement, at) => {
+    hypotheses[at].statement = statement;
+  });
   return value;
 };
-const sorted = (positions: number[]) => positions.every((value, at) => value >= 0 && (at === 0 || value > positions[at - 1]));
-const section = (value: Record<string, unknown>) => renderToStaticMarkup(<TestOrderSection rows={hypothesisRows(value)} actions={[]}/>);
+const sorted = (positions: number[]) =>
+  positions.every((value, at) => value >= 0 && (at === 0 || value > positions[at - 1]));
+const section = (value: Record<string, unknown>) =>
+  renderToStaticMarkup(<TestOrderSection rows={hypothesisRows(value)} actions={[]} />);
 
 it("counts a test with every hypothesis's expected result and puts the sharper one first, with a whole-number sentence", () => {
-  const html = section(result([
-    test("t1", "두 가설을 가르지 못하는 시험", rows([0, "나쁘다"], [1, "나쁘다"], [2, "같다"])),
-    test("t2", "세 가설을 모두 가르는 시험", rows([0, "A"], [1, "B"], [2, "C"])),
-  ]));
-  expect(sorted(order(html, ["세 가설을 모두 가르는 시험", "두 가설을 가르지 못하는 시험"]))).toBe(true);
+  const html = section(
+    result([
+      test("t1", "두 가설을 가르지 못하는 시험", rows([0, "나쁘다"], [1, "나쁘다"], [2, "같다"])),
+      test("t2", "세 가설을 모두 가르는 시험", rows([0, "A"], [1, "B"], [2, "C"])),
+    ]),
+  );
+  expect(sorted(order(html, ["세 가설을 모두 가르는 시험", "두 가설을 가르지 못하는 시험"]))).toBe(
+    true,
+  );
   expect(html).toContain("먼저 해 볼 시험");
   expect(html).toContain("결과에 따라 원인 후보를 최대 1개로 줄입니다");
   expect(html).toContain("결과에 따라 원인 후보를 최대 2개로 줄입니다");
@@ -49,33 +77,55 @@ it("counts a test with every hypothesis's expected result and puts the sharper o
 });
 
 it("treats a hypothesis whose expectation is not known as staying under every result, and a missing row as not countable", () => {
-  const html = section(result([
-    test("t1", "모름이 섞인 시험", rows([0, "A"], [1, "B"], [2, "모름"])),
-    test("t2", "행이 빠진 시험", rows([0, "A"], [1, "B"])),
-  ]));
+  const html = section(
+    result([
+      test("t1", "모름이 섞인 시험", rows([0, "A"], [1, "B"], [2, "모름"])),
+      test("t2", "행이 빠진 시험", rows([0, "A"], [1, "B"])),
+    ]),
+  );
   expect(html).toContain("결과에 따라 원인 후보를 최대 2개로 줄입니다");
   expect(html).toContain("얼마나 가르는지 아직 셀 수 없는 시험");
   expect(sorted(order(html, ["모름이 섞인 시험", "행이 빠진 시험"]))).toBe(true);
 });
 
 it("keeps the old behaviour for a result without tables: everything uncountable, in the order the rule gave before", () => {
-  const html = section(result([test("t1", "표 없는 시험"), test("t2", "또 하나", undefined, { estimated_cost: "9" })]));
+  const html = section(
+    result([test("t1", "표 없는 시험"), test("t2", "또 하나", undefined, { estimated_cost: "9" })]),
+  );
   expect(html).toContain("얼마나 가르는지 아직 셀 수 없는 시험");
   expect(html).not.toContain("먼저 해 볼 시험");
   expect(sorted(order(html, ["표 없는 시험", "또 하나"]))).toBe(true);
 });
 
-let root: Root | undefined; let node: HTMLDivElement;
-afterEach(async () => { if (root) await act(async () => root!.unmount()); root = undefined; node?.remove(); });
+let root: Root | undefined;
+let node: HTMLDivElement;
+afterEach(async () => {
+  if (root) await act(async () => root!.unmount());
+  root = undefined;
+  node?.remove();
+});
 async function mount(value: Record<string, unknown>) {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
-  node = document.createElement("div"); document.body.append(node); root = createRoot(node);
-  await act(async () => root!.render(<QueryClientProvider client={new QueryClient()}><HypothesisCompare result={value} projectId="p" canDraft/></QueryClientProvider>));
+  node = document.createElement("div");
+  document.body.append(node);
+  root = createRoot(node);
+  await act(async () =>
+    root!.render(
+      <QueryClientProvider client={new QueryClient()}>
+        <HypothesisCompare result={value} projectId="p" canDraft />
+      </QueryClientProvider>,
+    ),
+  );
 }
 const card = () => node.querySelectorAll<HTMLElement>(".hypothesis-card")[0];
 
 it("shows the model's refutation conditions apart, as an unconfirmed suggestion, and never mixes them with the person's own", async () => {
-  await mount(result([test("t1", "시험", rows([0, "A"], [1, "B"], [2, "C"]))], ["두 실행 결과가 같으면 이 가설을 버린다"]));
+  await mount(
+    result(
+      [test("t1", "시험", rows([0, "A"], [1, "B"], [2, "C"]))],
+      ["두 실행 결과가 같으면 이 가설을 버린다"],
+    ),
+  );
   const ai = card().querySelector(".ai-refutation")!;
   expect(ai.textContent).toContain("AI 제안(미확정) 기각 조건");
   expect(ai.textContent).toContain("두 실행 결과가 같으면 이 가설을 버린다");
@@ -89,7 +139,14 @@ it("shows the model's refutation conditions apart, as an unconfirmed suggestion,
 });
 
 it("lists what each hypothesis is expected to give for a test, in words, with how many sources it rests on", async () => {
-  await mount(named(result([test("t1", "시험", rows([0, "나쁘다", ["span:a", "span:b"]], [1, "같다"], [2, "모름"]))]), ["탐지 정의 오류", "라벨 오류", "표본 부족"]));
+  await mount(
+    named(
+      result([
+        test("t1", "시험", rows([0, "나쁘다", ["span:a", "span:b"]], [1, "같다"], [2, "모름"])),
+      ]),
+      ["탐지 정의 오류", "라벨 오류", "표본 부족"],
+    ),
+  );
   const text = card().querySelector("details.expected-results")!.textContent!;
   expect(text).toContain("각 가설의 예상 결과(AI 제안)");
   expect(text).toContain("가설 1(탐지 정의 오류): 나쁘다 · 근거 2개");
@@ -100,16 +157,37 @@ it("lists what each hypothesis is expected to give for a test, in words, with ho
 });
 
 it("marks a prediction that no material confirmed, and leaves 모름 and sourced predictions as they were", async () => {
-  await mount(named(result([test("t1", "시험", rows([0, "나쁘다", ["span:a"]], [1, "같다"], [2, "모름"]))]), ["가", "나", "다"]));
-  const lines = [...card().querySelectorAll("details.expected-results li")].map(item => item.textContent);
-  expect(lines).toEqual(["가설 1(가): 나쁘다 · 근거 1개", "가설 2(나): 같다 · 자료로 확인되지 않은 예상", "가설 3(다): 모름"]);
+  await mount(
+    named(result([test("t1", "시험", rows([0, "나쁘다", ["span:a"]], [1, "같다"], [2, "모름"]))]), [
+      "가",
+      "나",
+      "다",
+    ]),
+  );
+  const lines = [...card().querySelectorAll("details.expected-results li")].map(
+    (item) => item.textContent,
+  );
+  expect(lines).toEqual([
+    "가설 1(가): 나쁘다 · 근거 1개",
+    "가설 2(나): 같다 · 자료로 확인되지 않은 예상",
+    "가설 3(다): 모름",
+  ]);
   expect(lines.join(" ")).not.toMatch(BANNED);
 });
 
 it("shortens a long hypothesis statement in the list and writes only the number when the statement is empty", async () => {
-  const long = "탐지 정의와 판정 기준이 서로 달라 같은 장면을 다르게 세는 오류가 생긴다고 보는 설명입니다";
-  await mount(named(result([test("t1", "시험", rows([0, "나쁘다", ["span:a"]], [1, "같다"], [2, "모름"]))]), [long, "", "표본 부족"]));
-  const lines = [...card().querySelectorAll("details.expected-results li")].map(item => item.textContent!);
+  const long =
+    "탐지 정의와 판정 기준이 서로 달라 같은 장면을 다르게 세는 오류가 생긴다고 보는 설명입니다";
+  await mount(
+    named(result([test("t1", "시험", rows([0, "나쁘다", ["span:a"]], [1, "같다"], [2, "모름"]))]), [
+      long,
+      "",
+      "표본 부족",
+    ]),
+  );
+  const lines = [...card().querySelectorAll("details.expected-results li")].map(
+    (item) => item.textContent!,
+  );
   expect(lines[0]).toBe(`가설 1(${long.slice(0, 39)}…): 나쁘다 · 근거 1개`);
   expect(lines[1]).toBe("가설 2: 같다 · 자료로 확인되지 않은 예상");
   expect(lines[2]).toBe("가설 3(표본 부족): 모름");

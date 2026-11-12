@@ -5,9 +5,11 @@ export const hypothesisActionsJa: ColumnOf<typeof hypothesisActionsMessages> = {
   "hypothesisLink.unrelated": "変化した判定は、この仮説に影響しません",
   "hypothesisLink.unrelatedHint": "この仮説は、変化した部分とは無関係と見なされます。",
   "hypothesisLink.supports": "新しい結果は、この仮説に引き続き合っています（根拠を確認済み）",
-  "hypothesisLink.supportsHint": "変化した結果を直接確認し、この仮説と矛盾しないままであることを確かめました。",
+  "hypothesisLink.supportsHint":
+    "変化した結果を直接確認し、この仮説と矛盾しないままであることを確かめました。",
   "hypothesisLink.investigate": "別の調査が必要です",
-  "hypothesisLink.investigateHint": "この仮説は以前の根拠に基づいたままで、別の調査が必要であるという記録があります。",
+  "hypothesisLink.investigateHint":
+    "この仮説は以前の根拠に基づいたままで、別の調査が必要であるという記録があります。",
   "hypothesisLink.other": "その他",
   "hypothesisLink.otherHint": "上にない理由です。文章での説明が必要です。",
   "hypothesisLink.reasonRecorded": "理由を記録済み",
@@ -18,16 +20,21 @@ export const hypothesisActionsJa: ColumnOf<typeof hypothesisActionsMessages> = {
   "memoryEdit.applied": "今後の調査では、元の記憶の代わりにこの訂正が呼び出されることがあります。",
   "memoryEdit.tooVague": "内容が短すぎるか、具体性が足りません。",
   "memoryEdit.ambiguous": "関係が不明確だったため、提案は保留されました。",
-  "memoryEdit.quarantined": "内容に指示または機密が含まれているようです。保存されますが、使われません。",
+  "memoryEdit.quarantined":
+    "内容に指示または機密が含まれているようです。保存されますが、使われません。",
   "memoryEdit.conflict": "同じ記録が既存の記憶では異なる値になっているため、提案は保留されました。",
-  "memoryEdit.superseded": "この記憶は、より新しい訂正にすでに置き換えられています。一覧を更新しました。",
+  "memoryEdit.superseded":
+    "この記憶は、より新しい訂正にすでに置き換えられています。一覧を更新しました。",
   "memoryEdit.missing": "この記憶が見つかりませんでした。一覧を更新しました。",
   "memoryEdit.failed": "訂正の提案を送信できませんでした。しばらくしてからもう一度お試しください。",
-  "lesson.notice": "これらは、同じ基準、単位、条件、ルールの改訂版での、以前にルールで計算された結果、または人が記録した結果です。参考に限られ、テストの順序には影響しません。今回も同じ結果になるという予測でもありません。",
-  "lesson.effect": "修正の適用後、新しい結果によって、この行がルールの計算上、基準を満たしたことがありました",
+  "lesson.notice":
+    "これらは、同じ基準、単位、条件、ルールの改訂版での、以前にルールで計算された結果、または人が記録した結果です。参考に限られ、テストの順序には影響しません。今回も同じ結果になるという予測でもありません。",
+  "lesson.effect":
+    "修正の適用後、新しい結果によって、この行がルールの計算上、基準を満たしたことがありました",
   "lesson.disposition": "処置の記録",
   "sameHypothesis.mark": "別の調査の同じ仮説として記録",
-  "sameHypothesis.notice": "人がこれらを同じ仮説として記録しました。以前の調査の結果は参考に限られ、この仮説の除外やテストの順序には寄与しません。",
+  "sameHypothesis.notice":
+    "人がこれらを同じ仮説として記録しました。以前の調査の結果は参考に限られ、この仮説の除外やテストの順序には寄与しません。",
   "sameHypothesis.title": "別の調査での同じ仮説",
   "sameHypothesis.noResults": "テスト結果は記録されていません",
   "sameHypothesis.already": "これらは、すでに同じ仮説として記録されています。",
@@ -37,8 +44,10 @@ export const hypothesisActionsJa: ColumnOf<typeof hypothesisActionsMessages> = {
   "sameHypothesis.investigation": "調査",
   "sameHypothesis.unknownDate": "調査の日付は不明",
   "sameHypothesis.unreadable": "仮説を利用できません",
-  "actionDraft.undeclared": "影響が宣言されていないため、この行動は保護されています。影響が宣言され、改訂されるまでは、人の判断が必要です。",
-  "actionDraft.approvalRequired": "この行動は外部への書き込みや基準の変更を伴うため、人の承認が必要です。",
+  "actionDraft.undeclared":
+    "影響が宣言されていないため、この行動は保護されています。影響が宣言され、改訂されるまでは、人の判断が必要です。",
+  "actionDraft.approvalRequired":
+    "この行動は外部への書き込みや基準の変更を伴うため、人の承認が必要です。",
   "actionDraft.prohibited": "禁止された影響が宣言されたため、この行動は実行できません。",
   "actionDraft.allowed": "宣言された影響は、個別の承認なしで使える条件を満たしています。",
   "actionDraft.approval": "承認が必要",
@@ -55,8 +64,10 @@ export const hypothesisActionsJa: ColumnOf<typeof hypothesisActionsMessages> = {
   "actionDraft.owner": "担当責任者",
   "actionDraft.prepared": "行動リクエストの下書きを準備しました。これは承認ではありません。",
   "actionDraft.checkNeeded": "確認が必要",
-  "actionDraft.stale": "この仮説は以前の基準を使っているため、行動リクエストを準備できません。先にこの仮説をもう一度確認してください。",
-  "actionDraft.failed": "行動リクエストを準備できませんでした。しばらくしてからもう一度お試しください。",
+  "actionDraft.stale":
+    "この仮説は以前の基準を使っているため、行動リクエストを準備できません。先にこの仮説をもう一度確認してください。",
+  "actionDraft.failed":
+    "行動リクエストを準備できませんでした。しばらくしてからもう一度お試しください。",
   "effects.complete": "この行動の影響はすべて宣言されました",
   "effects.prohibited": "THOTH で禁止されている影響",
   "effects.prohibitedHint": "どれか1つを選ぶと、その行動は禁止として分類されます。",
@@ -77,7 +88,8 @@ export const hypothesisActionsJa: ColumnOf<typeof hypothesisActionsMessages> = {
   "effects.blocked": "この影響により、その行動は THOTH で禁止として分類されます。",
   "reviewList.failed": "レビュー一覧を読み込めませんでした。調査履歴は引き続き利用できます。",
   "reviewList.title": "レビューが必要な回答",
-  "reviewList.notice": "サーバーは、これらの回答に、現在の基準の確認、または残りのチェックのレビューが必要であると印を付けました。",
+  "reviewList.notice":
+    "サーバーは、これらの回答に、現在の基準の確認、または残りのチェックのレビューが必要であると印を付けました。",
   "reviewList.loading": "レビュー一覧を読み込んでいます…",
   "reviewList.empty": "このプロジェクトに、レビューが必要な回答はありません。",
   "reviewList.open": "回答を開く",
@@ -94,7 +106,8 @@ export const hypothesisActionsJa: ColumnOf<typeof hypothesisActionsMessages> = {
   "actions.criteria": "必須の基準",
   "actions.required": "必須",
   "actions.reversibilityUnknown": "元に戻せるかは不明",
-  "actions.protected": "保護された実行の提案 · 権限のある人が、その対象と影響を確認して判断する必要があります。",
+  "actions.protected":
+    "保護された実行の提案 · 権限のある人が、その対象と影響を確認して判断する必要があります。",
   "actions.proposalNotice": "提案と実際の実行結果は、別に記録されます。",
   "effort.humanEntry": "人の見積もりを入力",
   "effort.choose": "保存する見積もりを選んでください。",

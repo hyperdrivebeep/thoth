@@ -6,22 +6,53 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useResearchSession } from "./useResearchSession";
 import { LanguageSettingsCard } from "./LanguageSettingsCard";
 import { ResearchComposer } from "./ResearchComposer";
-import { getDisplayPreference, getLocale, setDisplayPreference, setLocale, t } from "../i18n/locale";
+import {
+  getDisplayPreference,
+  getLocale,
+  setDisplayPreference,
+  setLocale,
+  t,
+} from "../i18n/locale";
 import { LANGUAGE_CHOICES } from "../i18n/languageChoices";
 import { RESPONSE_LANGUAGE_CHOICES } from "../api/responseLanguages";
 import { readResponseLanguageDefault } from "../api/responseLanguageDefault";
 import type { BrowserScope } from "../api/localWorkspacePersistence";
 
-const state = vi.hoisted(() => ({ accepted: "ko" as string | null, calls: [] as { method: string; params: Record<string, unknown> }[] }));
-vi.mock("../api/rpcClient", () => ({ rpc: async (method: string, params: Record<string, unknown>) => {
-  state.calls.push({ method, params });
-  if (method === "thread/read") return { value: { operation_state: "SUCCEEDED", problem: "Earlier question", request: { operation_id: "operation:old", ...(state.accepted ? { response_language: state.accepted } : {}) } } };
-  if (method === "thread/input" || method === "thread/start") {
-    return { state: "RUNNING", operation_id: "operation:new", value: { contract_version: 2, project_id: "p", thread_id: "t",
-      status: "ACCEPTED_RUNNING", operation_id: "operation:new", request_epoch: 2 } };
-  }
-  throw new Error("Unexpected call " + method);
-} }));
+const state = vi.hoisted(() => ({
+  accepted: "ko" as string | null,
+  calls: [] as { method: string; params: Record<string, unknown> }[],
+}));
+vi.mock("../api/rpcClient", () => ({
+  rpc: async (method: string, params: Record<string, unknown>) => {
+    state.calls.push({ method, params });
+    if (method === "thread/read")
+      return {
+        value: {
+          operation_state: "SUCCEEDED",
+          problem: "Earlier question",
+          request: {
+            operation_id: "operation:old",
+            ...(state.accepted ? { response_language: state.accepted } : {}),
+          },
+        },
+      };
+    if (method === "thread/input" || method === "thread/start") {
+      return {
+        state: "RUNNING",
+        operation_id: "operation:new",
+        value: {
+          contract_version: 2,
+          project_id: "p",
+          thread_id: "t",
+          status: "ACCEPTED_RUNNING",
+          operation_id: "operation:new",
+          request_epoch: 2,
+        },
+      };
+    }
+    throw new Error("Unexpected call " + method);
+  },
+}));
 
 const scope: BrowserScope = { mode: "LOCAL", workspaceId: "workspace:language-settings" };
 let session: ReturnType<typeof useResearchSession>;
@@ -33,18 +64,45 @@ let client: QueryClient;
 function Harness({ composer = false }: { composer?: boolean }) {
   const epoch = useRef(0);
   session = useResearchSession("p", "t", epoch, () => {}, scope, true);
-  return <>
-    <LanguageSettingsCard scope={scope} />
-    {composer && <ResearchComposer session={session} projectId="p" threadId="t" epoch={0} onAttach={() => {}} onOpenSettings={() => { opened += 1; }} />}
-  </>;
+  return (
+    <>
+      <LanguageSettingsCard scope={scope} />
+      {composer && (
+        <ResearchComposer
+          session={session}
+          projectId="p"
+          threadId="t"
+          epoch={0}
+          onAttach={() => {}}
+          onOpenSettings={() => {
+            opened += 1;
+          }}
+        />
+      )}
+    </>
+  );
 }
-const ready = (languages: string[] | null) => ({ value: languages ? { response_languages: languages, response_language_scope: "REQUEST" } : {} });
+const ready = (languages: string[] | null) => ({
+  value: languages ? { response_languages: languages, response_language_scope: "REQUEST" } : {},
+});
 async function mount(languages: string[] | null = ["ko", "en"], composer = false) {
-  client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity }, mutations: { retry: false } } });
+  client = new QueryClient({
+    defaultOptions: { queries: { retry: false, staleTime: Infinity }, mutations: { retry: false } },
+  });
   client.setQueryData(["workspace-ready"], ready(languages));
-  node = document.createElement("div"); document.body.append(node); root = createRoot(node);
-  await act(async () => { root.render(<QueryClientProvider client={client}><Harness composer={composer} /></QueryClientProvider>); });
-  await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)); });
+  node = document.createElement("div");
+  document.body.append(node);
+  root = createRoot(node);
+  await act(async () => {
+    root.render(
+      <QueryClientProvider client={client}>
+        <Harness composer={composer} />
+      </QueryClientProvider>,
+    );
+  });
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  });
 }
 const select = (id: string) => document.getElementById(id) as HTMLSelectElement;
 async function choose(id: string, value: string) {
@@ -55,40 +113,70 @@ async function choose(id: string, value: string) {
     element.dispatchEvent(new Event("change", { bubbles: true }));
   });
 }
-const sent = () => state.calls.filter(call => call.method === "thread/input");
+const sent = () => state.calls.filter((call) => call.method === "thread/input");
 async function send(text: string) {
-  await act(async () => { session.setProblem(text); });
-  await act(async () => { session.send(); });
-  await act(async () => { await new Promise(resolve => setTimeout(resolve, 30)); });
+  await act(async () => {
+    session.setProblem(text);
+  });
+  await act(async () => {
+    session.send();
+  });
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 30));
+  });
 }
 
 beforeEach(() => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
-  localStorage.clear(); sessionStorage.clear(); state.calls.length = 0; state.accepted = "ko"; opened = 0; setLocale("ko");
+  localStorage.clear();
+  sessionStorage.clear();
+  state.calls.length = 0;
+  state.accepted = "ko";
+  opened = 0;
+  setLocale("ko");
 });
 afterEach(async () => {
-  await act(async () => root.unmount()); client.clear(); node.remove(); localStorage.clear(); sessionStorage.clear(); setLocale("ko");
-  Object.defineProperty(globalThis.navigator, "languages", { value: ["ko-KR", "ko"], configurable: true });
+  await act(async () => root.unmount());
+  client.clear();
+  node.remove();
+  localStorage.clear();
+  sessionStorage.clear();
+  setLocale("ko");
+  Object.defineProperty(globalThis.navigator, "languages", {
+    value: ["ko-KR", "ko"],
+    configurable: true,
+  });
 });
 
 describe("response language default in Settings", () => {
   it("lists the languages from the one constant, with automatic first", async () => {
     await mount();
-    const labels = [...select("reply-language-default").options].map(option => option.textContent);
-    expect(labels).toEqual([t("language.replyAuto"), ...RESPONSE_LANGUAGE_CHOICES.map(choice => choice.label)]);
+    const labels = [...select("reply-language-default").options].map(
+      (option) => option.textContent,
+    );
+    expect(labels).toEqual([
+      t("language.replyAuto"),
+      ...RESPONSE_LANGUAGE_CHOICES.map((choice) => choice.label),
+    ]);
     expect(labels).toContain("中文(简体)");
-    expect([...select("display-language").options].map(option => option.value)).toEqual(["auto", ...LANGUAGE_CHOICES.map(choice => choice.code)]);
+    expect([...select("display-language").options].map((option) => option.value)).toEqual([
+      "auto",
+      ...LANGUAGE_CHOICES.map((choice) => choice.code),
+    ]);
     expect(document.body.textContent).toContain(t("language.replyAutoHelp"));
   });
 
-  it.each(["ko", "en", "zh-Hans"] as const)("a fixed %s in Settings is sent with the next question", async language => {
-    await mount(["ko", "en", "zh-Hans"]);
-    await choose("reply-language-default", language);
-    expect(session.responseLanguage).toBe(language);
-    await send("Question to answer in the chosen language");
-    expect(sent()).toHaveLength(1);
-    expect(sent()[0].params.response_language).toBe(language);
-  });
+  it.each(["ko", "en", "zh-Hans"] as const)(
+    "a fixed %s in Settings is sent with the next question",
+    async (language) => {
+      await mount(["ko", "en", "zh-Hans"]);
+      await choose("reply-language-default", language);
+      expect(session.responseLanguage).toBe(language);
+      await send("Question to answer in the chosen language");
+      expect(sent()).toHaveLength(1);
+      expect(sent()[0].params.response_language).toBe(language);
+    },
+  );
 
   it("automatic leaves response_language out of the request, whatever the accepted request said", async () => {
     await mount();
@@ -103,8 +191,12 @@ describe("response language default in Settings", () => {
   it("a server that does not list a language leaves it disabled while the others stay available", async () => {
     await mount(["ko", "en"]);
     const options = [...select("reply-language-default").options];
-    expect(options.find(option => option.value === "zh-Hans")!.disabled).toBe(true);
-    expect(options.filter(option => option.value === "ko" || option.value === "en").every(option => !option.disabled)).toBe(true);
+    expect(options.find((option) => option.value === "zh-Hans")!.disabled).toBe(true);
+    expect(
+      options
+        .filter((option) => option.value === "ko" || option.value === "en")
+        .every((option) => !option.disabled),
+    ).toBe(true);
     expect(document.body.textContent).not.toContain(t("language.unsupported"));
     await choose("reply-language-default", "zh-Hans");
     expect(document.body.textContent).toContain(t("language.unsupported"));
@@ -116,8 +208,10 @@ describe("response language default in Settings", () => {
   it("without server support the fixed choices are disabled with the reason, and automatic stays available", async () => {
     await mount(null);
     const options = [...select("reply-language-default").options];
-    expect(options.find(option => option.value === "auto")!.disabled).toBe(false);
-    expect(options.filter(option => option.value !== "auto").every(option => option.disabled)).toBe(true);
+    expect(options.find((option) => option.value === "auto")!.disabled).toBe(false);
+    expect(
+      options.filter((option) => option.value !== "auto").every((option) => option.disabled),
+    ).toBe(true);
     expect(document.body.textContent).toContain(t("language.unsupported"));
     expect(session.languageSupported).toBe(false);
     await send("Question that needs no language");
@@ -125,14 +219,19 @@ describe("response language default in Settings", () => {
   });
 
   it("a fixed choice stays after reload, in one key for the scope, and leaves the old per-conversation keys alone", async () => {
-    const legacy = "thoth:draft-language:v1:" + JSON.stringify(["workspace:language-settings", "p", "t"]);
+    const legacy =
+      "thoth:draft-language:v1:" + JSON.stringify(["workspace:language-settings", "p", "t"]);
     localStorage.setItem(legacy, "en");
     await mount();
     await choose("reply-language-default", "ko");
     expect(readResponseLanguageDefault(scope)).toBe("ko");
-    const keys = Object.keys(localStorage).filter(key => key.startsWith("thoth:response-language-default:v1:"));
+    const keys = Object.keys(localStorage).filter((key) =>
+      key.startsWith("thoth:response-language-default:v1:"),
+    );
     expect(keys).toHaveLength(1);
-    await act(async () => root.unmount()); client.clear(); node.remove();
+    await act(async () => root.unmount());
+    client.clear();
+    node.remove();
     await mount();
     expect(select("reply-language-default").value).toBe("ko");
     expect(session.responseLanguage).toBe("ko");
@@ -140,7 +239,10 @@ describe("response language default in Settings", () => {
   });
 
   it("the old per-conversation choice is not read", async () => {
-    localStorage.setItem("thoth:draft-language:v1:" + JSON.stringify(["workspace:language-settings", "p", "t"]), "en");
+    localStorage.setItem(
+      "thoth:draft-language:v1:" + JSON.stringify(["workspace:language-settings", "p", "t"]),
+      "en",
+    );
     await mount();
     expect(session.responseLanguage).toBeNull();
     expect(select("reply-language-default").value).toBe("auto");
@@ -152,7 +254,9 @@ describe("question box", () => {
     await mount(["ko", "en"], true);
     expect(document.querySelector(".language-fixed")).toBeNull();
     expect(node.querySelector(".composer-dock select#reply-language-default")).toBeNull();
-    const optionTexts = [...node.querySelectorAll(".composer-dock select option")].map(item => item.textContent);
+    const optionTexts = [...node.querySelectorAll(".composer-dock select option")].map(
+      (item) => item.textContent,
+    );
     for (const choice of LANGUAGE_CHOICES) expect(optionTexts).not.toContain(choice.label);
     expect(document.querySelectorAll("select#reply-language-default")).toHaveLength(1);
   });
@@ -162,25 +266,39 @@ describe("question box", () => {
     await choose("reply-language-default", "en");
     const badge = document.querySelector(".language-fixed")!;
     expect(badge.textContent).toContain("답변: English 고정");
-    await act(async () => { (badge.querySelector("button") as HTMLButtonElement).click(); });
+    await act(async () => {
+      (badge.querySelector("button") as HTMLButtonElement).click();
+    });
     expect(opened).toBe(1);
-    await act(async () => { setLocale("en"); });
-    expect(document.querySelector(".language-fixed")!.textContent).toContain("Reply: English (fixed)");
-    expect(document.querySelector(".language-fixed")!.textContent).toContain(t("language.changeInSettings"));
+    await act(async () => {
+      setLocale("en");
+    });
+    expect(document.querySelector(".language-fixed")!.textContent).toContain(
+      "Reply: English (fixed)",
+    );
+    expect(document.querySelector(".language-fixed")!.textContent).toContain(
+      t("language.changeInSettings"),
+    );
   });
 
   it("still names the language of the accepted request when it differs from the setting", async () => {
     state.accepted = "ko";
     await mount(["ko", "en"], true);
     await choose("reply-language-default", "en");
-    expect(document.querySelector(".language-current")!.textContent).toContain(t("language.acceptedShort") + ": 한국어");
+    expect(document.querySelector(".language-current")!.textContent).toContain(
+      t("language.acceptedShort") + ": 한국어",
+    );
     await choose("reply-language-default", "ko");
     expect(document.querySelector(".language-current")).toBeNull();
   });
 });
 
 describe("display language", () => {
-  const browser = (...languages: string[]) => Object.defineProperty(globalThis.navigator, "languages", { value: languages, configurable: true });
+  const browser = (...languages: string[]) =>
+    Object.defineProperty(globalThis.navigator, "languages", {
+      value: languages,
+      configurable: true,
+    });
 
   it("automatic follows the browser language and the first supported one wins", async () => {
     await mount();
@@ -190,10 +308,14 @@ describe("display language", () => {
     expect(getLocale()).toBe("en");
     expect(document.documentElement.lang).toBe("en");
     browser("fr-FR", "ko-KR");
-    await act(async () => { setDisplayPreference("auto"); });
+    await act(async () => {
+      setDisplayPreference("auto");
+    });
     expect(getLocale()).toBe("ko");
     browser("fr-FR");
-    await act(async () => { setDisplayPreference("auto"); });
+    await act(async () => {
+      setDisplayPreference("auto");
+    });
     expect(getLocale()).toBe("ko");
   });
 
@@ -238,11 +360,20 @@ describe("Simplified Chinese screen", () => {
     expect(card.textContent).toContain("显示语言");
     expect(card.textContent).toContain("默认回答语言");
     expect(card.textContent).toContain("自动（提问所用的语言）");
-    expect([...select("display-language").options].map(option => option.textContent)).toEqual([t("language.displayAuto"), "한국어", "English", "中文(简体)", "中文(繁體)", "日本語"]);
+    expect([...select("display-language").options].map((option) => option.textContent)).toEqual([
+      t("language.displayAuto"),
+      "한국어",
+      "English",
+      "中文(简体)",
+      "中文(繁體)",
+      "日本語",
+    ]);
     expect(select("reply-language-default").value).toBe("auto");
     await choose("reply-language-default", "zh-Hans");
     expect(session.responseLanguage).toBe("zh-Hans");
-    expect(document.querySelector(".language-fixed")!.textContent).toContain("回答：中文(简体)（已固定）");
+    expect(document.querySelector(".language-fixed")!.textContent).toContain(
+      "回答：中文(简体)（已固定）",
+    );
     await choose("display-language", "ko");
     expect(session.responseLanguage).toBe("zh-Hans");
     expect(document.documentElement.lang).toBe("ko");
@@ -250,12 +381,18 @@ describe("Simplified Chinese screen", () => {
 
   it("follows a Simplified Chinese browser when the screen language is automatic, and a Traditional one chooses the Traditional screen", async () => {
     await mount();
-    const browser = (...languages: string[]) => Object.defineProperty(globalThis.navigator, "languages", { value: languages, configurable: true });
+    const browser = (...languages: string[]) =>
+      Object.defineProperty(globalThis.navigator, "languages", {
+        value: languages,
+        configurable: true,
+      });
     browser("zh-CN", "en");
     await choose("display-language", "auto");
     expect(getLocale()).toBe("zh-Hans");
     browser("zh-TW", "en-US");
-    await act(async () => { setDisplayPreference("auto"); });
+    await act(async () => {
+      setDisplayPreference("auto");
+    });
     expect(getLocale()).toBe("zh-Hant");
   });
 });
@@ -271,11 +408,20 @@ describe("Traditional Chinese screen", () => {
     expect(card.textContent).toContain("顯示語言");
     expect(card.textContent).toContain("預設回答語言");
     expect(card.textContent).toContain("自動（提問所用的語言）");
-    expect([...select("display-language").options].map(option => option.textContent)).toEqual([t("language.displayAuto"), "한국어", "English", "中文(简体)", "中文(繁體)", "日本語"]);
+    expect([...select("display-language").options].map((option) => option.textContent)).toEqual([
+      t("language.displayAuto"),
+      "한국어",
+      "English",
+      "中文(简体)",
+      "中文(繁體)",
+      "日本語",
+    ]);
     expect(select("reply-language-default").value).toBe("auto");
     await choose("reply-language-default", "zh-Hant");
     expect(session.responseLanguage).toBe("zh-Hant");
-    expect(document.querySelector(".language-fixed")!.textContent).toContain("回答：中文(繁體)（已固定）");
+    expect(document.querySelector(".language-fixed")!.textContent).toContain(
+      "回答：中文(繁體)（已固定）",
+    );
     await choose("display-language", "ko");
     expect(session.responseLanguage).toBe("zh-Hant");
     expect(document.documentElement.lang).toBe("ko");
@@ -289,16 +435,25 @@ describe("Traditional Chinese screen", () => {
     expect(sent()[0].params.response_language).toBe("zh-Hant");
   });
 
-  it.each(["zh-TW", "zh-HK", "zh-MO", "zh-Hant", "zh-Hant-TW"])("follows a %s browser when the screen language is automatic", async tag => {
-    await mount();
-    Object.defineProperty(globalThis.navigator, "languages", { value: [tag, "en"], configurable: true });
-    await choose("display-language", "auto");
-    expect(getLocale()).toBe("zh-Hant");
-  });
+  it.each(["zh-TW", "zh-HK", "zh-MO", "zh-Hant", "zh-Hant-TW"])(
+    "follows a %s browser when the screen language is automatic",
+    async (tag) => {
+      await mount();
+      Object.defineProperty(globalThis.navigator, "languages", {
+        value: [tag, "en"],
+        configurable: true,
+      });
+      await choose("display-language", "auto");
+      expect(getLocale()).toBe("zh-Hant");
+    },
+  );
 
   it("keeps a Simplified Chinese browser on the Simplified screen even with a Hong Kong or Taiwan region", async () => {
     await mount();
-    Object.defineProperty(globalThis.navigator, "languages", { value: ["zh-Hans-HK", "en"], configurable: true });
+    Object.defineProperty(globalThis.navigator, "languages", {
+      value: ["zh-Hans-HK", "en"],
+      configurable: true,
+    });
     await choose("display-language", "auto");
     expect(getLocale()).toBe("zh-Hans");
   });
@@ -315,11 +470,15 @@ describe("Japanese screen", () => {
     expect(card.textContent).toContain("表示言語");
     expect(card.textContent).toContain("回答言語の既定値");
     expect(card.textContent).toContain("自動（質問と同じ言語）");
-    expect([...select("reply-language-default").options].map(option => option.textContent)).toEqual([t("language.replyAuto"), "한국어", "English", "中文(简体)", "中文(繁體)", "日本語"]);
+    expect(
+      [...select("reply-language-default").options].map((option) => option.textContent),
+    ).toEqual([t("language.replyAuto"), "한국어", "English", "中文(简体)", "中文(繁體)", "日本語"]);
     expect(select("reply-language-default").value).toBe("auto");
     await choose("reply-language-default", "ja");
     expect(session.responseLanguage).toBe("ja");
-    expect(document.querySelector(".language-fixed")!.textContent).toContain("回答：日本語（固定）");
+    expect(document.querySelector(".language-fixed")!.textContent).toContain(
+      "回答：日本語（固定）",
+    );
     await choose("display-language", "ko");
     expect(session.responseLanguage).toBe("ja");
     expect(document.documentElement.lang).toBe("ko");
@@ -335,7 +494,11 @@ describe("Japanese screen", () => {
 
   it("follows a Japanese browser when the screen language is automatic", async () => {
     await mount();
-    const browser = (...languages: string[]) => Object.defineProperty(globalThis.navigator, "languages", { value: languages, configurable: true });
+    const browser = (...languages: string[]) =>
+      Object.defineProperty(globalThis.navigator, "languages", {
+        value: languages,
+        configurable: true,
+      });
     browser("ja-JP", "en");
     await choose("display-language", "auto");
     expect(getLocale()).toBe("ja");

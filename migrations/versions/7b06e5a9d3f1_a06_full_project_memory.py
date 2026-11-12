@@ -25,9 +25,7 @@ def upgrade() -> None:
         sa.Column("owner_revision_ref", sa.String(64), nullable=False),
         sa.Column("content_json", sa.Text(), nullable=False),
         sa.Column("revision_digest", sa.String(64), nullable=False, unique=True),
-        sa.UniqueConstraint(
-            "project_id", "memory_id", name="uq_memory_revision_source_memory"
-        ),
+        sa.UniqueConstraint("project_id", "memory_id", name="uq_memory_revision_source_memory"),
     )
     op.create_index(
         "ix_memory_revision_ledger_project_id", "memory_revision_ledger", ["project_id"]
@@ -53,9 +51,7 @@ def upgrade() -> None:
         sa.Column("content_json", sa.Text(), nullable=False),
         sa.Column("query_digest", sa.String(64), nullable=False),
     )
-    op.create_index(
-        "ix_memory_context_packs_project_id", "memory_context_packs", ["project_id"]
-    )
+    op.create_index("ix_memory_context_packs_project_id", "memory_context_packs", ["project_id"])
     op.create_table(
         "memory_projections",
         sa.Column("projection_id", sa.String(200), primary_key=True),
@@ -63,13 +59,9 @@ def upgrade() -> None:
         sa.Column("projection_type", sa.String(40), nullable=False),
         sa.Column("content_json", sa.Text(), nullable=False),
         sa.Column("rebuild_checkpoint", sa.String(64), nullable=False),
-        sa.UniqueConstraint(
-            "project_id", "projection_type", name="uq_memory_projection_type"
-        ),
+        sa.UniqueConstraint("project_id", "projection_type", name="uq_memory_projection_type"),
     )
-    op.create_index(
-        "ix_memory_projections_project_id", "memory_projections", ["project_id"]
-    )
+    op.create_index("ix_memory_projections_project_id", "memory_projections", ["project_id"])
 
 
 def downgrade() -> None:

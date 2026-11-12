@@ -1,309 +1,309 @@
 export const researchMessages = {
   "timeline.title": {
-    "ko": "연구 대화",
-    "en": "Research conversation"
+    ko: "연구 대화",
+    en: "Research conversation",
   },
   "timeline.accessUnverified": {
-    "ko": "대화의 접근 권한이나 저장 기준을 확인하지 못해 답변을 표시하지 않습니다.",
-    "en": "Answers are hidden because conversation access or the saved basis could not be verified."
+    ko: "대화의 접근 권한이나 저장 기준을 확인하지 못해 답변을 표시하지 않습니다.",
+    en: "Answers are hidden because conversation access or the saved basis could not be verified.",
   },
   "timeline.loadFailed": {
-    "ko": "대화를 불러오지 못했습니다.",
-    "en": "The conversation could not be loaded."
+    ko: "대화를 불러오지 못했습니다.",
+    en: "The conversation could not be loaded.",
   },
   "timeline.loading": {
-    "ko": "대화를 읽는 중…",
-    "en": "Loading conversation…"
+    ko: "대화를 읽는 중…",
+    en: "Loading conversation…",
   },
   "timeline.older": {
-    "ko": "이전 대화 불러오기",
-    "en": "Load earlier messages"
+    ko: "이전 대화 불러오기",
+    en: "Load earlier messages",
   },
   "timeline.refreshFailed": {
-    "ko": "대화를 다시 확인하지 못했습니다. 마지막으로 불러온 답변을 표시하며, 최신 상태는 확인되지 않았습니다. ",
-    "en": "The conversation could not be refreshed. The last loaded answers are shown; their current status is unverified. "
+    ko: "대화를 다시 확인하지 못했습니다. 마지막으로 불러온 답변을 표시하며, 최신 상태는 확인되지 않았습니다. ",
+    en: "The conversation could not be refreshed. The last loaded answers are shown; their current status is unverified. ",
   },
   "timeline.loadFailedSpace": {
-    "ko": "대화를 불러오지 못했습니다. ",
-    "en": "The conversation could not be loaded. "
+    ko: "대화를 불러오지 못했습니다. ",
+    en: "The conversation could not be loaded. ",
   },
   "timeline.limited": {
-    "ko": "조회 범위를 넘는 과거 이력이 있습니다. 기록에서 확인할 수 있습니다.",
-    "en": "Older history exceeds this view's range. Open research history to see it."
+    ko: "조회 범위를 넘는 과거 이력이 있습니다. 기록에서 확인할 수 있습니다.",
+    en: "Older history exceeds this view's range. Open research history to see it.",
   },
   "timeline.unsupported": {
-    "ko": "이 서버는 과거 대화 조회를 지원하지 않습니다. 확인 가능한 현재 기록만 표시합니다.",
-    "en": "This server does not support conversation history. Only current records that can be verified are shown."
+    ko: "이 서버는 과거 대화 조회를 지원하지 않습니다. 확인 가능한 현재 기록만 표시합니다.",
+    en: "This server does not support conversation history. Only current records that can be verified are shown.",
   },
   "timeline.queued": {
-    "ko": "현재 조사가 끝나면 이 지시를 이어서 반영합니다",
-    "en": "This instruction will be applied after the current investigation finishes"
+    ko: "현재 조사가 끝나면 이 지시를 이어서 반영합니다",
+    en: "This instruction will be applied after the current investigation finishes",
   },
   "timeline.unavailable": {
-    "ko": "이 대화의 기록을 현재 화면에서 불러올 수 없습니다.",
-    "en": "This conversation's history is unavailable in the current view."
+    ko: "이 대화의 기록을 현재 화면에서 불러올 수 없습니다.",
+    en: "This conversation's history is unavailable in the current view.",
   },
   "timeline.recoverAdvice": {
-    "ko": "저장된 연구 이력과 현재 프로젝트 기록을 확인하거나, 같은 대화에서 새 질문을 이어갈 수 있습니다.",
-    "en": "Check saved research history and current project records, or ask a new question in this conversation."
+    ko: "저장된 연구 이력과 현재 프로젝트 기록을 확인하거나, 같은 대화에서 새 질문을 이어갈 수 있습니다.",
+    en: "Check saved research history and current project records, or ask a new question in this conversation.",
   },
   "timeline.newQuestion": {
-    "ko": "새 질문으로 이어가기",
-    "en": "Continue with a new question"
+    ko: "새 질문으로 이어가기",
+    en: "Continue with a new question",
   },
   "timeline.openHistory": {
-    "ko": "연구 이력 확인",
-    "en": "View research history"
+    ko: "연구 이력 확인",
+    en: "View research history",
   },
   "timeline.emptyTitle": {
-    "ko": "지금 무엇이 막혀 있나요?",
-    "en": "What are you working through?"
+    ko: "지금 무엇이 막혀 있나요?",
+    en: "What are you working through?",
   },
   "timeline.emptyNotice": {
-    "ko": "질문과 자료에서 출발해 근거, 가능한 설명, 다음 행동을 함께 확인합니다.",
-    "en": "Start with a question and sources to examine evidence, possible explanations, and next actions."
+    ko: "질문과 자료에서 출발해 근거, 가능한 설명, 다음 행동을 함께 확인합니다.",
+    en: "Start with a question and sources to examine evidence, possible explanations, and next actions.",
   },
   "result.slow": {
-    "ko": "응답이 매우 느려짐",
-    "en": "Response stalled"
+    ko: "응답이 매우 느려짐",
+    en: "Response stalled",
   },
   "result.runaway": {
-    "ko": "응답이 끝나지 않고 계속 생성됨",
-    "en": "Response continued without finishing"
+    ko: "응답이 끝나지 않고 계속 생성됨",
+    en: "Response continued without finishing",
   },
   "result.connectionError": {
-    "ko": "연결 오류",
-    "en": "Connection error"
+    ko: "연결 오류",
+    en: "Connection error",
   },
   "result.deadline": {
-    "ko": "호출 시간 초과",
-    "en": "Call deadline reached"
+    ko: "호출 시간 초과",
+    en: "Call deadline reached",
   },
   "result.responseTimeout": {
-    "ko": "응답 시간 초과",
-    "en": "Response timeout"
+    ko: "응답 시간 초과",
+    en: "Response timeout",
   },
   "result.cancelled": {
-    "ko": "연구 실행이 취소되었습니다. 자동 재실행하지 않습니다.",
-    "en": "Research was cancelled. It will not restart automatically."
+    ko: "연구 실행이 취소되었습니다. 자동 재실행하지 않습니다.",
+    en: "Research was cancelled. It will not restart automatically.",
   },
   "result.cancelUnknown": {
-    "ko": "취소 사유는 현재 기록에서 확인되지 않습니다.",
-    "en": "The cancellation reason is not available in the current record."
+    ko: "취소 사유는 현재 기록에서 확인되지 않습니다.",
+    en: "The cancellation reason is not available in the current record.",
   },
   "result.beforeCancel": {
-    "ko": "취소 전까지 확인한 내용",
-    "en": "Findings saved before cancellation"
+    ko: "취소 전까지 확인한 내용",
+    en: "Findings saved before cancellation",
   },
   "result.noSavedAnswer": {
-    "ko": "이 요청에 저장된 답변은 없습니다.",
-    "en": "This request has no saved answer."
+    ko: "이 요청에 저장된 답변은 없습니다.",
+    en: "This request has no saved answer.",
   },
   "result.incomplete": {
-    "ko": "연구를 완료하지 못했습니다. 마지막으로 저장된 자료와 질문은 보존돼 있습니다.",
-    "en": "Research could not finish. The last saved sources and question are preserved."
+    ko: "연구를 완료하지 못했습니다. 마지막으로 저장된 자료와 질문은 보존돼 있습니다.",
+    en: "Research could not finish. The last saved sources and question are preserved.",
   },
   "result.savedBeforeCut": {
-    "ko": "연구 답은 저장됐지만 끝까지 확인하지 못했습니다.",
-    "en": "The research answer was saved, but it could not be checked to the end."
+    ko: "연구 답은 저장됐지만 끝까지 확인하지 못했습니다.",
+    en: "The research answer was saved, but it could not be checked to the end.",
   },
   "result.timeLimit": {
-    "ko": "모델 응답 시간 제한에 도달했습니다.",
-    "en": "The model response time limit was reached."
+    ko: "모델 응답 시간 제한에 도달했습니다.",
+    en: "The model response time limit was reached.",
   },
   "result.researchLimit": {
-    "ko": "조사의 총호출 수 또는 총시간 제한에 도달했습니다. 누적 토큰 상한과는 별도 제한입니다.",
-    "en": "The research call-count or elapsed-time limit was reached. This is separate from a cumulative token limit."
+    ko: "조사의 총호출 수 또는 총시간 제한에 도달했습니다. 누적 토큰 상한과는 별도 제한입니다.",
+    en: "The research call-count or elapsed-time limit was reached. This is separate from a cumulative token limit.",
   },
   "result.quota": {
-    "ko": "ChatGPT 사용 한도에 걸려 모델 호출이 거절됐습니다.",
-    "en": "The model call was rejected because the ChatGPT usage limit was reached."
+    ko: "ChatGPT 사용 한도에 걸려 모델 호출이 거절됐습니다.",
+    en: "The model call was rejected because the ChatGPT usage limit was reached.",
   },
   "result.authentication": {
-    "ko": "모델 계정 인증이 거절됐습니다. 연결을 다시 확인하세요.",
-    "en": "Model account authentication was rejected. Check the connection."
+    ko: "모델 계정 인증이 거절됐습니다. 연결을 다시 확인하세요.",
+    en: "Model account authentication was rejected. Check the connection.",
   },
   "result.unsupportedModel": {
-    "ko": "이 ChatGPT Codex 계정에서 지원하지 않는 모델입니다. 자동 재실행하지 않습니다.",
-    "en": "This model is not supported by this ChatGPT Codex account. It will not restart automatically."
+    ko: "이 ChatGPT Codex 계정에서 지원하지 않는 모델입니다. 자동 재실행하지 않습니다.",
+    en: "This model is not supported by this ChatGPT Codex account. It will not restart automatically.",
   },
   "result.requestRejected": {
-    "ko": "모델이 요청을 거절했습니다. 자동 재실행하지 않습니다.",
-    "en": "The model rejected the request. It will not restart automatically."
+    ko: "모델이 요청을 거절했습니다. 자동 재실행하지 않습니다.",
+    en: "The model rejected the request. It will not restart automatically.",
   },
   "result.storageFailed": {
-    "ko": "내부 결과 저장에 실패했습니다.",
-    "en": "Saving the research result failed."
+    ko: "내부 결과 저장에 실패했습니다.",
+    en: "Saving the research result failed.",
   },
   "result.internalFailed": {
-    "ko": "내부 연구 처리에 실패했습니다.",
-    "en": "Research processing failed."
+    ko: "내부 연구 처리에 실패했습니다.",
+    en: "Research processing failed.",
   },
   "result.remoteUnknown": {
-    "ko": "원격 모델의 종료 여부는 확인되지 않았습니다. 자동 재실행하지 않습니다.",
-    "en": "It is unknown whether the remote model stopped. It will not restart automatically."
+    ko: "원격 모델의 종료 여부는 확인되지 않았습니다. 자동 재실행하지 않습니다.",
+    en: "It is unknown whether the remote model stopped. It will not restart automatically.",
   },
   "result.stalled": {
-    "ko": "답은 저장됐지만 마지막 확인 전에 연결이 끊겼습니다. 모델 쪽에서는 계속 처리했을 수 있습니다.",
-    "en": "The answer was saved, but the connection was cut before the final check. The model may have kept processing."
+    ko: "답은 저장됐지만 마지막 확인 전에 연결이 끊겼습니다. 모델 쪽에서는 계속 처리했을 수 있습니다.",
+    en: "The answer was saved, but the connection was cut before the final check. The model may have kept processing.",
   },
   "result.autoRetryOff": {
-    "ko": "끊긴 모델 호출 자동 다시 시도가 꺼져 있습니다.",
-    "en": "Automatic retry of an interrupted model call is turned off."
+    ko: "끊긴 모델 호출 자동 다시 시도가 꺼져 있습니다.",
+    en: "Automatic retry of an interrupted model call is turned off.",
   },
   "result.autoRetryOpenSettings": {
-    "ko": "설정 열기",
-    "en": "Open settings"
+    ko: "설정 열기",
+    en: "Open settings",
   },
   "result.incompleteResponse": {
-    "ko": "모델 쪽 오류로 끝났습니다.",
-    "en": "The model ended with an error."
+    ko: "모델 쪽 오류로 끝났습니다.",
+    en: "The model ended with an error.",
   },
   "result.beforeInterruption": {
-    "ko": "중단 전까지 정리된 AI 검토 요약(인용 위치만 확인)",
-    "en": "AI review summary before interruption (citation locations checked only)"
+    ko: "중단 전까지 정리된 AI 검토 요약(인용 위치만 확인)",
+    en: "AI review summary before interruption (citation locations checked only)",
   },
   "result.retryQuestion": {
-    "ko": "같은 질문으로 다시 조사",
-    "en": "Research the same question again"
+    ko: "같은 질문으로 다시 조사",
+    en: "Research the same question again",
   },
   "result.retryNotice": {
-    "ko": " 질문을 입력창에 채워 둡니다. 보내기를 눌러야 시작합니다.",
-    "en": " The question is placed in the composer. Research starts only when you send it."
+    ko: " 질문을 입력창에 채워 둡니다. 보내기를 눌러야 시작합니다.",
+    en: " The question is placed in the composer. Research starts only when you send it.",
   },
   "result.resume": {
-    "ko": "이어서 조사",
-    "en": "Resume research"
+    ko: "이어서 조사",
+    en: "Resume research",
   },
   "result.beforeFailure": {
-    "ko": "실패 전까지 확인한 내용",
-    "en": "Findings saved before failure"
+    ko: "실패 전까지 확인한 내용",
+    en: "Findings saved before failure",
   },
   "result.stale": {
-    "ko": "현재 기준으로 다시 확인이 필요한 과거 답변입니다.",
-    "en": "This is a past answer that needs checking against the current basis."
+    ko: "현재 기준으로 다시 확인이 필요한 과거 답변입니다.",
+    en: "This is a past answer that needs checking against the current basis.",
   },
   "result.openChecks": {
-    "ko": "판정이 확인하지 않은 것",
-    "en": "What the assessment did not check"
+    ko: "판정이 확인하지 않은 것",
+    en: "What the assessment did not check",
   },
   "result.openChecksNote": {
-    "ko": "답변 점검 항목과는 별개입니다. 이 답의 판정 과정에서 확인되지 않은 조건입니다.",
-    "en": "Separate from the answer checks: conditions that the assessment of this answer did not confirm."
+    ko: "답변 점검 항목과는 별개입니다. 이 답의 판정 과정에서 확인되지 않은 조건입니다.",
+    en: "Separate from the answer checks: conditions that the assessment of this answer did not confirm.",
   },
   "actions.rawClassification": {
-    "ko": "위험 등급·실행 권한·상태의 원값",
-    "en": "Recorded risk tier, execution authority and state"
+    ko: "위험 등급·실행 권한·상태의 원값",
+    en: "Recorded risk tier, execution authority and state",
   },
   "result.alternatives": {
-    "ko": "다른 설명과 확인할 점",
-    "en": "Alternative explanations and checks"
+    ko: "다른 설명과 확인할 점",
+    en: "Alternative explanations and checks",
   },
   "result.noHypotheses": {
-    "ko": "현재 자료로 제안된 가설이 없습니다.",
-    "en": "No hypotheses were proposed from the current sources."
+    ko: "현재 자료로 제안된 가설이 없습니다.",
+    en: "No hypotheses were proposed from the current sources.",
   },
   "result.nextActions": {
-    "ko": "다음에 해볼 일",
-    "en": "Possible next actions"
+    ko: "다음에 해볼 일",
+    en: "Possible next actions",
   },
   "result.authorityRequired": {
-    "ko": "실행 제안입니다. 대상과 영향을 검토한 권한 결정이 필요합니다.",
-    "en": "This is an execution proposal. An authorized decision must review its target and effects."
+    ko: "실행 제안입니다. 대상과 영향을 검토한 권한 결정이 필요합니다.",
+    en: "This is an execution proposal. An authorized decision must review its target and effects.",
   },
   "result.details": {
-    "ko": "답변 상세",
-    "en": "Answer details"
+    ko: "답변 상세",
+    en: "Answer details",
   },
   "result.sources": {
-    "ko": "근거 원문",
-    "en": "Original evidence"
+    ko: "근거 원문",
+    en: "Original evidence",
   },
   "result.compareHypotheses": {
-    "ko": "가설 비교",
-    "en": "Compare hypotheses"
+    ko: "가설 비교",
+    en: "Compare hypotheses",
   },
   "result.compareActions": {
-    "ko": "행동 비교",
-    "en": "Compare actions"
+    ko: "행동 비교",
+    en: "Compare actions",
   },
   "result.changes": {
-    "ko": "변경 이력",
-    "en": "Change history"
+    ko: "변경 이력",
+    en: "Change history",
   },
   "result.more": {
-    "ko": "다른 상세 보기",
-    "en": "More details"
+    ko: "다른 상세 보기",
+    en: "More details",
   },
   "result.statusStripLabel": {
-    "ko": "결과 상태",
-    "en": "Result status"
+    ko: "결과 상태",
+    en: "Result status",
   },
   "result.counterTagNotRun": {
-    "ko": "반대 근거 안 찾음",
-    "en": "Counterevidence not searched"
+    ko: "반대 근거 안 찾음",
+    en: "Counterevidence not searched",
   },
   "result.holdDetailsPlain": {
-    "ko": "검토 근거: 답변 점검과 남은 확인 사항",
-    "en": "Review basis — answer checks and what is still open"
+    ko: "검토 근거: 답변 점검과 남은 확인 사항",
+    en: "Review basis — answer checks and what is still open",
   },
-  "timeline.turnAnswered": { "ko": "답변 있음", "en": "Answered" },
-  "timeline.turnNoAnswer": { "ko": "답 없음", "en": "No answer" },
-  "timeline.turnCutOff": { "ko": "끊김", "en": "Cut off" },
-  "timeline.turnInterrupted": { "ko": "완료되지 않음", "en": "Not finished" },
-  "timeline.turnFailed": { "ko": "실패", "en": "Failed" },
-  "timeline.turnCancelled": { "ko": "취소됨", "en": "Cancelled" },
-  "timeline.turnStale": { "ko": "최신 확인 안 됨", "en": "Not confirmed current" },
-  "timeline.turnUnavailable": { "ko": "볼 수 없음", "en": "Unavailable" },
-  "timeline.expandTurn": { "ko": "펼치기", "en": "Expand" },
-  "timeline.collapseTurn": { "ko": "접기", "en": "Collapse" },
-  "timeline.retryShort": { "ko": "같은 질문으로 다시 조사", "en": "Ask again" },
+  "timeline.turnAnswered": { ko: "답변 있음", en: "Answered" },
+  "timeline.turnNoAnswer": { ko: "답 없음", en: "No answer" },
+  "timeline.turnCutOff": { ko: "끊김", en: "Cut off" },
+  "timeline.turnInterrupted": { ko: "완료되지 않음", en: "Not finished" },
+  "timeline.turnFailed": { ko: "실패", en: "Failed" },
+  "timeline.turnCancelled": { ko: "취소됨", en: "Cancelled" },
+  "timeline.turnStale": { ko: "최신 확인 안 됨", en: "Not confirmed current" },
+  "timeline.turnUnavailable": { ko: "볼 수 없음", en: "Unavailable" },
+  "timeline.expandTurn": { ko: "펼치기", en: "Expand" },
+  "timeline.collapseTurn": { ko: "접기", en: "Collapse" },
+  "timeline.retryShort": { ko: "같은 질문으로 다시 조사", en: "Ask again" },
   "result.references": {
-    "ko": "참고값·조건",
-    "en": "Reference values and conditions"
+    ko: "참고값·조건",
+    en: "Reference values and conditions",
   },
   "result.map": {
-    "ko": "연구 지도",
-    "en": "Research map"
+    ko: "연구 지도",
+    en: "Research map",
   },
   "result.outcome": {
-    "ko": "실행 결과",
-    "en": "Execution result"
+    ko: "실행 결과",
+    en: "Execution result",
   },
   "result.memory": {
-    "ko": "프로젝트 기억",
-    "en": "Project memory"
+    ko: "프로젝트 기억",
+    en: "Project memory",
   },
   "result.checking": {
-    "ko": "자료와 조건을 확인하고 있습니다. 아직 저장된 답변은 없습니다.",
-    "en": "Checking sources and conditions. No answer has been saved yet."
+    ko: "자료와 조건을 확인하고 있습니다. 아직 저장된 답변은 없습니다.",
+    en: "Checking sources and conditions. No answer has been saved yet.",
   },
   "result.noLinkedAnswer": {
-    "ko": "이 요청에 연결된 저장 답변이 아직 없습니다.",
-    "en": "There is no saved answer linked to this request yet."
+    ko: "이 요청에 연결된 저장 답변이 아직 없습니다.",
+    en: "There is no saved answer linked to this request yet.",
   },
   "progress.current": {
-    "ko": "현재 조사",
-    "en": "Current research"
+    ko: "현재 조사",
+    en: "Current research",
   },
   "progress.pause": {
-    "ko": "일시정지",
-    "en": "Pause"
+    ko: "일시정지",
+    en: "Pause",
   },
   "progress.resume": {
-    "ko": "이어서 진행",
-    "en": "Continue"
+    ko: "이어서 진행",
+    en: "Continue",
   },
   "progress.stop": {
-    "ko": "중단 요청",
-    "en": "Request stop"
+    ko: "중단 요청",
+    en: "Request stop",
   },
   "progress.stopConfirm": {
-    "ko": "이 조사를 중단할까요? 이미 진행한 외부 실행의 종료 여부는 별도로 확인됩니다.",
-    "en": "Stop this research? Whether any external execution already started has stopped will be checked separately."
+    ko: "이 조사를 중단할까요? 이미 진행한 외부 실행의 종료 여부는 별도로 확인됩니다.",
+    en: "Stop this research? Whether any external execution already started has stopped will be checked separately.",
   },
   "progress.unknown": {
-    "ko": "미확인",
-    "en": "Unknown"
-  }
+    ko: "미확인",
+    en: "Unknown",
+  },
 } as const;

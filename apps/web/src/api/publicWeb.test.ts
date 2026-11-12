@@ -9,7 +9,9 @@ import {
 
 describe("public web update contract", () => {
   it("requires a strict boolean and normalizes hosts", () => {
-    expect(() => publicWebUpdateInputSchema.parse({ enabled: "true", preferred_hosts: ["arxiv.org"] })).toThrow();
+    expect(() =>
+      publicWebUpdateInputSchema.parse({ enabled: "true", preferred_hosts: ["arxiv.org"] }),
+    ).toThrow();
     const parsed = parsePublicWebUpdate({
       enabled: true,
       preferred_hosts: ["https://ArXiv.org/list", "arxiv.org"],
@@ -43,7 +45,9 @@ describe("public web update contract", () => {
 
 describe("public web execution status", () => {
   it("keeps typed execution states separate from the saved toggle", () => {
-    expect(publicWebExecutionSchema.parse({ desired_enabled: true, state: "READY" }).state).toBe("READY");
+    expect(publicWebExecutionSchema.parse({ desired_enabled: true, state: "READY" }).state).toBe(
+      "READY",
+    );
     expect(executionLabel("READY")).toBe("실행: 준비됨");
     expect(executionLabel("OFF")).toBe("실행: 꺼짐");
     expect(executionLabel("BLOCKED", ["PUBLIC_WEB_POLICY_INCONSISTENT"])).toBe("실행: 권한 불일치");

@@ -23,11 +23,13 @@ export const hypothesisActionsZhHant: ColumnOf<typeof hypothesisActionsMessages>
   "memoryEdit.superseded": "此記憶已被較新的更正取代。列表已重新整理。",
   "memoryEdit.missing": "找不到此記憶。列表已重新整理。",
   "memoryEdit.failed": "無法傳送更正提議。請稍後重試。",
-  "lesson.notice": "這些是同一標準、單位、條件和規則修訂版下較早的、由規則計算或人工記錄的結果。僅供參考，不影響測試順序，也不預測這次會得到相同的結果。",
+  "lesson.notice":
+    "這些是同一標準、單位、條件和規則修訂版下較早的、由規則計算或人工記錄的結果。僅供參考，不影響測試順序，也不預測這次會得到相同的結果。",
   "lesson.effect": "應用修復之後，新的結果曾使這一行按規則計算滿足了標準",
   "lesson.disposition": "處置記錄",
   "sameHypothesis.mark": "標記為來自另一次調查的同一假設",
-  "sameHypothesis.notice": "有人將這些標記為同一個假設。較早那次調查的結果僅供參考，不會影響此假設的排除或測試順序。",
+  "sameHypothesis.notice":
+    "有人將這些標記為同一個假設。較早那次調查的結果僅供參考，不會影響此假設的排除或測試順序。",
   "sameHypothesis.title": "另一次調查中的同一假設",
   "sameHypothesis.noResults": "沒有記錄測試結果",
   "sameHypothesis.already": "這些已被標記為同一個假設。",
@@ -37,7 +39,8 @@ export const hypothesisActionsZhHant: ColumnOf<typeof hypothesisActionsMessages>
   "sameHypothesis.investigation": "調查",
   "sameHypothesis.unknownDate": "調查日期未知",
   "sameHypothesis.unreadable": "假設不可用",
-  "actionDraft.undeclared": "尚未聲明影響，因此此行動受到保護。在聲明並修訂其影響之前，必須由人作出決定。",
+  "actionDraft.undeclared":
+    "尚未聲明影響，因此此行動受到保護。在聲明並修訂其影響之前，必須由人作出決定。",
   "actionDraft.approvalRequired": "此行動會向外部寫入或更改基線，需要人工批准。",
   "actionDraft.prohibited": "已聲明了被禁止的影響，因此此行動無法執行。",
   "actionDraft.allowed": "所聲明的影響符合無需單獨批准即可使用的條件。",

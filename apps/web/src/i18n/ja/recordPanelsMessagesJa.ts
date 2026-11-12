@@ -3,16 +3,22 @@ import type { recordPanelsMessages } from "../recordPanelsMessages";
 
 export const recordPanelsJa: ColumnOf<typeof recordPanelsMessages> = {
   "evidence.loading": "この回答の根拠を読み込んでいます…",
-  "evidence.scopeChanged": "アクセス範囲または記録のリンクが変わりました。詳細を閉じて、根拠をもう一度開いてください。",
-  "evidence.failed": "この回答の根拠を読み込めませんでした。根拠が存在しないという意味ではありません。",
+  "evidence.scopeChanged":
+    "アクセス範囲または記録のリンクが変わりました。詳細を閉じて、根拠をもう一度開いてください。",
+  "evidence.failed":
+    "この回答の根拠を読み込めませんでした。根拠が存在しないという意味ではありません。",
   "evidence.reload": "根拠を再読み込み",
   "evidence.selected": "回答のために選ばれた根拠",
-  "evidence.selectionNotice": "これらは調査のために選ばれた資料です。その数は、回答の中で直接引用されている数と異なることがあります。",
+  "evidence.selectionNotice":
+    "これらは調査のために選ばれた資料です。その数は、回答の中で直接引用されている数と異なることがあります。",
   "evidence.empty": "この保存済みバージョンでは、根拠が選ばれていません。",
-  "evidence.countNotice": "表示中の資料の数は、読み込み済みで原文を表示できる根拠が対象です。一度に一部しか読み込まないため、選ばれた総数より少ないことがあります。残りは「次の根拠を見る」で読み込めます。",
-  "evidence.citationMissing": "この根拠は一覧に見つかりませんでした。引用された資料は、この保存済みバージョンで選ばれた根拠にありません。",
+  "evidence.countNotice":
+    "表示中の資料の数は、読み込み済みで原文を表示できる根拠が対象です。一度に一部しか読み込まないため、選ばれた総数より少ないことがあります。残りは「次の根拠を見る」で読み込めます。",
+  "evidence.citationMissing":
+    "この根拠は一覧に見つかりませんでした。引用された資料は、この保存済みバージョンで選ばれた根拠にありません。",
   "evidence.unavailable": "この根拠の原文は表示できません。下の説明をご覧ください。",
-  "evidence.mismatch": "資料のバージョンまたはハッシュが保存済みバージョンと異なるため、文章は非表示です。",
+  "evidence.mismatch":
+    "資料のバージョンまたはハッシュが保存済みバージョンと異なるため、文章は非表示です。",
   "evidence.unknownBasis": "保存された資料の基準を検証できないため、原文は非表示です。",
   "evidence.unreadable": "この根拠は現在利用できません。",
   "evidence.next": "次の根拠を見る",
@@ -21,11 +27,14 @@ export const recordPanelsJa: ColumnOf<typeof recordPanelsMessages> = {
   "restore.readback": "適用の結果を受け取りました。現在の記録は、まだ確認が必要です。",
   "restore.pending": "元のリクエストの結果を確認してください。実行の完了は確認されていません。",
   "restore.title": "復元を確認",
-  "restore.notice": "選んだ過去の内容を新しいバージョンとして適用します。過去の記録と、完了した実行結果は残ります。",
+  "restore.notice":
+    "選んだ過去の内容を新しいバージョンとして適用します。過去の記録と、完了した実行結果は残ります。",
   "restore.noModel": "調査の再分析やモデル呼び出しは自動では始まりません。",
   "restore.loading": "対象と影響を確認しています…",
-  "restore.previewFailed": "プレビューを読み込めませんでした。記録を再読み込みして、もう一度確認してください。",
-  "restore.scopeChanged": "アクセス範囲が変わりました。このダイアログを閉じて、履歴を再読み込みしてください。",
+  "restore.previewFailed":
+    "プレビューを読み込めませんでした。記録を再読み込みして、もう一度確認してください。",
+  "restore.scopeChanged":
+    "アクセス範囲が変わりました。このダイアログを閉じて、履歴を再読み込みしてください。",
   "restore.same": "内容は現在のバージョンと同じです。復元するものはありません。",
   "restore.unavailable": "この項目は現在復元できません。履歴と変更は引き続き確認できます。",
   "restore.current": "現在の内容",
@@ -34,7 +43,8 @@ export const recordPanelsJa: ColumnOf<typeof recordPanelsMessages> = {
   "restore.impact": "結びついた項目への影響",
   "restore.impactedRecords": "影響を受ける記録を確認",
   "restore.noExtraImpact": "このプレビューには、ほかに影響を受ける項目は表示されていません。",
-  "restore.sourceChanged": "資料のバージョンまたはアクセス権が変わりました。このプレビューがまだ適用できるか、もう一度確認してください。",
+  "restore.sourceChanged":
+    "資料のバージョンまたはアクセス権が変わりました。このプレビューがまだ適用できるか、もう一度確認してください。",
   "restore.conditions": "適用の条件を確認",
   "restore.requestDiagnostics": "リクエストの診断",
   "restore.back": "戻る",
@@ -72,13 +82,15 @@ export const recordPanelsJa: ColumnOf<typeof recordPanelsMessages> = {
   "timeline.list": "調査履歴の一覧",
   "timeline.flow": "記録の順序",
   "timeline.newest": "新しい順",
-  "timeline.coverage": "これらの記録は現在読み込めます。一部の履歴リンクやカバー範囲は、まだ検証が必要です。",
+  "timeline.coverage":
+    "これらの記録は現在読み込めます。一部の履歴リンクやカバー範囲は、まだ検証が必要です。",
   "timeline.hasCheckpoints": "このページにはチェックポイントの記録が含まれます",
   "timeline.emptyPage": "このページに表示される記録はありません",
   "timeline.emptyHistory": "調査の記録はまだありません",
   "timeline.includeCheckpoints": "「チェックポイントを含める」を選ぶと表示されます。",
   "timeline.morePages": "記録の次のページへ進みます。",
-  "timeline.notAllEmpty": "履歴全体が空であるという意味ではありません。カバー範囲とアクセスを確認してください。",
+  "timeline.notAllEmpty":
+    "履歴全体が空であるという意味ではありません。カバー範囲とアクセスを確認してください。",
   "timeline.futureRecords": "質問、回答、判定の変化がここに記録されます。",
   "timeline.checkpoint": "チェックポイント",
   "timeline.otherBranch": "別の分岐",
@@ -91,21 +103,28 @@ export const recordPanelsJa: ColumnOf<typeof recordPanelsMessages> = {
   "detail.actions": "次の行動を比較",
   "detail.outcomes": "実行と観察の結果",
   "detail.diagnostics": "診断",
-  "detail.evidenceLinkMissing": "この回答の保存済みの記録へのリンクを検証できないため、元の根拠は利用できません。",
-  "detail.historyLinkMissing": "この回答の過去のリクエストのリンクを検証できませんでした。調査履歴を確認してください。",
-  "detail.referenceNotice": "参照候補と公式の基準は区別されています。欠けている値を、作り出した数字で埋めることはしません。",
-  "detail.outcomeNotice": "これらは記録された観察と解釈です。実行の提案だけでは、結果として表示されません。",
+  "detail.evidenceLinkMissing":
+    "この回答の保存済みの記録へのリンクを検証できないため、元の根拠は利用できません。",
+  "detail.historyLinkMissing":
+    "この回答の過去のリクエストのリンクを検証できませんでした。調査履歴を確認してください。",
+  "detail.referenceNotice":
+    "参照候補と公式の基準は区別されています。欠けている値を、作り出した数字で埋めることはしません。",
+  "detail.outcomeNotice":
+    "これらは記録された観察と解釈です。実行の提案だけでは、結果として表示されません。",
   "detail.evidenceAssessment": "根拠と判定",
   "detail.actionsResults": "行動と結果",
   "detail.lineage": "改訂の系譜",
   "detail.noRelations": "仮説の関係はまだ結びついていません。",
-  "detail.supportNotice": "これらは記録された裏づけ根拠のリンクであり、確認された因果関係ではありません。",
+  "detail.supportNotice":
+    "これらは記録された裏づけ根拠のリンクであり、確認された因果関係ではありません。",
   "sidePanel.title": "調査の作業パネル",
   "sidePanel.sources": "資料",
   "sidePanel.records": "記録",
   "sidePanel.close": "パネルを閉じる",
-  "sidePanel.noSources": "資料が接続されていません。入力欄の「資料を接続」から、元の資料を追加してください。",
+  "sidePanel.noSources":
+    "資料が接続されていません。入力欄の「資料を接続」から、元の資料を追加してください。",
   "sidePanel.manage": "ファイルとウェブの資料を管理",
-  "sidePanel.historyNotice": "過去の回答と判定の変化を確認し、対応している項目は復元をプレビューできます。",
+  "sidePanel.historyNotice":
+    "過去の回答と判定の変化を確認し、対応している項目は復元をプレビューできます。",
   "sidePanel.openHistory": "調査履歴を開く",
 };

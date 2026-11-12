@@ -123,9 +123,7 @@ async def test_provider_budget_reserves_each_repair_before_network(tmp_path: Pat
         http_client=httpx.AsyncClient(transport=httpx.MockTransport(handler)),
     )
     try:
-        model = OpenAIResponsesModel(
-            client, model_id="gpt-test", before_request=budget.reserve
-        )
+        model = OpenAIResponsesModel(client, model_id="gpt-test", before_request=budget.reserve)
         with pytest.raises(HostedReviewProviderBudgetExceeded):
             await model.structured(_request())
     finally:

@@ -5,141 +5,341 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, expect, it, vi } from "vitest";
 import { LiveProjectWorkspace } from "./LiveProjectWorkspace";
 
-const fixture = vi.hoisted(() => ({ calls: [] as {method: string; input: Record<string, unknown>; key:string}[],
-  effort: "low", pending: null as null | (() => void), delay: false, failOnce:false, unavailable:false,
-  reason:"MODEL_CAPABILITY_UNKNOWN", saved:{provider:"retired",model:"old-model",reasoning_effort:"high"}, inheritThread:false, projectSettingsDenied:false, threadDenied:false, includeXaiModel:false, catalogStatus: [] as unknown[], optionExtra: {} as Record<string, unknown> }));
-vi.mock("../api/rpcClient", async (importOriginal) => ({ ...(await importOriginal<typeof import("../api/rpcClient")>()),
-  rpc: async (method: string, input: Record<string, unknown>, key:string) => {
-    fixture.calls.push({method, input,key});
+const fixture = vi.hoisted(() => ({
+  calls: [] as { method: string; input: Record<string, unknown>; key: string }[],
+  effort: "low",
+  pending: null as null | (() => void),
+  delay: false,
+  failOnce: false,
+  unavailable: false,
+  reason: "MODEL_CAPABILITY_UNKNOWN",
+  saved: { provider: "retired", model: "old-model", reasoning_effort: "high" },
+  inheritThread: false,
+  projectSettingsDenied: false,
+  threadDenied: false,
+  includeXaiModel: false,
+  catalogStatus: [] as unknown[],
+  optionExtra: {} as Record<string, unknown>,
+}));
+vi.mock("../api/rpcClient", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../api/rpcClient")>()),
+  rpc: async (method: string, input: Record<string, unknown>, key: string) => {
+    fixture.calls.push({ method, input, key });
     let value: unknown = {};
     let responseState = "SUCCEEDED";
-    if (method === "project/list") value = {projects: ["p", "q"].map(project_id =>
-      ({project_id, name: project_id, overlay: "test", lifecycle: "ACTIVE"}))};
-    if (method === "workspace/ready") value = { ready: true, deployment_mode: "LOCAL", model_connected: true,
-      setup_complete: true, workspace_readable: true, execution_ready: true, workspace_id: "a".repeat(64), setup: { internet_consent: "DENIED" } };
-    if (method === "model/settings/update") { fixture.effort = (input.selection as {reasoning_effort: string}).reasoning_effort; fixture.unavailable = false; }
-    if (method === "model/settings/read" && !input.thread_id && fixture.inheritThread && fixture.projectSettingsDenied) throw new Error("PROJECT_SETTINGS_SCOPE_REQUIRED");
-    if (method === "model/settings/read" && input.thread_id && fixture.threadDenied) throw new Error("AUTHORIZATION_DENIED");
-    if (method.startsWith("model/settings/")) value = {settings_digest: fixture.unavailable && !(input.thread_id && fixture.inheritThread) ? "saved-digest" : null,
-      selection: fixture.unavailable ? input.thread_id && fixture.inheritThread ? {provider: null, model: null, reasoning_effort: null} : fixture.saved : {provider: null, model: null, reasoning_effort: null},
-      effective_settings: fixture.unavailable ? null : {provider: "test", model: "test", reasoning_effort: fixture.effort},
-      availability: fixture.unavailable ? "UNAVAILABLE" : "AVAILABLE", reason_code: fixture.unavailable ? fixture.reason : null,
-      catalog_status: fixture.catalogStatus,
-      model_options: [{provider: "test", model: "test", reasoning_efforts: ["low", "high"], default_effort: "low", ...fixture.optionExtra},
-        ...(fixture.includeXaiModel ? [{provider: "xai-oauth", model: "grok-4.6", reasoning_efforts: ["low", "medium", "high", "xhigh"], default_effort: null}] : [])]};
-    if (method === "project/source/list") value = {artifacts: []};
-    if (method === "model/credential/list") value = {accounts: []};
-    if (method === "evidence/list") value = {evidence: []};
-    if (method === "thread/list") value = {threads:["t","other"].map(thread_id=>({project_id:input.project_id,thread_id,problem:thread_id,execution_state:"IDLE",lifecycle:"OPEN"}))};
+    if (method === "project/list")
+      value = {
+        projects: ["p", "q"].map((project_id) => ({
+          project_id,
+          name: project_id,
+          overlay: "test",
+          lifecycle: "ACTIVE",
+        })),
+      };
+    if (method === "workspace/ready")
+      value = {
+        ready: true,
+        deployment_mode: "LOCAL",
+        model_connected: true,
+        setup_complete: true,
+        workspace_readable: true,
+        execution_ready: true,
+        workspace_id: "a".repeat(64),
+        setup: { internet_consent: "DENIED" },
+      };
+    if (method === "model/settings/update") {
+      fixture.effort = (input.selection as { reasoning_effort: string }).reasoning_effort;
+      fixture.unavailable = false;
+    }
+    if (
+      method === "model/settings/read" &&
+      !input.thread_id &&
+      fixture.inheritThread &&
+      fixture.projectSettingsDenied
+    )
+      throw new Error("PROJECT_SETTINGS_SCOPE_REQUIRED");
+    if (method === "model/settings/read" && input.thread_id && fixture.threadDenied)
+      throw new Error("AUTHORIZATION_DENIED");
+    if (method.startsWith("model/settings/"))
+      value = {
+        settings_digest:
+          fixture.unavailable && !(input.thread_id && fixture.inheritThread)
+            ? "saved-digest"
+            : null,
+        selection: fixture.unavailable
+          ? input.thread_id && fixture.inheritThread
+            ? { provider: null, model: null, reasoning_effort: null }
+            : fixture.saved
+          : { provider: null, model: null, reasoning_effort: null },
+        effective_settings: fixture.unavailable
+          ? null
+          : { provider: "test", model: "test", reasoning_effort: fixture.effort },
+        availability: fixture.unavailable ? "UNAVAILABLE" : "AVAILABLE",
+        reason_code: fixture.unavailable ? fixture.reason : null,
+        catalog_status: fixture.catalogStatus,
+        model_options: [
+          {
+            provider: "test",
+            model: "test",
+            reasoning_efforts: ["low", "high"],
+            default_effort: "low",
+            ...fixture.optionExtra,
+          },
+          ...(fixture.includeXaiModel
+            ? [
+                {
+                  provider: "xai-oauth",
+                  model: "grok-4.6",
+                  reasoning_efforts: ["low", "medium", "high", "xhigh"],
+                  default_effort: null,
+                },
+              ]
+            : []),
+        ],
+      };
+    if (method === "project/source/list") value = { artifacts: [] };
+    if (method === "model/credential/list") value = { accounts: [] };
+    if (method === "evidence/list") value = { evidence: [] };
+    if (method === "thread/list")
+      value = {
+        threads: ["t", "other"].map((thread_id) => ({
+          project_id: input.project_id,
+          thread_id,
+          problem: thread_id,
+          execution_state: "IDLE",
+          lifecycle: "OPEN",
+        })),
+      };
     if (method === "project/create") {
-      if(fixture.failOnce){fixture.failOnce=false;throw new Error("project response lost");}
-      if(fixture.delay)await new Promise<void>(resolve=>{fixture.pending=resolve;});
-      value={project_id:input.project_id,name:input.name,overlay:input.overlay,lifecycle:"DRAFT"};
+      if (fixture.failOnce) {
+        fixture.failOnce = false;
+        throw new Error("project response lost");
+      }
+      if (fixture.delay)
+        await new Promise<void>((resolve) => {
+          fixture.pending = resolve;
+        });
+      value = {
+        project_id: input.project_id,
+        name: input.name,
+        overlay: input.overlay,
+        lifecycle: "DRAFT",
+      };
     }
     if (method === "thread/start" || method === "thread/input") {
-      if (fixture.failOnce) {fixture.failOnce=false;throw new Error("transport response lost");}
-      if (fixture.delay) await new Promise<void>(resolve => {fixture.pending = resolve;});
-      value = {contract_version: 2, project_id: input.project_id, thread_id: input.thread_id ?? "t",
-        operation_id: "op", status: "ACCEPTED_RUNNING", request_epoch: 1};
+      if (fixture.failOnce) {
+        fixture.failOnce = false;
+        throw new Error("transport response lost");
+      }
+      if (fixture.delay)
+        await new Promise<void>((resolve) => {
+          fixture.pending = resolve;
+        });
+      value = {
+        contract_version: 2,
+        project_id: input.project_id,
+        thread_id: input.thread_id ?? "t",
+        operation_id: "op",
+        status: "ACCEPTED_RUNNING",
+        request_epoch: 1,
+      };
       responseState = "RUNNING";
     }
-    if (method === "thread/read") value = {project_id: input.project_id, thread_id: input.thread_id, operation_state: "RUNNING", current_result: null};
-    return {value, state: responseState, operation_id: "op"};
+    if (method === "thread/read")
+      value = {
+        project_id: input.project_id,
+        thread_id: input.thread_id,
+        operation_state: "RUNNING",
+        current_result: null,
+      };
+    return { value, state: responseState, operation_id: "op" };
   },
 }));
 
 let root: Root;
 let container: HTMLDivElement;
 let client: QueryClient;
-const tick = () => new Promise(resolve => setTimeout(resolve, 25));
-async function flush() { await act(async () => {await tick();}); }
+const tick = () => new Promise((resolve) => setTimeout(resolve, 25));
+async function flush() {
+  await act(async () => {
+    await tick();
+  });
+}
 async function openPage(label: string) {
   await act(async () => {
-    const tab = Array.from(container.querySelectorAll<HTMLElement>('[role="tab"]')).find(item => item.textContent === label)!;
+    const tab = Array.from(container.querySelectorAll<HTMLElement>('[role="tab"]')).find(
+      (item) => item.textContent === label,
+    )!;
     tab.click();
   });
-  await flush(); await flush();
+  await flush();
+  await flush();
 }
 
 /** The settings screen shows the project's default model and the open conversation's; these tests are about the conversation's. */
-const modelScope = (): ParentNode => container.querySelector('fieldset.model-settings[data-scope="conversation"]:not(.compact)') ?? container;
-function effort() { return modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 추론강도"]')!; }
-async function select(value: string) { await act(async () => {effort().value = value; effort().dispatchEvent(new Event("change", {bubbles: true}));}); }
+const modelScope = (): ParentNode =>
+  container.querySelector('fieldset.model-settings[data-scope="conversation"]:not(.compact)') ??
+  container;
+function effort() {
+  return modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 추론강도"]')!;
+}
+async function select(value: string) {
+  await act(async () => {
+    effort().value = value;
+    effort().dispatchEvent(new Event("change", { bubbles: true }));
+  });
+}
 async function submit() {
   await act(async () => {
     const input = container.querySelector<HTMLTextAreaElement>("#live-problem")!;
-    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")!.set!.call(input, "question");
-    input.dispatchEvent(new Event("input", {bubbles: true}));
+    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")!.set!.call(
+      input,
+      "question",
+    );
+    input.dispatchEvent(new Event("input", { bubbles: true }));
   });
-  await act(async () => {container.querySelector("form.prompt-composer")!.dispatchEvent(new Event("submit", {bubbles: true, cancelable: true}));});
+  await act(async () => {
+    container
+      .querySelector("form.prompt-composer")!
+      .dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+  });
   await flush();
 }
-async function mount(unavailable = false, options: { reason?: string; saved?: { provider: string; model: string; reasoning_effort: string }; inheritThread?: boolean; includeXaiModel?: boolean; newSession?: boolean } = {}) {
-  Object.assign(globalThis, {IS_REACT_ACT_ENVIRONMENT: true});
-  fixture.calls = []; fixture.effort = "low"; fixture.delay = false; fixture.pending = null;fixture.failOnce=false;fixture.unavailable=unavailable;
-  fixture.reason=options.reason??"MODEL_CAPABILITY_UNKNOWN";fixture.saved=options.saved??{provider:"retired",model:"old-model",reasoning_effort:"high"};fixture.inheritThread=options.inheritThread??false;fixture.projectSettingsDenied=false;fixture.threadDenied=false;fixture.includeXaiModel=options.includeXaiModel??false;
-  sessionStorage.clear(); localStorage.clear();
-  container = document.createElement("div"); document.body.append(container);
-  root = createRoot(container); client = new QueryClient({defaultOptions: {queries: {retry: false}}});
-  await act(async () => {root.render(<QueryClientProvider client={client}><LiveProjectWorkspace /></QueryClientProvider>);});
+async function mount(
+  unavailable = false,
+  options: {
+    reason?: string;
+    saved?: { provider: string; model: string; reasoning_effort: string };
+    inheritThread?: boolean;
+    includeXaiModel?: boolean;
+    newSession?: boolean;
+  } = {},
+) {
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+  fixture.calls = [];
+  fixture.effort = "low";
+  fixture.delay = false;
+  fixture.pending = null;
+  fixture.failOnce = false;
+  fixture.unavailable = unavailable;
+  fixture.reason = options.reason ?? "MODEL_CAPABILITY_UNKNOWN";
+  fixture.saved = options.saved ?? {
+    provider: "retired",
+    model: "old-model",
+    reasoning_effort: "high",
+  };
+  fixture.inheritThread = options.inheritThread ?? false;
+  fixture.projectSettingsDenied = false;
+  fixture.threadDenied = false;
+  fixture.includeXaiModel = options.includeXaiModel ?? false;
+  sessionStorage.clear();
+  localStorage.clear();
+  container = document.createElement("div");
+  document.body.append(container);
+  root = createRoot(container);
+  client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  await act(async () => {
+    root.render(
+      <QueryClientProvider client={client}>
+        <LiveProjectWorkspace />
+      </QueryClientProvider>,
+    );
+  });
   for (let i = 0; i < 8 && !container.querySelector("button.project-button"); i++) await flush();
-  await act(async () => {container.querySelector<HTMLButtonElement>("button.project-button")!.click();});
+  await act(async () => {
+    container.querySelector<HTMLButtonElement>("button.project-button")!.click();
+  });
   // The effort select exists before the settings response, so an unavailable mount waits for the notice
   // that only renders once that response has been applied.
-  const settingsApplied = () => unavailable
-    ? Boolean(container.textContent?.includes("저장된 모델 선택을 현재 사용할 수 없습니다"))
-    : Boolean(container.querySelector('[aria-label="연구 추론강도"]')) && effort().value === "low";
+  const settingsApplied = () =>
+    unavailable
+      ? Boolean(container.textContent?.includes("저장된 모델 선택을 현재 사용할 수 없습니다"))
+      : Boolean(container.querySelector('[aria-label="연구 추론강도"]')) &&
+        effort().value === "low";
   for (let i = 0; i < 40 && !settingsApplied(); i++) await flush();
   if (options.newSession) await startNewSession();
   if (!unavailable) expect(effort().value).toBe("low");
 }
 // A8: opening a project lands on its latest work, so tests that need a first-question draft start a new session.
 async function startNewSession() {
-  for (let i = 0; i < 10 && !container.querySelector("button.new-session-button"); i++) await flush();
-  await act(async () => {container.querySelector<HTMLButtonElement>("button.new-session-button")!.click();});
+  for (let i = 0; i < 10 && !container.querySelector("button.new-session-button"); i++)
+    await flush();
+  await act(async () => {
+    container.querySelector<HTMLButtonElement>("button.new-session-button")!.click();
+  });
   await flush();
 }
 /** Pick a thread the way the shell now offers it: the session button under the active project in the sidebar (the top select is gone). */
 async function chooseThread(threadId: string) {
   await act(async () => {
-    const button = [...container.querySelectorAll<HTMLButtonElement>(".project-sessions .thread-button")].find(item => item.textContent?.includes(threadId))!;
+    const button = [
+      ...container.querySelectorAll<HTMLButtonElement>(".project-sessions .thread-button"),
+    ].find((item) => item.textContent?.includes(threadId))!;
     button.click();
   });
 }
 
-afterEach(async () => { if (root) await act(async () => root.unmount()); client?.clear(); container?.remove(); fixture.catalogStatus = []; fixture.optionExtra = {}; });
+afterEach(async () => {
+  if (root) await act(async () => root.unmount());
+  client?.clear();
+  container?.remove();
+  fixture.catalogStatus = [];
+  fixture.optionExtra = {};
+});
 
 it("one-shot high returns to low visibly and in the next same-thread request", async () => {
-  await mount(); await submit(); // established Thread: same child key thereafter
-  await select("high"); await submit();
-  expect(fixture.calls.filter(c => c.method === "thread/input").at(-1)?.input.reasoning_effort).toBe("high");
+  await mount();
+  await submit(); // established Thread: same child key thereafter
+  await select("high");
+  await submit();
+  expect(
+    fixture.calls.filter((c) => c.method === "thread/input").at(-1)?.input.reasoning_effort,
+  ).toBe("high");
   expect(effort().value).toBe("low");
   await submit();
-  expect(fixture.calls.filter(c => c.method === "thread/input").at(-1)?.input.reasoning_effort).toBeUndefined();
+  expect(
+    fixture.calls.filter((c) => c.method === "thread/input").at(-1)?.input.reasoning_effort,
+  ).toBeUndefined();
 });
 
 it("offers the explicit xai-oauth model without replacing an existing selection", async () => {
   await mount(false, { includeXaiModel: true });
   const model = modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
-  expect([...model.options].map(option => option.value)).toContain("xai-oauth/grok-4.6");
+  expect([...model.options].map((option) => option.value)).toContain("xai-oauth/grok-4.6");
   expect(model.value).toBe("test/test");
   expect(effort().value).toBe("low");
-  expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
-  await act(async () => { model.value = "xai-oauth/grok-4.6"; model.dispatchEvent(new Event("change", { bubbles: true })); });
+  expect(fixture.calls.some((call) => call.method === "model/settings/update")).toBe(false);
+  await act(async () => {
+    model.value = "xai-oauth/grok-4.6";
+    model.dispatchEvent(new Event("change", { bubbles: true }));
+  });
   expect(model.value).toBe("xai-oauth/grok-4.6");
-  expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
+  expect(fixture.calls.some((call) => call.method === "model/settings/update")).toBe(false);
 });
 
 it("keeps an unavailable saved model and effort visible until a user selects a new option", async () => {
   await mount(true);
   // Next to the question box the notice is one short line; the reason stays in its tooltip and for a screen reader.
-  const brief = container.querySelector<HTMLParagraphElement>(".composer-dock .model-settings.compact p.result-notice")!;
-  const shown = [...brief.childNodes].filter(node => !(node instanceof HTMLElement && node.className === "visually-hidden"));
-  expect(shown.map(node => node.textContent).join("").replace(/\s+/g, " ").trim())
-    .toBe("저장된 모델 선택을 현재 사용할 수 없습니다. 기존 선택은 유지됩니다. 변경하려면 아래에서 모델을 직접 고르세요.");
+  const brief = container.querySelector<HTMLParagraphElement>(
+    ".composer-dock .model-settings.compact p.result-notice",
+  )!;
+  const shown = [...brief.childNodes].filter(
+    (node) => !(node instanceof HTMLElement && node.className === "visually-hidden"),
+  );
+  expect(
+    shown
+      .map((node) => node.textContent)
+      .join("")
+      .replace(/\s+/g, " ")
+      .trim(),
+  ).toBe(
+    "저장된 모델 선택을 현재 사용할 수 없습니다. 기존 선택은 유지됩니다. 변경하려면 아래에서 모델을 직접 고르세요.",
+  );
   expect(brief.title).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
   expect(brief.title).toContain("저장된 선택: retired / old-model · 추론강도 high");
-  expect(brief.querySelector(".visually-hidden")?.textContent).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
+  expect(brief.querySelector(".visually-hidden")?.textContent).toContain(
+    "현재 모델 목록에서 저장된 모델을 찾지 못했습니다",
+  );
   await openPage("설정");
   // The settings page spells the reason out in the text itself.
   const full = modelScope().querySelector<HTMLParagraphElement>("p.result-notice")!;
@@ -151,28 +351,40 @@ it("keeps an unavailable saved model and effort visible until a user selects a n
   expect(model.value).toBe("");
   const save = modelScope().querySelector<HTMLButtonElement>("button.model-defaults")!;
   expect(save.disabled).toBe(true);
-  expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
-  await act(async () => { model.value = "test/test"; model.dispatchEvent(new Event("change", { bubbles: true })); });
+  expect(fixture.calls.some((call) => call.method === "model/settings/update")).toBe(false);
+  await act(async () => {
+    model.value = "test/test";
+    model.dispatchEvent(new Event("change", { bubbles: true }));
+  });
   expect(save.disabled).toBe(true);
   await select("high");
   expect(save.disabled).toBe(false);
-  await act(async () => save.click()); await flush();
-  expect(fixture.calls.some(call => call.method === "model/settings/update" &&
-    (call.input.selection as { provider: string; model: string }).provider === "test" &&
-    (call.input.selection as { provider: string; model: string }).model === "test" &&
-    call.input.expected_digest === "saved-digest")).toBe(true);
+  await act(async () => save.click());
+  await flush();
+  expect(
+    fixture.calls.some(
+      (call) =>
+        call.method === "model/settings/update" &&
+        (call.input.selection as { provider: string; model: string }).provider === "test" &&
+        (call.input.selection as { provider: string; model: string }).model === "test" &&
+        call.input.expected_digest === "saved-digest",
+    ),
+  ).toBe(true);
 });
 
 it("does not silently replace an unsupported saved effort", async () => {
-  await mount(true, { reason: "MODEL_REASONING_EFFORT_UNSUPPORTED", saved: { provider: "test", model: "test", reasoning_effort: "ultra" } });
+  await mount(true, {
+    reason: "MODEL_REASONING_EFFORT_UNSUPPORTED",
+    saved: { provider: "test", model: "test", reasoning_effort: "ultra" },
+  });
   await openPage("설정");
   expect(container.textContent).toContain("저장된 선택: test / test · 추론강도 ultra");
   const save = modelScope().querySelector<HTMLButtonElement>("button.model-defaults")!;
   expect(save.disabled).toBe(true);
-  expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
+  expect(fixture.calls.some((call) => call.method === "model/settings/update")).toBe(false);
   await select("high");
   expect(save.disabled).toBe(false);
-  expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
+  expect(fixture.calls.some((call) => call.method === "model/settings/update")).toBe(false);
 });
 
 it("describes an empty thread selection as project inheritance without writing a replacement", async () => {
@@ -180,28 +392,34 @@ it("describes an empty thread selection as project inheritance without writing a
   await chooseThread("t");
   await flush();
   expect(container.textContent).toContain("이 대화는 프로젝트의 모델 설정을 그대로 씁니다");
-  expect(container.textContent).toContain("프로젝트에서 고른 모델: retired / old-model · 추론강도 high");
-  expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
+  expect(container.textContent).toContain(
+    "프로젝트에서 고른 모델: retired / old-model · 추론강도 high",
+  );
+  expect(fixture.calls.some((call) => call.method === "model/settings/update")).toBe(false);
 });
 
 it("hides inherited project model details when the separate project read is denied", async () => {
   await mount(true, { inheritThread: true });
   fixture.projectSettingsDenied = true;
   await chooseThread("t");
-  await flush(); await flush();
+  await flush();
+  await flush();
   expect(container.textContent).toContain("이 대화는 프로젝트의 모델 설정을 그대로 씁니다");
   expect(container.textContent).toContain("프로젝트의 모델 설정을 읽지 못했습니다");
   expect(container.textContent).not.toContain("프로젝트에서 고른 모델: retired / old-model");
-  expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
+  expect(fixture.calls.some((call) => call.method === "model/settings/update")).toBe(false);
 });
 
 it("removes cached inherited details when the actor loses thread settings access", async () => {
   await mount(true, { inheritThread: true });
   await chooseThread("t");
-  await flush(); await flush();
+  await flush();
+  await flush();
   expect(container.textContent).toContain("프로젝트에서 고른 모델: retired / old-model");
   fixture.threadDenied = true;
-  await act(async () => { await client.invalidateQueries({ queryKey: ["model-settings", "p", "t"], exact: true }); });
+  await act(async () => {
+    await client.invalidateQueries({ queryKey: ["model-settings", "p", "t"], exact: true });
+  });
   await flush();
   expect(container.textContent).not.toContain("프로젝트에서 고른 모델: retired / old-model");
   expect(container.textContent).toContain("AUTHORIZATION_DENIED");
@@ -210,43 +428,70 @@ it("removes cached inherited details when the actor loses thread settings access
 it("rechecks and hides cached parent details after project scope is revoked", async () => {
   await mount(true, { inheritThread: true });
   await chooseThread("t");
-  await flush(); await flush();
+  await flush();
+  await flush();
   await openPage("설정");
   expect(container.textContent).toContain("프로젝트에서 고른 모델: retired / old-model");
   fixture.projectSettingsDenied = true;
-  await act(async () => { await client.invalidateQueries({ queryKey: ["model-settings", "p", "t"], exact: true }); });
-  await flush(); await flush();
+  await act(async () => {
+    await client.invalidateQueries({ queryKey: ["model-settings", "p", "t"], exact: true });
+  });
+  await flush();
+  await flush();
   expect(container.textContent).toContain("이 대화는 프로젝트의 모델 설정을 그대로 씁니다");
   expect(container.textContent).toContain("프로젝트의 모델 설정을 읽지 못했습니다");
   expect(container.textContent).not.toContain("프로젝트에서 고른 모델: retired / old-model");
   expect(modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')?.value).toBe("");
-  expect(modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 추론강도"]')?.value).toBe("");
-  expect(modelScope().querySelector<HTMLButtonElement>("button.model-defaults")?.disabled).toBe(true);
+  expect(modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 추론강도"]')?.value).toBe(
+    "",
+  );
+  expect(modelScope().querySelector<HTMLButtonElement>("button.model-defaults")?.disabled).toBe(
+    true,
+  );
   const model = modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
-  await act(async () => { model.value = "test/test"; model.dispatchEvent(new Event("change", { bubbles: true })); });
+  await act(async () => {
+    model.value = "test/test";
+    model.dispatchEvent(new Event("change", { bubbles: true }));
+  });
   const save = modelScope().querySelector<HTMLButtonElement>("button.model-defaults")!;
   expect(effort().value).toBe("");
   expect(save.disabled).toBe(true);
   await select("high");
   expect(save.disabled).toBe(false);
-  expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
-  await act(async () => save.click()); await flush();
-  expect(fixture.calls.some(call => call.method === "model/settings/update" && call.input.expected_digest === null &&
-    (call.input.selection as { reasoning_effort: string }).reasoning_effort === "high")).toBe(true);
+  expect(fixture.calls.some((call) => call.method === "model/settings/update")).toBe(false);
+  await act(async () => save.click());
+  await flush();
+  expect(
+    fixture.calls.some(
+      (call) =>
+        call.method === "model/settings/update" &&
+        call.input.expected_digest === null &&
+        (call.input.selection as { reasoning_effort: string }).reasoning_effort === "high",
+    ),
+  ).toBe(true);
 });
 
 it("a new draft survives a late admission", async () => {
-  await mount(); await submit();
-  fixture.delay = true; await select("high"); await submit();
+  await mount();
+  await submit();
+  fixture.delay = true;
+  await select("high");
+  await submit();
   await select("low");
-  await act(async () => {fixture.pending!(); await tick();});
+  await act(async () => {
+    fixture.pending!();
+    await tick();
+  });
   fixture.delay = false;
   await submit();
-  expect(fixture.calls.filter(c => c.method === "thread/input").at(-1)?.input.reasoning_effort).toBe("low");
+  expect(
+    fixture.calls.filter((c) => c.method === "thread/input").at(-1)?.input.reasoning_effort,
+  ).toBe("low");
 });
 
 it("saved defaults survive reload and apply to successive requests", async () => {
-  await mount(); await select("high");
+  await mount();
+  await select("high");
   expect(container.querySelector("button.model-defaults")).toBeNull();
   await openPage("설정");
   await act(async () => {
@@ -254,81 +499,160 @@ it("saved defaults survive reload and apply to successive requests", async () =>
   });
   await flush();
   expect(fixture.effort).toBe("high");
-  await act(async () => { await client.invalidateQueries({queryKey: ["model-settings"]}); });
+  await act(async () => {
+    await client.invalidateQueries({ queryKey: ["model-settings"] });
+  });
   await openPage("대화");
-  await submit(); await submit();
+  await submit();
+  await submit();
   expect(effort().value).toBe("high");
-  expect(fixture.calls.filter(c => c.method === "thread/start" || c.method === "thread/input").every(c =>
-    (c.input.reasoning_effort ?? fixture.effort) === "high")).toBe(true);
+  expect(
+    fixture.calls
+      .filter((c) => c.method === "thread/start" || c.method === "thread/input")
+      .every((c) => (c.input.reasoning_effort ?? fixture.effort) === "high"),
+  ).toBe(true);
 });
 
 it("a late admission cannot replace a different project draft", async () => {
-  await mount(false, { newSession: true }); fixture.delay = true; await select("high"); await submit();
-  await act(async () => {container.querySelectorAll<HTMLButtonElement>("button.project-button")[1].click();});
-  await flush(); await startNewSession(); await select("low");
-  await act(async () => {fixture.pending!(); await tick();});
+  await mount(false, { newSession: true });
+  fixture.delay = true;
+  await select("high");
+  await submit();
+  await act(async () => {
+    container.querySelectorAll<HTMLButtonElement>("button.project-button")[1].click();
+  });
+  await flush();
+  await startNewSession();
+  await select("low");
+  await act(async () => {
+    fixture.pending!();
+    await tick();
+  });
   expect(effort().value).toBe("low");
-  fixture.delay = false; await submit();
-  const last = fixture.calls.filter(c => c.method === "thread/start").at(-1)!;
+  fixture.delay = false;
+  await submit();
+  const last = fixture.calls.filter((c) => c.method === "thread/start").at(-1)!;
   expect(last.input.project_id).toBe("q");
   expect(last.input.reasoning_effort).toBe("low");
 });
 
-it("same-draft transport retry reuses the idempotency key and double-submit is blocked",async()=>{
-  await mount(false, { newSession: true });fixture.failOnce=true;await submit();
-  const failed=fixture.calls.filter(c=>c.method==="thread/start").at(-1)!;
-  fixture.delay=true;
-  await act(async()=>{
-    const form=container.querySelector("form.prompt-composer")!;
-    form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
-    form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));
+it("same-draft transport retry reuses the idempotency key and double-submit is blocked", async () => {
+  await mount(false, { newSession: true });
+  fixture.failOnce = true;
+  await submit();
+  const failed = fixture.calls.filter((c) => c.method === "thread/start").at(-1)!;
+  fixture.delay = true;
+  await act(async () => {
+    const form = container.querySelector("form.prompt-composer")!;
+    form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
   });
-  expect(fixture.calls.filter(c=>c.method==="thread/start")).toHaveLength(2);
-  expect(fixture.calls.filter(c=>c.method==="thread/start").at(-1)!.key).toBe(failed.key);
-  await act(async()=>{fixture.pending!();await tick();});
+  expect(fixture.calls.filter((c) => c.method === "thread/start")).toHaveLength(2);
+  expect(fixture.calls.filter((c) => c.method === "thread/start").at(-1)!.key).toBe(failed.key);
+  await act(async () => {
+    fixture.pending!();
+    await tick();
+  });
 });
 
-it("a late admission cannot replace a different selected thread",async()=>{
-  await mount();await submit();fixture.delay=true;await select("high");await submit();
+it("a late admission cannot replace a different selected thread", async () => {
+  await mount();
+  await submit();
+  fixture.delay = true;
+  await select("high");
+  await submit();
   await chooseThread("other");
-  await flush();await select("low");
-  await act(async()=>{fixture.pending!();await tick();});
-  fixture.delay=false;await submit();
-  const last=fixture.calls.filter(c=>c.method==="thread/input").at(-1)!;
-  expect(last.input.thread_id).toBe("other");expect(last.input.reasoning_effort).toBe("low");
+  await flush();
+  await select("low");
+  await act(async () => {
+    fixture.pending!();
+    await tick();
+  });
+  fixture.delay = false;
+  await submit();
+  const last = fixture.calls.filter((c) => c.method === "thread/input").at(-1)!;
+  expect(last.input.thread_id).toBe("other");
+  expect(last.input.reasoning_effort).toBe("low");
 });
 
-it("ordinary navigation only automatically calls the actual nonmutating query surface",async()=>{
+it("ordinary navigation only automatically calls the actual nonmutating query surface", async () => {
   await mount();
   // The conversation also reads the project's call settings (read-only) to say when automatic retry is off. A8: opening a project also reads its latest work (read-only thread queries), which hypotheses came from a trace row, and whether the trace is demo data for the conversation's synthetic-data line (read-only queries).
-  expect(fixture.calls.filter(call=>!["project/list","thread/list","project/source/list","evidence/list","model/settings/read","workspace/ready","thread/read","thread/activity/list","hypothesis/link/list","trace/read","model/callSettings/read"].includes(call.method)).map(call=>call.method)).toEqual([]);
-  await act(async()=>{container.querySelector<HTMLElement>('[role="tab"][data-tab-id="records"]')?.click();});
-  expect(fixture.calls.some(call=>call.method==="receipt/verify")).toBe(false);
+  expect(
+    fixture.calls
+      .filter(
+        (call) =>
+          ![
+            "project/list",
+            "thread/list",
+            "project/source/list",
+            "evidence/list",
+            "model/settings/read",
+            "workspace/ready",
+            "thread/read",
+            "thread/activity/list",
+            "hypothesis/link/list",
+            "trace/read",
+            "model/callSettings/read",
+          ].includes(call.method),
+      )
+      .map((call) => call.method),
+  ).toEqual([]);
+  await act(async () => {
+    container.querySelector<HTMLElement>('[role="tab"][data-tab-id="records"]')?.click();
+  });
+  expect(fixture.calls.some((call) => call.method === "receipt/verify")).toBe(false);
 });
 
-it("project-create retry preserves project ID and key without a globally shared policy binding",async()=>{
+it("project-create retry preserves project ID and key without a globally shared policy binding", async () => {
   await mount();
-  await act(async()=>{container.querySelector<HTMLButtonElement>("button.new-project-button")!.click();});
-  // the left button now opens the create screen by itself (it used to need a second click on the list's button)
-  await act(async()=>{
-    const input=container.querySelector<HTMLInputElement>('input[placeholder="연구할 문제 또는 프로젝트 이름"]')!;
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value")!.set!.call(input,"second project");
-    input.dispatchEvent(new Event("input",{bubbles:true}));
+  await act(async () => {
+    container.querySelector<HTMLButtonElement>("button.new-project-button")!.click();
   });
-  fixture.failOnce=true;
-  const form=container.querySelector("form.onboarding-card")!;
-  await act(async()=>{form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));await tick();});
-  fixture.delay=true;
-  await act(async()=>{form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));form.dispatchEvent(new Event("submit",{bubbles:true,cancelable:true}));});
-  const calls=fixture.calls.filter(call=>call.method==="project/create");
-  expect(calls).toHaveLength(2);expect(calls[0].key).toBe(calls[1].key);
+  // the left button now opens the create screen by itself (it used to need a second click on the list's button)
+  await act(async () => {
+    const input = container.querySelector<HTMLInputElement>(
+      'input[placeholder="연구할 문제 또는 프로젝트 이름"]',
+    )!;
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(
+      input,
+      "second project",
+    );
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  fixture.failOnce = true;
+  const form = container.querySelector("form.onboarding-card")!;
+  await act(async () => {
+    form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    await tick();
+  });
+  fixture.delay = true;
+  await act(async () => {
+    form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+  });
+  const calls = fixture.calls.filter((call) => call.method === "project/create");
+  expect(calls).toHaveLength(2);
+  expect(calls[0].key).toBe(calls[1].key);
   expect(calls[0].input.project_id).toBe(calls[1].input.project_id);
   expect(calls[0].input).not.toHaveProperty("policy_binding_ref");
-  await act(async()=>{fixture.pending!();await tick();});
+  await act(async () => {
+    fixture.pending!();
+    await tick();
+  });
 });
 
 it("shows when the list was last checked and keeps listing the models", async () => {
-  fixture.catalogStatus = [{ provider: "test", source: "PROVIDER_LIST", status: "ACTIVE", fetched_at: new Date().toISOString(), failure_reason: null, excluded: [] }];
+  fixture.catalogStatus = [
+    {
+      provider: "test",
+      source: "PROVIDER_LIST",
+      status: "ACTIVE",
+      fetched_at: new Date().toISOString(),
+      failure_reason: null,
+      excluded: [],
+    },
+  ];
   await mount();
   expect(container.textContent).toContain("마지막 확인: 오늘");
   expect(container.textContent).toContain("최신");
@@ -336,20 +660,46 @@ it("shows when the list was last checked and keeps listing the models", async ()
 });
 
 it("warns in one line when the refresh failed, without emptying the list or changing the selection", async () => {
-  fixture.catalogStatus = [{ provider: "test", source: "PROVIDER_LIST", status: "STALE_LAST_GOOD", fetched_at: new Date().toISOString(), failure_reason: "CATALOG_UNAVAILABLE", excluded: [] }];
+  fixture.catalogStatus = [
+    {
+      provider: "test",
+      source: "PROVIDER_LIST",
+      status: "STALE_LAST_GOOD",
+      fetched_at: new Date().toISOString(),
+      failure_reason: "CATALOG_UNAVAILABLE",
+      excluded: [],
+    },
+  ];
   await mount();
   expect(container.textContent).toContain("마지막 확인 목록 · 갱신 실패");
-  expect(container.textContent).toContain("모델 목록을 새로 받지 못해 마지막으로 확인한 목록을 보여 줍니다");
+  expect(container.textContent).toContain(
+    "모델 목록을 새로 받지 못해 마지막으로 확인한 목록을 보여 줍니다",
+  );
   const model = modelScope().querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
-  expect([...model.options].map(option => option.value)).toContain("test/test");
+  expect([...model.options].map((option) => option.value)).toContain("test/test");
   expect(model.value).toBe("test/test");
-  expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
+  expect(fixture.calls.some((call) => call.method === "model/settings/update")).toBe(false);
 });
 
 it("marks a refused model and a model not yet checked against the account, and folds away the unsupported ones", async () => {
-  fixture.optionExtra = { entitlement: "UNVERIFIED", execution: "REJECTED", label: "최신 Sonnet(별칭) · Claude Code 2.1.284" };
-  fixture.catalogStatus = [{ provider: "test", source: "PROVIDER_LIST", status: "ACTIVE", fetched_at: new Date().toISOString(), failure_reason: null,
-    excluded: [{ model: "gpt-5.4", reason: "UNSUPPORTED_SLUG" }, { model: "router/x", reason: "NAMESPACED_ID" }] }];
+  fixture.optionExtra = {
+    entitlement: "UNVERIFIED",
+    execution: "REJECTED",
+    label: "최신 Sonnet(별칭) · Claude Code 2.1.284",
+  };
+  fixture.catalogStatus = [
+    {
+      provider: "test",
+      source: "PROVIDER_LIST",
+      status: "ACTIVE",
+      fetched_at: new Date().toISOString(),
+      failure_reason: null,
+      excluded: [
+        { model: "gpt-5.4", reason: "UNSUPPORTED_SLUG" },
+        { model: "router/x", reason: "NAMESPACED_ID" },
+      ],
+    },
+  ];
   await mount();
   const text = container.textContent ?? "";
   expect(text).toContain("최신 Sonnet(별칭) · Claude Code 2.1.284");
@@ -364,18 +714,31 @@ it("marks a refused model and a model not yet checked against the account, and f
 it("shows the project's default model and the open conversation's model as two named settings, and saves each to its own scope", async () => {
   await mount();
   await openPage("설정");
-  const legends = [...container.querySelectorAll("fieldset.model-settings:not(.compact) legend")].map(item => item.textContent);
+  const legends = [
+    ...container.querySelectorAll("fieldset.model-settings:not(.compact) legend"),
+  ].map((item) => item.textContent);
   expect(legends).toEqual(["이 프로젝트의 기본 모델", "이 대화의 모델"]);
-  const project = container.querySelector('fieldset.model-settings[data-scope="project"]:not(.compact)')!;
-  expect(project.querySelector("button.model-defaults")!.textContent).toBe("이 프로젝트의 기본값으로 저장");
-  expect(modelScope().querySelector("button.model-defaults")!.textContent).toBe("이 대화의 기본값으로 저장");
+  const project = container.querySelector(
+    'fieldset.model-settings[data-scope="project"]:not(.compact)',
+  )!;
+  expect(project.querySelector("button.model-defaults")!.textContent).toBe(
+    "이 프로젝트의 기본값으로 저장",
+  );
+  expect(modelScope().querySelector("button.model-defaults")!.textContent).toBe(
+    "이 대화의 기본값으로 저장",
+  );
   // A choice made for the project does not change what the conversation's setting shows.
   const projectEffort = project.querySelector<HTMLSelectElement>('[aria-label="연구 추론강도"]')!;
-  await act(async () => { projectEffort.value = "high"; projectEffort.dispatchEvent(new Event("change", { bubbles: true })); });
+  await act(async () => {
+    projectEffort.value = "high";
+    projectEffort.dispatchEvent(new Event("change", { bubbles: true }));
+  });
   expect(effort().value).toBe("low");
-  await act(async () => { project.querySelector<HTMLButtonElement>("button.model-defaults")!.click(); });
+  await act(async () => {
+    project.querySelector<HTMLButtonElement>("button.model-defaults")!.click();
+  });
   await flush();
-  const saved = fixture.calls.filter(call => call.method === "model/settings/update").at(-1)!;
+  const saved = fixture.calls.filter((call) => call.method === "model/settings/update").at(-1)!;
   expect(saved.input.project_id).toBe("p");
   expect(saved.input).not.toHaveProperty("thread_id");
   expect((saved.input.selection as { reasoning_effort: string }).reasoning_effort).toBe("high");
@@ -385,13 +748,16 @@ it("says what is wrong with the saved model in at most four sentences on the set
   await mount(true);
   await openPage("설정");
   const notice = modelScope().querySelector("p.result-notice")!.textContent!;
-  expect(notice).toBe("저장된 모델 선택을 현재 사용할 수 없습니다. 현재 모델 목록에서 저장된 모델을 찾지 못했습니다. 저장된 선택: retired / old-model · 추론강도 high. 바꾸려면 아래에서 모델을 고르세요.");
+  expect(notice).toBe(
+    "저장된 모델 선택을 현재 사용할 수 없습니다. 현재 모델 목록에서 저장된 모델을 찾지 못했습니다. 저장된 선택: retired / old-model · 추론강도 high. 바꾸려면 아래에서 모델을 고르세요.",
+  );
 });
 
 it("shows this project's settings on the project tab and this computer's from the sidebar, with no setting on both", async () => {
   await mount();
   await openPage("설정");
-  const titles = () => [...container.querySelectorAll(".workspace-content h2")].map(item => item.textContent);
+  const titles = () =>
+    [...container.querySelectorAll(".workspace-content h2")].map((item) => item.textContent);
   expect(container.querySelector(".workspace-heading h1")?.textContent).toBe("프로젝트 설정");
   // the title says the scope once; no small label above it says it again
   expect(container.querySelector(".workspace-heading .eyebrow")).toBeNull();
@@ -399,18 +765,31 @@ it("shows this project's settings on the project tab and this computer's from th
   expect(projectTitles).toContain("모델 기본값");
   expect(projectTitles).not.toContain("모델 연결");
   expect(projectTitles).not.toContain("언어");
-  await act(async () => { ([...container.querySelectorAll(".sidebar-bottom button")].find(item => item.textContent === "이 컴퓨터 설정") as HTMLButtonElement).click(); });
-  await flush(); await flush();
+  await act(async () => {
+    (
+      [...container.querySelectorAll(".sidebar-bottom button")].find(
+        (item) => item.textContent === "이 컴퓨터 설정",
+      ) as HTMLButtonElement
+    ).click();
+  });
+  await flush();
+  await flush();
   expect(container.querySelector(".workspace-heading h1")?.textContent).toBe("이 컴퓨터 설정");
   expect(container.querySelector(".workspace-heading .eyebrow")).toBeNull();
   const computerTitles = titles();
   expect(computerTitles).toContain("모델 연결");
   expect(computerTitles).toContain("언어");
-  expect(computerTitles.filter(title => projectTitles.includes(title))).toEqual([]);
+  expect(computerTitles.filter((title) => projectTitles.includes(title))).toEqual([]);
   expect(container.querySelector("fieldset.model-settings:not(.compact)")).toBeNull();
   // The project's screen has a way to this one.
   await openPage("설정");
-  await act(async () => { ([...container.querySelectorAll(".workspace-heading button")].find(item => item.textContent === "이 컴퓨터 설정 열기") as HTMLButtonElement).click(); });
+  await act(async () => {
+    (
+      [...container.querySelectorAll(".workspace-heading button")].find(
+        (item) => item.textContent === "이 컴퓨터 설정 열기",
+      ) as HTMLButtonElement
+    ).click();
+  });
   await flush();
   expect(container.querySelector(".workspace-heading h1")?.textContent).toBe("이 컴퓨터 설정");
 });

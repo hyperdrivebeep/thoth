@@ -1,13 +1,31 @@
 // @vitest-environment jsdom
 import { afterEach, expect, it } from "vitest";
-import { readLocalPending, submissionSignature, writeLocalPending, type PendingSubmission } from "./localWorkspacePersistence";
-import { readResponseLanguageDefault, writeResponseLanguageDefault } from "./responseLanguageDefault";
+import {
+  readLocalPending,
+  submissionSignature,
+  writeLocalPending,
+  type PendingSubmission,
+} from "./localWorkspacePersistence";
+import {
+  readResponseLanguageDefault,
+  writeResponseLanguageDefault,
+} from "./responseLanguageDefault";
 import { setLocale } from "../i18n/locale";
 
-afterEach(() => { localStorage.clear(); setLocale("ko"); });
+afterEach(() => {
+  localStorage.clear();
+  setLocale("ko");
+});
 const scope = { mode: "LOCAL" as const, workspaceId: "workspace:language-test" };
-const fields = { workspaceId: scope.workspaceId, projectId: "p", threadId: "t", problem: "Question", selection: null,
-  key: "11111111-1111-1111-1111-111111111111", createdAt: 1 };
+const fields = {
+  workspaceId: scope.workspaceId,
+  projectId: "p",
+  threadId: "t",
+  problem: "Question",
+  selection: null,
+  key: "11111111-1111-1111-1111-111111111111",
+  createdAt: 1,
+};
 
 it("preserves v1 signatures and keeps explicit ko distinct from omission", () => {
   const legacy = submissionSignature("p", "t", "Question", null);
@@ -20,8 +38,12 @@ it("preserves v1 signatures and keeps explicit ko distinct from omission", () =>
 });
 
 it("replays v2 with its saved language regardless of display and default-language changes", () => {
-  const saved: PendingSubmission = { ...fields, version: 2, responseLanguage: "en",
-    signature: submissionSignature("p", "t", "Question", null, null, "en") };
+  const saved: PendingSubmission = {
+    ...fields,
+    version: 2,
+    responseLanguage: "en",
+    signature: submissionSignature("p", "t", "Question", null, null, "en"),
+  };
   expect(writeLocalPending(saved)).toBe("SAVED");
   writeResponseLanguageDefault(scope, "ko");
   setLocale("en");

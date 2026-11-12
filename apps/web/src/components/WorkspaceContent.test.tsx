@@ -51,7 +51,9 @@ it("follows the tab when another page is shown", async () => {
   await show("research");
   const selected = container.querySelector('[role="tab"][aria-selected="true"]')!;
   expect(selected.textContent).toBe("Conversation");
-  expect(document.getElementById(selected.getAttribute("aria-controls") ?? "")).toBe(container.querySelector("section"));
+  expect(document.getElementById(selected.getAttribute("aria-controls") ?? "")).toBe(
+    container.querySelector("section"),
+  );
 });
 
 it("is plain content where there are no workspace tabs", async () => {

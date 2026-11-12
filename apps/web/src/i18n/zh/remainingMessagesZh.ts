@@ -28,14 +28,17 @@ export const remainingZh: ColumnOf<typeof remainingMessages> = {
   "labels.answerScope": "可回答的范围：",
   "approval.recreateFailed": "无法重新创建批准请求。",
   "approval.created": "批准请求已创建。批准人作出决定之前不会发送任何内容。",
-  "approval.notSentNotice": "部分变更被标记为不发送。此标记只作用于本屏幕；未经批准不会传输任何内容。",
+  "approval.notSentNotice":
+    "部分变更被标记为不发送。此标记只作用于本屏幕；未经批准不会传输任何内容。",
   "labels.retryKey": "重试键：",
   "tools.claudeTitle": "安装 Claude Code",
-  "tools.claudeNotice": "将官方 Anthropic Claude Code 安装到 THOTH 工具文件夹。其他程序使用的现有安装不受影响。",
+  "tools.claudeNotice":
+    "将官方 Anthropic Claude Code 安装到 THOTH 工具文件夹。其他程序使用的现有安装不受影响。",
   "closure.record": "记录处置",
   "labels.disposition": "处置记录 ·",
   "effects.title": "声明此行动的影响",
-  "effects.rules": "规则根据所声明的影响来确定风险和所需的权限。未作声明时，该行动仍须接受影响审查。",
+  "effects.rules":
+    "规则根据所声明的影响来确定风险和所需的权限。未作声明时，该行动仍须接受影响审查。",
   "effects.readOnly": "不选择任何影响，即声明该行动为只读。",
   "evidenceUse.title": "证据使用情况",
   "evidenceUse.ai": " （基于 AI 审查）",
@@ -81,7 +84,8 @@ export const remainingZh: ColumnOf<typeof remainingMessages> = {
   "labels.confirmed": "已确认 ·",
   "labels.changedVerdicts": "变化的评估：",
   "workspaceError.title": "无法显示此视图",
-  "workspaceError.notice": "服务器的响应可能与显示格式不符。这不会被视为成功或完成，已保存的记录不受影响。请使用标签页或项目查看其他记录。",
+  "workspaceError.notice":
+    "服务器的响应可能与显示格式不符。这不会被视为成功或完成，已保存的记录不受影响。请使用标签页或项目查看其他记录。",
   "workspaceError.retry": "重新加载服务器状态并重试",
   "labels.userCode": "用户代码：",
   "xai.enterCode": "请在打开的页面中输入上面的代码。",

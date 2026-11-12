@@ -167,14 +167,16 @@ def test_dispatch_release_endpoint_requires_internal_secret(
         )
         assert released.status_code == 200
         assert released.json() == {"released": "op-1"}
-        assert client.post(
-            "/internal/dispatch-release",
-            headers={"x-thoth-review-internal": "internal-secret"},
-            json={},
-        ).status_code == 400
         assert (
-            client.post("/internal/dispatch-abort", json={"operation_id": "op"}).status_code
-            == 404
+            client.post(
+                "/internal/dispatch-release",
+                headers={"x-thoth-review-internal": "internal-secret"},
+                json={},
+            ).status_code
+            == 400
+        )
+        assert (
+            client.post("/internal/dispatch-abort", json={"operation_id": "op"}).status_code == 404
         )
         aborted = client.post(
             "/internal/dispatch-abort",

@@ -23,11 +23,13 @@ export const hypothesisActionsZh: ColumnOf<typeof hypothesisActionsMessages> = {
   "memoryEdit.superseded": "此记忆已被较新的更正取代。列表已刷新。",
   "memoryEdit.missing": "找不到此记忆。列表已刷新。",
   "memoryEdit.failed": "无法发送更正提议。请稍后重试。",
-  "lesson.notice": "这些是同一标准、单位、条件和规则修订版下较早的、由规则计算或人工记录的结果。仅供参考，不影响测试顺序，也不预测这次会得到相同的结果。",
+  "lesson.notice":
+    "这些是同一标准、单位、条件和规则修订版下较早的、由规则计算或人工记录的结果。仅供参考，不影响测试顺序，也不预测这次会得到相同的结果。",
   "lesson.effect": "应用修复之后，新的结果曾使这一行按规则计算满足了标准",
   "lesson.disposition": "处置记录",
   "sameHypothesis.mark": "标记为来自另一次调查的同一假设",
-  "sameHypothesis.notice": "有人将这些标记为同一个假设。较早那次调查的结果仅供参考，不会影响此假设的排除或测试顺序。",
+  "sameHypothesis.notice":
+    "有人将这些标记为同一个假设。较早那次调查的结果仅供参考，不会影响此假设的排除或测试顺序。",
   "sameHypothesis.title": "另一次调查中的同一假设",
   "sameHypothesis.noResults": "没有记录测试结果",
   "sameHypothesis.already": "这些已被标记为同一个假设。",
@@ -37,7 +39,8 @@ export const hypothesisActionsZh: ColumnOf<typeof hypothesisActionsMessages> = {
   "sameHypothesis.investigation": "调查",
   "sameHypothesis.unknownDate": "调查日期未知",
   "sameHypothesis.unreadable": "假设不可用",
-  "actionDraft.undeclared": "尚未声明影响，因此此行动受到保护。在声明并修订其影响之前，必须由人作出决定。",
+  "actionDraft.undeclared":
+    "尚未声明影响，因此此行动受到保护。在声明并修订其影响之前，必须由人作出决定。",
   "actionDraft.approvalRequired": "此行动会向外部写入或更改基线，需要人工批准。",
   "actionDraft.prohibited": "已声明了被禁止的影响，因此此行动无法执行。",
   "actionDraft.allowed": "所声明的影响符合无需单独批准即可使用的条件。",
