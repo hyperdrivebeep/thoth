@@ -25,7 +25,7 @@ export const sourceMessages = {
     "en": " Uploaded files are used in this review project."
   },
   "sources.localUpload": {
-    "ko": " 파일은 이 컴퓨터의 THOTH 작업공간에 준비됩니다.",
+    "ko": " 파일은 이 컴퓨터의 THOTH 작업 공간에 준비됩니다.",
     "en": " Files are staged in this computer's THOTH workspace."
   },
   "sources.chooseFiles": {
@@ -74,7 +74,7 @@ export const sourceMessages = {
     "en": "Sources are connected. Start analysis with a new question or instruction."
   },
   "sources.unclassified": {
-    "ko": "권위 미분류",
+    "ko": "자료 성격 미분류",
     "en": "Authority unclassified"
   },
   "sources.informal": {
@@ -142,7 +142,7 @@ export const sourceMessages = {
     "en": "Register permitted domains first. Saving or enabling them does not start a search."
   },
   "web.workspaceDenied": {
-    "ko": "워크스페이스에서 인터넷을 허용하지 않았습니다.",
+    "ko": "이 작업 공간에서는 인터넷 사용을 허용하지 않았습니다.",
     "en": "Internet access is not allowed for this workspace."
   },
   "web.domainLabel": {

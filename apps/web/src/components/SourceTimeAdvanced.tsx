@@ -27,7 +27,7 @@ export function SourceTimeAdvanced({projectId, artifactId, assessment, cutoff}:{
         <Button small onClick={async ()=>{ try { await correctSourceTime({project_id:projectId, artifact_id:artifactId, source_version_id:assessment.source_version_id, byte_sha256:assessment.byte_sha256, expected_project_revision:cutoff.project_revision, expected_cutoff_at:cutoff.cutoff_at, expected_assessment_revision:assessment.revision, expected_metadata_digest:assessment.metadata_digest ?? assessment.assessment_digest, assertion:"AFTER_CUTOFF", correction_reason:reason}); } catch(err){ setError(err instanceof Error?err.message:String(err)); } }}>{t("sourceTime.after")}</Button>
         <Button small minimal onClick={async ()=>{ try { await correctSourceTime({project_id:projectId, artifact_id:artifactId, source_version_id:assessment.source_version_id, byte_sha256:assessment.byte_sha256, expected_project_revision:cutoff.project_revision, expected_cutoff_at:cutoff.cutoff_at, expected_assessment_revision:assessment.revision, expected_metadata_digest:assessment.metadata_digest ?? assessment.assessment_digest, revert_unknown:true, correction_reason:reason}); } catch(err){ setError(err instanceof Error?err.message:String(err)); } }}>{t("sourceTime.unknown")}</Button>
       </>}
-      {error && <Callout intent="danger">{error}</Callout>}
+      {error && <Callout intent="danger" role="alert">{error}</Callout>}
     </div></Collapse>
   </div>;
 }

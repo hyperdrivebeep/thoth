@@ -109,7 +109,7 @@ it("opens the existing conversation of the same row, with the question filled in
   fixture.threads = [{ thread_id: "t-other", origin: null }, { thread_id: "t-rain", origin: { subject_kind: "CRITERION", subject_id: RAIN, verdict_revision: "old-revision" } }];
   await mount("t-other");
   await investigate("Detection rate in rain");
-  expect(button("지시 추가")).toBeTruthy(); // an existing thread
+  expect(button("보내기")).toBeTruthy(); // an existing thread
   expect(editor().value).toContain("Detection rate in rain");
   expect(readDraft("p", "t-rain", scope)).toContain("Detection rate in rain");
   expect(sent("thread/start")).toHaveLength(0);

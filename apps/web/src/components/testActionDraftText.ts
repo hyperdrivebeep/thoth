@@ -32,9 +32,11 @@ export function draftReadyLines(action: Record<string, unknown>): string[] {
   const tier = typeof action.risk_tier === "string" ? action.risk_tier : "";
   const policy = typeof action.policy_state === "string" ? action.policy_state : "";
   const rule = ruleLine(action);
+  // The label already says "risk" ("위험 낮음"); the "위험 등급:" lead is kept only for the unknown case.
+  const risk = statusLabel(tier) ?? formatMessage("riskTier", t("actionDraft.checkNeeded"));
   return [
     t("actionDraft.prepared"),
-    formatMessage("riskTier", statusLabel(tier) ?? t("actionDraft.checkNeeded")),
+    risk,
     ...(rule ? [rule] : []),
     REASONS[policy] ?? openNotice(),
   ];

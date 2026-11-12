@@ -104,7 +104,7 @@ export const researchPanelsMessages = {
     "en": "There is no trace table yet. Import a CSV using Create new table to display requirements and criteria here."
   },
   "tracePage.tableLabel": {
-    "ko": "요구사항별 기준, 고른 결과, 판정, 현재성, 사람 확인, 근거 위치",
+    "ko": "요구사항별 기준, 고른 결과, 판정, 최신 여부, 사람 확인, 근거 위치",
     "en": "Criteria, selected results, assessments, currentness, human confirmations, and evidence locations by requirement"
   },
   "tracePage.history": {
@@ -124,7 +124,7 @@ export const researchPanelsMessages = {
     "en": "Assessment"
   },
   "tracePage.currentness": {
-    "ko": "현재성",
+    "ko": "최신 여부",
     "en": "Currentness"
   },
   "tracePage.humanConfirmation": {

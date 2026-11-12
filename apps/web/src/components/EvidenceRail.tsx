@@ -1,6 +1,7 @@
 import { message as formatMessage } from "../i18n/formatMessages";
+import { DetachedSourcesContext } from "./detachedSources";
 import { t, localeTag } from "../i18n/locale";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Callout, HTMLSelect, InputGroup } from "@blueprintjs/core";
 
 import type { EvidenceSpan } from "../types";
@@ -36,6 +37,8 @@ export function EvidenceRail({
   error?: string;
   heading?: string;
 }) {
+  // Evidence is kept when its source is disconnected later; it is marked instead.
+  const detached = useContext(DetachedSourcesContext);
   const [query, setQuery] = useState("");
   const [authority, setAuthority] = useState("ALL");
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -89,7 +92,7 @@ export function EvidenceRail({
         </div>
       )}
       <div className="evidence-list" ref={listRef}>
-        {loading ? <p className="empty-copy">{t("evidenceRail.reading")}</p> : error ? <Callout compact intent="danger">{error}</Callout> : evidence.length === 0 ? (
+        {loading ? <p className="empty-copy">{t("evidenceRail.reading")}</p> : error ? <Callout compact intent="danger" role="alert">{error}</Callout> : evidence.length === 0 ? (
           <p className="empty-copy">{t("evidenceRail.empty")}</p>
         ) : (
           filtered.map((span) => (
@@ -100,6 +103,7 @@ export function EvidenceRail({
               <code>{locator(span)}</code>
               <details className="connection-tech"><summary>{t("oauth.technical")}</summary><small>{span.artifact_id} · {span.span_id}</small></details>
               <div className="badge-row">
+                {detached.has(span.artifact_id) && <span className="status-badge detached-source">{t("evidenceRail.detached")}</span>}
                 <StatusBadge value={span.authority_state} />
                 <StatusBadge value={span.cutoff_state} />
                 <StatusBadge value={span.support_state} />

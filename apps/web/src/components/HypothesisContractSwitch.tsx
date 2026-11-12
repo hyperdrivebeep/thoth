@@ -1,4 +1,5 @@
 import { t } from "../i18n/locale";
+import { Sentences } from "./Sentences";
 import { Switch } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { rpc } from "../api/rpcClient";
@@ -25,7 +26,7 @@ export function HypothesisContractSwitch({ projectId }: { projectId: string }) {
   return <div className="hypothesis-contract-switch">
     <Switch checked={query.data.value.hypothesis_contract_v3 === true} disabled={change.isPending} label={t("modelHelp.hypothesisLabel")}
       onChange={event => change.mutate(event.currentTarget.checked)}/>
-    <small className="muted">{t("modelHelp.hypothesis")}</small>
+    <small className="muted"><Sentences text={t("modelHelp.hypothesis")} /></small>
     {change.error && <small role="alert">{t("modelHelp.changeFailed")}</small>}
   </div>;
 }

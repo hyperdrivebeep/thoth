@@ -12,7 +12,7 @@ import { localRetrievalJa, localRetrievalReasonJa } from "./ja/localRetrievalMes
 export const localRetrievalMessages = {
   "localRetrieval.title": { ko: "로컬 검색 준비", en: "Local retrieval preparation" },
   "localRetrieval.hostedOnly": {
-    ko: "이 기능은 로컬 작업 공간에서만 쓸 수 있습니다. 심사 워크스페이스에서는 아무것도 준비하지 않습니다.",
+    ko: "이 기능은 로컬 작업 공간에서만 쓸 수 있습니다. 심사 작업 공간에서는 아무것도 준비하지 않습니다.",
     en: "This is available only in a local workspace. Nothing is prepared in a review workspace.",
   },
   "localRetrieval.intro": {
@@ -34,7 +34,7 @@ export const localRetrievalMessages = {
   "localRetrieval.asset.FAILED": { ko: "모델 파일 확인 실패", en: "Model file check failed" },
   "localRetrieval.dependencyAvailable": { ko: "실행 구성 요소: 있음", en: "Runtime component: available" },
   "localRetrieval.dependencyMissing": {
-    ko: "실행 구성 요소: 없음 — 파일 반입은 할 수 있지만 색인 준비는 할 수 없습니다.",
+    ko: "실행 구성 요소: 없음. 파일 반입은 할 수 있지만 색인 준비는 할 수 없습니다.",
     en: "Runtime component: missing — files can be imported, but no index can be prepared.",
   },
   "localRetrieval.installRuntimeHelp": {
@@ -125,14 +125,14 @@ export const localRetrievalMessages = {
   "localRetrieval.opStarting": { ko: "시작 요청 중", en: "Starting" },
   "localRetrieval.opRunning": { ko: "진행 중", en: "In progress" },
   "localRetrieval.opCancelRequested": {
-    ko: "취소 요청됨 — 서버가 실제로 멈췄는지 확인하는 중입니다.",
+    ko: "취소 요청됨. 서버가 실제로 멈췄는지 확인하는 중입니다.",
     en: "Cancel requested — checking whether the server actually stopped.",
   },
   "localRetrieval.opCancelRejected": { ko: "취소 요청을 서버가 받아들이지 않았습니다. 작업은 계속됩니다.", en: "The server did not accept the cancel request. The work continues." },
   "localRetrieval.opCancelUnconfirmed": { ko: "취소 요청이 전달됐는지 확인하지 못했습니다.", en: "It could not be confirmed that the cancel request arrived." },
   "localRetrieval.opSucceeded": { ko: "완료", en: "Completed" },
   "localRetrieval.opFailed": { ko: "실패", en: "Failed" },
-  "localRetrieval.opCancelled": { ko: "취소됨 — 서버가 작업 종료를 확인했습니다.", en: "Cancelled — the server confirmed that the work stopped." },
+  "localRetrieval.opCancelled": { ko: "취소됨. 서버가 작업 종료를 확인했습니다.", en: "Cancelled — the server confirmed that the work stopped." },
   "localRetrieval.opRejected": { ko: "서버가 작업을 시작하지 않았습니다.", en: "The server did not start the work." },
   "localRetrieval.opUnconfirmed": {
     ko: "결과를 확인하지 못했습니다. 서버 작업은 계속되고 있을 수 있습니다. 같은 작업의 결과를 확인하거나 새로 실행할 수 있습니다.",

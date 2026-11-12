@@ -88,7 +88,7 @@ export const activityMessages = {
     "en": "Excluded from evidence"
   },
   "activity.stale": {
-    "ko": "현재성 만료",
+    "ko": "최신 아님",
     "en": "No longer current"
   },
   "activity.accessBlocked": {
@@ -132,7 +132,7 @@ export const activityMessages = {
     "en": "Source location"
   },
   "activity.noCurrentness": {
-    "ko": "현재성 미기록",
+    "ko": "최신 여부 기록 없음",
     "en": "Currentness not recorded"
   },
   "activity.protected": {
@@ -384,8 +384,8 @@ export const activityMessages = {
     "en": "Changes in this version"
   },
   "changeSummary.notice": {
-    "ko": "— 숫자·부정·상태·인용·권위·시점이 바뀐 항목은 원문을 함께 보여 줍니다.",
-    "en": "— Original text is shown when numbers, negation, states, citations, authority, or timing changed."
+    "ko": "숫자·부정·상태·인용·권위·시점이 바뀐 항목은 원문을 함께 보여 줍니다.",
+    "en": "Original text is shown when numbers, negation, states, citations, authority, or timing changed."
   },
   "changeSummary.original": {
     "ko": "바뀐 내용 원문",

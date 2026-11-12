@@ -1,8 +1,4 @@
 export const followupMessages = {
-  "followup.noAction": {
-    "ko": "다음 행동 기록 없음",
-    "en": "No next action recorded"
-  },
   "followup.complete": {
     "ko": "완료",
     "en": "Complete"
@@ -128,8 +124,8 @@ export const followupMessages = {
     "en": "The saved record does not establish the reason for the change."
   },
   "followup.nextAction": {
-    "ko": "필요한 다음 행동",
-    "en": "Required next action"
+    "ko": "지금 필요한 조치",
+    "en": "Action needed now"
   },
   "followup.authority": {
     "ko": "권한 결정이 필요한 행동입니다.",

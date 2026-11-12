@@ -2,6 +2,23 @@ import type { ColumnOf } from "../withColumns";
 import type { workspaceMessages } from "../workspaceMessages";
 
 export const workspaceZh: ColumnOf<typeof workspaceMessages> = {
+  "manage.rename": "重命名",
+  "manage.renameProjectTitle": "重命名项目",
+  "manage.renameThreadTitle": "重命名对话",
+  "manage.nameLabel": "新名称",
+  "manage.threadNameNotice": "原始问题不会改变，只更改列表和标题中显示的名称。",
+  "manage.save": "保存",
+  "manage.cancel": "取消",
+  "manage.renameFailed": "无法更改名称。",
+  "manage.threadChanged": "对话在此期间已更改。已重新读取列表，请再试一次。",
+  "manage.archiveConfirm": "归档",
+  "sources.disconnect": "断开连接",
+  "sources.disconnectKeeps": "此资料不会用于新的提问。文件和已生成的回答不会被删除。",
+  "sources.disconnectReview": "此项目中已生成的回答都会标记为“需要重新审查”。要再次使用，请重新连接同一文件。",
+  "sources.disconnectFailed": "无法断开连接。",
+  "sources.detachedNotice": "这些资料不会用于新的提问。要再次使用，请重新连接同一文件。",
+  "evidenceRail.detached": "现已断开连接",
+  "progress.stopTitle": "停止研究",
   "workspace.newProject": "新项目",
   "workspace.projectName": "项目名称",
   "workspace.namePlaceholder": "研究问题或项目名称",

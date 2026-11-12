@@ -2,6 +2,10 @@ import type { ColumnOf } from "../withColumns";
 import type { coreMessages } from "../coreMessages";
 
 export const coreZhHant: ColumnOf<typeof coreMessages> = {
+  "brand.tagline": "研究工作台",
+  "nav.projects": "專案",
+  "nav.workspaceRoot": "工作區",
+  "rpc.internalFailure": "伺服器未能處理此請求。",
   "usage.memoryExpansion": "記憶檢索詞擴充",
   "language.display": "顯示語言",
   "language.acceptedShort": "已提交",
@@ -29,7 +33,7 @@ export const coreZhHant: ColumnOf<typeof coreMessages> = {
   "composer.followupPlaceholder": "補充問題、新證據或變化的條件…",
   "composer.startPlaceholder": "你想調查什麼問題？",
   "composer.attach": "連線資料",
-  "composer.followup": "傳送補充指示",
+  "composer.followup": "傳送",
   "composer.start": "開始調查",
   "composer.checkOriginal": "檢查原始請求",
   "composer.retryOriginal": "檢查原始提交",

@@ -40,7 +40,7 @@ export const workspaceDetailMessages = {
     "en": "Server readiness could not be checked. Check the connection and try again."
   },
   "workspace.loadingSaved": {
-    "ko": "이 워크스페이스의 저장된 작업을 확인하는 중…",
+    "ko": "이 작업 공간의 저장된 작업을 확인하는 중…",
     "en": "Checking saved tasks in this workspace…"
   },
   "workspace.checkingProjects": {
@@ -52,7 +52,7 @@ export const workspaceDetailMessages = {
     "en": "Project access could not be verified. Saved work will not be replaced with a new project."
   },
   "workspace.savedUnavailable": {
-    "ko": "이 워크스페이스의 저장된 연구를 지금 읽을 수 없습니다. 접근 상태를 확인하세요.",
+    "ko": "이 작업 공간의 저장된 연구를 지금 읽을 수 없습니다. 접근 상태를 확인하세요.",
     "en": "Saved research in this workspace is currently unavailable. Check your access."
   },
   "workspace.taskUnavailable": {
@@ -72,7 +72,7 @@ export const workspaceDetailMessages = {
     "en": "The saved model selection is currently unavailable."
   },
   "model.inheritedUnchanged": {
-    "ko": " 이 작업은 프로젝트 모델 설정을 상속하며 별도 선택으로 대체하지 않았습니다.",
+    "ko": " 이 작업은 프로젝트의 모델 설정을 그대로 씁니다.",
     "en": " This task inherits the project model settings; no separate selection has replaced them."
   },
   "model.keepSelection": {

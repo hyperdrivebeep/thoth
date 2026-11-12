@@ -2,7 +2,6 @@ import type { ColumnOf } from "../withColumns";
 import type { followupMessages } from "../followupMessages";
 
 export const followupZh: ColumnOf<typeof followupMessages> = {
-  "followup.noAction": "没有记录下一步行动",
   "followup.complete": "已完成",
   "followup.partialHold": "部分暂缓",
   "followup.reviewNeeded": "需要审查",
@@ -34,7 +33,7 @@ export const followupZh: ColumnOf<typeof followupMessages> = {
   "followup.openEvidence": "打开原始证据",
   "followup.changes": "评估变化",
   "followup.unknownChangeReason": "已保存的记录没有说明变化的原因。",
-  "followup.nextAction": "需要的下一步行动",
+  "followup.nextAction": "现在需要的操作",
   "followup.authority": "此行动需要作出授权决定。",
   "followup.checks": "已完成和待完成的检查",
   "followup.recordedChecks": "已记录的检查",
@@ -54,11 +53,11 @@ export const followupZh: ColumnOf<typeof followupMessages> = {
   "hold.clearFailed": "无法清除该次尝试。请稍后重试。",
   "hold.reasonNeeded": "请输入清除该次尝试的原因。",
   "hold.notRun": "该测试被搁置，没有运行。",
-  "hold.notRunNotice": " 这一次没有运行沙箱测试。原因请见技术详情。",
+  "hold.notRunNotice": "这一次没有运行沙箱测试。原因请见技术详情。",
   "hold.notRepeated": "该测试没有重复运行。",
-  "hold.notRepeatedNotice": " 该测试此前已运行，但其结果尚未确定，为避免重复同样的工作，没有再次运行。",
+  "hold.notRepeatedNotice": "该测试此前已运行，但其结果尚未确定，为避免重复同样的工作，没有再次运行。",
   "hold.cleared": "该次尝试已清除。再次发送同一个问题即可开始新的运行。",
-  "hold.draftReady": " 问题已放入输入框。",
+  "hold.draftReady": "问题已放入输入框。",
   "hold.choice": "你可以带上记录的原因清除上一次尝试，然后发送同一个问题开始一次新的运行。之前的执行记录和结果记录会保留。",
   "hold.clearAndRerun": "开始新的运行前先清除该次尝试",
   "hold.notImmediate": " 这不会立即执行。清除之后，请自行发送问题来开始。",

@@ -91,17 +91,9 @@ export const remainingMessages = {
     "ko": "비용·시간:",
     "en": "Cost and time:"
   },
-  "labels.conclusion": {
-    "ko": "결론 상태:",
-    "en": "Conclusion state:"
-  },
   "labels.answerScope": {
     "ko": "답할 수 있는 범위:",
     "en": "Answerable scope:"
-  },
-  "labels.nextEvidence": {
-    "ko": "다음 확보:",
-    "en": "Evidence to obtain next:"
   },
   "approval.recreateFailed": {
     "ko": "승인 요청을 다시 만들지 못했습니다.",
@@ -324,8 +316,8 @@ export const remainingMessages = {
     "en": "This task view could not be displayed"
   },
   "workspaceError.notice": {
-    "ko": "서버 응답과 표시 형식이 맞지 않을 수 있습니다. 성공·완료로 처리하지 않으며 정본 기록을 바꾸지 않았습니다. 위 탭이나 왼쪽 프로젝트에서 다른 기록을 확인할 수 있습니다.",
-    "en": "The server response may not match the display format. This is not treated as success or completion, and canonical records are unchanged. Use the tabs or projects to view other records."
+    "ko": "서버 응답과 표시 형식이 맞지 않을 수 있습니다. 성공·완료로 처리하지 않으며 저장된 기록을 바꾸지 않았습니다. 위 탭이나 왼쪽 프로젝트에서 다른 기록을 확인할 수 있습니다.",
+    "en": "The server response may not match the display format. This is not treated as success or completion, and saved records are unchanged. Use the tabs or projects to view other records."
   },
   "workspaceError.retry": {
     "ko": "서버 상태 다시 읽고 재시도",
@@ -336,8 +328,8 @@ export const remainingMessages = {
     "en": "User code:"
   },
   "xai.enterCode": {
-    "ko": "— 열린 페이지에 위 코드를 입력하세요.",
-    "en": "— Enter the code above on the opened page."
+    "ko": "열린 페이지에 위 코드를 입력하세요.",
+    "en": "Enter the code above on the opened page."
   },
   "evidenceUse.direct": {
     "ko": "직접 사용 가능",

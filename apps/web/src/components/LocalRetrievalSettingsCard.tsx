@@ -1,4 +1,5 @@
 import { Button, Callout, Checkbox, InputGroup, ProgressBar, Switch, Tag } from "@blueprintjs/core";
+import { Sentences } from "./Sentences";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -180,7 +181,7 @@ export function LocalRetrievalSettingsCard({ workspaceId, projectId, hosted = fa
 
   return <section className="detail-card local-retrieval-card" aria-labelledby="local-retrieval-title">
     <h2 id="local-retrieval-title">{text("localRetrieval.title")}</h2>
-    <p className="muted">{text("localRetrieval.intro")}</p>
+    <p className="muted"><Sentences text={text("localRetrieval.intro")} /></p>
 
     {asset.isPending && <p className="muted" role="status">…</p>}
     {asset.error && <Callout intent="warning" role="alert">{text("localRetrieval.readFailed")}</Callout>}
@@ -250,7 +251,12 @@ function AssetSection({ asset, text, running, sourcePath, onSourcePath, installC
     </div>}
     {asset.asset_state === "FAILED" && <p className="result-notice" role="status">{reason(asset.reason_code)}</p>}
     {asset.active && <div role="status" aria-label={text("localRetrieval.operationLabel")}>
-      <ProgressBar intent="primary" value={asset.active.total_bytes > 0 ? Math.min(1, asset.active.transferred_bytes / asset.active.total_bytes) : undefined} />
+      <ProgressBar
+        intent="primary"
+        aria-label={text("localRetrieval.operationLabel")}
+        aria-valuetext={transfer ?? undefined}
+        value={asset.active.total_bytes > 0 ? Math.min(1, asset.active.transferred_bytes / asset.active.total_bytes) : undefined}
+      />
       <small className="muted">{transfer}</small>
     </div>}
     {!asset.can_manage && <p className="muted" role="status">{text("localRetrieval.manageDenied")}</p>}
@@ -295,8 +301,16 @@ function ProjectSection({ project, asset, text, running, configuring, configureN
       <Tag minimal round intent={project.state === "READY" ? "success" : project.state === "FAILED" ? "danger" : "none"}>{text(`localRetrieval.index.${project.state}`)}</Tag>{" "}
       <span>{counts}</span>
     </p>
-    {project.total_sources > 0 && <ProgressBar intent={project.state === "READY" ? "success" : "primary"} animate={indexActive} stripes={indexActive}
-      value={Math.min(1, project.ready_sources / project.total_sources)} />}
+    {project.total_sources > 0 && (
+      <ProgressBar
+        intent={project.state === "READY" ? "success" : "primary"}
+        animate={indexActive}
+        stripes={indexActive}
+        aria-label={text(`localRetrieval.index.${project.state}`)}
+        aria-valuetext={counts}
+        value={Math.min(1, project.ready_sources / project.total_sources)}
+      />
+    )}
     <OutdatedIndexNotice outdated={rebuildIsRunning(project, asset)} text={text} />
     <p>
       <Button intent="primary" onClick={onPrepare} disabled={Boolean(blocked) || running || explicitActive}>{text("localRetrieval.prepareButton")}</Button>

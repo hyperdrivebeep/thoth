@@ -56,7 +56,7 @@ it("counts a value no rule covers as unclassified instead of guessing", () => {
 
 it("shows criteria fulfilled over the total, then the evidence-use groups, each criterion with its own fulfilment state", () => {
   const html = render(held, { coverageMatrix: coverage(iris) });
-  expect(html).toContain("답변 점검 항목 7개 중 충족 0 · 확인 필요 7");
+  expect(html).toContain("답변 점검 7개 중 충족 0 · 확인 필요 7");
   expect(html).not.toContain("근거 있음");
   expect(html).toContain("직접 사용 가능 1");
   expect(html).toContain("조건부·참고용 5");
@@ -71,17 +71,23 @@ it("shows criteria fulfilled over the total, then the evidence-use groups, each 
 it("puts the first-screen lines in the agreed order", () => {
   const html = render(held, { coverageMatrix: coverage(iris), progressSummary: progress(action("REVIEW_GAPS", "Review unresolved evidence gaps")) });
   const at = (text: string) => html.indexOf(text);
-  expect(at("결론 상태")).toBeGreaterThan(-1);
-  expect(at("결론 상태")).toBeLessThan(at("근거 용도"));
-  expect(at("근거 용도")).toBeLessThan(at("답변 점검 항목"));
-  expect(at("답변 점검 항목")).toBeLessThan(at("반대 근거 탐색"));
-  expect(at("반대 근거 탐색")).toBeLessThan(at("다음 확보"));
+  // Header tags (status, checks met, counter-evidence search), the answer, then the review basis:
+  // evidence use, the action needed now, the checks table.
+  expect(at("판단 보류")).toBeGreaterThan(-1);
+  expect(at("판단 보류")).toBeLessThan(at("답변 점검 7개 중"));
+  expect(at("답변 점검 7개 중")).toBeLessThan(at("반대 근거"));
+  expect(at("반대 근거")).toBeLessThan(at("answer-text"));
+  expect(at("answer-text")).toBeLessThan(at("근거 용도"));
+  expect(at("근거 용도")).toBeLessThan(at("지금 필요한 조치"));
+  expect(at("지금 필요한 조치")).toBeLessThan(at("coverage-table"));
+  for (const repeated of ["결론 상태", "반대 근거 탐색:", "다음 확보"]) expect(html).not.toContain(repeated);
 });
 
 it("shows no refutation count when the counter-evidence search never ran", () => {
   const html = render(held, { coverageMatrix: coverage(iris) });
-  expect(html).toContain("반대 근거 탐색: 안 함 · 반박 -");
+  expect(html).toContain("반대 근거 안 찾음");
   expect(html).not.toContain("반박 0");
+  expect(html).not.toContain("반박 -");
 });
 
 it("shows refutation 0 only for a finished search", () => {
@@ -101,11 +107,11 @@ it("counts the counter-evidence of every hypothesis on the answer line, searched
     return copy as unknown as Record<string, unknown>;
   };
   const none = render(withCounter(false), { coverageMatrix: coverage(iris) });
-  expect(none).toContain("반대 근거 탐색: 안 함 · 반박 4");
+  expect(none).toContain("반대 근거 안 찾음 · 반박 4");
   expect(none).not.toContain("반박 -");
   const some = render(withCounter(true), { coverageMatrix: coverage(iris) });
   const total = (held as unknown as { portfolio: { hypotheses: unknown[] } }).portfolio.hypotheses.length;
-  expect(some).toContain(`반대 근거 탐색: 1/${total}개 가설 · 반박 4`); // the count covers every hypothesis, the N/M part only the searched ones
+  expect(some).toContain(`반대 근거 1/${total}개 가설 · 반박 4`); // the count covers every hypothesis, the N/M part only the searched ones
 });
 
 it("picks the Korean next-step text from the action type and keeps the English server label out of view", () => {

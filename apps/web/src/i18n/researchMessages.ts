@@ -184,8 +184,16 @@ export const researchMessages = {
     "en": "This is a past answer that needs checking against the current basis."
   },
   "result.openChecks": {
-    "ko": "아직 확인할 내용",
-    "en": "Checks still open"
+    "ko": "판정이 확인하지 않은 것",
+    "en": "What the assessment did not check"
+  },
+  "result.openChecksNote": {
+    "ko": "답변 점검 항목과는 별개입니다. 이 답의 판정 과정에서 확인되지 않은 조건입니다.",
+    "en": "Separate from the answer checks: conditions that the assessment of this answer did not confirm."
+  },
+  "actions.rawClassification": {
+    "ko": "위험 등급·실행 권한·상태의 원값",
+    "en": "Recorded risk tier, execution authority and state"
   },
   "result.alternatives": {
     "ko": "다른 설명과 확인할 점",
@@ -236,8 +244,8 @@ export const researchMessages = {
     "en": "Counterevidence not searched"
   },
   "result.holdDetailsPlain": {
-    "ko": "검토 근거 — 기준과 남은 확인 사항",
-    "en": "Review basis — criteria and open checks"
+    "ko": "검토 근거: 답변 점검과 남은 확인 사항",
+    "en": "Review basis — answer checks and what is still open"
   },
   "timeline.turnAnswered": { "ko": "답변 있음", "en": "Answered" },
   "timeline.turnNoAnswer": { "ko": "답 없음", "en": "No answer" },

@@ -1,4 +1,5 @@
 import { t } from "../i18n/locale";
+import { Sentences } from "./Sentences";
 import { Tag } from "@blueprintjs/core";
 import type { DiscriminationItem } from "../api/judgmentRecords";
 import type { HypothesisRow } from "./hypothesisView";
@@ -14,7 +15,7 @@ export function TestOrderSection({ rows, actions, discrimination }: { rows: Hypo
   const ranked = rankItems(input);
   return <section className="detail-card test-order" aria-label={t("testOrder.title")}>
     <h3>{t("testOrder.nextTests")}</h3>
-    <p className="muted">{orderNote()}</p>
+    <p className="muted"><Sentences text={orderNote()} /></p>
     {ranked.excluded.length > 0 && <p className="muted">{excludedTestsLine(ranked.excluded.length)}</p>}
     {ranked.groups.map(group => <div key={group.group}>
       <h4>{groupTitle(group.group, "TEST")}</h4>

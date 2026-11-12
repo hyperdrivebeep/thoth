@@ -7,6 +7,7 @@ import { useState } from "react";
 import { rpc } from "../api/rpcClient";
 import { canStartCredentialMethod, credentialAccountLabel, credentialAuthMethod, credentialAvailabilityNote, credentialCompanies, credentialGuideUrl, credentialResultMessage, loginSupported, loginUnavailable,
   xaiDeviceLoginSupported, type CredentialAccount, type CredentialRegisterResult } from "./modelCredentialPresentation";
+import { connectionErrorText } from "./connectionCopy";
 import { XaiDeviceLogin } from "./XaiDeviceLogin";
 import { OAuthLoginFlow } from "./OAuthLoginFlow";
 
@@ -64,11 +65,11 @@ export function ModelCredentialPanel({ projectId, workspaceId }: { projectId: st
       {connect.isSuccess && <Callout compact role="status">{credentialResultMessage(connect.data?.value)}
         {guideUrl && <p><a href={guideUrl} target="_blank" rel="noopener noreferrer">{t("setup.openKeySite")}</a></p>}</Callout>}
       {connect.error && (
-        <Callout compact intent="danger">
-          {connect.error.message}
+        <Callout compact intent="danger" role="alert">
+          {connectionErrorText(connect.error, connect.error.message)}
         </Callout>
       )}
-      {listed.error && <Callout compact intent="warning">{t("credential.methodsFailed")}</Callout>}
+      {listed.error && <Callout compact intent="warning" role="alert">{t("credential.methodsFailed")}</Callout>}
       <Button small minimal icon="refresh" loading={listed.isFetching} onClick={() => void listed.refetch()}>{t("setup.refreshConnection")}</Button>
     </section>
   );

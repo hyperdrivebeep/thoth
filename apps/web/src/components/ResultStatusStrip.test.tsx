@@ -21,7 +21,7 @@ it("shows the conclusion, criteria met over total, the counter-evidence search a
   const html = strip({ ...excerpt, answer_status: "PARTIAL_HOLD", selected_evidence_count: 21 }, coverage([row("SATISFIED"), row("UNRESOLVED"), row("NOT_ASSESSED")]));
   const text = visible(html);
   expect(text).toContain("판단 보류");
-  expect(text).toContain("기준 3개 중 충족 1 · 확인 필요 2");
+  expect(text).toContain("답변 점검 3개 중 충족 1 · 확인 필요 2");
   expect(text).toContain("반대 근거 안 찾음");
   expect(text).toContain("근거 21곳");
 });
@@ -29,7 +29,7 @@ it("shows the conclusion, criteria met over total, the counter-evidence search a
 it("leaves out a count it does not have instead of showing zero, and renders nothing for a result without status", () => {
   const text = visible(strip({ answer: "a", answer_status: "PARTIAL_HOLD" }, coverage([row("UNRESOLVED")], "UNAVAILABLE")));
   expect(text).toContain("판단 보류");
-  expect(text).not.toContain("기준 ");
+  expect(text).not.toContain("답변 점검 ");
   expect(text).not.toContain("근거 ");
   expect(strip({ answer: "a" })).toBe("");
 });
@@ -37,13 +37,15 @@ it("leaves out a count it does not have instead of showing zero, and renders not
 it("keeps the unresolved count in the header while the review basis is folded", () => {
   const html = renderToStaticMarkup(<ResearchResultCard state="SUCCEEDED" result={{ answer: "a", answer_status: "PARTIAL_HOLD" }} coverageMatrix={coverage([row("UNRESOLVED"), row("UNRESOLVED")])} onDetail={() => {}}/>);
   const header = html.slice(0, html.indexOf("answer-text"));
-  expect(visible(header)).toContain("기준 2개 중 충족 0 · 확인 필요 2");
-  expect(html).toContain("검토 근거 — 판단 보류 · 기준 2개와 남은 확인 사항");
-  expect(html).toContain("답변 점검 항목 2개 중 충족 0 · 확인 필요 2");
+  expect(visible(header)).toContain("답변 점검 2개 중 충족 0 · 확인 필요 2");
+  // The folding title names what is inside; the status and the counts are said once, in the header tags.
+  expect(html).toContain("검토 근거: 답변 점검 항목 2개와 남은 확인 사항");
+  expect(html.split("판단 보류").length - 1).toBe(1);
+  expect(html.split("확인 필요 2").length - 1).toBe(1);
 });
 
 it("words the tags in every screen language", () => {
-  for (const [locale, expected] of [["en", "3 criteria · 1 met · 2 to check"], ["zh-Hans", "共 3 项标准 · 已满足 1 · 需要检查 2"], ["ja", "基準 3 件 · 満たす 1 · 確認が必要 2"]] as const) {
+  for (const [locale, expected] of [["en", "3 answer checks · 1 met · 2 to check"], ["zh-Hans", "共 3 项回答核查 · 已满足 1 · 需要检查 2"], ["ja", "回答チェック 3 件 · 満たす 1 · 確認が必要 2"]] as const) {
     setLocale(locale);
     expect(visible(strip({ answer: "a", answer_status: "PARTIAL_HOLD" }, coverage([row("SATISFIED"), row("UNRESOLVED"), row("NOT_ASSESSED")])))).toContain(expected);
   }

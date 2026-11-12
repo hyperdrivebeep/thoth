@@ -2,7 +2,6 @@ import type { ColumnOf } from "../withColumns";
 import type { followupMessages } from "../followupMessages";
 
 export const followupJa: ColumnOf<typeof followupMessages> = {
-  "followup.noAction": "次の行動は記録されていません",
   "followup.complete": "完了",
   "followup.partialHold": "一部保留",
   "followup.reviewNeeded": "レビューが必要",
@@ -34,7 +33,7 @@ export const followupJa: ColumnOf<typeof followupMessages> = {
   "followup.openEvidence": "元の根拠を開く",
   "followup.changes": "判定の変化",
   "followup.unknownChangeReason": "保存された記録には、変更の理由が示されていません。",
-  "followup.nextAction": "必要な次の行動",
+  "followup.nextAction": "いま必要な対応",
   "followup.authority": "この行動には承認の判断が必要です。",
   "followup.checks": "完了したチェックと残りのチェック",
   "followup.recordedChecks": "記録されたチェック",
@@ -54,11 +53,11 @@ export const followupJa: ColumnOf<typeof followupMessages> = {
   "hold.clearFailed": "この試行をクリアできませんでした。しばらくしてからもう一度お試しください。",
   "hold.reasonNeeded": "試行をクリアする理由を入力してください。",
   "hold.notRun": "テストは実行されずに保留されました。",
-  "hold.notRunNotice": " 今回はサンドボックステストが実行されませんでした。理由は技術的な詳細をご覧ください。",
+  "hold.notRunNotice": "今回はサンドボックステストが実行されませんでした。理由は技術的な詳細をご覧ください。",
   "hold.notRepeated": "テストは繰り返されませんでした。",
-  "hold.notRepeatedNotice": " テストは以前に実行されましたが、結果が未解決のため、同じ作業の重複を避けて繰り返しませんでした。",
+  "hold.notRepeatedNotice": "テストは以前に実行されましたが、結果が未解決のため、同じ作業の重複を避けて繰り返しませんでした。",
   "hold.cleared": "試行をクリアしました。同じ質問をもう一度送ると、新しい実行が始まります。",
-  "hold.draftReady": " 質問を入力欄に入れました。",
+  "hold.draftReady": "質問を入力欄に入れました。",
   "hold.choice": "記録した理由とともに前回の試行をクリアし、そのあと同じ質問を送ると、新しい実行を1回始められます。前回の実行記録と結果の記録は保持されます。",
   "hold.clearAndRerun": "新しい実行の前に試行をクリアする",
   "hold.notImmediate": " これはすぐには実行されません。クリアしたあと、ご自身で質問を送って開始してください。",

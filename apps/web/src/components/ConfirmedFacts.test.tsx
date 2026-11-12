@@ -33,11 +33,13 @@ it("lists the stored facts with their source numbers and marks a valid negative 
   expect(html).toMatch(/aria-label="근거 \d+ 보기">\[\d+\]<\/button><\/li>/);
 });
 
-it("keeps facts visible on a held answer, directly under the conclusion status", () => {
+it("keeps facts visible on a held answer, below the status tag at the head of the card", () => {
   const html = render(withFindings([fact("문서에 적힌 사실", [spanA])]));
   const at = (text: string) => html.lastIndexOf(text);
-  expect(html.indexOf("결론 상태: <strong>판단 보류</strong>")).toBeGreaterThan(-1);
-  expect(html.indexOf("결론 상태: <strong>판단 보류</strong>")).toBeLessThan(html.indexOf("AI 검토 요약(인용 위치만 확인)"));
+  // The status is said once, by the header tag; the facts come first inside the review basis.
+  expect(html.indexOf("판단 보류")).toBeGreaterThan(-1);
+  expect(html.indexOf("판단 보류")).toBeLessThan(html.indexOf("AI 검토 요약(인용 위치만 확인)"));
+  expect(html).not.toContain("결론 상태");
   expect(html.indexOf("AI 검토 요약(인용 위치만 확인)")).toBeLessThan(html.indexOf("문서에 적힌 사실"));
   expect(at("문서에 적힌 사실")).toBeGreaterThan(-1);
 });

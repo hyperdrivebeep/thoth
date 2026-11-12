@@ -130,7 +130,19 @@ it("offers the explicit xai-oauth model without replacing an existing selection"
 
 it("keeps an unavailable saved model and effort visible until a user selects a new option", async () => {
   await mount(true);
+  // Next to the question box the notice is one short line; the reason stays in its tooltip and for a screen reader.
+  const brief = container.querySelector<HTMLParagraphElement>(".composer-dock .model-settings.compact p.result-notice")!;
+  const shown = [...brief.childNodes].filter(node => !(node instanceof HTMLElement && node.className === "visually-hidden"));
+  expect(shown.map(node => node.textContent).join("").replace(/\s+/g, " ").trim())
+    .toBe("저장된 모델 선택을 현재 사용할 수 없습니다. 기존 선택은 유지됩니다. 변경하려면 아래에서 모델을 직접 고르세요.");
+  expect(brief.title).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
+  expect(brief.title).toContain("저장된 선택: retired / old-model · 추론강도 high");
+  expect(brief.querySelector(".visually-hidden")?.textContent).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
   await openPage("설정");
+  // The settings page spells the reason out in the text itself.
+  const full = container.querySelector<HTMLParagraphElement>(".model-settings:not(.compact) p.result-notice")!;
+  expect(full.querySelector(".visually-hidden")).toBeNull();
+  expect(full.textContent).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
   expect(container.textContent).toContain("저장된 선택: retired / old-model · 추론강도 high");
   expect(container.textContent).toContain("현재 모델 목록에서 저장된 모델을 찾지 못했습니다");
   const model = container.querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')!;
@@ -165,8 +177,8 @@ it("describes an empty thread selection as project inheritance without writing a
   await mount(true, { inheritThread: true });
   await chooseThread("t");
   await flush();
-  expect(container.textContent).toContain("이 작업은 프로젝트 모델 설정을 상속하며 별도 선택으로 대체하지 않았습니다");
-  expect(container.textContent).toContain("상속한 프로젝트 선택: retired / old-model · 추론강도 high");
+  expect(container.textContent).toContain("이 작업은 프로젝트의 모델 설정을 그대로 씁니다");
+  expect(container.textContent).toContain("프로젝트에서 고른 모델: retired / old-model · 추론강도 high");
   expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
 });
 
@@ -175,9 +187,9 @@ it("hides inherited project model details when the separate project read is deni
   fixture.projectSettingsDenied = true;
   await chooseThread("t");
   await flush(); await flush();
-  expect(container.textContent).toContain("이 작업은 프로젝트 모델 설정을 상속하며 별도 선택으로 대체하지 않았습니다");
-  expect(container.textContent).toContain("상속한 프로젝트 모델을 읽지 못했습니다");
-  expect(container.textContent).not.toContain("상속한 프로젝트 선택: retired / old-model");
+  expect(container.textContent).toContain("이 작업은 프로젝트의 모델 설정을 그대로 씁니다");
+  expect(container.textContent).toContain("프로젝트의 모델 설정을 읽지 못했습니다");
+  expect(container.textContent).not.toContain("프로젝트에서 고른 모델: retired / old-model");
   expect(fixture.calls.some(call => call.method === "model/settings/update")).toBe(false);
 });
 
@@ -185,11 +197,11 @@ it("removes cached inherited details when the actor loses thread settings access
   await mount(true, { inheritThread: true });
   await chooseThread("t");
   await flush(); await flush();
-  expect(container.textContent).toContain("상속한 프로젝트 선택: retired / old-model");
+  expect(container.textContent).toContain("프로젝트에서 고른 모델: retired / old-model");
   fixture.threadDenied = true;
   await act(async () => { await client.invalidateQueries({ queryKey: ["model-settings", "p", "t"], exact: true }); });
   await flush();
-  expect(container.textContent).not.toContain("상속한 프로젝트 선택: retired / old-model");
+  expect(container.textContent).not.toContain("프로젝트에서 고른 모델: retired / old-model");
   expect(container.textContent).toContain("AUTHORIZATION_DENIED");
 });
 
@@ -198,13 +210,13 @@ it("rechecks and hides cached parent details after project scope is revoked", as
   await chooseThread("t");
   await flush(); await flush();
   await openPage("설정");
-  expect(container.textContent).toContain("상속한 프로젝트 선택: retired / old-model");
+  expect(container.textContent).toContain("프로젝트에서 고른 모델: retired / old-model");
   fixture.projectSettingsDenied = true;
   await act(async () => { await client.invalidateQueries({ queryKey: ["model-settings", "p", "t"], exact: true }); });
   await flush(); await flush();
-  expect(container.textContent).toContain("이 작업은 프로젝트 모델 설정을 상속하며 별도 선택으로 대체하지 않았습니다");
-  expect(container.textContent).toContain("상속한 프로젝트 모델을 읽지 못했습니다");
-  expect(container.textContent).not.toContain("상속한 프로젝트 선택: retired / old-model");
+  expect(container.textContent).toContain("이 작업은 프로젝트의 모델 설정을 그대로 씁니다");
+  expect(container.textContent).toContain("프로젝트의 모델 설정을 읽지 못했습니다");
+  expect(container.textContent).not.toContain("프로젝트에서 고른 모델: retired / old-model");
   expect(container.querySelector<HTMLSelectElement>('[aria-label="연구 모델"]')?.value).toBe("");
   expect(container.querySelector<HTMLSelectElement>('[aria-label="연구 추론강도"]')?.value).toBe("");
   expect(container.querySelector<HTMLButtonElement>("button.model-defaults")?.disabled).toBe(true);

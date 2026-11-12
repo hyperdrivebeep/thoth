@@ -1,5 +1,6 @@
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
+import { joinSentences, sentenceGap } from "../i18n/sentences";
 import { Button, HTMLSelect } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -24,6 +25,42 @@ function unavailableReason(code?: string | null): string {
 function savedLabel(value?: SavedSelection): string | null {
   if (!value?.provider && !value?.model && !value?.reasoning_effort) return null;
   return `${value.provider ?? t("model.providerUnset")} / ${value.model ?? t("model.modelUnset")}${value.reasoning_effort ? message("effort", value.reasoning_effort) : ""}`;
+}
+
+/**
+ * Says that the saved model cannot be used. Next to the question box it is one short line and the
+ * reason stays available to a screen reader and as the tooltip; the settings page spells it out.
+ */
+function UnavailableNotice({ compact, reasonCode, saved, inheritsProject }: {
+  compact: boolean;
+  reasonCode?: string | null;
+  saved?: SavedSelection;
+  inheritsProject: boolean;
+}) {
+  const label = savedLabel(saved);
+  const detail = joinSentences([
+    unavailableReason(reasonCode),
+    label ? message("savedSelection", label) : "",
+    inheritsProject ? t("model.inheritedUnchanged") : "",
+  ]);
+  if (compact) {
+    return (
+      <p role="status" className="result-notice" title={detail}>
+        {t("model.unavailable")}
+        <span className="visually-hidden">
+          {sentenceGap()}
+          {detail}
+        </span>
+        {sentenceGap()}
+        {t("model.keepSelection")}
+      </p>
+    );
+  }
+  return (
+    <p role="status" className="result-notice">
+      {joinSentences([t("model.unavailable"), detail, t("model.keepSelection")])}
+    </p>
+  );
 }
 
 export function ModelSettings({ projectId, threadId, selection, onSelect, onSaved, compact = false }: {
@@ -82,10 +119,14 @@ export function ModelSettings({ projectId, threadId, selection, onSelect, onSave
   } });
   return <fieldset className={`model-settings ${compact ? "compact" : ""}`}>
     <legend>{t("model.settings")}</legend>
-    {data?.availability === "UNAVAILABLE" && <p role="status" className="result-notice">{t("model.unavailable")} {unavailableReason(data.reason_code)}
-      {savedLabel(saved) ? message("savedSelection", savedLabel(saved) ?? "") : ""}
-      {inheritsProject ? t("model.inheritedUnchanged") : ""}
-      {" "}{t("model.keepSelection")}</p>}
+    {data?.availability === "UNAVAILABLE" && (
+      <UnavailableNotice
+        compact={compact}
+        reasonCode={data.reason_code}
+        saved={saved}
+        inheritsProject={inheritsProject}
+      />
+    )}
     {inheritsProject && data?.availability === "UNAVAILABLE" && (inherited.isPending || inherited.isFetching ? <small role="status">{t("model.parentLoading")}</small>
       : inherited.error ? <small role="alert">{t("model.parentFailed")}</small>
         : <small>{message("inheritedSelection", inheritedLabel ?? t("model.noProjectModel"))}</small>)}

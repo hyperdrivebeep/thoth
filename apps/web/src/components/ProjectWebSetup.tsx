@@ -123,7 +123,7 @@ export function ProjectWebSetup({ projectId }: { projectId: string }) {
         </Button>
       )}
       {save.error && (
-        <Callout compact intent="danger">
+        <Callout compact intent="danger" role="alert">
           {save.error.message}
         </Callout>
       )}

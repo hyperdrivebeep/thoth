@@ -117,47 +117,60 @@ it("lists archived projects on demand and restores one, then shows it in the nor
   await settle(() => container.querySelector(".navigation-rail")?.textContent?.includes("archived demo") === true);
 });
 
-it("tells the user that archiving makes a project read-only and that it can be restored", async () => {
+const menuItem = (label: string) =>
+  [...document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')].find(item => item.textContent === label)!;
+const dialog = () => document.querySelector(".confirm-dialog");
+const dialogButton = (label: string) =>
+  [...(dialog()?.querySelectorAll("button") ?? [])].find(item => item.textContent === label) as HTMLButtonElement;
+const openArchiveDialog = (name: string) => {
+  act(() => { (container.querySelector('[aria-label="' + name + ' 프로젝트 메뉴"]') as HTMLButtonElement).click(); });
+  act(() => { menuItem("프로젝트 보관").click(); });
+};
+
+it("asks in its own window, saying that archiving makes a project read-only and can be undone", async () => {
   fixture.projects = [project("p", "old project", "ACTIVE", 1)];
-  const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+  const browserConfirm = vi.spyOn(window, "confirm").mockReturnValue(true);
   await mount(false);
   act(() => { (container.querySelector('[aria-label="old project 프로젝트 메뉴"]') as HTMLButtonElement).click(); });
   // The menu is drawn in a portal outside the sidebar so the sidebar's overflow cannot clip it.
   expect(document.querySelector('[role="menuitem"]')).not.toBeNull();
   expect(container.querySelector('[role="menu"]')).toBeNull();
-  act(() => { (document.querySelector('[role="menuitem"]') as HTMLButtonElement).click(); });
-  expect(confirm).toHaveBeenCalledOnce();
-  const message = String(confirm.mock.calls[0][0]);
+  act(() => { menuItem("프로젝트 보관").click(); });
+  const message = dialog()?.textContent ?? "";
   expect(message).toContain("보관하면 읽기 전용이 되고 목록에서 숨겨집니다.");
-  expect(message).toContain("'보관한 프로젝트 보기'에서 되살릴 수 있습니다.");
+  expect(message).toContain("보관은 되돌릴 수 있습니다.");
+  expect(message).toContain("'보관한 프로젝트 보기'에서 되살립니다.");
   expect(message).not.toContain("데이터는 보관되고");
+  // Nothing is sent, and the browser's own confirm box is not used, until the person presses the button.
+  expect(browserConfirm).not.toHaveBeenCalled();
+  expect(fixture.calls.some(call => call.method === "project/archive")).toBe(false);
+  act(() => { dialogButton("취소").click(); });
+  expect(dialog()).toBeNull();
   expect(fixture.calls.some(call => call.method === "project/archive")).toBe(false);
   act(() => root!.unmount());
   root = undefined;
 });
 
-const archiveFromMenu = (name: string) => {
-  act(() => { (container.querySelector('[aria-label="' + name + ' 프로젝트 메뉴"]') as HTMLButtonElement).click(); });
-  act(() => { (document.querySelector('[role="menuitem"]') as HTMLButtonElement).click(); });
-};
-
 it("says in words that a project changed in the meantime, reads the list again and archives on the next try", async () => {
   fixture.projects = [project("p", "old project", "ACTIVE", 1)];
-  vi.spyOn(window, "confirm").mockReturnValue(true);
   await mount(false);
   // Connecting a source in another place raised the revision after this list was read.
   fixture.projects[0].revision = 2;
   const listsBefore = fixture.calls.filter(call => call.method === "project/list").length;
-  archiveFromMenu("old project");
-  await settle(() => container.querySelector('.navigation-rail [role="alert"]') !== null);
-  const alert = container.querySelector('.navigation-rail [role="alert"]')!.textContent ?? "";
+  openArchiveDialog("old project");
+  act(() => { dialogButton("보관").click(); });
+  await settle(() => dialog()?.querySelector('[role="alert"]') != null);
+  const alert = dialog()!.querySelector('[role="alert"]')!.textContent ?? "";
   expect(alert).toContain("프로젝트가 그 사이 바뀌었습니다");
   expect(alert).not.toContain("expected_revision");
   expect(fixture.calls.filter(call => call.method === "project/archive")).toEqual([{ method: "project/archive", input: { project_id: "p", expected_revision: 1 } }]);
   await settle(() => fixture.calls.filter(call => call.method === "project/list").length > listsBefore);
-  archiveFromMenu("old project");
+  // The window is still open; the same button now sends the version that was just read.
+  await settle(() => dialogButton("보관") !== undefined && !dialogButton("보관").disabled);
+  act(() => { dialogButton("보관").click(); });
   await settle(() => container.querySelector(".navigation-rail")?.textContent?.includes("old project") === false);
   expect(fixture.calls.filter(call => call.method === "project/archive").map(call => call.input.expected_revision)).toEqual([1, 2]);
+  expect(dialog()).toBeNull();
   act(() => root!.unmount());
   root = undefined;
 });

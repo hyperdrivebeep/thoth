@@ -156,7 +156,7 @@ it("reads the saved partial answer's evidence when its button opens instead of r
   await act(async () => root!.render(<QueryClientProvider client={client}><AnswerDetailFlow/></QueryClientProvider>));
   expect(vi.mocked(rpc)).not.toHaveBeenCalled();
   await act(async () => Array.from(node.querySelectorAll("button")).find(button => button.textContent === "근거 원문")!.click());
-  const panel = node.querySelector('[aria-label="원문 근거"]')!;
+  const panel = node.querySelector('[aria-label="근거 원문"]')!;
   expect(panel.textContent).toContain("근거를 읽는 중");
   expect(panel.textContent).not.toContain("활성 근거 0개");
   expect(panel.textContent).not.toContain("자료를 연결하거나");

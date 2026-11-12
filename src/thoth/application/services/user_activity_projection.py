@@ -223,7 +223,7 @@ def _append_judgement_events(
                 "contradicts": f"반례 관계가 기록된 근거 {count}곳을 확인했습니다.",
                 "inconclusive": f"판정이 끝나지 않은 근거 {count}곳을 보류했습니다.",
                 "selected_candidate": f"근거 후보 {count}곳이 결과 범위에 연결되었습니다.",
-                "stale": f"현재성이 달라진 자료 {count}곳은 다시 확인해야 합니다.",
+                "stale": f"최신 상태가 달라진 자료 {count}곳은 다시 확인해야 합니다.",
                 "access_blocked": f"접근 범위를 벗어난 자료 {count}곳은 사용하지 않았습니다.",
             }[relation]
             add(

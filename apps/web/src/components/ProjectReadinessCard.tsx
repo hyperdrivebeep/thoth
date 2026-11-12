@@ -1,5 +1,6 @@
 import { message } from "../i18n/formatMessages";
 import { t } from "../i18n/locale";
+import { sentenceGap } from "../i18n/sentences";
 import { Button, Tag } from "@blueprintjs/core";
 import { projectCutoffText } from "../api/sourceTime";
 import { blockedReason } from "./readinessText";
@@ -47,7 +48,7 @@ export function ProjectReadinessCard({ facts: input, onOpenSettings, onManageSou
     <p className="readiness-title">{t("readiness.title")}</p>
     {list.length > 0 && <div className="readiness-facts">{list.map(fact => <Tag key={fact.text} minimal intent={fact.intent}>{fact.text}</Tag>)}</div>}
     {blocked
-      ? <p className="muted">{blockedReason(consentMissing, input.modelConnected)} {t("composer.savedResearch")}</p>
+      ? <p className="muted">{blockedReason(consentMissing, input.modelConnected)}{sentenceGap()}{t("composer.savedResearch")}</p>
       : <p className="muted">{t("readiness.readyNotice")}</p>}
     <div className="readiness-actions">
       {blocked && onOpenSettings && (consentMissing && input.modelConnected !== false

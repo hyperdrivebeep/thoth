@@ -182,7 +182,7 @@ it.each([
   fixture.ready = unavailableSetupReady(status);
   await mount();
   expect(container.textContent).toContain(expected);
-  expect(container.textContent).not.toContain("공개 웹을 이 워크스페이스에서 쓸까요");
+  expect(container.textContent).not.toContain("공개 웹을 이 작업 공간에서 쓸까요");
   expect(fixture.calls.some(call => call.method === "workspace/setup/update" || call.method === "model/credential/register")).toBe(false);
   const refresh = [...container.querySelectorAll("button")].find(button => button.textContent === "설정 상태 다시 확인")!;
   await act(async () => refresh.click()); await flush();
@@ -1061,7 +1061,7 @@ it("shows disclosure and web consent only in hosted review", async () => {
     setup: { internet_consent: "UNDECIDED" },
   };
   await mount();
-  expect(container.textContent).toContain("심사 워크스페이스");
+  expect(container.textContent).toContain("심사 작업 공간");
   expect(container.textContent).toContain("질문과 분석에 쓰인 자료는 운영자 OpenAI API로 전달됩니다.");
   expect(container.textContent).toContain("웹 자료 조회만 거부합니다");
   expect(container.textContent).toContain("로그인이나 API 키는 넣지 않습니다.");

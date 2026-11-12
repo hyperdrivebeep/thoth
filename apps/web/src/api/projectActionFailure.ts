@@ -12,7 +12,7 @@ export const rereadProjects = (client: QueryClient) => () => { void client.inval
  * render so a language change applies. A revision mismatch means the screen held an older copy of
  * the project; the caller has already asked for the list again, and nothing is retried here.
  */
-export function projectActionFailure(error: unknown, fallbackKey: "archive.archiveFailed" | "archive.restoreFailed"): string {
+export function projectActionFailure(error: unknown, fallbackKey: "archive.archiveFailed" | "archive.restoreFailed" | "manage.renameFailed"): string {
   if (error instanceof RpcError && error.code === REVISION_MISMATCH) return t("archive.revisionChanged");
   return t(fallbackKey);
 }

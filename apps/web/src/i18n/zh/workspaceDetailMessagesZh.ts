@@ -20,7 +20,7 @@ export const workspaceDetailZh: ColumnOf<typeof workspaceDetailMessages> = {
   "workspace.draftNotSent": "已保存的草稿不会自动提交。",
   "setup.researchIndependent": "已保存的研究与此设置文件相互独立，在具备所需权限时仍可访问。",
   "model.unavailable": "已保存的模型选择目前不可用。",
-  "model.inheritedUnchanged": " 此任务沿用项目的模型设置；没有单独的选择取代它们。",
+  "model.inheritedUnchanged": "此任务沿用项目的模型设置；没有单独的选择取代它们。",
   "model.keepSelection": "你现有的选择会保留。如需更改，请在下面选择模型。",
   "model.modelLabel": "模型",
   "model.effortLabel": "推理强度",

@@ -22,7 +22,7 @@ async function mount(element: React.ReactElement) {
   node = document.createElement("div"); document.body.append(node); root = createRoot(node);
   await act(async () => root!.render(element));
 }
-const NOTICE = "이전 근거 기준 — 판정이 바뀌었습니다";
+const NOTICE = "이전 근거 기준: 판정이 바뀌었습니다";
 
 it("marks only the hypothesis whose row changed, on the comparison cards", async () => {
   await mount(<HypothesisCompare result={result} projectId="p" links={[link(0), link(1, { state: "CURRENT", change: null })]}/>);

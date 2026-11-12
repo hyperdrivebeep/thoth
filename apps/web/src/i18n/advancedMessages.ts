@@ -64,7 +64,7 @@ export const advancedMessages = {
     "en": "Changes and restoration"
   },
   "advanced.revisionsHint": {
-    "ko": "불변 revision · 분기 · 작업 head",
+    "ko": "바뀌지 않는 개정 기록 · 분기 · 작업 중인 최신 개정",
     "en": "Immutable revisions · branches · working heads"
   },
   "advanced.memoryHint": {
@@ -124,7 +124,7 @@ export const advancedMessages = {
     "en": "Requirements · criteria · results · rule-computed assessments"
   },
   "advanced.workspace": {
-    "ko": "워크스페이스 설정",
+    "ko": "작업 공간 설정",
     "en": "Workspace settings"
   },
   "advanced.workspaceHint": {

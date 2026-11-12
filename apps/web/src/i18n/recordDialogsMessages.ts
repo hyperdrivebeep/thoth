@@ -44,7 +44,7 @@ export const recordDialogsMessages = {
     "en": "Preview import"
   },
   "traceImport.notSaved": {
-    "ko": "미리보기 — 아직 저장하지 않았습니다",
+    "ko": "미리보기: 아직 저장하지 않았습니다",
     "en": "Preview — nothing has been saved"
   },
   "traceImport.added": {

@@ -30,8 +30,19 @@ export function resultUsageLine(status: ResearchStatus | undefined, operationId:
   const reused = reuse && reuse.reused > 0 ? formatMessage("reusedStages", reuse.reused, reuse.new) : "";
   const retried = usage.auto_retries ? formatMessage("autoRetries", usage.auto_retries) : "";
   // The totals already include these calls; the share is shown so it is not a hidden cost.
+  // When the total is unknown, a share that is also unknown would only say "unknown" a second time.
   const apart = Object.entries(usage.by_purpose ?? {})
+    .filter(([, part]) => usage.total_tokens != null || part.total_tokens != null)
     .map(([purpose, part]) => formatMessage("usagePart", purpose === "MEMORY_QUERY_EXPANSION" ? t("usage.memoryExpansion") : part.label, part.total_tokens == null ? null : part.total_tokens.toLocaleString(localeTag()))).join("");
   return formatMessage("resultUsage", tokens, timeText(status, operationId, usage.wall_ms), reused, retried, apart);
 }
 
+
+/**
+ * True when a finished run's usage is written under its result card ("이 조사: …"). The line under the
+ * question box then would say the same a second time. While research runs, or when it ended without a
+ * result on screen, there is no such card line and the line under the question box is the only one.
+ */
+export function usageShownUnderResult(status: Pick<ResearchStatus, "operation_state" | "current_result"> | undefined): boolean {
+  return status !== undefined && status.operation_state !== "RUNNING" && Boolean(status.current_result?.result);
+}

@@ -6,6 +6,7 @@ import { useDeferredValue, useState } from "react";
 import { capabilityCatalog, filterCapabilities, namespaceLabels, namespaces, parseInvocation, transportFor, type Capability } from "../api/capabilities";
 import { rpc, RpcError } from "../api/rpcClient";
 import { RecordInspector } from "./RecordInspector";
+import { eyebrowLabel } from "./statusLabels";
 
 function MethodDetail({ method, projectId, threadId }: { method: Capability; projectId: string; threadId?: string }) {
   const client = useQueryClient();
@@ -39,14 +40,14 @@ function MethodDetail({ method, projectId, threadId }: { method: Capability; pro
       setInput(event.target.value); setConfirmed(false); setRequestKey(crypto.randomUUID()); invocation.reset();
     }} />
     <p className="muted">{t("advanced.coverageNotice")}</p>
-    {validation && <Callout compact intent="warning">{validation}</Callout>}
+    {validation && <Callout compact intent="warning" role="status">{validation}</Callout>}
     {command && <Checkbox checked={confirmed} label={t("advanced.confirm")} onChange={event => setConfirmed(event.currentTarget.checked)} />}
     <div className="method-actions"><Button icon={command ? "play" : "search"} intent={command ? "warning" : "primary"} loading={invocation.isPending}
       disabled={Boolean(validation) || (command && !confirmed)} onClick={() => invocation.mutate({ input: parseInvocation(input, projectId), key: requestKey })}>
       {command ? t("advanced.runCommand") : t("advanced.runQuery")}</Button>
       <Button minimal disabled={invocation.isPending} onClick={() => { setRequestKey(crypto.randomUUID()); setConfirmed(false); invocation.reset(); }}>{t("advanced.newKey")}</Button></div>
     <small className="request-key">{t("labels.retryKey")}{" "}{requestKey}{" "}{t("advanced.sameKey")}</small>
-    {invocation.error && <Callout intent="danger" title={t("advanced.failed")}><p>{invocation.error.message}</p>{invocation.error instanceof RpcError && <RecordInspector value={invocation.error.details} />}</Callout>}
+    {invocation.error && <Callout intent="danger" title={t("advanced.failed")} role="alert"><p>{invocation.error.message}</p>{invocation.error instanceof RpcError && <RecordInspector value={invocation.error.details} />}</Callout>}
     {invocation.data && <div className="rpc-result"><div className="section-title-row"><h3>{t("advanced.response")}</h3><Tag>{invocation.data.state}</Tag></div>
       {invocation.data.operation_id && <p className="muted">operation: {invocation.data.operation_id}{" "}{t("advanced.notCompletion")}</p>}
       <RecordInspector value={invocation.data.value} /></div>}
@@ -65,12 +66,12 @@ export function CapabilityWorkbench({ projectId, threadId, initialNamespace = "a
   );
   const method = methods.find(item => item.name === selected) ?? methods[0];
   return <section className="capability-workbench">
-    <header className="workspace-heading"><div><p className="eyebrow">CAPABILITY WORKBENCH</p><h1>{t("advanced.title")}</h1><p>{t("advanced.intro")}</p></div>
+    <header className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel("CAPABILITY WORKBENCH")}</p><h1>{t("advanced.title")}</h1><p>{t("advanced.intro")}</p></div>
       <Tag minimal>{capabilityCatalog.canonical_method_count} canonical + {capabilityCatalog.compatibility_alias_count} aliases</Tag></header>
     <div className="catalog-toolbar"><InputGroup leftIcon="search" aria-label={t("advanced.search")} placeholder={t("advanced.searchPlaceholder")} value={search} onChange={event => setSearch(event.target.value)} />
       <HTMLSelect aria-label={t("advanced.namespace")} value={namespace} onChange={event => setNamespace(event.target.value)} options={[{value:"all", label:formatMessage("namespaceCount", visibleNamespaces.length)}, ...visibleNamespaces.map(value => ({value, label:`${value} · ${namespaceLabels[value] ?? value}`}))]} />
       <HTMLSelect aria-label={t("advanced.kind")} value={surface} onChange={event => setSurface(event.target.value)} options={[{value:"all",get label() { return t("advanced.allKinds"); }},{value:"QUERY",get label() { return t("advanced.queryKind"); }},{value:"COMMAND",get label() { return t("advanced.commandKind"); }},{value:"QUERY_OR_CONTROL",get label() { return t("advanced.compatibility"); }}]} /></div>
-    <div className="catalog-layout"><div className="method-list" aria-label={t("advanced.list")}><div className="catalog-count">{methods.length} visible methods</div>
+    <div className="catalog-layout"><div className="method-list" role="group" aria-label={t("advanced.list")}><div className="catalog-count">{methods.length} visible methods</div>
       {methods.length === 0 && <p className="empty-copy">{t("advanced.noMatch")}</p>}
       {methods.map(item => <Button alignText="left" minimal active={method?.name === item.name} key={item.name} onClick={() => setSelected(item.name)} className="method-item">
         <span className={`method-kind ${item.surface.toLowerCase()}`}>{item.surface === "QUERY" ? "Q" : "C"}</span><span><strong>{item.name}</strong><small>{namespaceLabels[item.namespace] ?? item.namespace}{!item.canonical ? " · alias" : ""}</small></span>

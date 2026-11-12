@@ -1,4 +1,5 @@
 import { message as formatMessage } from "../i18n/formatMessages";
+import { TechnicalDetails } from "./TechnicalDetails";
 import { t } from "../i18n/locale";
 import { Callout, HTMLTable, Tag } from "@blueprintjs/core";
 import { Fragment } from "react";
@@ -12,7 +13,7 @@ import { standingActionNote } from "./judgmentRecordText";
 import type { DiscriminationItem } from "../api/judgmentRecords";
 import { orderedActions } from "./testOrderInput";
 import { StatusBadge } from "./StatusBadge";
-import { actionFamilyLabel, actionStateLabel, reversibilityLabel } from "./statusLabels";
+import { actionFamilyLabel, actionStateLabel, reversibilityLabel, statusLabel } from "./statusLabels";
 
 const legacyEffort = (action: Record<string, unknown>) => action.estimated_cost == null && action.estimated_seconds == null ? undefined
   : formatMessage("actionRecorded", String(action.estimated_cost ?? t("actions.costUnknown")), String(action.estimated_seconds ?? t("actions.timeUnknown")));
@@ -21,6 +22,20 @@ const staleNote = (action: Record<string, unknown>, links?: HypothesisLink[]) =>
   staleActionNote([...stringValues(action.hypothesis_ids), ...stringValues(action.hypothesis_refs)], links);
 
 /** Next actions: the model's recommendation, the criteria it used, and how each action fares. No score, no rank. */
+/**
+ * The action's state as a tag, unless it says in the same words what the execution-authority tag already
+ * says (an action that may run without approval is "allowed to run without approval").
+ */
+function stateTag(action: Record<string, unknown>): string | null {
+  const label = actionStateLabel(textValue(action.state)) ?? null;
+  return label !== null && label === statusLabel(textValue(action.execution_authority)) ? null : label;
+}
+
+/** The recorded values behind the tags (R0, AUTO_R0, …), for the folded technical details. */
+function recordedCodes(action: Record<string, unknown>): string[] {
+  return [action.risk_tier, action.execution_authority, action.state].map(textValue).filter(Boolean);
+}
+
 export function ActionCompare({ result, projectId, links, discrimination }: {
   result: Record<string, unknown>; projectId?: string;
   /** Hypotheses that came from a trace row, read against today's verdicts; an action on a changed one is marked. */
@@ -67,7 +82,7 @@ export function ActionCompare({ result, projectId, links, discrimination }: {
       <h3>{textValue(action.specification)}</h3>
       <div className="badge-row"><StatusBadge value={textValue(action.risk_tier)}/><StatusBadge value={textValue(action.execution_authority)}/>
         <Tag minimal>{reversibilityLabel(textValue(action.reversibility)) ?? t("actions.reversibilityUnknown")}</Tag>
-        {actionStateLabel(textValue(action.state)) && <Tag minimal>{actionStateLabel(textValue(action.state))}</Tag>}</div>
+        {stateTag(action) && <Tag minimal>{stateTag(action)}</Tag>}</div>
       {staleNote(action, links) && <Callout compact intent="warning" role="note" className="hypothesis-link">{staleNote(action, links)}</Callout>}
       {againstNote(action) && <Callout compact intent="warning" role="note" className="standing-note">{againstNote(action)}</Callout>}
       <p>{textValue(action.expected_information_value)}</p>
@@ -77,6 +92,7 @@ export function ActionCompare({ result, projectId, links, discrimination }: {
       {stringValues(action.missing_evidence).map((value, j) => <p key={j}>{t("labels.requiredEvidence")}{" "}{value}</p>)}
       {stringValues(action.source_refs).length > 0 && <p>{t("history.evidence")}{" "}{cite(stringValues(action.source_refs))}</p>}
       <p>{action.execution_authority === "HUMAN_REQUIRED_R3" ? t("actions.protected") : t("actions.proposalNotice")}</p>
+      <TechnicalDetails groups={[{ label: t("actions.rawClassification"), items: recordedCodes(action) }]} />
     </section></Fragment>)}
   </>;
 }

@@ -6,6 +6,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ResearchStatus } from "../api/research";
 import { composerActivity } from "../api/researchProgress";
 import { rpc } from "../api/rpcClient";
+import { useState } from "react";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 export function ResearchProgress({ status }: { status: ResearchStatus }) {
   useTranslation();
@@ -14,17 +16,35 @@ export function ResearchProgress({ status }: { status: ResearchStatus }) {
     { project_id: status.project_id, thread_id: status.thread_id }, crypto.randomUUID()),
     onSuccess: () => Promise.all([client.invalidateQueries({queryKey:["research",status.project_id,status.thread_id]}), client.invalidateQueries({queryKey:["threads",status.project_id]})]),
   });
+  const [askingStop, setAskingStop] = useState(false);
   const message = composerActivity(status);
   const paused = status.execution_state === "PAUSED";
   const running = status.operation_state === "RUNNING";
-  return <div className="activity-disclosure" aria-label={t("progress.current")}>
+  // Nothing is running and nothing is to be said: no empty group is left in the question box.
+  if (!message && !running && !paused && !control.error) return null;
+  return <div className="activity-disclosure" role="group" aria-label={t("progress.current")}>
     {message && <p role="status"><span className={paused ? "activity-dot paused" : "activity-dot"}/>{message}</p>}
     <div className="activity-controls">
       {running && !paused && <Button small minimal icon="pause" disabled={control.isPending} onClick={()=>control.mutate("thread/pause")}>{t("progress.pause")}</Button>}
       {paused && <Button small minimal icon="play" disabled={control.isPending} onClick={()=>control.mutate("thread/resume")}>{t("progress.resume")}</Button>}
-      {running && <Button small minimal icon="stop" disabled={control.isPending} onClick={()=>{if(window.confirm(t("progress.stopConfirm")))control.mutate("thread/stop");}}>{t("progress.stop")}</Button>}
+      {running && <Button small minimal icon="stop" disabled={control.isPending} onClick={() => setAskingStop(true)}>{t("progress.stop")}</Button>}
     </div>
-    {control.error && <Callout compact intent="danger">{control.error.message}</Callout>}
+    {control.error && <Callout compact intent="danger" role="alert">{control.error.message}</Callout>}
+    {askingStop && (
+      <ConfirmDialog
+        title={t("progress.stopTitle")}
+        confirmLabel={t("progress.stop")}
+        intent="warning"
+        icon="stop"
+        onConfirm={() => {
+          setAskingStop(false);
+          control.mutate("thread/stop");
+        }}
+        onClose={() => setAskingStop(false)}
+      >
+        <p>{t("progress.stopConfirm")}</p>
+      </ConfirmDialog>
+    )}
   </div>;
 }
 export function UsageSummary({status}: {status?: Pick<ResearchStatus, "usage">}) {

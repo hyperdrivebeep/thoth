@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-from contextlib import suppress
 from pathlib import Path
 from typing import cast
 
@@ -18,6 +17,7 @@ from thoth.adapters.models.credential_auth_projection import (
     account_auth_methods as _account_auth_methods,
 )
 from thoth.adapters.models.openai_responses import OpenAIResponsesModel
+from thoth.adapters.models.private_file import UnreadableJsonError, read_for_replace, replace_json
 from thoth.adapters.models.registry import RegisteredModelResolver
 from thoth.domain.model_settings import ModelOption, ModelSelection
 from thoth.ports.model import ModelExecutionHold, ModelPort
@@ -46,13 +46,6 @@ def _read_json(path: Path, *, encoding: str = "utf-8") -> dict[str, object]:
     return {
         key: value for key, value in cast(dict[object, object], raw).items() if isinstance(key, str)
     }
-
-
-def _write_json(path: Path, payload: dict[str, object]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    with suppress(OSError):
-        os.chmod(path, 0o600)
 
 
 def list_credentials(root: Path | None = None) -> tuple[dict[str, str], ...]:
@@ -100,21 +93,27 @@ def register_api_key(
     directory = registry_dir(root)
     index_path = directory / _INDEX
     secrets_path = directory / _SECRETS
-    index = _read_json(index_path)
-    secrets = _read_json(secrets_path)
-    block = index.get(provider)
-    raw_models = (
-        cast(dict[object, object], block).get("models") if isinstance(block, dict) else None
-    )
-    models: list[object] = (
-        list(cast(list[object], raw_models)) if isinstance(raw_models, list) else []
-    )
-    if model not in models:
-        models.append(model)
-    index[provider] = {"kind": "api_key", "base_url": base_url, "models": models}
-    secrets[provider] = api_key
-    _write_json(index_path, index)
-    _write_json(secrets_path, secrets)
+    try:
+        # An unreadable file stops here: read as empty, the new key alone would replace every key.
+        index = read_for_replace(index_path)
+        secrets = read_for_replace(secrets_path)
+        block = index.get(provider)
+        raw_models = (
+            cast(dict[object, object], block).get("models") if isinstance(block, dict) else None
+        )
+        models: list[object] = (
+            list(cast(list[object], raw_models)) if isinstance(raw_models, list) else []
+        )
+        if model not in models:
+            models.append(model)
+        index[provider] = {"kind": "api_key", "base_url": base_url, "models": models}
+        secrets[provider] = api_key
+        replace_json(secrets_path, secrets, private=True)
+        replace_json(index_path, index, private=False)
+    except UnreadableJsonError as exc:
+        raise LocalCredentialHold("MODEL_CREDENTIAL_STORE_UNREADABLE") from exc
+    except OSError as exc:
+        raise LocalCredentialHold("MODEL_CREDENTIAL_STORE_UNWRITABLE") from exc
     return {"provider": provider, "model": model, "kind": "api_key", "base_url": base_url}
 
 

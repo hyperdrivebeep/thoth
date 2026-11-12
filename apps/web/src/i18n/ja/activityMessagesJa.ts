@@ -98,7 +98,7 @@ export const activityJa: ColumnOf<typeof activityMessages> = {
   "changeSummary.authority": "資料の権威性が変わった",
   "changeSummary.time": "時点が変わった",
   "changeSummary.title": "このバージョンでの変更",
-  "changeSummary.notice": "— 数値、否定、状態、引用、権威性、時点が変わったときは、原文が表示されます。",
+  "changeSummary.notice": "数値、否定、状態、引用、権威性、時点が変わったときは、原文が表示されます。",
   "changeSummary.original": "変更された元の内容",
   "changeSummary.before": "変更前",
   "changeSummary.after": "変更後",

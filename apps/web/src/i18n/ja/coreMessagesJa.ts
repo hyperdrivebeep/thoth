@@ -2,6 +2,10 @@ import type { ColumnOf } from "../withColumns";
 import type { coreMessages } from "../coreMessages";
 
 export const coreJa: ColumnOf<typeof coreMessages> = {
+  "brand.tagline": "リサーチワークステーション",
+  "nav.projects": "プロジェクト",
+  "nav.workspaceRoot": "ワークスペース",
+  "rpc.internalFailure": "サーバーがこのリクエストを処理できませんでした。",
   "usage.memoryExpansion": "記憶の検索語の拡張",
   "language.display": "表示言語",
   "language.acceptedShort": "送信済み",
@@ -29,7 +33,7 @@ export const coreJa: ColumnOf<typeof coreMessages> = {
   "composer.followupPlaceholder": "追加の質問、新しい根拠、変わった条件を入力してください…",
   "composer.startPlaceholder": "どんな問題を調べたいですか？",
   "composer.attach": "資料を接続",
-  "composer.followup": "追加の指示を送る",
+  "composer.followup": "送信",
   "composer.start": "調査を開始",
   "composer.checkOriginal": "元のリクエストを確認",
   "composer.retryOriginal": "元の送信を確認",

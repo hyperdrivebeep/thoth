@@ -1,5 +1,6 @@
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
+import { sentenceGap } from "../i18n/sentences";
 import { Button, Callout, InputGroup, Tag } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -95,7 +96,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
     <section className="first-run-card" aria-labelledby="first-run-title">
       <p className="eyebrow">{t("setup.checkNeeded")}</p>
       <h1 id="first-run-title">{t("setup.checkWorkspace")}</h1>
-      <Callout intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)} {t("setup.researchIndependent")}</Callout>
+      <Callout intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)}{sentenceGap()}{t("setup.researchIndependent")}</Callout>
       <Button small minimal icon="refresh" loading={ready.isFetching} onClick={() => void ready.refetch()}>{t("setup.checkAgain")}</Button>
     </section>
   </main>;
@@ -197,8 +198,8 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
               {guideUrl && <p><a href={guideUrl} target="_blank" rel="noopener noreferrer">{t("setup.openKeySite")}</a></p>}</Callout>}
             {loadModels.data && <Callout compact role="status" data-catalog-result>{catalogResultLines((loadModels.data.value as { catalog_status?: CatalogStatusRow[] }).catalog_status, providerLabel).map(line => <p key={line}>{line}</p>)}</Callout>}
             {loadModels.error && <Callout compact intent="warning" role="alert">{connectionErrorText(loadModels.error, t("setup.catalogFailed"))}</Callout>}
-            {connect.error && <Callout compact intent="danger">{connectionErrorText(connect.error, connect.error.message)}</Callout>}
-            {listed.error && <Callout compact intent="warning">{t("setup.methodsFailed")}</Callout>}
+            {connect.error && <Callout compact intent="danger" role="alert">{connectionErrorText(connect.error, connect.error.message)}</Callout>}
+            {listed.error && <Callout compact intent="warning" role="alert">{t("setup.methodsFailed")}</Callout>}
             <Button small minimal icon="refresh" loading={ready.isFetching || listed.isFetching}
               onClick={() => { void ready.refetch(); void listed.refetch(); }}>{t("setup.refreshConnection")}</Button>
             <div className="first-run-footer">
@@ -243,7 +244,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                 </span></span>
               </Button>
             </div>
-            {update.error && <Callout compact intent="danger">{update.error.message}</Callout>}
+            {update.error && <Callout compact intent="danger" role="alert">{update.error.message}</Callout>}
             <div className="first-run-footer">
               {hosted ? <span>{t("setup.noCredential")}</span> : <Button minimal onClick={() => setStep("model")}>{t("setup.backToModel")}</Button>}
               {setupReady ? (

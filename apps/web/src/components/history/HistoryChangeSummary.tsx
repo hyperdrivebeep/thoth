@@ -27,7 +27,7 @@ export function ChangeDetail({ summary }: { summary?: ChangeSummary | null }) {
   if (!summary || (summary.lines.length === 0 && other === 0)) return null;
   return <section className="history-change-summary" aria-label={t("changeSummary.title")}>
     <h3>{t("changeSummary.title")}</h3>
-    {summary.flags.length > 0 && <p className="history-help">{summary.flags.map(flag => flagLabels[flag] ?? flag).join(" · ")}{" "}{t("changeSummary.notice")}</p>}
+    {summary.flags.length > 0 && <p className="history-help">{summary.flags.map(flag => flagLabels[flag] ?? flag).join(" · ")}<br />{t("changeSummary.notice")}</p>}
     <Disclosure label={t("changeSummary.original")} defaultOpen={summary.text_diff_recommended}>
       {summary.lines.map((line, index) => <article className="history-change" key={index}>
         <h5>{line.label}</h5>

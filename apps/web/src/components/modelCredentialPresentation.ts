@@ -1,6 +1,7 @@
 import { message as formatMessage } from "../i18n/formatMessages";
 import { t } from "../i18n/locale";
 import { pickLocale } from "../i18n/pickLocale";
+import { joinSentences } from "../i18n/sentences";
 export type CredentialRegisterResult = {
   started?: boolean;
   provider?: string;
@@ -177,12 +178,30 @@ const guidanceJa: Record<string, string> = {
 };
 export function guidanceText(value: string | null | undefined): string | null {
   if (!value) return null;
-  if (guidanceKo[value]) return pickLocale({ ko: guidanceKo[value], en: value, "zh-Hans": guidanceZh[value], "zh-Hant": guidanceZhHant[value], ja: guidanceJa[value] });
+  if (guidanceKo[value]) {
+    return pickLocale({
+      ko: guidanceKo[value],
+      // The server writes the hint without a full stop; on screen it stands between other sentences.
+      en: /[.!?]$/.test(value) ? value : value + ".",
+      "zh-Hans": guidanceZh[value],
+      "zh-Hant": guidanceZhHant[value],
+      ja: guidanceJa[value],
+    });
+  }
   // A terminal command stays literal; only the sentence around it is Korean.
   const command = /^Run (.+) in the server terminal$/.exec(value);
   if (command) return t("labels.command") + command[1];
   return /[가-힣]/.test(value) ? value : null;
 }
+
+// With these states the note already says to finish signing in and check again; the hint repeats it.
+const GUIDANCE_THAT_REPEATS_THE_STATE: Readonly<Record<string, readonly string[]>> = {
+  LOGIN_REQUIRED: [
+    "Connect the THOTH-only Codex profile",
+    "Sign in with the official Claude Code executable in the THOTH profile",
+  ],
+  LOGIN_PENDING: ["Finish the THOTH Codex sign-in, then check connection status"],
+};
 
 // The server sends two hints that are really this one statement (the real run is not confirmed yet).
 const GUIDANCE_THAT_IS_THE_STATUS = new Set([
@@ -204,6 +223,18 @@ function executionStatusNote(account: CredentialAccount): string | null {
   return null;
 }
 
+function guidanceIsTheStatus(account: CredentialAccount): boolean {
+  return account.guidance != null && GUIDANCE_THAT_IS_THE_STATUS.has(account.guidance);
+}
+
+/** The server's hint as a sentence of the note, or null when the status line or the state note already says it. */
+function guidanceForNote(account: CredentialAccount): string | null {
+  const guidance = guidanceText(account.guidance);
+  if (!guidance || guidanceIsTheStatus(account)) return null;
+  const repeats = GUIDANCE_THAT_REPEATS_THE_STATE[account.connection_state ?? ""] ?? [];
+  return repeats.includes(account.guidance ?? "") ? null : guidance;
+}
+
 export function credentialAvailabilityNote(account?: CredentialAccount): string | null {
   if (!account) return null;
   const notes: string[] = [];
@@ -219,17 +250,16 @@ export function credentialAvailabilityNote(account?: CredentialAccount): string 
   if (loginUnavailable(account)) notes.push(t("credential.checkInstall"));
   if (account.connection_state === "CATALOG_UNAVAILABLE") notes.push(t("credential.catalogUnverified"));
   if (account.connection_state === "UNAVAILABLE" && account.reason_code) notes.push(formatMessage("routeUnavailable", account.reason_code));
-  const guidance = guidanceText(account.guidance);
+  const hint = guidanceForNote(account);
+  if (hint) notes.push(hint);
   // A hint that only says the run is not confirmed is the status itself: it is shown once, in the status place.
-  const guidanceIsStatus = account.guidance != null && GUIDANCE_THAT_IS_THE_STATUS.has(account.guidance);
-  if (guidance && !guidanceIsStatus) notes.push(guidance);
-  const status = guidanceIsStatus ? guidance : executionStatusNote(account);
-  if (!account.connected) return [...notes, ...(status ? [status] : [])].join(" ") || null;
+  const status = guidanceIsTheStatus(account) ? guidanceText(account.guidance) : executionStatusNote(account);
+  if (!account.connected) return joinSentences([...notes, status]) || null;
   if (!credentialLocallyConfigured(account) && !account.has_key) notes.push(t("credential.routeUnavailable"));
   const routes = account.available_model_providers;
   if (routes?.length === 0) notes.push(t("credential.noSelectableRoute"));
   if (status) notes.push(status);
-  return notes.join(" ") || null;
+  return joinSentences(notes) || null;
 }
 
 export function credentialConnectionHint(account?: CredentialAccount): string {

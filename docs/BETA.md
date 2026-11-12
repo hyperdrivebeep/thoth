@@ -155,6 +155,10 @@ Tell us what you were doing, what you expected, what happened, and attach a scre
 output of `thoth.cli version` and your Windows version. Remove or blur anything private first: do
 not attach your documents, sign-in details or workspace files.
 
+If an error on the screen ends in `[-32603] (operation:...)`, open `logs\thoth.log` in
+your workspace, copy the lines of the record with that operation id and paste them as text (see
+[Server log](INSTALL.md#server-log)). Read them first and do not attach the whole file.
+
 For a security problem, do not open a public issue. Use **Security → Report a vulnerability** on the
 repository and read the [security policy](../SECURITY.md).
 
@@ -188,4 +192,7 @@ repository and read the [security policy](../SECURITY.md).
 - **신고**: [Beta feedback 이슈](https://github.com/hyperdrivebeep/thoth/issues/new/choose)에
   하던 일, 기대한 결과, 실제 결과, 화면 캡처, 버전·OS를 적어 주세요. 보안 문제는 공개 이슈 대신
   **Security → Report a vulnerability**로 알려 주세요.
+  화면의 오류 끝에 `[-32603] (operation:...)`가 보이면 작업 공간의
+  `logs\thoth.log`에서 그 operation id가 있는 기록의 줄만 복사해 글로 붙여 주세요. 붙이기 전에
+  내용을 읽어 보고, 파일 전체는 올리지 마세요.
 

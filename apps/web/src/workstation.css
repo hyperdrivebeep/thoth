@@ -62,7 +62,7 @@
 :root {
   color-scheme: dark;
   --surface-0: #1c2127; --surface-1: #22272f; --surface-2: #252d37; --surface-3: #2f3b49;
-  --line: #3c4755; --line-soft: #303a46; --text: #f1f4f7; --muted: #a6b4c4; --faint: #738497;
+  --line: #3c4755; --line-soft: #303a46; --text: #f1f4f7; --muted: #a6b4c4; --faint: #8c9bab;
   --accent: #4c90f0; --accent-bright: #8abbff; --green: #72ca9b; --amber: #e7b96e; --red: #ff8c87;
   --sidebar-width: 248px; --evidence-width: 318px; --space: 8px; --radius: 4px;
   font-family: "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; color: var(--text); background: var(--surface-0);
@@ -406,4 +406,106 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 :root:lang(zh-Hant), :root:lang(zh-Hant) body {
   --bp-typography-family-default: "Segoe UI", "Microsoft JhengHei UI", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", "Source Han Sans TC", sans-serif;
   font-family: var(--bp-typography-family-default);
+}
+
+/* The question box shows where the keyboard is (the caret alone is easy to miss). */
+.composer-dock .prompt-composer:focus-within {
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 0 1px var(--accent-bright), 0 6px 24px #0002;
+}
+
+/* The question box is one line until someone types (it grows to 160px), so a saved answer keeps
+   the screen. Only the vertical spacing is set here; the narrow-window rules keep their sides. */
+.composer-dock {
+  padding-top: 8px;
+  padding-bottom: 10px;
+}
+.composer-dock .prompt-composer {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.workstation .composer-dock .prompt-composer textarea {
+  min-height: 32px;
+}
+.composer-tools {
+  margin-top: 4px;
+}
+.usage-summary {
+  padding-top: 4px;
+}
+
+/* The faintest text colour (--faint, set at the top) is #8c9bab: 4.9:1 on the lightest surface it sits
+   on (#252d37) and 5.8:1 on the project list. It was #738497 (3.6:1 and 4.3:1), under the 4.5:1 of WCAG 1.4.3. */
+
+/* "Choose files" before a file is chosen: Blueprint draws it at 3.7:1. */
+.workstation .bp6-file-upload-input {
+  color: var(--muted);
+}
+
+/* A conversation in the project list: its name and, next to it, its menu. */
+.thread-nav-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+.thread-nav-row > .thread-button {
+  flex: 1;
+  min-width: 0;
+}
+.thread-nav-row .bp6-popover-target > .bp6-button {
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* Evidence from a source that was disconnected afterwards. */
+.status-badge.detached-source {
+  color: var(--muted);
+  border: 1px dashed var(--line);
+}
+
+.detached-sources {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.confirm-dialog p,
+.rename-dialog p {
+  line-height: 1.6;
+}
+.rename-dialog label {
+  display: grid;
+  gap: 6px;
+}
+
+/* Text for a screen reader that the screen says more briefly. */
+/* The small labels of the project list keep their capital look in English; other scripts are unaffected. */
+.workstation .brand span,
+.workstation .brand .bp6-tag,
+.workstation .nav-label {
+  text-transform: uppercase;
+}
+
+/* Each note about an account is its own line (they used to run together: "…로그인하세요.API 키"). */
+.company-account small {
+  display: block;
+}
+
+/* A long explanation is shown one sentence per line. */
+.sentence-line {
+  display: block;
+}
+.sentence-line + .sentence-line {
+  margin-top: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

@@ -1,5 +1,6 @@
 """Dense material for the research path: when it is made, when it is not, why dense falls back."""
 
+import logging
 from collections.abc import Callable
 from types import SimpleNamespace
 from typing import Any, cast
@@ -153,6 +154,68 @@ async def test_the_encoder_is_started_in_the_background_once_per_cooldown() -> N
     assert p.warming is not None
     await p.warming
     assert started == [1, 1]
+
+
+DENSE_LOGGER = "thoth.application.services.dense_material"
+
+
+def _dense_warnings(caplog: pytest.LogCaptureFixture) -> list[str]:
+    return [r.getMessage() for r in caplog.records if r.name == DENSE_LOGGER]
+
+
+async def test_a_failed_encoder_start_is_written_to_the_log_once(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    now = [0.0]
+
+    async def warm() -> None:
+        raise RuntimeError("model folder is gone")
+
+    p = provider(index=None, warm=warm, clock=lambda: now[0])
+    with caplog.at_level(logging.WARNING, logger=DENSE_LOGGER):
+        for _ in range(2):  # two cooldowns, the same failure
+            await p.material("p", "lantern", frame())
+            assert p.warming is not None
+            await p.warming
+            now[0] += WARM_COOLDOWN_SECONDS + 1
+    messages = _dense_warnings(caplog)
+    assert len(messages) == 1
+    assert messages[0].startswith(
+        "background failure at local retrieval encoder warm-up\n"
+        "RuntimeError: model folder is gone\n"
+    )
+
+
+async def test_a_dense_failure_is_logged_with_its_cause_and_never_with_the_question(
+    caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    unreadable = provider(stamp=OSError("db is locked"))
+    with caplog.at_level(logging.WARNING, logger=DENSE_LOGGER):
+        for _ in range(2):  # two questions, the same failure
+            material = await unreadable.material("p", "lantern", frame())
+            assert material is not None and material.unavailable_reason == "EMBEDDING_FAILED"
+    messages = _dense_warnings(caplog)
+    assert len(messages) == 1
+    assert messages[0].startswith(
+        "background failure at dense index stamp project_id=p\nOSError: db is locked\n"
+    )
+
+    caplog.clear()
+    broken = provider()
+
+    async def explode(project: str, question: str, *rest: object) -> object:
+        del project, rest
+        raise RuntimeError(f"no vector for {question}")
+
+    monkeypatch.setattr(broken, "_compute", explode)
+    with caplog.at_level(logging.WARNING, logger=DENSE_LOGGER):
+        material = await broken.material("p", "where is the lantern kept", frame())
+    assert material is not None and material.unavailable_reason == "EMBEDDING_FAILED"
+    (message,) = _dense_warnings(caplog)
+    assert message.startswith(
+        "background failure at dense scores project_id=p\nRuntimeError: no vector for [input]\n"
+    )
+    assert "lantern kept" not in message
 
 
 # --- the research path ----------------------------------------------------------------------

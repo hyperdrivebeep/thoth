@@ -11,6 +11,7 @@ from typing import Literal
 import pytest
 
 from thoth.adapters.models import claude_profile, windows_user_sid, xai_profile
+from thoth.adapters.models.private_file import BROAD_GROUP_SIDS
 from thoth.ports.model import ModelExecutionHold
 
 SID = "S-1-5-21-100-200-300-1001"
@@ -108,7 +109,13 @@ def test_windows_native_output_preserves_sid_without_reader_errors(
     assert reader_errors == []
     assert failure is None
     assert calls[0] == ["whoami", "/user", "/fo", "csv", "/nh"]
-    assert calls[1][2:] == ["/inheritance:r", "/grant:r", f"*{SID}:(OI)(CI)F"]
+    assert calls[1][2:] == [
+        "/inheritance:r",
+        "/grant:r",
+        f"*{SID}:(OI)(CI)F",
+        "/remove:g",
+        *(f"*{group}" for group in BROAD_GROUP_SIDS),
+    ]
 
 
 @pytest.mark.parametrize("provider", ["xai", "claude"])

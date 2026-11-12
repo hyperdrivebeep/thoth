@@ -14,6 +14,7 @@ from thoth.adapters.storage.workspace_location import (
     confirm_workspace_location,
 )
 from thoth.adapters.storage.workspace_owner import WorkspaceInUse, acquire_workspace_owner
+from thoth.apps.log_files import close_workspace_log, install_workspace_log
 from thoth.apps.workspace_location_presentation import location_messages
 from thoth.domain.deployment_mode import DeploymentMode
 from thoth.domain.storage_context import storage_deployment_mode
@@ -68,12 +69,15 @@ def owned_workspace(workspace: Path, *, command: str) -> Generator[None]:
     """Own the workspace for a long-running command and let go when it ends.
 
     A server opens its runtime on the first request, which is too late to refuse a second one.
+    While it is owned, warnings and unexpected failures go to the workspace log file.
     """
     with workspace_guard():
         if storage_deployment_mode() is DeploymentMode.LOCAL:
             _warn_location(check_workspace_location(workspace))
         ownership = acquire_workspace_owner(workspace, command=command)
+    install_workspace_log(workspace)
     try:
         yield
     finally:
+        close_workspace_log()
         ownership.release()

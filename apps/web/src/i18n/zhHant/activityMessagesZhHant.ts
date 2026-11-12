@@ -98,7 +98,7 @@ export const activityZhHant: ColumnOf<typeof activityMessages> = {
   "changeSummary.authority": "資料權威性有變化",
   "changeSummary.time": "時間有變化",
   "changeSummary.title": "此版本中的變化",
-  "changeSummary.notice": "— 當數字、否定、狀態、引用、權威性或時間發生變化時，會顯示原文。",
+  "changeSummary.notice": "當數字、否定、狀態、引用、權威性或時間發生變化時，會顯示原文。",
   "changeSummary.original": "原始變更內容",
   "changeSummary.before": "之前",
   "changeSummary.after": "之後",

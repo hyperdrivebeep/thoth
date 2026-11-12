@@ -122,7 +122,7 @@ it("opens authorized stored research and draft while disconnected, but cannot su
   await settle(() => Boolean(container.textContent?.includes("A stored synthetic answer")));
   expect((container.querySelector("#live-problem") as HTMLTextAreaElement).value).toBe("unsubmitted A draft");
   expect(container.textContent).toContain("저장된 연구는 계속 볼 수 있습니다");
-  expect((container.querySelector('[aria-label="지시 추가"]') as HTMLButtonElement).disabled).toBe(true);
+  expect((container.querySelector('[aria-label="보내기"]') as HTMLButtonElement).disabled).toBe(true);
   const recordsTab = [...container.querySelectorAll('[role="tab"]')].find(tab => tab.textContent === "연구 이력");
   expect(recordsTab?.getAttribute("aria-disabled")).not.toBe("true");
   await act(async () => container.querySelector("form.prompt-composer")!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
@@ -133,13 +133,45 @@ it("opens authorized stored research and draft while disconnected, but cannot su
   expect(fixture.calls.some(call => call.method === "model/credential/register")).toBe(false);
 });
 
+it("says once, in the question box, why a question cannot be sent while no model is connected", async () => {
+  saveWorkspaceContext("p", "t", scope("A"));
+  await mount();
+  await settle(() => Boolean(container.textContent?.includes("A stored synthetic answer")));
+  const dock = container.querySelector(".composer-dock")!;
+  const send = dock.querySelector('[aria-label="보내기"]') as HTMLButtonElement;
+  const reason = "새 연구를 실행하려면 모델 연결을 확인하세요.";
+  // The reason is on the button itself and in the one notice the button points at.
+  expect(send.disabled).toBe(true);
+  expect(send.title).toBe(reason);
+  const notice = document.getElementById(send.getAttribute("aria-describedby") ?? "");
+  expect(notice?.textContent).toContain(reason);
+  expect(dock.textContent?.split(reason)).toHaveLength(2);
+  // There is nothing to choose from: no model or effort box, and no second notice about a saved model.
+  expect(dock.querySelector("select")).toBeNull();
+  expect(dock.textContent).not.toContain("저장된 모델 선택");
+});
+
+it("offers the model choice and names the send button plainly once a model is connected", async () => {
+  fixture.executionReady = true;
+  saveWorkspaceContext("p", "t", scope("A"));
+  writeDraft("p", "t", "a follow-up question", scope("A"));
+  await mount();
+  await settle(() => Boolean(container.querySelector('[aria-label="보내기"]:not([disabled])')));
+  const dock = container.querySelector(".composer-dock")!;
+  const send = dock.querySelector('[aria-label="보내기"]') as HTMLButtonElement;
+  expect(send.title).toBe("보내기");
+  expect(send.hasAttribute("aria-describedby")).toBe(false);
+  expect(dock.querySelectorAll("select")).toHaveLength(2);
+  expect(document.getElementById("composer-blocked-reason")).toBeNull();
+});
+
 it("keeps authorized research readable when the LOCAL setup record is corrupt", async () => {
   fixture.setupFailure = "CORRUPT";
   saveWorkspaceContext("p", "t", scope("A"));
   await mount();
   await settle(() => Boolean(container.textContent?.includes("A stored synthetic answer")));
   expect(container.textContent).toContain("설정 파일이 손상");
-  expect((container.querySelector('[aria-label="지시 추가"]') as HTMLButtonElement).disabled).toBe(true);
+  expect((container.querySelector('[aria-label="보내기"]') as HTMLButtonElement).disabled).toBe(true);
   expect(fixture.calls.some(call => call.method === "thread/read")).toBe(true);
   expect(fixture.calls.some(call => call.method === "workspace/setup/update" || call.method === "model/credential/register" || call.method === "thread/input")).toBe(false);
 });
@@ -150,7 +182,7 @@ it("shows unreadable LOCAL setup without offering a fresh consent write on first
   await mount();
   await settle(() => fixture.calls.some(call => call.method === "project/list") && Boolean(container.querySelector(".first-run-card")));
   expect(container.textContent).toContain("설정 파일을 읽지 못");
-  expect(container.textContent).not.toContain("공개 웹을 이 워크스페이스에서 쓸까요");
+  expect(container.textContent).not.toContain("공개 웹을 이 작업 공간에서 쓸까요");
   expect(fixture.calls.some(call => call.method === "workspace/setup/update" || call.method === "model/credential/register")).toBe(false);
 });
 
@@ -188,7 +220,7 @@ it("keeps an existing authorized project readable when setup is unfinished, with
   fixture.setupComplete = false;
   saveWorkspaceContext("p", "t", scope("A"));
   await mount(); await settle(() => Boolean(container.textContent?.includes("A stored synthetic answer")));
-  expect((container.querySelector('[aria-label="지시 추가"]') as HTMLButtonElement).disabled).toBe(true);
+  expect((container.querySelector('[aria-label="보내기"]') as HTMLButtonElement).disabled).toBe(true);
   expect(container.querySelector(".first-run-shell")).toBeNull();
 });
 
@@ -281,7 +313,7 @@ it("hides cached research during a permission refetch and clears it after denial
 it("does not apply a late admission after project access is withdrawn", async () => {
   fixture.executionReady = true;
   saveWorkspaceContext("p", "t", scope("A")); writeDraft("p", "t", "unsent on revoke", scope("A"));
-  await mount(); await settle(() => Boolean(container.querySelector<HTMLButtonElement>('[aria-label="지시 추가"]:not([disabled])')));
+  await mount(); await settle(() => Boolean(container.querySelector<HTMLButtonElement>('[aria-label="보내기"]:not([disabled])')));
   let release!: () => void;
   fixture.admissionGate = new Promise<void>(resolve => { release = resolve; });
   try {
@@ -312,7 +344,7 @@ it("keeps an editable draft through same-workspace background permission refetch
       editor.dispatchEvent(new Event("input", { bubbles: true }));
     });
     expect(readDraft("p", "t", scope("A"))).toBe("edited while checking");
-    expect((container.querySelector('[aria-label="지시 추가"]') as HTMLButtonElement).disabled).toBe(true);
+    expect((container.querySelector('[aria-label="보내기"]') as HTMLButtonElement).disabled).toBe(true);
     release(); await settle(() => Boolean(container.textContent?.includes("A stored synthetic answer")));
     expect((container.querySelector("#live-problem") as HTMLTextAreaElement).value).toBe("edited while checking");
   } finally { release(); }
@@ -412,7 +444,7 @@ it("reopens a lost accepted response without auto-submit and reuses the original
     editor.dispatchEvent(new Event("input", { bubbles: true }));
   });
   expect((container.querySelector('[aria-label="첫 조사 시작"]') as HTMLButtonElement).disabled).toBe(true);
-  const retry = [...container.querySelectorAll("button")].find(button => button.textContent === "이전 요청 같은 key로 확인")!;
+  const retry = [...container.querySelectorAll("button")].find(button => button.textContent === "이전 요청 다시 확인")!;
   await act(async () => retry.click());
   await settle(() => readLocalPending(ids.A, "p", "").kind === "NONE");
   const calls = fixture.calls.filter(call => call.method === "thread/start");
@@ -446,8 +478,8 @@ it("retries the persisted model choice instead of replacing it with a new draft'
   expect(writeLocalPending({ version: 1, workspaceId: ids.A, projectId: "p", threadId: "t", problem, selection,
     signature: submissionSignature("p", "t", problem, selection), key: "22222222-2222-4222-8222-222222222222", createdAt: 1 })).toBe("SAVED");
   await mount(); await settle(() => Boolean(container.textContent?.includes("이전 요청이 접수됐을 수 있습니다")));
-  expect((container.querySelector('[aria-label="지시 추가"]') as HTMLButtonElement).disabled).toBe(true);
-  const retry = [...container.querySelectorAll("button")].find(button => button.textContent === "이전 요청 같은 key로 확인")!;
+  expect((container.querySelector('[aria-label="보내기"]') as HTMLButtonElement).disabled).toBe(true);
+  const retry = [...container.querySelectorAll("button")].find(button => button.textContent === "이전 요청 다시 확인")!;
   await act(async () => retry.click());
   await settle(() => fixture.calls.some(call => call.method === "thread/input"));
   const call = fixture.calls.find(item => item.method === "thread/input")!;
@@ -550,4 +582,34 @@ it("does not show the queued notice for a normally accepted instruction", async 
   await submitDraft();
   await settle(() => readDraft("p", "t", scope("A")) === "");
   expect(container.textContent).not.toContain(QUEUED_NOTICE);
+});
+
+it("links the selected workspace tab to the content on screen, on the conversation and on another page", async () => {
+  saveWorkspaceContext("p", "t", scope("A"));
+  await mount();
+  await settle(() => Boolean(container.textContent?.includes("A stored synthetic answer")));
+  const linked = () => {
+    const tab = container.querySelector('.workspace-navigation [role="tab"][aria-selected="true"]')!;
+    return { tab, panel: document.getElementById(tab.getAttribute("aria-controls") ?? "") };
+  };
+  const conversation = linked();
+  expect(conversation.tab.textContent).toBe("대화");
+  expect(conversation.panel?.getAttribute("role")).toBe("tabpanel");
+  expect(conversation.panel?.getAttribute("aria-labelledby")).toBe(conversation.tab.id);
+  expect(conversation.panel?.textContent).toContain("A stored synthetic answer");
+  const settingsTab = [...container.querySelectorAll('.workspace-navigation [role="tab"]')].find(tab => tab.textContent === "설정") as HTMLElement;
+  await act(async () => settingsTab.click());
+  await settle(() => linked().tab.textContent === "설정");
+  const settings = linked();
+  expect(settings.panel?.getAttribute("role")).toBe("tabpanel");
+  expect(settings.panel?.getAttribute("aria-labelledby")).toBe(settings.tab.id);
+  expect(container.querySelectorAll('.workspace-content[role="tabpanel"]')).toHaveLength(1);
+});
+
+it("leaves no empty progress group in the question box when nothing is running", async () => {
+  saveWorkspaceContext("p", "t", scope("A"));
+  await mount();
+  await settle(() => Boolean(container.textContent?.includes("A stored synthetic answer")));
+  expect(container.querySelector(".composer-dock")).not.toBeNull();
+  expect(container.querySelector(".composer-dock .activity-disclosure")).toBeNull();
 });

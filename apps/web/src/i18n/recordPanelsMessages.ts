@@ -336,7 +336,7 @@ export const recordPanelsMessages = {
     "en": "Load more records"
   },
   "detail.evidence": {
-    "ko": "원문 근거",
+    "ko": "근거 원문",
     "en": "Original evidence"
   },
   "detail.references": {

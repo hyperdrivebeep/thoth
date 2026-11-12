@@ -83,7 +83,7 @@ export const hypothesisActionsZh: ColumnOf<typeof hypothesisActionsMessages> = {
   "reviewList.open": "打开回答",
   "reviewList.pageFailed": "无法读取审查列表的下一页。",
   "reviewList.next": "查看更多审查项目",
-  "reviewList.scope": "未读状态、指派和评论通知不在此列表的契约范围内。",
+  "reviewList.scope": "此列表不包含未读状态、指派和评论通知。",
   "actions.costUnknown": "成本未知",
   "actions.timeUnknown": "时长未知",
   "actions.empty": "尚未提出任何行动。",

@@ -1,4 +1,6 @@
+import { useContext } from "react";
 import { t } from "../i18n/locale";
+import { AskedQuestionContext, isTheQuestion } from "./askedQuestion";
 import { ReadableList } from "./ReadableList";
 import { hypothesisStatusWord, reviewWord, type ReviewView } from "./hypothesisReview";
 import type { HypothesisRow } from "./hypothesisView";
@@ -19,8 +21,13 @@ function ReviewLines({ review }: { review: ReviewView }) {
 /** What the hypothesis records beyond its statement. A value an old record does not have is hidden, except the observation. */
 export function HypothesisFields({ row }: { row: HypothesisRow }) {
   const status = row.status ? hypothesisStatusWord(row.status) : null;
+  const asked = useContext(AskedQuestionContext);
   return <>
-    <p className="hypothesis-observed"><strong>{t("tracePage.observation")}</strong> {row.observed || t("delta.noRecord")}</p>
+    {!isTheQuestion(row.observed, asked) && (
+      <p className="hypothesis-observed">
+        <strong>{t("tracePage.observation")}</strong> {row.observed || t("delta.noRecord")}
+      </p>
+    )}
     <h3 className="hypothesis-inferred"><small className="muted">{t("hypothesisFields.inference")}</small> {row.statement}</h3>
     {status && <small className="muted">{t("labels.hypothesisState")}{" "}{status}</small>}
     {row.assumptions.length > 0 && <><h4>{t("hypothesisFields.assumptions")}</h4><ReadableList items={row.assumptions}/></>}

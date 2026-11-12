@@ -1,5 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { credentialAvailabilityNote, credentialConnectionHint, type CredentialAccount } from "./modelCredentialPresentation";
+import { afterEach, describe, expect, it } from "vitest";
+import { setLocale } from "../i18n/locale";
+import { credentialAvailabilityNote, credentialConnectionHint, guidanceText, type CredentialAccount } from "./modelCredentialPresentation";
+
+afterEach(() => setLocale("ko"));
 
 // A sentence that says "the real model run is not confirmed yet", in any of the wordings the screen has used.
 const UNCONFIRMED = /실행 성공은 별도|별도 확인이 필요|첫 연구에서 확인|(확인|검증)되지 않았|미검증/;
@@ -51,5 +54,64 @@ describe("the account note says once that a real run is not confirmed", () => {
     const note = credentialAvailabilityNote({ ...chatgpt, connected: false, connection_state: "LOGIN_REQUIRED", guidance: null, execution_eligible: null });
     expect(unconfirmed(note)).toHaveLength(0);
     expect(note).toContain("로그인을 완료한 뒤 연결 상태를 다시 확인하세요");
+  });
+
+  it("says once that sign-in is needed when the server's hint repeats it", () => {
+    const signedOut = { ...chatgpt, connected: false, oauth: false, execution_eligible: null };
+    const required = credentialAvailabilityNote({
+      ...signedOut,
+      connection_state: "LOGIN_REQUIRED",
+      guidance: "Connect the THOTH-only Codex profile",
+    }) ?? "";
+    expect(sentences(required).filter(sentence => sentence.includes("로그인"))).toEqual([
+      "로그인을 완료한 뒤 연결 상태를 다시 확인하세요.",
+    ]);
+    const pending = credentialAvailabilityNote({
+      ...signedOut,
+      connection_state: "LOGIN_PENDING",
+      guidance: "Finish the THOTH Codex sign-in, then check connection status",
+    }) ?? "";
+    expect(pending).not.toContain("THOTH 전용 Codex 로그인을 마친 뒤");
+    expect(pending).toContain("시작 응답은 연결 완료가 아닙니다");
+    const claudeSignedOut = credentialAvailabilityNote({
+      ...claude,
+      connected: false,
+      oauth: false,
+      connection_state: "LOGIN_REQUIRED",
+    }) ?? "";
+    expect(sentences(claudeSignedOut).filter(sentence => sentence.includes("로그인하세요"))).toEqual([]);
+    expect(claudeSignedOut).toContain("로그인을 완료한 뒤 연결 상태를 다시 확인하세요.");
+  });
+
+  it("keeps a hint that says something the state does not", () => {
+    const note = credentialAvailabilityNote({
+      ...chatgpt,
+      connected: false,
+      oauth: false,
+      execution_eligible: null,
+      connection_state: "LOGIN_REQUIRED",
+      guidance: "Check the isolated Codex model catalog",
+    }) ?? "";
+    expect(note).toContain("THOTH 전용 Codex의 모델 목록을 확인하세요.");
+  });
+
+  it("ends the server's English hint with a full stop, so the next sentence does not run into it", () => {
+    setLocale("en");
+    expect(guidanceText("Check the isolated Codex model catalog")).toBe("Check the isolated Codex model catalog.");
+    const note = credentialAvailabilityNote({ ...claude, connection_state: "EXECUTION_UNVERIFIED" }) ?? "";
+    expect(note).not.toMatch(/[a-z] [A-Z][a-z]+ model execution/);
+    expect(note).toContain("in the THOTH profile. ");
+  });
+
+  it("writes Japanese and Chinese notes without a space after the full stop", () => {
+    for (const code of ["ja", "zh-Hans", "zh-Hant"] as const) {
+      setLocale(code);
+      const signedOut = credentialAvailabilityNote({ ...chatgpt, connected: false, oauth: false, connection_state: "LOGIN_REQUIRED", guidance: null }) ?? "";
+      const signedIn = credentialAvailabilityNote(chatgpt) ?? "";
+      for (const note of [signedOut, signedIn]) {
+        expect(note.split("。").length, code).toBeGreaterThan(2);
+        expect(note, code).not.toMatch(/。\s/);
+      }
+    }
   });
 });

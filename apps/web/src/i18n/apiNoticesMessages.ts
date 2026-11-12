@@ -108,8 +108,8 @@ export const apiNoticesMessages = {
     "en": "Use memory in research"
   },
   "answerHold.title": {
-    "ko": "결론 상태",
-    "en": "Conclusion state"
+    "ko": "확인된 사실과 근거 용도",
+    "en": "Confirmed facts and evidence use"
   },
   "answerHold.coverageMissing": {
     "ko": "답변 점검 항목 정보를 아직 읽지 못했습니다",

@@ -156,7 +156,10 @@ async def cancel_async_operation(
     _resolve_bus_for_request: Callable[[FastAPI, Request], CommandBus],
     _auth_denied: Callable[[str | int | None, str], Response],
 ) -> Response:
-    body = cast(object, await request.json())
+    try:
+        body = cast(object, await request.json())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="invalid JSON") from exc
     mapping = cast(dict[object, object], body) if isinstance(body, dict) else {}
     project_id = mapping.get("project_id")
     if not isinstance(project_id, str) or not project_id:
