@@ -3,7 +3,7 @@ import type { advancedMessages } from "../advancedMessages";
 
 export const advancedZh: ColumnOf<typeof advancedMessages> = {
   "advanced.projectHint": "截止时间 · 策略绑定 · 生命周期",
-  "advanced.task": "任务",
+  "advanced.task": "对话",
   "advanced.taskHint": "输入应用 · 研究进展 · 当前结果",
   "advanced.discovery": "发现",
   "advanced.discoveryHint": "搜索范围 · 获取阶段 · 停止原因",
@@ -42,7 +42,7 @@ export const advancedZh: ColumnOf<typeof advancedMessages> = {
   "advanced.fieldHint": "方案 · 参与者会话 · 评分 · 保护隐私的导出",
   "advanced.fieldNotice": "公开的现场命名空间目前只提供命令，没有只读查询 API，本界面也不能证明参与者评估、节省的时间或付费意愿。只有在获得批准的方案和参与者同意的情况下，才能使用高级命令。",
   "advanced.projectGroup": "项目、资料与访问",
-  "advanced.threadGroup": "任务与请求",
+  "advanced.threadGroup": "对话与请求",
   "advanced.discoveryGroup": "资料发现",
   "advanced.evidenceGroup": "证据与主张",
   "advanced.hypothesisGroup": "假设与验证",
@@ -94,7 +94,7 @@ export const advancedZh: ColumnOf<typeof advancedMessages> = {
   "records.controls": "此区域的详细查询和高级控制",
   "records.readOnly": "这是只读查询。",
   "records.journaled": "这是记入日志的 /rpc 查询。只有按下此按钮时才可能创建操作或日志。",
-  "records.chooseTask": "请先选择任务。",
+  "records.chooseTask": "请先选择对话。",
   "records.failed": "读取失败或缺少所需范围",
   "records.moreInputs": "需要额外 ID 或范围的契约，可以通过能力输入编辑器查询。",
   "records.beforeRead": "尚未读取",

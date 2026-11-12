@@ -40,7 +40,7 @@ export const historyViewZhHant: ColumnOf<typeof historyViewMessages> = {
   "delta.record": "記錄",
   "delta.noIdentifier": "無識別碼",
   "delta.noIdentity": "沒有精確的請求與結果連結的記錄無法比較。",
-  "delta.sameScope": "請從同一專案和同一會話中選擇兩個回答。",
+  "delta.sameScope": "請從同一專案和同一對話中選擇兩個回答。",
   "delta.distinct": "請選擇兩個不同的回答。",
   "delta.checkAccess": "確認存取權限後即可比較。",
   "delta.checkingAccess": "正在重新檢查存取權限… 你選擇的兩個回答會保留。",

@@ -9,7 +9,7 @@ export const finishingJa: ColumnOf<typeof finishingMessages> = {
   "progress.elapsedUnknown": "経過時間は不明",
   "progress.noFirstByte": "最初のバイトはまだ届いていません",
   "progress.pausing": "現在の段階を終えてから一時停止します。",
-  "progress.paused": "タスクは一時停止中です。",
+  "progress.paused": "調査は一時停止中です。",
   "progress.externalUnknown": "外部での実行の終了はまだ確認されていません。",
   "usage.none": "この結果の使用量は記録されていません",
   "usage.lessMinute": "1分未満",

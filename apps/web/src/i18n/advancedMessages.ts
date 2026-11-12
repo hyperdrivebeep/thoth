@@ -4,8 +4,8 @@ export const advancedMessages = {
     "en": "Cutoff · policy binding · lifecycle"
   },
   "advanced.task": {
-    "ko": "작업",
-    "en": "Task"
+    "ko": "대화",
+    "en": "Conversation"
   },
   "advanced.taskHint": {
     "ko": "입력 반영 · 조사 진행 · 현재 결과",
@@ -160,8 +160,8 @@ export const advancedMessages = {
     "en": "Projects, sources, and access"
   },
   "advanced.threadGroup": {
-    "ko": "작업 · 요청",
-    "en": "Tasks and requests"
+    "ko": "대화 · 요청",
+    "en": "Conversations and requests"
   },
   "advanced.discoveryGroup": {
     "ko": "자료 탐색",
@@ -368,8 +368,8 @@ export const advancedMessages = {
     "en": "This is a journaled /rpc query. An operation or journal may be created only when this button is pressed."
   },
   "records.chooseTask": {
-    "ko": "작업을 먼저 선택하세요.",
-    "en": "Select a task first."
+    "ko": "대화를 먼저 선택하세요.",
+    "en": "Select a conversation first."
   },
   "records.failed": {
     "ko": "조회 실패 또는 필요한 범위 누락",

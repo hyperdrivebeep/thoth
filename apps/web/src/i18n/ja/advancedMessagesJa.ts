@@ -3,7 +3,7 @@ import type { advancedMessages } from "../advancedMessages";
 
 export const advancedJa: ColumnOf<typeof advancedMessages> = {
   "advanced.projectHint": "基準時点 · ポリシーの結びつき · ライフサイクル",
-  "advanced.task": "タスク",
+  "advanced.task": "会話",
   "advanced.taskHint": "入力の適用 · 調査の進み具合 · 現在の結果",
   "advanced.discovery": "探索",
   "advanced.discoveryHint": "検索範囲 · 取得の段階 · 停止の理由",
@@ -42,7 +42,7 @@ export const advancedJa: ColumnOf<typeof advancedMessages> = {
   "advanced.fieldHint": "プロトコル · 参加者のセッション · スコア · プライバシーに配慮したエクスポート",
   "advanced.fieldNotice": "公開されている現場の名前空間は、現在コマンドだけを提供しています。読み取り専用の照会 API はなく、この画面では参加者の評価、時間の節約、支払い意欲を確かめることはできません。上級者向けのコマンドは、承認されたプロトコルと参加者の同意がある場合にのみ使ってください。",
   "advanced.projectGroup": "プロジェクト、資料、アクセス",
-  "advanced.threadGroup": "タスクとリクエスト",
+  "advanced.threadGroup": "会話とリクエスト",
   "advanced.discoveryGroup": "資料の探索",
   "advanced.evidenceGroup": "根拠と主張",
   "advanced.hypothesisGroup": "仮説と検証",
@@ -94,7 +94,7 @@ export const advancedJa: ColumnOf<typeof advancedMessages> = {
   "records.controls": "この領域の詳細な照会と上級者向けの制御",
   "records.readOnly": "これは読み取り専用の照会です。",
   "records.journaled": "これはジャーナルに記録される /rpc の照会です。このボタンを押したときにだけ、操作やジャーナルが作られることがあります。",
-  "records.chooseTask": "先にタスクを選んでください。",
+  "records.chooseTask": "先に会話を選んでください。",
   "records.failed": "読み取りに失敗したか、必要な範囲がありません",
   "records.moreInputs": "追加の ID や範囲が必要な契約は、機能の入力エディターから照会できます。",
   "records.beforeRead": "まだ読み取っていません",

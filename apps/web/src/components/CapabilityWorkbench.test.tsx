@@ -31,7 +31,7 @@ it("a malformed panel leaves navigation available and resets on a different view
   try{
     await mount(<><nav>프로젝트 탐색 유지</nav><WorkspaceErrorBoundary resetKey="research"><BrokenPanel/></WorkspaceErrorBoundary></>);
     expect(container.textContent).toContain("프로젝트 탐색 유지");
-    expect(container.textContent).toContain("이 작업 화면을 표시하지 못했습니다");
+    expect(container.textContent).toContain("이 화면을 표시하지 못했습니다");
     await render(<><nav>프로젝트 탐색 유지</nav><WorkspaceErrorBoundary resetKey="records"><p>기록 조회 가능</p></WorkspaceErrorBoundary></>);
     expect(container.textContent).toContain("기록 조회 가능");
   }finally{logger.mockRestore();}

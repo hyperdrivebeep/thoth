@@ -28,8 +28,8 @@ export const finishingMessages = {
     "en": "Finishing the current stage before pausing."
   },
   "progress.paused": {
-    "ko": "작업이 일시정지되어 있습니다.",
-    "en": "The task is paused."
+    "ko": "조사가 일시정지되어 있습니다.",
+    "en": "The research is paused."
   },
   "progress.externalUnknown": {
     "ko": "외부 실행의 종료 여부를 아직 확인하지 못했습니다.",

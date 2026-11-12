@@ -52,7 +52,7 @@ it("builds the typed Japanese sentences", () => {
   expect(message("monthDay", 11, 5, "09:30")).toBe("11月5日 09:30");
   expect(message("minutesSeconds", 2, 5)).toBe("2 分 5 秒");
   expect(message("replyFixed", "日本語")).toBe("回答：日本語（固定）");
-  expect(message("missingSelection", "thread")).toBe("保存済みのタスクの選択を確認してください");
+  expect(message("missingSelection", "thread")).toBe("保存済みの会話の選択を確認してください");
   expect(t("expected.unknown")).toBe("不明");
 });
 

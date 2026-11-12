@@ -40,7 +40,7 @@ export const historyViewZh: ColumnOf<typeof historyViewMessages> = {
   "delta.record": "记录",
   "delta.noIdentifier": "无标识符",
   "delta.noIdentity": "没有精确的请求与结果链接的记录无法比较。",
-  "delta.sameScope": "请从同一项目和同一会话中选择两个回答。",
+  "delta.sameScope": "请从同一项目和同一对话中选择两个回答。",
   "delta.distinct": "请选择两个不同的回答。",
   "delta.checkAccess": "确认访问权限后即可比较。",
   "delta.checkingAccess": "正在重新检查访问权限… 你选择的两个回答会保留。",

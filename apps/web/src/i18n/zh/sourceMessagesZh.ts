@@ -20,7 +20,7 @@ export const sourceZh: ColumnOf<typeof sourceMessages> = {
   "sources.projectShared": "在本项目内共享",
   "sources.explicitGrants": "仅限明确许可的任务",
   "sources.connectFailed": "未能连接资料",
-  "sources.scopeHelp": "“在本项目内共享”让本项目的所有任务都能把这份资料用作证据。“仅限明确允许的任务”只让单独获得许可的任务使用。",
+  "sources.scopeHelp": "“在本项目内共享”让本项目的所有任务都能把这份资料用作证据。“仅限明确许可的任务”只让单独获得许可的任务使用。",
   "sources.connected": "资料已连接。请用新的问题或指示开始分析。",
   "sources.unclassified": "权威性未分类",
   "sources.informal": "非正式参考",

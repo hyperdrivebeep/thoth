@@ -294,21 +294,17 @@ export const workspaceMessages = {
     "ko": "프로젝트 목록 새로고침",
     "en": "Refresh project list"
   },
-  "workspace.newTask": {
-    "ko": "새 작업",
-    "en": "New task"
-  },
   "workspace.newSession": {
-    "ko": "새 세션",
-    "en": "New session"
+    "ko": "새 대화",
+    "en": "New conversation"
   },
   "workspace.loadingSessions": {
-    "ko": "세션을 읽는 중…",
-    "en": "Loading sessions…"
+    "ko": "대화를 읽는 중…",
+    "en": "Loading conversations…"
   },
   "workspace.untitledSession": {
-    "ko": "제목 없는 세션",
-    "en": "Untitled session"
+    "ko": "제목 없는 대화",
+    "en": "Untitled conversation"
   },
   "workspace.running": {
     "ko": "진행 중",
@@ -323,8 +319,8 @@ export const workspaceMessages = {
     "en": "Continue reading"
   },
   "workspace.firstQuestion": {
-    "ko": "첫 질문을 보내면 이 프로젝트 아래 세션이 생깁니다.",
-    "en": "Send your first question to create a session in this project."
+    "ko": "첫 질문을 보내면 이 프로젝트 아래 대화가 생깁니다.",
+    "en": "Send your first question to create a conversation in this project."
   },
   "workspace.noProjects": {
     "ko": "아직 프로젝트가 없습니다.",
@@ -343,12 +339,12 @@ export const workspaceMessages = {
     "en": "Select a project"
   },
   "workspace.checkingTask": {
-    "ko": "작업 확인 중",
-    "en": "Checking task"
+    "ko": "대화 확인 중",
+    "en": "Checking conversation"
   },
   "workspace.selectedTask": {
-    "ko": "선택한 작업",
-    "en": "Selected task"
+    "ko": "선택한 대화",
+    "en": "Selected conversation"
   },
   "workspace.cutoffHint": {
     "ko": "이 프로젝트가 판단에 쓰는 자료의 기준시점",
@@ -377,7 +373,7 @@ export const workspaceMessages = {
   "readiness.consentOff": { "ko": "인터넷 사용 안 함", "en": "Internet use off" },
   "readiness.consentUndecided": { "ko": "인터넷 사용 미결정", "en": "Internet use undecided" },
   "readiness.readyNotice": { "ko": "질문을 보내면 연결된 자료에서 근거를 찾고, 가능한 설명과 다음 행동을 함께 정리합니다.", "en": "Send a question and THOTH finds evidence in the connected sources, with possible explanations and next actions." },
-  "workspace.sessionsCount": { "ko": "세션", "en": "Sessions" },
+  "workspace.sessionsCount": { "ko": "대화", "en": "Conversations" },
   "workspace.sourcesCount": { "ko": "자료", "en": "Sources" },
   "workspace.countsLabel": { "ko": "이 프로젝트의 개수", "en": "Counts for this project" },
   "workspace.locationUnsaved": {
@@ -385,8 +381,8 @@ export const workspaceMessages = {
     "en": "Workspace location not saved"
   },
   "workspace.taskSelectionNeeded": {
-    "ko": "저장된 작업 선택 확인 필요",
-    "en": "Check the saved task selection"
+    "ko": "저장된 대화 선택 확인 필요",
+    "en": "Check the saved conversation selection"
   },
   "workspace.projectList": { "ko": "프로젝트 목록", "en": "Project list" },
   "workspace.setupNeededHint": {
@@ -404,14 +400,6 @@ export const workspaceMessages = {
   "workspace.trace": {
     "ko": "추적표",
     "en": "Trace table"
-  },
-  "workspace.chooseTask": {
-    "ko": "현재 작업 선택",
-    "en": "Select current task"
-  },
-  "workspace.untitledTask": {
-    "ko": "제목 없는 작업",
-    "en": "Untitled task"
   },
   "workspace.missingProject": {
     "ko": "저장된 프로젝트를 현재 목록에서 확인하지 못해 선택을 비웠습니다.",
@@ -438,12 +426,12 @@ export const workspaceMessages = {
     "en": "Model connection"
   },
   "workspace.checkingAccess": {
-    "ko": "선택한 작업의 접근 범위를 확인하는 중…",
-    "en": "Checking access to the selected task…"
+    "ko": "선택한 대화의 접근 범위를 확인하는 중…",
+    "en": "Checking access to the selected conversation…"
   },
   "workspace.selectionCheck": {
-    "ko": "저장된 작업 선택을 다시 확인하는 중…",
-    "en": "Checking the saved task selection…"
+    "ko": "저장된 대화 선택을 다시 확인하는 중…",
+    "en": "Checking the saved conversation selection…"
   },
   "workspace.checkAgain": {
     "ko": "다시 확인",

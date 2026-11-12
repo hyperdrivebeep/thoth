@@ -40,12 +40,12 @@ export const researchMessages = {
     "en": "This instruction will be applied after the current investigation finishes"
   },
   "timeline.unavailable": {
-    "ko": "이 작업의 대화 기록을 현재 화면에서 불러올 수 없습니다.",
-    "en": "This task's conversation history is unavailable in the current view."
+    "ko": "이 대화의 기록을 현재 화면에서 불러올 수 없습니다.",
+    "en": "This conversation's history is unavailable in the current view."
   },
   "timeline.recoverAdvice": {
-    "ko": "저장된 연구 이력과 현재 프로젝트 기록을 확인하거나, 같은 작업에서 새 질문을 이어갈 수 있습니다.",
-    "en": "Check saved research history and current project records, or ask a new question in this task."
+    "ko": "저장된 연구 이력과 현재 프로젝트 기록을 확인하거나, 같은 대화에서 새 질문을 이어갈 수 있습니다.",
+    "en": "Check saved research history and current project records, or ask a new question in this conversation."
   },
   "timeline.newQuestion": {
     "ko": "새 질문으로 이어가기",
@@ -283,8 +283,8 @@ export const researchMessages = {
     "en": "There is no saved answer linked to this request yet."
   },
   "progress.current": {
-    "ko": "현재 작업",
-    "en": "Current task"
+    "ko": "현재 조사",
+    "en": "Current research"
   },
   "progress.pause": {
     "ko": "일시정지",
@@ -299,8 +299,8 @@ export const researchMessages = {
     "en": "Request stop"
   },
   "progress.stopConfirm": {
-    "ko": "이 작업을 중단할까요? 이미 진행한 외부 실행의 종료 여부는 별도로 확인됩니다.",
-    "en": "Stop this task? Whether any external execution already started has stopped will be checked separately."
+    "ko": "이 조사를 중단할까요? 이미 진행한 외부 실행의 종료 여부는 별도로 확인됩니다.",
+    "en": "Stop this research? Whether any external execution already started has stopped will be checked separately."
   },
   "progress.unknown": {
     "ko": "미확인",

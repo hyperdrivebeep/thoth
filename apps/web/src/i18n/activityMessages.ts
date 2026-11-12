@@ -276,12 +276,12 @@ export const activityMessages = {
     "en": "Readback or explicit recovery is required instead of repeating execution."
   },
   "activity.stopRequested": {
-    "ko": "현재 연구 작업의 중단을 요청했습니다.",
-    "en": "A stop was requested for the current research task."
+    "ko": "현재 조사의 중단을 요청했습니다.",
+    "en": "A stop was requested for the current research."
   },
   "activity.stopped": {
-    "ko": "연구 작업이 중단됐습니다.",
-    "en": "The research task was interrupted."
+    "ko": "조사가 중단됐습니다.",
+    "en": "The research was interrupted."
   },
   "activity.partialPreserved": {
     "ko": "중단 전까지 확인된 기록만 부분 상태로 유지합니다.",

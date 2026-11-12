@@ -18,7 +18,7 @@ export const sourceJa: ColumnOf<typeof sourceMessages> = {
   "sources.scopeLabel": "資料の利用範囲",
   "sources.chooseScope": "利用範囲を選択",
   "sources.projectShared": "このプロジェクト内で共有",
-  "sources.explicitGrants": "明示的に許可されたタスクのみ",
+  "sources.explicitGrants": "明示的に許可した作業のみ",
   "sources.connectFailed": "資料を接続できませんでした",
   "sources.scopeHelp": "「このプロジェクト内で共有」にすると、このプロジェクトのすべての作業がこの資料を根拠として使えます。「明示的に許可した作業のみ」にすると、個別に許可した作業だけが使えます。",
   "sources.connected": "資料を接続しました。新しい質問または指示で分析を始めてください。",

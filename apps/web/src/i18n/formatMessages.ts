@@ -39,7 +39,7 @@ const formats = {
     en: (ids: string) => `Other projects reference this project, so it cannot be deleted. Referencing projects: ${ids}`, "zh-Hans": (ids: string)=>`其他项目引用了此项目，因此无法删除。引用它的项目：${ids}`, "zh-Hant": (ids: string)=>`其他專案引用了此專案，因此無法刪除。引用它的專案：${ids}`, ja: (ids: string)=>`ほかのプロジェクトがこのプロジェクトを参照しているため、削除できません。参照しているプロジェクト：${ids}`,
   },
   replyFixed: { ko: (language: string) => `답변: ${language} 고정`, en: (language: string) => `Reply: ${language} (fixed)`, "zh-Hans": (language: string)=>`回答：${language}（已固定）`, "zh-Hant": (language: string)=>`回答：${language}（已固定）`, ja: (language: string)=>`回答：${language}（固定）` },
-  missingSelection: { ko: (kind: "project" | "thread") => `저장된 ${kind === "project" ? "프로젝트" : "작업"} 선택 확인 필요`, en: (kind: "project" | "thread") => `Check the saved ${kind === "project" ? "project" : "task"} selection`, "zh-Hans": (kind: "project" | "thread") => `请检查已保存的${kind === "project" ? "项目" : "任务"}选择`, "zh-Hant": (kind: "project" | "thread") => `請檢查已儲存的${kind === "project" ? "專案" : "任務"}選擇`, ja: (kind: "project" | "thread") => `保存済みの${kind === "project" ? "プロジェクト" : "タスク"}の選択を確認してください` },
+  missingSelection: { ko: (kind: "project" | "thread") => `저장된 ${kind === "project" ? "프로젝트" : "대화"} 선택 확인 필요`, en: (kind: "project" | "thread") => `Check the saved ${kind === "project" ? "project" : "conversation"} selection`, "zh-Hans": (kind: "project" | "thread") => `请检查已保存的${kind === "project" ? "项目" : "对话"}选择`, "zh-Hant": (kind: "project" | "thread") => `請檢查已儲存的${kind === "project" ? "專案" : "對話"}選擇`, ja: (kind: "project" | "thread") => `保存済みの${kind === "project" ? "プロジェクト" : "会話"}の選択を確認してください` },
 } as const;
 
 const checkedFormats: { [K in keyof typeof formats]: {

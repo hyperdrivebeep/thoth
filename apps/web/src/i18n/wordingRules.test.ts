@@ -4,8 +4,9 @@ import { join, resolve } from "node:path";
 import { afterEach, expect, it } from "vitest";
 import { activityDisplay } from "./activityDisplay";
 import { connectionReason } from "./connectionReasons";
-import { formatCatalog } from "./formatMessages";
+import { formatCatalog, message } from "./formatMessages";
 import { historyTitle } from "./historyTitle";
+import { localRetrievalReason, localRetrievalReasonMessages } from "./localRetrievalMessages";
 import { setLocale } from "./locale";
 import { messages } from "./messages";
 import { joinSentences, sentenceGap } from "./sentences";
@@ -119,4 +120,73 @@ it("says in every screen language why a key was not saved, without the reason co
   }
   setLocale("ko");
   expect(connectionReason("MODEL_CREDENTIAL_STORE_UNREADABLE")).toContain("새 키를 저장하지 않았습니다");
+});
+
+// One word for the unit a person asks questions in, in every screen language. It used to be a session in the
+// sidebar, a task in the top bar and a conversation in the menu, so the same thing looked like three.
+const LANGUAGES = ["ko", "en", "ja", "zh-Hans", "zh-Hant"] as const;
+const CONVERSATION = { ko: "대화", en: "conversation", ja: "会話", "zh-Hans": "对话", "zh-Hant": "對話" } as const;
+const CONVERSATION_KEYS = [
+  "workspace.newSession", "workspace.loadingSessions", "workspace.untitledSession", "workspace.firstQuestion",
+  "workspace.checkingTask", "workspace.selectedTask", "workspace.sessionsCount", "workspace.taskSelectionNeeded",
+  "workspace.checkingAccess", "workspace.selectionCheck", "workspace.taskUnavailable", "workspace.loadingSaved",
+  "workspace.conversation", "manage.renameThreadTitle", "manage.threadChanged",
+  "model.inheritedUnchanged", "model.inheritsProject", "model.saveThread",
+  "advanced.task", "advanced.threadGroup", "records.chooseTask", "delta.sameScope",
+  "timeline.unavailable", "timeline.recoverAdvice", "historyWorkspace.session",
+] as const;
+// The words it was called before. They stay only where they mean another thing, and each place says which.
+const RETIRED = { ko: /세션/, en: /\b(?:session|task)s?\b/i, ja: /セッション|タスク/, "zh-Hans": /会话|任务/, "zh-Hant": /會話|任務|工作階段/ } as const;
+const ANOTHER_THING: Record<string, string> = {
+  "advanced.fieldHint": "a session of a field study with its participants",
+  RESOURCE_AUTHORITY_CHANGED: "the login session",
+  "sources.explicitGrants": "a line of work that was given a source, which is not a conversation",
+  "sources.scopeHelp": "the same line of work",
+};
+const INDEX_JOB = /^(?:localRetrieval\.|EMBEDDING_)/;
+
+it("calls the unit of questions and answers a conversation in every screen language", () => {
+  const found: string[] = [];
+  for (const key of CONVERSATION_KEYS) {
+    const row = messages[key];
+    for (const language of LANGUAGES) {
+      if (!row[language].toLowerCase().includes(CONVERSATION[language])) found.push(key + " " + language + ": " + row[language]);
+    }
+    // "작업 공간" is the workspace; any other "작업" here would be the old word for a conversation.
+    if (row.ko.replaceAll("작업 공간", "").includes("작업")) found.push(key + " ko: 작업");
+  }
+  for (const language of LANGUAGES) {
+    setLocale(language);
+    for (const text of [message("missingSelection", "thread"), message("threadMenu", "A")]) {
+      if (!text.toLowerCase().includes(CONVERSATION[language])) found.push(language + ": " + text);
+    }
+  }
+  expect(found).toEqual([]);
+});
+
+it("keeps the words a conversation was called before out of every other sentence", () => {
+  // Every sentence of the three word lists, by key and language.
+  const sentences = new Map<string, string[]>();
+  for (const [key, row] of Object.entries(messages)) sentences.set(key, LANGUAGES.map(language => row[language]));
+  for (const [key, row] of Object.entries(formatCatalog)) {
+    sentences.set(key, LANGUAGES.map(language => writtenPart(row[language] as (...values: never[]) => string)));
+  }
+  for (const code of Object.keys(localRetrievalReasonMessages)) sentences.set(code, LANGUAGES.map(language => localRetrievalReason(code, language)));
+  const retired = (texts: string[]) => LANGUAGES.filter((language, index) => RETIRED[language].test(texts[index]));
+  const found: string[] = [];
+  for (const [key, texts] of sentences) {
+    if (key in ANOTHER_THING || INDEX_JOB.test(key)) continue;
+    for (const language of retired(texts)) found.push(key + " " + language);
+  }
+  expect(found).toEqual([]);
+  // Every exception is still in use: a place that stops using the old word leaves the list.
+  for (const key of Object.keys(ANOTHER_THING)) expect(retired(sentences.get(key) ?? []), key).not.toEqual([]);
+});
+
+it("quotes the two choices for who may use a source by the names they have on the form", () => {
+  for (const language of LANGUAGES) {
+    const help = messages["sources.scopeHelp"][language];
+    expect(help, language).toContain(messages["sources.projectShared"][language]);
+    expect(help, language).toContain(messages["sources.explicitGrants"][language]);
+  }
 });

@@ -9,7 +9,7 @@ export const finishingZhHant: ColumnOf<typeof finishingMessages> = {
   "progress.elapsedUnknown": "耗時未知",
   "progress.noFirstByte": "尚未收到首位元組",
   "progress.pausing": "正在完成目前階段後暫停。",
-  "progress.paused": "任務已暫停。",
+  "progress.paused": "研究已暫停。",
   "progress.externalUnknown": "尚未確認外部執行已終止。",
   "usage.none": "此結果沒有使用量記錄",
   "usage.lessMinute": "不到一分鐘",

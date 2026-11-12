@@ -95,6 +95,6 @@ export const researchPanelsZh: ColumnOf<typeof researchPanelsMessages> = {
   "historyWorkspace.testMode": "验证模式：此屏幕使用受控的资料和模型，不会验证真实的研究结果。",
   "historyWorkspace.preserve": "在审查评估变化时，保留原始回答和证据。",
   "historyWorkspace.scope": "历史范围",
-  "historyWorkspace.session": "当前会话",
+  "historyWorkspace.session": "当前对话",
   "historyWorkspace.project": "整个项目",
 };

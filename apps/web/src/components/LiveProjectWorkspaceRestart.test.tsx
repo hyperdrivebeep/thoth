@@ -89,6 +89,8 @@ let root: Root | undefined;
 let container: HTMLDivElement;
 let client: QueryClient;
 const scope = (workspace: "A" | "B") => ({ mode: "LOCAL" as const, workspaceId: ids[workspace] });
+// The two sentences the gate shows while it checks the saved selection.
+const GATE_CHECKING = /저장된 대화 선택을 다시 확인하는 중|선택한 대화의 접근 범위를 확인하는 중/;
 async function settle(check: () => boolean) {
   for (let i = 0; i < 25; i++) {
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 15)); });
@@ -194,7 +196,7 @@ it("keeps the parent as the sole readiness query owner while opening project set
   await act(async () => { container.querySelector<HTMLElement>('[role="tab"][data-tab-id="settings"]')!.click(); });
   await settle(() => Boolean(container.textContent?.includes("모델 기본값")));
   expect(fixture.calls.filter(call => call.method === "workspace/ready")).toHaveLength(readyBefore);
-  expect(container.textContent).not.toContain("저장된 작업의 접근 범위를 다시 확인하는 중");
+  expect(container.textContent).not.toMatch(GATE_CHECKING);
 });
 
 it("settles after project creation followed by an immediate settings visit", async () => {
@@ -213,7 +215,7 @@ it("settles after project creation followed by an immediate settings visit", asy
   await act(async () => { container.querySelector<HTMLElement>('[role="tab"][data-tab-id="settings"]')!.click(); });
   await settle(() => Boolean(container.textContent?.includes("모델 기본값")));
   expect(fixture.calls.filter(call => call.method === "workspace/ready")).toHaveLength(readyBefore);
-  expect(container.textContent).not.toContain("저장된 작업의 접근 범위를 다시 확인하는 중");
+  expect(container.textContent).not.toMatch(GATE_CHECKING);
 });
 
 it("keeps an existing authorized project readable when setup is unfinished, without enabling execution", async () => {
@@ -354,7 +356,7 @@ it("drops a missing thread selection but leaves that thread's draft untouched", 
   fixture.threads = [];
   saveWorkspaceContext("p", "missing-thread", scope("A"));
   writeDraft("p", "missing-thread", "unsent old-thread draft", scope("A"));
-  await mount(); await settle(() => Boolean(container.textContent?.includes("저장된 작업 선택 확인 필요")));
+  await mount(); await settle(() => Boolean(container.textContent?.includes("저장된 대화 선택 확인 필요")));
   expect(readWorkspaceContext(scope("A"))).toEqual({ projectId: "p", threadId: "" });
   expect(readDraft("p", "missing-thread", scope("A"))).toBe("unsent old-thread draft");
   expect(fixture.calls.some(call => call.method === "thread/read" && call.input.thread_id === "missing-thread")).toBe(false);
@@ -537,10 +539,10 @@ it("opens the project at its most recently updated work and shows the project cu
   await settle(() => Boolean(container.textContent?.includes("stored synthetic answer")));
   expect(container.querySelector(".workstation-topbar")?.textContent).toContain("기준시점");
   expect(container.querySelector(".workstation-topbar")?.textContent).toContain("2026");
-  expect(container.textContent).not.toContain("저장된 작업의 접근 범위를 다시 확인하는 중");
+  expect(container.textContent).not.toMatch(GATE_CHECKING);
 });
 
-it("keeps the new-session screen when the user chooses 새 세션 after opening a project", async () => {
+it("keeps the new-session screen when the user chooses 새 대화 after opening a project", async () => {
   fixture.executionReady = true;
   await mount(); await settle(() => Boolean(container.querySelector(".project-button")));
   await act(async () => (container.querySelector(".project-button") as HTMLButtonElement).click());

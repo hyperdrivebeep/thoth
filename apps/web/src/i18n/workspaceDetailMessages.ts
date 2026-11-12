@@ -36,8 +36,8 @@ export const workspaceDetailMessages = {
     "en": "Server readiness could not be checked. Check the connection and try again."
   },
   "workspace.loadingSaved": {
-    "ko": "이 작업 공간의 저장된 작업을 확인하는 중…",
-    "en": "Checking saved tasks in this workspace…"
+    "ko": "이 작업 공간의 저장된 대화를 확인하는 중…",
+    "en": "Checking saved conversations in this workspace…"
   },
   "workspace.checkingProjects": {
     "ko": "읽을 수 있는 프로젝트를 확인하는 중…",
@@ -52,8 +52,8 @@ export const workspaceDetailMessages = {
     "en": "Saved research in this workspace is currently unavailable. Check your access."
   },
   "workspace.taskUnavailable": {
-    "ko": "선택한 작업을 확인하지 못했습니다. 초안은 유지합니다.",
-    "en": "The selected task could not be verified. Your draft is preserved."
+    "ko": "선택한 대화를 확인하지 못했습니다. 초안은 유지합니다.",
+    "en": "The selected conversation could not be verified. Your draft is preserved."
   },
   "workspace.draftNotSent": {
     "ko": "저장된 초안은 자동 제출하지 않습니다.",

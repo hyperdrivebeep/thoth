@@ -372,8 +372,8 @@ export const researchPanelsMessages = {
     "en": "History scope"
   },
   "historyWorkspace.session": {
-    "ko": "현재 세션",
-    "en": "Current session"
+    "ko": "현재 대화",
+    "en": "Current conversation"
   },
   "historyWorkspace.project": {
     "ko": "프로젝트 전체",

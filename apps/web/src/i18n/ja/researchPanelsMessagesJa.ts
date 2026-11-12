@@ -95,6 +95,6 @@ export const researchPanelsJa: ColumnOf<typeof researchPanelsMessages> = {
   "historyWorkspace.testMode": "検証モード：この画面は、制御された資料とモデルを使います。実際の調査結果は検証しません。",
   "historyWorkspace.preserve": "判定の変化を確認するあいだ、元の回答と根拠を保持します。",
   "historyWorkspace.scope": "履歴の範囲",
-  "historyWorkspace.session": "現在のセッション",
+  "historyWorkspace.session": "現在の会話",
   "historyWorkspace.project": "プロジェクト全体",
 };

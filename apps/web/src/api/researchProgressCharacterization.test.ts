@@ -342,7 +342,7 @@ describe("one-line texts", () => {
     expect(lines).toMatchInlineSnapshot(`
       [
         "현재 단계를 마치고 멈추는 중입니다.",
-        "작업이 일시정지되어 있습니다.",
+        "조사가 일시정지되어 있습니다.",
         "외부 실행의 종료 여부를 아직 확인하지 못했습니다.",
         null,
         null,

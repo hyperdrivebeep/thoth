@@ -264,7 +264,7 @@ export function LiveProjectWorkspace() {
         {visibleProjects.filter(item=>`${item.name} ${item.project_id}`.toLowerCase().includes(search.toLowerCase())).flatMap(item=>[
           <ProjectNavItem project={item} active={item.project_id===context.projectId} removing={management.archiving} key={item.project_id} onOpen={drawer.closing(()=>openProject(item.project_id))} onRename={()=>management.askRenameProject(item)} onRemove={()=>management.askArchive(item)}/>,
           item.project_id===context.projectId ? <div className="project-sessions" key={`${item.project_id}-sessions`}>
-            <Button small minimal icon="plus" className="new-session-button" aria-label={t("workspace.newTask")} onClick={drawer.closing(()=>chooseThread(""))}>{t("workspace.newSession")}</Button>
+            <Button small minimal icon="plus" className="new-session-button" onClick={drawer.closing(()=>chooseThread(""))}>{t("workspace.newSession")}</Button>
             {threadsQuery.isPending&&<p className="empty-copy">{t("workspace.loadingSessions")}</p>}
             {threadsQuery.error&&<Callout compact intent="danger" role="alert">{threadsQuery.error.message}</Callout>}
             {visibleThreads.map(thread => (
