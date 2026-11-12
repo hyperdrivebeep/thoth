@@ -225,8 +225,10 @@ class SqliteProjectPurge(ProjectPurgePort):
                 delete(table).where(table.c.project_id == project_id)
             ).rowcount
             self._fault(f"purge:{table.name}")
+        # The table name is a module constant; the project id is a bound parameter.
         deleted += connection.exec_driver_sql(
-            f"DELETE FROM {FULL_TEXT_TABLE} WHERE project_id = ?", (project_id,)
+            f"DELETE FROM {FULL_TEXT_TABLE} WHERE project_id = ?",  # noqa: S608
+            (project_id,),
         ).rowcount
         self._fault(f"purge:{FULL_TEXT_TABLE}")
         return deleted

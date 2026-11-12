@@ -2,9 +2,10 @@ import type { ColumnOf } from "../withColumns";
 import type { reviewPanelsMessages } from "../reviewPanelsMessages";
 
 export const reviewPanelsZh: ColumnOf<typeof reviewPanelsMessages> = {
-  "absence.title": "对\"不存在\"主张的字面检查",
-  "absence.limitation": "只在记录的提取范围内检查了模型声明的字符串。这并不能证明整个资料中不存在，也不能验证含义或事实。",
-  "absence.empty": "没有声明任何需要检查的\"不存在\"主张。这并不表示每一句话都被检查过。",
+  "absence.title": '对"不存在"主张的字面检查',
+  "absence.limitation":
+    "只在记录的提取范围内检查了模型声明的字符串。这并不能证明整个资料中不存在，也不能验证含义或事实。",
+  "absence.empty": '没有声明任何需要检查的"不存在"主张。这并不表示每一句话都被检查过。',
   "absence.inInput": "模型声称不存在的字符串，实际存在于它的输入中",
   "absence.outsideInput": "在模型输入之外的允许材料中找到",
   "absence.inputUnchecked": "在允许材料中找到；模型输入范围未检查",
@@ -16,7 +17,8 @@ export const reviewPanelsZh: ColumnOf<typeof reviewPanelsMessages> = {
   "absence.allowedScope": "调查开始时允许使用的提取材料",
   "absence.notDelivered": "附加的佐证没有传递到下一次模型输入中。",
   "numeric.title": "根据资料中的数字计算出的值",
-  "numeric.limitation": "这不是因果判断，也不是计算复杂度的判定。对印出的数值做算术运算，并不能证明测量有效，也不能证明符合正式标准。显示的值四舍五入到六位小数。",
+  "numeric.limitation":
+    "这不是因果判断，也不是计算复杂度的判定。对印出的数值做算术运算，并不能证明测量有效，也不能证明符合正式标准。显示的值四舍五入到六位小数。",
   "numeric.series": "序列",
   "numeric.interval": "规模区间",
   "numeric.operation": "运算",
@@ -30,7 +32,8 @@ export const reviewPanelsZh: ColumnOf<typeof reviewPanelsMessages> = {
   "numeric.notDelivered": "部分计算记录没有包含在模型输入中。",
   "reviewDialog.required": "请至少选择一个原因。",
   "reviewDialog.title": "请求审查评估",
-  "reviewDialog.notice": "AI 将重新审查证据，并决定保留、更改还是暂缓该评估。仅提出请求不会更改任何评估值。如果研究正在运行，则在这次运行结束后应用。",
+  "reviewDialog.notice":
+    "AI 将重新审查证据，并决定保留、更改还是暂缓该评估。仅提出请求不会更改任何评估值。如果研究正在运行，则在这次运行结束后应用。",
   "reviewDialog.failed": "无法发送审查请求。",
   "reviewDialog.send": "发送审查请求",
   "hypothesisFields.unconfirmed": "原因未确认 — 没有任何假设得到支持；这并不表示不存在原因",
@@ -46,7 +49,8 @@ export const reviewPanelsZh: ColumnOf<typeof reviewPanelsMessages> = {
   "reviewStatus.afterCurrent": "· 在当前调查结束后应用",
   "reviewStatus.request": "请求审查",
   "facts.title": "AI 审查摘要（仅检查了引用位置）",
-  "facts.documentOnly": "· 由 AI 审查员撰写；只检查了所引用的位置，没有检查陈述是否属实，也没有检查标准是否满足",
+  "facts.documentOnly":
+    "· 由 AI 审查员撰写；只检查了所引用的位置，没有检查陈述是否属实，也没有检查标准是否满足",
   "facts.legacy": "这个较早的结果格式没有结构化的 AI 审查摘要。",
   "facts.empty": "没有结构化的 AI 审查摘要",
   "facts.notFound": "AI 已搜索并报告未找到",

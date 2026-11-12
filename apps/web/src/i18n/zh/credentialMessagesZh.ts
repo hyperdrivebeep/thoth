@@ -50,21 +50,29 @@ export const credentialZh: ColumnOf<typeof credentialMessages> = {
   "credential.claudeOauthChoice": "Claude OAuth 是一条独立的途径，只有在明确选择时才会启动。",
   "credential.loginThenRefresh": "请完成登录，然后刷新连接状态。",
   "credential.startNotComplete": "请完成登录，然后刷新连接状态。开始登录并不表示已确认连接。",
-  "credential.checkInstall": "请检查可执行文件和受支持的版本。THOTH 不会自动安装它，也不会更改已有的桌面版凭据。",
+  "credential.checkInstall":
+    "请检查可执行文件和受支持的版本。THOTH 不会自动安装它，也不会更改已有的桌面版凭据。",
   "credential.catalogUnverified": "无法在登录之外单独验证模型列表。",
   "credential.routeUnavailable": "无法验证任何可用的 THOTH 连接途径。",
   "credential.noSelectableRoute": "目前没有可选的模型途径。",
-  "credential.claudeCodeHint": "Claude 登录使用官方 Claude Code，只有在选择时才会启动。API 密钥连接与此无关。",
-  "credential.claudeOauthHint": "Claude Code 的指引与 THOTH 专用的 Claude OAuth 是分开的。OAuth 登录只有在选择时才会启动。",
+  "credential.claudeCodeHint":
+    "Claude 登录使用官方 Claude Code，只有在选择时才会启动。API 密钥连接与此无关。",
+  "credential.claudeOauthHint":
+    "Claude Code 的指引与 THOTH 专用的 Claude OAuth 是分开的。OAuth 登录只有在选择时才会启动。",
   "credential.xaiReady": "xAI 登录已确认。你可以在模型列表中选择 xai-oauth 途径。",
-  "credential.xaiNoRoute": "xAI 登录已确认，但暂时没有可用的模型途径。重新登录之前，请先检查模型列表。",
+  "credential.xaiNoRoute":
+    "xAI 登录已确认，但暂时没有可用的模型途径。重新登录之前，请先检查模型列表。",
   "credential.xaiStart": "为此工作区启动 xAI 设备码登录，或另行登记 API 密钥。",
   "credential.codexReady": "Codex 登录已确认。如果没有模型列表，请先检查模型途径，再重新登录。",
-  "credential.codexStart": "启动 THOTH 专用的 Codex 登录，或登记 API 密钥。开始登录并不表示已完成。",
+  "credential.codexStart":
+    "启动 THOTH 专用的 Codex 登录，或登记 API 密钥。开始登录并不表示已完成。",
   "credential.keyOnly": "不支持账户登录。请获取并登记 API 密钥。",
-  "credential.methodsPending": "与服务器确认登录支持情况之后，才会显示连接方式。你可以另行登记 API 密钥。",
-  "credential.keySaved": "API 密钥已登记在 THOTH 的本地存储中。实际能否使用该模型，会在使用时检查。",
+  "credential.methodsPending":
+    "与服务器确认登录支持情况之后，才会显示连接方式。你可以另行登记 API 密钥。",
+  "credential.keySaved":
+    "API 密钥已登记在 THOTH 的本地存储中。实际能否使用该模型，会在使用时检查。",
   "credential.sameWorkspace": "请检查此服务器所用工作区的 THOTH 专用连接方式。",
-  "credential.obtainKey": "不支持账户登录。请在服务提供商的网站上创建 API 密钥，并登记到 THOTH。仅访问该网站并不表示已建立连接。",
+  "credential.obtainKey":
+    "不支持账户登录。请在服务提供商的网站上创建 API 密钥，并登记到 THOTH。仅访问该网站并不表示已建立连接。",
   "credential.notConfirmed": "无法确认连接。请刷新连接状态。",
 };

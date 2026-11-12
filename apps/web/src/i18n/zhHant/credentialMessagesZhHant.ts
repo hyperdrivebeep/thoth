@@ -50,21 +50,29 @@ export const credentialZhHant: ColumnOf<typeof credentialMessages> = {
   "credential.claudeOauthChoice": "Claude OAuth 是一條獨立的途徑，只有在明確選擇時才會啟動。",
   "credential.loginThenRefresh": "請完成登入，然後重新整理連線狀態。",
   "credential.startNotComplete": "請完成登入，然後重新整理連線狀態。開始登入並不表示已確認連線。",
-  "credential.checkInstall": "請檢查可執行檔案和受支援的版本。THOTH 不會自動安裝它，也不會更改已有的桌面版憑證。",
+  "credential.checkInstall":
+    "請檢查可執行檔案和受支援的版本。THOTH 不會自動安裝它，也不會更改已有的桌面版憑證。",
   "credential.catalogUnverified": "無法在登入之外單獨驗證模型列表。",
   "credential.routeUnavailable": "無法驗證任何可用的 THOTH 連線途徑。",
   "credential.noSelectableRoute": "目前沒有可選的模型途徑。",
-  "credential.claudeCodeHint": "Claude 登入使用官方 Claude Code，只有在選擇時才會啟動。API 金鑰連線與此無關。",
-  "credential.claudeOauthHint": "Claude Code 的指引與 THOTH 專用的 Claude OAuth 是分開的。OAuth 登入只有在選擇時才會啟動。",
+  "credential.claudeCodeHint":
+    "Claude 登入使用官方 Claude Code，只有在選擇時才會啟動。API 金鑰連線與此無關。",
+  "credential.claudeOauthHint":
+    "Claude Code 的指引與 THOTH 專用的 Claude OAuth 是分開的。OAuth 登入只有在選擇時才會啟動。",
   "credential.xaiReady": "xAI 登入已確認。你可以在模型列表中選擇 xai-oauth 途徑。",
-  "credential.xaiNoRoute": "xAI 登入已確認，但暫時沒有可用的模型途徑。重新登入之前，請先檢查模型列表。",
+  "credential.xaiNoRoute":
+    "xAI 登入已確認，但暫時沒有可用的模型途徑。重新登入之前，請先檢查模型列表。",
   "credential.xaiStart": "為此工作區啟動 xAI 裝置碼登入，或另行登記 API 金鑰。",
   "credential.codexReady": "Codex 登入已確認。如果沒有模型列表，請先檢查模型途徑，再重新登入。",
-  "credential.codexStart": "啟動 THOTH 專用的 Codex 登入，或登記 API 金鑰。開始登入並不表示已完成。",
+  "credential.codexStart":
+    "啟動 THOTH 專用的 Codex 登入，或登記 API 金鑰。開始登入並不表示已完成。",
   "credential.keyOnly": "不支援帳戶登入。請獲取並登記 API 金鑰。",
-  "credential.methodsPending": "與伺服器確認登入支援情況之後，才會顯示連線方式。你可以另行登記 API 金鑰。",
-  "credential.keySaved": "API 金鑰已登記在 THOTH 的本地儲存中。實際能否使用該模型，會在使用時檢查。",
+  "credential.methodsPending":
+    "與伺服器確認登入支援情況之後，才會顯示連線方式。你可以另行登記 API 金鑰。",
+  "credential.keySaved":
+    "API 金鑰已登記在 THOTH 的本地儲存中。實際能否使用該模型，會在使用時檢查。",
   "credential.sameWorkspace": "請檢查此伺服器所用工作區的 THOTH 專用連線方式。",
-  "credential.obtainKey": "不支援帳戶登入。請在服務提供商的網站上建立 API 金鑰，並登記到 THOTH。僅造訪該網站並不表示已建立連線。",
+  "credential.obtainKey":
+    "不支援帳戶登入。請在服務提供商的網站上建立 API 金鑰，並登記到 THOTH。僅造訪該網站並不表示已建立連線。",
   "credential.notConfirmed": "無法確認連線。請重新整理連線狀態。",
 };

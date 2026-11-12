@@ -40,7 +40,8 @@ export const advancedZhHant: ColumnOf<typeof advancedMessages> = {
   "advanced.examplesNotice": "檢視範例並不會執行它們。這與正常的研究流程是分開的。",
   "advanced.field": "現場評估",
   "advanced.fieldHint": "方案 · 參與者會話 · 評分 · 保護隱私的匯出",
-  "advanced.fieldNotice": "公開的現場名稱空間目前只提供命令，沒有隻讀查詢 API，本介面也不能證明參與者評估、節省的時間或付費意願。只有在獲得批准的方案和參與者同意的情況下，才能使用進階命令。",
+  "advanced.fieldNotice":
+    "公開的現場名稱空間目前只提供命令，沒有隻讀查詢 API，本介面也不能證明參與者評估、節省的時間或付費意願。只有在獲得批准的方案和參與者同意的情況下，才能使用進階命令。",
   "advanced.projectGroup": "專案、資料與存取",
   "advanced.threadGroup": "對話與請求",
   "advanced.discoveryGroup": "資料發現",
@@ -62,12 +63,15 @@ export const advancedZhHant: ColumnOf<typeof advancedMessages> = {
   "advanced.command": "進階命令 · 明確執行",
   "advanced.query": "唯讀查詢",
   "advanced.journaledQuery": "記入日誌的查詢",
-  "advanced.commandNotice": "這可能會更改規範資料、呼叫模型或外部服務，或產生費用。請仔細核對下面的具體輸入。伺服器的授權、預算和時效性檢查仍然適用。",
+  "advanced.commandNotice":
+    "這可能會更改規範資料、呼叫模型或外部服務，或產生費用。請仔細核對下面的具體輸入。伺服器的授權、預算和時效性檢查仍然適用。",
   "advanced.queryNotice": "使用伺服器的唯讀允許列表。僅讀取不會產生操作或回執。",
-  "advanced.journalNotice": "此查詢不在唯讀允許列表中。透過 /rpc 明確執行可能會記錄操作和日誌。僅瀏覽不會執行它。",
+  "advanced.journalNotice":
+    "此查詢不在唯讀允許列表中。透過 /rpc 明確執行可能會記錄操作和日誌。僅瀏覽不會執行它。",
   "advanced.input": "輸入 JSON",
   "advanced.inputHint": "只會注入 project_id。請按契約提供所需的 ID、摘要和 DTO。",
-  "advanced.coverageNotice": "這是技術性的 RPC 入口。目錄中有條目或狀態為 IMPLEMENTED，並不能證明每條路徑都已透過介面或實時驗證。",
+  "advanced.coverageNotice":
+    "這是技術性的 RPC 入口。目錄中有條目或狀態為 IMPLEMENTED，並不能證明每條路徑都已透過介面或實時驗證。",
   "advanced.confirm": "我已審閱此方法和輸入可能造成的資料更改及外部影響。",
   "advanced.runCommand": "執行已審閱的命令",
   "advanced.runQuery": "執行此查詢",

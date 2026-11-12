@@ -10,5 +10,7 @@ export function answerTopLayerSelectorsWithNo(): () => void {
   Element.prototype.matches = function (this: Element, selectors: string): boolean {
     return TOP_LAYER_SELECTORS.has(selectors) ? false : real.call(this, selectors);
   };
-  return () => { Element.prototype.matches = real; };
+  return () => {
+    Element.prototype.matches = real;
+  };
 }

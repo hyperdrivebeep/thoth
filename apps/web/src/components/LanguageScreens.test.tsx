@@ -32,27 +32,43 @@ it("changes expected-result labels but preserves source prose, row states and or
   const result = structuredClone(excerpt) as unknown as Record<string, unknown>;
   const rows = hypothesisRows(result);
   rows[0].statement = "한글 사용자 가설";
-  const test = {expected_by_hypothesis: [
-    {hypothesis_id:rows[0].id,knowledge_state:"PREDICTED",expected:"원문 값",basis:[]},
-    {hypothesis_id:rows[1].id,knowledge_state:"UNKNOWN",expected:null,basis:["span:source"]},
-    {hypothesis_id:rows[2].id,knowledge_state:"PREDICTED",expected:"stays same",basis:[]},
-  ]};
-  rows.forEach(row => { row.tests = []; });
-  rows[0].tests = [{...test, test_id:"typed", estimated_cost:"1", reversibility:"FULL"}];
-  const original = JSON.stringify({result, test});
+  const test = {
+    expected_by_hypothesis: [
+      { hypothesis_id: rows[0].id, knowledge_state: "PREDICTED", expected: "원문 값", basis: [] },
+      {
+        hypothesis_id: rows[1].id,
+        knowledge_state: "UNKNOWN",
+        expected: null,
+        basis: ["span:source"],
+      },
+      {
+        hypothesis_id: rows[2].id,
+        knowledge_state: "PREDICTED",
+        expected: "stays same",
+        basis: [],
+      },
+    ],
+  };
+  rows.forEach((row) => {
+    row.tests = [];
+  });
+  rows[0].tests = [{ ...test, test_id: "typed", estimated_cost: "1", reversibility: "FULL" }];
+  const original = JSON.stringify({ result, test });
   setLocale("ko");
   const before = rankItems(testOrderInput(rows, [], undefined).input);
   expect(before.groups[0].items[0].worst).toBe(2);
-  expect(renderToStaticMarkup(<ExpectedResults test={test} rows={rows}/>)).toContain("모름");
+  expect(renderToStaticMarkup(<ExpectedResults test={test} rows={rows} />)).toContain("모름");
   setLocale("en");
-  const html = renderToStaticMarkup(<ExpectedResults test={test} rows={rows}/>);
+  const html = renderToStaticMarkup(<ExpectedResults test={test} rows={rows} />);
   expect(html).toContain("Unknown");
   expect(html).toContain("Expected results for each hypothesis");
   expect(html).toContain("원문 값");
   expect(html).toContain("한글 사용자 가설");
   expect(rankItems(testOrderInput(rows, [], undefined).input)).toEqual(before);
-  expect(JSON.stringify({result, test})).toBe(original);
-  expect(renderToStaticMarkup(<HypothesisCompare result={result}/>)).toContain("Discriminating tests");
+  expect(JSON.stringify({ result, test })).toBe(original);
+  expect(renderToStaticMarkup(<HypothesisCompare result={result} />)).toContain(
+    "Discriminating tests",
+  );
 });
 
 it("keeps verdict meaning and generated request language independent of display locale", () => {
@@ -72,7 +88,9 @@ it("keeps verdict meaning and generated request language independent of display 
       expect(JSON.stringify(next)).not.toMatch(/[가-힣]/);
       expect(investigationFor("p", kind, verdict, view, "ko")?.question).toBe(question);
       for (const code of verdict.reasons.computed) {
-        expect(reasonSentence(code, id => id, verdict.conditions.condition)).not.toMatch(/[가-힣]/);
+        expect(reasonSentence(code, (id) => id, verdict.conditions.condition)).not.toMatch(
+          /[가-힣]/,
+        );
       }
       setLocale("zh-Hans");
       const chinese = verdictLook(kind, verdict.state);
@@ -83,7 +101,9 @@ it("keeps verdict meaning and generated request language independent of display 
       expect(JSON.stringify(nextStep(kind, verdict.state, true))).not.toMatch(/[가-힣]/);
       expect(investigationFor("p", kind, verdict, view, "ko")?.question).toBe(question);
       for (const code of verdict.reasons.computed) {
-        expect(reasonSentence(code, id => id, verdict.conditions.condition)).not.toMatch(/[가-힣]/);
+        expect(reasonSentence(code, (id) => id, verdict.conditions.condition)).not.toMatch(
+          /[가-힣]/,
+        );
       }
       setLocale("ja");
       const japanese = verdictLook(kind, verdict.state);
@@ -94,7 +114,9 @@ it("keeps verdict meaning and generated request language independent of display 
       expect(JSON.stringify(nextStep(kind, verdict.state, true))).not.toMatch(/[가-힣]/);
       expect(investigationFor("p", kind, verdict, view, "ko")?.question).toBe(question);
       for (const code of verdict.reasons.computed) {
-        expect(reasonSentence(code, id => id, verdict.conditions.condition)).not.toMatch(/[가-힣]/);
+        expect(reasonSentence(code, (id) => id, verdict.conditions.condition)).not.toMatch(
+          /[가-힣]/,
+        );
       }
     }
   }

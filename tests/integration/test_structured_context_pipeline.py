@@ -230,8 +230,7 @@ async def test_multi_provenance_source_connect_context_and_detach(tmp_path: Path
             "second located PDF segment",
         ]
         located_ranges = [
-            (node.locator.page, node.locator.char_start, node.locator.char_end)
-            for node in material
+            (node.locator.page, node.locator.char_start, node.locator.char_end) for node in material
         ]
         assert located_ranges == [
             (1, 0, 25),

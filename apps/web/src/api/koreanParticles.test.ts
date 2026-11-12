@@ -13,9 +13,12 @@ describe("finalHasBatchim", () => {
 
   it("reads a digit by how it is spoken", () => {
     const spoken = [true, true, false, true, false, false, true, true, true, false];
-    spoken.forEach((expected, digit) => expect(finalHasBatchim(String(digit)), String(digit)).toBe(expected));
+    spoken.forEach((expected, digit) =>
+      expect(finalHasBatchim(String(digit)), String(digit)).toBe(expected),
+    );
     // 십, 백, 천 and 만 all carry a final consonant, and so does 영.
-    for (const value of ["10", "100", "1000", "10000"]) expect(finalHasBatchim(value), value).toBe(true);
+    for (const value of ["10", "100", "1000", "10000"])
+      expect(finalHasBatchim(value), value).toBe(true);
     expect(finalHasBatchim("12")).toBe(false);
     expect(finalHasBatchim("A3")).toBe(true);
     expect(finalHasBatchim("p.6")).toBe(true);
@@ -23,8 +26,32 @@ describe("finalHasBatchim", () => {
   });
 
   it("reads a Latin letter by its name and ignores case", () => {
-    for (const letter of ["l", "m", "n", "r", "L", "M", "N", "R"]) expect(finalHasBatchim(letter), letter).toBe(true);
-    for (const letter of ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "o", "p", "q", "s", "t", "u", "v", "w", "x", "y", "z"]) {
+    for (const letter of ["l", "m", "n", "r", "L", "M", "N", "R"])
+      expect(finalHasBatchim(letter), letter).toBe(true);
+    for (const letter of [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+      "g",
+      "h",
+      "i",
+      "j",
+      "k",
+      "o",
+      "p",
+      "q",
+      "s",
+      "t",
+      "u",
+      "v",
+      "w",
+      "x",
+      "y",
+      "z",
+    ]) {
       expect(finalHasBatchim(letter), letter).toBe(false);
       expect(finalHasBatchim(letter.toUpperCase()), letter.toUpperCase()).toBe(false);
     }

@@ -6,8 +6,8 @@ const UNKNOWN_KEY = "parserError.unknown" satisfies MessageKey;
 
 /** The parser reason codes the screen has a sentence for. */
 export const PARSER_ERROR_CODES: readonly string[] = Object.keys(messages)
-  .filter(key => key.startsWith(PREFIX) && key !== UNKNOWN_KEY)
-  .map(key => key.slice(PREFIX.length));
+  .filter((key) => key.startsWith(PREFIX) && key !== UNKNOWN_KEY)
+  .map((key) => key.slice(PREFIX.length));
 
 export type ParserFailureText = { code: string; text: string };
 
@@ -15,7 +15,13 @@ export type ParserFailureText = { code: string; text: string };
  *  the general sentence; the code itself stays available for the technical details. */
 export function parserFailureText(error: unknown): ParserFailureText | null {
   const details = (error as { details?: unknown } | null)?.details;
-  const code = details && typeof details === "object" ? (details as Record<string, unknown>).parser_error : undefined;
+  const code =
+    details && typeof details === "object"
+      ? (details as Record<string, unknown>).parser_error
+      : undefined;
   if (typeof code !== "string" || code === "") return null;
-  return { code, text: t(PARSER_ERROR_CODES.includes(code) ? PREFIX + code as MessageKey : UNKNOWN_KEY) };
+  return {
+    code,
+    text: t(PARSER_ERROR_CODES.includes(code) ? ((PREFIX + code) as MessageKey) : UNKNOWN_KEY),
+  };
 }

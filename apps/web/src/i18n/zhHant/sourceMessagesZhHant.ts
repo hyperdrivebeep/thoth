@@ -2,11 +2,13 @@ import type { ColumnOf } from "../withColumns";
 import type { sourceMessages } from "../sourceMessages";
 
 export const sourceZhHant: ColumnOf<typeof sourceMessages> = {
-  "sources.fileUploadStalled": "兩分鐘內沒有傳送任何資料，因此上傳已停止。請檢查連線後重試。沒有連線任何資料。",
+  "sources.fileUploadStalled":
+    "兩分鐘內沒有傳送任何資料，因此上傳已停止。請檢查連線後重試。沒有連線任何資料。",
   "sources.fileUploadCancel": "取消上傳",
   "sources.fileUploadCancelled": "上傳已取消。沒有連線任何資料。",
   "sources.fileTitle": "連線資料檔案",
-  "sources.fileTypes": "上傳 HWPX、PDF、DOCX、XLSX、CSV、JSON、MD、TXT、YAML 或 HTML 檔案，並記錄其權威性和使用範圍。",
+  "sources.fileTypes":
+    "上傳 HWPX、PDF、DOCX、XLSX、CSV、JSON、MD、TXT、YAML 或 HTML 檔案，並記錄其權威性和使用範圍。",
   "sources.hostedUpload": "上傳的檔案用於此審查專案。",
   "sources.localUpload": "檔案暫存在這臺電腦的 THOTH 工作區中。",
   "sources.chooseFiles": "選擇檔案…",
@@ -19,7 +21,8 @@ export const sourceZhHant: ColumnOf<typeof sourceMessages> = {
   "sources.projectShared": "在本專案內共享",
   "sources.explicitGrants": "僅限明確許可的任務",
   "sources.connectFailed": "未能連線資料",
-  "sources.scopeHelp": "「在本專案內共享」讓本專案的所有任務都能把這份資料用作證據。「僅限明確許可的任務」原本只讓個別獲得許可的任務使用，但目前還沒有為任務授予許可的畫面。現在無論選哪一項，本專案的研究都能讀取這份資料，所選範圍只會留在資料的記錄裡。通常請選擇「在本專案內共享」。",
+  "sources.scopeHelp":
+    "「在本專案內共享」讓本專案的所有任務都能把這份資料用作證據。「僅限明確許可的任務」原本只讓個別獲得許可的任務使用，但目前還沒有為任務授予許可的畫面。現在無論選哪一項，本專案的研究都能讀取這份資料，所選範圍只會留在資料的記錄裡。通常請選擇「在本專案內共享」。",
   "sources.connected": "資料已連線。請用新的問題或指示開始分析。",
   "sources.unclassified": "權威性未分類",
   "sources.informal": "非正式參考",
@@ -35,7 +38,8 @@ export const sourceZhHant: ColumnOf<typeof sourceMessages> = {
   "web.denied": "拒絕",
   "web.lookup": "公共網路檢索",
   "web.undecided": "尚未選擇",
-  "web.consentScope": "允許：在已連線檔案之後，研究只能使用專案中登記的網站。這不會開始搜尋。拒絕：停用網路檢索；模型呼叫繼續。",
+  "web.consentScope":
+    "允許：在已連線檔案之後，研究只能使用專案中登記的網站。這不會開始搜尋。拒絕：停用網路檢索；模型呼叫繼續。",
   "web.permittedSources": "允許使用的公共網路資料",
   "web.registerFirst": "請先登記允許的域名。儲存或啟用它們並不會開始搜尋。",
   "web.allowInSettings": "在設定中允許",
@@ -74,7 +78,8 @@ export const sourceZhHant: ColumnOf<typeof sourceMessages> = {
   "archive.deleteNotFound": "未找到該專案。它可能已被刪除，因此正在重新整理列表。",
   "archive.deleteFailed": "無法永久刪除該專案。請重試。",
   "credential.connections": "帳戶連線",
-  "credential.registrationNotice": "開始受支援的帳戶登入，或登記 API 金鑰。僅造訪金鑰控制台並不會連線 THOTH。",
+  "credential.registrationNotice":
+    "開始受支援的帳戶登入，或登記 API 金鑰。僅造訪金鑰控制台並不會連線 THOTH。",
   "credential.methodsFailed": "無法檢查連線方式。請重試。",
   "setupIssue.corrupt": "已有的工作區設定檔案已損壞。不會把它當作新的設定，也不會覆蓋它。",
   "setupIssue.unreadable": "無法讀取工作區設定檔案。在檢查檔案存取權限之前，不會儲存新的設定。",

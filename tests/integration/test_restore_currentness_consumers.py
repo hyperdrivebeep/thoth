@@ -118,7 +118,11 @@ async def test_restored_basis_blocks_action_preflight_and_new_execution(
         assert generator_calls
         context = generator_calls[-1].context_pack
         assert (
-            _record(_record(context.research_context["entity_currentness"])[f"HYPOTHESIS:{revision.entity_id}"])["state"]
+            _record(
+                _record(context.research_context["entity_currentness"])[
+                    f"HYPOTHESIS:{revision.entity_id}"
+                ]
+            )["state"]
             == "REVIEW_REQUIRED"
         )
         candidate = next(

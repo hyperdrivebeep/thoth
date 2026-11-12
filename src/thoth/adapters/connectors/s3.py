@@ -98,9 +98,7 @@ class S3ReadConnector:
                 fields=(
                     SelectorFieldSpec(name="bucket", value_type="STRING"),
                     SelectorFieldSpec(name="key", value_type="STRING"),
-                    SelectorFieldSpec(
-                        name="version_id", value_type="STRING", required=False
-                    ),
+                    SelectorFieldSpec(name="version_id", value_type="STRING", required=False),
                 ),
             ),
         )

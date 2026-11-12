@@ -8,9 +8,21 @@ afterEach(() => setLocale("ko"));
 
 const held = { ...excerpt, answer_status: "PARTIAL_HOLD" } as Record<string, unknown>;
 const spanA = (excerpt.answer.match(/span:[0-9A-Za-z][0-9A-Za-z_-]*/) ?? [""])[0];
-const render = (result: Record<string, unknown>) => renderToStaticMarkup(<ResearchResultCard state="SUCCEEDED" result={result} onDetail={() => {}}/>);
-const withFindings = (findings: unknown, extra: Record<string, unknown> = {}) => ({ ...held, confirmed_findings: findings, ...extra });
-const fact = (statement: string, refs: string[], kind = "DOCUMENT_FACT") => ({ statement, evidence_refs: refs, requirement_id: null, kind });
+const render = (result: Record<string, unknown>) =>
+  renderToStaticMarkup(
+    <ResearchResultCard state="SUCCEEDED" result={result} onDetail={() => {}} />,
+  );
+const withFindings = (findings: unknown, extra: Record<string, unknown> = {}) => ({
+  ...held,
+  confirmed_findings: findings,
+  ...extra,
+});
+const fact = (statement: string, refs: string[], kind = "DOCUMENT_FACT") => ({
+  statement,
+  evidence_refs: refs,
+  requirement_id: null,
+  kind,
+});
 
 it("says the result predates confirmed facts instead of pulling facts out of the answer text", () => {
   expect(held.answer).toContain("FACT");
@@ -21,10 +33,16 @@ it("says the result predates confirmed facts instead of pulling facts out of the
 
 it("lists the stored facts with their source numbers and marks a valid negative finding", () => {
   expect(spanA).not.toBe("");
-  const html = render(withFindings([
-    fact("RFP p.36에 1세부 과제명이 적혀 있다", [spanA]),
-    fact("1세부 발췌에서 센서 조합의 필수 지정을 찾아봤지만 없다", [spanA, "span:not-cited-in-answer"], "VALID_NEGATIVE_FINDING"),
-  ]));
+  const html = render(
+    withFindings([
+      fact("RFP p.36에 1세부 과제명이 적혀 있다", [spanA]),
+      fact(
+        "1세부 발췌에서 센서 조합의 필수 지정을 찾아봤지만 없다",
+        [spanA, "span:not-cited-in-answer"],
+        "VALID_NEGATIVE_FINDING",
+      ),
+    ]),
+  );
   expect(html).toContain("RFP p.36에 1세부 과제명이 적혀 있다");
   expect(html).toContain("AI가 찾아봤지만 없다고 함");
   expect(html).toMatch(/RFP p\.36에 1세부 과제명이 적혀 있다[\s\S]{0,300}\[1\]/);
@@ -40,7 +58,9 @@ it("keeps facts visible on a held answer, below the status tag at the head of th
   expect(html.indexOf("판단 보류")).toBeGreaterThan(-1);
   expect(html.indexOf("판단 보류")).toBeLessThan(html.indexOf("AI 검토 요약(인용 위치만 확인)"));
   expect(html).not.toContain("결론 상태");
-  expect(html.indexOf("AI 검토 요약(인용 위치만 확인)")).toBeLessThan(html.indexOf("문서에 적힌 사실"));
+  expect(html.indexOf("AI 검토 요약(인용 위치만 확인)")).toBeLessThan(
+    html.indexOf("문서에 적힌 사실"),
+  );
   expect(at("문서에 적힌 사실")).toBeGreaterThan(-1);
 });
 
@@ -52,7 +72,13 @@ it("tells an empty list apart from an old result, and reports dropped findings w
 });
 
 it("ignores a stored entry that has no source or an unknown kind rather than showing it", () => {
-  const html = render(withFindings([fact("근거 없는 문장", []), fact("종류를 모르는 문장", [spanA], "SOMETHING"), fact("정상 문장", [spanA])]));
+  const html = render(
+    withFindings([
+      fact("근거 없는 문장", []),
+      fact("종류를 모르는 문장", [spanA], "SOMETHING"),
+      fact("정상 문장", [spanA]),
+    ]),
+  );
   expect(html).toContain("정상 문장");
   expect(html).not.toContain("근거 없는 문장");
   expect(html).not.toContain("종류를 모르는 문장");
@@ -60,10 +86,13 @@ it("ignores a stored entry that has no source or an unknown kind rather than sho
 
 it("does not turn a stored fact into a claim that criteria are fulfilled", () => {
   const html = render(withFindings([fact("문서에 적힌 사실", [spanA])]));
-  expect(html).toContain("인용한 위치만 확인했고, 내용이 사실인지와 기준 충족은 확인하지 않았습니다");
+  expect(html).toContain(
+    "인용한 위치만 확인했고, 내용이 사실인지와 기준 충족은 확인하지 않았습니다",
+  );
 });
 
-const card = (html: string) => html.match(/<section class="confirmed-facts"[\s\S]*?<\/section>/)?.[0] ?? "";
+const card = (html: string) =>
+  html.match(/<section class="confirmed-facts"[\s\S]*?<\/section>/)?.[0] ?? "";
 
 it("labels stored findings as an AI summary in both languages, for old and new results alike, with no verified wording", () => {
   const results = [held, withFindings([fact("문서에 적힌 사실", [spanA])]), withFindings([])];

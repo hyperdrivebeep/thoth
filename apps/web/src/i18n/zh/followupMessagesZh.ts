@@ -55,13 +55,16 @@ export const followupZh: ColumnOf<typeof followupMessages> = {
   "hold.notRun": "该测试被搁置，没有运行。",
   "hold.notRunNotice": "这一次没有运行沙箱测试。原因请见技术详情。",
   "hold.notRepeated": "该测试没有重复运行。",
-  "hold.notRepeatedNotice": "该测试此前已运行，但其结果尚未确定，为避免重复同样的工作，没有再次运行。",
+  "hold.notRepeatedNotice":
+    "该测试此前已运行，但其结果尚未确定，为避免重复同样的工作，没有再次运行。",
   "hold.cleared": "该次尝试已清除。再次发送同一个问题即可开始新的运行。",
   "hold.draftReady": "问题已放入输入框。",
-  "hold.choice": "你可以带上记录的原因清除上一次尝试，然后发送同一个问题开始一次新的运行。之前的执行记录和结果记录会保留。",
+  "hold.choice":
+    "你可以带上记录的原因清除上一次尝试，然后发送同一个问题开始一次新的运行。之前的执行记录和结果记录会保留。",
   "hold.clearAndRerun": "开始新的运行前先清除该次尝试",
   "hold.notImmediate": " 这不会立即执行。清除之后，请自行发送问题来开始。",
-  "hold.clearNotice": "清除之前测试尚未确定的结果。谁在何时因何原因清除会被记录；之前的执行和结果保持完整。",
+  "hold.clearNotice":
+    "清除之前测试尚未确定的结果。谁在何时因何原因清除会被记录；之前的执行和结果保持完整。",
   "hold.reasonLabel": "清除原因",
   "hold.reasonRequired": "清除原因（必填）",
   "hold.reasonExample": "例如：在有意更改输入文件后重新运行",

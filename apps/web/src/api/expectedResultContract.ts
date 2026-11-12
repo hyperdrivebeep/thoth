@@ -5,5 +5,7 @@ export function expectedResultContract(ready: unknown): "v4" | "v5" | undefined 
     if (ready.expected_result_contracts.includes("v5")) return "v5";
     return ready.expected_result_contracts.includes("v4") ? "v4" : undefined;
   }
-  return "response_language_scope" in ready && ready.response_language_scope === "REQUEST" ? "v4" : undefined;
+  return "response_language_scope" in ready && ready.response_language_scope === "REQUEST"
+    ? "v4"
+    : undefined;
 }

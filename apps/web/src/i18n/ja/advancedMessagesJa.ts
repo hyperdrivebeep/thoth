@@ -39,8 +39,10 @@ export const advancedJa: ColumnOf<typeof advancedMessages> = {
   "advanced.examplesHint": "登録済みの ProjectPack · スクリプト実行と実運用の区別",
   "advanced.examplesNotice": "例を読んでも実行されません。通常の調査の流れとは別です。",
   "advanced.field": "現場評価",
-  "advanced.fieldHint": "プロトコル · 参加者のセッション · スコア · プライバシーに配慮したエクスポート",
-  "advanced.fieldNotice": "公開されている現場の名前空間は、現在コマンドだけを提供しています。読み取り専用の照会 API はなく、この画面では参加者の評価、時間の節約、支払い意欲を確かめることはできません。上級者向けのコマンドは、承認されたプロトコルと参加者の同意がある場合にのみ使ってください。",
+  "advanced.fieldHint":
+    "プロトコル · 参加者のセッション · スコア · プライバシーに配慮したエクスポート",
+  "advanced.fieldNotice":
+    "公開されている現場の名前空間は、現在コマンドだけを提供しています。読み取り専用の照会 API はなく、この画面では参加者の評価、時間の節約、支払い意欲を確かめることはできません。上級者向けのコマンドは、承認されたプロトコルと参加者の同意がある場合にのみ使ってください。",
   "advanced.projectGroup": "プロジェクト、資料、アクセス",
   "advanced.threadGroup": "会話とリクエスト",
   "advanced.discoveryGroup": "資料の探索",
@@ -62,12 +64,17 @@ export const advancedJa: ColumnOf<typeof advancedMessages> = {
   "advanced.command": "上級者向けコマンド · 明示的な実行",
   "advanced.query": "読み取り専用の照会",
   "advanced.journaledQuery": "ジャーナルに記録される照会",
-  "advanced.commandNotice": "正式なデータの変更、モデルや外部サービスの呼び出し、費用の発生が起こりうります。下の入力内容をよく確認してください。サーバーの認可、予算、最新性のチェックは引き続き適用されます。",
-  "advanced.queryNotice": "サーバーの読み取り専用の許可リストを使います。読むだけでは、操作もレシートも作られません。",
-  "advanced.journalNotice": "この照会は読み取り専用の許可リストにありません。/rpc で明示的に実行すると、操作とジャーナルが記録されることがあります。閲覧するだけでは実行されません。",
+  "advanced.commandNotice":
+    "正式なデータの変更、モデルや外部サービスの呼び出し、費用の発生が起こりうります。下の入力内容をよく確認してください。サーバーの認可、予算、最新性のチェックは引き続き適用されます。",
+  "advanced.queryNotice":
+    "サーバーの読み取り専用の許可リストを使います。読むだけでは、操作もレシートも作られません。",
+  "advanced.journalNotice":
+    "この照会は読み取り専用の許可リストにありません。/rpc で明示的に実行すると、操作とジャーナルが記録されることがあります。閲覧するだけでは実行されません。",
   "advanced.input": "入力 JSON",
-  "advanced.inputHint": "注入されるのは project_id だけです。必要な ID、ダイジェスト、DTO は契約に従って指定してください。",
-  "advanced.coverageNotice": "これは技術的な RPC の入口です。カタログに載っていること、または IMPLEMENTED という状態は、すべての経路が画面や実運用で検証されたことを意味しません。",
+  "advanced.inputHint":
+    "注入されるのは project_id だけです。必要な ID、ダイジェスト、DTO は契約に従って指定してください。",
+  "advanced.coverageNotice":
+    "これは技術的な RPC の入口です。カタログに載っていること、または IMPLEMENTED という状態は、すべての経路が画面や実運用で検証されたことを意味しません。",
   "advanced.confirm": "このメソッドと入力で起こりうるデータの変更と外部への影響を確認しました。",
   "advanced.runCommand": "確認済みのコマンドを実行",
   "advanced.runQuery": "この照会を実行",
@@ -77,7 +84,8 @@ export const advancedJa: ColumnOf<typeof advancedMessages> = {
   "advanced.response": "サーバーの応答",
   "advanced.notCompletion": "· 受理や実行の状態は、業務上の完了とは別です。",
   "advanced.title": "機能ブラウザと上級者向けの制御",
-  "advanced.intro": "公開されている契約を一か所にまとめています。専用の調査の流れと技術的な RPC は分けて扱います。",
+  "advanced.intro":
+    "公開されている契約を一か所にまとめています。専用の調査の流れと技術的な RPC は分けて扱います。",
   "advanced.search": "機能を検索",
   "advanced.searchPlaceholder": "メソッド、所有者、ポリシーを検索…",
   "advanced.namespace": "機能の名前空間",
@@ -93,7 +101,8 @@ export const advancedJa: ColumnOf<typeof advancedMessages> = {
   "records.load": "記録を読み込む",
   "records.controls": "この領域の詳細な照会と上級者向けの制御",
   "records.readOnly": "これは読み取り専用の照会です。",
-  "records.journaled": "これはジャーナルに記録される /rpc の照会です。このボタンを押したときにだけ、操作やジャーナルが作られることがあります。",
+  "records.journaled":
+    "これはジャーナルに記録される /rpc の照会です。このボタンを押したときにだけ、操作やジャーナルが作られることがあります。",
   "records.chooseTask": "先に会話を選んでください。",
   "records.failed": "読み取りに失敗したか、必要な範囲がありません",
   "records.moreInputs": "追加の ID や範囲が必要な契約は、機能の入力エディターから照会できます。",

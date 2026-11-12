@@ -56,9 +56,7 @@ export function ResearchSidePanel({
       <div className="detail-scroll">
         {tab === "files" && (
           <>
-            {sources.length === 0 && (
-              <p className="muted">{t("sidePanel.noSources")}</p>
-            )}
+            {sources.length === 0 && <p className="muted">{t("sidePanel.noSources")}</p>}
             {sources.map((artifact) => (
               <article className="detail-card" key={artifact.artifact_id}>
                 <h3>
@@ -70,17 +68,29 @@ export function ResearchSidePanel({
                     sourceCardTitle(artifact.source_uri)
                   )}
                 </h3>
-                {sourceCardHost(artifact.source_uri) ? <p>{sourceCardHost(artifact.source_uri)}</p> : null}
+                {sourceCardHost(artifact.source_uri) ? (
+                  <p>{sourceCardHost(artifact.source_uri)}</p>
+                ) : null}
                 <p>{artifact.media_type}</p>
               </article>
             ))}
-            <Button minimal icon="folder-open" text={t("sidePanel.manage")} onClick={onManageResources}/>
+            <Button
+              minimal
+              icon="folder-open"
+              text={t("sidePanel.manage")}
+              onClick={onManageResources}
+            />
           </>
         )}
         {tab === "history" && (
           <>
             <p className="muted">{t("sidePanel.historyNotice")}</p>
-            <Button minimal icon="history" text={t("sidePanel.openHistory")} onClick={onOpenRecords} />
+            <Button
+              minimal
+              icon="history"
+              text={t("sidePanel.openHistory")}
+              onClick={onOpenRecords}
+            />
           </>
         )}
       </div>

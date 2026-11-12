@@ -39,25 +39,43 @@ export function selectedEvidence(result: Record<string, unknown>): string[] | nu
 export function hypothesisRows(result: Record<string, unknown>): HypothesisRow[] {
   const selected = selectedEvidence(result);
   const reviews = reviewDecisions(result);
-  return objectList(objectValue(result.portfolio).hypotheses).map(h => {
+  return objectList(objectValue(result.portfolio).hypotheses).map((h) => {
     // The server records support as evidence_refs; older results used support_evidence_refs.
-    const support = unique([...stringValues(h.evidence_refs), ...stringValues(h.support_evidence_refs)]);
+    const support = unique([
+      ...stringValues(h.evidence_refs),
+      ...stringValues(h.support_evidence_refs),
+    ]);
     const counter = unique(stringValues(h.counterevidence_refs));
-    const review = objectValue(h.critical_review ?? objectValue(h.generation_details).critical_review);
+    const review = objectValue(
+      h.critical_review ?? objectValue(h.generation_details).critical_review,
+    );
     const id = textValue(h.hypothesis_id);
     const judged = reviews.get(id) ?? null;
     const tests = objectList(h.discriminating_tests);
     const row: HypothesisRow = {
-      id, statement: textValue(h.statement), uncertainty: textValue(h.uncertainty), support, counter,
+      id,
+      statement: textValue(h.statement),
+      uncertainty: textValue(h.uncertainty),
+      support,
+      counter,
       unevaluated: null,
       counterQueries: stringValues(h.counterevidence_queries),
       counterTerminal: textValue(review.terminal) || null,
-      tests, observed: textValue(h.observed_problem), assumptions: stringValues(h.assumptions), predicted: stringValues(h.predicted_observations),
-      missing: stringValues(h.missing_evidence), status: textValue(h.status) || textValue(objectValue(h.generation_details).candidate_status),
-      refutationSignals: tests.map(test => textValue(test.expected_if_alternative)).filter(Boolean), review: judged,
+      tests,
+      observed: textValue(h.observed_problem),
+      assumptions: stringValues(h.assumptions),
+      predicted: stringValues(h.predicted_observations),
+      missing: stringValues(h.missing_evidence),
+      status: textValue(h.status) || textValue(objectValue(h.generation_details).candidate_status),
+      refutationSignals: tests
+        .map((test) => textValue(test.expected_if_alternative))
+        .filter(Boolean),
+      review: judged,
       aiRefutation: stringValues(h.refutation_conditions),
     };
-    row.unevaluated = selected ? selected.filter(ref => relationOf(row, ref) === "UNEVALUATED").length : null;
+    row.unevaluated = selected
+      ? selected.filter((ref) => relationOf(row, ref) === "UNEVALUATED").length
+      : null;
     return row;
   });
 }
@@ -72,12 +90,18 @@ export type CounterSearchSummary = { searched: number; total: number; counter: n
 export function counterSearchSummary(result: Record<string, unknown>): CounterSearchSummary | null {
   const rows = hypothesisRows(result);
   if (!rows.length) return null;
-  return { searched: rows.filter(row => row.counterTerminal).length, total: rows.length, counter: rows.reduce((sum, row) => sum + row.counter.length, 0) };
+  return {
+    searched: rows.filter((row) => row.counterTerminal).length,
+    total: rows.length,
+    counter: rows.reduce((sum, row) => sum + row.counter.length, 0),
+  };
 }
 
 /** A source the review cited for this hypothesis and judged "not supporting" is shown as not applicable; a source never looked at stays unevaluated. */
 export function relationOf(row: HypothesisRow, ref: string): Relation {
   if (row.counter.includes(ref)) return "COUNTER";
   if (row.support.includes(ref)) return "SUPPORT";
-  return row.review?.relation === "UNSUPPORTED" && row.review.evidenceRefs.includes(ref) ? "NOT_APPLICABLE" : "UNEVALUATED";
+  return row.review?.relation === "UNSUPPORTED" && row.review.evidenceRefs.includes(ref)
+    ? "NOT_APPLICABLE"
+    : "UNEVALUATED";
 }

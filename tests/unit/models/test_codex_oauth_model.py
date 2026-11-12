@@ -172,8 +172,7 @@ def test_strict_schema_requires_every_property_and_removes_defaults_recursively(
     branch_values = cast(list[object], branches)
     assert all(
         not (
-            isinstance(branch, dict)
-            and cast(dict[object, object], branch).get("type") == "string"
+            isinstance(branch, dict) and cast(dict[object, object], branch).get("type") == "string"
         )
         for branch in branch_values
     )

@@ -8,84 +8,201 @@ import { answerTopLayerSelectorsWithNo } from "../test/jsdomTopLayer";
 import { LiveProjectWorkspace } from "./LiveProjectWorkspace";
 
 const WORKSPACE = `workspace:${"a".repeat(32)}`;
-const project = (id: string, name: string, lifecycle: string, revision: number) =>
-  ({ project_id: id, name, overlay: "test", lifecycle, revision, cutoff_at: "2026-09-26T00:00:00Z" });
-const fixture = vi.hoisted(() => ({ projects: [] as Record<string, unknown>[], calls: [] as { method: string; input: Record<string, unknown> }[], hosted: false }));
-vi.mock("../api/rpcClient", async importOriginal => { const actual = await importOriginal<typeof import("../api/rpcClient")>(); return { ...actual,
-  rpc: async (method: string, input: Record<string, unknown>) => {
-    fixture.calls.push({ method, input });
-    let value: unknown = {};
-    if (method === "project/archive" || method === "project/restore") {
-      const current = fixture.projects.find(item => item.project_id === input.project_id)!;
-      if (current.revision !== input.expected_revision) throw new actual.RpcError("project revision does not match expected_revision", -32030, { current_revision: current.revision, expected_revision: input.expected_revision });
-    }
-    if (method === "project/archive") {
-      const target = fixture.projects.find(item => item.project_id === input.project_id)!;
-      Object.assign(target, { lifecycle: "ARCHIVED_READ_ONLY", revision: Number(input.expected_revision) + 1 });
-      value = target;
-    }
-    if (method === "workspace/ready") value = { ready: true, execution_ready: true, workspace_readable: true, setup_complete: true, workspace_id: WORKSPACE,
-      deployment_mode: fixture.hosted ? "HOSTED_REVIEW" : "LOCAL", model_connected: true, setup: { internet_consent: "ALLOWED" } };
-    if (method === "project/list") value = { projects: fixture.projects.filter(item => input.include_archived === true || item.lifecycle !== "ARCHIVED_READ_ONLY").map(item => ({ ...item })) };
-    if (method === "project/restore") {
-      const target = fixture.projects.find(item => item.project_id === input.project_id)!;
-      Object.assign(target, { lifecycle: "DRAFT", revision: Number(input.expected_revision) + 1 });
-      value = target;
-    }
-    if (method === "project/permanentDelete") {
-      fixture.projects = fixture.projects.filter(item => item.project_id !== input.project_id);
-      value = { project_id: input.project_id, deleted: true, already_deleted: false, deleted_at: "2026-11-04T00:00:00Z", deleted_rows: 1, cleanup_pending: [] };
-    }
-    if (method === "thread/list") value = { threads: [{ project_id: input.project_id, thread_id: "t", updated_at: "2026-09-20T00:00:00Z", problem: "stored work", execution_state: "IDLE", lifecycle: "OPEN" }] };
-    if (method === "thread/read") value = { project_id: input.project_id, thread_id: input.thread_id, problem: "stored work", lifecycle: "OPEN", execution_state: "IDLE", current_object_ids: [], operation_state: "SUCCEEDED", current_result: null };
-    if (method === "thread/activity/list") value = { conversation: { turns: [], next_before_epoch: null, history_limited: false } };
-    if (method === "project/source/list") value = { artifacts: [] };
-    if (method === "evidence/list") value = { evidence: [] };
-    if (method === "model/settings/read") value = { settings_digest: null, selection: { provider: null, model: null, reasoning_effort: null }, effective_settings: null, availability: "UNAVAILABLE", reason_code: "MODEL_CAPABILITY_UNKNOWN", model_options: [] };
-    if (method === "model/credential/list") value = { accounts: [] };
-    return { value, state: "SUCCEEDED", operation_id: "op" };
-  },
-}; });
+const project = (id: string, name: string, lifecycle: string, revision: number) => ({
+  project_id: id,
+  name,
+  overlay: "test",
+  lifecycle,
+  revision,
+  cutoff_at: "2026-09-26T00:00:00Z",
+});
+const fixture = vi.hoisted(() => ({
+  projects: [] as Record<string, unknown>[],
+  calls: [] as { method: string; input: Record<string, unknown> }[],
+  hosted: false,
+}));
+vi.mock("../api/rpcClient", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../api/rpcClient")>();
+  return {
+    ...actual,
+    rpc: async (method: string, input: Record<string, unknown>) => {
+      fixture.calls.push({ method, input });
+      let value: unknown = {};
+      if (method === "project/archive" || method === "project/restore") {
+        const current = fixture.projects.find((item) => item.project_id === input.project_id)!;
+        if (current.revision !== input.expected_revision)
+          throw new actual.RpcError("project revision does not match expected_revision", -32030, {
+            current_revision: current.revision,
+            expected_revision: input.expected_revision,
+          });
+      }
+      if (method === "project/archive") {
+        const target = fixture.projects.find((item) => item.project_id === input.project_id)!;
+        Object.assign(target, {
+          lifecycle: "ARCHIVED_READ_ONLY",
+          revision: Number(input.expected_revision) + 1,
+        });
+        value = target;
+      }
+      if (method === "workspace/ready")
+        value = {
+          ready: true,
+          execution_ready: true,
+          workspace_readable: true,
+          setup_complete: true,
+          workspace_id: WORKSPACE,
+          deployment_mode: fixture.hosted ? "HOSTED_REVIEW" : "LOCAL",
+          model_connected: true,
+          setup: { internet_consent: "ALLOWED" },
+        };
+      if (method === "project/list")
+        value = {
+          projects: fixture.projects
+            .filter(
+              (item) => input.include_archived === true || item.lifecycle !== "ARCHIVED_READ_ONLY",
+            )
+            .map((item) => ({ ...item })),
+        };
+      if (method === "project/restore") {
+        const target = fixture.projects.find((item) => item.project_id === input.project_id)!;
+        Object.assign(target, {
+          lifecycle: "DRAFT",
+          revision: Number(input.expected_revision) + 1,
+        });
+        value = target;
+      }
+      if (method === "project/permanentDelete") {
+        fixture.projects = fixture.projects.filter((item) => item.project_id !== input.project_id);
+        value = {
+          project_id: input.project_id,
+          deleted: true,
+          already_deleted: false,
+          deleted_at: "2026-11-04T00:00:00Z",
+          deleted_rows: 1,
+          cleanup_pending: [],
+        };
+      }
+      if (method === "thread/list")
+        value = {
+          threads: [
+            {
+              project_id: input.project_id,
+              thread_id: "t",
+              updated_at: "2026-09-20T00:00:00Z",
+              problem: "stored work",
+              execution_state: "IDLE",
+              lifecycle: "OPEN",
+            },
+          ],
+        };
+      if (method === "thread/read")
+        value = {
+          project_id: input.project_id,
+          thread_id: input.thread_id,
+          problem: "stored work",
+          lifecycle: "OPEN",
+          execution_state: "IDLE",
+          current_object_ids: [],
+          operation_state: "SUCCEEDED",
+          current_result: null,
+        };
+      if (method === "thread/activity/list")
+        value = { conversation: { turns: [], next_before_epoch: null, history_limited: false } };
+      if (method === "project/source/list") value = { artifacts: [] };
+      if (method === "evidence/list") value = { evidence: [] };
+      if (method === "model/settings/read")
+        value = {
+          settings_digest: null,
+          selection: { provider: null, model: null, reasoning_effort: null },
+          effective_settings: null,
+          availability: "UNAVAILABLE",
+          reason_code: "MODEL_CAPABILITY_UNKNOWN",
+          model_options: [],
+        };
+      if (method === "model/credential/list") value = { accounts: [] };
+      return { value, state: "SUCCEEDED", operation_id: "op" };
+    },
+  };
+});
 
 let root: Root | undefined;
 let container: HTMLDivElement;
 let client: QueryClient;
 let restoreMatches: () => void;
-beforeAll(() => { restoreMatches = answerTopLayerSelectorsWithNo(); });
+beforeAll(() => {
+  restoreMatches = answerTopLayerSelectorsWithNo();
+});
 afterAll(() => restoreMatches());
 async function settle(check: () => boolean) {
   for (let i = 0; i < 40; i++) {
-    await act(async () => { await new Promise(resolve => setTimeout(resolve, 15)); });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 15));
+    });
     if (check()) return;
   }
   throw new Error(`did not settle: ${container.textContent?.slice(0, 260)}`);
 }
-const button = (label: string) => [...container.querySelectorAll("button")].find(item => item.textContent === label) as HTMLButtonElement | undefined;
+const button = (label: string) =>
+  [...container.querySelectorAll("button")].find((item) => item.textContent === label) as
+    HTMLButtonElement | undefined;
 async function mount(selected: boolean) {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ status: "ok", version: "synthetic" }))));
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(new Response(JSON.stringify({ status: "ok", version: "synthetic" }))),
+  );
   if (selected) saveWorkspaceContext("p", "t", { mode: "LOCAL", workspaceId: WORKSPACE });
-  container = document.createElement("div"); document.body.append(container);
+  container = document.createElement("div");
+  document.body.append(container);
   root = createRoot(container);
-  client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
-  await act(async () => root!.render(<QueryClientProvider client={client}><LiveProjectWorkspace /></QueryClientProvider>));
-  await settle(() => Boolean(container.querySelector(selected ? "#live-problem" : ".project-home")));
+  client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  await act(async () =>
+    root!.render(
+      <QueryClientProvider client={client}>
+        <LiveProjectWorkspace />
+      </QueryClientProvider>,
+    ),
+  );
+  await settle(() =>
+    Boolean(container.querySelector(selected ? "#live-problem" : ".project-home")),
+  );
 }
 afterEach(async () => {
   if (root) await act(async () => root!.unmount());
-  root = undefined; client?.clear(); container?.remove(); vi.restoreAllMocks(); localStorage.clear(); sessionStorage.clear(); vi.unstubAllGlobals();
-  fixture.projects = []; fixture.calls = []; fixture.hosted = false;
+  root = undefined;
+  client?.clear();
+  container?.remove();
+  vi.restoreAllMocks();
+  localStorage.clear();
+  sessionStorage.clear();
+  vi.unstubAllGlobals();
+  fixture.projects = [];
+  fixture.calls = [];
+  fixture.hosted = false;
 });
 
 const newProject = () => container.querySelector("button.new-project-button") as HTMLButtonElement;
-const openArchivedMenu = () => act(async () => { (container.querySelector(".archived-project-row button") as HTMLButtonElement).click(); });
-const archivedMenuItems = () => [...document.querySelectorAll('.archived-project-menu [role="menuitem"]')] as HTMLButtonElement[];
+const openArchivedMenu = () =>
+  act(async () => {
+    (container.querySelector(".archived-project-row button") as HTMLButtonElement).click();
+  });
+const archivedMenuItems = () =>
+  [...document.querySelectorAll('.archived-project-menu [role="menuitem"]')] as HTMLButtonElement[];
 /** Restore and delete are in the row's menu, which is drawn outside the list. */
 const chooseArchived = async (label: string) => {
   await openArchivedMenu();
-  await act(async () => { archivedMenuItems().find(item => item.textContent === label)!.click(); });
+  await act(async () => {
+    archivedMenuItems()
+      .find((item) => item.textContent === label)!
+      .click();
+  });
 };
-const nameInput = () => [...container.querySelectorAll("label")].find(item => item.textContent?.startsWith("프로젝트 이름"));
+const nameInput = () =>
+  [...container.querySelectorAll("label")].find((item) =>
+    item.textContent?.startsWith("프로젝트 이름"),
+  );
 
 it("opens the create screen from the left button on the first screen, where it used to do nothing", async () => {
   fixture.projects = [project("p", "old project", "ACTIVE", 1)];
@@ -110,39 +227,76 @@ it("opens the create screen from the left button while a project is open", async
 });
 
 it("lists archived projects on demand and restores one, then shows it in the normal list", async () => {
-  fixture.projects = [project("p", "old project", "ACTIVE", 1), project("q", "archived demo", "ARCHIVED_READ_ONLY", 4)];
+  fixture.projects = [
+    project("p", "old project", "ACTIVE", 1),
+    project("q", "archived demo", "ARCHIVED_READ_ONLY", 4),
+  ];
   await mount(false);
   expect(container.textContent).not.toContain("archived demo");
-  expect(fixture.calls.filter(call => call.method === "project/list").every(call => call.input.include_archived !== true)).toBe(true);
+  expect(
+    fixture.calls
+      .filter((call) => call.method === "project/list")
+      .every((call) => call.input.include_archived !== true),
+  ).toBe(true);
   await act(async () => button("보관한 프로젝트 보기")!.click());
   await settle(() => container.textContent?.includes("archived demo") === true);
-  expect(fixture.calls.some(call => call.method === "project/list" && call.input.include_archived === true)).toBe(true);
+  expect(
+    fixture.calls.some(
+      (call) => call.method === "project/list" && call.input.include_archived === true,
+    ),
+  ).toBe(true);
   expect(container.querySelector(".archived-projects")!.textContent).not.toContain("old project");
   await chooseArchived("되살리기");
-  await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("보관한 프로젝트가 없습니다") === true);
-  expect(fixture.calls.filter(call => call.method === "project/restore")).toEqual([{ method: "project/restore", input: { project_id: "q", expected_revision: 4 } }]);
-  await settle(() => container.querySelector(".navigation-rail")?.textContent?.includes("archived demo") === true);
+  await settle(
+    () =>
+      container
+        .querySelector(".archived-projects")
+        ?.textContent?.includes("보관한 프로젝트가 없습니다") === true,
+  );
+  expect(fixture.calls.filter((call) => call.method === "project/restore")).toEqual([
+    { method: "project/restore", input: { project_id: "q", expected_revision: 4 } },
+  ]);
+  await settle(
+    () =>
+      container.querySelector(".navigation-rail")?.textContent?.includes("archived demo") === true,
+  );
 });
 
 const menuItem = (label: string) =>
-  [...document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')].find(item => item.textContent === label)!;
+  [...document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')].find(
+    (item) => item.textContent === label,
+  )!;
 const dialog = () => document.querySelector(".confirm-dialog");
 const dialogButton = (label: string) =>
-  [...(dialog()?.querySelectorAll("button") ?? [])].find(item => item.textContent === label) as HTMLButtonElement;
+  [...(dialog()?.querySelectorAll("button") ?? [])].find(
+    (item) => item.textContent === label,
+  ) as HTMLButtonElement;
 const openArchiveDialog = (name: string) => {
-  act(() => { (container.querySelector('[aria-label="' + name + ' 프로젝트 메뉴"]') as HTMLButtonElement).click(); });
-  act(() => { menuItem("프로젝트 보관").click(); });
+  act(() => {
+    (
+      container.querySelector('[aria-label="' + name + ' 프로젝트 메뉴"]') as HTMLButtonElement
+    ).click();
+  });
+  act(() => {
+    menuItem("프로젝트 보관").click();
+  });
 };
 
 it("asks in its own window, saying that archiving makes a project read-only and can be undone", async () => {
   fixture.projects = [project("p", "old project", "ACTIVE", 1)];
   const browserConfirm = vi.spyOn(window, "confirm").mockReturnValue(true);
   await mount(false);
-  act(() => { (container.querySelector('[aria-label="old project 프로젝트 메뉴"]') as HTMLButtonElement).click(); });
+  act(() => {
+    (
+      container.querySelector('[aria-label="old project 프로젝트 메뉴"]') as HTMLButtonElement
+    ).click();
+  });
   // The menu is drawn in a portal outside the sidebar so the sidebar's overflow cannot clip it.
   expect(document.querySelector('[role="menuitem"]')).not.toBeNull();
   expect(container.querySelector('[role="menu"]')).toBeNull();
-  act(() => { menuItem("프로젝트 보관").click(); });
+  act(() => {
+    menuItem("프로젝트 보관").click();
+  });
   const message = dialog()?.textContent ?? "";
   expect(message).toContain("보관하면 읽기 전용이 되고 목록에서 숨겨집니다.");
   expect(message).toContain("보관은 되돌릴 수 있습니다.");
@@ -150,10 +304,12 @@ it("asks in its own window, saying that archiving makes a project read-only and 
   expect(message).not.toContain("데이터는 보관되고");
   // Nothing is sent, and the browser's own confirm box is not used, until the person presses the button.
   expect(browserConfirm).not.toHaveBeenCalled();
-  expect(fixture.calls.some(call => call.method === "project/archive")).toBe(false);
-  act(() => { dialogButton("취소").click(); });
+  expect(fixture.calls.some((call) => call.method === "project/archive")).toBe(false);
+  act(() => {
+    dialogButton("취소").click();
+  });
   expect(dialog()).toBeNull();
-  expect(fixture.calls.some(call => call.method === "project/archive")).toBe(false);
+  expect(fixture.calls.some((call) => call.method === "project/archive")).toBe(false);
   act(() => root!.unmount());
   root = undefined;
 });
@@ -163,70 +319,129 @@ it("says in words that a project changed in the meantime, reads the list again a
   await mount(false);
   // Connecting a source in another place raised the revision after this list was read.
   fixture.projects[0].revision = 2;
-  const listsBefore = fixture.calls.filter(call => call.method === "project/list").length;
+  const listsBefore = fixture.calls.filter((call) => call.method === "project/list").length;
   openArchiveDialog("old project");
-  act(() => { dialogButton("보관").click(); });
+  act(() => {
+    dialogButton("보관").click();
+  });
   await settle(() => dialog()?.querySelector('[role="alert"]') != null);
   const alert = dialog()!.querySelector('[role="alert"]')!.textContent ?? "";
   expect(alert).toContain("프로젝트가 그 사이 바뀌었습니다");
   expect(alert).not.toContain("expected_revision");
-  expect(fixture.calls.filter(call => call.method === "project/archive")).toEqual([{ method: "project/archive", input: { project_id: "p", expected_revision: 1 } }]);
-  await settle(() => fixture.calls.filter(call => call.method === "project/list").length > listsBefore);
+  expect(fixture.calls.filter((call) => call.method === "project/archive")).toEqual([
+    { method: "project/archive", input: { project_id: "p", expected_revision: 1 } },
+  ]);
+  await settle(
+    () => fixture.calls.filter((call) => call.method === "project/list").length > listsBefore,
+  );
   // The window is still open; the same button now sends the version that was just read.
   await settle(() => dialogButton("보관") !== undefined && !dialogButton("보관").disabled);
-  act(() => { dialogButton("보관").click(); });
-  await settle(() => container.querySelector(".navigation-rail")?.textContent?.includes("old project") === false);
-  expect(fixture.calls.filter(call => call.method === "project/archive").map(call => call.input.expected_revision)).toEqual([1, 2]);
+  act(() => {
+    dialogButton("보관").click();
+  });
+  await settle(
+    () =>
+      container.querySelector(".navigation-rail")?.textContent?.includes("old project") === false,
+  );
+  expect(
+    fixture.calls
+      .filter((call) => call.method === "project/archive")
+      .map((call) => call.input.expected_revision),
+  ).toEqual([1, 2]);
   expect(dialog()).toBeNull();
   act(() => root!.unmount());
   root = undefined;
 });
 
 it("explains a stale revision when restoring and reads the list again", async () => {
-  fixture.projects = [project("p", "old project", "ACTIVE", 1), project("q", "archived demo", "ARCHIVED_READ_ONLY", 4)];
+  fixture.projects = [
+    project("p", "old project", "ACTIVE", 1),
+    project("q", "archived demo", "ARCHIVED_READ_ONLY", 4),
+  ];
   await mount(false);
   await act(async () => button("보관한 프로젝트 보기")!.click());
-  await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("archived demo") === true);
+  await settle(
+    () =>
+      container.querySelector(".archived-projects")?.textContent?.includes("archived demo") ===
+      true,
+  );
   fixture.projects[1].revision = 5;
   await chooseArchived("되살리기");
   await settle(() => container.querySelector('.archived-projects [role="alert"]') !== null);
-  expect(container.querySelector('.archived-projects [role="alert"]')!.textContent).toContain("프로젝트가 그 사이 바뀌었습니다");
+  expect(container.querySelector('.archived-projects [role="alert"]')!.textContent).toContain(
+    "프로젝트가 그 사이 바뀌었습니다",
+  );
   await chooseArchived("되살리기");
-  await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("보관한 프로젝트가 없습니다") === true);
-  expect(fixture.calls.filter(call => call.method === "project/restore").map(call => call.input.expected_revision)).toEqual([4, 5]);
+  await settle(
+    () =>
+      container
+        .querySelector(".archived-projects")
+        ?.textContent?.includes("보관한 프로젝트가 없습니다") === true,
+  );
+  expect(
+    fixture.calls
+      .filter((call) => call.method === "project/restore")
+      .map((call) => call.input.expected_revision),
+  ).toEqual([4, 5]);
 });
 
-const typeInto = async (input: HTMLInputElement, value: string) => act(async () => {
-  Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, value);
-  input.dispatchEvent(new Event("input", { bubbles: true }));
-});
+const typeInto = async (input: HTMLInputElement, value: string) =>
+  act(async () => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, value);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
 async function deleteFromArchive(name: string) {
   await act(async () => button("보관한 프로젝트 보기")!.click());
-  await settle(() => container.querySelector(".archived-projects")?.textContent?.includes(name) === true);
+  await settle(
+    () => container.querySelector(".archived-projects")?.textContent?.includes(name) === true,
+  );
   await chooseArchived("영구 삭제");
   await settle(() => document.querySelector(".project-delete-dialog") !== null);
   const dialog = document.querySelector(".project-delete-dialog")!;
   await typeInto(dialog.querySelector("input")!, name);
-  await act(async () => ([...dialog.querySelectorAll("button")].find(item => item.textContent === "영구 삭제") as HTMLButtonElement).click());
+  await act(async () =>
+    (
+      [...dialog.querySelectorAll("button")].find(
+        (item) => item.textContent === "영구 삭제",
+      ) as HTMLButtonElement
+    ).click(),
+  );
   await settle(() => document.querySelector(".project-delete-dialog") === null);
 }
 
 it("permanently deletes an archived project by typing its name, keeps the open project and forgets the deleted one's drafts", async () => {
-  fixture.projects = [project("p", "open demo", "ACTIVE", 1), project("q", "archived demo", "ARCHIVED_READ_ONLY", 4)];
+  fixture.projects = [
+    project("p", "open demo", "ACTIVE", 1),
+    project("q", "archived demo", "ARCHIVED_READ_ONLY", 4),
+  ];
   const keep = `thoth:local-workspace:v1:draft:${JSON.stringify([WORKSPACE, "p", "t"])}`;
   const forget = `thoth:local-workspace:v1:draft:${JSON.stringify([WORKSPACE, "q", "t"])}`;
   await mount(true);
-  localStorage.setItem(keep, "{}"); localStorage.setItem(forget, "{}");
+  localStorage.setItem(keep, "{}");
+  localStorage.setItem(forget, "{}");
   await deleteFromArchive("archived demo");
-  expect(fixture.calls.filter(call => call.method === "project/permanentDelete")).toEqual([{ method: "project/permanentDelete", input: { project_id: "q", confirm_name: "archived demo" } }]);
-  await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("보관한 프로젝트가 없습니다") === true);
+  expect(fixture.calls.filter((call) => call.method === "project/permanentDelete")).toEqual([
+    {
+      method: "project/permanentDelete",
+      input: { project_id: "q", confirm_name: "archived demo" },
+    },
+  ]);
+  await settle(
+    () =>
+      container
+        .querySelector(".archived-projects")
+        ?.textContent?.includes("보관한 프로젝트가 없습니다") === true,
+  );
   expect(container.querySelector("#live-problem")).not.toBeNull();
   expect(localStorage.getItem(forget)).toBeNull();
   expect(localStorage.getItem(keep)).toBe("{}");
 });
 
 it("goes back to the project list when the deleted project was the open one", async () => {
-  fixture.projects = [project("p", "open demo", "ACTIVE", 1), project("r", "other demo", "ACTIVE", 1)];
+  fixture.projects = [
+    project("p", "open demo", "ACTIVE", 1),
+    project("r", "other demo", "ACTIVE", 1),
+  ];
   await mount(true);
   // Another window archived it; this window still has it open until the list is read again.
   Object.assign(fixture.projects[0], { lifecycle: "ARCHIVED_READ_ONLY", revision: 2 });
@@ -239,10 +454,17 @@ it("goes back to the project list when the deleted project was the open one", as
 
 it("offers no permanent delete in the hosted review environment", async () => {
   fixture.hosted = true;
-  fixture.projects = [project("p", "old project", "ACTIVE", 1), project("q", "archived demo", "ARCHIVED_READ_ONLY", 4)];
+  fixture.projects = [
+    project("p", "old project", "ACTIVE", 1),
+    project("q", "archived demo", "ARCHIVED_READ_ONLY", 4),
+  ];
   await mount(false);
   await act(async () => button("보관한 프로젝트 보기")!.click());
-  await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("archived demo") === true);
+  await settle(
+    () =>
+      container.querySelector(".archived-projects")?.textContent?.includes("archived demo") ===
+      true,
+  );
   await openArchivedMenu();
-  expect(archivedMenuItems().map(item => item.textContent)).toEqual(["되살리기"]);
+  expect(archivedMenuItems().map((item) => item.textContent)).toEqual(["되살리기"]);
 });

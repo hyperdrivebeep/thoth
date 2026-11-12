@@ -9,7 +9,13 @@ import { SourceTimeAdvanced } from "./SourceTimeAdvanced";
 import type { ProjectSources } from "./useProjectSources";
 
 /** One connected source: what it is, whether it may be cited, and the actions on it. */
-export function ConnectedSourceCard({ projectId, artifact, sources, hosted, onCite }: {
+export function ConnectedSourceCard({
+  projectId,
+  artifact,
+  sources,
+  hosted,
+  onCite,
+}: {
   projectId: string;
   artifact: ProjectSources["artifacts"][number];
   sources: ProjectSources | undefined;
@@ -17,25 +23,51 @@ export function ConnectedSourceCard({ projectId, artifact, sources, hosted, onCi
   onCite: () => void;
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const assessment = (sources?.source_times ?? []).find(item => item.artifact_id === artifact.artifact_id);
+  const assessment = (sources?.source_times ?? []).find(
+    (item) => item.artifact_id === artifact.artifact_id,
+  );
   const title = sourceCardTitle(artifact.source_uri);
   const host = sourceCardHost(artifact.source_uri);
   return (
     <article className="detail-card">
-      <h3>{isHttpUrl(artifact.source_uri) ? <a href={artifact.source_uri} target="_blank" rel="noreferrer">{title}</a> : title}</h3>
+      <h3>
+        {isHttpUrl(artifact.source_uri) ? (
+          <a href={artifact.source_uri} target="_blank" rel="noreferrer">
+            {title}
+          </a>
+        ) : (
+          title
+        )}
+      </h3>
       {host ? <p>{host}</p> : null}
       <p>{artifact.media_type}</p>
       <p>{cutoffLabel(assessment?.cutoff_state ?? artifact.cutoff_state ?? "UNKNOWN_TIME")}</p>
-      <Button small onClick={onCite}>{t("workspace.cite")}</Button>
+      <Button small onClick={onCite}>
+        {t("workspace.cite")}
+      </Button>
       <SourceDisconnectButton projectId={projectId} artifact={artifact} sources={sources} />
-      {!hosted && <SourceTimeAdvanced projectId={projectId} artifactId={artifact.artifact_id} assessment={assessment} cutoff={sources?.cutoff_basis} />}
-      {" "}
+      {!hosted && (
+        <SourceTimeAdvanced
+          projectId={projectId}
+          artifactId={artifact.artifact_id}
+          assessment={assessment}
+          cutoff={sources?.cutoff_basis}
+        />
+      )}{" "}
       {!hosted && (
         <>
-          <Button small minimal icon={detailsOpen ? "chevron-up" : "info-sign"} aria-expanded={detailsOpen} onClick={() => setDetailsOpen(value => !value)}>
+          <Button
+            small
+            minimal
+            icon={detailsOpen ? "chevron-up" : "info-sign"}
+            aria-expanded={detailsOpen}
+            onClick={() => setDetailsOpen((value) => !value)}
+          >
             {t("workspace.sourceDetails")}
           </Button>
-          <Collapse isOpen={detailsOpen}><RecordInspector value={artifact} /></Collapse>
+          <Collapse isOpen={detailsOpen}>
+            <RecordInspector value={artifact} />
+          </Collapse>
         </>
       )}
     </article>

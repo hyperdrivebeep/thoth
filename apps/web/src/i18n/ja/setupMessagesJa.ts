@@ -19,29 +19,37 @@ export const setupJa: ColumnOf<typeof setupMessages> = {
   "setup.checkMethods": "接続方法を確認しています",
   "setup.apiKey": "API キー",
   "setup.registerKey": "キーを登録",
-  "setup.keyStorage": "キーはこのコンピューターの THOTH ワークスペースにのみ保存されます。使用料金はプロバイダーのアカウントに請求されます。",
+  "setup.keyStorage":
+    "キーはこのコンピューターの THOTH ワークスペースにのみ保存されます。使用料金はプロバイダーのアカウントに請求されます。",
   "setup.details": "接続の詳細",
   "setup.notRead": "未確認",
   "setup.connectedSuffix": " · 接続済み",
   "setup.registered": "登録済み",
   "setup.unregistered": "未登録",
-  "setup.sharedUsage": "ChatGPT と Claude のアカウント接続は、そのアカウントの Codex または Claude Code の利用上限を共有します。",
+  "setup.sharedUsage":
+    "ChatGPT と Claude のアカウント接続は、そのアカウントの Codex または Claude Code の利用上限を共有します。",
   "setup.openKeySite": "キー登録のサイトを開く",
-  "setup.catalogFailed": "モデル一覧を読み込めませんでした。しばらくしてからもう一度お試しください。",
+  "setup.catalogFailed":
+    "モデル一覧を読み込めませんでした。しばらくしてからもう一度お試しください。",
   "setup.methodsFailed": "接続方法を確認できませんでした。接続状態を更新してください。",
   "setup.refreshConnection": "接続状態を更新",
   "setup.modelReady": "接続しました。次に、ウェブへのアクセスを許可するかを選んでください。",
-  "setup.modelNeeded": "モデルを1つ接続すると、すぐに質問できます。あとで接続する場合は、質問を送るときに接続を求めます。",
+  "setup.modelNeeded":
+    "モデルを1つ接続すると、すぐに質問できます。あとで接続する場合は、質問を送るときに接続を求めます。",
   "setup.connectLater": "あとで接続",
   "setup.next": "次へ",
   "setup.webQuestion": "このワークスペースで公開ウェブへのアクセスを許可しますか？",
-  "setup.hostedDisclosure": "質問と分析に使う資料は、運営者の OpenAI API に送信されます。ウェブの同意は、モデル呼び出しとは別に、資料の取得を対象とします。",
-  "setup.localDisclosure": "これはモデル呼び出しとは別です。ウェブへのアクセスを許可しても、プロジェクトで自動的に有効になるわけではありません。調査は、プロジェクトでサイトを登録したあとにのみ、ウェブを検索します。",
+  "setup.hostedDisclosure":
+    "質問と分析に使う資料は、運営者の OpenAI API に送信されます。ウェブの同意は、モデル呼び出しとは別に、資料の取得を対象とします。",
+  "setup.localDisclosure":
+    "これはモデル呼び出しとは別です。ウェブへのアクセスを許可しても、プロジェクトで自動的に有効になるわけではありません。調査は、プロジェクトでサイトを登録したあとにのみ、ウェブを検索します。",
   "setup.operatorNotReady": "運営者のモデルの準備ができていません。キーは入力しないでください。",
   "setup.allow": "許可",
-  "setup.allowedScope": "接続済みのファイルを確認したあと、調査はプロジェクトに登録されたサイトだけを検索できます。許可しても、検索は始まりません。",
+  "setup.allowedScope":
+    "接続済みのファイルを確認したあと、調査はプロジェクトに登録されたサイトだけを検索できます。許可しても、検索は始まりません。",
   "setup.deny": "拒否",
-  "setup.hostedDeny": "これはウェブからの取得だけを拒否します。質問と分析は引き続き運営者のモデルに送られます。",
+  "setup.hostedDeny":
+    "これはウェブからの取得だけを拒否します。質問と分析は引き続き運営者のモデルに送られます。",
   "setup.localDeny": "これはウェブからの取得だけを拒否します。モデル呼び出しは続きます。",
   "setup.noCredential": "ログイン情報や API キーは入力しないでください。",
   "setup.backToModel": "モデルの接続に戻る",
@@ -64,6 +72,7 @@ export const setupJa: ColumnOf<typeof setupMessages> = {
   "model.default": "既定",
   "model.saveThread": "この会話の既定として保存",
   "model.saveProject": "プロジェクトの既定として保存",
-  "model.nextRequestOnly": "保存していない選択は、次のリクエストにのみ適用されます。モデルが一覧にあっても、プロバイダーの認証や実行の成功が確認されたわけではありません。",
+  "model.nextRequestOnly":
+    "保存していない選択は、次のリクエストにのみ適用されます。モデルが一覧にあっても、プロバイダーの認証や実行の成功が確認されたわけではありません。",
   "model.saved": "既定の設定を保存しました。",
 };

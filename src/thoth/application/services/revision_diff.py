@@ -14,12 +14,8 @@ def semantic_diff(
     if isinstance(before, Mapping) and isinstance(after, Mapping):
         before_values = cast(Mapping[object, object], before)
         after_values = cast(Mapping[object, object], after)
-        before_map: dict[str, object] = {
-            str(key): value for key, value in before_values.items()
-        }
-        after_map: dict[str, object] = {
-            str(key): value for key, value in after_values.items()
-        }
+        before_map: dict[str, object] = {str(key): value for key, value in before_values.items()}
+        after_map: dict[str, object] = {str(key): value for key, value in after_values.items()}
         changes: list[SemanticDiffEntry] = []
         for key in sorted(set(before_map) | set(after_map)):
             changes.extend(

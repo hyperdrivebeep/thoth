@@ -35,9 +35,7 @@ class Execution(DomainModel):
             and self.outcome_validity == OutcomeValidity.VALID
             and not self.output_refs
         ):
-            raise ValueError(
-                "valid outcome requires independently assessable output references"
-            )
+            raise ValueError("valid outcome requires independently assessable output references")
         return self
 
 

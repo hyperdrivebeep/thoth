@@ -3,17 +3,22 @@ import type { researchMessages } from "../researchMessages";
 
 export const researchJa: ColumnOf<typeof researchMessages> = {
   "timeline.title": "調査の会話",
-  "timeline.accessUnverified": "会話へのアクセスまたは保存済みの基準を検証できなかったため、回答は非表示です。",
+  "timeline.accessUnverified":
+    "会話へのアクセスまたは保存済みの基準を検証できなかったため、回答は非表示です。",
   "timeline.loadFailed": "会話を読み込めませんでした。",
   "timeline.loading": "会話を読み込んでいます…",
   "timeline.older": "以前のメッセージを読み込む",
-  "timeline.refreshFailed": "会話を更新できませんでした。最後に読み込んだ回答を表示していますが、その現在の状態は未検証です。",
+  "timeline.refreshFailed":
+    "会話を更新できませんでした。最後に読み込んだ回答を表示していますが、その現在の状態は未検証です。",
   "timeline.loadFailedSpace": "会話を読み込めませんでした。",
-  "timeline.limited": "さらに古い履歴は、この画面の範囲を超えています。調査履歴を開いてご覧ください。",
-  "timeline.unsupported": "このサーバーは会話履歴に対応していません。検証できる現在の記録だけを表示します。",
+  "timeline.limited":
+    "さらに古い履歴は、この画面の範囲を超えています。調査履歴を開いてご覧ください。",
+  "timeline.unsupported":
+    "このサーバーは会話履歴に対応していません。検証できる現在の記録だけを表示します。",
   "timeline.queued": "この指示は、現在の調査が終わったあとに適用されます",
   "timeline.unavailable": "この会話の履歴は、現在の画面では利用できません。",
-  "timeline.recoverAdvice": "保存済みの調査履歴と現在のプロジェクトの記録を確認するか、この会話で新しい質問をしてください。",
+  "timeline.recoverAdvice":
+    "保存済みの調査履歴と現在のプロジェクトの記録を確認するか、この会話で新しい質問をしてください。",
   "timeline.newQuestion": "新しい質問で続ける",
   "timeline.openHistory": "調査履歴を見る",
   "timeline.emptyTitle": "何を検討していますか？",
@@ -30,15 +35,18 @@ export const researchJa: ColumnOf<typeof researchMessages> = {
   "result.incomplete": "調査を完了できませんでした。最後に保存された資料と質問は保持されています。",
   "result.savedBeforeCut": "調査の答えは保存されましたが、最後まで確認できませんでした。",
   "result.timeLimit": "モデルの応答時間の上限に達しました。",
-  "result.researchLimit": "調査の呼び出し回数または経過時間の上限に達しました。これは累積トークンの上限とは別です。",
+  "result.researchLimit":
+    "調査の呼び出し回数または経過時間の上限に達しました。これは累積トークンの上限とは別です。",
   "result.quota": "ChatGPT の利用上限に達したため、モデル呼び出しが拒否されました。",
   "result.authentication": "モデルアカウントの認証が拒否されました。接続を確認してください。",
-  "result.unsupportedModel": "このモデルは、この ChatGPT Codex アカウントでは対応していません。自動では再開しません。",
+  "result.unsupportedModel":
+    "このモデルは、この ChatGPT Codex アカウントでは対応していません。自動では再開しません。",
   "result.requestRejected": "モデルがリクエストを拒否しました。自動では再開しません。",
   "result.storageFailed": "調査結果の保存に失敗しました。",
   "result.internalFailed": "調査の処理に失敗しました。",
   "result.remoteUnknown": "リモートのモデルが停止したかどうかは不明です。自動では再開しません。",
-  "result.stalled": "答えは保存されましたが、最後の確認の前に接続が切れました。モデル側では処理が続いていた可能性があります。",
+  "result.stalled":
+    "答えは保存されましたが、最後の確認の前に接続が切れました。モデル側では処理が続いていた可能性があります。",
   "result.autoRetryOff": "中断されたモデル呼び出しの自動再試行はオフになっています。",
   "result.autoRetryOpenSettings": "設定を開く",
   "result.incompleteResponse": "モデル側のエラーで終了しました。",
@@ -49,12 +57,14 @@ export const researchJa: ColumnOf<typeof researchMessages> = {
   "result.beforeFailure": "失敗前に保存された調査結果",
   "result.stale": "これは過去の回答で、現在の基準に照らした確認が必要です。",
   "result.openChecks": "判定で確認されていないこと",
-  "result.openChecksNote": "回答チェックとは別のものです。この回答の判定の過程で確認されなかった条件です。",
+  "result.openChecksNote":
+    "回答チェックとは別のものです。この回答の判定の過程で確認されなかった条件です。",
   "actions.rawClassification": "リスク区分・実行権限・状態の記録値",
   "result.alternatives": "別の説明とチェック",
   "result.noHypotheses": "現在の資料からは、仮説は提案されませんでした。",
   "result.nextActions": "考えられる次の行動",
-  "result.authorityRequired": "これは実行の提案です。権限のある人が、その対象と影響を確認して判断する必要があります。",
+  "result.authorityRequired":
+    "これは実行の提案です。権限のある人が、その対象と影響を確認して判断する必要があります。",
   "result.details": "回答の詳細",
   "result.sources": "元の根拠",
   "result.compareHypotheses": "仮説を比較",
@@ -85,6 +95,7 @@ export const researchJa: ColumnOf<typeof researchMessages> = {
   "progress.pause": "一時停止",
   "progress.resume": "再開",
   "progress.stop": "停止を要求",
-  "progress.stopConfirm": "この調査を停止しますか？すでに始まった外部での実行が止まったかどうかは、別に確認されます。",
+  "progress.stopConfirm":
+    "この調査を停止しますか？すでに始まった外部での実行が止まったかどうかは、別に確認されます。",
   "progress.unknown": "不明",
 };

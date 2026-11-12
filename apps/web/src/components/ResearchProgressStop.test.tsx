@@ -7,7 +7,7 @@ import type { ResearchStatus } from "../api/research";
 import { ResearchProgress } from "./ResearchProgress";
 
 const calls = vi.hoisted(() => [] as string[]);
-vi.mock("../api/rpcClient", async importOriginal => ({
+vi.mock("../api/rpcClient", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../api/rpcClient")>()),
   rpc: async (method: string) => {
     calls.push(method);
@@ -17,8 +17,17 @@ vi.mock("../api/rpcClient", async importOriginal => ({
 
 let root: Root;
 let container: HTMLDivElement;
-const running = { project_id: "p", thread_id: "t", problem: "q", operation_state: "RUNNING", execution_state: "RUNNING" } as unknown as ResearchStatus;
-const button = (scope: ParentNode, label: string) => [...scope.querySelectorAll("button")].find(item => item.textContent === label) as HTMLButtonElement;
+const running = {
+  project_id: "p",
+  thread_id: "t",
+  problem: "q",
+  operation_state: "RUNNING",
+  execution_state: "RUNNING",
+} as unknown as ResearchStatus;
+const button = (scope: ParentNode, label: string) =>
+  [...scope.querySelectorAll("button")].find(
+    (item) => item.textContent === label,
+  ) as HTMLButtonElement;
 const dialog = () => document.querySelector(".confirm-dialog");
 
 beforeEach(async () => {
@@ -27,7 +36,13 @@ beforeEach(async () => {
   document.body.append(container);
   root = createRoot(container);
   const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
-  await act(async () => root.render(<QueryClientProvider client={client}><ResearchProgress status={running} /></QueryClientProvider>));
+  await act(async () =>
+    root.render(
+      <QueryClientProvider client={client}>
+        <ResearchProgress status={running} />
+      </QueryClientProvider>,
+    ),
+  );
 });
 afterEach(async () => {
   await act(async () => root.unmount());

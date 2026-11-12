@@ -21,14 +21,16 @@ export const coreZhHant: ColumnOf<typeof coreMessages> = {
   "language.automatic": "與提問語言一致",
   "language.fixed": "已提交的請求保持原來的語言。更改將從下一個問題開始生效。",
   "language.accepted": "已接收請求的回答語言",
-  "language.proseFlag": "部分新的假設或預期結果的文字與所請求的英語不一致。原文已保留，未自動重新生成。",
+  "language.proseFlag":
+    "部分新的假設或預期結果的文字與所請求的英語不一致。原文已保留，未自動重新生成。",
   "language.cost": "新的提問會佔用模型額度。只更改顯示語言不會呼叫模型。",
   "language.unsupported": "此伺服器不支援選擇回答語言。",
   "expected.title": "各假設的預期結果（AI 建議）",
   "expected.sourceUnavailable": "此證據不屬於已儲存的結果，因此無法顯示原文。",
   "expected.unknown": "未知",
   "expected.unconfirmed": "未經證據證實的預測",
-  "expected.notice": "這些是模型的建議，經人工審查之前尚未確定。相同的標籤表示相同的結果。它們不是機率或分數。",
+  "expected.notice":
+    "這些是模型的建議，經人工審查之前尚未確定。相同的標籤表示相同的結果。它們不是機率或分數。",
   "composer.problem": "你正在處理什麼問題？",
   "composer.followupPlaceholder": "補充問題、新證據或變化的條件…",
   "composer.startPlaceholder": "你想調查什麼問題？",
@@ -38,7 +40,8 @@ export const coreZhHant: ColumnOf<typeof coreMessages> = {
   "composer.checkOriginal": "檢查原始請求",
   "composer.retryOriginal": "檢查原始提交",
   "composer.checking": "正在確認原始請求是否已被接收。你的草稿會保留。",
-  "composer.uncertain": "你之前的請求可能已被接收。重新開啟後沒有自動重發。請先檢查它，再提交新的請求。",
+  "composer.uncertain":
+    "你之前的請求可能已被接收。重新開啟後沒有自動重發。請先檢查它，再提交新的請求。",
   "composer.invalidPending": "無法驗證已儲存的提交。請先檢查原始操作，再建立新的提交。",
   "composer.accessChecking": "正在確認存取權限。你可以繼續編輯草稿；確認存取權限之前暫停提交。",
   "composer.savedResearch": "已儲存的研究仍可檢視。",
@@ -50,7 +53,8 @@ export const coreZhHant: ColumnOf<typeof coreMessages> = {
   "composer.needSetup": "檢查模型連線和初始設定後才能開始調查。",
   "composer.corruptDraft": "無法讀取已儲存的草稿。它沒有被刪除；儲存新草稿可能會將其替換。",
   "composer.unavailableDraft": "無法讀取瀏覽器草稿。請檢查瀏覽器儲存和工作區標識。",
-  "composer.draftScope": "其他位址、埠、瀏覽器設定檔或工作區中的草稿不會自動合併。已儲存的研究會單獨從伺服器讀取。",
+  "composer.draftScope":
+    "其他位址、埠、瀏覽器設定檔或工作區中的草稿不會自動合併。已儲存的研究會單獨從伺服器讀取。",
   "composer.draftTooLarge": "草稿超出瀏覽器儲存上限。請縮短草稿，以確保重新開啟後能夠還原。",
   "composer.draftUnsaved": "無法在此瀏覽器中儲存草稿。關閉頁面時可能會丟失。",
 };

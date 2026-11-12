@@ -23,9 +23,7 @@ class DecimalCostProjectPackModel(GenericProjectPackModel):
         if request.role != ModelRole.ACTION_PLANNER:
             return result
         draft = cast(ActionPlanDraft, result.output)
-        first = draft.alternatives[0].model_copy(
-            update={"estimated_cost": Decimal("12.50")}
-        )
+        first = draft.alternatives[0].model_copy(update={"estimated_cost": Decimal("12.50")})
         updated = draft.model_copy(update={"alternatives": (first, *draft.alternatives[1:])})
         return ModelResult(
             output=cast(TModel, updated),

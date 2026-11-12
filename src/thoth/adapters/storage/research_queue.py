@@ -33,9 +33,7 @@ class ControlResearchQueueStore(ResearchQueueStorePort):
         return item
 
     def list(self, project_id: str, thread_id: str) -> tuple[QueuedResearchInput, ...]:
-        return tuple(
-            item for item in self.list_project(project_id) if item.thread_id == thread_id
-        )
+        return tuple(item for item in self.list_project(project_id) if item.thread_id == thread_id)
 
     def list_project(self, project_id: str) -> tuple[QueuedResearchInput, ...]:
         records = self.controls.list(

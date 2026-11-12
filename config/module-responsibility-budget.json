@@ -76,7 +76,7 @@
       "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     },
     "src/thoth/adapters/models/local_credentials.py": {
-      "baseline_lines": 559,
+      "baseline_lines": 558,
       "top_level_symbols": [
         "LocalCredentialHold",
         "registry_dir",
@@ -145,7 +145,7 @@
       "policy": "existing Revision RPC surface only; new responsibility goes to a new command/service module"
     },
     "src/thoth/application/services/action_service.py": {
-      "baseline_lines": 751,
+      "baseline_lines": 750,
       "top_level_symbols": [
         "ActionService"
       ],
@@ -195,7 +195,7 @@
       "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
     },
     "src/thoth/application/services/r2_closed_loop.py": {
-      "baseline_lines": 622,
+      "baseline_lines": 621,
       "top_level_symbols": [
         "R2ClosedLoopExecution",
         "R2ClosedLoopCoordinator"
@@ -234,9 +234,34 @@
         "CommandBus"
       ],
       "policy": "over the 600-line limit when it was introduced; do not grow it; lower the baseline when it is split"
+    },
+    "apps/web/src/components/LiveProjectWorkspace.tsx": {
+      "baseline_lines": 991,
+      "top_level_symbols": [],
+      "policy": "over the 600-line limit once the web sources were formatted (prettier, width 100); do not grow it; lower the baseline when it is split"
+    },
+    "apps/web/src/components/LocalRetrievalSettingsCard.tsx": {
+      "baseline_lines": 806,
+      "top_level_symbols": [],
+      "policy": "over the 600-line limit once the web sources were formatted (prettier, width 100); do not grow it; lower the baseline when it is split"
+    },
+    "apps/web/src/components/OAuthLoginFlow.tsx": {
+      "baseline_lines": 630,
+      "top_level_symbols": [],
+      "policy": "over the 600-line limit once the web sources were formatted (prettier, width 100); do not grow it; lower the baseline when it is split"
+    },
+    "apps/web/src/components/TracePage.tsx": {
+      "baseline_lines": 652,
+      "top_level_symbols": [],
+      "policy": "over the 600-line limit once the web sources were formatted (prettier, width 100); do not grow it; lower the baseline when it is split"
+    },
+    "apps/web/src/components/traceText.ts": {
+      "baseline_lines": 694,
+      "top_level_symbols": [],
+      "policy": "over the 600-line limit once the web sources were formatted (prettier, width 100); do not grow it; lower the baseline when it is split"
     }
   },
   "watched_long_functions": {
-    "src/thoth/apps/runtime.py::create_runtime": 355
+    "src/thoth/apps/runtime.py::create_runtime": 354
   }
 }

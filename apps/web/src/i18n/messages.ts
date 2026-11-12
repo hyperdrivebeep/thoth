@@ -110,32 +110,120 @@ import { parserErrorJa } from "./ja/parserErrorMessagesJa";
 /** Whole UI messages. Research text and canonical status codes never pass through this catalog. */
 export const messages = {
   ...withColumns(coreMessages, { "zh-Hans": coreZh, "zh-Hant": coreZhHant, ja: coreJa }),
-  ...withColumns(finishingMessages, { "zh-Hans": finishingZh, "zh-Hant": finishingZhHant, ja: finishingJa }),
-  ...withColumns(groundingMessages, { "zh-Hans": groundingZh, "zh-Hant": groundingZhHant, ja: groundingJa }),
-  ...withColumns(remainingMessages, { "zh-Hans": remainingZh, "zh-Hant": remainingZhHant, ja: remainingJa }),
-  ...withColumns(apiNoticesMessages, { "zh-Hans": apiNoticesZh, "zh-Hant": apiNoticesZhHant, ja: apiNoticesJa }),
-  ...withColumns(advancedMessages, { "zh-Hans": advancedZh, "zh-Hant": advancedZhHant, ja: advancedJa }),
-  ...withColumns(reviewPanelsMessages, { "zh-Hans": reviewPanelsZh, "zh-Hant": reviewPanelsZhHant, ja: reviewPanelsJa }),
-  ...withColumns(activityMessages, { "zh-Hans": activityZh, "zh-Hant": activityZhHant, ja: activityJa }),
-  ...withColumns(hypothesisActionsMessages, { "zh-Hans": hypothesisActionsZh, "zh-Hant": hypothesisActionsZhHant, ja: hypothesisActionsJa }),
-  ...withColumns(recordDialogsMessages, { "zh-Hans": recordDialogsZh, "zh-Hant": recordDialogsZhHant, ja: recordDialogsJa }),
-  ...withColumns(recordPanelsMessages, { "zh-Hans": recordPanelsZh, "zh-Hant": recordPanelsZhHant, ja: recordPanelsJa }),
-  ...withColumns(researchPanelsMessages, { "zh-Hans": researchPanelsZh, "zh-Hant": researchPanelsZhHant, ja: researchPanelsJa }),
-  ...withColumns(modelHelpMessages, { "zh-Hans": modelHelpZh, "zh-Hant": modelHelpZhHant, ja: modelHelpJa }),
-  ...withColumns(historyViewMessages, { "zh-Hans": historyViewZh, "zh-Hant": historyViewZhHant, ja: historyViewJa }),
-  ...withColumns(judgmentMessages, { "zh-Hans": judgmentZh, "zh-Hant": judgmentZhHant, ja: judgmentJa }),
-  ...withColumns(followupMessages, { "zh-Hans": followupZh, "zh-Hant": followupZhHant, ja: followupJa }),
-  ...withColumns(commonStateMessages, { "zh-Hans": commonStateZh, "zh-Hant": commonStateZhHant, ja: commonStateJa }),
+  ...withColumns(finishingMessages, {
+    "zh-Hans": finishingZh,
+    "zh-Hant": finishingZhHant,
+    ja: finishingJa,
+  }),
+  ...withColumns(groundingMessages, {
+    "zh-Hans": groundingZh,
+    "zh-Hant": groundingZhHant,
+    ja: groundingJa,
+  }),
+  ...withColumns(remainingMessages, {
+    "zh-Hans": remainingZh,
+    "zh-Hant": remainingZhHant,
+    ja: remainingJa,
+  }),
+  ...withColumns(apiNoticesMessages, {
+    "zh-Hans": apiNoticesZh,
+    "zh-Hant": apiNoticesZhHant,
+    ja: apiNoticesJa,
+  }),
+  ...withColumns(advancedMessages, {
+    "zh-Hans": advancedZh,
+    "zh-Hant": advancedZhHant,
+    ja: advancedJa,
+  }),
+  ...withColumns(reviewPanelsMessages, {
+    "zh-Hans": reviewPanelsZh,
+    "zh-Hant": reviewPanelsZhHant,
+    ja: reviewPanelsJa,
+  }),
+  ...withColumns(activityMessages, {
+    "zh-Hans": activityZh,
+    "zh-Hant": activityZhHant,
+    ja: activityJa,
+  }),
+  ...withColumns(hypothesisActionsMessages, {
+    "zh-Hans": hypothesisActionsZh,
+    "zh-Hant": hypothesisActionsZhHant,
+    ja: hypothesisActionsJa,
+  }),
+  ...withColumns(recordDialogsMessages, {
+    "zh-Hans": recordDialogsZh,
+    "zh-Hant": recordDialogsZhHant,
+    ja: recordDialogsJa,
+  }),
+  ...withColumns(recordPanelsMessages, {
+    "zh-Hans": recordPanelsZh,
+    "zh-Hant": recordPanelsZhHant,
+    ja: recordPanelsJa,
+  }),
+  ...withColumns(researchPanelsMessages, {
+    "zh-Hans": researchPanelsZh,
+    "zh-Hant": researchPanelsZhHant,
+    ja: researchPanelsJa,
+  }),
+  ...withColumns(modelHelpMessages, {
+    "zh-Hans": modelHelpZh,
+    "zh-Hant": modelHelpZhHant,
+    ja: modelHelpJa,
+  }),
+  ...withColumns(historyViewMessages, {
+    "zh-Hans": historyViewZh,
+    "zh-Hant": historyViewZhHant,
+    ja: historyViewJa,
+  }),
+  ...withColumns(judgmentMessages, {
+    "zh-Hans": judgmentZh,
+    "zh-Hant": judgmentZhHant,
+    ja: judgmentJa,
+  }),
+  ...withColumns(followupMessages, {
+    "zh-Hans": followupZh,
+    "zh-Hant": followupZhHant,
+    ja: followupJa,
+  }),
+  ...withColumns(commonStateMessages, {
+    "zh-Hans": commonStateZh,
+    "zh-Hant": commonStateZhHant,
+    ja: commonStateJa,
+  }),
   ...withColumns(oauthMessages, { "zh-Hans": oauthZh, "zh-Hant": oauthZhHant, ja: oauthJa }),
   ...withColumns(sourceMessages, { "zh-Hans": sourceZh, "zh-Hant": sourceZhHant, ja: sourceJa }),
   ...withColumns(traceMessages, { "zh-Hans": traceZh, "zh-Hant": traceZhHant, ja: traceJa }),
-  ...withColumns(researchMessages, { "zh-Hans": researchZh, "zh-Hant": researchZhHant, ja: researchJa }),
-  ...withColumns(credentialMessages, { "zh-Hans": credentialZh, "zh-Hant": credentialZhHant, ja: credentialJa }),
-  ...withColumns(workspaceDetailMessages, { "zh-Hans": workspaceDetailZh, "zh-Hant": workspaceDetailZhHant, ja: workspaceDetailJa }),
-  ...withColumns(workspaceMessages, { "zh-Hans": workspaceZh, "zh-Hant": workspaceZhHant, ja: workspaceJa }),
+  ...withColumns(researchMessages, {
+    "zh-Hans": researchZh,
+    "zh-Hant": researchZhHant,
+    ja: researchJa,
+  }),
+  ...withColumns(credentialMessages, {
+    "zh-Hans": credentialZh,
+    "zh-Hant": credentialZhHant,
+    ja: credentialJa,
+  }),
+  ...withColumns(workspaceDetailMessages, {
+    "zh-Hans": workspaceDetailZh,
+    "zh-Hant": workspaceDetailZhHant,
+    ja: workspaceDetailJa,
+  }),
+  ...withColumns(workspaceMessages, {
+    "zh-Hans": workspaceZh,
+    "zh-Hant": workspaceZhHant,
+    ja: workspaceJa,
+  }),
   ...withColumns(setupMessages, { "zh-Hans": setupZh, "zh-Hant": setupZhHant, ja: setupJa }),
-  ...withColumns(localRetrievalMessages, { "zh-Hans": localRetrievalZh, "zh-Hant": localRetrievalZhHant, ja: localRetrievalJa }),
-  ...withColumns(parserErrorMessages, { "zh-Hans": parserErrorZh, "zh-Hant": parserErrorZhHant, ja: parserErrorJa }),
+  ...withColumns(localRetrievalMessages, {
+    "zh-Hans": localRetrievalZh,
+    "zh-Hant": localRetrievalZhHant,
+    ja: localRetrievalJa,
+  }),
+  ...withColumns(parserErrorMessages, {
+    "zh-Hans": parserErrorZh,
+    "zh-Hant": parserErrorZhHant,
+    ja: parserErrorJa,
+  }),
 } as const;
 
 export type MessageKey = keyof typeof messages;

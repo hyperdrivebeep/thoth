@@ -87,9 +87,8 @@ async def test_saving_arxiv_web_exposes_managed_catalog_path(tmp_path: Path) -> 
         execution = record(read["public_web_execution"])
         assert execution["state"] == "READY"
         assert "arxiv.org" in [text(item) for item in items(execution["effective_hosts"])]
-        assert (
-            PROJECT_PUBLIC_WEB_CONNECTOR_ID
-            in [text(item) for item in items(execution["managed_connector_ids"])]
-        )
+        assert PROJECT_PUBLIC_WEB_CONNECTOR_ID in [
+            text(item) for item in items(execution["managed_connector_ids"])
+        ]
     finally:
         runtime.close()

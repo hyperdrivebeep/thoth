@@ -47,7 +47,9 @@ vi.mock("../api/rpcClient", async (importOriginal) => ({
     }
     if (method === "project/policy/update") {
       const projectId = String(input.project_id);
-      const payload = input.payload as { public_web: { enabled: boolean; preferred_hosts: string[] } };
+      const payload = input.payload as {
+        public_web: { enabled: boolean; preferred_hosts: string[] };
+      };
       const current = fixture.projects[projectId];
       fixture.projects[projectId] = {
         revision: current.revision + 1,
@@ -82,7 +84,9 @@ async function mount(projectId: string) {
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
-  client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+  client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
   await act(async () => {
     root.render(
       <QueryClientProvider client={client}>
@@ -121,7 +125,9 @@ it("separates a saved ON toggle from execution READY", async () => {
   };
   await mount("p");
   expect(container.textContent).toContain("허용할 공개 웹 출처");
-  expect(container.querySelector<HTMLInputElement>('[aria-label="허용할 공개 웹 도메인"]')?.placeholder).toBe("예: arxiv.org");
+  expect(
+    container.querySelector<HTMLInputElement>('[aria-label="허용할 공개 웹 도메인"]')?.placeholder,
+  ).toBe("예: arxiv.org");
   expect(container.textContent).toContain("실행: 준비됨");
   expect(fixture.calls.map((call) => call.method).sort()).toEqual([
     "project/read",

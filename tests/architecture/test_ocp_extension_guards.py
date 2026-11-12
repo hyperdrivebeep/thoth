@@ -42,9 +42,9 @@ def test_sandbox_guard_rejects_concrete_class_name_routing(tmp_path: Path) -> No
 
 
 def test_current_connector_and_sandbox_composition_pass_guards() -> None:
-    assert connector_route_errors(
-        ROOT / "src/thoth/application/services/connector_service.py"
-    ) == []
+    assert (
+        connector_route_errors(ROOT / "src/thoth/application/services/connector_service.py") == []
+    )
     assert sandbox_runtime_errors(ROOT / "src/thoth/apps/runtime.py") == []
     assert hero_trace_errors(ROOT / "qa/scenarios/hero_6g_current_core.py") == []
 

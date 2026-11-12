@@ -38,7 +38,7 @@ def test_html_publication_attributes_only() -> None:
 def test_unrelated_time_and_filename_dates_are_ignored() -> None:
     raw = (
         b'<html><body><time datetime="2024-12-31">footer</time>'
-        b'<p>report-2020-01-01.pdf</p></body></html>'
+        b"<p>report-2020-01-01.pdf</p></body></html>"
     )
     tree = _parse_html(raw)
     assert extract_html_time_observations(tree) == ()

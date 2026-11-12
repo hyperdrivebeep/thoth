@@ -104,22 +104,14 @@ def reconcile_managed_web_permissions(
         if isinstance(raw_allowlist, (list, tuple))
         else ()
     )
-    allowlist = [
-        str(item)
-        for item in allowlist_items
-        if isinstance(item, str) and item
-    ]
+    allowlist = [str(item) for item in allowlist_items if isinstance(item, str) and item]
     raw_egress = merged.get("connector_allowed_egress_classes", [])
     egress_items = (
         cast(list[object] | tuple[object, ...], raw_egress)
         if isinstance(raw_egress, (list, tuple))
         else ()
     )
-    egress = [
-        str(item)
-        for item in egress_items
-        if isinstance(item, str) and item
-    ]
+    egress = [str(item) for item in egress_items if isinstance(item, str) and item]
     managed_id = PROJECT_PUBLIC_WEB_CONNECTOR_ID
     if web.enabled:
         if not connector_registered:

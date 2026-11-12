@@ -5,28 +5,50 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { useAutoRetryOff } from "./useAutoRetryOff";
 
-const state = vi.hoisted(() => ({ calls: [] as { method: string; params: Record<string, unknown> }[], answer: null as unknown }));
-vi.mock("../api/rpcClient", () => ({ rpc: async (method: string, params: Record<string, unknown>) => {
-  state.calls.push({ method, params });
-  if (state.answer instanceof Error) throw state.answer;
-  return state.answer;
-} }));
+const state = vi.hoisted(() => ({
+  calls: [] as { method: string; params: Record<string, unknown> }[],
+  answer: null as unknown,
+}));
+vi.mock("../api/rpcClient", () => ({
+  rpc: async (method: string, params: Record<string, unknown>) => {
+    state.calls.push({ method, params });
+    if (state.answer instanceof Error) throw state.answer;
+    return state.answer;
+  },
+}));
 
-let root: Root; let node: HTMLDivElement; let client: QueryClient;
+let root: Root;
+let node: HTMLDivElement;
+let client: QueryClient;
 function Probe({ projectId, enabled = true }: { projectId: string; enabled?: boolean }) {
-  return <span data-off={String(useAutoRetryOff(projectId, enabled))}/>;
+  return <span data-off={String(useAutoRetryOff(projectId, enabled))} />;
 }
 async function off(projectId = "p", enabled = true): Promise<string | null> {
-  await act(async () => { root.render(<QueryClientProvider client={client}><Probe projectId={projectId} enabled={enabled}/></QueryClientProvider>); });
-  await act(async () => { await new Promise(resolve => setTimeout(resolve, 20)); });
+  await act(async () => {
+    root.render(
+      <QueryClientProvider client={client}>
+        <Probe projectId={projectId} enabled={enabled} />
+      </QueryClientProvider>,
+    );
+  });
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  });
   return node.querySelector("span")!.getAttribute("data-off");
 }
 beforeEach(() => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
-  state.calls.length = 0; client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  node = document.createElement("div"); document.body.append(node); root = createRoot(node);
+  state.calls.length = 0;
+  client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  node = document.createElement("div");
+  document.body.append(node);
+  root = createRoot(node);
 });
-afterEach(async () => { await act(async () => root.unmount()); client.clear(); node.remove(); });
+afterEach(async () => {
+  await act(async () => root.unmount());
+  client.clear();
+  node.remove();
+});
 
 it("is true only when the project's setting was read and is off, using the settings switch's query and RPC", async () => {
   state.answer = { value: { auto_retry_interrupted_model_call: false, settings_digest: "d" } };
@@ -52,4 +74,3 @@ it("reads nothing for the example timeline or without a project", async () => {
   expect(await off("", true)).toBe("false");
   expect(state.calls).toEqual([]);
 });
-

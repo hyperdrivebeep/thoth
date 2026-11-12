@@ -19,12 +19,15 @@ export const recordDialogsZhHant: ColumnOf<typeof recordDialogsMessages> = {
   "traceImport.issues": "妨礙應用的問題",
   "traceImport.untouched": "CSV 中未包含，本次匯入不會改動",
   "traceImport.noChange": "沒有變更。",
-  "traceImport.recompute": "應用變更時會以原子方式重新計算受影響的評估。之前的評估仍保留在歷史記錄中。",
+  "traceImport.recompute":
+    "應用變更時會以原子方式重新計算受影響的評估。之前的評估仍保留在歷史記錄中。",
   "traceImport.apply": "應用這些變更",
-  "traceEvidence.notice": "證據位置標明了與此評估相關聯的資料中的位置。僅有連結並不表示 THOTH 已驗證該段落可作為支援證據。",
+  "traceEvidence.notice":
+    "證據位置標明了與此評估相關聯的資料中的位置。僅有連結並不表示 THOTH 已驗證該段落可作為支援證據。",
   "traceEvidence.loading": "正在資料中定位該段落…",
   "traceEvidence.failed": "無法讀取資料列表，因此無法開啟此位置。這並不表示該位置不存在。",
-  "traceEvidence.notFound": "在專案已連線的資料中未找到此位置。可能該資料尚未連線，或該定位符不是由 THOTH 生成的。",
+  "traceEvidence.notFound":
+    "在專案已連線的資料中未找到此位置。可能該資料尚未連線，或該定位符不是由 THOTH 生成的。",
   "traceEvidence.passage": "此位置的段落（已高亮）",
   "traceConfirm.reasonNeeded": "請填寫確認的原因。",
   "traceConfirm.title": "記錄評估確認",
@@ -36,7 +39,7 @@ export const recordDialogsZhHant: ColumnOf<typeof recordDialogsMessages> = {
   "traceHistory.current": "目前評估",
   "traceHistory.previous": "上一次評估",
   "traceHistory.initial": "這是第一次計算的評估。",
-  "traceHistory.moreNotice": "使用\"載入更早的歷史\"檢視之前的評估。",
+  "traceHistory.moreNotice": '使用"載入更早的歷史"檢視之前的評估。',
   "traceHistory.trigger": "觸發計算的原因",
   "traceHistory.noChanges": "沒有記錄影響此評估的輸入變化。",
   "traceHistory.noResult": "沒有符合條件可選用的結果。",
@@ -51,8 +54,10 @@ export const recordDialogsZhHant: ColumnOf<typeof recordDialogsMessages> = {
   "traceHistory.more": "載入更早的歷史",
   "recheck.reasonNeeded": "請選擇原因。",
   "recheck.writtenNeeded": "此原因需要填寫文字說明。",
-  "recheck.notice": "記錄評估發生變化後，有人對此假設的看法。假設和評估保持不變；會保留誰、何時、因何原因進行了審查。",
-  "recheck.basisOnly": "評估狀態沒有變化；只是其結果或證據位置發生了變化。選擇原因之前，請先審查變化的證據。",
+  "recheck.notice":
+    "記錄評估發生變化後，有人對此假設的看法。假設和評估保持不變；會保留誰、何時、因何原因進行了審查。",
+  "recheck.basisOnly":
+    "評估狀態沒有變化；只是其結果或證據位置發生了變化。選擇原因之前，請先審查變化的證據。",
   "recheck.writtenLabel": "文字原因（必填）",
   "recheck.optionalNote": "備註（可選）",
   "recheck.writeReason": "寫下原因",
@@ -63,7 +68,8 @@ export const recordDialogsZhHant: ColumnOf<typeof recordDialogsMessages> = {
   "testResult.rerecord": "再記錄一個結果",
   "testResult.record": "記錄結果",
   "testResult.title": "記錄測試結果",
-  "testResult.notice": "記錄由人進行的測試。假設和之前的記錄會保留。對同一測試再次記錄時，最新的記錄將成為有效記錄。",
+  "testResult.notice":
+    "記錄由人進行的測試。假設和之前的記錄會保留。對同一測試再次記錄時，最新的記錄將成為有效記錄。",
   "testResult.match": "哪種解釋相符？",
   "testResult.requiredObservation": "觀察（必填）",
   "testResult.observation": "觀察",
@@ -84,7 +90,8 @@ export const recordDialogsZhHant: ColumnOf<typeof recordDialogsMessages> = {
   "refutation.conditions": "反駁條件",
   "refutation.empty": "尚未記錄任何反駁條件。",
   "refutation.record": "記錄反駁條件",
-  "refutation.notice": "每行填寫一個條件，描述會推翻此假設的結果。新的記錄將成為顯示的列表；之前的記錄會保留。",
+  "refutation.notice":
+    "每行填寫一個條件，描述會推翻此假設的結果。新的記錄將成為顯示的列表；之前的記錄會保留。",
   "memoryEdit.required": "請同時填寫更正後的內容和原因。",
   "memoryEdit.title": "提出記憶更正",
   "memoryEdit.notice": "審查透過後，該提議將成為新版本。原來的記憶仍保留在歷史記錄中。",

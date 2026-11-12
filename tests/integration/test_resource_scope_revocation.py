@@ -137,9 +137,11 @@ async def historical_query(
 ) -> httpx.Response:
     from tests.integration.storage_coverage_helpers import request
 
-    payload = _record(request(
-        method, key, {"project_id": h.project, "operation_id": operation_id}
-    ).model_dump(mode="json", by_alias=True))
+    payload = _record(
+        request(method, key, {"project_id": h.project, "operation_id": operation_id}).model_dump(
+            mode="json", by_alias=True
+        )
+    )
     _record(_record(payload["params"])["_meta"])["dataScope"] = {"workstream": "beta"}
     return await h.client.post(
         "/rpc/query", json=payload, headers={"authorization": f"Bearer {h.tokens['beta']}"}

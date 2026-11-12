@@ -169,9 +169,5 @@ class SqliteFieldMeasurementStore(FieldMeasurementStorePort):
         self, table: Table, condition: ColumnElement[bool], model: type[TRecord]
     ) -> tuple[TRecord, ...]:
         with self._engine.connect() as connection:
-            rows = connection.execute(
-                select(table.c.content_json).where(condition)
-            ).all()
-        return tuple(
-            model.model_validate(orjson.loads(str(cast(object, row[0])))) for row in rows
-        )
+            rows = connection.execute(select(table.c.content_json).where(condition)).all()
+        return tuple(model.model_validate(orjson.loads(str(cast(object, row[0])))) for row in rows)

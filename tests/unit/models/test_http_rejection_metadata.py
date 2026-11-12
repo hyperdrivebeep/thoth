@@ -17,9 +17,7 @@ from thoth.adapters.models.http_rejection import read_rejection_metadata
 async def test_retry_after_numeric_limit_and_malformed_fallback(
     header: str, expected: int | None
 ) -> None:
-    metadata = await read_rejection_metadata(
-        httpx.Response(429, headers={"retry-after": header})
-    )
+    metadata = await read_rejection_metadata(httpx.Response(429, headers={"retry-after": header}))
     assert metadata.retry_after_seconds == expected
 
 
@@ -35,9 +33,7 @@ async def test_retry_after_http_dates_use_utc_and_clamp_past() -> None:
         assert metadata.retry_after_seconds is not None
         assert 115 <= metadata.retry_after_seconds <= 121
     past = format_datetime(datetime.now(UTC) - timedelta(days=1), usegmt=True)
-    metadata = await read_rejection_metadata(
-        httpx.Response(429, headers={"retry-after": past})
-    )
+    metadata = await read_rejection_metadata(httpx.Response(429, headers={"retry-after": past}))
     assert metadata.retry_after_seconds == 0
 
 

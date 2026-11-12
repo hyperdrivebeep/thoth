@@ -161,9 +161,7 @@ class AlembicSchemaMigrator(SchemaMigrationPort):
             "owner_data_scopes_json",
         }.issubset(operation_columns):
             return "f7a69b2345cd"
-        candidates = tuple(
-            revision for revision, marker in _LEGACY_MARKERS if marker in tables
-        )
+        candidates = tuple(revision for revision, marker in _LEGACY_MARKERS if marker in tables)
         if not candidates:
             raise MigrationFailure(
                 MigrationFailureCode.LEGACY_SCHEMA_UNRECOGNIZED,

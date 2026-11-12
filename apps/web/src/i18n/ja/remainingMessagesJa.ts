@@ -4,14 +4,17 @@ import type { remainingMessages } from "../remainingMessages";
 export const remainingJa: ColumnOf<typeof remainingMessages> = {
   "examples.historyLoading": "履歴の例を開いています…",
   "examples.resultLoading": "結果の例を開いています…",
-  "conversation.unavailable": "現在の権限ではこの回答にアクセスできないか、保存済みの基準を検証できませんでした。",
-  "conversation.refreshFailed": "会話を更新できませんでした。しばらくしてから、もう一度読み込んでください。",
+  "conversation.unavailable":
+    "現在の権限ではこの回答にアクセスできないか、保存済みの基準を検証できませんでした。",
+  "conversation.refreshFailed":
+    "会話を更新できませんでした。しばらくしてから、もう一度読み込んでください。",
   "comparison.incomplete": "比較が完了しませんでした。",
   "comparison.binding": "比較したバージョンのリンクを検証できませんでした。",
   "followup.queryIncomplete": "レビューの照会が完了しませんでした。",
   "followup.binding": "比較用の回答のリンクを検証できませんでした。",
   "followup.projectBinding": "レビュー一覧のプロジェクトへのリンクを検証できませんでした。",
-  "evidence.binding": "選択した回答の根拠のリンクを検証できませんでした。回答をもう一度確認してください。",
+  "evidence.binding":
+    "選択した回答の根拠のリンクを検証できませんでした。回答をもう一度確認してください。",
   "evidence.queryIncomplete": "根拠の照会が完了しませんでした。",
   "evidence.accessDenied": "現在の権限では、この回答の根拠を読めません。",
   "evidence.versionUnknown": "回答の保存済みバージョンと根拠の一覧を検証できませんでした。",
@@ -28,14 +31,17 @@ export const remainingJa: ColumnOf<typeof remainingMessages> = {
   "labels.answerScope": "答えられる範囲：",
   "approval.recreateFailed": "承認リクエストを再作成できませんでした。",
   "approval.created": "承認リクエストを作成しました。承認者が決めるまで、何も送信されません。",
-  "approval.notSentNotice": "一部の変更に、送信しない印が付いています。この印はこの画面にだけ適用され、承認なしに何かが送信されることはありません。",
+  "approval.notSentNotice":
+    "一部の変更に、送信しない印が付いています。この印はこの画面にだけ適用され、承認なしに何かが送信されることはありません。",
   "labels.retryKey": "再試行キー：",
   "tools.claudeTitle": "Claude Code をインストール",
-  "tools.claudeNotice": "公式の Anthropic Claude Code を THOTH のツールフォルダにインストールします。ほかのプログラムが使っている既存のインストールは変更されません。",
+  "tools.claudeNotice":
+    "公式の Anthropic Claude Code を THOTH のツールフォルダにインストールします。ほかのプログラムが使っている既存のインストールは変更されません。",
   "closure.record": "処置を記録",
   "labels.disposition": "処置の記録 ·",
   "effects.title": "この行動の影響を宣言",
-  "effects.rules": "ルールは、宣言された影響を使ってリスクと必要な権限を決めます。宣言がない場合、その行動は影響のレビューの対象のままです。",
+  "effects.rules":
+    "ルールは、宣言された影響を使ってリスクと必要な権限を決めます。宣言がない場合、その行動は影響のレビューの対象のままです。",
   "effects.readOnly": "影響を何も選ばないと、読み取り専用の行動として宣言されます。",
   "evidenceUse.title": "根拠の利用状況",
   "evidenceUse.ai": " （AI のレビューに基づく）",
@@ -45,7 +51,8 @@ export const remainingJa: ColumnOf<typeof remainingMessages> = {
   "review.stateFailed": "レビューのリクエストの状態を読み込めませんでした。",
   "labels.reviewResult": "レビューの結果：",
   "labels.hypothesisState": "仮説の状態：",
-  "hypothesisLink.recordFailed": "確認を記録できませんでした。判定がまた変わった可能性があります。表示を更新してから、もう一度お試しください。",
+  "hypothesisLink.recordFailed":
+    "確認を記録できませんでした。判定がまた変わった可能性があります。表示を更新してから、もう一度お試しください。",
   "hypothesisLink.staleNotice": "以前の根拠に基づく仮説は、行動の承認や実行には使われません。",
   "lesson.title": "同じ条件での以前の結果",
   "labels.originalMemory": "元の記憶：",
@@ -81,7 +88,8 @@ export const remainingJa: ColumnOf<typeof remainingMessages> = {
   "labels.confirmed": "確認済み ·",
   "labels.changedVerdicts": "変化した判定：",
   "workspaceError.title": "この画面を表示できませんでした",
-  "workspaceError.notice": "サーバーの応答が表示形式と合っていない可能性があります。これは成功や完了とは扱われず、正式な記録は変更されません。タブやプロジェクトから、ほかの記録を見てください。",
+  "workspaceError.notice":
+    "サーバーの応答が表示形式と合っていない可能性があります。これは成功や完了とは扱われず、正式な記録は変更されません。タブやプロジェクトから、ほかの記録を見てください。",
   "workspaceError.retry": "サーバーの状態を再読み込みして、もう一度試す",
   "labels.userCode": "ユーザーコード：",
   "xai.enterCode": "開いたページに、上のコードを入力してください。",
@@ -93,12 +101,15 @@ export const remainingJa: ColumnOf<typeof remainingMessages> = {
   "labels.linkedRecords": "結びついた記録：",
   "labels.before": "変更前：",
   "labels.after": "変更後：",
-  "restore.scopeResendDenied": "別のログインやアクセス範囲からのリクエストは再送されません。記録を再読み込みしてください。",
+  "restore.scopeResendDenied":
+    "別のログインやアクセス範囲からのリクエストは再送されません。記録を再読み込みしてください。",
   "restore.scopeReload": "ログインまたはアクセス範囲が変わりました。記録を再読み込みしてください。",
   "restore.prepareFailed": "復元を準備できませんでした。",
   "restore.resultUnknown": "リクエストの結果を検証できませんでした。",
-  "hypotheses.noRefutation": "反証する根拠は見つかりませんでした。反証がないことは、裏づけにはなりません。",
-  "hypotheses.counterUnsearched": "反証の根拠はまだ検索されていません。反証がないことは、裏づけにはなりません。",
+  "hypotheses.noRefutation":
+    "反証する根拠は見つかりませんでした。反証がないことは、裏づけにはなりません。",
+  "hypotheses.counterUnsearched":
+    "反証の根拠はまだ検索されていません。反証がないことは、裏づけにはなりません。",
   "catalog.notChecked": "モデル一覧はまだ検証されていません",
   "catalog.static": "アカウント未検証 · 固定の一覧",
   "catalog.current": "現在",
@@ -109,8 +120,11 @@ export const remainingJa: ColumnOf<typeof remainingMessages> = {
   "catalog.unknownEffort": "対応していない推論の強度しかないモデル",
   "catalog.otherRoute": "モデル ID は別の経路のものです",
   "submission.unconfirmed": "調査の受理を確認できませんでした。下書きは保持されています。",
-  "submission.clearFailed": "受理は確認されましたが、ブラウザの復旧用マーカーを消去できませんでした。元のリクエストをもう一度確認してください。",
+  "submission.clearFailed":
+    "受理は確認されましたが、ブラウザの復旧用マーカーを消去できませんでした。元のリクエストをもう一度確認してください。",
   "submission.resumeUnavailable": "現在は調査を再開できません。",
-  "submission.tooLarge": "下書きが大きすぎて、送信の復旧用データを保存できません。短くして、もう一度お試しください。",
-  "submission.storageFailed": "送信の復旧用データを保存できませんでした。重複した受理を防ぐため、何も送信されませんでした。",
+  "submission.tooLarge":
+    "下書きが大きすぎて、送信の復旧用データを保存できません。短くして、もう一度お試しください。",
+  "submission.storageFailed":
+    "送信の復旧用データを保存できませんでした。重複した受理を防ぐため、何も送信されませんでした。",
 };

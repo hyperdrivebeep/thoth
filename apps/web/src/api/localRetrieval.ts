@@ -14,20 +14,51 @@ import { z } from "zod";
 export const WORKSPACE_PROJECT_ID = "system:workspace";
 
 const assetReadSchema = z.object({
-  schema_version: z.literal("1.0.0"), supported: z.boolean(), can_manage: z.boolean(),
-  model_name: z.string(), manifest_digest: z.string(), total_bytes: z.number().nonnegative(),
-  asset_state: z.enum(["MODEL_REQUIRED", "READY", "FAILED"]), dependency_available: z.boolean(),
-  worker_loaded: z.boolean(), reason_code: z.string().nullable(),
-  active: z.object({ operation_id: z.string(), state: z.enum(["COPYING", "DOWNLOADING", "VERIFYING"]),
-    transferred_bytes: z.number().nonnegative(), total_bytes: z.number().nonnegative() }).nullable(),
+  schema_version: z.literal("1.0.0"),
+  supported: z.boolean(),
+  can_manage: z.boolean(),
+  model_name: z.string(),
+  manifest_digest: z.string(),
+  total_bytes: z.number().nonnegative(),
+  asset_state: z.enum(["MODEL_REQUIRED", "READY", "FAILED"]),
+  dependency_available: z.boolean(),
+  worker_loaded: z.boolean(),
+  reason_code: z.string().nullable(),
+  active: z
+    .object({
+      operation_id: z.string(),
+      state: z.enum(["COPYING", "DOWNLOADING", "VERIFYING"]),
+      transferred_bytes: z.number().nonnegative(),
+      total_bytes: z.number().nonnegative(),
+    })
+    .nullable(),
 });
 const projectReadSchema = z.object({
-  project_id: z.string(), can_prepare: z.boolean(), enabled: z.boolean(), generation: z.number().int().nonnegative(),
-  state: z.enum(["OFF", "NO_SOURCES", "INDEX_PENDING", "INDEXING", "READY", "FAILED", "CANCEL_REQUESTED"]),
-  ready_sources: z.number().nonnegative(), total_sources: z.number().nonnegative(),
-  pending_sources: z.number().nonnegative(), failed_sources: z.number().nonnegative(),
-  jobs: z.array(z.object({ job_id: z.string(), generation: z.number().int(),
-    state: z.enum(["PENDING", "RUNNING", "READY", "FAILED", "CANCELLED", "STALE"]), reason_code: z.string().nullable() })),
+  project_id: z.string(),
+  can_prepare: z.boolean(),
+  enabled: z.boolean(),
+  generation: z.number().int().nonnegative(),
+  state: z.enum([
+    "OFF",
+    "NO_SOURCES",
+    "INDEX_PENDING",
+    "INDEXING",
+    "READY",
+    "FAILED",
+    "CANCEL_REQUESTED",
+  ]),
+  ready_sources: z.number().nonnegative(),
+  total_sources: z.number().nonnegative(),
+  pending_sources: z.number().nonnegative(),
+  failed_sources: z.number().nonnegative(),
+  jobs: z.array(
+    z.object({
+      job_id: z.string(),
+      generation: z.number().int(),
+      state: z.enum(["PENDING", "RUNNING", "READY", "FAILED", "CANCELLED", "STALE"]),
+      reason_code: z.string().nullable(),
+    }),
+  ),
   active_operation_id: z.string().nullable(),
   // True while sources are indexed only under an earlier preprocessing version.
   outdated_index: z.boolean().optional(),
@@ -39,12 +70,25 @@ export type RetrievalExperimentRead = z.infer<typeof projectReadSchema>;
 export type RetrievalJob = RetrievalExperimentRead["jobs"][number];
 
 export async function readLocalAsset(signal?: AbortSignal): Promise<RpcResult<LocalAssetRead>> {
-  const result = await rpc<unknown>("model/localAsset/read", { project_id: WORKSPACE_PROJECT_ID }, crypto.randomUUID(), signal);
+  const result = await rpc<unknown>(
+    "model/localAsset/read",
+    { project_id: WORKSPACE_PROJECT_ID },
+    crypto.randomUUID(),
+    signal,
+  );
   return { ...result, value: assetReadSchema.parse(result.value) };
 }
 
-export async function readRetrievalExperiment(projectId: string, signal?: AbortSignal): Promise<RpcResult<RetrievalExperimentRead>> {
-  const result = await rpc<unknown>("project/retrieval/experiment/read", { project_id: projectId }, crypto.randomUUID(), signal);
+export async function readRetrievalExperiment(
+  projectId: string,
+  signal?: AbortSignal,
+): Promise<RpcResult<RetrievalExperimentRead>> {
+  const result = await rpc<unknown>(
+    "project/retrieval/experiment/read",
+    { project_id: projectId },
+    crypto.randomUUID(),
+    signal,
+  );
   const value = projectReadSchema.parse(result.value);
   if (value.project_id !== projectId) throw new Error("LOCAL_RETRIEVAL_SCOPE_MISMATCH");
   return { ...result, value };
@@ -55,7 +99,11 @@ export async function configureRetrievalExperiment(
   input: { project_id: string; enabled: boolean; expected_generation: number },
   idempotencyKey: string,
 ): Promise<RpcResult<RetrievalExperimentRead>> {
-  const result = await rpc<unknown>("project/retrieval/experiment/configure", input, idempotencyKey);
+  const result = await rpc<unknown>(
+    "project/retrieval/experiment/configure",
+    input,
+    idempotencyKey,
+  );
   const value = projectReadSchema.parse(result.value);
   if (value.project_id !== input.project_id) throw new Error("LOCAL_RETRIEVAL_SCOPE_MISMATCH");
   return { ...result, value };
@@ -81,7 +129,11 @@ export type OperationTimeouts = {
 };
 
 export const DEFAULT_OPERATION_TIMEOUTS: OperationTimeouts = {
-  startMs: 15_000, pollMs: 15_000, pollIntervalMs: 900, totalMs: 610_000, cancelMs: 15_000,
+  startMs: 15_000,
+  pollMs: 15_000,
+  pollIntervalMs: 900,
+  totalMs: 610_000,
+  cancelMs: 15_000,
 };
 
 /** Every way a long action can end, as the client can actually tell it apart. */
@@ -110,18 +162,31 @@ type BoundedJson =
   | { ok: false; cause: "TIMEOUT" | "NETWORK" | "ABORTED" };
 
 /** One request whose headers *and* body must arrive within `timeoutMs`; a stalled body is a timeout too. */
-async function boundedJson(url: string, init: RequestInit, signal: AbortSignal | undefined, timeoutMs: number): Promise<BoundedJson> {
+async function boundedJson(
+  url: string,
+  init: RequestInit,
+  signal: AbortSignal | undefined,
+  timeoutMs: number,
+): Promise<BoundedJson> {
   if (signal?.aborted) return { ok: false, cause: "ABORTED" };
   const controller = new AbortController();
   let timedOut = false;
-  const timer = globalThis.setTimeout(() => { timedOut = true; controller.abort(); }, timeoutMs);
+  const timer = globalThis.setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, timeoutMs);
   const abort = () => controller.abort();
   signal?.addEventListener("abort", abort, { once: true });
   try {
-    const response = await fetch(url, { ...init, signal: controller.signal, credentials: "same-origin" });
+    const response = await fetch(url, {
+      ...init,
+      signal: controller.signal,
+      credentials: "same-origin",
+    });
     let body: unknown;
-    try { body = await response.json(); }
-    catch (error) {
+    try {
+      body = await response.json();
+    } catch (error) {
       if (controller.signal.aborted) throw error;
       body = undefined;
     }
@@ -136,13 +201,23 @@ async function boundedJson(url: string, init: RequestInit, signal: AbortSignal |
 }
 
 /** An HTTP status that leaves it open whether the server took the request (it may be working on it). */
-const startUnconfirmedStatus = (status: number) => status === 408 || status === 429 || status >= 500;
+const startUnconfirmedStatus = (status: number) =>
+  status === 408 || status === 429 || status >= 500;
 
 function sleep(ms: number, signal: AbortSignal | undefined): Promise<void> {
-  return new Promise(resolve => {
-    if (signal?.aborted) { resolve(); return; }
-    const timer = globalThis.setTimeout(() => { signal?.removeEventListener("abort", done); resolve(); }, ms);
-    const done = () => { globalThis.clearTimeout(timer); resolve(); };
+  return new Promise((resolve) => {
+    if (signal?.aborted) {
+      resolve();
+      return;
+    }
+    const timer = globalThis.setTimeout(() => {
+      signal?.removeEventListener("abort", done);
+      resolve();
+    }, ms);
+    const done = () => {
+      globalThis.clearTimeout(timer);
+      resolve();
+    };
     signal?.addEventListener("abort", done, { once: true });
   });
 }
@@ -150,7 +225,9 @@ function sleep(ms: number, signal: AbortSignal | undefined): Promise<void> {
 const codeShape = /^[A-Z][A-Z0-9_]{2,79}$/;
 
 /** Only a code-shaped value is kept; free text (which may carry paths) is dropped. */
-export function reasonCodeOf(error: { message?: unknown; data?: unknown } | null | undefined): string | null {
+export function reasonCodeOf(
+  error: { message?: unknown; data?: unknown } | null | undefined,
+): string | null {
   if (!error) return null;
   const data = error.data;
   if (data && typeof data === "object" && "reason_code" in data) {
@@ -173,7 +250,9 @@ export type RunLocalOperationRequest = {
   timeouts?: Partial<OperationTimeouts>;
 };
 
-export async function runLocalOperation(request: RunLocalOperationRequest): Promise<OperationOutcome> {
+export async function runLocalOperation(
+  request: RunLocalOperationRequest,
+): Promise<OperationOutcome> {
   const timeouts = { ...DEFAULT_OPERATION_TIMEOUTS, ...request.timeouts };
   const deadline = Date.now() + timeouts.totalMs;
   /** Each request gets its own limit, never more than what is left of the whole wait. */
@@ -184,16 +263,21 @@ export async function runLocalOperation(request: RunLocalOperationRequest): Prom
 
   if (!operationId) {
     if (signal?.aborted) return { kind: "ABANDONED", operationId: null };
-    const started = await boundedJson("/rpc/async", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: crypto.randomUUID(),
-        method: request.method,
-        params: { _meta: { idempotencyKey: request.idempotencyKey }, input: request.input },
-      }),
-    }, signal, remaining(timeouts.startMs));
+    const started = await boundedJson(
+      "/rpc/async",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: crypto.randomUUID(),
+          method: request.method,
+          params: { _meta: { idempotencyKey: request.idempotencyKey }, input: request.input },
+        }),
+      },
+      signal,
+      remaining(timeouts.startMs),
+    );
     if (!started.ok) {
       if (started.cause === "ABORTED") return { kind: "ABANDONED", operationId: null };
       return { kind: "UNCONFIRMED", operationId: null };
@@ -202,10 +286,15 @@ export async function runLocalOperation(request: RunLocalOperationRequest): Prom
     if (!started.httpOk) {
       // 408/429/5xx do not prove that nothing started: keep the same key for a later check.
       if (startUnconfirmedStatus(started.status)) return { kind: "UNCONFIRMED", operationId: null };
-      return { kind: "REJECTED", reasonCode: parsed.success ? reasonCodeOf(parsed.data.error) : null, httpStatus: started.status };
+      return {
+        kind: "REJECTED",
+        reasonCode: parsed.success ? reasonCodeOf(parsed.data.error) : null,
+        httpStatus: started.status,
+      };
     }
     if (!parsed.success) return { kind: "UNCONFIRMED", operationId: null };
-    if (parsed.data.error) return { kind: "REJECTED", reasonCode: reasonCodeOf(parsed.data.error), httpStatus: null };
+    if (parsed.data.error)
+      return { kind: "REJECTED", reasonCode: reasonCodeOf(parsed.data.error), httpStatus: null };
     const id = parsed.data.result?.operation_id;
     if (typeof id !== "string" || !id) return { kind: "UNCONFIRMED", operationId: null };
     operationId = id;
@@ -217,7 +306,9 @@ export async function runLocalOperation(request: RunLocalOperationRequest): Prom
     if (Date.now() >= deadline) return { kind: "UNCONFIRMED", operationId };
     const read = await boundedJson(
       `/operations/${encodeURIComponent(operationId)}?project_id=${encodeURIComponent(projectId)}`,
-      { method: "GET" }, signal, remaining(timeouts.pollMs),
+      { method: "GET" },
+      signal,
+      remaining(timeouts.pollMs),
     );
     if (!read.ok) {
       if (read.cause === "ABORTED") return { kind: "ABANDONED", operationId };
@@ -229,7 +320,8 @@ export async function runLocalOperation(request: RunLocalOperationRequest): Prom
     if (record.state === "SUCCEEDED" && record.result !== null && record.result !== undefined) {
       return { kind: "SUCCEEDED", operationId, value: record.result };
     }
-    if (record.state === "FAILED") return { kind: "FAILED", operationId, reasonCode: reasonCodeOf(record.error) };
+    if (record.state === "FAILED")
+      return { kind: "FAILED", operationId, reasonCode: reasonCodeOf(record.error) };
     if (record.state === "CANCELLED") return { kind: "CANCELLED", operationId };
     await sleep(timeouts.pollIntervalMs, signal);
   }
@@ -243,20 +335,33 @@ export type CancelRequestResult =
 
 /** Asks the server to cancel. This never claims that the work stopped. */
 export async function cancelLocalOperation(
-  projectId: string, operationId: string, signal?: AbortSignal, timeoutMs: number = DEFAULT_OPERATION_TIMEOUTS.cancelMs,
+  projectId: string,
+  operationId: string,
+  signal?: AbortSignal,
+  timeoutMs: number = DEFAULT_OPERATION_TIMEOUTS.cancelMs,
 ): Promise<CancelRequestResult> {
-  const sent = await boundedJson(`/operations/${encodeURIComponent(operationId)}/cancel`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ project_id: projectId }),
-  }, signal, timeoutMs);
+  const sent = await boundedJson(
+    `/operations/${encodeURIComponent(operationId)}/cancel`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ project_id: projectId }),
+    },
+    signal,
+    timeoutMs,
+  );
   if (!sent.ok) return { kind: "UNCONFIRMED" };
   const parsed = jsonRpcResponseSchema.safeParse(sent.body);
   if (!sent.httpOk) {
     if (startUnconfirmedStatus(sent.status)) return { kind: "UNCONFIRMED" };
-    return { kind: "REJECTED", reasonCode: parsed.success ? reasonCodeOf(parsed.data.error) : null, httpStatus: sent.status };
+    return {
+      kind: "REJECTED",
+      reasonCode: parsed.success ? reasonCodeOf(parsed.data.error) : null,
+      httpStatus: sent.status,
+    };
   }
   if (!parsed.success) return { kind: "UNCONFIRMED" };
-  if (parsed.data.error) return { kind: "REJECTED", reasonCode: reasonCodeOf(parsed.data.error), httpStatus: null };
+  if (parsed.data.error)
+    return { kind: "REJECTED", reasonCode: reasonCodeOf(parsed.data.error), httpStatus: null };
   return { kind: "REQUESTED" };
 }

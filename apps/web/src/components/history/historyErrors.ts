@@ -12,6 +12,7 @@ export function restoreErrorText(error: Error): string {
     return t("restore.error.unconfirmed");
   }
   if (error.name === "ZodError") return t("restore.error.schema");
-  if (error instanceof TypeError || ["AbortError", "TimeoutError"].includes(error.name)) return t("restore.error.connection");
+  if (error instanceof TypeError || ["AbortError", "TimeoutError"].includes(error.name))
+    return t("restore.error.connection");
   return error.message;
 }

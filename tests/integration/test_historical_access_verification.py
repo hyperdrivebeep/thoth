@@ -160,9 +160,9 @@ async def test_maximum_failure_binding_query_adds_real_read_without_mutating_his
             )
         )
         assert query.preclaim_allowed and result["state"] == "FAILED"
-        assert [
-            _text(_record(use)["resource_ref"]) for use in _list(result["new_uses"])
-        ] == list(refs[4096:4097])
+        assert [_text(_record(use)["resource_ref"]) for use in _list(result["new_uses"])] == list(
+            refs[4096:4097]
+        )
         assert_phase_delta(before, snapshot(runtime.ledger.engine))
         assert host.operations.read(operation.operation_id) == operation
         # The same recording RPC must still consume the old inputs plus its new read and fail.
@@ -291,11 +291,13 @@ async def test_query_revalidates_current_role_before_returning_historical_output
             "beta", "evidence/read", "old-output", {"span_id": _text(span["span_id"])}
         )
         operation_id = _text(_record(_record(read.json())["result"])["operation_id"])
-        payload = _record(request(
-            "operation/result/read",
-            "read-role",
-            {"project_id": h.project, "operation_id": operation_id},
-        ).model_dump(mode="json", by_alias=True))
+        payload = _record(
+            request(
+                "operation/result/read",
+                "read-role",
+                {"project_id": h.project, "operation_id": operation_id},
+            ).model_dump(mode="json", by_alias=True)
+        )
         _record(_record(payload["params"])["_meta"])["dataScope"] = {"workstream": "beta"}
         headers = {"authorization": f"Bearer {h.tokens['beta']}"}
         allowed = await h.client.post("/rpc/query", json=payload, headers=headers)

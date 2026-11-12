@@ -72,8 +72,8 @@ def test_concrete_project_id_branch_is_rejected_inline_or_multiline(source: str)
     "source",
     [
         'if isinstance(selection, dict) and selection.get("project_id") != project:\n    pass\n',
-        'if work is not None and work.request_ref.project_id == project:\n    pass\n',
-        'if span is None or span.project_id != project:\n    pass\n',
+        "if work is not None and work.request_ref.project_id == project:\n    pass\n",
+        "if span is None or span.project_id != project:\n    pass\n",
         'if project.startswith("project:"):\n    pass\n',
         'if project == "project:":\n    pass\n',
     ],

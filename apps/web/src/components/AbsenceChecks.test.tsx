@@ -4,13 +4,41 @@ import { setLocale } from "../i18n/locale";
 import { AbsenceChecks } from "./AbsenceChecks";
 import { ResearchResultCard } from "./ResearchResultCard";
 
-const payload = { schema_version: "1.0.0", checker_version: "literal-absence:1.0.0", items: [
-  { target: "Polars 1.44.1", a_outcome: "FOUND", b_outcome: "FOUND", effective: "FOUND_IN_MODEL_INPUT", warning_code: "FOUND_IN_MODEL_INPUT" },
-  { target: "Polars 1.44.2", a_outcome: "NOT_FOUND_WITHIN_SCOPE", b_outcome: "FOUND", effective: "FOUND_OUTSIDE_MODEL_INPUT", warning_code: "FOUND_OUTSIDE_MODEL_INPUT", injection_state: "NOT_DELIVERED" },
-  { target: "반복 분포", a_outcome: "UNSUPPORTED", b_outcome: "UNSUPPORTED", effective: "UNSUPPORTED" },
-  { target: "Other", a_outcome: "NOT_FOUND_WITHIN_SCOPE", b_outcome: "NOT_FOUND_WITHIN_SCOPE", effective: "NOT_FOUND_WITHIN_SCOPES" },
-] };
-const render = (value: unknown) => renderToStaticMarkup(<AbsenceChecks result={{ absence_assessments: value }}/>);
+const payload = {
+  schema_version: "1.0.0",
+  checker_version: "literal-absence:1.0.0",
+  items: [
+    {
+      target: "Polars 1.44.1",
+      a_outcome: "FOUND",
+      b_outcome: "FOUND",
+      effective: "FOUND_IN_MODEL_INPUT",
+      warning_code: "FOUND_IN_MODEL_INPUT",
+    },
+    {
+      target: "Polars 1.44.2",
+      a_outcome: "NOT_FOUND_WITHIN_SCOPE",
+      b_outcome: "FOUND",
+      effective: "FOUND_OUTSIDE_MODEL_INPUT",
+      warning_code: "FOUND_OUTSIDE_MODEL_INPUT",
+      injection_state: "NOT_DELIVERED",
+    },
+    {
+      target: "반복 분포",
+      a_outcome: "UNSUPPORTED",
+      b_outcome: "UNSUPPORTED",
+      effective: "UNSUPPORTED",
+    },
+    {
+      target: "Other",
+      a_outcome: "NOT_FOUND_WITHIN_SCOPE",
+      b_outcome: "NOT_FOUND_WITHIN_SCOPE",
+      effective: "NOT_FOUND_WITHIN_SCOPES",
+    },
+  ],
+};
+const render = (value: unknown) =>
+  renderToStaticMarkup(<AbsenceChecks result={{ absence_assessments: value }} />);
 afterEach(() => setLocale("ko"));
 describe("declared absence checks", () => {
   it("leaves old and unsupported versions without invented check records", () => {
@@ -33,7 +61,13 @@ describe("declared absence checks", () => {
   it("keeps English wording, exact targets and the original answer beside the hold", () => {
     setLocale("en");
     const answer = "The original answer remains unchanged.";
-    const html = renderToStaticMarkup(<ResearchResultCard state="SUCCEEDED" result={{ answer, answer_status: "PARTIAL_HOLD", absence_assessments: payload }} onDetail={() => {}}/>);
+    const html = renderToStaticMarkup(
+      <ResearchResultCard
+        state="SUCCEEDED"
+        result={{ answer, answer_status: "PARTIAL_HOLD", absence_assessments: payload }}
+        onDetail={() => {}}
+      />,
+    );
     expect(html).toContain(answer);
     expect(html).toContain("The model claimed absence of a string present in its input");
     expect(html).toContain("Found in allowed material outside the model input");
@@ -41,10 +75,25 @@ describe("declared absence checks", () => {
     expect(html).not.toContain("AUDITED_COMPLETE");
   });
   it("renders full records and does not call an unchecked input absent", () => {
-    const html = render({ ...payload, active_stage_ref: { revision_id: "new" }, items: [
-      { claim: { target: "Old target" }, origin_stage_ref: { revision_id: "old" }, effective: "FOUND_IN_MODEL_INPUT" },
-      { claim: { target: "Visible target" }, origin_stage_ref: { revision_id: "new" }, a_result: { outcome: "NOT_CHECKED" }, b_result: { outcome: "FOUND" }, effective: "FOUND_A_SCOPE_UNCHECKED", warning_code: "FOUND_A_SCOPE_UNCHECKED" },
-    ] });
+    const html = render({
+      ...payload,
+      active_stage_ref: { revision_id: "new" },
+      items: [
+        {
+          claim: { target: "Old target" },
+          origin_stage_ref: { revision_id: "old" },
+          effective: "FOUND_IN_MODEL_INPUT",
+        },
+        {
+          claim: { target: "Visible target" },
+          origin_stage_ref: { revision_id: "new" },
+          a_result: { outcome: "NOT_CHECKED" },
+          b_result: { outcome: "FOUND" },
+          effective: "FOUND_A_SCOPE_UNCHECKED",
+          warning_code: "FOUND_A_SCOPE_UNCHECKED",
+        },
+      ],
+    });
     expect(html).toContain("AI 입력 범위는 미확인");
     expect(html).toContain("Visible target");
     expect(html).not.toContain("Old target");

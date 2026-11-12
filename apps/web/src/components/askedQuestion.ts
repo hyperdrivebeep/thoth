@@ -7,7 +7,9 @@ import { createContext } from "react";
  */
 export const AskedQuestionContext = createContext<string | null>(null);
 
-export function askedQuestion(status: { request?: { effective_question?: string } | null } | undefined): string | null {
+export function askedQuestion(
+  status: { request?: { effective_question?: string } | null } | undefined,
+): string | null {
   return status?.request?.effective_question ?? null;
 }
 

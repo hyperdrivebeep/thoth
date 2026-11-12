@@ -112,9 +112,7 @@ def compile_criterion(
     )
     questions: list[str] = []
     if not signals.source_scope_confirmed:
-        questions.append(
-            "Do the cited spans belong to the controlling plan and applicable phase?"
-        )
+        questions.append("Do the cited spans belong to the controlling plan and applicable phase?")
     if not signals.expert_semantics_confirmed:
         questions.append(
             "Does the extracted construct match the domain meaning of the official criterion?"

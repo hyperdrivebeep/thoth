@@ -10,14 +10,33 @@ import { foldedOriginals } from "./foldedOriginals";
  * only counted and folded away. A card that gathers its technical details in one place passes
  * technical={false} and shows foldedOriginals() there.
  */
-export function ReadableList({ items, technical: showTechnical = true }: { items: string[]; technical?: boolean }) {
+export function ReadableList({
+  items,
+  technical: showTechnical = true,
+}: {
+  items: string[];
+  technical?: boolean;
+}) {
   useTranslation();
   const language = useResultLanguage();
   const { plain, technical } = splitReadable(items, language);
   const folded = showTechnical ? foldedOriginals(items, language) : [];
-  return <>
-    {plain.length > 0 && <ul>{plain.map((item, index) => <li key={index}>{item}</li>)}</ul>}
-    {technical.length > 0 && <p>{message("technicalPhrases", technical.length)}</p>}
-    {folded.length > 0 && <details className="connection-tech"><summary>{t("oauth.technical")}</summary><small>{folded.join(" · ")}</small></details>}
-  </>;
+  return (
+    <>
+      {plain.length > 0 && (
+        <ul>
+          {plain.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      )}
+      {technical.length > 0 && <p>{message("technicalPhrases", technical.length)}</p>}
+      {folded.length > 0 && (
+        <details className="connection-tech">
+          <summary>{t("oauth.technical")}</summary>
+          <small>{folded.join(" · ")}</small>
+        </details>
+      )}
+    </>
+  );
 }

@@ -241,7 +241,6 @@ class EvidenceGraphService:
             audit_records=(audit,),
         )
 
-
     def correct_source_time(
         self,
         *,

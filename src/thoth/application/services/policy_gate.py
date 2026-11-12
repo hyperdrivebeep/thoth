@@ -110,9 +110,7 @@ class PolicyGate:
             "requested_policy_revision": (
                 None if expectation is None else expectation.policy_revision
             ),
-            "requested_policy_digest": (
-                None if expectation is None else expectation.policy_digest
-            ),
+            "requested_policy_digest": (None if expectation is None else expectation.policy_digest),
             "denied_at": self._clock.now(),
             "semantic_truth_certified": False,
         }

@@ -8,4 +8,3 @@ from thoth.ports.improvement import ImprovementEvaluatorPort
 
 class EvaluatorRegistryPort(ImprovementEvaluatorPort, Protocol):
     def capabilities(self) -> tuple[EvaluatorCapability, ...]: ...
-

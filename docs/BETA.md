@@ -27,8 +27,8 @@ claim that answers are correct or useful on your data.
 3. Back up your workspace before opening it with the beta. Opening an existing workspace runs
    database migrations, and THOTH has no downgrade command (see [Upgrading](#upgrading)).
 4. Check what you installed: `.\.venv\Scripts\python.exe -m thoth.cli version`. The beta prints
-   `THOTH 0.2.0b3` (the release is named `v0.2.0-beta.3`; Python writes the same version as
-   `0.2.0b3`). The earlier preview prints `0.1.0`. Put that line in any report.
+   `THOTH 0.2.0b4` (the release is named `v0.2.0-beta.4`; Python writes the same version as
+   `0.2.0b4`). The earlier preview prints `0.1.0`. Put that line in any report.
 
 **Optional: local retrieval preparation.** Settings has a card, *Local retrieval preparation*
 (로컬 검색 준비). Once installed it applies to every project (a project can be switched off), and it

@@ -8,7 +8,17 @@ import { useReturnFocus } from "./returnFocus";
  * language, with the action named on its button. A browser confirm box says "OK" and cannot be styled
  * or translated.
  */
-export function ConfirmDialog({ title, children, confirmLabel, intent = "primary", icon, pending = false, error, onConfirm, onClose }: {
+export function ConfirmDialog({
+  title,
+  children,
+  confirmLabel,
+  intent = "primary",
+  icon,
+  pending = false,
+  error,
+  onConfirm,
+  onClose,
+}: {
   title: string;
   children: ReactNode;
   confirmLabel: string;

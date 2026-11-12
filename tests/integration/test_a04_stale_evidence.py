@@ -221,9 +221,7 @@ async def test_rejected_sandbox_result_cannot_reenter_other_consumers(
                         "evidence_refs": safe_refs,
                         "specification": {
                             "description": "Read-only local metadata fixture",
-                            "expected_observation_or_change": {
-                                "description": "read target state"
-                            },
+                            "expected_observation_or_change": {"description": "read target state"},
                             "effect_completeness_confirmed": True,
                             "stop_conditions": ["read complete"],
                             "observability": "receipt",

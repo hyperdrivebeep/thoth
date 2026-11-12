@@ -40,10 +40,34 @@ export const timelineExampleStatus: ResearchStatus = {
     },
   },
   completed_stages: [
-    { role: "RESEARCH_PLANNER", state: "COMPLETED", elapsed_ms: 91700, context_bytes: 12000, dispatch_ids: ["d1"] },
-    { role: "EVIDENCE_RERANKER", state: "COMPLETED", elapsed_ms: 59100, context_bytes: 8400, dispatch_ids: ["d2"] },
-    { role: "SEMANTIC_REVIEWER", state: "COMPLETED", elapsed_ms: 68000, context_bytes: 15600, dispatch_ids: ["d3"] },
-    { role: "HYPOTHESIS_GENERATOR", state: "COMPLETED", elapsed_ms: 131000, context_bytes: 22100, dispatch_ids: ["d4"] },
+    {
+      role: "RESEARCH_PLANNER",
+      state: "COMPLETED",
+      elapsed_ms: 91700,
+      context_bytes: 12000,
+      dispatch_ids: ["d1"],
+    },
+    {
+      role: "EVIDENCE_RERANKER",
+      state: "COMPLETED",
+      elapsed_ms: 59100,
+      context_bytes: 8400,
+      dispatch_ids: ["d2"],
+    },
+    {
+      role: "SEMANTIC_REVIEWER",
+      state: "COMPLETED",
+      elapsed_ms: 68000,
+      context_bytes: 15600,
+      dispatch_ids: ["d3"],
+    },
+    {
+      role: "HYPOTHESIS_GENERATOR",
+      state: "COMPLETED",
+      elapsed_ms: 131000,
+      context_bytes: 22100,
+      dispatch_ids: ["d4"],
+    },
   ],
   activity_events: [
     { seq: 1, kind: "note", key: "RESEARCH_PLANNER" },
@@ -118,7 +142,11 @@ export const timelineExampleStatus: ResearchStatus = {
       why_ko: "원문 확인 범위와 추측 금지 조건을 이후 단계에 그대로 적용하기 위해서입니다.",
       state: "succeeded",
       research_relation: "none",
-      result: { summary_ko: "질문 조건 4개와 인용 제한을 정리했습니다.", duration_ms: 91700, counts: { constraints: 4 } },
+      result: {
+        summary_ko: "질문 조건 4개와 인용 제한을 정리했습니다.",
+        duration_ms: 91700,
+        counts: { constraints: 4 },
+      },
       redaction: { applied: false, classes: [], source_content_included: false },
     },
     {
@@ -155,8 +183,17 @@ export const timelineExampleStatus: ResearchStatus = {
         raw_command_available: false,
         command_detail: "unavailable",
       },
-      result: { summary_ko: "지정한 쪽의 구조와 표 위치를 확인했습니다.", duration_ms: 840, counts: { spans: 1 } },
-      redaction: { applied: true, classes: ["absolute_path", "source_content"], public_note_ko: "로컬 경로와 원문은 화면에서 제외했습니다.", source_content_included: false },
+      result: {
+        summary_ko: "지정한 쪽의 구조와 표 위치를 확인했습니다.",
+        duration_ms: 840,
+        counts: { spans: 1 },
+      },
+      redaction: {
+        applied: true,
+        classes: ["absolute_path", "source_content"],
+        public_note_ko: "로컬 경로와 원문은 화면에서 제외했습니다.",
+        source_content_included: false,
+      },
     },
     {
       schema_version: "thoth.user_activity_event.v1",
@@ -173,7 +210,11 @@ export const timelineExampleStatus: ResearchStatus = {
       why_ko: "질문의 네 조건과 직접 연결되는 원문만 다음 판단에 넘기기 위해서입니다.",
       state: "succeeded",
       research_relation: "selected_candidate",
-      result: { summary_ko: "후보 38개 중 관련성이 높은 4개를 골랐습니다.", duration_ms: 59100, counts: { reviewed: 38, selected: 4 } },
+      result: {
+        summary_ko: "후보 38개 중 관련성이 높은 4개를 골랐습니다.",
+        duration_ms: 59100,
+        counts: { reviewed: 38, selected: 4 },
+      },
       redaction: { applied: false, classes: [], source_content_included: false },
     },
     {
@@ -191,10 +232,32 @@ export const timelineExampleStatus: ResearchStatus = {
       why_ko: "서로 다른 설명 4개 중 원문과 맞지 않는 설명을 걸러내기 위해서입니다.",
       state: "running",
       research_relation: "none",
-      target: { kind: "model", title: "판단 검토 모델", display_ref: "모델 호출 5", currentness: null, access_state: "allowed" },
-      tool: { display_name: "판단 검토", family: "MODEL", operation: "CALL_MODEL", sanitized_args: { evidence_candidates: 4, hypotheses: 4 }, raw_command_available: false, command_detail: "unavailable" },
-      result: { summary_ko: "가설 4개 중 2개를 검토했습니다.", duration_ms: 47000, counts: { reviewed: 2, total: 4 } },
-      redaction: { applied: true, classes: ["prompt", "provider_payload"], public_note_ko: "프롬프트와 제공자 응답 원문은 표시하지 않았습니다.", source_content_included: false },
+      target: {
+        kind: "model",
+        title: "판단 검토 모델",
+        display_ref: "모델 호출 5",
+        currentness: null,
+        access_state: "allowed",
+      },
+      tool: {
+        display_name: "판단 검토",
+        family: "MODEL",
+        operation: "CALL_MODEL",
+        sanitized_args: { evidence_candidates: 4, hypotheses: 4 },
+        raw_command_available: false,
+        command_detail: "unavailable",
+      },
+      result: {
+        summary_ko: "가설 4개 중 2개를 검토했습니다.",
+        duration_ms: 47000,
+        counts: { reviewed: 2, total: 4 },
+      },
+      redaction: {
+        applied: true,
+        classes: ["prompt", "provider_payload"],
+        public_note_ko: "프롬프트와 제공자 응답 원문은 표시하지 않았습니다.",
+        source_content_included: false,
+      },
     },
   ],
   request: {
@@ -211,7 +274,9 @@ export const timelineExampleStatus: ResearchStatus = {
     unreported_calls: 1,
     cumulative_token_limit_enforced: false,
   },
-  model_dispatches: [{ state: "RESERVED", transport_observation: { elapsed_ms: 47000, received_bytes: 0 } }],
+  model_dispatches: [
+    { state: "RESERVED", transport_observation: { elapsed_ms: 47000, received_bytes: 0 } },
+  ],
 };
 
 export function isTimelineExampleRequested(): boolean {

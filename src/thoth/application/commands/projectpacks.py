@@ -36,9 +36,7 @@ class ProjectPackCommandHandlers:
 
     async def list(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         ProjectPackListInput.model_validate(value)
-        return {
-            "packs": [item.model_dump(mode="json") for item in self._loader.list()]
-        }
+        return {"packs": [item.model_dump(mode="json") for item in self._loader.list()]}
 
     async def run(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = ProjectPackRunInput.model_validate(value)

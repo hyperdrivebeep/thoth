@@ -21,14 +21,16 @@ export const coreZh: ColumnOf<typeof coreMessages> = {
   "language.automatic": "与提问语言一致",
   "language.fixed": "已提交的请求保持原来的语言。更改将从下一个问题开始生效。",
   "language.accepted": "已接收请求的回答语言",
-  "language.proseFlag": "部分新的假设或预期结果的文字与所请求的英语不一致。原文已保留，未自动重新生成。",
+  "language.proseFlag":
+    "部分新的假设或预期结果的文字与所请求的英语不一致。原文已保留，未自动重新生成。",
   "language.cost": "新的提问会占用模型额度。只更改显示语言不会调用模型。",
   "language.unsupported": "此服务器不支持选择回答语言。",
   "expected.title": "各假设的预期结果（AI 建议）",
   "expected.sourceUnavailable": "此证据不属于已保存的结果，因此无法显示原文。",
   "expected.unknown": "未知",
   "expected.unconfirmed": "未经证据证实的预测",
-  "expected.notice": "这些是模型的建议，经人工审查之前尚未确定。相同的标签表示相同的结果。它们不是概率或分数。",
+  "expected.notice":
+    "这些是模型的建议，经人工审查之前尚未确定。相同的标签表示相同的结果。它们不是概率或分数。",
   "composer.problem": "你正在处理什么问题？",
   "composer.followupPlaceholder": "补充问题、新证据或变化的条件…",
   "composer.startPlaceholder": "你想调查什么问题？",
@@ -38,7 +40,8 @@ export const coreZh: ColumnOf<typeof coreMessages> = {
   "composer.checkOriginal": "检查原始请求",
   "composer.retryOriginal": "检查原始提交",
   "composer.checking": "正在确认原始请求是否已被接收。你的草稿会保留。",
-  "composer.uncertain": "你之前的请求可能已被接收。重新打开后没有自动重发。请先检查它，再提交新的请求。",
+  "composer.uncertain":
+    "你之前的请求可能已被接收。重新打开后没有自动重发。请先检查它，再提交新的请求。",
   "composer.invalidPending": "无法验证已保存的提交。请先检查原始操作，再创建新的提交。",
   "composer.accessChecking": "正在确认访问权限。你可以继续编辑草稿；确认访问权限之前暂停提交。",
   "composer.savedResearch": "已保存的研究仍可查看。",
@@ -50,7 +53,8 @@ export const coreZh: ColumnOf<typeof coreMessages> = {
   "composer.needSetup": "检查模型连接和初始设置后才能开始调查。",
   "composer.corruptDraft": "无法读取已保存的草稿。它没有被删除；保存新草稿可能会将其替换。",
   "composer.unavailableDraft": "无法读取浏览器草稿。请检查浏览器存储和工作区标识。",
-  "composer.draftScope": "其他地址、端口、浏览器配置文件或工作区中的草稿不会自动合并。已保存的研究会单独从服务器读取。",
+  "composer.draftScope":
+    "其他地址、端口、浏览器配置文件或工作区中的草稿不会自动合并。已保存的研究会单独从服务器读取。",
   "composer.draftTooLarge": "草稿超出浏览器存储上限。请缩短草稿，以确保重新打开后能够恢复。",
   "composer.draftUnsaved": "无法在此浏览器中保存草稿。关闭页面时可能会丢失。",
 };

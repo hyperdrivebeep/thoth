@@ -10,13 +10,16 @@ import { ConfirmDialog } from "./ConfirmDialog";
 import { RenameDialog } from "./RenameDialog";
 
 /** What is being asked, by id: the row itself is looked up again, so a retry uses the version read since. */
-type Asking = { kind: "archive" | "renameProject"; projectId: string } | { kind: "renameThread"; threadId: string };
+type Asking =
+  | { kind: "archive" | "renameProject"; projectId: string }
+  | { kind: "renameThread"; threadId: string };
 
 const REVISION_MISMATCH = -32030;
 
 /** Why a conversation could not be renamed, in words. A changed revision means the list on screen was old. */
 function threadRenameFailure(error: unknown): string {
-  if (error instanceof RpcError && error.code === REVISION_MISMATCH) return t("manage.threadChanged");
+  if (error instanceof RpcError && error.code === REVISION_MISMATCH)
+    return t("manage.threadChanged");
   return t("manage.renameFailed");
 }
 
@@ -24,7 +27,11 @@ function threadRenameFailure(error: unknown): string {
  * Archive and rename for the project list: the three requests, and the window each one asks in.
  * The list component only says which item was chosen; nothing is sent before the person confirms.
  */
-export function useProjectManagement({ projects, threads, onArchived }: {
+export function useProjectManagement({
+  projects,
+  threads,
+  onArchived,
+}: {
   projects: ProjectSummary[];
   threads: WorkThread[];
   onArchived: (project: ProjectSummary) => void;
@@ -35,7 +42,11 @@ export function useProjectManagement({ projects, threads, onArchived }: {
 
   const archive = useMutation({
     mutationFn: (target: ProjectSummary) =>
-      rpc<ProjectSummary>("project/archive", { project_id: target.project_id, expected_revision: target.revision }, crypto.randomUUID()),
+      rpc<ProjectSummary>(
+        "project/archive",
+        { project_id: target.project_id, expected_revision: target.revision },
+        crypto.randomUUID(),
+      ),
     onSuccess: async (_response, target) => {
       close();
       await client.invalidateQueries({ queryKey: ["projects"] });
@@ -64,13 +75,20 @@ export function useProjectManagement({ projects, threads, onArchived }: {
     mutationFn: ({ thread, name }: { thread: WorkThread; name: string }) =>
       rpc<WorkThread>(
         "thread/metadata/update",
-        { project_id: thread.project_id, thread_id: thread.thread_id, expected_revision: thread.revision, display_name: name },
+        {
+          project_id: thread.project_id,
+          thread_id: thread.thread_id,
+          expected_revision: thread.revision,
+          display_name: name,
+        },
         crypto.randomUUID(),
       ),
     onSuccess: async (_response, { thread }) => {
       close();
       await client.invalidateQueries({ queryKey: ["threads"] });
-      await client.invalidateQueries({ queryKey: ["research", thread.project_id, thread.thread_id] });
+      await client.invalidateQueries({
+        queryKey: ["research", thread.project_id, thread.thread_id],
+      });
     },
     onError: () => {
       void client.invalidateQueries({ queryKey: ["threads"] });
@@ -84,8 +102,14 @@ export function useProjectManagement({ projects, threads, onArchived }: {
     setAsking(next);
   };
 
-  const project = asking && "projectId" in asking ? projects.find(item => item.project_id === asking.projectId) : undefined;
-  const thread = asking && "threadId" in asking ? threads.find(item => item.thread_id === asking.threadId) : undefined;
+  const project =
+    asking && "projectId" in asking
+      ? projects.find((item) => item.project_id === asking.projectId)
+      : undefined;
+  const thread =
+    asking && "threadId" in asking
+      ? threads.find((item) => item.thread_id === asking.threadId)
+      : undefined;
   let dialog: ReactNode = null;
   if (asking?.kind === "archive" && project) {
     dialog = (
@@ -107,8 +131,12 @@ export function useProjectManagement({ projects, threads, onArchived }: {
         title={t("manage.renameProjectTitle")}
         current={project.name}
         pending={renameProject.isPending}
-        error={renameProject.error ? projectActionFailure(renameProject.error, "manage.renameFailed") : null}
-        onSave={name => renameProject.mutate({ project, name })}
+        error={
+          renameProject.error
+            ? projectActionFailure(renameProject.error, "manage.renameFailed")
+            : null
+        }
+        onSave={(name) => renameProject.mutate({ project, name })}
         onClose={close}
       />
     );
@@ -120,7 +148,7 @@ export function useProjectManagement({ projects, threads, onArchived }: {
         notice={t("manage.threadNameNotice")}
         pending={renameThread.isPending}
         error={renameThread.error ? threadRenameFailure(renameThread.error) : null}
-        onSave={name => renameThread.mutate({ thread, name })}
+        onSave={(name) => renameThread.mutate({ thread, name })}
         onClose={close}
       />
     );
@@ -130,7 +158,9 @@ export function useProjectManagement({ projects, threads, onArchived }: {
     dialog,
     archiving: archive.isPending,
     askArchive: (target: ProjectSummary) => ask({ kind: "archive", projectId: target.project_id }),
-    askRenameProject: (target: ProjectSummary) => ask({ kind: "renameProject", projectId: target.project_id }),
-    askRenameThread: (target: WorkThread) => ask({ kind: "renameThread", threadId: target.thread_id }),
+    askRenameProject: (target: ProjectSummary) =>
+      ask({ kind: "renameProject", projectId: target.project_id }),
+    askRenameThread: (target: WorkThread) =>
+      ask({ kind: "renameThread", threadId: target.thread_id }),
   };
 }

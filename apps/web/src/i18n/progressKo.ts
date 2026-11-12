@@ -110,7 +110,10 @@ export function sceneFor(key: string | undefined, facts: WorkFacts, live = false
     case "RESEARCH_PLANNER":
     case "REQUIREMENTS":
       return {
-        title: title(`${eulreul(constraintSubject)} 고정했습니다`, `${eulreul(constraintSubject)} 고정하고 있습니다`),
+        title: title(
+          `${eulreul(constraintSubject)} 고정했습니다`,
+          `${eulreul(constraintSubject)} 고정하고 있습니다`,
+        ),
         detail: "아직 답을 쓰지 않았습니다.",
       };
     case "EVIDENCE_RERANKER":
@@ -129,7 +132,8 @@ export function sceneFor(key: string | undefined, facts: WorkFacts, live = false
       };
     case "SEMANTIC_REVIEWER":
     case "EVIDENCE_REVIEW": {
-      const condition = facts.constraints.find((item) => /조건/u.test(item)) ?? focus ?? "질문 조건";
+      const condition =
+        facts.constraints.find((item) => /조건/u.test(item)) ?? focus ?? "질문 조건";
       return {
         title: title(
           locators
@@ -153,8 +157,12 @@ export function sceneFor(key: string | undefined, facts: WorkFacts, live = false
     case "SOURCE_PLANNER":
       return {
         title: title(
-          sources ? `${sources} 외에 더 열 주소를 골랐습니다` : "허용된 사이트에서 더 열 주소를 골랐습니다",
-          sources ? `${sources} 외에 더 열 주소를 고르고 있습니다` : "허용된 사이트에서 더 열 주소를 고르고 있습니다",
+          sources
+            ? `${sources} 외에 더 열 주소를 골랐습니다`
+            : "허용된 사이트에서 더 열 주소를 골랐습니다",
+          sources
+            ? `${sources} 외에 더 열 주소를 고르고 있습니다`
+            : "허용된 사이트에서 더 열 주소를 고르고 있습니다",
         ),
         detail: "인터넷 전체를 검색하지 않습니다.",
       };
@@ -162,8 +170,12 @@ export function sceneFor(key: string | undefined, facts: WorkFacts, live = false
     case "HYPOTHESES":
       return {
         title: title(
-          hyps ? `${eulreul(hyps)} 준비했습니다` : `${focus ?? "질문"}에 대한 가능한 설명을 준비했습니다`,
-          hyps ? `${eulreul(hyps)} 준비하고 있습니다` : `${focus ?? "질문"}에 대한 가능한 설명을 준비하고 있습니다`,
+          hyps
+            ? `${eulreul(hyps)} 준비했습니다`
+            : `${focus ?? "질문"}에 대한 가능한 설명을 준비했습니다`,
+          hyps
+            ? `${eulreul(hyps)} 준비하고 있습니다`
+            : `${focus ?? "질문"}에 대한 가능한 설명을 준비하고 있습니다`,
         ),
         detail: "아직 채택이 아닙니다.",
       };
@@ -188,8 +200,12 @@ export function sceneFor(key: string | undefined, facts: WorkFacts, live = false
     case "ACTION_COMPARISON":
       return {
         title: title(
-          focus ? `${eulreul(focus)} 확인하려면 다음에 할 작업을 골랐습니다` : "다음에 할 확인 작업을 골랐습니다",
-          focus ? `${eulreul(focus)} 확인하려면 다음에 할 작업을 고르고 있습니다` : "다음에 할 확인 작업을 고르고 있습니다",
+          focus
+            ? `${eulreul(focus)} 확인하려면 다음에 할 작업을 골랐습니다`
+            : "다음에 할 확인 작업을 골랐습니다",
+          focus
+            ? `${eulreul(focus)} 확인하려면 다음에 할 작업을 고르고 있습니다`
+            : "다음에 할 확인 작업을 고르고 있습니다",
         ),
         detail: "실행 전 초안입니다.",
       };
@@ -197,8 +213,12 @@ export function sceneFor(key: string | undefined, facts: WorkFacts, live = false
     case "EVIDENCE_FOCUS":
       return {
         title: title(
-          locators ? `${locators} 구절을 골랐습니다` : `${focus ?? "표와 원문"} 위치를 확인했습니다`,
-          locators ? `${locators} 위치를 확인하고 있습니다` : `${focus ?? "표와 원문"} 위치를 확인하고 있습니다`,
+          locators
+            ? `${locators} 구절을 골랐습니다`
+            : `${focus ?? "표와 원문"} 위치를 확인했습니다`,
+          locators
+            ? `${locators} 위치를 확인하고 있습니다`
+            : `${focus ?? "표와 원문"} 위치를 확인하고 있습니다`,
         ),
         detail: "실제로 집어넣을 칸과 문장을 찾습니다.",
       };
@@ -213,8 +233,12 @@ export function sceneFor(key: string | undefined, facts: WorkFacts, live = false
     case "COUNTEREVIDENCE_CHALLENGER":
       return {
         title: title(
-          hyps ? `${eulreul(hyps)} 뒤집을 근거를 찾았습니다` : `${eulreul(focus ?? "질문")} 뒤집을 근거를 찾았습니다`,
-          hyps ? `${eulreul(hyps)} 뒤집을 근거를 찾고 있습니다` : `${eulreul(focus ?? "질문")} 뒤집을 근거를 찾고 있습니다`,
+          hyps
+            ? `${eulreul(hyps)} 뒤집을 근거를 찾았습니다`
+            : `${eulreul(focus ?? "질문")} 뒤집을 근거를 찾았습니다`,
+          hyps
+            ? `${eulreul(hyps)} 뒤집을 근거를 찾고 있습니다`
+            : `${eulreul(focus ?? "질문")} 뒤집을 근거를 찾고 있습니다`,
         ),
         detail: "지지 문장만 보지 않습니다.",
       };
@@ -229,8 +253,12 @@ export function sceneFor(key: string | undefined, facts: WorkFacts, live = false
     case "REFERENCE_MAPPER":
       return {
         title: title(
-          locators ? `${locators} 인용을 원문 위치에 맞춰 두었습니다` : "인용과 원문 위치를 맞춰 두었습니다",
-          locators ? `${locators} 인용을 원문 위치에 맞추고 있습니다` : "인용과 원문 위치를 맞추고 있습니다",
+          locators
+            ? `${locators} 인용을 원문 위치에 맞춰 두었습니다`
+            : "인용과 원문 위치를 맞춰 두었습니다",
+          locators
+            ? `${locators} 인용을 원문 위치에 맞추고 있습니다`
+            : "인용과 원문 위치를 맞추고 있습니다",
         ),
         detail: "표 번호와 셀 위치를 자료에 연결합니다.",
       };
@@ -256,9 +284,7 @@ export function sceneFor(key: string | undefined, facts: WorkFacts, live = false
       };
     case "HOLD":
       return {
-        title: live
-          ? "모델 응답을 기다리다 멈췄습니다"
-          : "모델 호출이 끝나 연구를 멈췄습니다",
+        title: live ? "모델 응답을 기다리다 멈췄습니다" : "모델 호출이 끝나 연구를 멈췄습니다",
         detail: "연결 자료는 그대로 있고, 답을 확정하지 않았습니다.",
       };
     default:
@@ -284,7 +310,9 @@ export function waitLine(status?: ResearchStatus): string | null {
   }
   const observation = active.transport_observation;
   const elapsed = formatDuration(observation?.elapsed_ms ?? null);
-  const firstByte = formatDuration(observation?.first_byte_ms ?? observation?.first_response_ms ?? null);
+  const firstByte = formatDuration(
+    observation?.first_byte_ms ?? observation?.first_response_ms ?? null,
+  );
   const received = observation?.received_bytes ?? active.received_bytes;
   if (active.state === "RESERVED") {
     if (firstByte) {
@@ -307,7 +335,9 @@ export function usageLine(status?: ResearchStatus): string | null {
   const tokens = total == null ? "미확인" : total.toLocaleString(localeTag());
   const partial = usage.state === "PARTIAL" ? " (부분 관측)" : "";
   const cached =
-    usage.cached_input_tokens != null ? ` · 캐시 입력 ${usage.cached_input_tokens.toLocaleString(localeTag())}` : "";
+    usage.cached_input_tokens != null
+      ? ` · 캐시 입력 ${usage.cached_input_tokens.toLocaleString(localeTag())}`
+      : "";
   return `사용 토큰 ${tokens}${partial}${cached}`;
 }
 
@@ -395,7 +425,9 @@ export function stageActionPayload(stage: CompletedStage): string | null {
   ]);
 }
 
-export function modelActionPayload(status?: ResearchStatus): { payload: string | null; live: boolean } | null {
+export function modelActionPayload(
+  status?: ResearchStatus,
+): { payload: string | null; live: boolean } | null {
   const dispatches = status?.model_dispatches ?? [];
   if (dispatches.length === 0) {
     return null;
@@ -408,7 +440,9 @@ export function modelActionPayload(status?: ResearchStatus): { payload: string |
   }
   const observation = active.transport_observation;
   const elapsed = formatDuration(observation?.elapsed_ms ?? null);
-  const firstByte = formatDuration(observation?.first_byte_ms ?? observation?.first_response_ms ?? null);
+  const firstByte = formatDuration(
+    observation?.first_byte_ms ?? observation?.first_response_ms ?? null,
+  );
   const received = observation?.received_bytes ?? active.received_bytes;
   if (active.state === "RESERVED") {
     return {
@@ -428,7 +462,10 @@ export function modelActionPayload(status?: ResearchStatus): { payload: string |
   };
 }
 
-export function hypothesisActionPayload(hypotheses: number | null, reviews: number | null): string | null {
+export function hypothesisActionPayload(
+  hypotheses: number | null,
+  reviews: number | null,
+): string | null {
   if (hypotheses == null) {
     return null;
   }

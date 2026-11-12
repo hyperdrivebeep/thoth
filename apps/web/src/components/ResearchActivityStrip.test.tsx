@@ -27,40 +27,81 @@ describe("ResearchActivityStrip", () => {
   it("translates the redacted span placeholder but preserves an authored artifact title", () => {
     try {
       setLocale("en");
-      const html = renderToStaticMarkup(<ResearchActivityStrip events={[
-        event(1, { label_ko: "연결된 자료 line 1을 읽었습니다.", target: { kind: "span", title: "연결된 자료", display_ref: "line 1", access_state: "allowed" } }),
-        event(2, { label_ko: "Opened source", target: { kind: "artifact", title: "연결된 자료", access_state: "allowed" } }),
-      ]}/>);
+      const html = renderToStaticMarkup(
+        <ResearchActivityStrip
+          events={[
+            event(1, {
+              label_ko: "연결된 자료 line 1을 읽었습니다.",
+              target: {
+                kind: "span",
+                title: "연결된 자료",
+                display_ref: "line 1",
+                access_state: "allowed",
+              },
+            }),
+            event(2, {
+              label_ko: "Opened source",
+              target: { kind: "artifact", title: "연결된 자료", access_state: "allowed" },
+            }),
+          ]}
+        />,
+      );
       expect(html).toContain("Read Connected source line 1.");
       expect(html).toContain("Connected source · line 1");
       expect(html).toContain("연결된 자료");
-    } finally { setLocale("ko"); }
+    } finally {
+      setLocale("ko");
+    }
   });
 
   it("translates the program-owned LOCAL READ tool name in English details", () => {
     try {
       setLocale("en");
-      const html = renderToStaticMarkup(<ResearchActivityStrip detailOpen events={[event(1, {
-        label_ko: "Read original record.",
-        tool: { display_name: "프로젝트 자료", family: "LOCAL", operation: "READ", sanitized_args: {}, raw_command_available: false, command_detail: "unavailable" },
-      })]} />);
+      const html = renderToStaticMarkup(
+        <ResearchActivityStrip
+          detailOpen
+          events={[
+            event(1, {
+              label_ko: "Read original record.",
+              tool: {
+                display_name: "프로젝트 자료",
+                family: "LOCAL",
+                operation: "READ",
+                sanitized_args: {},
+                raw_command_available: false,
+                command_detail: "unavailable",
+              },
+            }),
+          ]}
+        />,
+      );
       expect(html).toContain("Project source");
       expect(html).not.toContain("프로젝트 자료");
-    } finally { setLocale("ko"); }
+    } finally {
+      setLocale("ko");
+    }
   });
   it("translates the program model title but preserves the same words in a source title", () => {
     try {
       setLocale("en");
-      const html = renderToStaticMarkup(<ResearchActivityStrip events={[
-        event(1, { target: { kind: "model", title: "모델 검토기", access_state: "allowed" } }),
-        event(2, { target: { kind: "span", title: "모델 검토기", access_state: "allowed" } }),
-      ]} />);
+      const html = renderToStaticMarkup(
+        <ResearchActivityStrip
+          events={[
+            event(1, { target: { kind: "model", title: "모델 검토기", access_state: "allowed" } }),
+            event(2, { target: { kind: "span", title: "모델 검토기", access_state: "allowed" } }),
+          ]}
+        />,
+      );
       expect(html).toContain("Model reviewer");
       expect(html).toContain("모델 검토기");
-    } finally { setLocale("ko"); }
+    } finally {
+      setLocale("ko");
+    }
   });
   it("shows only the five most recent default events in the compact view", () => {
-    const html = renderToStaticMarkup(<ResearchActivityStrip events={Array.from({ length: 7 }, (_, index) => event(index + 1))} />);
+    const html = renderToStaticMarkup(
+      <ResearchActivityStrip events={Array.from({ length: 7 }, (_, index) => event(index + 1))} />,
+    );
     expect(html).not.toContain("자료 1 확인");
     expect(html).not.toContain("자료 2 확인");
     expect(html).toContain("자료 3 확인");
@@ -69,20 +110,57 @@ describe("ResearchActivityStrip", () => {
   });
 
   it("keeps execution state separate from the research relationship", () => {
-    const html = renderToStaticMarkup(<ResearchActivityStrip events={[event(1, { state: "succeeded", research_relation: "contradicts" })]} />);
+    const html = renderToStaticMarkup(
+      <ResearchActivityStrip
+        events={[event(1, { state: "succeeded", research_relation: "contradicts" })]}
+      />,
+    );
     expect(html).toContain("실행 완료");
     expect(html).toContain("판단을 반박");
   });
 
   it("renders only sanitized tool and source detail when expanded", () => {
-    const html = renderToStaticMarkup(<ResearchActivityStrip detailOpen events={[event(1, {
-      why_ko: "근거 후보가 질문과 직접 연결되는지 확인합니다.",
-      target: { kind: "span", title: "감사 보고서", display_ref: "연결 자료 1", safe_uri: "https://example.org", locator: { page: 6 }, source_version_id: "source-v3", hash_short: "71e8c8f2", currentness: "current", access_state: "allowed" },
-      tool: { display_name: "연결 자료 읽기", family: "LOCAL", operation: "READ_SOURCE", sanitized_args: { page: 6 }, raw_command_available: false, command_detail: "unavailable" },
-      result: { summary_ko: "지정한 쪽을 확인했습니다.", duration_ms: 840, counts: { spans: 1 } },
-      redaction: { applied: true, classes: ["absolute_path", "source_content"], public_note_ko: "로컬 경로와 원문은 제외했습니다.", source_content_included: false },
-      refs: { operation_alias: "operation:public", source_ref: "source:private-value" },
-    })]} />);
+    const html = renderToStaticMarkup(
+      <ResearchActivityStrip
+        detailOpen
+        events={[
+          event(1, {
+            why_ko: "근거 후보가 질문과 직접 연결되는지 확인합니다.",
+            target: {
+              kind: "span",
+              title: "감사 보고서",
+              display_ref: "연결 자료 1",
+              safe_uri: "https://example.org",
+              locator: { page: 6 },
+              source_version_id: "source-v3",
+              hash_short: "71e8c8f2",
+              currentness: "current",
+              access_state: "allowed",
+            },
+            tool: {
+              display_name: "연결 자료 읽기",
+              family: "LOCAL",
+              operation: "READ_SOURCE",
+              sanitized_args: { page: 6 },
+              raw_command_available: false,
+              command_detail: "unavailable",
+            },
+            result: {
+              summary_ko: "지정한 쪽을 확인했습니다.",
+              duration_ms: 840,
+              counts: { spans: 1 },
+            },
+            redaction: {
+              applied: true,
+              classes: ["absolute_path", "source_content"],
+              public_note_ko: "로컬 경로와 원문은 제외했습니다.",
+              source_content_included: false,
+            },
+            refs: { operation_alias: "operation:public", source_ref: "source:private-value" },
+          }),
+        ]}
+      />,
+    );
     expect(html).toContain("연결 자료 읽기");
     expect(html).toContain("6쪽");
     expect(html).toContain("소요 840ms");

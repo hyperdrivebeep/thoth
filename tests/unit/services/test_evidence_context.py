@@ -150,9 +150,7 @@ def test_context_assembler_expands_same_version_continuation_group() -> None:
             ordinal=2,
             text="middle continuation span",
             locator=SourceLocator(page=2, structural_node_id="node:middle"),
-            relations=(
-                StructuralRelation(kind="CONTINUATION_OF", target_id="node:first"),
-            ),
+            relations=(StructuralRelation(kind="CONTINUATION_OF", target_id="node:first"),),
         ),
         StructuralNode(
             node_id="node:last",

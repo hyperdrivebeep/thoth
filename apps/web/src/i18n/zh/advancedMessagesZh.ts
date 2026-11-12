@@ -40,7 +40,8 @@ export const advancedZh: ColumnOf<typeof advancedMessages> = {
   "advanced.examplesNotice": "查看示例并不会执行它们。这与正常的研究流程是分开的。",
   "advanced.field": "现场评估",
   "advanced.fieldHint": "方案 · 参与者会话 · 评分 · 保护隐私的导出",
-  "advanced.fieldNotice": "公开的现场命名空间目前只提供命令，没有只读查询 API，本界面也不能证明参与者评估、节省的时间或付费意愿。只有在获得批准的方案和参与者同意的情况下，才能使用高级命令。",
+  "advanced.fieldNotice":
+    "公开的现场命名空间目前只提供命令，没有只读查询 API，本界面也不能证明参与者评估、节省的时间或付费意愿。只有在获得批准的方案和参与者同意的情况下，才能使用高级命令。",
   "advanced.projectGroup": "项目、资料与访问",
   "advanced.threadGroup": "对话与请求",
   "advanced.discoveryGroup": "资料发现",
@@ -62,12 +63,15 @@ export const advancedZh: ColumnOf<typeof advancedMessages> = {
   "advanced.command": "高级命令 · 明确执行",
   "advanced.query": "只读查询",
   "advanced.journaledQuery": "记入日志的查询",
-  "advanced.commandNotice": "这可能会更改规范数据、调用模型或外部服务，或产生费用。请仔细核对下面的具体输入。服务器的授权、预算和时效性检查仍然适用。",
+  "advanced.commandNotice":
+    "这可能会更改规范数据、调用模型或外部服务，或产生费用。请仔细核对下面的具体输入。服务器的授权、预算和时效性检查仍然适用。",
   "advanced.queryNotice": "使用服务器的只读允许列表。仅读取不会产生操作或回执。",
-  "advanced.journalNotice": "此查询不在只读允许列表中。通过 /rpc 明确执行可能会记录操作和日志。仅浏览不会执行它。",
+  "advanced.journalNotice":
+    "此查询不在只读允许列表中。通过 /rpc 明确执行可能会记录操作和日志。仅浏览不会执行它。",
   "advanced.input": "输入 JSON",
   "advanced.inputHint": "只会注入 project_id。请按契约提供所需的 ID、摘要和 DTO。",
-  "advanced.coverageNotice": "这是技术性的 RPC 入口。目录中有条目或状态为 IMPLEMENTED，并不能证明每条路径都已通过界面或实时验证。",
+  "advanced.coverageNotice":
+    "这是技术性的 RPC 入口。目录中有条目或状态为 IMPLEMENTED，并不能证明每条路径都已通过界面或实时验证。",
   "advanced.confirm": "我已审阅此方法和输入可能造成的数据更改及外部影响。",
   "advanced.runCommand": "运行已审阅的命令",
   "advanced.runQuery": "运行此查询",

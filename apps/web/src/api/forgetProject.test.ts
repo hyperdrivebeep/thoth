@@ -1,11 +1,19 @@
 // @vitest-environment jsdom
 import { afterEach, expect, it } from "vitest";
 import { forgetProject } from "./forgetProject";
-import { inspectLocalContext, readLocalDraft, writeLocalContext, writeLocalDraft } from "./localWorkspacePersistence";
+import {
+  inspectLocalContext,
+  readLocalDraft,
+  writeLocalContext,
+  writeLocalDraft,
+} from "./localWorkspacePersistence";
 
 const HERE = `workspace:${"c".repeat(32)}`;
 const OTHER = `workspace:${"d".repeat(32)}`;
-afterEach(() => { localStorage.clear(); sessionStorage.clear(); });
+afterEach(() => {
+  localStorage.clear();
+  sessionStorage.clear();
+});
 
 it("removes drafts and the last place of the deleted project in this workspace and nothing else", () => {
   writeLocalDraft(HERE, "gone", "t1", "unsent one");
@@ -29,4 +37,3 @@ it("leaves the last place alone when it points at another project", () => {
   forgetProject({ mode: "LOCAL", workspaceId: HERE }, "gone");
   expect(inspectLocalContext(HERE).context).toEqual({ projectId: "kept", threadId: "t1" });
 });
-

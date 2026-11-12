@@ -14,7 +14,10 @@ export function expectedGrounding(row: Record<string, unknown>) {
   const legacy = row.grounding_projection === "LEGACY_UNASSESSED";
   const fallback: MessageKey = "grounding.unclassified";
   return {
-    role: known && !legacy ? roleLabels.get(textValue(grounding.derivation_role)) ?? fallback : undefined,
+    role:
+      known && !legacy
+        ? (roleLabels.get(textValue(grounding.derivation_role)) ?? fallback)
+        : undefined,
     rationale: known && !legacy ? textValue(grounding.rationale) : "",
     unassessed: known || legacy,
     unavailable: row.binding_availability !== undefined && row.binding_availability !== "AVAILABLE",

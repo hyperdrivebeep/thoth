@@ -11,4 +11,3 @@ __all__ = [
     "EvaluatorRegistry",
     "default_evaluator_registry",
 ]
-

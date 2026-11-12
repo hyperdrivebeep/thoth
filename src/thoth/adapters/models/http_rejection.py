@@ -113,9 +113,7 @@ async def read_rejection_metadata(response: httpx.Response) -> HttpRejectionMeta
                             error_fields.get("type")
                         )
                     if code is None:
-                        code = _safe_code(payload.get("code")) or _safe_code(
-                            payload.get("type")
-                        )
+                        code = _safe_code(payload.get("code")) or _safe_code(payload.get("type"))
                     detail = payload.get("detail")
                     if (
                         code is None

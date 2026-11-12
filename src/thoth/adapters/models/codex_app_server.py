@@ -17,9 +17,7 @@ from thoth.adapters.models.codex_profile import (
     CodexProfileHold,
 )
 
-_ALLOWED = frozenset(
-    {"account/read", "account/login/start", "account/login/cancel", "model/list"}
-)
+_ALLOWED = frozenset({"account/read", "account/login/start", "account/login/cancel", "model/list"})
 
 
 class AppServerProcessPort(Protocol):
@@ -50,19 +48,22 @@ def _spawn(identity: CodexExecutableIdentity, profile: CodexProfile) -> AppServe
         LOCALAPPDATA=isolated,
         XDG_CONFIG_HOME=isolated,
     )
-    return cast(AppServerProcessPort, subprocess.Popen(
-        [str(identity.path), "app-server", "--listen", "stdio://"],
-        cwd=profile.root,
-        env=env,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        bufsize=1,
-        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
-    ))
+    return cast(
+        AppServerProcessPort,
+        subprocess.Popen(
+            [str(identity.path), "app-server", "--listen", "stdio://"],
+            cwd=profile.root,
+            env=env,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            bufsize=1,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        ),
+    )
 
 
 class CodexAppServerClient:

@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState, type FocusEvent, type KeyboardEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FocusEvent,
+  type KeyboardEvent,
+} from "react";
 
 export const NAVIGATION_ID = "project-navigation";
 
@@ -26,7 +33,7 @@ export function useNavigationDrawer() {
   }, []);
   const toggle = useCallback(() => {
     giveFocusBack.current = true;
-    setOpen(value => !value);
+    setOpen((value) => !value);
   }, []);
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
@@ -44,10 +51,12 @@ export function useNavigationDrawer() {
   };
 
   /** A choice made in the list (a project, a conversation, the settings): the list closes after it. */
-  const closing = <A extends unknown[]>(action: (...args: A) => void) => (...args: A) => {
-    action(...args);
-    close();
-  };
+  const closing =
+    <A extends unknown[]>(action: (...args: A) => void) =>
+    (...args: A) => {
+      action(...args);
+      close();
+    };
 
   return {
     open,
@@ -56,6 +65,13 @@ export function useNavigationDrawer() {
     closing,
     button,
     railProps: { id: NAVIGATION_ID, ref: rail, "data-open": open, onKeyDown, onBlur },
+    // The dimmed page behind the open list. A click on it closes the list; it is not a control
+    // (the keyboard closes the list with Escape or its button), so it is kept out of the reading order.
+    backdropProps: {
+      className: "nav-drawer-backdrop",
+      role: "presentation" as const,
+      onClick: () => close(),
+    },
   };
 }
 

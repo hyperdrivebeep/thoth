@@ -11,7 +11,7 @@ export const sourceTimeAssessmentSchema = z.object({
   byte_sha256: z.string(),
   cutoff_at: z.string(),
   cutoff_state: z.enum(cutoffStates),
-  mode: z.enum(["AUTO","USER_CONFIRMATION","ADVANCED_CORRECTION"]),
+  mode: z.enum(["AUTO", "USER_CONFIRMATION", "ADVANCED_CORRECTION"]),
   basis_observation_ids: z.array(z.string()),
   reason_code: z.string(),
   revision: z.number(),
@@ -48,16 +48,45 @@ export function projectCutoffText(cutoffAt?: string | null) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-export async function confirmSourceTime(input: z.infer<typeof sourceTimeMutationBasisSchema> & {assertion:"ON_OR_BEFORE_CUTOFF"|"AFTER_CUTOFF"}) {
-  return rpc<{source_time: SourceTimeAssessment}>("project/source/time/confirm", input, crypto.randomUUID());
+export async function confirmSourceTime(
+  input: z.infer<typeof sourceTimeMutationBasisSchema> & {
+    assertion: "ON_OR_BEFORE_CUTOFF" | "AFTER_CUTOFF";
+  },
+) {
+  return rpc<{ source_time: SourceTimeAssessment }>(
+    "project/source/time/confirm",
+    input,
+    crypto.randomUUID(),
+  );
 }
 
-export async function correctSourceTime(input: z.infer<typeof sourceTimeMutationBasisSchema> & {assertion?: "ON_OR_BEFORE_CUTOFF"|"AFTER_CUTOFF"; revert_unknown?: boolean; correction_reason: string}) {
-  return rpc<{source_time: SourceTimeAssessment}>("project/source/time/correct", input, crypto.randomUUID());
+export async function correctSourceTime(
+  input: z.infer<typeof sourceTimeMutationBasisSchema> & {
+    assertion?: "ON_OR_BEFORE_CUTOFF" | "AFTER_CUTOFF";
+    revert_unknown?: boolean;
+    correction_reason: string;
+  },
+) {
+  return rpc<{ source_time: SourceTimeAssessment }>(
+    "project/source/time/correct",
+    input,
+    crypto.randomUUID(),
+  );
 }
 
 /** Refresh query-backed views only; do not auto-refetch legacy journaling RPCs. */
 export async function refreshSourceTimeViews(client: QueryClient, projectId: string) {
-  await Promise.all(["sources", "evidence", "result-evidence", "research", "conversation", "research-history", "history-detail", "history-comparison", "restore-preview"]
-    .map(prefix => client.invalidateQueries({ queryKey: [prefix, projectId] })));
+  await Promise.all(
+    [
+      "sources",
+      "evidence",
+      "result-evidence",
+      "research",
+      "conversation",
+      "research-history",
+      "history-detail",
+      "history-comparison",
+      "restore-preview",
+    ].map((prefix) => client.invalidateQueries({ queryKey: [prefix, projectId] })),
+  );
 }

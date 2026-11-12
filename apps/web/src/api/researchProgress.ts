@@ -30,7 +30,8 @@ export type TimelineEvent = {
   kind: "note" | "action";
   text: string;
   live?: boolean;
-  actionType?: "stage_completed" | "source_read" | "source_attached" | "model_call" | "hypothesis_review";
+  actionType?:
+    "stage_completed" | "source_read" | "source_attached" | "model_call" | "hypothesis_review";
   label?: string;
   payload?: string | null;
   icon?: TimelineIcon;
@@ -67,7 +68,10 @@ function numberOrNull(value: unknown): number | null {
 
 function questionText(status?: ResearchStatus): string {
   return [status?.request?.authored_text, status?.request?.effective_question, status?.problem]
-    .filter((value): value is string => typeof value === "string" && value.trim().length > 1 && value.trim() !== "q")
+    .filter(
+      (value): value is string =>
+        typeof value === "string" && value.trim().length > 1 && value.trim() !== "q",
+    )
     .join("\n");
 }
 
@@ -104,7 +108,9 @@ function extractConstraints(status?: ResearchStatus): string[] {
   if (/확인 안 되면|부족한지|HOLD/u.test(text)) {
     found.push(t("progress.explainMissing"));
   }
-  const quotes = [...text.matchAll(/[“「"]([^”」"]{2,48})[”」"]/gu)].map((match) => match[1].trim());
+  const quotes = [...text.matchAll(/[“「"]([^”」"]{2,48})[”」"]/gu)].map((match) =>
+    match[1].trim(),
+  );
   return unique([...found, ...quotes]);
 }
 
@@ -138,7 +144,9 @@ function decidedHypothesisIds(status?: ResearchStatus): Set<string> {
 function workFacts(status: ResearchStatus, sourceUris: string[] = []): WorkFacts {
   const records = hypothesisRecords(status);
   const decidedIds = decidedHypothesisIds(status);
-  const quotes = [...questionText(status).matchAll(/[“「]([^”」]{2,48})[”」]/gu)].map((match) => match[1].trim());
+  const quotes = [...questionText(status).matchAll(/[“「]([^”」]{2,48})[”」]/gu)].map((match) =>
+    match[1].trim(),
+  );
   const hypotheses = unique([...records.map((item) => item.statement), ...quotes]);
   const decided = records.filter((item) => decidedIds.has(item.id)).map((item) => item.statement);
   const pending = records.filter((item) => !decidedIds.has(item.id)).map((item) => item.statement);
@@ -218,7 +226,11 @@ function actionEvent(
   };
 }
 
-function timelineFromStages(status: ResearchStatus, sourceUris: string[], facts: WorkFacts): TimelineEvent[] {
+function timelineFromStages(
+  status: ResearchStatus,
+  sourceUris: string[],
+  facts: WorkFacts,
+): TimelineEvent[] {
   const events: TimelineEvent[] = [];
   const stages = status.completed_stages ?? [];
   stages.forEach((stage, index) => {
@@ -241,7 +253,11 @@ function timelineFromStages(status: ResearchStatus, sourceUris: string[], facts:
   return events;
 }
 
-function timelineFromPublished(status: ResearchStatus, sourceUris: string[], facts: WorkFacts): TimelineEvent[] | null {
+function timelineFromPublished(
+  status: ResearchStatus,
+  sourceUris: string[],
+  facts: WorkFacts,
+): TimelineEvent[] | null {
   const published = status.activity_events;
   if (!Array.isArray(published) || published.length === 0) {
     return null;
@@ -322,8 +338,14 @@ function timelineFromPublished(status: ResearchStatus, sourceUris: string[], fac
           `event-action-${event.seq ?? index}`,
           "model_call",
           waiting
-            ? compactPayload([elapsed ?? t("progress.elapsedUnknown"), firstByte ? formatMessage("firstByte", firstByte) : t("progress.noFirstByte")])
-            : compactPayload([received != null ? `${received.toLocaleString(localeTag())}B` : null, elapsed]),
+            ? compactPayload([
+                elapsed ?? t("progress.elapsedUnknown"),
+                firstByte ? formatMessage("firstByte", firstByte) : t("progress.noFirstByte"),
+              ])
+            : compactPayload([
+                received != null ? `${received.toLocaleString(localeTag())}B` : null,
+                elapsed,
+              ]),
           waiting,
         ),
       );
@@ -390,12 +412,14 @@ export function liveResearchProgress(
   const reviews = reviewCount(status);
   const facts = workFacts(status, sourceUris);
   const current = sceneFor(phase, facts, running);
-  const missing = phase === "EVIDENCE_FOCUS" && labels.length === 0 && total === null
-    ? formatMessage("progressLocationUnavailable")
-    : missingFor(status, facts, labels, total, hypotheses, reviews);
+  const missing =
+    phase === "EVIDENCE_FOCUS" && labels.length === 0 && total === null
+      ? formatMessage("progressLocationUnavailable")
+      : missingFor(status, facts, labels, total, hypotheses, reviews);
   const liveText = missing ? `${current.title} ${missing}` : current.title;
   let events =
-    timelineFromPublished(status, sourceUris, facts) ?? timelineFromStages(status, sourceUris, facts);
+    timelineFromPublished(status, sourceUris, facts) ??
+    timelineFromStages(status, sourceUris, facts);
   if (!running) {
     events = events.map((event) => (event.live ? { ...event, live: false } : event));
   }
@@ -428,7 +452,10 @@ export function composerActivity(status: ResearchStatus): string | null {
   if (status.execution_state === "PAUSED") {
     return t("progress.paused");
   }
-  if (status.attempt?.remote_observation === "UNKNOWN" && status.attempt.external_effect_state === "DISPATCHING") {
+  if (
+    status.attempt?.remote_observation === "UNKNOWN" &&
+    status.attempt.external_effect_state === "DISPATCHING"
+  ) {
     return t("progress.externalUnknown");
   }
   if (status.operation_state !== "RUNNING") {

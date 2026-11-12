@@ -5,7 +5,14 @@ import { t } from "../i18n/locale";
 import type { ProjectSummary } from "../types";
 
 /** One project in the list, with its menu: rename and archive. */
-export function ProjectNavItem({ project, active, removing, onOpen, onRename, onRemove }: {
+export function ProjectNavItem({
+  project,
+  active,
+  removing,
+  onOpen,
+  onRename,
+  onRemove,
+}: {
   project: ProjectSummary;
   active: boolean;
   removing: boolean;
@@ -23,21 +30,47 @@ export function ProjectNavItem({ project, active, removing, onOpen, onRename, on
       <Button fill alignText="left" minimal role="menuitem" icon="edit" onClick={choose(onRename)}>
         {t("manage.rename")}
       </Button>
-      <Button fill alignText="left" minimal role="menuitem" icon="box" disabled={removing} onClick={choose(onRemove)}>
+      <Button
+        fill
+        alignText="left"
+        minimal
+        role="menuitem"
+        icon="box"
+        disabled={removing}
+        onClick={choose(onRemove)}
+      >
         {t("workspace.removeProject")}
       </Button>
     </div>
   );
   return (
     <div className={`project-nav-row ${active ? "active" : ""}`}>
-      <Button minimal alignText="left" className={`project-button ${active ? "active" : ""}`} onClick={onOpen}>
+      <Button
+        minimal
+        alignText="left"
+        className={`project-button ${active ? "active" : ""}`}
+        onClick={onOpen}
+      >
         <Icon icon={active ? "folder-open" : "folder-close"} />
         <span>
           <strong>{project.name}</strong>
         </span>
       </Button>
-      <PopoverNext isOpen={menuOpen} onInteraction={setMenuOpen} placement="right-start" arrow={false} content={menu}>
-        <Button small minimal icon="more" aria-label={message("projectMenu", project.name)} aria-expanded={menuOpen} loading={removing} />
+      <PopoverNext
+        isOpen={menuOpen}
+        onInteraction={setMenuOpen}
+        placement="right-start"
+        arrow={false}
+        content={menu}
+      >
+        <Button
+          small
+          minimal
+          icon="more"
+          aria-label={message("projectMenu", project.name)}
+          aria-expanded={menuOpen}
+          loading={removing}
+        />
       </PopoverNext>
     </div>
   );

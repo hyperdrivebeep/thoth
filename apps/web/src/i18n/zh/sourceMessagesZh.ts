@@ -2,11 +2,13 @@ import type { ColumnOf } from "../withColumns";
 import type { sourceMessages } from "../sourceMessages";
 
 export const sourceZh: ColumnOf<typeof sourceMessages> = {
-  "sources.fileUploadStalled": "两分钟内没有发送任何数据，因此上传已停止。请检查连接后重试。没有连接任何资料。",
+  "sources.fileUploadStalled":
+    "两分钟内没有发送任何数据，因此上传已停止。请检查连接后重试。没有连接任何资料。",
   "sources.fileUploadCancel": "取消上传",
   "sources.fileUploadCancelled": "上传已取消。没有连接任何资料。",
   "sources.fileTitle": "连接资料文件",
-  "sources.fileTypes": "上传 HWPX、PDF、DOCX、XLSX、CSV、JSON、MD、TXT、YAML 或 HTML 文件，并记录其权威性和使用范围。",
+  "sources.fileTypes":
+    "上传 HWPX、PDF、DOCX、XLSX、CSV、JSON、MD、TXT、YAML 或 HTML 文件，并记录其权威性和使用范围。",
   "sources.hostedUpload": "上传的文件用于此审查项目。",
   "sources.localUpload": "文件暂存在这台电脑的 THOTH 工作区中。",
   "sources.chooseFiles": "选择文件…",
@@ -19,7 +21,8 @@ export const sourceZh: ColumnOf<typeof sourceMessages> = {
   "sources.projectShared": "在本项目内共享",
   "sources.explicitGrants": "仅限明确许可的任务",
   "sources.connectFailed": "未能连接资料",
-  "sources.scopeHelp": "“在本项目内共享”让本项目的所有任务都能把这份资料用作证据。“仅限明确许可的任务”本应只让单独获得许可的任务使用，但目前还没有为任务授予许可的界面。现在无论选哪一项，本项目的研究都能读取这份资料，所选范围只会留在资料的记录里。通常请选择“在本项目内共享”。",
+  "sources.scopeHelp":
+    "“在本项目内共享”让本项目的所有任务都能把这份资料用作证据。“仅限明确许可的任务”本应只让单独获得许可的任务使用，但目前还没有为任务授予许可的界面。现在无论选哪一项，本项目的研究都能读取这份资料，所选范围只会留在资料的记录里。通常请选择“在本项目内共享”。",
   "sources.connected": "资料已连接。请用新的问题或指示开始分析。",
   "sources.unclassified": "权威性未分类",
   "sources.informal": "非正式参考",
@@ -35,7 +38,8 @@ export const sourceZh: ColumnOf<typeof sourceMessages> = {
   "web.denied": "拒绝",
   "web.lookup": "公共网络检索",
   "web.undecided": "尚未选择",
-  "web.consentScope": "允许：在已连接文件之后，研究只能使用项目中登记的网站。这不会开始搜索。拒绝：停用网络检索；模型调用继续。",
+  "web.consentScope":
+    "允许：在已连接文件之后，研究只能使用项目中登记的网站。这不会开始搜索。拒绝：停用网络检索；模型调用继续。",
   "web.permittedSources": "允许使用的公共网络资料",
   "web.registerFirst": "请先登记允许的域名。保存或启用它们并不会开始搜索。",
   "web.allowInSettings": "在设置中允许",
@@ -74,7 +78,8 @@ export const sourceZh: ColumnOf<typeof sourceMessages> = {
   "archive.deleteNotFound": "未找到该项目。它可能已被删除，因此正在刷新列表。",
   "archive.deleteFailed": "无法永久删除该项目。请重试。",
   "credential.connections": "账户连接",
-  "credential.registrationNotice": "开始受支持的账户登录，或登记 API 密钥。仅访问密钥控制台并不会连接 THOTH。",
+  "credential.registrationNotice":
+    "开始受支持的账户登录，或登记 API 密钥。仅访问密钥控制台并不会连接 THOTH。",
   "credential.methodsFailed": "无法检查连接方式。请重试。",
   "setupIssue.corrupt": "已有的工作区设置文件已损坏。不会把它当作新的设置，也不会覆盖它。",
   "setupIssue.unreadable": "无法读取工作区设置文件。在检查文件访问权限之前，不会保存新的设置。",

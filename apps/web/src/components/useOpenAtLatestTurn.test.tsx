@@ -4,11 +4,19 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { useOpenAtLatestTurn } from "./useOpenAtLatestTurn";
 
-function Timeline({ threadId, turns, loaded }: { threadId: string; turns: string[]; loaded: boolean }) {
+function Timeline({
+  threadId,
+  turns,
+  loaded,
+}: {
+  threadId: string;
+  turns: string[];
+  loaded: boolean;
+}) {
   const timeline = useOpenAtLatestTurn(threadId, loaded);
   return (
     <section ref={timeline}>
-      {turns.map(turn => (
+      {turns.map((turn) => (
         <div className="conversation-turn" data-turn={turn} key={turn} />
       ))}
     </section>
@@ -58,13 +66,13 @@ it("does not jump again when the same conversation is read again from the start"
   await show("thread:a", ["first", "latest"], true);
   await show("thread:a", [], false); // the saved pages were dropped and are being read again
   await show("thread:a", ["first", "latest", "newer"], true);
-  expect(scrolled.map(entry => entry.turn)).toEqual(["latest"]);
+  expect(scrolled.map((entry) => entry.turn)).toEqual(["latest"]);
 });
 
 it("opens another conversation at its own latest turn", async () => {
   await show("thread:a", ["a-1", "a-2"], true);
   await show("thread:b", ["b-1", "b-2", "b-3"], true);
-  expect(scrolled.map(entry => entry.turn)).toEqual(["a-2", "b-3"]);
+  expect(scrolled.map((entry) => entry.turn)).toEqual(["a-2", "b-3"]);
 });
 
 it("does nothing for a new conversation that has no turn yet", async () => {

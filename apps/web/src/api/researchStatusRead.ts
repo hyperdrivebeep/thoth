@@ -10,7 +10,11 @@ import { expectedResultContract } from "./expectedResultContract";
  * the first read that no longer says running is a full one, so the result appears exactly once.
  */
 export async function readResearchStatus(
-  client: QueryClient, queryKey: readonly unknown[], projectId: string, threadId: string, signal?: AbortSignal,
+  client: QueryClient,
+  queryKey: readonly unknown[],
+  projectId: string,
+  threadId: string,
+  signal?: AbortSignal,
 ): Promise<RpcResult<ResearchStatus>> {
   const ready = client.getQueryData<RpcResult<WorkspaceReady>>(["workspace-ready"]);
   const selected = expectedResultContract(ready?.value);
@@ -19,15 +23,29 @@ export async function readResearchStatus(
   // Same key contract as useReadAccessProtection; the query's real success releases it.
   const guardKey = ["read-access-blocked", queryHash];
   const owner = client.getQueryCache().get(queryHash);
-  const requiresFullRead = () => client.getQueryData<boolean>(guardKey) === true
-    || isReadAccessDenied(client.getQueryState(queryKey)?.error);
+  const requiresFullRead = () =>
+    client.getQueryData<boolean>(guardKey) === true ||
+    isReadAccessDenied(client.getQueryState(queryKey)?.error);
   try {
-    const prior = requiresFullRead() ? undefined : client.getQueryData<RpcResult<ResearchStatus>>(queryKey);
+    const prior = requiresFullRead()
+      ? undefined
+      : client.getQueryData<RpcResult<ResearchStatus>>(queryKey);
     if (prior?.value.operation_state === "RUNNING") {
-      const light = await rpc<ResearchStatus>("thread/read", { project_id: projectId, thread_id: threadId, ...contract, view: "PROGRESS" }, crypto.randomUUID(), signal);
-      if (light.value.operation_state === "RUNNING" && !requiresFullRead()) return { ...light, value: { ...prior.value, ...light.value } };
+      const light = await rpc<ResearchStatus>(
+        "thread/read",
+        { project_id: projectId, thread_id: threadId, ...contract, view: "PROGRESS" },
+        crypto.randomUUID(),
+        signal,
+      );
+      if (light.value.operation_state === "RUNNING" && !requiresFullRead())
+        return { ...light, value: { ...prior.value, ...light.value } };
     }
-    return await rpc<ResearchStatus>("thread/read", { project_id: projectId, thread_id: threadId, ...contract }, crypto.randomUUID(), signal);
+    return await rpc<ResearchStatus>(
+      "thread/read",
+      { project_id: projectId, thread_id: threadId, ...contract },
+      crypto.randomUUID(),
+      signal,
+    );
   } catch (error) {
     if (isReadAccessDenied(error) && client.getQueryCache().get(queryHash) === owner) {
       client.setQueryData(guardKey, true);
@@ -35,4 +53,3 @@ export async function readResearchStatus(
     throw error;
   }
 }
-

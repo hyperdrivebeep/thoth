@@ -44,8 +44,13 @@ def _seed_related_history(database: Path) -> None:
         connection.execute(
             "INSERT INTO governance_revisions VALUES (?,?,?,?,?,?,?,?)",
             (
-                "project:history", "PROJECT", "project:history", 1,
-                "c" * 64, '{"preserve":"revision bytes"}', "d" * 64,
+                "project:history",
+                "PROJECT",
+                "project:history",
+                1,
+                "c" * 64,
+                '{"preserve":"revision bytes"}',
+                "d" * 64,
                 '{"preserve":"receipt bytes"}',
             ),
         )
@@ -60,8 +65,12 @@ def _seed_related_history(database: Path) -> None:
         connection.execute(
             "INSERT INTO receipts VALUES (?,?,?,?,?,?,?)",
             (
-                "receipt:history", "project:history", "TRANSITION",
-                '{"preserve":"original receipt bytes"}', "e" * 64, None,
+                "receipt:history",
+                "project:history",
+                "TRANSITION",
+                '{"preserve":"original receipt bytes"}',
+                "e" * 64,
+                None,
                 "2026-09-01T00:00:00+00:00",
             ),
         )
@@ -71,9 +80,7 @@ def _related_history(database: Path) -> dict[str, list[tuple[object, ...]]]:
     with sqlite3.connect(database) as connection:
         return {
             table: connection.execute(f"SELECT * FROM {table} ORDER BY rowid").fetchall()
-            for table in (
-                "governance_revisions", "governance_heads", "working_heads", "receipts"
-            )
+            for table in ("governance_revisions", "governance_heads", "working_heads", "receipts")
         }
 
 

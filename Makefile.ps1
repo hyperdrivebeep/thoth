@@ -37,6 +37,7 @@ function Invoke-NativeStage {
 
 function Invoke-BackendLint {
     Invoke-NativeStage "LINT" $Python @("-m", "ruff", "check", "src", "apps", "tests", "migrations")
+    Invoke-NativeStage "FORMAT_CHECK" $Python @("-m", "ruff", "format", "--check", "src", "apps", "tests", "migrations")
 }
 
 function Invoke-BackendType {

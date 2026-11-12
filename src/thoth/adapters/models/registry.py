@@ -20,9 +20,7 @@ class RegisteredModelResolver(ModelResolverPort):
             raise ValueError(f"model provider already registered or invalid: {provider}")
         self._factories[normalized] = factory
 
-    def register_dynamic(
-        self, available: ModelAvailability, factory: DynamicModelFactory
-    ) -> None:
+    def register_dynamic(self, available: ModelAvailability, factory: DynamicModelFactory) -> None:
         self._dynamic.append((available, factory))
 
     def contains(self, provider: str) -> bool:

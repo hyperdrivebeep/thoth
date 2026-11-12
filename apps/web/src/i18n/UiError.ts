@@ -5,6 +5,6 @@ import type { MessageKey } from "./messages";
 export class UiError extends Error {
   constructor(readonly messageKey: MessageKey) {
     super(t(messageKey));
-    Object.defineProperty(this, "message", {configurable: true, get: () => t(messageKey)});
+    Object.defineProperty(this, "message", { configurable: true, get: () => t(messageKey) });
   }
 }

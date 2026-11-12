@@ -26,7 +26,8 @@ export function ProjectForm({ onCreated }: { onCreated: (projectId: string) => v
   // One request per name, cutoff and profile: pressing twice sends the same request again, not a second project.
   const pending = useRef<(Captured & { signature: string; inFlight: boolean }) | null>(null);
   const create = useMutation({
-    mutationFn: (captured: Captured & { onCreated: typeof onCreated }) => rpc<ProjectSummary>("project/create", captured.input, captured.key),
+    mutationFn: (captured: Captured & { onCreated: typeof onCreated }) =>
+      rpc<ProjectSummary>("project/create", captured.input, captured.key),
     onSuccess: async (response, captured) => {
       pending.current = null;
       await client.invalidateQueries({ queryKey: ["projects"] });
@@ -39,7 +40,12 @@ export function ProjectForm({ onCreated }: { onCreated: (projectId: string) => v
   const submit = () => {
     if (!name.trim() || pending.current?.inFlight) return;
     const signature = JSON.stringify([name, cutoff, overlay]);
-    if (pending.current?.signature !== signature) pending.current = { ...captureProjectCreation(name, cutoff, overlay), signature, inFlight: false };
+    if (pending.current?.signature !== signature)
+      pending.current = {
+        ...captureProjectCreation(name, cutoff, overlay),
+        signature,
+        inFlight: false,
+      };
     pending.current.inFlight = true;
     create.mutate({ ...pending.current, onCreated });
   };
@@ -47,32 +53,68 @@ export function ProjectForm({ onCreated }: { onCreated: (projectId: string) => v
     <div className="start-page project-create">
       <h1>{t("workspace.newProject")}</h1>
       <p className="muted">{t("workspace.createNotice")}</p>
-      <form className="onboarding-card" onSubmit={event => { event.preventDefault(); submit(); }}>
+      <form
+        className="onboarding-card"
+        onSubmit={(event) => {
+          event.preventDefault();
+          submit();
+        }}
+      >
         <label>
           {t("workspace.projectName")}
-          <InputGroup required value={name} onChange={event => setName(event.target.value)} placeholder={t("workspace.namePlaceholder")} />
+          <InputGroup
+            required
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder={t("workspace.namePlaceholder")}
+          />
         </label>
         <div className="project-advanced">
-          <Button minimal small icon={advancedOpen ? "chevron-up" : "chevron-down"} aria-expanded={advancedOpen} onClick={() => setAdvancedOpen(value => !value)}>
+          <Button
+            minimal
+            small
+            icon={advancedOpen ? "chevron-up" : "chevron-down"}
+            aria-expanded={advancedOpen}
+            onClick={() => setAdvancedOpen((value) => !value)}
+          >
             {t("workspace.advanced")}
           </Button>
           <Collapse isOpen={advancedOpen}>
             <div className="form-row">
               <label>
                 {t("workspace.cutoff")}
-                <InputGroup required type="datetime-local" value={cutoff} onChange={event => setCutoff(event.target.value)} />
+                <InputGroup
+                  required
+                  type="datetime-local"
+                  value={cutoff}
+                  onChange={(event) => setCutoff(event.target.value)}
+                />
               </label>
               <label>
                 {t("workspace.profile")}
-                <InputGroup required value={overlay} onChange={event => setOverlay(event.target.value)} />
+                <InputGroup
+                  required
+                  value={overlay}
+                  onChange={(event) => setOverlay(event.target.value)}
+                />
               </label>
             </div>
           </Collapse>
         </div>
-        <Button type="submit" icon="plus" intent="primary" disabled={!name.trim() || !cutoff || !overlay.trim()} loading={create.isPending}>
+        <Button
+          type="submit"
+          icon="plus"
+          intent="primary"
+          disabled={!name.trim() || !cutoff || !overlay.trim()}
+          loading={create.isPending}
+        >
           {t("workspace.create")}
         </Button>
-        {create.error && <Callout intent="danger" role="alert">{create.error.message}</Callout>}
+        {create.error && (
+          <Callout intent="danger" role="alert">
+            {create.error.message}
+          </Callout>
+        )}
       </form>
     </div>
   );

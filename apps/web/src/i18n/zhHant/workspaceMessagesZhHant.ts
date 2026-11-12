@@ -14,7 +14,8 @@ export const workspaceZhHant: ColumnOf<typeof workspaceMessages> = {
   "manage.archiveConfirm": "歸檔",
   "sources.disconnect": "中斷連線",
   "sources.disconnectKeeps": "此資料不會用於新的提問。檔案和已產生的回答不會被刪除。",
-  "sources.disconnectReview": "此專案中已產生的回答都會標記為“需要重新審查”。要再次使用，請重新連接同一檔案。",
+  "sources.disconnectReview":
+    "此專案中已產生的回答都會標記為“需要重新審查”。要再次使用，請重新連接同一檔案。",
   "sources.disconnectFailed": "無法中斷連線。",
   "sources.detachedNotice": "這些資料不會用於新的提問。要再次使用，請重新連接同一檔案。",
   "evidenceRail.detached": "現已中斷連線",
@@ -43,7 +44,8 @@ export const workspaceZhHant: ColumnOf<typeof workspaceMessages> = {
   "workspace.operations": "工作區資訊",
   "settings.thisProject": "此專案",
   "settings.projectTitle": "專案設定",
-  "settings.projectNotice": "設定此專案的預設模型和資料索引。帳戶、語言和連網許可在這臺電腦的設定中。",
+  "settings.projectNotice":
+    "設定此專案的預設模型和資料索引。帳戶、語言和連網許可在這臺電腦的設定中。",
   "settings.projectModel": "此專案的預設模型",
   "settings.conversationModel": "此對話的模型",
   "settings.computerTitle": "這臺電腦的設定",
@@ -70,7 +72,8 @@ export const workspaceZhHant: ColumnOf<typeof workspaceMessages> = {
   "workspace.apiTools": "開啟 API 工具",
   "workspace.removeProject": "歸檔專案",
   "workspace.contextCorrupt": "無法讀取上一次的工作區位置。原始記錄沒有被刪除。",
-  "workspace.contextUnavailable": "無法在此瀏覽器中讀取上一次的工作區位置。請檢查儲存存取權限和工作區標識。",
+  "workspace.contextUnavailable":
+    "無法在此瀏覽器中讀取上一次的工作區位置。請檢查儲存存取權限和工作區標識。",
   "workspace.backProjects": "返回專案選擇",
   "workspace.projects": "專案",
   "workspace.loadingProjects": "正在載入專案…",
@@ -103,7 +106,8 @@ export const workspaceZhHant: ColumnOf<typeof workspaceMessages> = {
   "readiness.consentOn": "允許使用網際網路",
   "readiness.consentOff": "不使用網際網路",
   "readiness.consentUndecided": "網際網路使用未決定",
-  "readiness.readyNotice": "傳送問題後，THOTH 會在已連線的資料中查詢證據，並一併整理可能的解釋與下一步行動。",
+  "readiness.readyNotice":
+    "傳送問題後，THOTH 會在已連線的資料中查詢證據，並一併整理可能的解釋與下一步行動。",
   "workspace.sessionsCount": "對話",
   "workspace.sourcesCount": "資料",
   "workspace.countsLabel": "此專案的數量",
@@ -115,7 +119,8 @@ export const workspaceZhHant: ColumnOf<typeof workspaceMessages> = {
   "workspace.conversation": "對話",
   "workspace.trace": "追溯表",
   "workspace.missingProject": "已儲存的專案不在目前列表中，因此選擇已被清除。",
-  "workspace.locationFailure": "無法在此瀏覽器中儲存上一次的工作區位置。重新開啟後，自動還原可能受限。",
+  "workspace.locationFailure":
+    "無法在此瀏覽器中儲存上一次的工作區位置。重新開啟後，自動還原可能受限。",
   "workspace.identityMissing": "無法驗證工作區標識，因此重新開啟後無法還原草稿。",
   "workspace.chooseProjectNotice": "選擇專案",
   "workspace.selectForInfo": "選擇專案以檢視工作區資訊和使用量。",

@@ -136,8 +136,7 @@ async def test_no_eligible_source_keeps_unknown_fallback_and_explicit_limitation
             for uri, state in states.items()
         )
         assert any(
-            uri.endswith("after.html") and state == "AFTER_CUTOFF"
-            for uri, state in states.items()
+            uri.endswith("after.html") and state == "AFTER_CUTOFF" for uri, state in states.items()
         )
         assert any(
             uri.endswith("prohibited.html") and state == "PROHIBITED_CONTEXT"

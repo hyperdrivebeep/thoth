@@ -16,15 +16,21 @@ const listeners = new Set<() => void>();
 const unsaved = new Map<string, ResponseLanguageDefault>();
 
 function identity(scope: BrowserScope): string | null {
-  return scope.mode === "LOCAL" ? scope.workspaceId : scope.browserScopeId ?? null;
+  return scope.mode === "LOCAL" ? scope.workspaceId : (scope.browserScopeId ?? null);
 }
-function memoryKey(scope: BrowserScope): string { return `${scope.mode}:${identity(scope)}`; }
+function memoryKey(scope: BrowserScope): string {
+  return `${scope.mode}:${identity(scope)}`;
+}
 function storageKey(scope: BrowserScope): string | null {
   const id = identity(scope);
   return id ? `thoth:response-language-default:v1:${JSON.stringify([id])}` : null;
 }
 function store(scope: BrowserScope): Storage | null {
-  try { return scope.mode === "LOCAL" ? localStorage : sessionStorage; } catch { return null; }
+  try {
+    return scope.mode === "LOCAL" ? localStorage : sessionStorage;
+  } catch {
+    return null;
+  }
 }
 
 export function readResponseLanguageDefault(scope: BrowserScope): ResponseLanguageDefault {
@@ -35,19 +41,30 @@ export function readResponseLanguageDefault(scope: BrowserScope): ResponseLangua
   try {
     const value = store(scope)?.getItem(name);
     return isResponseLanguage(value) ? value : null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 /** Returns false when the browser could not keep the choice; it then lasts until the tab closes. */
-export function writeResponseLanguageDefault(scope: BrowserScope, value: ResponseLanguageDefault): boolean {
+export function writeResponseLanguageDefault(
+  scope: BrowserScope,
+  value: ResponseLanguageDefault,
+): boolean {
   let saved = false;
   const name = storageKey(scope);
   try {
     const target = store(scope);
-    if (name && target) { target.setItem(name, value ?? "auto"); saved = true; }
-  } catch { saved = false; }
-  if (saved) unsaved.delete(memoryKey(scope)); else unsaved.set(memoryKey(scope), value);
-  listeners.forEach(listener => listener());
+    if (name && target) {
+      target.setItem(name, value ?? "auto");
+      saved = true;
+    }
+  } catch {
+    saved = false;
+  }
+  if (saved) unsaved.delete(memoryKey(scope));
+  else unsaved.set(memoryKey(scope), value);
+  listeners.forEach((listener) => listener());
   return saved;
 }
 
@@ -55,9 +72,16 @@ const subscribe = (listener: () => void) => {
   listeners.add(listener);
   const onStorage = () => listener();
   if (typeof window !== "undefined") window.addEventListener("storage", onStorage);
-  return () => { listeners.delete(listener); if (typeof window !== "undefined") window.removeEventListener("storage", onStorage); };
+  return () => {
+    listeners.delete(listener);
+    if (typeof window !== "undefined") window.removeEventListener("storage", onStorage);
+  };
 };
 
 export function useResponseLanguageDefault(scope: BrowserScope): ResponseLanguageDefault {
-  return useSyncExternalStore(subscribe, () => readResponseLanguageDefault(scope), () => null);
+  return useSyncExternalStore(
+    subscribe,
+    () => readResponseLanguageDefault(scope),
+    () => null,
+  );
 }

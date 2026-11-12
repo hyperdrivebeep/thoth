@@ -80,9 +80,7 @@ def _request(
 async def test_search_mode_is_rejected_before_any_io() -> None:
     reader = _Reader()
     with pytest.raises(ConnectorFailure) as error:
-        await _connector(reader).discover(
-            _request({"mode": "SEARCH", "query": SENTINEL})
-        )
+        await _connector(reader).discover(_request({"mode": "SEARCH", "query": SENTINEL}))
     assert error.value.code == ConnectorErrorCode.EGRESS_DENIED
     assert "PUBLIC_QUERY_DISCLOSURE_NOT_APPROVED" in str(error.value)
     assert reader.calls == []
@@ -123,9 +121,7 @@ async def test_fetch_refuses_query_string_targets_before_any_io() -> None:
     assert reader.calls == []
 
 
-@pytest.mark.parametrize(
-    "query_security_class", [None, SecurityClass.PUBLIC]
-)
+@pytest.mark.parametrize("query_security_class", [None, SecurityClass.PUBLIC])
 @pytest.mark.asyncio
 async def test_query_class_omission_or_downgrade_is_not_permission(
     query_security_class: SecurityClass | None,
@@ -157,6 +153,4 @@ def test_bound_connector_keeps_search_disabled() -> None:
     connector = _connector(_Reader())
     bound = connector.bound_for_test(_request({"mode": "READ", "uri": "https://arxiv.org/abs/1"}))
     assert bound.search_enabled is False
-    assert "query" not in {
-        field.name for field in bound.capability.selector_contract.fields
-    }
+    assert "query" not in {field.name for field in bound.capability.selector_contract.fields}

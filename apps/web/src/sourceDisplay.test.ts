@@ -9,9 +9,15 @@ describe("sourceDisplay", () => {
   });
 
   it("drops the upload hash prefix from project-uploaded files only", () => {
-    expect(sourceCardTitle("file://C:/ws/inbox/web/projects/c55d00cc9f1d0b905825a326/e9ac587f7cd94944-01_IRIS_2026_smart_port_RFP.pdf")).toBe("01_IRIS_2026_smart_port_RFP.pdf");
+    expect(
+      sourceCardTitle(
+        "file://C:/ws/inbox/web/projects/c55d00cc9f1d0b905825a326/e9ac587f7cd94944-01_IRIS_2026_smart_port_RFP.pdf",
+      ),
+    ).toBe("01_IRIS_2026_smart_port_RFP.pdf");
     expect(sourceCardTitle("inbox/e9ac587f7cd94944-notes.pdf")).toBe("e9ac587f7cd94944-notes.pdf");
-    expect(sourceCardTitle("inbox/web/projects/c55d00cc9f1d0b905825a326/report.pdf")).toBe("report.pdf");
+    expect(sourceCardTitle("inbox/web/projects/c55d00cc9f1d0b905825a326/report.pdf")).toBe(
+      "report.pdf",
+    );
   });
 
   it("shows absolute http URLs and host", () => {

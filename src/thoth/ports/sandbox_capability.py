@@ -8,6 +8,4 @@ from thoth.ports.sandbox import SandboxPort
 
 
 class SandboxCapabilityRouterPort(Protocol):
-    def resolve(
-        self, profile: SandboxRuntimeProfile
-    ) -> tuple[SandboxPort, SandboxCapability]: ...
+    def resolve(self, profile: SandboxRuntimeProfile) -> tuple[SandboxPort, SandboxCapability]: ...

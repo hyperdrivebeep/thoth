@@ -7,8 +7,8 @@ import type { GroupId, Ranked } from "./testRanking";
 
 export const orderNote = () => t("testOrder.note");
 
-
-export const groupTitle = (group: GroupId, kind: "TEST" | "ACTION") => TITLES[group][kind === "TEST" ? "test" : "action"];
+export const groupTitle = (group: GroupId, kind: "TEST" | "ACTION") =>
+  TITLES[group][kind === "TEST" ? "test" : "action"];
 export const groupHint = (group: GroupId) => TITLES[group].hint;
 export const excludedTitle = () => t("testOrder.excluded");
 export const excludedTestsLine = (count: number) => message("orderExcluded", count);

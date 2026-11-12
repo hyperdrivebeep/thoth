@@ -1,432 +1,441 @@
 export const workspaceMessages = {
   "manage.rename": {
-    "ko": "이름 바꾸기",
-    "en": "Rename"
+    ko: "이름 바꾸기",
+    en: "Rename",
   },
   "manage.renameProjectTitle": {
-    "ko": "프로젝트 이름 바꾸기",
-    "en": "Rename project"
+    ko: "프로젝트 이름 바꾸기",
+    en: "Rename project",
   },
   "manage.renameThreadTitle": {
-    "ko": "대화 이름 바꾸기",
-    "en": "Rename conversation"
+    ko: "대화 이름 바꾸기",
+    en: "Rename conversation",
   },
   "manage.nameLabel": {
-    "ko": "새 이름",
-    "en": "New name"
+    ko: "새 이름",
+    en: "New name",
   },
   "manage.threadNameNotice": {
-    "ko": "질문 원문은 바뀌지 않습니다. 목록과 제목에 보이는 이름만 바뀝니다.",
-    "en": "The original question is not changed. Only the name shown in the list and the title changes."
+    ko: "질문 원문은 바뀌지 않습니다. 목록과 제목에 보이는 이름만 바뀝니다.",
+    en: "The original question is not changed. Only the name shown in the list and the title changes.",
   },
   "manage.save": {
-    "ko": "저장",
-    "en": "Save"
+    ko: "저장",
+    en: "Save",
   },
   "manage.cancel": {
-    "ko": "취소",
-    "en": "Cancel"
+    ko: "취소",
+    en: "Cancel",
   },
   "manage.renameFailed": {
-    "ko": "이름을 바꾸지 못했습니다.",
-    "en": "The name could not be changed."
+    ko: "이름을 바꾸지 못했습니다.",
+    en: "The name could not be changed.",
   },
   "manage.threadChanged": {
-    "ko": "그 사이에 대화가 바뀌었습니다. 목록을 다시 읽었으니 한 번 더 시도하세요.",
-    "en": "The conversation changed in the meantime. The list was read again; please try once more."
+    ko: "그 사이에 대화가 바뀌었습니다. 목록을 다시 읽었으니 한 번 더 시도하세요.",
+    en: "The conversation changed in the meantime. The list was read again; please try once more.",
   },
   "manage.archiveConfirm": {
-    "ko": "보관",
-    "en": "Archive"
+    ko: "보관",
+    en: "Archive",
   },
   "sources.disconnect": {
-    "ko": "연결 해제",
-    "en": "Disconnect"
+    ko: "연결 해제",
+    en: "Disconnect",
   },
   "sources.disconnectKeeps": {
-    "ko": "이 자료는 새 질문에 쓰이지 않습니다. 파일과 이미 만든 답은 지워지지 않습니다.",
-    "en": "This source will not be used for new questions. The file and the answers already made are not deleted."
+    ko: "이 자료는 새 질문에 쓰이지 않습니다. 파일과 이미 만든 답은 지워지지 않습니다.",
+    en: "This source will not be used for new questions. The file and the answers already made are not deleted.",
   },
   "sources.disconnectReview": {
-    "ko": "이 프로젝트에서 이미 만든 답은 모두 \"재검토 필요\"로 표시됩니다. 다시 쓰려면 같은 파일을 다시 연결합니다.",
-    "en": "Every answer already made in this project will be marked \"Review needed\". To use the source again, connect the same file again."
+    ko: '이 프로젝트에서 이미 만든 답은 모두 "재검토 필요"로 표시됩니다. 다시 쓰려면 같은 파일을 다시 연결합니다.',
+    en: 'Every answer already made in this project will be marked "Review needed". To use the source again, connect the same file again.',
   },
   "sources.disconnectFailed": {
-    "ko": "연결을 해제하지 못했습니다.",
-    "en": "The source could not be disconnected."
+    ko: "연결을 해제하지 못했습니다.",
+    en: "The source could not be disconnected.",
   },
   "sources.detachedNotice": {
-    "ko": "새 질문에는 쓰이지 않습니다. 다시 쓰려면 같은 파일을 다시 연결하세요.",
-    "en": "These are not used for new questions. To use one again, connect the same file again."
+    ko: "새 질문에는 쓰이지 않습니다. 다시 쓰려면 같은 파일을 다시 연결하세요.",
+    en: "These are not used for new questions. To use one again, connect the same file again.",
   },
   "evidenceRail.detached": {
-    "ko": "지금은 연결 해제됨",
-    "en": "Now disconnected"
+    ko: "지금은 연결 해제됨",
+    en: "Now disconnected",
   },
   "progress.stopTitle": {
-    "ko": "조사 중단",
-    "en": "Stop research"
+    ko: "조사 중단",
+    en: "Stop research",
   },
   "workspace.newProject": {
-    "ko": "새 프로젝트",
-    "en": "New project"
+    ko: "새 프로젝트",
+    en: "New project",
   },
   "workspace.projectName": {
-    "ko": "프로젝트 이름",
-    "en": "Project name"
+    ko: "프로젝트 이름",
+    en: "Project name",
   },
   "workspace.namePlaceholder": {
-    "ko": "연구할 문제 또는 프로젝트 이름",
-    "en": "Research problem or project name"
+    ko: "연구할 문제 또는 프로젝트 이름",
+    en: "Research problem or project name",
   },
   "workspace.advanced": {
-    "ko": "기준시점 · 고급 설정",
-    "en": "Cutoff and advanced settings"
+    ko: "기준시점 · 고급 설정",
+    en: "Cutoff and advanced settings",
   },
   "workspace.cutoff": {
-    "ko": "판단 기준시점",
-    "en": "Assessment cutoff"
+    ko: "판단 기준시점",
+    en: "Assessment cutoff",
   },
   "workspace.profile": {
-    "ko": "도메인 프로필",
-    "en": "Domain profile"
+    ko: "도메인 프로필",
+    en: "Domain profile",
   },
   "workspace.createNotice": {
-    "ko": "프로젝트를 만든 뒤 질문을 이어가고 필요한 자료를 연결할 수 있습니다.",
-    "en": "After creating a project, ask questions and connect relevant sources."
+    ko: "프로젝트를 만든 뒤 질문을 이어가고 필요한 자료를 연결할 수 있습니다.",
+    en: "After creating a project, ask questions and connect relevant sources.",
   },
   "workspace.create": {
-    "ko": "프로젝트 만들기",
-    "en": "Create project"
+    ko: "프로젝트 만들기",
+    en: "Create project",
   },
   "workspace.continue": {
-    "ko": "연구 이어가기",
-    "en": "Continue research"
+    ko: "연구 이어가기",
+    en: "Continue research",
   },
   "workspace.newQuestion": {
-    "ko": "새로운 질문",
-    "en": "New question"
+    ko: "새로운 질문",
+    en: "New question",
   },
   "workspace.testModeNotice": {
-    "ko": "검증 모드 · 고정 응답/통제 자료로 확인하는 화면입니다.",
-    "en": "Verification mode: this screen uses fixed responses and controlled data."
+    ko: "검증 모드 · 고정 응답/통제 자료로 확인하는 화면입니다.",
+    en: "Verification mode: this screen uses fixed responses and controlled data.",
   },
   "workspace.reload": {
-    "ko": "다시 읽기",
-    "en": "Reload"
+    ko: "다시 읽기",
+    en: "Reload",
   },
   "workspace.research": {
-    "ko": "연구",
-    "en": "Research"
+    ko: "연구",
+    en: "Research",
   },
   "workspace.backSettings": {
-    "ko": "설정으로 돌아가기",
-    "en": "Back to settings"
+    ko: "설정으로 돌아가기",
+    en: "Back to settings",
   },
   "workspace.resources": {
-    "ko": "자료·연결",
-    "en": "Sources and connections"
+    ko: "자료·연결",
+    en: "Sources and connections",
   },
   "workspace.resourcesNotice": {
-    "ko": "연구에 사용할 파일과 허용할 공개 웹 출처를 관리합니다.",
-    "en": "Manage research files and permitted public web sources."
+    ko: "연구에 사용할 파일과 허용할 공개 웹 출처를 관리합니다.",
+    en: "Manage research files and permitted public web sources.",
   },
   "workspace.backConversation": {
-    "ko": "대화로 돌아가기",
-    "en": "Back to conversation"
+    ko: "대화로 돌아가기",
+    en: "Back to conversation",
   },
   "workspace.noConnectedSources": {
-    "ko": "연결한 자료가 없습니다. 아래에서 파일을 올려 연결하세요.",
-    "en": "No sources are connected yet. Upload a file below to connect one."
+    ko: "연결한 자료가 없습니다. 아래에서 파일을 올려 연결하세요.",
+    en: "No sources are connected yet. Upload a file below to connect one.",
   },
   "workspace.connectedSources": {
-    "ko": "연결한 자료",
-    "en": "Connected sources"
+    ko: "연결한 자료",
+    en: "Connected sources",
   },
   "workspace.cite": {
-    "ko": "인용에 사용",
-    "en": "Use as a citation"
+    ko: "인용에 사용",
+    en: "Use as a citation",
   },
   "workspace.sourceDetails": {
-    "ko": "출처·추출 상태",
-    "en": "Source and extraction status"
+    ko: "출처·추출 상태",
+    en: "Source and extraction status",
   },
   "workspace.operations": {
-    "ko": "운영 정보",
-    "en": "Workspace information"
+    ko: "운영 정보",
+    en: "Workspace information",
   },
-  "settings.thisProject": { "ko": "이 프로젝트", "en": "This project" },
-  "settings.projectTitle": { "ko": "프로젝트 설정", "en": "Project settings" },
+  "settings.thisProject": { ko: "이 프로젝트", en: "This project" },
+  "settings.projectTitle": { ko: "프로젝트 설정", en: "Project settings" },
   "settings.projectNotice": {
-    "ko": "이 프로젝트의 모델 기본값과 자료 색인을 정합니다. 계정, 언어, 인터넷 허용은 이 컴퓨터 설정에 있습니다.",
-    "en": "Set this project's default model and source index. Accounts, language and internet permission are in this computer's settings."
+    ko: "이 프로젝트의 모델 기본값과 자료 색인을 정합니다. 계정, 언어, 인터넷 허용은 이 컴퓨터 설정에 있습니다.",
+    en: "Set this project's default model and source index. Accounts, language and internet permission are in this computer's settings.",
   },
-  "settings.projectModel": { "ko": "이 프로젝트의 기본 모델", "en": "This project's default model" },
-  "settings.conversationModel": { "ko": "이 대화의 모델", "en": "This conversation's model" },
-  "settings.computerTitle": { "ko": "이 컴퓨터 설정", "en": "This computer's settings" },
+  "settings.projectModel": { ko: "이 프로젝트의 기본 모델", en: "This project's default model" },
+  "settings.conversationModel": { ko: "이 대화의 모델", en: "This conversation's model" },
+  "settings.computerTitle": { ko: "이 컴퓨터 설정", en: "This computer's settings" },
   "settings.computerNotice": {
-    "ko": "모델 계정, 화면 언어, 인터넷 허용, 로컬 검색 구성 요소를 정합니다. 모든 프로젝트에 적용됩니다.",
-    "en": "Model accounts, display language, internet permission and local search components. These apply to every project."
+    ko: "모델 계정, 화면 언어, 인터넷 허용, 로컬 검색 구성 요소를 정합니다. 모든 프로젝트에 적용됩니다.",
+    en: "Model accounts, display language, internet permission and local search components. These apply to every project.",
   },
   "settings.noModel": {
-    "ko": "연결된 모델이 없습니다. 모델을 연결하면 여기서 기본 모델을 고를 수 있습니다.",
-    "en": "No model is connected. Connect one to choose a default model here."
+    ko: "연결된 모델이 없습니다. 모델을 연결하면 여기서 기본 모델을 고를 수 있습니다.",
+    en: "No model is connected. Connect one to choose a default model here.",
   },
-  "settings.openComputer": { "ko": "이 컴퓨터 설정 열기", "en": "Open this computer's settings" },
-  "model.chooseBelow": { "ko": "바꾸려면 아래에서 모델을 고르세요.", "en": "To change it, choose a model below." },
+  "settings.openComputer": { ko: "이 컴퓨터 설정 열기", en: "Open this computer's settings" },
+  "model.chooseBelow": {
+    ko: "바꾸려면 아래에서 모델을 고르세요.",
+    en: "To change it, choose a model below.",
+  },
   "workspace.settings": {
-    "ko": "설정",
-    "en": "Settings"
+    ko: "설정",
+    en: "Settings",
   },
   "workspace.reviewInfo": {
-    "ko": "심사 환경의 모델과 사용 현황을 확인합니다.",
-    "en": "View the review environment's model and usage."
+    ko: "심사 환경의 모델과 사용 현황을 확인합니다.",
+    en: "View the review environment's model and usage.",
   },
   "workspace.reviewModel": {
-    "ko": "심사 모델",
-    "en": "Review model"
+    ko: "심사 모델",
+    en: "Review model",
   },
   "workspace.operatorModel": {
-    "ko": "운영자가 준비한 OpenAI 모델을 사용합니다. 브라우저에 키를 넣지 않습니다.",
-    "en": "This workspace uses the operator's OpenAI model. Do not enter keys in the browser."
+    ko: "운영자가 준비한 OpenAI 모델을 사용합니다. 브라우저에 키를 넣지 않습니다.",
+    en: "This workspace uses the operator's OpenAI model. Do not enter keys in the browser.",
   },
   "workspace.modelDefaults": {
-    "ko": "모델 기본값",
-    "en": "Model defaults"
+    ko: "모델 기본값",
+    en: "Model defaults",
   },
   "workspace.usage": {
-    "ko": "사용량",
-    "en": "Usage"
+    ko: "사용량",
+    en: "Usage",
   },
   "workspace.noUsage": {
-    "ko": "아직 없음",
-    "en": "None reported yet"
+    ko: "아직 없음",
+    en: "None reported yet",
   },
   "workspace.partialUsage": {
-    "ko": " (부분 관측)",
-    "en": " (partially observed)"
+    ko: " (부분 관측)",
+    en: " (partially observed)",
   },
   "workspace.usagePending": {
-    "ko": "진행 중인 호출의 사용량은 아직 포함되지 않을 수 있습니다.",
-    "en": "Usage from calls still running may not yet be included."
+    ko: "진행 중인 호출의 사용량은 아직 포함되지 않을 수 있습니다.",
+    en: "Usage from calls still running may not yet be included.",
   },
   "workspace.projectSettings": {
-    "ko": "현재 프로젝트 설정",
-    "en": "Current project settings"
+    ko: "현재 프로젝트 설정",
+    en: "Current project settings",
   },
   "workspace.recordsSources": {
-    "ko": "기록과 자료",
-    "en": "Records and sources"
+    ko: "기록과 자료",
+    en: "Records and sources",
   },
   "workspace.recordsTools": {
-    "ko": "기록과 로컬 도구",
-    "en": "Records and local tools"
+    ko: "기록과 로컬 도구",
+    en: "Records and local tools",
   },
   "workspace.manageSources": {
-    "ko": "자료·연결 관리",
-    "en": "Manage sources and connections"
+    ko: "자료·연결 관리",
+    en: "Manage sources and connections",
   },
   "workspace.history": {
-    "ko": "연구 이력",
-    "en": "Research history"
+    ko: "연구 이력",
+    en: "Research history",
   },
   "workspace.devTools": {
-    "ko": "로컬 개발자 도구",
-    "en": "Local developer tools"
+    ko: "로컬 개발자 도구",
+    en: "Local developer tools",
   },
   "workspace.detailedRecords": {
-    "ko": "상세 기록 열기",
-    "en": "Open detailed records"
+    ko: "상세 기록 열기",
+    en: "Open detailed records",
   },
   "workspace.apiTools": {
-    "ko": "상세 API 도구 열기",
-    "en": "Open API tools"
+    ko: "상세 API 도구 열기",
+    en: "Open API tools",
   },
   "workspace.removeProject": {
-    "ko": "프로젝트 보관",
-    "en": "Archive project"
+    ko: "프로젝트 보관",
+    en: "Archive project",
   },
   "workspace.contextCorrupt": {
-    "ko": "마지막 작업 위치 기록을 읽지 못했습니다. 원본을 자동 삭제하지 않았습니다.",
-    "en": "The last workspace location could not be read. The original record has not been deleted."
+    ko: "마지막 작업 위치 기록을 읽지 못했습니다. 원본을 자동 삭제하지 않았습니다.",
+    en: "The last workspace location could not be read. The original record has not been deleted.",
   },
   "workspace.contextUnavailable": {
-    "ko": "이 브라우저의 마지막 작업 위치를 읽지 못했습니다. 저장소 접근과 작업 공간 식별자를 확인하세요.",
-    "en": "The last workspace location could not be read from this browser. Check storage access and workspace identity."
+    ko: "이 브라우저의 마지막 작업 위치를 읽지 못했습니다. 저장소 접근과 작업 공간 식별자를 확인하세요.",
+    en: "The last workspace location could not be read from this browser. Check storage access and workspace identity.",
   },
   "workspace.backProjects": {
-    "ko": "프로젝트 선택으로 돌아가기",
-    "en": "Back to project selection"
+    ko: "프로젝트 선택으로 돌아가기",
+    en: "Back to project selection",
   },
   "workspace.projects": {
-    "ko": "프로젝트",
-    "en": "Projects"
+    ko: "프로젝트",
+    en: "Projects",
   },
   "workspace.loadingProjects": {
-    "ko": "프로젝트를 읽는 중…",
-    "en": "Loading projects…"
+    ko: "프로젝트를 읽는 중…",
+    en: "Loading projects…",
   },
   "workspace.openProject": {
-    "ko": "프로젝트 열기",
-    "en": "Open project"
+    ko: "프로젝트 열기",
+    en: "Open project",
   },
   "workspace.noReplacement": {
-    "ko": "읽을 수 없는 기록은 새 답변으로 대체하지 않습니다.",
-    "en": "Unavailable records are never replaced with newly generated answers."
+    ko: "읽을 수 없는 기록은 새 답변으로 대체하지 않습니다.",
+    en: "Unavailable records are never replaced with newly generated answers.",
   },
   "workspace.searchProjects": {
-    "ko": "프로젝트 검색",
-    "en": "Search projects"
+    ko: "프로젝트 검색",
+    en: "Search projects",
   },
   "workspace.searchPlaceholder": {
-    "ko": "프로젝트 찾기…",
-    "en": "Find a project…"
+    ko: "프로젝트 찾기…",
+    en: "Find a project…",
   },
   "workspace.refreshProjects": {
-    "ko": "프로젝트 목록 새로고침",
-    "en": "Refresh project list"
+    ko: "프로젝트 목록 새로고침",
+    en: "Refresh project list",
   },
   "workspace.newSession": {
-    "ko": "새 대화",
-    "en": "New conversation"
+    ko: "새 대화",
+    en: "New conversation",
   },
   "workspace.loadingSessions": {
-    "ko": "대화를 읽는 중…",
-    "en": "Loading conversations…"
+    ko: "대화를 읽는 중…",
+    en: "Loading conversations…",
   },
   "workspace.untitledSession": {
-    "ko": "제목 없는 대화",
-    "en": "Untitled conversation"
+    ko: "제목 없는 대화",
+    en: "Untitled conversation",
   },
   "workspace.running": {
-    "ko": "진행 중",
-    "en": "Running"
+    ko: "진행 중",
+    en: "Running",
   },
   "workspace.paused": {
-    "ko": "일시정지",
-    "en": "Paused"
+    ko: "일시정지",
+    en: "Paused",
   },
   "workspace.reopen": {
-    "ko": "이어서 보기",
-    "en": "Continue reading"
+    ko: "이어서 보기",
+    en: "Continue reading",
   },
   "workspace.firstQuestion": {
-    "ko": "첫 질문을 보내면 이 프로젝트 아래 대화가 생깁니다.",
-    "en": "Send your first question to create a conversation in this project."
+    ko: "첫 질문을 보내면 이 프로젝트 아래 대화가 생깁니다.",
+    en: "Send your first question to create a conversation in this project.",
   },
   "workspace.noProjects": {
-    "ko": "아직 프로젝트가 없습니다.",
-    "en": "No projects yet."
+    ko: "아직 프로젝트가 없습니다.",
+    en: "No projects yet.",
   },
   "workspace.testMode": {
-    "ko": "검증 모드",
-    "en": "Verification mode"
+    ko: "검증 모드",
+    en: "Verification mode",
   },
   "workspace.checkingProject": {
-    "ko": "프로젝트 확인 중",
-    "en": "Checking project"
+    ko: "프로젝트 확인 중",
+    en: "Checking project",
   },
   "workspace.selectProject": {
-    "ko": "프로젝트 선택",
-    "en": "Select a project"
+    ko: "프로젝트 선택",
+    en: "Select a project",
   },
   "workspace.checkingTask": {
-    "ko": "대화 확인 중",
-    "en": "Checking conversation"
+    ko: "대화 확인 중",
+    en: "Checking conversation",
   },
   "workspace.selectedTask": {
-    "ko": "선택한 대화",
-    "en": "Selected conversation"
+    ko: "선택한 대화",
+    en: "Selected conversation",
   },
   "workspace.cutoffHint": {
-    "ko": "이 프로젝트가 판단에 쓰는 자료의 기준시점",
-    "en": "The cutoff for sources used in this project's assessments"
+    ko: "이 프로젝트가 판단에 쓰는 자료의 기준시점",
+    en: "The cutoff for sources used in this project's assessments",
   },
   "workspace.serverConnected": {
-    "ko": "서버 연결됨",
-    "en": "Server connected"
+    ko: "서버 연결됨",
+    en: "Server connected",
   },
   "workspace.serverFailed": {
-    "ko": "서버 연결 실패",
-    "en": "Server connection failed"
+    ko: "서버 연결 실패",
+    en: "Server connection failed",
   },
   "workspace.checkingConnection": {
-    "ko": "연결 확인 중",
-    "en": "Checking connection"
+    ko: "연결 확인 중",
+    en: "Checking connection",
   },
   "workspace.setupNeeded": {
-    "ko": "새 연구 준비 필요",
-    "en": "Research setup needed"
+    ko: "새 연구 준비 필요",
+    en: "Research setup needed",
   },
-  "readiness.title": { "ko": "이 프로젝트에서 바로 쓸 수 있는 것", "en": "Ready to use in this project" },
-  "readiness.modelConnected": { "ko": "모델 연결됨", "en": "Model connected" },
-  "readiness.modelMissing": { "ko": "모델 미연결", "en": "Model not connected" },
-  "readiness.consentOn": { "ko": "인터넷 사용 허용", "en": "Internet use allowed" },
-  "readiness.consentOff": { "ko": "인터넷 사용 안 함", "en": "Internet use off" },
-  "readiness.consentUndecided": { "ko": "인터넷 사용 미결정", "en": "Internet use undecided" },
-  "readiness.readyNotice": { "ko": "질문을 보내면 연결된 자료에서 근거를 찾고, 가능한 설명과 다음 행동을 함께 정리합니다.", "en": "Send a question and THOTH finds evidence in the connected sources, with possible explanations and next actions." },
-  "workspace.sessionsCount": { "ko": "대화", "en": "Conversations" },
-  "workspace.sourcesCount": { "ko": "자료", "en": "Sources" },
-  "workspace.countsLabel": { "ko": "이 프로젝트의 개수", "en": "Counts for this project" },
+  "readiness.title": {
+    ko: "이 프로젝트에서 바로 쓸 수 있는 것",
+    en: "Ready to use in this project",
+  },
+  "readiness.modelConnected": { ko: "모델 연결됨", en: "Model connected" },
+  "readiness.modelMissing": { ko: "모델 미연결", en: "Model not connected" },
+  "readiness.consentOn": { ko: "인터넷 사용 허용", en: "Internet use allowed" },
+  "readiness.consentOff": { ko: "인터넷 사용 안 함", en: "Internet use off" },
+  "readiness.consentUndecided": { ko: "인터넷 사용 미결정", en: "Internet use undecided" },
+  "readiness.readyNotice": {
+    ko: "질문을 보내면 연결된 자료에서 근거를 찾고, 가능한 설명과 다음 행동을 함께 정리합니다.",
+    en: "Send a question and THOTH finds evidence in the connected sources, with possible explanations and next actions.",
+  },
+  "workspace.sessionsCount": { ko: "대화", en: "Conversations" },
+  "workspace.sourcesCount": { ko: "자료", en: "Sources" },
+  "workspace.countsLabel": { ko: "이 프로젝트의 개수", en: "Counts for this project" },
   "workspace.locationUnsaved": {
-    "ko": "작업 위치 저장 실패",
-    "en": "Workspace location not saved"
+    ko: "작업 위치 저장 실패",
+    en: "Workspace location not saved",
   },
   "workspace.taskSelectionNeeded": {
-    "ko": "저장된 대화 선택 확인 필요",
-    "en": "Check the saved conversation selection"
+    ko: "저장된 대화 선택 확인 필요",
+    en: "Check the saved conversation selection",
   },
-  "workspace.projectList": { "ko": "프로젝트 목록", "en": "Project list" },
+  "workspace.projectList": { ko: "프로젝트 목록", en: "Project list" },
   "workspace.setupNeededHint": {
-    "ko": "새 연구를 실행하려면 설정이 필요합니다. 누르면 설정으로 이동합니다.",
-    "en": "New research needs setup. Opens settings."
+    ko: "새 연구를 실행하려면 설정이 필요합니다. 누르면 설정으로 이동합니다.",
+    en: "New research needs setup. Opens settings.",
   },
   "workspace.refreshContext": {
-    "ko": "현재 맥락 새로고침",
-    "en": "Refresh current context"
+    ko: "현재 맥락 새로고침",
+    en: "Refresh current context",
   },
   "workspace.conversation": {
-    "ko": "대화",
-    "en": "Conversation"
+    ko: "대화",
+    en: "Conversation",
   },
   "workspace.trace": {
-    "ko": "추적표",
-    "en": "Trace table"
+    ko: "추적표",
+    en: "Trace table",
   },
   "workspace.missingProject": {
-    "ko": "저장된 프로젝트를 현재 목록에서 확인하지 못해 선택을 비웠습니다.",
-    "en": "The saved project is not in the current list, so the selection was cleared."
+    ko: "저장된 프로젝트를 현재 목록에서 확인하지 못해 선택을 비웠습니다.",
+    en: "The saved project is not in the current list, so the selection was cleared.",
   },
   "workspace.locationFailure": {
-    "ko": "이 브라우저에 마지막 작업 위치를 저장하지 못했습니다. 재시작 후 자동 복원이 제한될 수 있습니다.",
-    "en": "The last workspace location could not be saved in this browser. Automatic restoration may be limited after reopening."
+    ko: "이 브라우저에 마지막 작업 위치를 저장하지 못했습니다. 재시작 후 자동 복원이 제한될 수 있습니다.",
+    en: "The last workspace location could not be saved in this browser. Automatic restoration may be limited after reopening.",
   },
   "workspace.identityMissing": {
-    "ko": "작업 공간 식별자를 확인하지 못해 브라우저 재시작용 초안 저장을 사용할 수 없습니다.",
-    "en": "The workspace identity could not be verified, so draft restoration after reopening is unavailable."
+    ko: "작업 공간 식별자를 확인하지 못해 브라우저 재시작용 초안 저장을 사용할 수 없습니다.",
+    en: "The workspace identity could not be verified, so draft restoration after reopening is unavailable.",
   },
   "workspace.chooseProjectNotice": {
-    "ko": "프로젝트를 선택하세요",
-    "en": "Select a project"
+    ko: "프로젝트를 선택하세요",
+    en: "Select a project",
   },
   "workspace.selectForInfo": {
-    "ko": "운영 정보와 사용 현황은 프로젝트를 선택한 뒤 확인할 수 있습니다.",
-    "en": "Select a project to view workspace information and usage."
+    ko: "운영 정보와 사용 현황은 프로젝트를 선택한 뒤 확인할 수 있습니다.",
+    en: "Select a project to view workspace information and usage.",
   },
   "workspace.connectModel": {
-    "ko": "모델 연결",
-    "en": "Model connection"
+    ko: "모델 연결",
+    en: "Model connection",
   },
   "workspace.checkingAccess": {
-    "ko": "선택한 대화의 접근 범위를 확인하는 중…",
-    "en": "Checking access to the selected conversation…"
+    ko: "선택한 대화의 접근 범위를 확인하는 중…",
+    en: "Checking access to the selected conversation…",
   },
   "workspace.selectionCheck": {
-    "ko": "저장된 대화 선택을 다시 확인하는 중…",
-    "en": "Checking the saved conversation selection…"
+    ko: "저장된 대화 선택을 다시 확인하는 중…",
+    en: "Checking the saved conversation selection…",
   },
   "workspace.checkAgain": {
-    "ko": "다시 확인",
-    "en": "Check again"
-  }
+    ko: "다시 확인",
+    en: "Check again",
+  },
 } as const;

@@ -42,9 +42,7 @@ def register_decision_chain_methods(
         hypothesis_handlers.counterevidence_request,
     )
     registry.register("hypothesis/portfolio/compose", hypothesis_handlers.portfolio_compose)
-    registry.register(
-        "hypothesis/portfolio/revalidate", hypothesis_handlers.portfolio_revalidate
-    )
+    registry.register("hypothesis/portfolio/revalidate", hypothesis_handlers.portfolio_revalidate)
     registry.register("hypothesis/test/bind", hypothesis_handlers.test_bind)
     registry.register("hypothesis/appraise", hypothesis_handlers.appraise)
     registry.register("hypothesis/split/propose", hypothesis_handlers.split_propose)

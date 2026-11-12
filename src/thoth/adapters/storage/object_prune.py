@@ -129,7 +129,8 @@ def _scan_table(
 ) -> None:
     quoted = '"' + table.replace('"', '""') + '"'
     try:
-        cursor = connection.execute(f"SELECT * FROM {quoted}")
+        # The table name was read from sqlite_master of this database and is quoted above.
+        cursor = connection.execute(f"SELECT * FROM {quoted}")  # noqa: S608
         while rows := cursor.fetchmany(500):
             for row in rows:
                 for value in row:

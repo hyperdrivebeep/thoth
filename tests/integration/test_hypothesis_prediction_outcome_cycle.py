@@ -199,9 +199,7 @@ async def prepare_measurement(
             candidate = call.context_pack.candidate_portfolio
             assert candidate is not None
             selected_refs = {item.span_id for item in call.context_pack.evidence}
-            selected_contract_refs = tuple(
-                ref for ref in contract_refs if ref in selected_refs
-            )
+            selected_contract_refs = tuple(ref for ref in contract_refs if ref in selected_refs)
             assert selected_contract_refs, "measurement contract is absent from active evidence"
             payload["alternatives"][0]["primary_purpose"] = "HYPOTHESIS_DISCRIMINATION"
             payload["alternatives"][0]["hypothesis_ids"] = tuple(

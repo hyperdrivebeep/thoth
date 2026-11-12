@@ -18,7 +18,9 @@ function running(overrides: Partial<ResearchStatus> = {}): ResearchStatus {
     working_head_digest: "0".repeat(64),
     operation_state: "RUNNING",
     attempt: { operation_id: "operation:o", phase: "HYPOTHESIS_REVIEW", status: "RUNNING" },
-    completed_stages: [{ role: "RESEARCH_PLANNER", state: "COMPLETED", elapsed_ms: 91700, context_bytes: 12000 }],
+    completed_stages: [
+      { role: "RESEARCH_PLANNER", state: "COMPLETED", elapsed_ms: 91700, context_bytes: 12000 },
+    ],
     ...overrides,
   };
 }
@@ -27,8 +29,15 @@ describe("live research progress", () => {
   it("exposes Korean scenes while RUNNING and keeps them after HOLD", () => {
     const live = liveResearchProgress(running());
     expect(live?.headline).toBe("방금 만든 설명을 원문과 대조하고 있습니다");
-    expect(live?.events[0]).toMatchObject({ kind: "note", text: "질문에서 꼭 지킬 조건을 고정했습니다" });
-    expect(live?.events[1]).toMatchObject({ kind: "action", label: "단계 완료", payload: "1분 32초 · 맥락 12KB" });
+    expect(live?.events[0]).toMatchObject({
+      kind: "note",
+      text: "질문에서 꼭 지킬 조건을 고정했습니다",
+    });
+    expect(live?.events[1]).toMatchObject({
+      kind: "action",
+      label: "단계 완료",
+      payload: "1분 32초 · 맥락 12KB",
+    });
     expect(live?.evidenceLabels).toEqual([]);
     const held = liveResearchProgress(
       running({
@@ -96,8 +105,12 @@ describe("live research progress", () => {
         ],
       }),
     );
-    const notes = live?.events.filter((event) => event.kind === "note" && !event.live).map((event) => event.text);
-    const payloads = live?.events.filter((event) => event.actionType === "stage_completed").map((event) => event.payload);
+    const notes = live?.events
+      .filter((event) => event.kind === "note" && !event.live)
+      .map((event) => event.text);
+    const payloads = live?.events
+      .filter((event) => event.actionType === "stage_completed")
+      .map((event) => event.payload);
     expect(notes).toEqual(["질문 조건을 원문과 대조했습니다", "질문 조건을 원문과 대조했습니다"]);
     expect(payloads).toEqual(["4초 · 맥락 2.0KB", "8초 · 맥락 4.0KB"]);
     expect(notes?.join(" ")).not.toContain("2회");
@@ -108,7 +121,8 @@ describe("live research progress", () => {
       "C:/papers/psyche-irb-2022.pdf",
       "C:/papers/gao-23-106021.pdf",
     ]);
-    const notes = live?.events.filter((event) => event.kind === "note").map((event) => event.text) ?? [];
+    const notes =
+      live?.events.filter((event) => event.kind === "note").map((event) => event.text) ?? [];
     expect(notes[0]).toContain("표 3 발사 준비 조건 4개");
     expect(notes[0]).toContain("표 숫자만 인용");
     expect(notes[0]).toContain("추측 금지");
@@ -157,8 +171,17 @@ describe("live research progress", () => {
               "Psyche 표 3 발사 준비 조건 4개가 원문에서 각각 확인되는지 적어라. 표 숫자만 인용하고 추측 금지.",
             model_settings: { model: "grok-4.6", reasoning_effort: "high" },
           },
-          usage: { input_tokens: 8000, output_tokens: 4400, total_tokens: 12400, state: "PARTIAL", unreported_calls: 1, cumulative_token_limit_enforced: false },
-          model_dispatches: [{ state: "RESERVED", transport_observation: { elapsed_ms: 47000, received_bytes: 0 } }],
+          usage: {
+            input_tokens: 8000,
+            output_tokens: 4400,
+            total_tokens: 12400,
+            state: "PARTIAL",
+            unreported_calls: 1,
+            cumulative_token_limit_enforced: false,
+          },
+          model_dispatches: [
+            { state: "RESERVED", transport_observation: { elapsed_ms: 47000, received_bytes: 0 } },
+          ],
         })}
         sourceUris={["C:/papers/mobilenets.pdf"]}
       />,
@@ -216,7 +239,12 @@ describe("live research progress", () => {
         operation_id: "operation:o",
         phase: "EVIDENCE_FOCUS",
         status: "RUNNING",
-        draft_progress: { evidence_focus: { locators: [{ page: 1 }, { page: 1 }, { page: 1 }, { page: 2 }], total: 4 } },
+        draft_progress: {
+          evidence_focus: {
+            locators: [{ page: 1 }, { page: 1 }, { page: 1 }, { page: 2 }],
+            total: 4,
+          },
+        },
       },
     });
     const live = liveResearchProgress(status)!;
@@ -273,7 +301,9 @@ describe("live research progress", () => {
         ],
       }),
     );
-    expect(live?.events.map((event) => [event.kind, event.text, event.payload ?? event.live])).toEqual([
+    expect(
+      live?.events.map((event) => [event.kind, event.text, event.payload ?? event.live]),
+    ).toEqual([
       ["note", "질문에서 꼭 지킬 조건을 고정했습니다", false],
       ["action", "단계 완료", "1분 32초 · 맥락 12KB · 모델 1회"],
       ["note", "방금 만든 설명을 원문과 대조하고 있습니다", true],
@@ -289,6 +319,8 @@ describe("live research progress", () => {
         }),
       ),
     ).toBe("표와 원문 위치를 확인하고 있습니다");
-    expect(composerActivity(running({ execution_state: "PAUSED" }))).toBe("조사가 일시정지되어 있습니다.");
+    expect(composerActivity(running({ execution_state: "PAUSED" }))).toBe(
+      "조사가 일시정지되어 있습니다.",
+    );
   });
 });

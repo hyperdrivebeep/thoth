@@ -24,14 +24,17 @@ export const apiNoticesJa: ColumnOf<typeof apiNoticesMessages> = {
   "sourceTime.existed": "基準時点までに存在",
   "sourceTime.later": "基準時点より後",
   "sourceTime.skip": "不明 / この時点は使わない",
-  "memorySwitch.help": "オフにしても、保存済みの記憶と訂正は残りますが、今後の調査では使われなくなります。",
+  "memorySwitch.help":
+    "オフにしても、保存済みの記憶と訂正は残りますが、今後の調査では使われなくなります。",
   "memorySwitch.expansion": "検索語を拡張する（調査ごとにモデル呼び出しが1回増えます）",
-  "memorySwitch.expansionHelp": "モデルが検索語を補い、言い回しの違う記憶を見つけやすくします。無効の場合は質問の語だけで検索し、保存済みの記憶は変わりません。",
+  "memorySwitch.expansionHelp":
+    "モデルが検索語を補い、言い回しの違う記憶を見つけやすくします。無効の場合は質問の語だけで検索し、保存済みの記憶は変わりません。",
   "memorySwitch.failed": "記憶の利用設定を読み込めませんでした。",
   "memorySwitch.label": "調査で記憶を使う",
   "answerHold.title": "確認された事実と根拠の用途",
   "answerHold.coverageMissing": "回答のチェック情報はまだありません",
-  "answerHold.coverageEarlier": "この回の回答チェック項目はここには表示されません。最新の回の回答にだけ表示されます。",
+  "answerHold.coverageEarlier":
+    "この回の回答チェック項目はここには表示されません。最新の回の回答にだけ表示されます。",
   "approvalView.approved": "承認済み · この内容に有効",
   "approvalView.pending": "承認待ち",
   "approvalView.rejected": "却下",

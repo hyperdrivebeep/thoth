@@ -1,20 +1,143 @@
 export const historyFormats = {
-  deltaList: {ko: (n: number) => `목록 ${n}개`, en: (n: number) => `List of ${n} ${n === 1 ? "item" : "items"}`, "zh-Hans": (n: number)=>`列表，共 ${n} 项`, "zh-Hant": (n: number)=>`列表，共 ${n} 項`, ja: (n: number)=>`リスト ${n} 件`},
-  deltaListPreview: {ko: (n: number, first: string | null) => `목록 ${n}개${first !== null ? ` · 첫 항목: ${first}` : ""}`, en: (n: number, first: string | null) => `List of ${n} ${n === 1 ? "item" : "items"}${first !== null ? ` · First item: ${first}` : ""}`, "zh-Hans": (n: number, first: string | null) => `列表，共 ${n} 项${first !== null ? ` · 第一项：${first}` : ""}`, "zh-Hant": (n: number, first: string | null) => `列表，共 ${n} 項${first !== null ? ` · 第一項：${first}` : ""}`, ja: (n: number, first: string | null) => `リスト ${n} 件${first !== null ? ` · 最初の項目：${first}` : ""}`},
-  deltaFields: {ko: (n: number) => `필드 ${n}개`, en: (n: number) => `${n} ${n === 1 ? "field" : "fields"}`, "zh-Hans": (n: number)=>`${n} 个字段`, "zh-Hant": (n: number)=>`${n} 個欄位`, ja: (n: number)=>`フィールド ${n} 件`},
-  deltaFieldPreview: {ko: (n: number, name: string, value: string) => `필드 ${n}개 · ${name}: ${value}`, en: (n: number, name: string, value: string) => `${n} ${n === 1 ? "field" : "fields"} · ${name}: ${value}`, "zh-Hans": (n: number, name: string, value: string)=>`${n} 个字段 · ${name}：${value}`, "zh-Hant": (n: number, name: string, value: string)=>`${n} 個欄位 · ${name}：${value}`, ja: (n: number, name: string, value: string)=>`フィールド ${n} 件 · ${name}：${value}`},
-  deltaOpenFields: {ko: (n: number) => `필드 ${n}개 · 세부 값 펼치기`, en: (n: number) => `${n} ${n === 1 ? "field" : "fields"} · Expand detailed values`, "zh-Hans": (n: number)=>`${n} 个字段 · 展开详细值`, "zh-Hant": (n: number)=>`${n} 個欄位 · 展開詳細值`, ja: (n: number)=>`フィールド ${n} 件 · 詳細な値を展開`},
-  deltaCount: {ko: (n: number) => `${n}건`, en: (n: number) => `${n} ${n === 1 ? "change" : "changes"}`, "zh-Hans": (n: number)=>`${n} 项变更`, "zh-Hant": (n: number)=>`${n} 項變更`, ja: (n: number)=>`${n} 件`},
-  deltaViewDetails: {ko: (n: number) => `상세 ${n}건 보기`, en: (n: number) => `View ${n} more ${n === 1 ? "change" : "changes"}`, "zh-Hans": (n: number)=>`查看另外 ${n} 项变更`, "zh-Hant": (n: number)=>`檢視另外 ${n} 項變更`, ja: (n: number)=>`詳細 ${n} 件を見る`},
-  deltaRemaining: {ko: (n: number) => `이 그룹에서 아직 펼치지 않은 변경 ${n}건`, en: (n: number) => `${n} ${n === 1 ? "change remains" : "changes remain"} collapsed in this group`, "zh-Hans": (n: number)=>`此分组中还有 ${n} 项变更处于折叠状态`, "zh-Hant": (n: number)=>`此分組中還有 ${n} 項變更處於摺疊狀態`, ja: (n: number)=>`このグループで、まだ展開していない変更 ${n} 件`},
-  deltaPreviewCount: {ko: (total: number, shown: number) => `서버 기록 변경 ${total}건 중 ${shown}건을 먼저 표시합니다. 나머지 ${total - shown}건은 그룹별 상세에서 확인할 수 있습니다.`, en: (total: number, shown: number) => `Showing ${shown} of ${total} recorded changes. The remaining ${total - shown} are available in group details.`, "zh-Hans": (total: number, shown: number)=>`共 ${total} 项服务器记录的变更，先显示其中 ${shown} 项。其余 ${total - shown} 项可在分组详情中查看。`, "zh-Hant": (total: number, shown: number)=>`共 ${total} 項伺服器記錄的變更，先顯示其中 ${shown} 項。其餘 ${total - shown} 項可在分組詳情中檢視。`, ja: (total: number, shown: number)=>`サーバーが記録した変更 ${total} 件のうち ${shown} 件を先に表示しています。残りの ${total - shown} 件は、グループごとの詳細で確認できます。`},
-  deltaReasonDetails: {ko: (n: number) => `이유 상세 보기${n ? ` · 연결 기록 ${n}건` : ""}`, en: (n: number) => `View reason details${n ? ` · ${n} linked ${n === 1 ? "record" : "records"}` : ""}`, "zh-Hans": (n: number) => `查看原因详情${n ? ` · ${n} 条关联记录` : ""}`, "zh-Hant": (n: number) => `檢視原因詳情${n ? ` · ${n} 條關聯記錄` : ""}`, ja: (n: number) => `理由の詳細を見る${n ? ` · 結びついた記録 ${n} 件` : ""}`},
-  deltaCurrentness: {ko: (before: string, after: string) => `비교 전: ${before} · 비교 후: ${after}`, en: (before: string, after: string) => `Before: ${before} · After: ${after}`, "zh-Hans": (before: string, after: string)=>`之前：${before} · 之后：${after}`, "zh-Hant": (before: string, after: string)=>`之前：${before} · 之後：${after}`, ja: (before: string, after: string)=>`比較前：${before} · 比較後：${after}`},
-  orderExcluded: {ko: (n: number) => `금지 수준이라 순서에서 뺀 시험이 ${n}개 있습니다.`, en: (n: number) => `${n} ${n === 1 ? "test is" : "tests are"} excluded from ordering because the risk level is prohibited.`, "zh-Hans": (n: number)=>`有 ${n} 项测试因风险等级为禁止而被排除在排序之外。`, "zh-Hant": (n: number)=>`有 ${n} 項測試因風險等級為禁止而被排除在排序之外。`, ja: (n: number)=>`禁止レベルのため順序から外したテストが ${n} 件あります。`},
-  orderReduction: {ko: (n: number) => `이 시험은 결과에 따라 원인 후보를 최대 ${n}개로 줄입니다.`, en: (n: number) => `Depending on its result, this test reduces the possible causes to at most ${n}.`, "zh-Hans": (n: number)=>`根据其结果，此测试最多可把可能的原因缩小到 ${n} 个。`, "zh-Hant": (n: number)=>`根據其結果，此測試最多可把可能的原因縮小到 ${n} 個。`, ja: (n: number)=>`このテストは、結果によって原因の候補を最大 ${n} 件に絞り込みます。`},
-  standingResults: {ko: (state: string) => `기록된 시험 결과: ${state}`, en: (state: string) => `Recorded test results: ${state}`, "zh-Hans": (state: string)=>`已记录的测试结果：${state}`, "zh-Hant": (state: string)=>`已記錄的測試結果：${state}`, ja: (state: string)=>`記録されたテスト結果：${state}`},
-  closureCondition: {ko: (scope: string) => `운용 조건 변경(조건 범위: ${scope})`, en: (scope: string) => `Operating condition changed (scope: ${scope})`, "zh-Hans": (scope: string)=>`运行条件已变化（条件范围：${scope}）`, "zh-Hant": (scope: string)=>`執行條件已變化（條件範圍：${scope}）`, ja: (scope: string)=>`運用条件の変更（条件の範囲：${scope}）`},
-  closureOriginalVerdict: {ko: (verdict: string) => `원래 판정: ${verdict}`, en: (verdict: string) => `Original assessment: ${verdict}`, "zh-Hans": (verdict: string)=>`原评估：${verdict}`, "zh-Hant": (verdict: string)=>`原評估：${verdict}`, ja: (verdict: string)=>`元の判定：${verdict}`},
-  closureRecordedBy: {ko: (actor: string, time: string) => `${actor} 기록 · ${time}`, en: (actor: string, time: string) => `Recorded by ${actor} · ${time}`, "zh-Hans": (actor: string, time: string)=>`${actor} 记录 · ${time}`, "zh-Hant": (actor: string, time: string)=>`${actor} 記錄 · ${time}`, ja: (actor: string, time: string)=>`${actor} が記録 · ${time}`},
-  closureBasis: {ko: (ref: string) => `근거 문서: ${ref}`, en: (ref: string) => `Supporting document: ${ref}`, "zh-Hans": (ref: string)=>`佐证文件：${ref}`, "zh-Hant": (ref: string)=>`佐證檔案：${ref}`, ja: (ref: string)=>`裏づけとなる文書：${ref}`},
+  deltaList: {
+    ko: (n: number) => `목록 ${n}개`,
+    en: (n: number) => `List of ${n} ${n === 1 ? "item" : "items"}`,
+    "zh-Hans": (n: number) => `列表，共 ${n} 项`,
+    "zh-Hant": (n: number) => `列表，共 ${n} 項`,
+    ja: (n: number) => `リスト ${n} 件`,
+  },
+  deltaListPreview: {
+    ko: (n: number, first: string | null) =>
+      `목록 ${n}개${first !== null ? ` · 첫 항목: ${first}` : ""}`,
+    en: (n: number, first: string | null) =>
+      `List of ${n} ${n === 1 ? "item" : "items"}${first !== null ? ` · First item: ${first}` : ""}`,
+    "zh-Hans": (n: number, first: string | null) =>
+      `列表，共 ${n} 项${first !== null ? ` · 第一项：${first}` : ""}`,
+    "zh-Hant": (n: number, first: string | null) =>
+      `列表，共 ${n} 項${first !== null ? ` · 第一項：${first}` : ""}`,
+    ja: (n: number, first: string | null) =>
+      `リスト ${n} 件${first !== null ? ` · 最初の項目：${first}` : ""}`,
+  },
+  deltaFields: {
+    ko: (n: number) => `필드 ${n}개`,
+    en: (n: number) => `${n} ${n === 1 ? "field" : "fields"}`,
+    "zh-Hans": (n: number) => `${n} 个字段`,
+    "zh-Hant": (n: number) => `${n} 個欄位`,
+    ja: (n: number) => `フィールド ${n} 件`,
+  },
+  deltaFieldPreview: {
+    ko: (n: number, name: string, value: string) => `필드 ${n}개 · ${name}: ${value}`,
+    en: (n: number, name: string, value: string) =>
+      `${n} ${n === 1 ? "field" : "fields"} · ${name}: ${value}`,
+    "zh-Hans": (n: number, name: string, value: string) => `${n} 个字段 · ${name}：${value}`,
+    "zh-Hant": (n: number, name: string, value: string) => `${n} 個欄位 · ${name}：${value}`,
+    ja: (n: number, name: string, value: string) => `フィールド ${n} 件 · ${name}：${value}`,
+  },
+  deltaOpenFields: {
+    ko: (n: number) => `필드 ${n}개 · 세부 값 펼치기`,
+    en: (n: number) => `${n} ${n === 1 ? "field" : "fields"} · Expand detailed values`,
+    "zh-Hans": (n: number) => `${n} 个字段 · 展开详细值`,
+    "zh-Hant": (n: number) => `${n} 個欄位 · 展開詳細值`,
+    ja: (n: number) => `フィールド ${n} 件 · 詳細な値を展開`,
+  },
+  deltaCount: {
+    ko: (n: number) => `${n}건`,
+    en: (n: number) => `${n} ${n === 1 ? "change" : "changes"}`,
+    "zh-Hans": (n: number) => `${n} 项变更`,
+    "zh-Hant": (n: number) => `${n} 項變更`,
+    ja: (n: number) => `${n} 件`,
+  },
+  deltaViewDetails: {
+    ko: (n: number) => `상세 ${n}건 보기`,
+    en: (n: number) => `View ${n} more ${n === 1 ? "change" : "changes"}`,
+    "zh-Hans": (n: number) => `查看另外 ${n} 项变更`,
+    "zh-Hant": (n: number) => `檢視另外 ${n} 項變更`,
+    ja: (n: number) => `詳細 ${n} 件を見る`,
+  },
+  deltaRemaining: {
+    ko: (n: number) => `이 그룹에서 아직 펼치지 않은 변경 ${n}건`,
+    en: (n: number) =>
+      `${n} ${n === 1 ? "change remains" : "changes remain"} collapsed in this group`,
+    "zh-Hans": (n: number) => `此分组中还有 ${n} 项变更处于折叠状态`,
+    "zh-Hant": (n: number) => `此分組中還有 ${n} 項變更處於摺疊狀態`,
+    ja: (n: number) => `このグループで、まだ展開していない変更 ${n} 件`,
+  },
+  deltaPreviewCount: {
+    ko: (total: number, shown: number) =>
+      `서버 기록 변경 ${total}건 중 ${shown}건을 먼저 표시합니다. 나머지 ${total - shown}건은 그룹별 상세에서 확인할 수 있습니다.`,
+    en: (total: number, shown: number) =>
+      `Showing ${shown} of ${total} recorded changes. The remaining ${total - shown} are available in group details.`,
+    "zh-Hans": (total: number, shown: number) =>
+      `共 ${total} 项服务器记录的变更，先显示其中 ${shown} 项。其余 ${total - shown} 项可在分组详情中查看。`,
+    "zh-Hant": (total: number, shown: number) =>
+      `共 ${total} 項伺服器記錄的變更，先顯示其中 ${shown} 項。其餘 ${total - shown} 項可在分組詳情中檢視。`,
+    ja: (total: number, shown: number) =>
+      `サーバーが記録した変更 ${total} 件のうち ${shown} 件を先に表示しています。残りの ${total - shown} 件は、グループごとの詳細で確認できます。`,
+  },
+  deltaReasonDetails: {
+    ko: (n: number) => `이유 상세 보기${n ? ` · 연결 기록 ${n}건` : ""}`,
+    en: (n: number) =>
+      `View reason details${n ? ` · ${n} linked ${n === 1 ? "record" : "records"}` : ""}`,
+    "zh-Hans": (n: number) => `查看原因详情${n ? ` · ${n} 条关联记录` : ""}`,
+    "zh-Hant": (n: number) => `檢視原因詳情${n ? ` · ${n} 條關聯記錄` : ""}`,
+    ja: (n: number) => `理由の詳細を見る${n ? ` · 結びついた記録 ${n} 件` : ""}`,
+  },
+  deltaCurrentness: {
+    ko: (before: string, after: string) => `비교 전: ${before} · 비교 후: ${after}`,
+    en: (before: string, after: string) => `Before: ${before} · After: ${after}`,
+    "zh-Hans": (before: string, after: string) => `之前：${before} · 之后：${after}`,
+    "zh-Hant": (before: string, after: string) => `之前：${before} · 之後：${after}`,
+    ja: (before: string, after: string) => `比較前：${before} · 比較後：${after}`,
+  },
+  orderExcluded: {
+    ko: (n: number) => `금지 수준이라 순서에서 뺀 시험이 ${n}개 있습니다.`,
+    en: (n: number) =>
+      `${n} ${n === 1 ? "test is" : "tests are"} excluded from ordering because the risk level is prohibited.`,
+    "zh-Hans": (n: number) => `有 ${n} 项测试因风险等级为禁止而被排除在排序之外。`,
+    "zh-Hant": (n: number) => `有 ${n} 項測試因風險等級為禁止而被排除在排序之外。`,
+    ja: (n: number) => `禁止レベルのため順序から外したテストが ${n} 件あります。`,
+  },
+  orderReduction: {
+    ko: (n: number) => `이 시험은 결과에 따라 원인 후보를 최대 ${n}개로 줄입니다.`,
+    en: (n: number) =>
+      `Depending on its result, this test reduces the possible causes to at most ${n}.`,
+    "zh-Hans": (n: number) => `根据其结果，此测试最多可把可能的原因缩小到 ${n} 个。`,
+    "zh-Hant": (n: number) => `根據其結果，此測試最多可把可能的原因縮小到 ${n} 個。`,
+    ja: (n: number) => `このテストは、結果によって原因の候補を最大 ${n} 件に絞り込みます。`,
+  },
+  standingResults: {
+    ko: (state: string) => `기록된 시험 결과: ${state}`,
+    en: (state: string) => `Recorded test results: ${state}`,
+    "zh-Hans": (state: string) => `已记录的测试结果：${state}`,
+    "zh-Hant": (state: string) => `已記錄的測試結果：${state}`,
+    ja: (state: string) => `記録されたテスト結果：${state}`,
+  },
+  closureCondition: {
+    ko: (scope: string) => `운용 조건 변경(조건 범위: ${scope})`,
+    en: (scope: string) => `Operating condition changed (scope: ${scope})`,
+    "zh-Hans": (scope: string) => `运行条件已变化（条件范围：${scope}）`,
+    "zh-Hant": (scope: string) => `執行條件已變化（條件範圍：${scope}）`,
+    ja: (scope: string) => `運用条件の変更（条件の範囲：${scope}）`,
+  },
+  closureOriginalVerdict: {
+    ko: (verdict: string) => `원래 판정: ${verdict}`,
+    en: (verdict: string) => `Original assessment: ${verdict}`,
+    "zh-Hans": (verdict: string) => `原评估：${verdict}`,
+    "zh-Hant": (verdict: string) => `原評估：${verdict}`,
+    ja: (verdict: string) => `元の判定：${verdict}`,
+  },
+  closureRecordedBy: {
+    ko: (actor: string, time: string) => `${actor} 기록 · ${time}`,
+    en: (actor: string, time: string) => `Recorded by ${actor} · ${time}`,
+    "zh-Hans": (actor: string, time: string) => `${actor} 记录 · ${time}`,
+    "zh-Hant": (actor: string, time: string) => `${actor} 記錄 · ${time}`,
+    ja: (actor: string, time: string) => `${actor} が記録 · ${time}`,
+  },
+  closureBasis: {
+    ko: (ref: string) => `근거 문서: ${ref}`,
+    en: (ref: string) => `Supporting document: ${ref}`,
+    "zh-Hans": (ref: string) => `佐证文件：${ref}`,
+    "zh-Hant": (ref: string) => `佐證檔案：${ref}`,
+    ja: (ref: string) => `裏づけとなる文書：${ref}`,
+  },
 } as const;

@@ -108,9 +108,7 @@ class InvestigationQueryHandlers:
             "investigation": investigation.model_dump(mode="json"),
             "search_intents": [
                 item.model_dump(mode="json")
-                for item in self._acquisition.list_search_intents(
-                    investigation.investigation_id
-                )
+                for item in self._acquisition.list_search_intents(investigation.investigation_id)
             ],
             "leads": [
                 item.model_dump(mode="json")

@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { composerActivity, evidenceLabels, formatDuration, liveResearchProgress } from "./researchProgress";
+import {
+  composerActivity,
+  evidenceLabels,
+  formatDuration,
+  liveResearchProgress,
+} from "./researchProgress";
 import type { ResearchStatus } from "./research";
 import { sceneFor, type WorkFacts } from "../i18n/progressKo";
 
@@ -28,7 +33,11 @@ function status(overrides: Record<string, unknown> = {}): ResearchStatus {
   } as ResearchStatus;
 }
 
-function inPhase(phase: string, extra: Record<string, unknown> = {}, draft: Record<string, unknown> = {}) {
+function inPhase(
+  phase: string,
+  extra: Record<string, unknown> = {},
+  draft: Record<string, unknown> = {},
+) {
   return status({
     attempt: { operation_id: "operation:o", phase, status: "RUNNING", draft_progress: draft },
     ...extra,
@@ -36,7 +45,13 @@ function inPhase(phase: string, extra: Record<string, unknown> = {}, draft: Reco
 }
 
 const RICH_DRAFT = {
-  evidence_focus: { locators: [{ page: 6, exact_text: "70.6" }, { page: 8, exact_text: "GNC" }], total: 5 },
+  evidence_focus: {
+    locators: [
+      { page: 6, exact_text: "70.6" },
+      { page: 8, exact_text: "GNC" },
+    ],
+    total: 5,
+  },
   portfolio: {
     hypotheses: [
       { hypothesis_id: "h1", statement: "일정만 늘리면 해결된다" },
@@ -49,24 +64,59 @@ const RICH_DRAFT = {
 const QUESTION = {
   request: {
     operation_id: "operation:o",
-    authored_text: "Psyche 표 3 발사 준비 조건 4개가 원문에서 각각 확인되는지 적어라. 표 숫자만 인용하고 추측 금지. 원문 위치와 함께 답.",
+    authored_text:
+      "Psyche 표 3 발사 준비 조건 4개가 원문에서 각각 확인되는지 적어라. 표 숫자만 인용하고 추측 금지. 원문 위치와 함께 답.",
   },
 };
-const SOURCES = ["C:/papers/psyche-irb-2022.pdf", "C:/papers/gao-23-106021.pdf", "C:/papers/third.pdf"];
+const SOURCES = [
+  "C:/papers/psyche-irb-2022.pdf",
+  "C:/papers/gao-23-106021.pdf",
+  "C:/papers/third.pdf",
+];
 
 const KEYS = [
-  "RESEARCH_PLANNER", "REQUIREMENTS", "EVIDENCE_RERANKER", "SEMANTIC_REVIEWER", "EVIDENCE_REVIEW",
-  "REVIEW_ADJUDICATOR", "SOURCE_PLANNER", "HYPOTHESIS_GENERATOR", "HYPOTHESES", "HYPOTHESIS_REVIEWER",
-  "HYPOTHESIS_REVIEW", "ACTION_PLANNER", "ACTION_COMPARISON", "EVIDENCE_EXTRACTOR", "EVIDENCE_FOCUS",
-  "SUFFICIENCY_EXPLAINER", "COUNTEREVIDENCE_CHALLENGER", "USER_EXPLAINER", "REFERENCE_MAPPER",
-  "CONNECTED_SOURCES", "SOURCE_SHORTLIST", "HOLD", "SOMETHING_ELSE",
+  "RESEARCH_PLANNER",
+  "REQUIREMENTS",
+  "EVIDENCE_RERANKER",
+  "SEMANTIC_REVIEWER",
+  "EVIDENCE_REVIEW",
+  "REVIEW_ADJUDICATOR",
+  "SOURCE_PLANNER",
+  "HYPOTHESIS_GENERATOR",
+  "HYPOTHESES",
+  "HYPOTHESIS_REVIEWER",
+  "HYPOTHESIS_REVIEW",
+  "ACTION_PLANNER",
+  "ACTION_COMPARISON",
+  "EVIDENCE_EXTRACTOR",
+  "EVIDENCE_FOCUS",
+  "SUFFICIENCY_EXPLAINER",
+  "COUNTEREVIDENCE_CHALLENGER",
+  "USER_EXPLAINER",
+  "REFERENCE_MAPPER",
+  "CONNECTED_SOURCES",
+  "SOURCE_SHORTLIST",
+  "HOLD",
+  "SOMETHING_ELSE",
 ];
 
 describe("durations", () => {
   it.each([
-    [null, null], [undefined, null], [Number.NaN, null], [-1, null], [Number.POSITIVE_INFINITY, null],
-    [0, "0ms"], [999, "999ms"], [1000, "1초"], [1499, "1초"], [59499, "59초"], [59500, "1분"],
-    [60000, "1분"], [61000, "1분 1초"], [91700, "1분 32초"], [3600000, "60분"],
+    [null, null],
+    [undefined, null],
+    [Number.NaN, null],
+    [-1, null],
+    [Number.POSITIVE_INFINITY, null],
+    [0, "0ms"],
+    [999, "999ms"],
+    [1000, "1초"],
+    [1499, "1초"],
+    [59499, "59초"],
+    [59500, "1분"],
+    [60000, "1분"],
+    [61000, "1분 1초"],
+    [91700, "1분 32초"],
+    [3600000, "60분"],
   ])("formats %s as %s", (input, expected) => {
     expect(formatDuration(input as number | null | undefined)).toBe(expected);
   });
@@ -77,8 +127,13 @@ describe("scene sentences", () => {
     const lines: string[] = [];
     for (const key of KEYS) {
       for (const state of ["RUNNING", "SUCCEEDED"]) {
-        const live = liveResearchProgress(inPhase(key, { operation_state: state, ...QUESTION }, RICH_DRAFT), SOURCES);
-        lines.push(`${key} ${state}: ${live?.headline} // ${live?.current.detail} // ${live?.missing}`);
+        const live = liveResearchProgress(
+          inPhase(key, { operation_state: state, ...QUESTION }, RICH_DRAFT),
+          SOURCES,
+        );
+        lines.push(
+          `${key} ${state}: ${live?.headline} // ${live?.current.detail} // ${live?.missing}`,
+        );
       }
     }
     expect(lines).toMatchInlineSnapshot(`
@@ -174,7 +229,15 @@ describe("scene sentences", () => {
       return `${problem}: ${live?.headline}`;
     });
     const withLocators = ["책", "사과", "A3", "표 3", "ABC"].map((label) => {
-      const facts: WorkFacts = { focus: null, constraints: [], locators: [label], hypotheses: [], pendingHypotheses: [], decidedHypotheses: [], sources: [] };
+      const facts: WorkFacts = {
+        focus: null,
+        constraints: [],
+        locators: [label],
+        hypotheses: [],
+        pendingHypotheses: [],
+        decidedHypotheses: [],
+        sources: [],
+      };
       const reranked = sceneFor("EVIDENCE_RERANKER", facts, true);
       const reviewed = sceneFor("SEMANTIC_REVIEWER", { ...facts, focus: "발사 조건" }, true);
       return `${label}: ${reranked.title} | ${reviewed.title}`;
@@ -197,7 +260,8 @@ describe("scene sentences", () => {
   });
 
   it("clips, deduplicates and limits the quoted hypotheses and the joined lists", () => {
-    const long = "아주 긴 가설 문장은 스물여덟 글자를 넘기면 말줄임표로 잘려야 합니다 그래서 길게 적습니다";
+    const long =
+      "아주 긴 가설 문장은 스물여덟 글자를 넘기면 말줄임표로 잘려야 합니다 그래서 길게 적습니다";
     const draft = {
       portfolio: {
         hypotheses: [
@@ -224,21 +288,66 @@ describe("scene sentences", () => {
 describe("one-line texts", () => {
   it("pins the model, token and wait lines", () => {
     const cases: Record<string, unknown>[] = [
-      { request: { operation_id: "o", model_settings: { model: "gpt-x", reasoning_effort: "high" } } },
+      {
+        request: {
+          operation_id: "o",
+          model_settings: { model: "gpt-x", reasoning_effort: "high" },
+        },
+      },
       { request: { operation_id: "o", model_settings: { model: "gpt-x" } } },
       { request: { operation_id: "o", model_settings: { reasoning_effort: "low" } } },
       { request: { operation_id: "o", model_settings: {} } },
       { request: { operation_id: "o" } },
-      { usage: { input_tokens: 1, output_tokens: 2, total_tokens: 12400, state: "COMPLETE", unreported_calls: 0, cumulative_token_limit_enforced: false } },
-      { usage: { input_tokens: 1, output_tokens: 2, total_tokens: null, state: "PARTIAL", unreported_calls: 1, cumulative_token_limit_enforced: false, cached_input_tokens: 3000 } },
-      { model_dispatches: [{ state: "RESERVED", transport_observation: { elapsed_ms: 47000, received_bytes: 0 } }] },
-      { model_dispatches: [{ state: "RESERVED", transport_observation: { elapsed_ms: 47000, first_byte_ms: 1200 } }] },
+      {
+        usage: {
+          input_tokens: 1,
+          output_tokens: 2,
+          total_tokens: 12400,
+          state: "COMPLETE",
+          unreported_calls: 0,
+          cumulative_token_limit_enforced: false,
+        },
+      },
+      {
+        usage: {
+          input_tokens: 1,
+          output_tokens: 2,
+          total_tokens: null,
+          state: "PARTIAL",
+          unreported_calls: 1,
+          cumulative_token_limit_enforced: false,
+          cached_input_tokens: 3000,
+        },
+      },
+      {
+        model_dispatches: [
+          { state: "RESERVED", transport_observation: { elapsed_ms: 47000, received_bytes: 0 } },
+        ],
+      },
+      {
+        model_dispatches: [
+          { state: "RESERVED", transport_observation: { elapsed_ms: 47000, first_byte_ms: 1200 } },
+        ],
+      },
       { model_dispatches: [{ state: "RESERVED" }] },
-      { model_dispatches: [{ state: "OBSERVED", transport_observation: { elapsed_ms: 173, received_bytes: 2048 } }] },
-      { model_dispatches: [{ state: "OBSERVED", received_bytes: 5, transport_observation: { elapsed_ms: 90000 } }] },
+      {
+        model_dispatches: [
+          { state: "OBSERVED", transport_observation: { elapsed_ms: 173, received_bytes: 2048 } },
+        ],
+      },
+      {
+        model_dispatches: [
+          { state: "OBSERVED", received_bytes: 5, transport_observation: { elapsed_ms: 90000 } },
+        ],
+      },
       { model_dispatches: [{ state: "OBSERVED", transport_observation: { elapsed_ms: 5000 } }] },
       { model_dispatches: [{ state: "OBSERVED" }] },
-      { model_dispatches: [{ state: "OBSERVED", received_bytes: 1 }, { state: "RESERVED", transport_observation: { elapsed_ms: 1000 } }] },
+      {
+        model_dispatches: [
+          { state: "OBSERVED", received_bytes: 1 },
+          { state: "RESERVED", transport_observation: { elapsed_ms: 1000 } },
+        ],
+      },
     ];
     const lines = cases.map((extra) => {
       const live = liveResearchProgress(status(extra));
@@ -266,27 +375,85 @@ describe("one-line texts", () => {
   });
 
   it("pins the finished-stage and model-call payload texts, including sizes", () => {
-    const stages = [500, 1023, 1024, 1536, 10239, 10240, 1048576, 5242880, 20971520, null, -1].map((context_bytes) => ({
-      role: "RESEARCH_PLANNER", elapsed_ms: 2000, context_bytes, dispatch_ids: ["a", "b"],
-    }));
+    const stages = [500, 1023, 1024, 1536, 10239, 10240, 1048576, 5242880, 20971520, null, -1].map(
+      (context_bytes) => ({
+        role: "RESEARCH_PLANNER",
+        elapsed_ms: 2000,
+        context_bytes,
+        dispatch_ids: ["a", "b"],
+      }),
+    );
     const live = liveResearchProgress(status({ completed_stages: stages as unknown }));
     const published = liveResearchProgress(
       status({
         activity_events: [
-          { seq: 1, kind: "action", action_type: "stage_completed", live: false, payload: { elapsed_ms: 1500, context_bytes: 2048, dispatch_count: 2 } },
-          { seq: 2, kind: "action", action_type: "source_read", live: false, payload: { page: 3, exact_text: " 표 3 " } },
-          { seq: 3, kind: "action", action_type: "source_read", live: false, payload: { page: null, exact_text: null } },
-          { seq: 4, kind: "action", action_type: "hypothesis_review", live: false, payload: { hypothesis_count: 4, review_count: 4 } },
-          { seq: 5, kind: "action", action_type: "hypothesis_review", live: false, payload: { hypothesis_count: 4, review_count: 1 } },
-          { seq: 6, kind: "action", action_type: "hypothesis_review", live: false, payload: { hypothesis_count: 4 } },
-          { seq: 7, kind: "action", action_type: "model_call", live: false, payload: { state: "OBSERVED", received_bytes: 1200, elapsed_ms: 800 } },
-          { seq: 8, kind: "action", action_type: "model_call", live: true, payload: { state: "RESERVED", elapsed_ms: 3000, first_byte_ms: 400 } },
+          {
+            seq: 1,
+            kind: "action",
+            action_type: "stage_completed",
+            live: false,
+            payload: { elapsed_ms: 1500, context_bytes: 2048, dispatch_count: 2 },
+          },
+          {
+            seq: 2,
+            kind: "action",
+            action_type: "source_read",
+            live: false,
+            payload: { page: 3, exact_text: " 표 3 " },
+          },
+          {
+            seq: 3,
+            kind: "action",
+            action_type: "source_read",
+            live: false,
+            payload: { page: null, exact_text: null },
+          },
+          {
+            seq: 4,
+            kind: "action",
+            action_type: "hypothesis_review",
+            live: false,
+            payload: { hypothesis_count: 4, review_count: 4 },
+          },
+          {
+            seq: 5,
+            kind: "action",
+            action_type: "hypothesis_review",
+            live: false,
+            payload: { hypothesis_count: 4, review_count: 1 },
+          },
+          {
+            seq: 6,
+            kind: "action",
+            action_type: "hypothesis_review",
+            live: false,
+            payload: { hypothesis_count: 4 },
+          },
+          {
+            seq: 7,
+            kind: "action",
+            action_type: "model_call",
+            live: false,
+            payload: { state: "OBSERVED", received_bytes: 1200, elapsed_ms: 800 },
+          },
+          {
+            seq: 8,
+            kind: "action",
+            action_type: "model_call",
+            live: true,
+            payload: { state: "RESERVED", elapsed_ms: 3000, first_byte_ms: 400 },
+          },
         ],
       }),
     );
-    const flat = (events: { kind: string; text: string; payload?: string | null; live?: boolean }[] | undefined) =>
-      events?.map((event) => `${event.kind}|${event.text}|${event.payload ?? ""}|${event.live ?? false}`);
-    expect({ stages: flat(live?.events), published: flat(published?.events) }).toMatchInlineSnapshot(`
+    const flat = (
+      events: { kind: string; text: string; payload?: string | null; live?: boolean }[] | undefined,
+    ) =>
+      events?.map(
+        (event) => `${event.kind}|${event.text}|${event.payload ?? ""}|${event.live ?? false}`,
+      );
+    expect({ stages: flat(live?.events), published: flat(published?.events) })
+      .toMatchInlineSnapshot(`
       {
         "published": [
           "action|단계 완료|2초 · 맥락 2.0KB · 모델 2회|false",
@@ -333,11 +500,23 @@ describe("one-line texts", () => {
       composerActivity(status({ execution_state: "PAUSE_PENDING" })),
       composerActivity(status({ execution_state: "PAUSED" })),
       composerActivity(
-        status({ attempt: { operation_id: "o", phase: "HOLD", status: "RUNNING", external_effect_state: "DISPATCHING", remote_observation: "UNKNOWN" } }),
+        status({
+          attempt: {
+            operation_id: "o",
+            phase: "HOLD",
+            status: "RUNNING",
+            external_effect_state: "DISPATCHING",
+            remote_observation: "UNKNOWN",
+          },
+        }),
       ),
       composerActivity(status({ operation_state: "SUCCEEDED" })),
       composerActivity(status({ attempt: undefined })),
-      composerActivity(inPhase("EVIDENCE_FOCUS", { model_dispatches: [{ state: "RESERVED", transport_observation: { elapsed_ms: 47000 } }] })),
+      composerActivity(
+        inPhase("EVIDENCE_FOCUS", {
+          model_dispatches: [{ state: "RESERVED", transport_observation: { elapsed_ms: 47000 } }],
+        }),
+      ),
     ];
     expect(lines).toMatchInlineSnapshot(`
       [
@@ -352,16 +531,37 @@ describe("one-line texts", () => {
   });
 
   it("pins the hold reasons and the evidence labels", () => {
-    const reasons = ["HTTP 429", "AUTH_REQUIRED", "x403", "MODEL_NOT_SUPPORTED", "400", "other", ""].map((terminal_reason) => {
+    const reasons = [
+      "HTTP 429",
+      "AUTH_REQUIRED",
+      "x403",
+      "MODEL_NOT_SUPPORTED",
+      "400",
+      "other",
+      "",
+    ].map((terminal_reason) => {
       const live = liveResearchProgress(
         inPhase("HOLD", {
           operation_state: "SUCCEEDED",
-          current_result: { operation_id: "o", phase: "HOLD", state: "PARTIAL", completion: "TERMINAL", terminal_reason, basis_digest: "0", result: {}, gaps: [], next_steps: [], source_refs: [], record_refs: [] },
+          current_result: {
+            operation_id: "o",
+            phase: "HOLD",
+            state: "PARTIAL",
+            completion: "TERMINAL",
+            terminal_reason,
+            basis_digest: "0",
+            result: {},
+            gaps: [],
+            next_steps: [],
+            source_refs: [],
+            record_refs: [],
+          },
         }),
       );
       return `${terminal_reason}: ${live?.missing}`;
     });
-    expect({ reasons, labels: evidenceLabels(inPhase("EVIDENCE_FOCUS", {}, RICH_DRAFT)) }).toMatchInlineSnapshot(`
+    expect({ reasons, labels: evidenceLabels(inPhase("EVIDENCE_FOCUS", {}, RICH_DRAFT)) })
+      .toMatchInlineSnapshot(`
       {
         "labels": [
           "p.6",

@@ -177,9 +177,7 @@ class TuiSessionService:
                 **selected,
             }
             if allows_once_transient_429(
-                provider=(
-                    provider if isinstance(provider, str) else None
-                ),
+                provider=(provider if isinstance(provider, str) else None),
                 capability_source=(
                     capability_source if isinstance(capability_source, str) else None
                 ),

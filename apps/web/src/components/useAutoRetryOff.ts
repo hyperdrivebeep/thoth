@@ -8,10 +8,15 @@ import { rpc } from "../api/rpcClient";
  */
 export function useAutoRetryOff(projectId: string, enabled = true): boolean {
   const query = useQuery({
-    queryKey: ["model-call-settings", projectId], enabled: enabled && projectId !== "",
-    queryFn: ({ signal }) => rpc<{ auto_retry_interrupted_model_call: boolean; settings_digest: string | null }>(
-      "model/callSettings/read", { project_id: projectId }, crypto.randomUUID(), signal),
+    queryKey: ["model-call-settings", projectId],
+    enabled: enabled && projectId !== "",
+    queryFn: ({ signal }) =>
+      rpc<{ auto_retry_interrupted_model_call: boolean; settings_digest: string | null }>(
+        "model/callSettings/read",
+        { project_id: projectId },
+        crypto.randomUUID(),
+        signal,
+      ),
   });
   return query.data?.value.auto_retry_interrupted_model_call === false;
 }
-

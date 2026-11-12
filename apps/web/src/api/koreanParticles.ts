@@ -23,7 +23,9 @@ export function finalHasBatchim(text: string): boolean | null {
 
 function withParticle(text: string, withBatchim: string, without: string): string {
   const batchim = finalHasBatchim(text);
-  return batchim === null ? `${text}${withBatchim}(${without})` : `${text}${batchim ? withBatchim : without}`;
+  return batchim === null
+    ? `${text}${withBatchim}(${without})`
+    : `${text}${batchim ? withBatchim : without}`;
 }
 
 /** 을/를 */

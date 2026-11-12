@@ -30,7 +30,8 @@ export const historyViewJa: ColumnOf<typeof historyViewMessages> = {
   "delta.unchanged": "変更なし",
   "delta.partial": "一部検証済み",
   "delta.noChanges": "サーバーには、これらの回答の間の判定の変化が記録されていません。",
-  "delta.partialNotice": "変化の一部しか検証できませんでした。表示されていない項目が変化なしを意味するわけではありません。",
+  "delta.partialNotice":
+    "変化の一部しか検証できませんでした。表示されていない項目が変化なしを意味するわけではありません。",
   "delta.unavailable": "現在の権限または記録の状態では、この比較はできません。",
   "delta.noDetails": "変化は記録されていますが、表示できる詳細がありません。",
   "delta.reasons": "記録された変更の理由",
@@ -47,30 +48,38 @@ export const historyViewJa: ColumnOf<typeof historyViewMessages> = {
   "delta.comparing": "選択した回答を比較しています…",
   "delta.failed": "比較を読み込めませんでした。現在の権限と記録のリンクを確認してください。",
   "delta.retry": "もう一度比較",
-  "historyDetail.restoreChanged": "復元は記録されましたが、現在のバージョンが変わったか、利用できません。もう一度適用せず、記録を確認してください。",
+  "historyDetail.restoreChanged":
+    "復元は記録されましたが、現在のバージョンが変わったか、利用できません。もう一度適用せず、記録を確認してください。",
   "historyDetail.loading": "選択した記録を読み込んでいます…",
-  "historyDetail.failed": "選択した記録を読み込めませんでした。現在の回答で置き換えることはしません。",
+  "historyDetail.failed":
+    "選択した記録を読み込めませんでした。現在の回答で置き換えることはしません。",
   "historyDetail.reload": "記録を再読み込み",
   "historyDetail.diagnostics": "診断を読み込む",
   "historyDetail.selected": "選択した調査記録",
   "historyDetail.unavailable": "現在の権限または資料の状態では、この記録を利用できません。",
   "historyDetail.partial": "この記録の一部しか検証できません。",
-  "historyDetail.failedRun": "この調査の実行は失敗しました。失敗前に保存された内容が下に表示されることがあります。",
+  "historyDetail.failedRun":
+    "この調査の実行は失敗しました。失敗前に保存された内容が下に表示されることがあります。",
   "historyDetail.cancelled": "中断された調査の保存済みの記録です。",
-  "historyDetail.checkpoint": "これは途中で保存された記録です。実行が終了したことを示すものではありません。",
-  "historyDetail.heldAnswer": "この回答の一部は保留のままです。不足している根拠と適用される条件を確認してください。",
+  "historyDetail.checkpoint":
+    "これは途中で保存された記録です。実行が終了したことを示すものではありません。",
+  "historyDetail.heldAnswer":
+    "この回答の一部は保留のままです。不足している根拠と適用される条件を確認してください。",
   "historyDetail.question": "当時の質問",
   "historyDetail.answer": "当時保存された回答",
-  "historyDetail.noAnswer": "このリクエストに結びついた回答の文はありません。部分的な記録が下にあります。",
+  "historyDetail.noAnswer":
+    "このリクエストに結びついた回答の文はありません。部分的な記録が下にあります。",
   "historyDetail.chooseBefore": "「変更前」として選択",
   "historyDetail.chooseAfter": "「変更後」として選択",
   "historyDetail.closeCompare": "比較を閉じる",
   "historyDetail.compareCurrent": "現在と比較",
   "historyDetail.restorePreview": "復元をプレビュー",
   "historyDetail.useQuestion": "質問を入力欄にコピー",
-  "historyDetail.readOnly": "この記録は読み取り専用です。復元のプレビューは、対応している項目でのみ使えます。",
+  "historyDetail.readOnly":
+    "この記録は読み取り専用です。復元のプレビューは、対応している項目でのみ使えます。",
   "historyDetail.notReady": "復元のプレビューはできますが、現在は適用の準備ができていません。",
-  "historyDetail.noHead": "現在のバージョンのリンクを検証できないため、バージョンの比較はできません。",
+  "historyDetail.noHead":
+    "現在のバージョンのリンクを検証できないため、バージョンの比較はできません。",
   "historyDetail.comparing": "2つのバージョンを比較しています…",
   "historyDetail.compareFailed": "比較を読み込めませんでした。",
   "historyDetail.technical": "詳細な記録と診断",

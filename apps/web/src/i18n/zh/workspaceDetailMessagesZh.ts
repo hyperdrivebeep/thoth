@@ -3,9 +3,11 @@ import type { workspaceDetailMessages } from "../workspaceDetailMessages";
 
 export const workspaceDetailZh: ColumnOf<typeof workspaceDetailMessages> = {
   "workspace.authorizedRead": "在你的访问权限范围内，仍可阅读已保存的研究。",
-  "workspace.readOnlyHold": "在你的权限范围内，已保存的研究仍可使用。新的模型运行和同意变更已暂缓。",
+  "workspace.readOnlyHold":
+    "在你的权限范围内，已保存的研究仍可使用。新的模型运行和同意变更已暂缓。",
   "workspace.resumeFailed": "无法继续研究。",
-  "workspace.restoreScope": "其他地址、端口、浏览器配置文件或工作区中的选择和草稿不会自动合并。选择项目后会保存新的位置。",
+  "workspace.restoreScope":
+    "其他地址、端口、浏览器配置文件或工作区中的选择和草稿不会自动合并。选择项目后会保存新的位置。",
   "workspace.existingRead": "如果项目已存在，你可以在访问权限范围内打开其已保存的研究。",
   "workspace.preparing": "正在检查就绪状态…",
   "workspace.readinessFailed": "服务器就绪检查失败",

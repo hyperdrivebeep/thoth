@@ -14,7 +14,8 @@ export const workspaceZh: ColumnOf<typeof workspaceMessages> = {
   "manage.archiveConfirm": "归档",
   "sources.disconnect": "断开连接",
   "sources.disconnectKeeps": "此资料不会用于新的提问。文件和已生成的回答不会被删除。",
-  "sources.disconnectReview": "此项目中已生成的回答都会标记为“需要重新审查”。要再次使用，请重新连接同一文件。",
+  "sources.disconnectReview":
+    "此项目中已生成的回答都会标记为“需要重新审查”。要再次使用，请重新连接同一文件。",
   "sources.disconnectFailed": "无法断开连接。",
   "sources.detachedNotice": "这些资料不会用于新的提问。要再次使用，请重新连接同一文件。",
   "evidenceRail.detached": "现已断开连接",
@@ -43,7 +44,8 @@ export const workspaceZh: ColumnOf<typeof workspaceMessages> = {
   "workspace.operations": "工作区信息",
   "settings.thisProject": "此项目",
   "settings.projectTitle": "项目设置",
-  "settings.projectNotice": "设置此项目的默认模型和资料索引。账户、语言和联网许可在这台电脑的设置中。",
+  "settings.projectNotice":
+    "设置此项目的默认模型和资料索引。账户、语言和联网许可在这台电脑的设置中。",
   "settings.projectModel": "此项目的默认模型",
   "settings.conversationModel": "此对话的模型",
   "settings.computerTitle": "这台电脑的设置",
@@ -70,7 +72,8 @@ export const workspaceZh: ColumnOf<typeof workspaceMessages> = {
   "workspace.apiTools": "打开 API 工具",
   "workspace.removeProject": "归档项目",
   "workspace.contextCorrupt": "无法读取上一次的工作区位置。原始记录没有被删除。",
-  "workspace.contextUnavailable": "无法在此浏览器中读取上一次的工作区位置。请检查存储访问权限和工作区标识。",
+  "workspace.contextUnavailable":
+    "无法在此浏览器中读取上一次的工作区位置。请检查存储访问权限和工作区标识。",
   "workspace.backProjects": "返回项目选择",
   "workspace.projects": "项目",
   "workspace.loadingProjects": "正在加载项目…",
@@ -103,7 +106,8 @@ export const workspaceZh: ColumnOf<typeof workspaceMessages> = {
   "readiness.consentOn": "允许使用互联网",
   "readiness.consentOff": "不使用互联网",
   "readiness.consentUndecided": "互联网使用未决定",
-  "readiness.readyNotice": "发送问题后，THOTH 会在已连接的资料中查找证据，并一并整理可能的解释与下一步行动。",
+  "readiness.readyNotice":
+    "发送问题后，THOTH 会在已连接的资料中查找证据，并一并整理可能的解释与下一步行动。",
   "workspace.sessionsCount": "对话",
   "workspace.sourcesCount": "资料",
   "workspace.countsLabel": "此项目的数量",
@@ -115,7 +119,8 @@ export const workspaceZh: ColumnOf<typeof workspaceMessages> = {
   "workspace.conversation": "对话",
   "workspace.trace": "追溯表",
   "workspace.missingProject": "已保存的项目不在当前列表中，因此选择已被清除。",
-  "workspace.locationFailure": "无法在此浏览器中保存上一次的工作区位置。重新打开后，自动恢复可能受限。",
+  "workspace.locationFailure":
+    "无法在此浏览器中保存上一次的工作区位置。重新打开后，自动恢复可能受限。",
   "workspace.identityMissing": "无法验证工作区标识，因此重新打开后无法恢复草稿。",
   "workspace.chooseProjectNotice": "选择项目",
   "workspace.selectForInfo": "选择项目以查看工作区信息和使用量。",

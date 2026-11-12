@@ -83,10 +83,7 @@ class ModelSettingsService:
         )
         if option is None:
             # Legacy injected providers without catalog are allowed only with unchanged defaults.
-            if (
-                any(s != "TRANSPORT_DEFAULT" for s in sources.values())
-                or model is not None
-            ):
+            if any(s != "TRANSPORT_DEFAULT" for s in sources.values()) or model is not None:
                 raise ModelResolutionError("MODEL_CAPABILITY_UNKNOWN")
             capability_source = "UNREGISTERED_DEFAULT"
         else:

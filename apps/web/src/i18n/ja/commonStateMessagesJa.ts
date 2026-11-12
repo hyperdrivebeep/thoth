@@ -58,10 +58,12 @@ export const commonStateJa: ColumnOf<typeof commonStateMessages> = {
   "tools.installFailed": "自動インストールに失敗しました。下のコマンドを手動で実行してください。",
   "tools.installing": "インストール中…",
   "tools.install": "自動でインストール",
-  "tools.wait": "インストール中です。最大5分かかることがあります。この画面を開いたままにしてください。",
+  "tools.wait":
+    "インストール中です。最大5分かかることがあります。この画面を開いたままにしてください。",
   "tools.manual": "手動でインストールするには、PowerShell で下のコマンドを実行してください。",
   "tools.copied": "コピーしました",
   "tools.copy": "コマンドをコピー",
   "tools.codexTitle": "Codex 接続ツールをインストール",
-  "tools.codexNotice": "公式の OpenAI Codex CLI 0.157.1 を THOTH のツールフォルダにインストールします。既存の Codex のインストールとログインはそのまま残ります。",
+  "tools.codexNotice":
+    "公式の OpenAI Codex CLI 0.157.1 を THOTH のツールフォルダにインストールします。既存の Codex のインストールとログインはそのまま残ります。",
 };

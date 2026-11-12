@@ -99,8 +99,9 @@ def sqlite_has_running(database: Path) -> bool:
         return False
     try:
         with closing(sqlite3.connect(database)) as connection:
+            # _queue_exclusion() returns a constant of this module or nothing.
             row = connection.execute(
-                "SELECT 1 FROM operations WHERE state IN ('PENDING', 'RUNNING') "
+                "SELECT 1 FROM operations WHERE state IN ('PENDING', 'RUNNING') "  # noqa: S608
                 + _queue_exclusion(connection)
                 + " LIMIT 1"
             ).fetchone()
@@ -126,7 +127,8 @@ def referenced_object_digests(database: Path) -> tuple[str, ...]:
             for table, column in source_tables:
                 if table not in tables:
                     continue
-                for (raw,) in connection.execute(f"SELECT DISTINCT {column} FROM {table}"):
+                # Both names come from the tuple written just above.
+                for (raw,) in connection.execute(f"SELECT DISTINCT {column} FROM {table}"):  # noqa: S608
                     digest = str(raw or "").strip().lower()
                     if _DIGEST.fullmatch(digest):
                         found.add(digest)
@@ -164,9 +166,7 @@ def snapshot_file_count(workspace: Path) -> int:
         if not folder.is_dir():
             continue
         count += sum(
-            1
-            for path in folder.rglob("*")
-            if path.is_file() and not _should_skip(path, workspace)
+            1 for path in folder.rglob("*") if path.is_file() and not _should_skip(path, workspace)
         )
     return count
 
@@ -200,16 +200,20 @@ def fail_stale_running_sqlite(database: Path, *, completed_at: str | None = None
                 # Runtime migrations must create the binding table before sealing.
                 return 0
             connection.execute("BEGIN IMMEDIATE")
+            # _queue_exclusion() returns a constant of this module or nothing.
             rows = connection.execute(
-                "SELECT operation_id, project_id, scope_digest FROM operations "
+                "SELECT operation_id, project_id, scope_digest FROM operations "  # noqa: S608
                 "WHERE state IN ('PENDING', 'RUNNING') " + _queue_exclusion(connection)
             ).fetchall()
             changed = 0
             for operation_id, project_id, scope_digest in rows:
-                if connection.execute(
-                    "SELECT 1 FROM operation_resource_bindings WHERE operation_id = ?",
-                    (operation_id,),
-                ).fetchone() is not None:
+                if (
+                    connection.execute(
+                        "SELECT 1 FROM operation_resource_bindings WHERE operation_id = ?",
+                        (operation_id,),
+                    ).fetchone()
+                    is not None
+                ):
                     raise ValueError("HOSTED_REVIEW_RUNNING_OPERATION_ALREADY_BOUND")
                 updated = connection.execute(
                     "UPDATE operations SET state = ?, error_json = ?, result_json = NULL, "
@@ -365,9 +369,7 @@ def _restore_archive_into_directory(
             raise ValueError("HOSTED_REVIEW_SNAPSHOT_MANIFEST_INVALID")
         reference_values = cast(list[object], raw_refs)
         referenced = tuple(
-            str(item).lower()
-            for item in reference_values
-            if _DIGEST.fullmatch(str(item).lower())
+            str(item).lower() for item in reference_values if _DIGEST.fullmatch(str(item).lower())
         )
     database = sqlite_path(workspace)
     db_refs = referenced_object_digests(database)

@@ -50,6 +50,7 @@ The product check consists of:
 - `python -m pytest`: all applicable product, contract, integration and structure tests.
 - `pnpm --dir apps/web run test --run`, `lint`, `typecheck` and `build`.
 - `python -m ruff check src apps tests migrations`.
+- `python -m ruff format --check src apps tests migrations`.
 - `python scripts/check_architecture.py` for runtime layer boundaries. Module/function budgets,
   protocol parity, canonical owners and migration guards remain active in the Python suite.
 
@@ -59,7 +60,7 @@ Set `PLAYWRIGHT_BROWSERS_PATH` to an absolute checkout-local `.thoth-test-browse
 assets; no account, external page or model call is required. The basic README first-run screen
 still needs only its documented minimal dependencies. See INSTALL.md for the optional setup.
 
-Python lint uses the same product paths as the existing `Makefile.ps1` lint task.
+Python lint and the format check use the same product paths as the existing `Makefile.ps1` lint task.
 On 2026-11-01 the user permanently retired the old development Hook/checkpoint/receipt automation.
 Its dedicated tests and helpers, inactive-test list, root selector conftest and selection plugin were
 removed together. Product and structural checks that shared those files were retained. There is no
