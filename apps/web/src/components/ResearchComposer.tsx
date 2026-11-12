@@ -1,4 +1,5 @@
 import { Button, Callout, TextArea } from "@blueprintjs/core";
+import type { ResearchStatus } from "../api/research";
 import { useTranslation, t } from "../i18n/locale";
 import { sentenceGap } from "../i18n/sentences";
 import { blockedReason } from "./readinessText";
@@ -6,6 +7,7 @@ import { message } from "../i18n/formatMessages";
 import { isResponseLanguage, responseLanguageLabel } from "../api/responseLanguages";
 import { ModelSettings } from "./ModelSettings";
 import { ResearchProgress, UsageSummary } from "./ResearchProgress";
+import { usageShownUnderResult } from "./resultUsage";
 import { useCitationGate } from "./SourceCitationGate";
 import type { useResearchSession } from "./useResearchSession";
 
@@ -84,8 +86,20 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
       </div>
       {session.submit.error&&<Callout compact intent="danger" role="alert">{session.submit.error.message}</Callout>}
     </form>
-    {!readSuspended&&<UsageSummary status={session.research.data?.value}/>}
+    <ComposerUsage hidden={readSuspended} status={session.research.data?.value} />
   </div>;
+}
+
+/**
+ * Tokens and cost of the running research, under the question box. Once the run has ended and its result
+ * card is on screen, the card's own usage line says it and this one is left out.
+ */
+export function ComposerUsage({ hidden, status }: {
+  hidden: boolean;
+  status: ResearchStatus | undefined;
+}) {
+  if (hidden || usageShownUnderResult(status)) return null;
+  return <UsageSummary status={status} />;
 }
 
 /**

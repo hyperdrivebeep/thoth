@@ -29,7 +29,7 @@ export const apiNoticesJa: ColumnOf<typeof apiNoticesMessages> = {
   "memorySwitch.expansionHelp": "モデルが検索語を補い、言い回しの違う記憶を見つけやすくします。無効の場合は質問の語だけで検索し、保存済みの記憶は変わりません。",
   "memorySwitch.failed": "記憶の利用設定を読み込めませんでした。",
   "memorySwitch.label": "調査で記憶を使う",
-  "answerHold.title": "結論の状態",
+  "answerHold.title": "確認された事実と根拠の用途",
   "answerHold.coverageMissing": "回答のチェック情報はまだありません",
   "approvalView.approved": "承認済み · この内容に有効",
   "approvalView.pending": "承認待ち",

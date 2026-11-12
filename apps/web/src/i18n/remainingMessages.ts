@@ -91,17 +91,9 @@ export const remainingMessages = {
     "ko": "비용·시간:",
     "en": "Cost and time:"
   },
-  "labels.conclusion": {
-    "ko": "결론 상태:",
-    "en": "Conclusion state:"
-  },
   "labels.answerScope": {
     "ko": "답할 수 있는 범위:",
     "en": "Answerable scope:"
-  },
-  "labels.nextEvidence": {
-    "ko": "다음 확보:",
-    "en": "Evidence to obtain next:"
   },
   "approval.recreateFailed": {
     "ko": "승인 요청을 다시 만들지 못했습니다.",

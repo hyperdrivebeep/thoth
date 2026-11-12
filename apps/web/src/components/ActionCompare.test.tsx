@@ -34,7 +34,7 @@ it("lists mandatory criteria and the action-by-criterion assessments with source
 
 it("shows risk, execution authority, reversibility and unknown cost and time in plain Korean", () => {
   const html = render();
-  for (const text of ["자동 실행 가능", "사전 허용 범위", "격리 실행만", "되돌릴 수 있음"]) expect(html).toContain(text);
+  for (const text of ["승인 없이 실행 가능", "사전 허용 범위", "격리 실행만", "되돌릴 수 있음"]) expect(html).toContain(text);
   expect(html).toContain("비용·시간: 미확인");
   expect(visible(html)).not.toMatch(/AUTO_R0|PREAUTHORIZED|SANDBOX_ONLY|FULL|READ_ONLY_ANALYSIS/);
   expect(actionFamilyLabel("SANDBOX_REPLAY")).toBe("격리 환경 재현");

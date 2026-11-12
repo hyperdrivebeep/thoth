@@ -29,7 +29,7 @@ export const apiNoticesZhHant: ColumnOf<typeof apiNoticesMessages> = {
   "memorySwitch.expansionHelp": "模型會補充檢索詞，以找到用不同措辭寫成的記憶。關閉後，檢索只使用問題中的詞；已儲存的記憶不變。",
   "memorySwitch.failed": "無法讀取記憶使用設定。",
   "memorySwitch.label": "在研究中使用記憶",
-  "answerHold.title": "結論狀態",
+  "answerHold.title": "已確認的事實與證據用途",
   "answerHold.coverageMissing": "暫時沒有回答核查資訊",
   "approvalView.approved": "已批准 · 對此內容有效",
   "approvalView.pending": "等待批准",

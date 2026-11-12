@@ -2,7 +2,6 @@ import type { ColumnOf } from "../withColumns";
 import type { followupMessages } from "../followupMessages";
 
 export const followupJa: ColumnOf<typeof followupMessages> = {
-  "followup.noAction": "次の行動は記録されていません",
   "followup.complete": "完了",
   "followup.partialHold": "一部保留",
   "followup.reviewNeeded": "レビューが必要",
@@ -34,7 +33,7 @@ export const followupJa: ColumnOf<typeof followupMessages> = {
   "followup.openEvidence": "元の根拠を開く",
   "followup.changes": "判定の変化",
   "followup.unknownChangeReason": "保存された記録には、変更の理由が示されていません。",
-  "followup.nextAction": "必要な次の行動",
+  "followup.nextAction": "いま必要な対応",
   "followup.authority": "この行動には承認の判断が必要です。",
   "followup.checks": "完了したチェックと残りのチェック",
   "followup.recordedChecks": "記録されたチェック",

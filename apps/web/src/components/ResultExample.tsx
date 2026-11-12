@@ -58,7 +58,7 @@ function LegacyResultCard() {
   const actions=objectList(objectValue(result.action_plan).alternatives);
   const gaps=stringValues(objectValue(result.assessment).missing_items);
   return <article className="assistant-message"><header>THOTH</header><div className="answer-text">{result.answer}</div>
-    <div className="result-notice"><strong>아직 확인할 내용</strong><ReadableList items={gaps}/></div>
+    <div className="result-notice"><strong>판정이 확인하지 않은 것</strong><ReadableList items={gaps}/></div>
     <section className="conversation-findings"><h3>검토할 설명</h3>{hypotheses.map((item,index)=><div key={index}><p>{textValue(item.statement)}</p><small>{textValue(item.uncertainty)}</small></div>)}</section>
     <section className="conversation-findings"><h3>다음에 해볼 일</h3>{actions.map((item,index)=><div key={index}><p>{textValue(item.specification)}</p><small>{textValue(item.expected_information_value)}</small></div>)}</section>
     <nav className="answer-actions" aria-label="답변 상세">{["근거","가설 비교","참고값·조건","행동 비교","연구 지도","결과","기억","변경 이력"].map(label=><Button small minimal key={label}>{label}</Button>)}</nav>

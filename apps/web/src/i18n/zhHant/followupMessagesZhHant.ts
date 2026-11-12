@@ -2,7 +2,6 @@ import type { ColumnOf } from "../withColumns";
 import type { followupMessages } from "../followupMessages";
 
 export const followupZhHant: ColumnOf<typeof followupMessages> = {
-  "followup.noAction": "沒有記錄下一步行動",
   "followup.complete": "已完成",
   "followup.partialHold": "部分暫緩",
   "followup.reviewNeeded": "需要審查",
@@ -34,7 +33,7 @@ export const followupZhHant: ColumnOf<typeof followupMessages> = {
   "followup.openEvidence": "開啟原始證據",
   "followup.changes": "評估變化",
   "followup.unknownChangeReason": "已儲存的記錄沒有說明變化的原因。",
-  "followup.nextAction": "需要的下一步行動",
+  "followup.nextAction": "現在需要的操作",
   "followup.authority": "此行動需要作出授權決定。",
   "followup.checks": "已完成和待完成的檢查",
   "followup.recordedChecks": "已記錄的檢查",

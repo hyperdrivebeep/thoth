@@ -8,7 +8,7 @@ it("translates recorded internal values into plain Korean", () => {
   expect(statusLabel("ELIGIBLE")).toBe("기준시점에 적합");
   expect(statusLabel("EXTRACTED")).toBe("원문 추출됨");
   expect(statusLabel("HUMAN_REQUIRED_R3")).toBe("사람 승인 필요");
-  expect(statusLabel("AUTO_R0")).toBe("자동 실행 가능");
+  expect(statusLabel("AUTO_R0")).toBe("승인 없이 실행 가능");
   expect(statusLabel("PREAUTHORIZED_R1")).toBe("사전 허용 범위");
   expect(statusLabel("SANDBOX_ONLY_R2")).toBe("격리 실행만");
   expect(statusLabel("PROHIBITED_R4")).toBe("실행 금지");

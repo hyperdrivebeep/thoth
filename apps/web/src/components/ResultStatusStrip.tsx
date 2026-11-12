@@ -6,6 +6,15 @@ import { coverageCounts, selectedEvidenceCount } from "./coverageCounts";
 import { counterSearchSummary } from "./hypothesisView";
 import { answerStatusLabel } from "./statusLabels";
 
+/**
+ * The counter-evidence search in one tag. Refuting sources can be on record although no search ran;
+ * their count is kept on the tag, because nothing else on the card says it.
+ */
+function counterTagText(counter: { searched: number; total: number; counter: number }): string {
+  if (counter.searched) return message("counterTag", counter.searched, counter.total, counter.counter);
+  return counter.counter > 0 ? message("counterTagNotRunWith", counter.counter) : t("result.counterTagNotRun");
+}
+
 type StripTag = { text: string; intent: "none" | "warning" | "success" };
 
 /**
@@ -19,7 +28,7 @@ export function ResultStatusStrip({ result, coverage }: { result: Record<string,
   const counts = coverageCounts(coverage);
   if (counts.total > 0) tags.push({ text: message("coverageTag", counts.total, counts.satisfied, counts.needsCheck), intent: counts.needsCheck > 0 ? "warning" : "success" });
   const counter = counterSearchSummary(result);
-  if (counter) tags.push({ text: counter.searched ? message("counterTag", counter.searched, counter.total, counter.counter) : t("result.counterTagNotRun"), intent: "none" });
+  if (counter) tags.push({ text: counterTagText(counter), intent: "none" });
   const evidence = selectedEvidenceCount(result);
   if (evidence) tags.push({ text: message("evidenceTag", evidence), intent: "none" });
   if (!tags.length) return null;

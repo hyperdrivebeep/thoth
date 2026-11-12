@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } fro
 import { rpc } from "../api/rpcClient";
 import { connectedArtifacts, detachedArtifactIds } from "../api/sourceBindings";
 import { DetachedSourcesContext } from "./detachedSources";
+import { AskedQuestionContext, askedQuestion } from "./askedQuestion";
 import { threadName } from "../api/threadName";
 import { ProjectNavItem } from "./ProjectNavItem";
 import { ThreadNavItem } from "./ThreadNavItem";
@@ -162,7 +163,7 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
       <ResearchComposer session={session} projectId={project.project_id} threadId={threadId} epoch={capturedEpoch} onAttach={openResourcePanel}
         onOpenSettings={openSettings} hosted={hosted} executionReady={executionReady} setupNoticeShown={freshConversation}
         consentMissing={!hosted && consent==="UNDECIDED"} modelConnected={modelConnected}/>
-    </div>{panelOpen && !(session.researchReadDenied && detailFromResearch.current)&&<DetachedSourcesContext.Provider value={detachedSources}><ResearchSidePanel tab={sideTab} onTab={setSideTab} detail={detail} onClose={closeDetail} sources={connectedArtifacts(sourceData?.value)} project={project} thread={{thread_id:threadId,problem:status?.problem??t("workspace.research"),current_object_ids:status?.current_object_ids??[]}} onOpenRecords={()=>onPage("records")} onManageResources={()=>{closeDetail();onPage("resources");}}/></DetachedSourcesContext.Provider>}</div> :
+    </div>{panelOpen && !(session.researchReadDenied && detailFromResearch.current)&&<DetachedSourcesContext.Provider value={detachedSources}><AskedQuestionContext.Provider value={askedQuestion(status)}><ResearchSidePanel tab={sideTab} onTab={setSideTab} detail={detail} onClose={closeDetail} sources={connectedArtifacts(sourceData?.value)} project={project} thread={{thread_id:threadId,problem:status?.problem??t("workspace.research"),current_object_ids:status?.current_object_ids??[]}} onOpenRecords={()=>onPage("records")} onManageResources={()=>{closeDetail();onPage("resources");}}/></AskedQuestionContext.Provider></DetachedSourcesContext.Provider>}</div> :
     page==="capabilities" && !hosted ? <><Button minimal icon="arrow-left" onClick={()=>onPage("settings")}>{t("workspace.backSettings")}</Button><CapabilityWorkbench projectId={project.project_id} threadId={threadId} initialNamespace={catalogNamespace}/></> :
     page==="trace" ? <TracePage projectId={project.project_id} responseLanguage={session.responseLanguage} onInvestigate={onInvestigate} focusRow={traceFocus}/> : page==="records" ? <ResearchHistoryWorkspace key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId}
       onUseQuestion={session.problem.trim() ? undefined : question=>{session.setProblem(question);onPage("research");}}/> :

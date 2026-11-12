@@ -17,23 +17,28 @@ const visible = (html: string) => html.replace(/<details[\s\S]*?<\/details>/g, "
 const render = (result: Record<string, unknown>, extra: Record<string, unknown> = {}) =>
   renderToStaticMarkup(<ResearchResultCard state="SUCCEEDED" result={result} onDetail={() => {}} {...extra}/>);
 
-it("puts two hold lines inside the answer card for a real held IRIS answer, under the detail buttons and above the alternatives", () => {
+it("says the hold and the counts once, in the header tags, and puts the review basis under the detail buttons and above the alternatives", () => {
   const html = render(excerpt, { coverageMatrix: coverage([row("SATISFIED"), row("SATISFIED"), row("UNRESOLVED"), row("NOT_ASSESSED"), row("NOT_APPLICABLE")]) });
-  expect(html).toContain("결론 상태: <strong>판단 보류</strong>");
-  expect(html).toContain("답할 수 있는 범위: 답변 점검 항목 5개 중 충족 2 · 확인 필요 2");
-  expect(html.indexOf("결론 상태")).toBeGreaterThan(html.indexOf("answer-text"));
-  expect(html.indexOf("결론 상태")).toBeGreaterThan(html.indexOf("answer-actions"));
-  expect(html.indexOf("결론 상태")).toBeLessThan(html.indexOf("conversation-findings"));
-  // the header tags carry the same numbers as the conclusion line
-  expect(html).toContain("기준 5개 중 충족 2 · 확인 필요 2");
-  expect(html.indexOf("기준 5개 중 충족 2")).toBeLessThan(html.indexOf("answer-text"));
+  const header = html.slice(0, html.indexOf("answer-text"));
+  expect(header).toContain("판단 보류");
+  expect(header).toContain("답변 점검 5개 중 충족 2 · 확인 필요 2");
+  // The same status and numbers are not repeated in the body.
+  expect(html.split("판단 보류").length - 1).toBe(1);
+  expect(html.split("충족 2").length - 1).toBe(1);
+  expect(html.split("확인 필요 2").length - 1).toBe(1);
+  expect(html).not.toContain("결론 상태");
+  expect(html).not.toContain("답할 수 있는 범위");
+  expect(html.indexOf("result-hold-details")).toBeGreaterThan(html.indexOf("answer-actions"));
+  expect(html.indexOf("result-hold-details")).toBeLessThan(html.indexOf("conversation-findings"));
 });
 
 it("names the other answer statuses and a missing coverage read", () => {
-  expect(render({ answer: "a", answer_status: "ASSESSED_WITH_OPEN_CHECKS" })).toContain("<strong>부분 답변</strong>");
-  expect(render({ answer: "a", answer_status: "ASSESSED_FOR_REQUEST" })).toContain("<strong>답변 완료</strong>");
+  const headerOf = (html: string) => html.slice(0, html.indexOf("answer-text"));
+  expect(headerOf(render({ answer: "a", answer_status: "ASSESSED_WITH_OPEN_CHECKS" }))).toContain("부분 답변");
+  expect(headerOf(render({ answer: "a", answer_status: "ASSESSED_FOR_REQUEST" }))).toContain("답변 완료");
+  // No tag can say that the checks were not read, so this one sentence stays in the body.
   expect(render({ answer: "a", answer_status: "PARTIAL_HOLD" })).toContain("답할 수 있는 범위: 답변 점검 항목 정보를 아직 읽지 못했습니다");
-  expect(render({ answer: "a" })).not.toContain("결론 상태");
+  expect(render({ answer: "a" })).not.toContain("result-status-strip");
 });
 
 it("splits the criteria table into status and judgment so unresolved is not shown next to APPLIED", () => {

@@ -17,13 +17,13 @@ labels: {
   // evaluation criteria
   SATISFIED: "충족", NOT_APPLICABLE: "해당 없음", NOT_ASSESSED: "미평가", APPLIED: "판단 반영됨",
   // risk and execution authority
-  R0: "위험 낮음 · R0", R1: "낮음 · R1", R2: "중간 · R2", R3: "높음 · R3", R4: "금지 수준 · R4",
-  AUTO_R0: "자동 실행 가능", PREAUTHORIZED_R1: "사전 허용 범위", SANDBOX_ONLY_R2: "격리 실행만",
+  R0: "위험 낮음", R1: "위험 조금 있음", R2: "위험 중간", R3: "위험 높음", R4: "실행 금지 수준",
+  AUTO_R0: "승인 없이 실행 가능", PREAUTHORIZED_R1: "사전 허용 범위", SANDBOX_ONLY_R2: "격리 실행만",
   HUMAN_REQUIRED_R3: "사람 승인 필요", PROHIBITED_R4: "실행 금지",
   // reversibility
   FULL: "되돌릴 수 있음",
   // action state (APPROVED and PARTIAL mean something else elsewhere; see actionStateLabel)
-  PROPOSED: "제안됨", RISK_CLASSIFIED: "위험 분류됨", AUTO_ALLOWED: "자동 실행 허용", APPROVAL_PENDING: "승인 대기",
+  PROPOSED: "제안됨", RISK_CLASSIFIED: "위험 분류됨", AUTO_ALLOWED: "승인 없이 실행 가능", APPROVAL_PENDING: "승인 대기",
   EXECUTING: "실행 중", INVALIDATED: "무효화됨", REJECTED: "거절됨", PROHIBITED: "금지됨",
   // memory
   FACT: "사실", FAILURE: "실패 기록", REFERENCE: "참고값", HYPOTHESIS: "가설", DECISION: "판단", ACTION: "행동", LESSON: "교훈",

@@ -1,28 +1,24 @@
-import { message as formatMessage } from "../i18n/formatMessages";
 import { t } from "../i18n/locale";
 import type { ReactNode } from "react";
 import { Callout } from "@blueprintjs/core";
 import type { CoverageMatrix } from "../api/researchFollowup";
 import { coverageCounts } from "./coverageCounts";
 import { EvidenceUseSummary } from "./EvidenceUseSummary";
-import { answerStatusLabel } from "./statusLabels";
 
 /**
- * The first lines under an answer, in a fixed order: conclusion status, confirmed facts (slot), what each criterion's
- * evidence can be used for, how many criteria are fulfilled, the counter-evidence search, and what to secure next.
+ * The first lines under an answer, in a fixed order: confirmed facts (slot) and what each answer check's
+ * evidence can be used for. The conclusion status, the count of checks met and the counter-evidence search
+ * are in the tags at the head of the card, and the action needed is in the review summary below; they are
+ * not said a second time here. Only "no answer checks were recorded" is said here, because no tag says it.
  */
-export function AnswerHold({ status, coverage, facts, counter, next }: {
-  status: string; coverage?: CoverageMatrix | null; facts?: ReactNode; counter?: string | null; next?: string | null;
+export function AnswerHold({ status, coverage, facts }: {
+  status: string; coverage?: CoverageMatrix | null; facts?: ReactNode;
 }) {
-  const label = answerStatusLabel(status) ?? status;
-  const { rows, total, satisfied, needsCheck } = coverageCounts(coverage);
-  return <Callout compact className="answer-hold" intent={status === "PARTIAL_HOLD" ? "warning" : "none"} aria-label={t("answerHold.title")}>
-    <p>{t("labels.conclusion")}{" "}<strong>{label}</strong></p>
+  const { rows, total } = coverageCounts(coverage);
+  return <Callout compact className="answer-hold" intent={status === "PARTIAL_HOLD" ? "warning" : "none"} role="group" aria-label={t("answerHold.title")}>
     {facts}
     {rows.length > 0 && <EvidenceUseSummary rows={rows}/>}
-    <p>{t("labels.answerScope")}{" "}{total ? formatMessage("answerCoverage", total, satisfied, needsCheck) : t("answerHold.coverageMissing")}</p>
-    {counter && <p>{counter}</p>}
-    {next && <p>{t("labels.nextEvidence")}{" "}{next}</p>}
+    {total === 0 && <p>{t("labels.answerScope")}{" "}{t("answerHold.coverageMissing")}</p>}
   </Callout>;
 }
 

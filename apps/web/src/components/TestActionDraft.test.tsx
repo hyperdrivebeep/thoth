@@ -46,7 +46,7 @@ it("sends which test it is and an empty declaration, never a risk, then says the
   const text = container.textContent!;
   expect(text).toContain("행동 요청을 준비했습니다");
   expect(text).toContain("아직 승인이 아닙니다");
-  expect(text).toContain("높음 · R3");
+  expect(text).toContain("위험 높음");
   expect(text).toContain("효과를 아직 선언하지 않아 보호된 행동으로 분류했습니다");
   expect(text).not.toMatch(BANNED);
   expect(text).not.toMatch(LEAK);
@@ -61,7 +61,8 @@ it("tells a declared protected action from a read-only one", async () => {
   await act(async () => root!.unmount()); container.remove(); root = undefined;
   await mount();
   await press();
-  expect(container.textContent).toContain("위험 낮음 · R0");
+  expect(container.textContent).toContain("위험 낮음");
+  expect(container.textContent).not.toContain("위험 등급: 위험");
   expect(container.textContent).not.toContain("사람의 승인이 필요합니다");
 });
 
