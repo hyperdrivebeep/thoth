@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-12T11:00:04.245678+00:00",
+  "created_at": "2026-11-12T16:09:54.951120+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -58,13 +58,13 @@
     },
     {
       "path": "README.ko.md",
-      "sha256": "f096324affdd7936709d38a027f71369679e6e3d78df53a9ec275ffcb58637d5",
-      "bytes": 18519
+      "sha256": "fe710924f12741bf8ff363a826aa6569b6aee17e991d3b3150f5b5f765719ff0",
+      "bytes": 18847
     },
     {
       "path": "README.md",
-      "sha256": "2032c1d90b0456774f61b8ba14a726887b5b566b287460ce4b7118ca1c4a6795",
-      "bytes": 16557
+      "sha256": "6f330b9066917ac15954526558d51ea6e31937ac3ff83775d799c311ea61b686",
+      "bytes": 16917
     },
     {
       "path": "SECURITY.md",
@@ -3213,108 +3213,78 @@
     },
     {
       "path": "docs/releases/v0.2.0-beta.4.md",
-      "sha256": "7950b01eb040aa12ed66535ca802780a253f789065c8a12bf4ac6665664bd714",
-      "bytes": 4520
-    },
-    {
-      "path": "docs/screenshots/01-trace-verdict.png",
-      "sha256": "800800b0e2bcfdd290d2f911618aab8a8e60e8e803d2400df9829cd61a351989",
-      "bytes": 169161
-    },
-    {
-      "path": "docs/screenshots/02-question.png",
-      "sha256": "a41bf8421b96d72c7a97c8a663d248f118dde6bad78aee75945e9e7797d74b22",
-      "bytes": 80357
-    },
-    {
-      "path": "docs/screenshots/03-progress.png",
-      "sha256": "7214715cdcc606c1c0f12368f7c6395c188204314446962be551ec875ed2235f",
-      "bytes": 164664
-    },
-    {
-      "path": "docs/screenshots/04-answer.png",
-      "sha256": "04f3cb6002ccc7ed1b58702cbfa0ebc43081021f421a9c85be6a97b05554d8ad",
-      "bytes": 242801
-    },
-    {
-      "path": "docs/screenshots/05-hypotheses.png",
-      "sha256": "a78447e9e5f8a63c8dd2bfeca76e943588cfb9e4f613d603c22c543bf987a14c",
-      "bytes": 406289
-    },
-    {
-      "path": "docs/screenshots/06-evidence.png",
-      "sha256": "2cff40afec991c105b4813fd4b1bf1d9092f836b8cd55b1239511ef480a488c5",
-      "bytes": 287062
+      "sha256": "2f6b52704e74274b374854633ac9dda22ee0bd440db82ccd98e5f64b6e270298",
+      "bytes": 4604
     },
     {
       "path": "docs/screenshots/en/01-trace-verdict.png",
-      "sha256": "63dec42925d7ea512c4caed1bc4c320caa5965e28b1c4a057342359d003c6003",
-      "bytes": 316500
+      "sha256": "c47ab8053dd899a47e8afb31a760ab2326e331b0bd8ec647e45d9fcf05297119",
+      "bytes": 339768
     },
     {
       "path": "docs/screenshots/en/02-question.png",
-      "sha256": "e411f84d3e5ea61d2594bd489bcc91dec03e09656d7d1805703435f463c0a534",
-      "bytes": 210351
+      "sha256": "5d949922c801b30a0ec04e284fe3a34f24729a7ac3a8cffbca51accb0bf898aa",
+      "bytes": 273795
     },
     {
       "path": "docs/screenshots/en/03-progress.png",
-      "sha256": "b789eae6df3d7e27c16f0281ab577d4090b352cc86bcb2ed1f565335c8f362c9",
-      "bytes": 372412
+      "sha256": "76bd8ab2feb97fdda18e516e7b0b145ccbc3806a26b104c9a0448e4de6c44449",
+      "bytes": 392994
     },
     {
       "path": "docs/screenshots/en/04-answer.png",
-      "sha256": "bcbc8f0f623be67b0d0dc398feb0c9d72bc4de801dd717ac4563b04d0bf44ec4",
-      "bytes": 403713
+      "sha256": "8be65dfd7a845f2e15770e75783058959d8a4445fd3a001daf45f431cc8ea12a",
+      "bytes": 479348
     },
     {
       "path": "docs/screenshots/en/05-hypotheses.png",
-      "sha256": "07a8d2e712cfb172168b02a439855ae012f3b51db7ffe8b1bbe65f4764130e8b",
-      "bytes": 638520
+      "sha256": "89db20e9b88abe07fd0be5099c30e339d8cb15a9548159dc613342d3fe75f6a4",
+      "bytes": 766450
     },
     {
       "path": "docs/screenshots/en/06-evidence.png",
-      "sha256": "2c75a384f76f9ac7decfcd0c6783c93bdb20845ea7cb6aa9326de47bb203da42",
-      "bytes": 587085
+      "sha256": "60c1776585c43f5bc937ca6b7741e4bfa8bc59a3eb0a20871f80d76cff147e0a",
+      "bytes": 696081
     },
     {
       "path": "docs/screenshots/en/07-inferred-evidence.png",
-      "sha256": "e518b65a1e9b912ac4f7fdee821b9ffb8f07202f2eedf2140021f1f4923e1451",
-      "bytes": 327895
+      "sha256": "a65dc2e795d773c71f603a8a35a63242f23dac37e76805aec6fa21f292e75ea5",
+      "bytes": 330593
     },
     {
       "path": "docs/screenshots/ko/01-trace-verdict.png",
-      "sha256": "127b0da5c371e3d2a2fdfb88951fd676b5831d7027effd92624ef81cc196e40f",
-      "bytes": 284179
+      "sha256": "77bbf7f2867d9f6ec76249e7fbe6f31f91d0f22ef366a4a388ece142d9140ba6",
+      "bytes": 301083
     },
     {
       "path": "docs/screenshots/ko/02-question.png",
-      "sha256": "d36f726fa03ccf2d9cb4d345ab0f1d92369f0bff786d2881df7a9dc61d3758d4",
-      "bytes": 181763
+      "sha256": "ccf6cc294035f0878cef949ec9426169df09d26c60f5926faa568e12b33cb683",
+      "bytes": 229547
     },
     {
       "path": "docs/screenshots/ko/03-progress.png",
-      "sha256": "c3e7414c59a3a08a47adad32dd6ff7edd5556b04dc5d94c51d439b972585f8e8",
-      "bytes": 374766
+      "sha256": "dc649d8bb10d7f9b8e3a6b43d9019d70c62dca78d57d34bc3a616bddd7cdce33",
+      "bytes": 393370
     },
     {
       "path": "docs/screenshots/ko/04-answer.png",
-      "sha256": "e46affb3cd5409b146648bdd1ad6aa2ef7af8efed43f2431922440550b11ab27",
-      "bytes": 414714
+      "sha256": "c24378bd7a8341693d47c6789aa6893829e7b971844c4307ef664b28cd7447b4",
+      "bytes": 415154
     },
     {
       "path": "docs/screenshots/ko/05-hypotheses.png",
-      "sha256": "93e2e1a87ec8bb6e25db4edb056afec1d24a3807ea63b15ae18f11667a3f97f1",
-      "bytes": 637091
+      "sha256": "6d4f790596cee85925dff582758aff92106977c4ae9bbf9d78981e79b3b20950",
+      "bytes": 684763
     },
     {
       "path": "docs/screenshots/ko/06-evidence.png",
-      "sha256": "c8e1463371de832e8e9806f88ac0d0d7e0ac667a98923025f9b4ccfaba01cb65",
-      "bytes": 558880
+      "sha256": "707ea5c92f00cac3ea9a53b1e94c58348ac1d661ff3fcb9052505208e344ef02",
+      "bytes": 625814
     },
     {
       "path": "docs/screenshots/ko/07-inferred-evidence.png",
-      "sha256": "c9fec121d182637080b5f532fcf190c209d464abd511fe46f1fa1420bfa6bfa9",
-      "bytes": 247568
+      "sha256": "e7acbb6173a77fb79d89fbcf5b0f69dce5accf5b7d52685a4700ae5767ea2d43",
+      "bytes": 256550
     },
     {
       "path": "examples/projectpacks/6g-sandbox-hero/criteria.json",
