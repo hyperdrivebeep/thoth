@@ -37,7 +37,7 @@ competing explanations and recorded results connected.** Inspect what supports a
 see what remains unresolved, and compare two saved results before deciding what comes next.
 
 > [!NOTE]
-> **Experimental source preview for personal/local use.** The interface supports Korean and English.
+> **Experimental source preview for personal/local use.** The interface supports Korean and English. Japanese and Chinese (Simplified, Traditional) screens can be chosen too; they are machine-translated and unreviewed.
 > GitHub Actions checks the Python suite, Web tests/build and a reviewed Python type-error baseline.
 > Recorded synthetic-demo investigations have completed with a real model; this does not establish research quality or usefulness on real data.
 > English question, answer and source-text captures are available; broader English quality, real-account coverage and physical PC restart coverage remain incomplete.
@@ -47,7 +47,7 @@ see what remains unresolved, and compare two saved results before deciding what 
 
 ## See it work
 
-English captures from a 2026-10-25 investigation on the bundled
+English captures from a 2026-11-13 investigation with v0.2.0-beta.4 on the bundled
 [synthetic radar demo](examples/synthetic-radar-demo-v1), with an English synthetic completed-experiment
 source added. The question, answer and cited source text shown here are in English. These are invented
 records, not real measurements or evidence of engineering performance.
@@ -55,18 +55,18 @@ records, not real measurements or evidence of engineering performance.
 <table>
   <tr>
     <td width="50%"><img src="docs/screenshots/en/01-trace-verdict.png" alt="Trace table showing rain detection of 0.80 below the criterion of at least 0.90."></td>
-    <td width="50%"><img src="docs/screenshots/en/02-question.png" alt="An English investigation question filled from the failed rain-detection row, with English selected for the response."></td>
+    <td width="50%"><img src="docs/screenshots/en/02-question.png" alt="The question box holding the English investigation question filled from the failed rain-detection row; under it, the reply is shown as fixed to English."></td>
   </tr>
   <tr>
     <td><b>1 · A result misses its criterion.</b> Rules compute the assessment: 0.80 does not meet a requirement of 0.90 or higher.</td>
     <td><b>2 · Ask why, from that row.</b> “Investigate causes” fills in a question with the result and criterion. Sending it starts the investigation.</td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/en/03-progress.png" alt="Progress while three proposed hypotheses are compared with the original sources."></td>
-    <td><img src="docs/screenshots/en/04-answer.png" alt="A partial English answer retains the failed criterion and proposes causes and tests that could distinguish them."></td>
+    <td><img src="docs/screenshots/en/03-progress.png" alt="Progress view naming the three candidate explanations being compared with the original sources, with the reason, the checks performed, the evidence scope and the assessment state."></td>
+    <td><img src="docs/screenshots/en/04-answer.png" alt="A partial English answer marked 'Assessment on hold' retains the failed criterion and proposes causes and tests that could distinguish them."></td>
   </tr>
   <tr>
-    <td><b>3 · Watch the source review.</b> The progress view names the three candidate explanations being compared with the source documents.</td>
+    <td><b>3 · Watch the source review.</b> The progress view names the candidate explanations being compared with the source documents, and says why, what was checked and how much evidence is in scope.</td>
     <td><b>4 · Keep the unresolved judgment visible.</b> The partial answer retains the original assessment and separates possible causes from proposed tests.</td>
   </tr>
   <tr><td colspan="2"><img src="docs/screenshots/en/05-hypotheses.png" alt="Hypothesis comparison showing an inference from data and hypothesis-only predictions, each marked as an AI proposal."></td></tr>
