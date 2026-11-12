@@ -80,7 +80,7 @@ export const remainingZhHant: ColumnOf<typeof remainingMessages> = {
   "labels.decider": "決定人：",
   "labels.confirmed": "已確認 ·",
   "labels.changedVerdicts": "變化的評估：",
-  "workspaceError.title": "無法顯示此任務檢視",
+  "workspaceError.title": "無法顯示此檢視",
   "workspaceError.notice": "伺服器的回應可能與顯示格式不符。這不會被視為成功或完成，已儲存的記錄不受影響。請使用標籤頁或專案檢視其他記錄。",
   "workspaceError.retry": "重新載入伺服器狀態並重試",
   "labels.userCode": "使用者程式碼：",

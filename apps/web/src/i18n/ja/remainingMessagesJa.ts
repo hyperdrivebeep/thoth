@@ -80,7 +80,7 @@ export const remainingJa: ColumnOf<typeof remainingMessages> = {
   "labels.decider": "決定者：",
   "labels.confirmed": "確認済み ·",
   "labels.changedVerdicts": "変化した判定：",
-  "workspaceError.title": "このタスクの画面を表示できませんでした",
+  "workspaceError.title": "この画面を表示できませんでした",
   "workspaceError.notice": "サーバーの応答が表示形式と合っていない可能性があります。これは成功や完了とは扱われず、正式な記録は変更されません。タブやプロジェクトから、ほかの記録を見てください。",
   "workspaceError.retry": "サーバーの状態を再読み込みして、もう一度試す",
   "labels.userCode": "ユーザーコード：",

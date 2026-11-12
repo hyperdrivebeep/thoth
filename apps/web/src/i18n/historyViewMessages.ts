@@ -152,8 +152,8 @@ export const historyViewMessages = {
     "en": "Records without an exact request-to-result link cannot be compared."
   },
   "delta.sameScope": {
-    "ko": "같은 프로젝트와 세션의 답변 두 개를 선택해 주세요.",
-    "en": "Select two answers from the same project and session."
+    "ko": "같은 프로젝트와 대화의 답변 두 개를 선택해 주세요.",
+    "en": "Select two answers from the same project and conversation."
   },
   "delta.distinct": {
     "ko": "서로 다른 답변 두 개를 선택해 주세요.",

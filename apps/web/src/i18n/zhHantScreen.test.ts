@@ -56,7 +56,7 @@ it("uses Taiwan wording where the conversion tool or mainland usage would not", 
   expect(t("usage.memoryExpansion")).toBe("記憶檢索詞擴充");
   expect(t("history.itemAbsent")).toBe("項目不存在");
   expect(t("restore.impact")).toBe("對關聯項目的影響");
-  expect(t("delta.sameScope")).toBe("請從同一專案和同一會話中選擇兩個回答。");
+  expect(t("delta.sameScope")).toBe("請從同一專案和同一對話中選擇兩個回答。");
   expect(t("closure.basis")).toBe("佐證文件");
   expect(t("review.unsupported")).toBe("未得到支持");
   expect(t("credential.keyOnly")).toBe("不支援帳戶登入。請獲取並登記 API 金鑰。");

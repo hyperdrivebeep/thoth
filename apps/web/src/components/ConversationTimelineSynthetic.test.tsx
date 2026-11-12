@@ -37,7 +37,7 @@ async function mount(trace: TraceView | Error) {
     <ConversationTimeline projectId="p" threadId="t" onDetail={() => undefined}/></QueryClientProvider>));
   for (let index = 0; index < 30; index += 1) {
     await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
-    if (container.textContent?.includes("이 작업의 대화 기록을 현재 화면에서 불러올 수 없습니다")) {
+    if (container.textContent?.includes("이 대화의 기록을 현재 화면에서 불러올 수 없습니다")) {
       await act(async () => { await new Promise(resolve => setTimeout(resolve, 50)); }); // let the trace read settle too
       return;
     }

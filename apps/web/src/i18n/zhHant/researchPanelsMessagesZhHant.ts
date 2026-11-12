@@ -95,6 +95,6 @@ export const researchPanelsZhHant: ColumnOf<typeof researchPanelsMessages> = {
   "historyWorkspace.testMode": "驗證模式：此螢幕使用受控的資料和模型，不會驗證真實的研究結果。",
   "historyWorkspace.preserve": "在審查評估變化時，保留原始回答和證據。",
   "historyWorkspace.scope": "歷史範圍",
-  "historyWorkspace.session": "目前會話",
+  "historyWorkspace.session": "目前對話",
   "historyWorkspace.project": "整個專案",
 };

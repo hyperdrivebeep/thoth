@@ -262,6 +262,6 @@ describe("live research progress", () => {
         }),
       ),
     ).toBe("표와 원문 위치를 확인하고 있습니다");
-    expect(composerActivity(running({ execution_state: "PAUSED" }))).toBe("작업이 일시정지되어 있습니다.");
+    expect(composerActivity(running({ execution_state: "PAUSED" }))).toBe("조사가 일시정지되어 있습니다.");
   });
 });

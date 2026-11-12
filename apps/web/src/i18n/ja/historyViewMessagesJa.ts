@@ -40,7 +40,7 @@ export const historyViewJa: ColumnOf<typeof historyViewMessages> = {
   "delta.record": "記録",
   "delta.noIdentifier": "識別子なし",
   "delta.noIdentity": "リクエストと結果の正確なリンクがない記録は比較できません。",
-  "delta.sameScope": "同じプロジェクト・同じセッションから2つの回答を選んでください。",
+  "delta.sameScope": "同じプロジェクト・同じ会話から2つの回答を選んでください。",
   "delta.distinct": "異なる2つの回答を選んでください。",
   "delta.checkAccess": "アクセスが確認できると比較できます。",
   "delta.checkingAccess": "アクセスを再確認しています… 選択した2つの回答は保持されます。",

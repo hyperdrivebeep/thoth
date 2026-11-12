@@ -51,7 +51,7 @@ it("does not present an existing legacy thread as a brand-new empty thread", asy
       <ConversationTimeline projectId="p" threadId="legacy-thread" onDetail={() => undefined} onContinue={onContinue} onOpenHistory={onOpenHistory}/>
     </QueryClientProvider>,
   ));
-  await settle(() => Boolean(container.textContent?.includes("이 작업의 대화 기록을 현재 화면에서 불러올 수 없습니다")));
+  await settle(() => Boolean(container.textContent?.includes("이 대화의 기록을 현재 화면에서 불러올 수 없습니다")));
   expect(container.textContent).not.toContain("지금 무엇이 막혀 있나요?");
 
   const buttons = [...container.querySelectorAll<HTMLButtonElement>("button")];

@@ -3,7 +3,7 @@ import type { advancedMessages } from "../advancedMessages";
 
 export const advancedZhHant: ColumnOf<typeof advancedMessages> = {
   "advanced.projectHint": "截止時間 · 策略繫結 · 生命週期",
-  "advanced.task": "任務",
+  "advanced.task": "對話",
   "advanced.taskHint": "輸入應用 · 研究進展 · 目前結果",
   "advanced.discovery": "發現",
   "advanced.discoveryHint": "搜尋範圍 · 獲取階段 · 停止原因",
@@ -42,7 +42,7 @@ export const advancedZhHant: ColumnOf<typeof advancedMessages> = {
   "advanced.fieldHint": "方案 · 參與者會話 · 評分 · 保護隱私的匯出",
   "advanced.fieldNotice": "公開的現場名稱空間目前只提供命令，沒有隻讀查詢 API，本介面也不能證明參與者評估、節省的時間或付費意願。只有在獲得批准的方案和參與者同意的情況下，才能使用進階命令。",
   "advanced.projectGroup": "專案、資料與存取",
-  "advanced.threadGroup": "任務與請求",
+  "advanced.threadGroup": "對話與請求",
   "advanced.discoveryGroup": "資料發現",
   "advanced.evidenceGroup": "證據與主張",
   "advanced.hypothesisGroup": "假設與驗證",
@@ -94,7 +94,7 @@ export const advancedZhHant: ColumnOf<typeof advancedMessages> = {
   "records.controls": "此區域的詳細查詢和進階控制",
   "records.readOnly": "這是隻讀查詢。",
   "records.journaled": "這是記入日誌的 /rpc 查詢。只有按下此按鈕時才可能建立操作或日誌。",
-  "records.chooseTask": "請先選擇任務。",
+  "records.chooseTask": "請先選擇對話。",
   "records.failed": "讀取失敗或缺少所需範圍",
   "records.moreInputs": "需要額外 ID 或範圍的契約，可以透過能力輸入編輯器查詢。",
   "records.beforeRead": "尚未讀取",

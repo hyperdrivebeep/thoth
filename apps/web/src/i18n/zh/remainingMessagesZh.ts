@@ -80,7 +80,7 @@ export const remainingZh: ColumnOf<typeof remainingMessages> = {
   "labels.decider": "决定人：",
   "labels.confirmed": "已确认 ·",
   "labels.changedVerdicts": "变化的评估：",
-  "workspaceError.title": "无法显示此任务视图",
+  "workspaceError.title": "无法显示此视图",
   "workspaceError.notice": "服务器的响应可能与显示格式不符。这不会被视为成功或完成，已保存的记录不受影响。请使用标签页或项目查看其他记录。",
   "workspaceError.retry": "重新加载服务器状态并重试",
   "labels.userCode": "用户代码：",

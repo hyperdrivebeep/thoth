@@ -63,10 +63,10 @@ it("shows the readiness card on a fresh conversation from values the shell alrea
   // one sources read for both the page and the count chips
   expect(fixture.calls.filter(method => method === "project/source/list")).toHaveLength(1);
   const counts = container.querySelector(".workspace-counts")!;
-  expect(counts.textContent).toContain("세션 1");
+  expect(counts.textContent).toContain("대화 1");
   expect(counts.textContent).toContain("자료 2");
-  // the top task select is gone; sessions are chosen in the sidebar
-  expect(container.querySelector('[aria-label="현재 작업 선택"]')).toBeNull();
+  // the top bar has no select for the conversation; conversations are chosen in the sidebar
+  expect(container.querySelector(".workstation-topbar select")).toBeNull();
   expect(container.querySelectorAll(".project-sessions .thread-button")).toHaveLength(1);
   // the card's action opens this computer's settings, where the model accounts are
   await act(async () => buttons().find(item => item.textContent === "모델 연결 확인")!.click());

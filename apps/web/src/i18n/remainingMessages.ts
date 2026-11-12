@@ -312,8 +312,8 @@ export const remainingMessages = {
     "en": "Changed assessments:"
   },
   "workspaceError.title": {
-    "ko": "이 작업 화면을 표시하지 못했습니다",
-    "en": "This task view could not be displayed"
+    "ko": "이 화면을 표시하지 못했습니다",
+    "en": "This view could not be displayed"
   },
   "workspaceError.notice": {
     "ko": "서버 응답과 표시 형식이 맞지 않을 수 있습니다. 성공·완료로 처리하지 않으며 저장된 기록을 바꾸지 않았습니다. 위 탭이나 왼쪽 프로젝트에서 다른 기록을 확인할 수 있습니다.",
