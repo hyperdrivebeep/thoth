@@ -1,6 +1,6 @@
 {
   "schema_version": "thoth-source-preview-manifest-v1",
-  "created_at": "2026-11-12T01:38:48.513075+00:00",
+  "created_at": "2026-11-12T03:20:57.648794+00:00",
   "license": "MIT",
   "git_history_included": false,
   "full_suite_verified": false,
@@ -68,8 +68,8 @@
     },
     {
       "path": "SECURITY.md",
-      "sha256": "f1ea20ee15fbb43b8f4ad248ad13da3e97e8a7d881ec0ef4305df74d41b7734c",
-      "bytes": 4281
+      "sha256": "43b7d1e444621711fe27cbcf417ff151b8373c9fef0cd1ca83a9bf007c1f022f",
+      "bytes": 4715
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
@@ -4723,8 +4723,8 @@
     },
     {
       "path": "src/thoth/adapters/models/private_file.py",
-      "sha256": "d5caf9dd12531734cff50c934efe804fca57396649081652b50a3622f4a30ad1",
-      "bytes": 4088
+      "sha256": "c6b72adc56f1f1aafa8672f703a894e97712b8055c50b1ddec894f89581b5835",
+      "bytes": 5291
     },
     {
       "path": "src/thoth/adapters/models/receive_stats.py",
@@ -12598,8 +12598,8 @@
     },
     {
       "path": "tests/unit/models/test_private_file.py",
-      "sha256": "91b93d81f11b463965532dbbe73e1a4676bb53d9617f4bd3ae48b812d4b95296",
-      "bytes": 4312
+      "sha256": "c1e5249318b875014f74d27b3e7aa73baf7cefcefbebcfced447ac682e6ea2c3",
+      "bytes": 7213
     },
     {
       "path": "tests/unit/models/test_ranking_reference_contract.py",
@@ -12678,8 +12678,8 @@
     },
     {
       "path": "tests/unit/models/test_windows_profile_output_encoding.py",
-      "sha256": "65ec063c8e601dc47bec076089e39eee35730dc5304895ea6ce9930305fbe08a",
-      "bytes": 4523
+      "sha256": "5e121058ad57f0c8b63ba7d517e284440e1331dedc90fdce115687e3f8efa896",
+      "bytes": 4693
     },
     {
       "path": "tests/unit/models/test_windows_user_sid.py",

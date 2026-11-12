@@ -1,8 +1,9 @@
 """Files only the current user may read: the permission step and a whole-file JSON write.
 
 The sign-in profiles and the API key file keep secrets in the workspace. They share this module so a
-secret gets the same protection wherever it is stored: on Windows an ACL that names the current user
-and drops inherited entries (a file mode does nothing there), elsewhere mode 0600/0700.
+secret gets the same protection wherever it is stored: on Windows an ACL that gives the current user
+full control, drops what the folder passed down and drops entries for broad groups (a file mode does
+nothing there), elsewhere mode 0600/0700.
 """
 
 from __future__ import annotations
@@ -15,6 +16,25 @@ from pathlib import Path
 from typing import cast
 
 from thoth.adapters.models.windows_user_sid import UserSidUnavailable, current_user_sid
+
+# Groups that stand for many accounts. "/inheritance:r" only removes entries marked as inherited,
+# so an entry for one of these that sits on the file itself would stay and keep the secret readable
+# by other users; they are removed by name. Entries for SYSTEM and Administrators are left: backup
+# and recovery tools work through them, and an administrator can read the file in any case.
+BROAD_GROUP_SIDS = (
+    "S-1-1-0",  # Everyone
+    "S-1-5-11",  # Authenticated Users
+    "S-1-5-32-545",  # BUILTIN Users
+    "S-1-5-32-546",  # BUILTIN Guests
+    "S-1-5-4",  # INTERACTIVE
+    "S-1-5-14",  # REMOTE INTERACTIVE LOGON
+    "S-1-5-2",  # NETWORK
+    "S-1-5-7",  # ANONYMOUS LOGON
+    "S-1-5-15",  # This Organization
+    "S-1-5-113",  # Local account
+    "S-1-2-0",  # LOCAL
+    "S-1-2-1",  # CONSOLE LOGON
+)
 
 
 class PrivatePathError(OSError):
@@ -45,7 +65,12 @@ def read_for_replace(path: Path) -> dict[str, object]:
 
 
 def make_private(path: Path, *, directory: bool = False) -> None:
-    """Leave the path readable and writable by the current user only."""
+    """Give the current user full control and take the path away from other ordinary accounts.
+
+    On Windows: entries passed down by the folder go, the current user gets full control, and
+    entries for broad groups (BROAD_GROUP_SIDS) set on the path itself go. Elsewhere: mode 0600 or
+    0700.
+    """
     if os.name == "nt":
         try:
             sid = current_user_sid()
@@ -59,6 +84,8 @@ def make_private(path: Path, *, directory: bool = False) -> None:
                     "/inheritance:r",
                     "/grant:r",
                     f"*{sid}:(OI)(CI)F" if directory else f"*{sid}:F",
+                    "/remove:g",
+                    *(f"*{group}" for group in BROAD_GROUP_SIDS),
                 ],
                 capture_output=True,
                 text=True,

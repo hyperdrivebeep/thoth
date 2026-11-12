@@ -31,7 +31,9 @@ This preview does not promise a response deadline or a reward.
   establish the security of a hosted deployment. See the [documented limitations](docs/KNOWN_LIMITATIONS.md).
 - **The workspace contains secrets.** Registered API keys are held in its `model-registry` directory;
   provider sign-in profiles can also hold tokens. The key file and the sign-in profiles are
-  restricted to the current user (a Windows ACL without inherited entries, mode 0600 elsewhere);
+  closed to other ordinary accounts (on Windows the current user gets full control, and entries
+  inherited from the folder and entries for broad groups such as Users and Everyone are removed;
+  entries for SYSTEM and Administrators set on the file itself are left; mode 0600 elsewhere);
   the rest of the workspace has the permissions of its folder. Treat the whole workspace and
   backups as sensitive.
   Keep them out of source control, public logs and shared exports. The preview does not promise that
@@ -48,7 +50,7 @@ This preview does not promise a response deadline or a reward.
 
 로컬 모드는 같은 컴퓨터의 사용자와 프로그램을 신뢰하며 별도 사용자 인증을 제공하지 않습니다.
 Hosted review의 권한 체계와 구분하세요. 작업 공간의 `model-registry`와 로그인 프로필에는 비밀 정보가
-포함될 수 있으므로 백업까지 보호해야 합니다. 키 파일과 로그인 프로필은 현재 사용자만 읽게 권한을 좁혀 둡니다.
+포함될 수 있으므로 백업까지 보호해야 합니다. 키 파일과 로그인 프로필은 다른 일반 계정이 읽지 못하게 권한을 좁혀 둡니다(Windows에서는 폴더에서 상속한 항목과 Users·Everyone 같은 넓은 그룹 항목을 지우고 현재 사용자에게 전체 권한을 줍니다. 파일에 직접 걸린 SYSTEM·Administrators 항목은 남깁니다).
 
 웹 페이지는 "같은 컴퓨터의 프로그램"으로 보지 않습니다. Origin이 붙은 요청은 서버가 직접 내준 화면과
 웹 개발 서버(`http://127.0.0.1:5173`, `http://localhost:5173`)에서 온 것만 받고, 다른 로컬 웹 서버의
