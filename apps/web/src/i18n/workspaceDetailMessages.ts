@@ -1,8 +1,4 @@
 export const workspaceDetailMessages = {
-  "workspace.continueHeading": {
-    "ko": "연구를 이어가거나 새 문제를 시작하세요.",
-    "en": "Continue your research or start a new problem."
-  },
   "workspace.authorizedRead": {
     "ko": "권한 있는 저장 연구는 계속 읽을 수 있습니다.",
     "en": "You can still read saved research within your access permissions."

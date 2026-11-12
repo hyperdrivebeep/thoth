@@ -46,6 +46,26 @@ describe.each(["stored_current", "stored_before_grounded_rows"] as const)("the a
     serve(c, value => { value.result = { ...value.result, answer: "another answer" }; value.shown_result = { ...value.shown_result, answer: "another answer" }; });
     await expect(show(c, { ...c.displayed, answer: "another answer" })).rejects.toThrow(BINDING);
   });
+  // An earlier round of a conversation is shown from operation/result/read, which returns the stored result whole,
+  // not the summary view the latest round is shown from.
+  it("opens the evidence for an earlier round, which the screen shows from the stored result itself", async () => {
+    serve(c);
+    const whole = c.read.result as Wire;
+    // it is not the summary view: at least one of the two summarized records is there in full
+    expect(["absence_assessments", "checked_observations"].some(key => JSON.stringify(whole[key]) !== JSON.stringify(c.displayed[key]))).toBe(true);
+    expect((await show(c, whole)).selected_count).toBeGreaterThan(0);
+    expect((await show(c, c.read.manifest.result as Wire)).selected_count).toBeGreaterThan(0);
+  });
+  it("still rejects a whole result with another answer or an invented key, and one put together from two forms", async () => {
+    serve(c);
+    const whole = c.read.result as Wire;
+    await expect(show(c, { ...whole, answer: "another answer" })).rejects.toThrow(BINDING);
+    await expect(show(c, { ...whole, invented_key: 1 })).rejects.toThrow(BINDING);
+    // the summary of one record inside the whole result: each key is right in one form, the whole is right in none
+    const mixedKey = (["absence_assessments", "checked_observations"] as const).find(key => JSON.stringify(whole[key]) !== JSON.stringify(c.displayed[key]));
+    expect(mixedKey).toBeDefined();
+    await expect(show(c, { ...whole, [mixedKey!]: c.displayed[mixedKey!] })).rejects.toThrow(BINDING);
+  });
 });
 
 describe("a server that does not send shown_result or projected_keys (older)", () => {

@@ -258,14 +258,6 @@ export const workspaceMessages = {
     "ko": "프로젝트 선택으로 돌아가기",
     "en": "Back to project selection"
   },
-  "workspace.openOrCreate": {
-    "ko": "기존 프로젝트를 열어 작업을 이어가거나, 새로운 연구 맥락을 만들 수 있습니다.",
-    "en": "Open an existing project to continue, or create a new research context."
-  },
-  "workspace.continueProject": {
-    "ko": "이어갈 프로젝트",
-    "en": "Project to continue"
-  },
   "workspace.projects": {
     "ko": "프로젝트",
     "en": "Projects"

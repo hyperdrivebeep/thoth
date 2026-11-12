@@ -29,4 +29,3 @@ it("has no slogan in the other languages either", () => {
     setLocale("ko");
   }
 });
-

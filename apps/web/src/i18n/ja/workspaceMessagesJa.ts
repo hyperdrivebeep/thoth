@@ -72,8 +72,6 @@ export const workspaceJa: ColumnOf<typeof workspaceMessages> = {
   "workspace.contextCorrupt": "最後のワークスペースの場所を読み込めませんでした。元の記録は削除されていません。",
   "workspace.contextUnavailable": "このブラウザから最後のワークスペースの場所を読み込めませんでした。ストレージへのアクセスとワークスペースの識別子を確認してください。",
   "workspace.backProjects": "プロジェクトの選択に戻る",
-  "workspace.openOrCreate": "既存のプロジェクトを開いて続けるか、新しい調査の文脈を作成してください。",
-  "workspace.continueProject": "続けるプロジェクト",
   "workspace.projects": "プロジェクト",
   "workspace.loadingProjects": "プロジェクトを読み込んでいます…",
   "workspace.openProject": "プロジェクトを開く",

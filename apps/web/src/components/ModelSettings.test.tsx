@@ -393,7 +393,8 @@ it("shows this project's settings on the project tab and this computer's from th
   await openPage("설정");
   const titles = () => [...container.querySelectorAll(".workspace-content h2")].map(item => item.textContent);
   expect(container.querySelector(".workspace-heading h1")?.textContent).toBe("프로젝트 설정");
-  expect(container.querySelector(".workspace-heading .eyebrow")?.textContent).toBe("이 프로젝트");
+  // the title says the scope once; no small label above it says it again
+  expect(container.querySelector(".workspace-heading .eyebrow")).toBeNull();
   const projectTitles = titles();
   expect(projectTitles).toContain("모델 기본값");
   expect(projectTitles).not.toContain("모델 연결");
@@ -401,7 +402,7 @@ it("shows this project's settings on the project tab and this computer's from th
   await act(async () => { ([...container.querySelectorAll(".sidebar-bottom button")].find(item => item.textContent === "이 컴퓨터 설정") as HTMLButtonElement).click(); });
   await flush(); await flush();
   expect(container.querySelector(".workspace-heading h1")?.textContent).toBe("이 컴퓨터 설정");
-  expect(container.querySelector(".workspace-heading .eyebrow")?.textContent).toBe("이 컴퓨터");
+  expect(container.querySelector(".workspace-heading .eyebrow")).toBeNull();
   const computerTitles = titles();
   expect(computerTitles).toContain("모델 연결");
   expect(computerTitles).toContain("언어");

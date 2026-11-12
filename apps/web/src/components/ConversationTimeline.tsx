@@ -51,6 +51,11 @@ function followupFor(liveStatus: ResearchStatus | undefined, requestDigest?: str
     ? { progressSummary: liveStatus.user_progress_summary, coverageMatrix: liveStatus.coverage_matrix, nextUserAction: liveStatus.next_user_action }
     : {};
 }
+/** A saved round the live status does not describe: the answer checks are sent for the latest request only. */
+function isEarlierRound(liveStatus: ResearchStatus | undefined, requestDigest: string) {
+  const latest = liveStatus?.user_progress_summary?.request_revision_digest;
+  return Boolean(latest) && latest !== requestDigest;
+}
 
 /** The request the live status is about, when it has produced or kept a checkpoint; otherwise the live block shows progress only. */
 function currentRequestOf(liveStatus: ResearchStatus | undefined) {
@@ -110,7 +115,7 @@ function SavedTurnCard({ turn, projectId, threadId, status, liveStatus, savedBef
   return <ResearchResultCard {...retry} onOpenTrace={onOpenTrace} projectId={projectId} hypothesisLinks={linked.links} linkDistribution={linked.distribution} result={turn.result} state={turn.state} unavailable={turn.unavailable} error={turn.error} failure={turn.failure} terminalReason={turn.terminalReason} onDetail={onDetail} onRetry={onRetry ? () => onRetry(turn.input.text) : undefined} usageLine={resultUsageLine(liveStatus, turn.input.operation_id)}
     hasSavedResult={savedBefore.has(requestDigest) || Boolean(liveStatus?.request?.operation_id === turn.input.operation_id && liveStatus.previous_result)}
     currentness={turn.currentness} historySelection={{ kind: "result", scope: { projectId, threadId, requestDigest }, operationId: turn.input.operation_id,
-      resultDigest: currentResultDigest(status, { projectId, threadId, requestDigest }, turn.input.operation_id) }} {...followupFor(liveStatus, requestDigest)}/>;
+      resultDigest: currentResultDigest(status, { projectId, threadId, requestDigest }, turn.input.operation_id) }} {...followupFor(liveStatus, requestDigest)} earlierRound={isEarlierRound(liveStatus, requestDigest)}/>;
 }
 
 export function ConversationTimeline(props: TimelineProps) {

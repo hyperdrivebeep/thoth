@@ -542,6 +542,20 @@ it("opens the project at its most recently updated work and shows the project cu
   expect(container.textContent).not.toMatch(GATE_CHECKING);
 });
 
+it("starts the home screen with the list of projects under a plain title, without a headline about the product", async () => {
+  await mount(); await settle(() => Boolean(container.querySelector(".project-home .project-home-item")));
+  const home = container.querySelector(".project-home")!;
+  expect([...home.querySelectorAll("h1")].map(heading => heading.textContent)).toEqual(["프로젝트"]);
+  // the list is the first thing on the page and is named by that title
+  const list = home.querySelector("section.project-home-list")!;
+  expect(list.getAttribute("aria-labelledby")).toBe(home.querySelector("h1")!.id);
+  expect(home.querySelector(".eyebrow")).toBeNull();
+  expect(home.querySelector(".workspace-heading")).toBeNull();
+  expect(home.textContent).not.toContain("연구를 이어가거나");
+  // one filled button: the way to a new project
+  expect([...home.querySelectorAll("button.bp6-intent-primary")].map(button => button.textContent)).toEqual(["새 프로젝트"]);
+});
+
 it("keeps the new-session screen when the user chooses 새 대화 after opening a project", async () => {
   fixture.executionReady = true;
   await mount(); await settle(() => Boolean(container.querySelector(".project-button")));

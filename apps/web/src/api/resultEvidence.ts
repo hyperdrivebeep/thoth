@@ -66,9 +66,13 @@ function bindAnswer(selection: ResultSelection, displayed: Record<string, unknow
   // it may only hold keys the result has. An older server sends none: the screen is then compared with the manifest itself.
   const shownBody = value.shown_result ? answerContent(value.shown_result, thread!, epoch, terminal) : manifestBody;
   if (value.shown_result && !Object.keys(shownBody).every(key => Object.hasOwn(resultBody, key))) mismatch();
+  // The latest round is shown from the summary view. A saved earlier round is shown from the stored result itself
+  // (operation/result/read returns it whole). What the screen shows must be, all of it, a part of one of these forms
+  // of the same stored answer; keys taken from two forms that disagree are refused.
+  const shownIsStored = [shownBody, resultBody, manifestBody].some(body => isShownPartOf(displayedContent, body));
   if (manifest.operation_id !== selection.operationId || manifest.request_ref.project_id !== scope.projectId ||
       manifest.request_ref.entity_type !== "THREAD" || manifest.request_ref.entity_id !== `request:${thread}` || manifest.request_ref.revision_digest !== scope.requestDigest ||
-      resultContentKey(without(resultBody, projected)) !== resultContentKey(without(manifestBody, projected)) || !isShownPartOf(displayedContent, shownBody)) mismatch();
+      resultContentKey(without(resultBody, projected)) !== resultContentKey(without(manifestBody, projected)) || !shownIsStored) mismatch();
 }
 
 async function read(selection: ResultSelection, displayed: Record<string, unknown>, digest: string | undefined, offset: number, expand: boolean, signal?: AbortSignal) {

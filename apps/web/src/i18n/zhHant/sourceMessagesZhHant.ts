@@ -6,7 +6,6 @@ export const sourceZhHant: ColumnOf<typeof sourceMessages> = {
   "sources.fileUploadCancel": "取消上傳",
   "sources.fileUploadCancelled": "上傳已取消。沒有連線任何資料。",
   "sources.fileTitle": "連線資料檔案",
-  "sources.preserve": "保留原文、版本和位置",
   "sources.fileTypes": "上傳 HWPX、PDF、DOCX、XLSX、CSV、JSON、MD、TXT、YAML 或 HTML 檔案，並記錄其權威性和使用範圍。",
   "sources.hostedUpload": "上傳的檔案用於此審查專案。",
   "sources.localUpload": "檔案暫存在這臺電腦的 THOTH 工作區中。",

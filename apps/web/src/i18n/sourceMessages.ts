@@ -12,10 +12,6 @@ export const sourceMessages = {
     "ko": "파일 자료 연결",
     "en": "Connect source files"
   },
-  "sources.preserve": {
-    "ko": "원문 · 버전 · 위치 보존",
-    "en": "Preserve original text, versions, and locations"
-  },
   "sources.fileTypes": {
     "ko": "HWPX · PDF · DOCX · XLSX · CSV · JSON · MD · TXT · YAML · HTML 파일을 올리고, 자료의 성격과 사용 범위를 함께 기록합니다.",
     "en": "Upload HWPX, PDF, DOCX, XLSX, CSV, JSON, MD, TXT, YAML, or HTML files and record their authority and usage scope."

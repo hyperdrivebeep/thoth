@@ -86,4 +86,3 @@ export function WorkspaceTopbar({ drawer, testMode, projectLabel, threadLabel, c
     </header>
   );
 }
-

@@ -1,7 +1,7 @@
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
 import { sentenceGap } from "../i18n/sentences";
-import { Button, Callout, Icon, InputGroup, Tab, Tabs, Tag } from "@blueprintjs/core";
+import { Button, Callout, InputGroup, Tab, Tabs, Tag } from "@blueprintjs/core";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { flushSync } from "react-dom";
@@ -27,7 +27,6 @@ import { workspaceSetupIssue, workspaceSetupIssueText, type WorkspaceSetupIssue 
 import { LanguageSettingsCard } from "./LanguageSettingsCard";
 import { useResearchSession } from "./useResearchSession";
 import { useReadAccessProtection } from "./useReadAccessProtection";
-import { eyebrowLabel } from "./statusLabels";
 import { WorkspaceErrorBoundary } from "./WorkspaceErrorBoundary";
 import { ConversationTimeline } from "./ConversationTimeline";
 import { ArchivedProjects } from "./ArchivedProjects";
@@ -169,8 +168,8 @@ export function ProjectLanding({ projects, loading = false, contextRestoreIssue 
     {sentenceGap()}{t("workspace.restoreScope")}</Callout>;
   const setupNotice = setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)}{sentenceGap()}{t("workspace.existingRead")}</Callout>;
   if (creating) return <>{setupNotice}{restoreNotice}<Button minimal icon="arrow-left" disabled={projects.length===0} onClick={()=>setCreating(false)}>{t("workspace.backProjects")}</Button><ProjectForm onCreated={onCreated}/></>;
-  return <div className="start-page project-home">{setupNotice}{restoreNotice}<div className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel("RESEARCH WORKSPACE")}</p><h1>{t("workspace.continueHeading")}</h1><p>{t("workspace.openOrCreate")}</p></div><Icon icon="projects" size={50}/></div>
-    <section className="project-home-list" aria-label={t("workspace.continueProject")}><div className="section-title-row"><h2>{t("workspace.projects")}</h2><Button icon="plus" intent="primary" onClick={()=>setCreating(true)}>{t("workspace.newProject")}</Button></div>
+  return <div className="start-page project-home">{setupNotice}{restoreNotice}
+    <section className="project-home-list" aria-labelledby="project-home-title"><div className="section-title-row"><h1 id="project-home-title">{t("workspace.projects")}</h1><Button icon="plus" intent="primary" onClick={()=>setCreating(true)}>{t("workspace.newProject")}</Button></div>
       {loading&&<p className="empty-copy" role="status">{t("workspace.loadingProjects")}</p>}
       {projects.map(project=><Button fill large alignText="left" className="project-home-item" key={project.project_id} icon="folder-open" onClick={()=>onOpen(project.project_id)}><span><strong>{project.name}</strong><small>{t("workspace.openProject")}</small></span></Button>)}
     </section>

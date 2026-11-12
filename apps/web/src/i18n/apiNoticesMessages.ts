@@ -115,6 +115,10 @@ export const apiNoticesMessages = {
     "ko": "답변 점검 항목 정보를 아직 읽지 못했습니다",
     "en": "Answer-check information is not available yet"
   },
+  "answerHold.coverageEarlier": {
+    "ko": "이 회차의 답변 점검 항목은 여기서 볼 수 없습니다. 최신 회차의 답에서만 보입니다.",
+    "en": "The answer checks of this turn are not shown here. They are shown for the latest turn only."
+  },
   "approvalView.approved": {
     "ko": "승인됨 · 이 내용으로 유효",
     "en": "Approved · valid for this content"

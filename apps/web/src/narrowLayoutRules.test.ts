@@ -109,3 +109,13 @@ it("never shortens the state tag of a provider on the first-run screen", () => {
   expect(head[0].body).toContain("flex-wrap: wrap");
 });
 
+it("never shortens the label of where this copy runs: it takes a row of its own when the name leaves no room", () => {
+  // English and Japanese do not fit next to the name in the project list's head; the label used to be cut to "THIS CO…".
+  const brand = all.filter(rule => has(rule, ".workstation .brand"));
+  expect(brand).toHaveLength(1);
+  expect(brand[0].body).toContain("flex-wrap: wrap");
+  const tag = all.filter(rule => has(rule, ".workstation .brand .bp6-tag") && declares(rule, "flex"));
+  expect(tag.map(rule => rule.body.match(/flex:\s*([^;]+);/)?.[1])).toEqual(["none"]);
+  // nothing pushes the label off its row or gives it a width to be cut to
+  expect(all.filter(rule => has(rule, ".workstation .brand .bp6-tag") && (declares(rule, "max-width") || declares(rule, "width") || declares(rule, "overflow")))).toEqual([]);
+});

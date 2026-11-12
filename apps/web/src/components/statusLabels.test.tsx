@@ -31,7 +31,7 @@ it("names answer status, provider routes and English eyebrows", () => {
   expect(answerStatusLabel(undefined)).toBeNull();
   expect(providerLabel("codex-oauth")).toBe("ChatGPT 계정");
   expect(providerLabel("mystery-route")).toBe("mystery-route");
-  expect(eyebrowLabel("EVIDENCE")).toBe("근거");
+  expect(eyebrowLabel("LOCAL WORKSPACE")).toBe("이 컴퓨터");
   expect(eyebrowLabel("SOMETHING ELSE")).toBe("SOMETHING ELSE");
   expect(reversibilityLabel("PARTIAL")).toBe("일부만 되돌릴 수 있음");
   expect(actionStateLabel("APPROVED")).toBe("승인됨");

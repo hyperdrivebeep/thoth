@@ -72,8 +72,6 @@ export const workspaceZhHant: ColumnOf<typeof workspaceMessages> = {
   "workspace.contextCorrupt": "無法讀取上一次的工作區位置。原始記錄沒有被刪除。",
   "workspace.contextUnavailable": "無法在此瀏覽器中讀取上一次的工作區位置。請檢查儲存存取權限和工作區標識。",
   "workspace.backProjects": "返回專案選擇",
-  "workspace.openOrCreate": "開啟已有的專案以繼續，或建立新的研究上下文。",
-  "workspace.continueProject": "要繼續的專案",
   "workspace.projects": "專案",
   "workspace.loadingProjects": "正在載入專案…",
   "workspace.openProject": "開啟專案",
