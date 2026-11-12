@@ -46,6 +46,26 @@ it("calls the kind of a source by one Korean word in the status labels too", () 
   expect(labels).not.toContain("권위");
 });
 
+// 을/를, 이/가, 은/는, 와/과, 로/으로 depend on the last sound of the word before them. A sentence that puts one
+// straight after an inserted name or label is wrong for half of the names ('"2차"을 보관할까요').
+const PARTICLE_AFTER_VALUE = /\$\{[^}]+\}["'”’]?(?:을|를|이|가|은|는|와|과|으로|로)(?=[ ,.?!`])/;
+// The login button names one of three accounts (ChatGPT, Claude, xAI); read in Korean all three end in a vowel
+// sound, so "로" is right for each. A fourth account whose name ends in a consonant needs "으로" and a new sentence.
+const PARTICLE_IS_RIGHT_FOR_EVERY_VALUE = new Set(["loginButton"]);
+
+it("puts no Korean particle straight after an inserted value", () => {
+  const found: string[] = [];
+  for (const [key, value] of Object.entries(formatCatalog)) {
+    const source = (value.ko as (...values: never[]) => string).toString();
+    if (!PARTICLE_IS_RIGHT_FOR_EVERY_VALUE.has(key) && PARTICLE_AFTER_VALUE.test(source.slice(source.indexOf("=>") + 2))) found.push(key);
+  }
+  expect(found).toEqual([]);
+  for (const account of ["ChatGPT", "Claude", "xAI"]) expect(message("loginButton", account, false)).toBe(account + "로 로그인");
+  // the check sees what it is meant to see
+  expect(PARTICLE_AFTER_VALUE.test('`프로젝트 "${name}"을 보관할까요?`')).toBe(true);
+  expect(PARTICLE_AFTER_VALUE.test('`"${name}" 프로젝트를 보관할까요?`')).toBe(false);
+});
+
 // Text between tags that is written in capitals or as a bare English word is not in the translation
 // lists, so every language would see it in English. The product name is the one that stays.
 const FIXED_ENGLISH = />\s*([A-Z][A-Za-z]+(?: [A-Za-z]+)*)\s*</g;
@@ -69,6 +89,26 @@ it("has no English wording written straight into a screen", () => {
     }
   }
   expect(found).toEqual([]);
+});
+
+// A small label above a heading ("eyebrow") is used only where it says something the heading under it does not.
+// One above every heading, repeating the heading or the open tab, is decoration (the audit's slop list, 2).
+const SMALL_LABELS: Record<string, string> = {
+  "FirstRunSetup.tsx": "the step of the first-run setup (1 / 2), and that an existing setup needs a look",
+  "ModelCredentialPanel.tsx": "what the list of account names under it is for",
+  "ProjectSessionPages.tsx": "that the page belongs to the review site, which its title does not say",
+};
+
+it("puts a small label above a heading only where the label has something of its own to say", () => {
+  const used = new Map<string, number>();
+  for (const path of screenSources(resolve(import.meta.dirname, ".."))) {
+    const count = readFileSync(path, "utf8").split('className="eyebrow"').length - 1;
+    if (count > 0) used.set(path.split(/[\\/]/).pop()!, count);
+  }
+  expect([...used.keys()].sort()).toEqual(Object.keys(SMALL_LABELS).sort());
+  expect(used.get("FirstRunSetup.tsx")).toBe(2);
+  expect(used.get("ModelCredentialPanel.tsx")).toBe(1);
+  expect(used.get("ProjectSessionPages.tsx")).toBe(1);
 });
 
 it("names the workspace and the project list in every screen language", () => {
@@ -157,7 +197,8 @@ it("calls the unit of questions and answers a conversation in every screen langu
   }
   for (const language of LANGUAGES) {
     setLocale(language);
-    for (const text of [message("missingSelection", "thread"), message("threadMenu", "A")]) {
+    // The number under the question box is the conversation's total (a second research starts at the first one's total).
+    for (const text of [message("missingSelection", "thread"), message("threadMenu", "A"), message("usageCaption", "1", false), message("usageTooltip", "1", "2")]) {
       if (!text.toLowerCase().includes(CONVERSATION[language])) found.push(language + ": " + text);
     }
   }
@@ -188,5 +229,16 @@ it("quotes the two choices for who may use a source by the names they have on th
     const help = messages["sources.scopeHelp"][language];
     expect(help, language).toContain(messages["sources.projectShared"][language]);
     expect(help, language).toContain(messages["sources.explicitGrants"][language]);
+  }
+});
+
+it("ends the help for who may use a source by naming the usual choice", () => {
+  // The narrower choice restricts nothing while no screen gives a line of work its permission, so the help says
+  // which one to pick: the shared choice is named once to describe it and once more, last, to recommend it.
+  for (const language of LANGUAGES) {
+    const help = messages["sources.scopeHelp"][language];
+    const shared = messages["sources.projectShared"][language];
+    expect(help.split(shared).length - 1, language).toBe(2);
+    expect(help.lastIndexOf(shared), language).toBeGreaterThan(help.lastIndexOf(messages["sources.explicitGrants"][language]));
   }
 });

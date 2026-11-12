@@ -31,6 +31,7 @@ export const apiNoticesZhHant: ColumnOf<typeof apiNoticesMessages> = {
   "memorySwitch.label": "在研究中使用記憶",
   "answerHold.title": "已確認的事實與證據用途",
   "answerHold.coverageMissing": "暫時沒有回答核查資訊",
+  "answerHold.coverageEarlier": "這一輪的回答核查項目不在這裡顯示，只在最新一輪的回答中顯示。",
   "approvalView.approved": "已批准 · 對此內容有效",
   "approvalView.pending": "等待批准",
   "approvalView.rejected": "已拒絕",

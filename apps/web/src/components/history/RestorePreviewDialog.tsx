@@ -7,12 +7,14 @@ import { RevisionComparison } from "./RevisionComparison";
 import { useRestoreFlow } from "./useRestoreFlow";
 import { restoreErrorText } from "./historyErrors";
 import { Disclosure } from "../Disclosure";
+import { useReturnFocus } from "../returnFocus";
 
 export function RestorePreviewDialog({ scope, selection, actorScope, title, onClose, onApplied, onRefresh }: {
   scope: HistoryScope; selection: RestoreSelection; actorScope: string; title: string;
   onClose: () => void; onApplied: (result: RestoreResult) => Promise<void>; onRefresh: () => Promise<void>;
 }) {
   const flow = useRestoreFlow(scope, selection, actorScope, onApplied);
+  useReturnFocus();
   const completion = useRef<HTMLDivElement | null>(null);
   useEffect(() => { if (flow.readback) completion.current?.focus(); }, [flow.readback]);
   const preview = flow.preview.data;

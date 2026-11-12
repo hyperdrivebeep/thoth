@@ -110,4 +110,3 @@ it("offers no way to the setting where this screen cannot change it (hosted revi
   expect(web.textContent).not.toContain("허용하면 여기서");
   expect(web.querySelectorAll("button")).toHaveLength(0);
 });
-

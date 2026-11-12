@@ -324,7 +324,7 @@ export function missingFor(
     return `${facts.focus ?? "질문"}에 집어넣을 표·문장이 아직 0곳입니다. 붙인 로컬 원문이 없어 웹 검색은 이 단계에서 시작하지 않습니다.`;
   }
   if (phase === "EVIDENCE_FOCUS" && labels.length > 0) {
-    const found = joinKo(labels.slice(0, 3));
+    const found = joinKo(unique(labels).slice(0, 3));
     return `${found} ${labels.length}곳을 확인했습니다${total != null && total > labels.length ? ` · 전체 ${total}곳 중 일부` : ""}.`;
   }
   if ((phase === "HYPOTHESIS_REVIEW" || phase === "HYPOTHESES") && hypotheses != null) {

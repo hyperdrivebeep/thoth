@@ -3,7 +3,8 @@ import { useDraftGeneration, type DraftTicket } from "./useDraftGeneration";
 import { useReadAccessProtection } from "./useReadAccessProtection";
 import { message as formatMessage } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
-import { Button, Callout, HTMLSelect, InputGroup } from "@blueprintjs/core";
+import { Button, Callout, InputGroup } from "@blueprintjs/core";
+import { Select } from "./Select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { objectValue, textValue } from "../api/presentation";
@@ -83,7 +84,7 @@ export function ActionEffort({ projectId, actionId, initial, legacy }: { project
     {open && <div className="effort-editor">
       {DIMENSIONS.map(dimension => <div className="effort-editor-row" key={dimension}>
         <label>{effortDimensionLabel(dimension)}
-          <HTMLSelect aria-label={formatMessage("effortEstimate", effortDimensionLabel(dimension))} value={draft[dimension].band} onChange={event => set(dimension, "band", event.target.value)}
+          <Select aria-label={formatMessage("effortEstimate", effortDimensionLabel(dimension))} value={draft[dimension].band} onChange={event => set(dimension, "band", event.target.value)}
             options={[{ value: "", get label() { return t("effort.none"); } }, ...effortBandOptions(dimension)]}/></label>
         <InputGroup small aria-label={formatMessage("effortBasis", effortDimensionLabel(dimension))} placeholder={t("effort.basis")} value={draft[dimension].basis} onChange={event => set(dimension, "basis", event.target.value)}/>
       </div>)}

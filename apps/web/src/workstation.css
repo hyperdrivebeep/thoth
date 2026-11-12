@@ -76,11 +76,14 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 .workstation { display: grid; grid-template-columns: var(--sidebar-width) minmax(0,1fr); grid-template-rows: 56px 49px minmax(0,1fr); min-height: 100vh; }
 .workstation.with-evidence { grid-template-columns: var(--sidebar-width) minmax(450px,1fr) var(--evidence-width); }
 .workstation .navigation-rail { grid-column: 1; grid-row: 1 / -1; z-index: 10; background: #182029; border-right: 1px solid var(--line-soft); padding: 20px 12px 12px; height: 100vh; position: sticky; top: 0; gap: 12px; }
-.workstation .brand { padding: 0 0 15px; gap: 9px; }
+/* The name and the label of where this copy runs share a row when both fit. In a language where they do not
+   (English, Japanese), the label takes a row of its own and is shown whole; it is never shortened. */
+.workstation .brand { padding: 0 0 15px; gap: 6px 9px; flex-wrap: wrap; justify-content: space-between; }
+.workstation .brand-name { display: flex; align-items: center; gap: 9px; min-width: 0; }
 .workstation .brand-mark { width: 34px; height: 34px; background: #294568; color: #9cc8ff; border: 1px solid #3d638b; border-radius: var(--radius); }
 .workstation .brand strong { font-size: 15px; letter-spacing: .18em; }
 .workstation .brand span { font-size: var(--font-small); letter-spacing: .09em; }
-.workstation .brand .bp6-tag { margin-left: auto; font-size: var(--font-small); }
+.workstation .brand .bp6-tag { flex: none; font-size: var(--font-small); }
 .workstation .nav-section { margin: 5px 0 0; }
 .workstation .nav-section-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .workstation .nav-label { color: var(--faint); margin: 0 0 0 8px; font-size: var(--font-small); letter-spacing: .13em; }
@@ -664,6 +667,9 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 /* ---- New project ---- */
 .project-create { max-width: 760px; }
 .start-page.project-create h1 { margin: 8px 0 6px; font-size: 27px; line-height: 1.3; }
+/* The home screen starts with the list of projects under a plain title of the same size. */
+.start-page.project-home h1 { margin: 0; font-size: 27px; line-height: 1.3; }
+.start-page.project-home .project-home-list { margin-top: 0; }
 .project-create > .muted { margin: 0 0 18px; font-size: 13px; }
 .project-create .onboarding-card > .bp6-button { margin-top: 4px; }
 

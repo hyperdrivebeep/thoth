@@ -6,6 +6,7 @@ import { rpc } from "../api/rpcClient";
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
 import type { ProjectSummary } from "../types";
+import { useReturnFocus } from "./returnFocus";
 
 /**
  * Confirms and sends project/permanentDelete for one archived project. The name must be typed
@@ -18,6 +19,7 @@ export function ProjectPermanentDelete({ target, onClose, onDeleted }: {
   onDeleted: (projectId: string) => void;
 }) {
   useTranslation();
+  useReturnFocus();
   const client = useQueryClient();
   const [name, setName] = useState("");
   const [leftover, setLeftover] = useState(false);

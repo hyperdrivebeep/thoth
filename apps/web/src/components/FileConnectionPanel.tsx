@@ -1,13 +1,13 @@
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
-import { Button, Callout, FileInput, HTMLSelect } from "@blueprintjs/core";
+import { Button, Callout, FileInput } from "@blueprintjs/core";
+import { Select } from "./Select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { stageFile, type StagedFile, type UploadProgress } from "../api/files";
 import { UiError } from "../i18n/UiError";
 import { sentenceGap } from "../i18n/sentences";
 import { rpc } from "../api/rpcClient";
-import { eyebrowLabel } from "./statusLabels";
 import { authorityOptions, sourceConnectSchema } from "../api/sourcePolicy";
 import { parserFailureText } from "../api/parserError";
 import { refusalBeforeUpload, UPLOAD_ACCEPT, UploadRefused } from "../api/uploadTypes";
@@ -99,14 +99,15 @@ export function FileConnectionPanel({ projectId, hosted = false }: { projectId: 
   } });
   const progress = progressText(uploadProgress, connectingName);
   return <section className="source-connect-panel">
-    <div className="section-title-row"><div><p className="eyebrow">{eyebrowLabel("AUTHORIZED SOURCES")}</p><h2>{t("sources.fileTitle")}</h2></div><span className="muted">{t("sources.preserve")}</span></div>
+    <div className="section-title-row"><h2>{t("sources.fileTitle")}</h2></div>
     <p className="muted">{t("sources.fileTypes")}{hosted?t("sources.hostedUpload"):t("sources.localUpload")}</p>
     <div className="source-controls"><FileInput fill buttonText={t("sources.browse")} text={files.length ? message("filesSelected", files.length) : t("sources.chooseFiles")} inputProps={{ref:fileInput,multiple:true,accept:UPLOAD_ACCEPT,get "aria-label"() { return t("sources.fileLabel"); }}} onInputChange={event => { selectionVersion.current += 1; setNotice(null); setUploadProgress(null); setConnectingName(""); setFiles(Array.from((event.target as HTMLInputElement).files ?? [])); }} />
-      <label className="source-control-label"><span>{t("sources.authority")}</span><HTMLSelect aria-label={t("sources.authority")} value={authority} onChange={event=>setAuthority(event.target.value)} options={authorityOptions} /></label>
+      <label className="source-control-label"><span>{t("sources.authority")}</span><Select aria-label={t("sources.authority")} value={authority} onChange={event=>setAuthority(event.target.value)} options={authorityOptions} /></label>
       {hosted && <ScopeSelect value={visibility} onChange={setVisibility} askFirst />}
       <Button icon="upload" intent="primary" disabled={!files.length || !visibility || connect.isPending} loading={connect.isPending} onClick={()=>connect.mutate({files,authority,visibility,version:selectionVersion.current,projectId,connected:0})}>{t("composer.attach")}</Button>
       {canCancel && <Button onClick={() => upload.current?.abort()}>{t("sources.fileUploadCancel")}</Button>}</div>
-    {!hosted && (
+    {/* The hosted review environment asks for the scope in the row above; what the choices do is said in both. */}
+    {hosted ? <p className="muted">{t("sources.scopeHelp")}</p> : (
       <Disclosure className="source-scope-advanced" label={message("scopeNow", scopeLabel(visibility))}>
         <ScopeSelect value={visibility} onChange={setVisibility} />
         <p className="muted">{t("sources.scopeHelp")}</p>
@@ -141,7 +142,7 @@ function ScopeSelect({ value, onChange, askFirst = false }: { value: Visibility;
   return (
     <label className="source-control-label">
       <span>{t("sources.scope")}</span>
-      <HTMLSelect aria-label={t("sources.scopeLabel")} value={value} onChange={event => onChange(event.target.value as Visibility)} options={options} />
+      <Select aria-label={t("sources.scopeLabel")} value={value} onChange={event => onChange(event.target.value as Visibility)} options={options} />
     </label>
   );
 }

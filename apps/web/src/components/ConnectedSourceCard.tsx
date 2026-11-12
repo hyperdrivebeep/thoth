@@ -41,4 +41,3 @@ export function ConnectedSourceCard({ projectId, artifact, sources, hosted, onCi
     </article>
   );
 }
-

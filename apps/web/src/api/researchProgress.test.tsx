@@ -208,6 +208,33 @@ describe("live research progress", () => {
     expect(html).not.toContain("EVIDENCE_FOCUS");
   });
 
+  // Seen with a real model on a one-line HTML source: every range carries the place "1행", and the screen said
+  // "1행, 1행, 1행 8곳" and "1행 · 1행 외 6곳", and repeated the last sentence of the reason as the state.
+  it("names a place once when several ranges share its label, and does not say the reason's sentence again as the state", () => {
+    const status = running({
+      attempt: {
+        operation_id: "operation:o",
+        phase: "EVIDENCE_FOCUS",
+        status: "RUNNING",
+        draft_progress: { evidence_focus: { locators: [{ page: 1 }, { page: 1 }, { page: 1 }, { page: 2 }], total: 4 } },
+      },
+    });
+    const live = liveResearchProgress(status)!;
+    // the count is still of ranges
+    expect(live.evidenceLabels).toEqual(["p.1", "p.1", "p.1", "p.2"]);
+    expect(live.missing).toContain("4곳");
+    expect(live.missing).not.toMatch(/p\.1.*p\.1/);
+    expect(live.current.title).not.toMatch(/p\.1.*p\.1/);
+    const html = renderToStaticMarkup(<ResearchLiveProgress status={status} />);
+    expect(html).toContain("p.1 · p.2");
+    expect(html).not.toContain("p.1 · p.1");
+    // two places are named and two more ranges are counted
+    expect(html).toMatch(/p\.1 · p\.2[^<]*2/);
+    expect(live.current.detail).toContain(live.missing!);
+    expect(html.split(live.missing!).length - 1).toBe(1);
+    expect(html).not.toContain("판단 상태");
+  });
+
   it("names source shortlist as choosing local excerpts, not a web search", () => {
     const live = liveResearchProgress(
       running({

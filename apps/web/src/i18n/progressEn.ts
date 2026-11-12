@@ -18,7 +18,8 @@ export function formatBytes(bytes: number | null | undefined): string | null {
   const kb = bytes / 1024, mb = kb / 1024;
   return kb < 1024 ? `Context ${kb < 10 ? kb.toFixed(1) : Math.round(kb)}KB` : `Context ${mb < 10 ? mb.toFixed(1) : Math.round(mb)}MB`;
 }
-const join = (values: string[], limit: number) => values.slice(0, limit).join(", ");
+// A name is said once, however many times it was recorded (several ranges of a source can share one place label).
+const join = (values: string[], limit: number) => [...new Set(values)].slice(0, limit).join(", ");
 const quoted = (values: string[], limit: number) => values.slice(0, limit).map(value => `“${clip(value, 28)}”`).join(", ");
 
 export function sceneFor(key: string | undefined, facts: WorkFacts, live = false): ProgressScene {

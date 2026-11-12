@@ -230,4 +230,3 @@ it("does not take the focus when a page that already shows the list button is fi
   await click(button);
   expect(document.activeElement).toBe(button);
 });
-

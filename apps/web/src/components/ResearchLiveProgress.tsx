@@ -7,6 +7,31 @@ import type { ResearchStatus } from "../api/research";
 import { Disclosure } from "./Disclosure";
 import { ResearchActivityStrip } from "./ResearchActivityStrip";
 
+type LiveProgress = NonNullable<ReturnType<typeof liveResearchProgress>>;
+
+function evidenceScopeLine(progress: LiveProgress): string | null {
+  const shown = progress.evidenceLabels.length;
+  // Several ranges of one source can carry the same place label ("1행"); a place is named once.
+  const places = [...new Set(progress.evidenceLabels)];
+  const coverage = progress.evidenceTotal != null && progress.evidenceTotal > shown
+    ? formatMessage("progressLocationCoverage", shown, progress.evidenceTotal) : null;
+  if (shown > 0) {
+    const named = places.slice(0, 2);
+    const remaining = shown > named.length ? formatMessage("moreLocations", shown - named.length) : "";
+    return [named.join(" · ") + remaining, coverage].filter(Boolean).join(" · ");
+  }
+  if (progress.evidenceTotal === 0) return t("liveProgress.noCandidates");
+  return coverage ? `${formatMessage("progressLocationUnavailable")} · ${coverage}` : null;
+}
+
+function judgementLine(progress: LiveProgress): string | null | undefined {
+  const state = progress.hypothesisCount==null ? progress.missing
+    : formatMessage("hypothesesReviewed", progress.hypothesisCount, progress.reviewCount??0);
+  // The reason line often ends with the very sentence the state line would say; it is said once.
+  const judgement = state && progress.current.detail.includes(state) ? null : state;
+  return judgement;
+}
+
 export function ResearchLiveProgress({
   status,
   sourceUris = [],
@@ -20,21 +45,8 @@ export function ResearchLiveProgress({
   }
   const notes = progress.events.filter(event => event.kind === "note" && !event.live).map(event=>event.text);
   const contextNotes = [...new Set([notes[0],notes.at(-1)])].filter((note):note is string=>Boolean(note)&&note!==progress.current.title);
-  const shown = progress.evidenceLabels.length;
-  const coverage = progress.evidenceTotal != null && progress.evidenceTotal > shown
-    ? formatMessage("progressLocationCoverage", shown, progress.evidenceTotal) : null;
-  let evidenceScope: string | null = null;
-  if (shown > 0) {
-    const locations = progress.evidenceLabels.slice(0, 2).join(" · ");
-    const remaining = shown > 2 ? formatMessage("moreLocations", shown - 2) : "";
-    evidenceScope = [locations + remaining, coverage].filter(Boolean).join(" · ");
-  } else if (progress.evidenceTotal === 0) {
-    evidenceScope = t("liveProgress.noCandidates");
-  } else if (coverage) {
-    evidenceScope = `${formatMessage("progressLocationUnavailable")} · ${coverage}`;
-  }
-  const judgement = progress.hypothesisCount==null ? progress.missing
-    : formatMessage("hypothesesReviewed", progress.hypothesisCount, progress.reviewCount??0);
+  const evidenceScope = evidenceScopeLine(progress);
+  const judgement = judgementLine(progress);
   return (
     <aside className="research-progress" aria-label={t("liveProgress.title")}>
       <div className="research-progress-summary" role="status" aria-live="polite" aria-atomic="true">

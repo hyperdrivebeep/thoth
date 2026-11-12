@@ -44,4 +44,3 @@ export function refusalBeforeUpload(file: Pick<File, "name" | "size">): UploadRe
   if (file.size > MAX_UPLOAD_BYTES) return new UploadRefused("UPLOAD_TOO_LARGE", file.name);
   return null;
 }
-

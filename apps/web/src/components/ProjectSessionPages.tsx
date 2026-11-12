@@ -96,7 +96,7 @@ function ProjectModelDefault({ projectId }: { projectId: string }) {
 function ProjectSettingsPage({ project, threadId, workspaceId, session, capturedEpoch, status, onPage, onOpenCatalog, modelConnected }: SettingsProps) {
   return <>
     <header className="workspace-heading">
-      <div><p className="eyebrow">{t("settings.thisProject")}</p><h1>{t("settings.projectTitle")}</h1><p>{t("settings.projectNotice")}</p></div>
+      <div><h1>{t("settings.projectTitle")}</h1><p>{t("settings.projectNotice")}</p></div>
       <Button minimal icon="desktop" onClick={() => onPage("computer")}>{t("settings.openComputer")}</Button>
     </header>
     <section className="detail-card">
@@ -127,7 +127,7 @@ export function ComputerSettingsPage({ credentialProjectId, workspaceId, storage
 }) {
   return <>
     <header className="workspace-heading">
-      <div><p className="eyebrow">{eyebrowLabel("LOCAL WORKSPACE")}</p><h1>{t("settings.computerTitle")}</h1><p>{t("settings.computerNotice")}</p></div>
+      <div><h1>{t("settings.computerTitle")}</h1><p>{t("settings.computerNotice")}</p></div>
     </header>
     <section className="detail-card"><h2>{t("workspace.connectModel")}</h2><ModelCredentialPanel projectId={credentialProjectId} workspaceId={workspaceId ?? undefined}/></section>
     <LanguageSettingsCard scope={storageScope}/>

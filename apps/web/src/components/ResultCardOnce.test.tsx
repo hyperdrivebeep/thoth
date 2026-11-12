@@ -112,6 +112,14 @@ it("says the missing answer checks in the body, because no header tag can", () =
   expect(html).not.toContain("답변 점검 0개");
 });
 
+it("says of an earlier round that its answer checks are not shown here, not that they have not arrived yet", () => {
+  const html = render(withOpen("PARTIAL_HOLD"), { earlierRound: true });
+  expect(html).toContain("답할 수 있는 범위: 이 회차의 답변 점검 항목은 여기서 볼 수 없습니다. 최신 회차의 답에서만 보입니다.");
+  expect(html).not.toContain("아직 읽지 못했습니다");
+  // what the assessment left open is still said
+  for (const reason of OPEN_KO) expect(html).toContain(reason);
+});
+
 const usageStatus = (total: number | null, part: number | null) => ({
   request: { operation_id: "op" }, completed_stages: [],
   result_usage: { op: { operation_id: "op", calls: 2, input_tokens: null, output_tokens: null, total_tokens: total, cached_input_tokens: null,

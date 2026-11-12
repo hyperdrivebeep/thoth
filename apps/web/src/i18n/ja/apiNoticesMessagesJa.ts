@@ -31,6 +31,7 @@ export const apiNoticesJa: ColumnOf<typeof apiNoticesMessages> = {
   "memorySwitch.label": "調査で記憶を使う",
   "answerHold.title": "確認された事実と根拠の用途",
   "answerHold.coverageMissing": "回答のチェック情報はまだありません",
+  "answerHold.coverageEarlier": "この回の回答チェック項目はここには表示されません。最新の回の回答にだけ表示されます。",
   "approvalView.approved": "承認済み · この内容に有効",
   "approvalView.pending": "承認待ち",
   "approvalView.rejected": "却下",
