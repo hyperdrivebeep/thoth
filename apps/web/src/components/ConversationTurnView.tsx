@@ -14,18 +14,34 @@ export function QuestionBubble({ heading, time, text }: { heading: string; time?
  * One past turn of the conversation. Folded by default so the newest turn stays in view: the question, then one line
  * with the turn number, its state tags (read from the same facts as the result card) and a preview of the answer.
  * "Expand" opens the full result card in place; a cut-off turn keeps its "ask again" button on the folded line.
+ * The turn that is being researched right now is its question only: the live block under it says what is happening,
+ * and a line saying "no answer" with an "ask again" button would be wrong while the answer is still being made.
  */
-export function ConversationTurnView({ turn, index, expanded: expandedAtFirst, onRetry, children }: {
+export function ConversationTurnView({ turn, index, expanded: expandedAtFirst, onRetry, inProgress, children }: {
   turn: ConversationTurn; index: number;
   /** The newest turn starts open; earlier turns start folded. */
   expanded: boolean;
   onRetry?: () => void;
+  /** This turn's research is running now. */
+  inProgress?: boolean;
   /** The full result card for this turn. */
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(expandedAtFirst);
+  // A turn becomes the newest finished one when its research ends. It was folded (or question only) until then,
+  // and the answer the person waited for must not stay behind a one-line preview. Nothing is folded on its own.
+  const [wasNewest, setWasNewest] = useState(expandedAtFirst);
+  if (expandedAtFirst !== wasNewest) {
+    setWasNewest(expandedAtFirst);
+    if (expandedAtFirst) setOpen(true);
+  }
   const summary = turnSummary(turn);
   const label = message("turnIndex", index);
+  if (inProgress) {
+    return <div className="conversation-turn" data-turn-index={index} data-turn-running>
+      <QuestionBubble heading={message("questionHeading", turn.input.edit_kind)} time={turn.input.created_at} text={turn.input.text}/>
+    </div>;
+  }
   return <div className="conversation-turn" data-turn-index={index} data-turn-open={open}>
     <QuestionBubble heading={message("questionHeading", turn.input.edit_kind)} time={turn.input.created_at} text={turn.input.text}/>
     {open ? <>

@@ -145,7 +145,7 @@ function workFacts(status: ResearchStatus, sourceUris: string[] = []): WorkFacts
   return {
     focus: extractFocus(status),
     constraints: extractConstraints(status),
-    locators: evidenceLabels(status).slice(0, 2),
+    locators: unique(evidenceLabels(status)).slice(0, 2),
     hypotheses,
     pendingHypotheses: unique(pending),
     decidedHypotheses: unique(decided),

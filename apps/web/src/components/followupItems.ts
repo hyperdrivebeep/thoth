@@ -1,5 +1,6 @@
 import { t } from "../i18n/locale";
 import type { CoverageMatrix, CoverageMatrixRow, NextUserAction, UserProgressSummary } from "../api/researchFollowup";
+import { builtinCriteria } from "../i18n/plainWordingResources";
 import { criterionText, isReadable, plainReason } from "./plainWording";
 import { coverageTermLabel } from "./statusLabels";
 import type { TechnicalGroup } from "./TechnicalDetails";
@@ -20,6 +21,17 @@ const STAGE_ID = /^research-stage:/;
 const REQUIREMENT_ID = /^requirement:/;
 // An ASCII token with no spaces that carries a separator or is all capitals is an internal code, not a sentence.
 const CODE_LIKE = /^(?=.*[_:])[A-Za-z0-9_:.-]+$|^[A-Z][A-Z0-9]+$/;
+// What the program records for a requirement that is still open: "Resolve " and the requirement's question
+// (requirement_compiler.py). The question is a built-in criterion's English wording, or what the person asked.
+const OPEN_REQUIREMENT = /^Resolve ([\s\S]+)$/;
+
+/** The open requirement a recorded follow-up names: a built-in criterion by its title in the screen language, or the question as it was asked. */
+function openRequirement(item: string): { text: string; builtIn: boolean } | null {
+  const question = OPEN_REQUIREMENT.exec(item)?.[1].trim();
+  if (!question) return null;
+  const known = Object.values(builtinCriteria).find(criterion => criterion.english === question);
+  return known ? { text: known.title, builtIn: true } : { text: question, builtIn: false };
+}
 
 function listItemLabel(item: string): string | null {
   if (progressTerms[item]) return progressTerms[item];
@@ -36,7 +48,16 @@ export function splitItems(items: string[], responseLanguage?: string | null) {
   const codes: string[] = [];
   const sentences: string[] = [];
   const originals: string[] = [];
-  for (const item of rest) {
+  for (const recorded of rest) {
+    const open = openRequirement(recorded);
+    if (open) {
+      // A built-in criterion by its title, or the question in the person's own words (readable whatever its language).
+      // A bare code (a field name of a criterion) stays a code. The recorded line is kept for the folded technical part.
+      if (!open.builtIn && CODE_LIKE.test(open.text)) codes.push(recorded);
+      else { plain.push(open.text); originals.push(recorded); }
+      continue;
+    }
+    const item = recorded;
     const label = listItemLabel(item) ?? plainReason(item);
     if (label) { plain.push(label); if (plainReason(item)) originals.push(item); }
     else if (CODE_LIKE.test(item)) codes.push(item);

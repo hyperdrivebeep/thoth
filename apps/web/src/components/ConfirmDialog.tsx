@@ -1,6 +1,7 @@
 import { Button, Callout, Classes, Dialog, type Intent } from "@blueprintjs/core";
 import type { ReactNode } from "react";
 import { t, useTranslation } from "../i18n/locale";
+import { useReturnFocus } from "./returnFocus";
 
 /**
  * The one confirmation window of the app (archive, stop, disconnect): what will happen, in the screen
@@ -19,6 +20,7 @@ export function ConfirmDialog({ title, children, confirmLabel, intent = "primary
   onClose: () => void;
 }) {
   useTranslation();
+  useReturnFocus();
   const close = () => {
     if (!pending) onClose();
   };

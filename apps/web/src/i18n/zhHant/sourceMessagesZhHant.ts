@@ -19,7 +19,7 @@ export const sourceZhHant: ColumnOf<typeof sourceMessages> = {
   "sources.projectShared": "在本專案內共享",
   "sources.explicitGrants": "僅限明確許可的任務",
   "sources.connectFailed": "未能連線資料",
-  "sources.scopeHelp": "「在本專案內共享」讓本專案的所有任務都能把這份資料用作證據。「僅限明確許可的任務」只讓個別獲得許可的任務使用。",
+  "sources.scopeHelp": "「在本專案內共享」讓本專案的所有任務都能把這份資料用作證據。「僅限明確許可的任務」原本只讓個別獲得許可的任務使用，但目前還沒有為任務授予許可的畫面。現在無論選哪一項，本專案的研究都能讀取這份資料，所選範圍只會留在資料的記錄裡。通常請選擇「在本專案內共享」。",
   "sources.connected": "資料已連線。請用新的問題或指示開始分析。",
   "sources.unclassified": "權威性未分類",
   "sources.informal": "非正式參考",

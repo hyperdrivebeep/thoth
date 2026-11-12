@@ -106,7 +106,8 @@ export function FileConnectionPanel({ projectId, hosted = false }: { projectId: 
       {hosted && <ScopeSelect value={visibility} onChange={setVisibility} askFirst />}
       <Button icon="upload" intent="primary" disabled={!files.length || !visibility || connect.isPending} loading={connect.isPending} onClick={()=>connect.mutate({files,authority,visibility,version:selectionVersion.current,projectId,connected:0})}>{t("composer.attach")}</Button>
       {canCancel && <Button onClick={() => upload.current?.abort()}>{t("sources.fileUploadCancel")}</Button>}</div>
-    {!hosted && (
+    {/* The hosted review environment asks for the scope in the row above; what the choices do is said in both. */}
+    {hosted ? <p className="muted">{t("sources.scopeHelp")}</p> : (
       <Disclosure className="source-scope-advanced" label={message("scopeNow", scopeLabel(visibility))}>
         <ScopeSelect value={visibility} onChange={setVisibility} />
         <p className="muted">{t("sources.scopeHelp")}</p>

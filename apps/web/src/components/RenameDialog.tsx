@@ -1,6 +1,7 @@
 import { Button, Callout, Classes, Dialog, InputGroup } from "@blueprintjs/core";
 import { useState, type ReactNode } from "react";
 import { t, useTranslation } from "../i18n/locale";
+import { useReturnFocus } from "./returnFocus";
 
 /** The longest name the server stores for a project or a conversation. */
 const NAME_LIMIT = 500;
@@ -16,6 +17,7 @@ export function RenameDialog({ title, current, notice, pending = false, error, o
   onClose: () => void;
 }) {
   useTranslation();
+  useReturnFocus();
   const [name, setName] = useState(current);
   const trimmed = name.trim();
   const canSave = trimmed !== "" && trimmed !== current.trim() && !pending;

@@ -29,6 +29,7 @@ const status = { user_progress_summary: { schema_version: "1.0.0", request_revis
   coverage_matrix: null, next_user_action: null } as unknown as ResearchStatus;
 const EARLIER = "이 회차의 답변 점검 항목은 여기서 볼 수 없습니다. 최신 회차의 답에서만 보입니다.";
 const NOT_YET = "답변 점검 항목 정보를 아직 읽지 못했습니다";
+const NO_USAGE = "이 결과의 사용량 기록 없음";
 
 afterEach(async () => {
   if (root) await act(async () => root!.unmount());
@@ -65,12 +66,17 @@ it("tells an earlier round that its answer checks are not shown here, and the la
   expect(first).not.toContain(NOT_YET);
   expect(latest).toContain(NOT_YET);
   expect(latest).not.toContain(EARLIER);
+  // The usage of an earlier round is not sent either. Its card does not claim that none was recorded; the latest
+  // round, whose usage would be sent if there were any, still says so.
+  expect(first).not.toContain(NO_USAGE);
+  expect(latest).toContain(NO_USAGE);
 });
 
 it("does not call a round earlier when nothing says which request is the latest", async () => {
   await mount(undefined);
   for (const card of cards()) {
     expect(card).toContain(NOT_YET);
+    expect(card).toContain(NO_USAGE);
     expect(card).not.toContain(EARLIER);
   }
 });

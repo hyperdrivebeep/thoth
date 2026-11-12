@@ -197,7 +197,8 @@ it("calls the unit of questions and answers a conversation in every screen langu
   }
   for (const language of LANGUAGES) {
     setLocale(language);
-    for (const text of [message("missingSelection", "thread"), message("threadMenu", "A")]) {
+    // The number under the question box is the conversation's total (a second research starts at the first one's total).
+    for (const text of [message("missingSelection", "thread"), message("threadMenu", "A"), message("usageCaption", "1", false), message("usageTooltip", "1", "2")]) {
       if (!text.toLowerCase().includes(CONVERSATION[language])) found.push(language + ": " + text);
     }
   }
@@ -228,5 +229,16 @@ it("quotes the two choices for who may use a source by the names they have on th
     const help = messages["sources.scopeHelp"][language];
     expect(help, language).toContain(messages["sources.projectShared"][language]);
     expect(help, language).toContain(messages["sources.explicitGrants"][language]);
+  }
+});
+
+it("ends the help for who may use a source by naming the usual choice", () => {
+  // The narrower choice restricts nothing while no screen gives a line of work its permission, so the help says
+  // which one to pick: the shared choice is named once to describe it and once more, last, to recommend it.
+  for (const language of LANGUAGES) {
+    const help = messages["sources.scopeHelp"][language];
+    const shared = messages["sources.projectShared"][language];
+    expect(help.split(shared).length - 1, language).toBe(2);
+    expect(help.lastIndexOf(shared), language).toBeGreaterThan(help.lastIndexOf(messages["sources.explicitGrants"][language]));
   }
 });

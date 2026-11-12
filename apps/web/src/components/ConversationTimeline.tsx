@@ -56,6 +56,10 @@ function isEarlierRound(liveStatus: ResearchStatus | undefined, requestDigest: s
   const latest = liveStatus?.user_progress_summary?.request_revision_digest;
   return Boolean(latest) && latest !== requestDigest;
 }
+/** The saved turn whose research the live status says is running (or about to run) now. */
+function isRunningTurn(liveStatus: ResearchStatus | undefined, operationId: string) {
+  return ["PENDING", "RUNNING"].includes(liveStatus?.operation_state ?? "") && liveStatus?.request?.operation_id === operationId;
+}
 
 /** The request the live status is about, when it has produced or kept a checkpoint; otherwise the live block shows progress only. */
 function currentRequestOf(liveStatus: ResearchStatus | undefined) {
@@ -112,10 +116,15 @@ function SavedTurnCard({ turn, projectId, threadId, status, liveStatus, savedBef
   onDetail: TimelineProps["onDetail"]; onRetry?: TimelineProps["onRetry"]; onOpenTrace?: TimelineProps["onOpenTrace"]; linked: ReturnType<typeof useHypothesisLinks>;
 }) {
   const requestDigest = turn.input.request_revision_digest;
-  return <ResearchResultCard {...retry} onOpenTrace={onOpenTrace} projectId={projectId} hypothesisLinks={linked.links} linkDistribution={linked.distribution} result={turn.result} state={turn.state} unavailable={turn.unavailable} error={turn.error} failure={turn.failure} terminalReason={turn.terminalReason} onDetail={onDetail} onRetry={onRetry ? () => onRetry(turn.input.text) : undefined} usageLine={resultUsageLine(liveStatus, turn.input.operation_id)}
+  const earlier = isEarlierRound(liveStatus, requestDigest);
+  // The server sends the usage of the latest result and of the request now running only. An earlier round has
+  // none here, which is not the same as "no usage recorded": its line is left out (the conversation's total is
+  // under the question box).
+  const usageLine = earlier && !liveStatus?.result_usage?.[turn.input.operation_id] ? undefined : resultUsageLine(liveStatus, turn.input.operation_id);
+  return <ResearchResultCard {...retry} onOpenTrace={onOpenTrace} projectId={projectId} hypothesisLinks={linked.links} linkDistribution={linked.distribution} result={turn.result} state={turn.state} unavailable={turn.unavailable} error={turn.error} failure={turn.failure} terminalReason={turn.terminalReason} onDetail={onDetail} onRetry={onRetry ? () => onRetry(turn.input.text) : undefined} usageLine={usageLine}
     hasSavedResult={savedBefore.has(requestDigest) || Boolean(liveStatus?.request?.operation_id === turn.input.operation_id && liveStatus.previous_result)}
     currentness={turn.currentness} historySelection={{ kind: "result", scope: { projectId, threadId, requestDigest }, operationId: turn.input.operation_id,
-      resultDigest: currentResultDigest(status, { projectId, threadId, requestDigest }, turn.input.operation_id) }} {...followupFor(liveStatus, requestDigest)} earlierRound={isEarlierRound(liveStatus, requestDigest)}/>;
+      resultDigest: currentResultDigest(status, { projectId, threadId, requestDigest }, turn.input.operation_id) }} {...followupFor(liveStatus, requestDigest)} earlierRound={earlier}/>;
 }
 
 export function ConversationTimeline(props: TimelineProps) {
@@ -160,7 +169,8 @@ export function ConversationTimeline(props: TimelineProps) {
     {query.hasNextPage && <Button minimal loading={query.isFetchingNextPage} onClick={() => void query.fetchNextPage()}>{t("timeline.older")}</Button>}
     {query.error && <Callout intent="warning" role="alert">{query.data ? t("timeline.refreshFailed") : t("timeline.loadFailedSpace")}<Button small onClick={() => void query.refetch()}>{t("workspace.reload")}</Button></Callout>}
     {query.data?.pages.some(page => page.limited) && <Callout compact>{t("timeline.limited")}</Callout>}
-    {turns.map((turn, index) => <ConversationTurnView key={turn.input.request_revision_digest} turn={turn} index={index + 1} expanded={index === openIndex} onRetry={onRetry ? () => onRetry(turn.input.text) : undefined}>
+    {turns.map((turn, index) => <ConversationTurnView key={turn.input.request_revision_digest} turn={turn} index={index + 1} expanded={index === openIndex} onRetry={onRetry ? () => onRetry(turn.input.text) : undefined}
+      inProgress={isRunningTurn(liveStatus, turn.input.operation_id)}>
       <SavedTurnCard turn={turn} projectId={projectId} threadId={threadId} status={status} liveStatus={liveStatus} savedBefore={savedBefore} onDetail={onDetail} onRetry={onRetry} onOpenTrace={onOpenTrace} linked={linked} retry={retry}/>
     </ConversationTurnView>)}
     {unavailableHistory && <Callout compact>{t("timeline.unsupported")}</Callout>}

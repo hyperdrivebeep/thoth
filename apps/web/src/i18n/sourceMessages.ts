@@ -62,8 +62,8 @@ export const sourceMessages = {
     "en": "The source was not connected"
   },
   "sources.scopeHelp": {
-    "ko": "'이 프로젝트에서 함께 사용'은 이 프로젝트의 모든 작업이 이 자료를 근거로 쓸 수 있게 합니다. '명시적으로 허용된 작업만'은 따로 허용한 작업에서만 쓰게 합니다.",
-    "en": "'Shared within this project' lets every task in this project use the source as evidence. 'Explicitly permitted tasks only' limits it to tasks that were given permission."
+    "ko": "'이 프로젝트에서 함께 사용'은 이 프로젝트의 모든 작업이 이 자료를 근거로 쓸 수 있게 합니다. '명시적으로 허용된 작업만'은 따로 허용한 작업에서만 쓰게 하는 범위지만, 작업에 허용을 주는 화면이 아직 없습니다. 지금은 어느 쪽을 골라도 이 프로젝트의 조사가 이 자료를 읽을 수 있고, 고른 범위는 자료 기록에만 남습니다. 보통은 '이 프로젝트에서 함께 사용'을 고르세요.",
+    "en": "'Shared within this project' lets every task in this project use the source as evidence. 'Explicitly permitted tasks only' is meant to limit it to tasks that were given permission, but there is no screen yet for giving a task permission. For now, research in this project can read the source whichever you choose, and the choice is only kept in the source's record. 'Shared within this project' is the usual choice."
   },
   "sources.connected": {
     "ko": "자료 연결이 완료되었습니다. 분석은 새 질문이나 지시로 시작합니다.",

@@ -164,6 +164,9 @@ it("lets the scope be changed under the fold, and sends the changed one", async 
   await act(async () => { button("Usage scope: Shared within this project")!.click(); });
   expect([...scopeSelect()!.options].map(option => option.value)).toEqual(["PROJECT_SHARED", "EXPLICIT_GRANT"]);
   expect(container.textContent).toContain("lets every task in this project use the source as evidence");
+  // No screen gives a task its permission and research reads the source either way: the help says so.
+  expect(container.textContent).toContain("there is no screen yet for giving a task permission");
+  expect(container.textContent).toContain("research in this project can read the source whichever you choose");
   await choose(scopeSelect()!, "EXPLICIT_GRANT");
   expect(button("Usage scope: Explicitly permitted tasks only")).toBeDefined();
   await start(["A.md"]);
@@ -176,6 +179,8 @@ it("still asks for the scope in the hosted review environment", async () => {
   await select(["A.md"]);
   expect(scopeSelect()!.value).toBe("");
   expect(button(t("composer.attach"))!.disabled).toBe(true);
+  // The choice is asked for here, so what the two choices do is said here too, without a fold.
+  expect([...container.querySelectorAll("p")].filter(p => p.textContent === t("sources.scopeHelp") && !p.closest(".source-scope-advanced"))).toHaveLength(1);
   await choose(scopeSelect()!, "PROJECT_SHARED");
   expect(button(t("composer.attach"))!.disabled).toBe(false);
 });
