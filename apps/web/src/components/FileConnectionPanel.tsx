@@ -98,8 +98,8 @@ export function FileConnectionPanel({ projectId, hosted = false }: { projectId: 
       <Button icon="upload" intent="primary" disabled={!files.length || !visibility || connect.isPending} loading={connect.isPending} onClick={()=>connect.mutate({files,authority,visibility,version:selectionVersion.current,projectId})}>{t("composer.attach")}</Button>
       {canCancel && <Button onClick={() => upload.current?.abort()}>{t("sources.fileUploadCancel")}</Button>}</div>
     {files.length > 0 && <p className="muted">{files.map(file=>file.name).join(" · ")}</p>}{progress && <p role="status">{progress}</p>}
-    {notice?.kind === "error" && <Callout compact intent="danger" title={t("sources.connectFailed")}>{connectFailure(notice.error)}{sentenceGap()}{t("sources.checkConnected")}</Callout>}
-    {notice?.kind === "success" && <Callout compact intent="success">{t("sources.connected")}</Callout>}
+    {notice?.kind === "error" && <Callout compact intent="danger" title={t("sources.connectFailed")} role="alert">{connectFailure(notice.error)}{sentenceGap()}{t("sources.checkConnected")}</Callout>}
+    {notice?.kind === "success" && <Callout compact intent="success" role="status">{t("sources.connected")}</Callout>}
   </section>;
 }
 

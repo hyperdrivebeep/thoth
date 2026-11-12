@@ -64,11 +64,11 @@ export function ModelCredentialPanel({ projectId, workspaceId }: { projectId: st
       {connect.isSuccess && <Callout compact role="status">{credentialResultMessage(connect.data?.value)}
         {guideUrl && <p><a href={guideUrl} target="_blank" rel="noopener noreferrer">{t("setup.openKeySite")}</a></p>}</Callout>}
       {connect.error && (
-        <Callout compact intent="danger">
+        <Callout compact intent="danger" role="alert">
           {connect.error.message}
         </Callout>
       )}
-      {listed.error && <Callout compact intent="warning">{t("credential.methodsFailed")}</Callout>}
+      {listed.error && <Callout compact intent="warning" role="alert">{t("credential.methodsFailed")}</Callout>}
       <Button small minimal icon="refresh" loading={listed.isFetching} onClick={() => void listed.refetch()}>{t("setup.refreshConnection")}</Button>
     </section>
   );

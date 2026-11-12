@@ -49,7 +49,7 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
     {!hosted && session.draftSaveState !== "SAVED" && <Callout compact intent="warning" role="status">{session.draftSaveState === "TOO_LARGE"
       ? t("composer.draftTooLarge")
       : t("composer.draftUnsaved")}</Callout>}
-    {!readSuspended&&citation.dialog}{!readSuspended&&citation.message&&<Callout compact>{citation.message}</Callout>}<form className="prompt-composer" onSubmit={event=>{event.preventDefault();void submit();}}>
+    {!readSuspended&&citation.dialog}{!readSuspended&&citation.message&&<Callout compact role="status">{citation.message}</Callout>}<form className="prompt-composer" onSubmit={event=>{event.preventDefault();void submit();}}>
       <label className="composer-label" htmlFor="live-problem">{t("composer.problem")}</label>
       <TextArea
         id="live-problem"

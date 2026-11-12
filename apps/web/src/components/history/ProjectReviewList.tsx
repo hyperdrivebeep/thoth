@@ -37,7 +37,7 @@ export function ProjectReviewList({ projectId, onSelect }: { projectId: string; 
         <details className="connection-tech"><summary>{t("oauth.technical")}</summary><small>{item.next_user_action.label}</small>{item.reason_codes.map(code => <small key={code}>{code}</small>)}</details>
         <Button small icon="document-open" onClick={() => onSelect(selectionOf(item))}>{t("reviewList.open")}</Button>
       </article>)}</div>}
-    {query.error && pages.length > 0 && <Callout compact intent="warning">{t("reviewList.pageFailed")}</Callout>}
+    {query.error && pages.length > 0 && <Callout compact intent="warning" role="alert">{t("reviewList.pageFailed")}</Callout>}
     {query.hasNextPage && <Button small onClick={() => void query.fetchNextPage()} loading={query.isFetchingNextPage}>{t("reviewList.next")}</Button>}
     {pages[0] && (!pages[0].unread_supported || !pages[0].assignment_supported) && <p className="muted">{t("reviewList.scope")}</p>}
   </section>;

@@ -583,3 +583,33 @@ it("does not show the queued notice for a normally accepted instruction", async 
   await settle(() => readDraft("p", "t", scope("A")) === "");
   expect(container.textContent).not.toContain(QUEUED_NOTICE);
 });
+
+it("links the selected workspace tab to the content on screen, on the conversation and on another page", async () => {
+  saveWorkspaceContext("p", "t", scope("A"));
+  await mount();
+  await settle(() => Boolean(container.textContent?.includes("A stored synthetic answer")));
+  const linked = () => {
+    const tab = container.querySelector('.workspace-navigation [role="tab"][aria-selected="true"]')!;
+    return { tab, panel: document.getElementById(tab.getAttribute("aria-controls") ?? "") };
+  };
+  const conversation = linked();
+  expect(conversation.tab.textContent).toBe("대화");
+  expect(conversation.panel?.getAttribute("role")).toBe("tabpanel");
+  expect(conversation.panel?.getAttribute("aria-labelledby")).toBe(conversation.tab.id);
+  expect(conversation.panel?.textContent).toContain("A stored synthetic answer");
+  const settingsTab = [...container.querySelectorAll('.workspace-navigation [role="tab"]')].find(tab => tab.textContent === "설정") as HTMLElement;
+  await act(async () => settingsTab.click());
+  await settle(() => linked().tab.textContent === "설정");
+  const settings = linked();
+  expect(settings.panel?.getAttribute("role")).toBe("tabpanel");
+  expect(settings.panel?.getAttribute("aria-labelledby")).toBe(settings.tab.id);
+  expect(container.querySelectorAll('.workspace-content[role="tabpanel"]')).toHaveLength(1);
+});
+
+it("leaves no empty progress group in the question box when nothing is running", async () => {
+  saveWorkspaceContext("p", "t", scope("A"));
+  await mount();
+  await settle(() => Boolean(container.textContent?.includes("A stored synthetic answer")));
+  expect(container.querySelector(".composer-dock")).not.toBeNull();
+  expect(container.querySelector(".composer-dock .activity-disclosure")).toBeNull();
+});

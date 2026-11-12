@@ -42,7 +42,7 @@ export function RestorePreviewDialog({ scope, selection, actorScope, title, onCl
         {preview.sourceChanges.length > 0 && <Callout compact intent="warning">{t("restore.sourceChanged")}</Callout>}
         {preview.reasons.length > 0 && <Disclosure className="history-technical" label={t("restore.conditions")}><ul>{preview.reasons.map(reason => <li key={reason}>{reason}</li>)}</ul></Disclosure>}
       </>}
-      {status && <div ref={completion} tabIndex={-1} role="status"><Callout intent={flow.readback ? "success" : "warning"}>{status}</Callout></div>}
+      {status && <div ref={completion} tabIndex={-1} role="status"><Callout intent={flow.readback ? "success" : "warning"} role="status">{status}</Callout></div>}
       {flow.error && <Callout intent="warning" role="alert">{restoreErrorText(flow.error)}<Disclosure defaultOpen label={t("restore.requestDiagnostics")}><pre>{flow.error.message}</pre></Disclosure></Callout>}
     </DialogBody>
     <DialogFooter actions={<>

@@ -62,7 +62,7 @@
 :root {
   color-scheme: dark;
   --surface-0: #1c2127; --surface-1: #22272f; --surface-2: #252d37; --surface-3: #2f3b49;
-  --line: #3c4755; --line-soft: #303a46; --text: #f1f4f7; --muted: #a6b4c4; --faint: #738497;
+  --line: #3c4755; --line-soft: #303a46; --text: #f1f4f7; --muted: #a6b4c4; --faint: #8c9bab;
   --accent: #4c90f0; --accent-bright: #8abbff; --green: #72ca9b; --amber: #e7b96e; --red: #ff8c87;
   --sidebar-width: 248px; --evidence-width: 318px; --space: 8px; --radius: 4px;
   font-family: "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; color: var(--text); background: var(--surface-0);
@@ -432,6 +432,14 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
 }
 .usage-summary {
   padding-top: 4px;
+}
+
+/* The faintest text colour (--faint, set at the top) is #8c9bab: 4.9:1 on the lightest surface it sits
+   on (#252d37) and 5.8:1 on the project list. It was #738497 (3.6:1 and 4.3:1), under the 4.5:1 of WCAG 1.4.3. */
+
+/* "Choose files" before a file is chosen: Blueprint draws it at 3.7:1. */
+.workstation .bp6-file-upload-input {
+  color: var(--muted);
 }
 
 /* Text for a screen reader that the screen says more briefly. */

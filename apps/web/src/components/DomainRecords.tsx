@@ -24,7 +24,7 @@ function DomainRecordDetail({projectId,threadId,operationId,view,onOpenCatalog}:
     <div className="catalog-toolbar"><Button icon="refresh" intent="primary" loading={read.isPending} disabled={blocked} onClick={()=>read.mutate()}>{t("records.load")}</Button><Button minimal icon="code" onClick={()=>onOpenCatalog(view.namespace)}>{t("records.controls")}</Button></div>
     {view.method && <Callout compact title={view.method}>{transportFor(view.method)==="/rpc/query" ? t("records.readOnly") : t("records.journaled")}</Callout>}
     {view.scope === "thread"&&!threadId && <Callout compact intent="warning">{t("records.chooseTask")}</Callout>}
-    {read.error && <Callout intent="danger" title={t("records.failed")}><p>{read.error.message}</p><p>{t("records.moreInputs")}</p></Callout>}
+    {read.error && <Callout intent="danger" title={t("records.failed")} role="alert"><p>{read.error.message}</p><p>{t("records.moreInputs")}</p></Callout>}
     {read.data ? <div className="record-panel"><div className="section-title-row"><h2>{view.label}</h2><Tag>{read.data.state}</Tag></div><RecordInspector value={read.data.value} /></div> : !read.error && <div className="records-empty"><h2>{view.label}{" "}{t("records.beforeRead")}</h2><p>{t("records.noAutoRun")}</p></div>}
   </div>;
 }
@@ -33,7 +33,7 @@ export function DomainRecords({ projectId, threadId, operationId = "", onOpenCat
   const [selected, setSelected] = useState("object");
   const view = visibleRecordViews.find(item => item.namespace === selected) ?? visibleRecordViews[0];
   return <section className="domain-records"><header className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel("CANONICAL RECORDS")}</p><h1>{t("records.title")}</h1><p>{t("records.intro")}</p></div></header>
-    <div className="domain-grid" aria-label={t("records.area")}>{visibleRecordViews.map(item=><Button minimal active={selected===item.namespace} alignText="left" className="domain-card" key={item.namespace} onClick={()=>setSelected(item.namespace)}>
+    <div className="domain-grid" role="group" aria-label={t("records.area")}>{visibleRecordViews.map(item=><Button minimal active={selected===item.namespace} alignText="left" className="domain-card" key={item.namespace} onClick={()=>setSelected(item.namespace)}>
       <Icon icon={item.method?"database":"lock"}/><span><strong>{item.label}</strong><small>{item.namespace}</small></span></Button>)}</div>
     <DomainRecordDetail key={`${projectId}:${threadId}:${view.namespace}`} projectId={projectId} threadId={threadId} operationId={operationId} view={view} onOpenCatalog={onOpenCatalog}/>
   </section>;

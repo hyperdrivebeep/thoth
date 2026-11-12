@@ -82,7 +82,7 @@ export function ResearchHistoryWorkspace({ projectId, threadId, requestDigest, i
   return <section className={`research-history ${compact ? "history-compact" : ""}`} aria-label={t("workspace.history")}>
     {import.meta.env.VITE_THOTH_TEST_MODE === "true" && <Callout compact intent="warning" className="history-test-banner">{t("historyWorkspace.testMode")}</Callout>}
     <header className="workspace-heading history-heading"><div><p className="eyebrow">{eyebrowLabel("RESEARCH HISTORY")}</p><h1>{kinds?.length === 1 && kinds[0] === "MEMORY" ? t("result.memory") : t("workspace.history")}</h1><p>{t("historyWorkspace.preserve")}</p></div>
-      {!initialSelection && !requestDigest && threadId && <div className="history-scope" aria-label={t("historyWorkspace.scope")}><Button small active={!allProject} onClick={() => setAllProject(false)}>{t("historyWorkspace.session")}</Button><Button small active={allProject} onClick={() => setAllProject(true)}>{t("historyWorkspace.project")}</Button></div>}
+      {!initialSelection && !requestDigest && threadId && <div className="history-scope" role="group" aria-label={t("historyWorkspace.scope")}><Button small active={!allProject} onClick={() => setAllProject(false)}>{t("historyWorkspace.session")}</Button><Button small active={allProject} onClick={() => setAllProject(true)}>{t("historyWorkspace.project")}</Button></div>}
     </header>
     <ScopedHistory key={JSON.stringify([scope, kinds, initialSelection ? selectionKey(initialSelection) : null])} scope={scope} initialSelection={initialSelection} onUseQuestion={onUseQuestion} kinds={kinds} />
   </section>;

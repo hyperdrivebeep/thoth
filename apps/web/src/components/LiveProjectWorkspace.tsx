@@ -27,6 +27,8 @@ import { eyebrowLabel } from "./statusLabels";
 import { WorkspaceErrorBoundary } from "./WorkspaceErrorBoundary";
 import { ConversationTimeline } from "./ConversationTimeline";
 import { ArchivedProjects } from "./ArchivedProjects";
+import { WorkspaceContent } from "./WorkspaceContent";
+import { WORKSPACE_TABS_ID, WorkspacePageContext } from "./workspaceTabs";
 import { Brand } from "./Brand";
 import { ResearchComposer } from "./ResearchComposer";
 import { ResearchSidePanel, type SidePanelTab } from "./ResearchSidePanel";
@@ -45,7 +47,7 @@ import {
 
 function TimelineExamplePane() {
   return (
-    <section className="workspace-content conversation-page">
+    <WorkspaceContent className="conversation-page">
       <div className="conversation-layout">
         <div className="conversation-center">
           <header className="conversation-heading">
@@ -62,7 +64,7 @@ function TimelineExamplePane() {
           </div>
         </div>
       </div>
-    </section>
+    </WorkspaceContent>
   );
 }
 
@@ -138,11 +140,11 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
   // A thread with nothing sent yet: the readiness card carries the setup notice, so the composer does not repeat it.
   const freshConversation = !threadId && !status?.request && status?.operation_state !== "RUNNING";
   const readiness: ReadinessFacts = { sourceCount: sourceData ? sourceData.value.artifacts.length : null, modelConnected, consent, cutoffAt: project.cutoff_at, executionReady, hosted };
-  if (readSuspended) return <section className="workspace-content conversation-page">
+  if (readSuspended) return <WorkspaceContent className="conversation-page">
     {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)}{sentenceGap()}{t("workspace.authorizedRead")}</Callout>}
     {page==="research"&&<ResearchComposer session={session} projectId={project.project_id} threadId={threadId} epoch={capturedEpoch}
-      onAttach={openResourcePanel} hosted={hosted} executionReady={false} readSuspended/>}</section>;
-  return <section ref={contentRef} className={`workspace-content ${page==="research"?"conversation-page":""}`}>
+      onAttach={openResourcePanel} hosted={hosted} executionReady={false} readSuspended/>}</WorkspaceContent>;
+  return <WorkspaceContent ref={contentRef} className={page==="research"?"conversation-page":undefined}>
     {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)}{sentenceGap()}{t("workspace.readOnlyHold")}</Callout>}
     {page==="research" ? <div className={`conversation-layout ${panelOpen?"detail-open":""}`}><div className="conversation-center">
       <header className="conversation-heading"><h1>{status?.problem??(threadId?t("workspace.continue"):t("workspace.newQuestion"))}</h1></header>
@@ -162,7 +164,7 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
     page==="raw-records" && !hosted ? <><Button minimal icon="arrow-left" onClick={()=>onPage("settings")}>{t("workspace.backSettings")}</Button><DomainRecords key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId} operationId={status?.request?.operation_id} onOpenCatalog={namespace=>{setCatalogNamespace(namespace);onPage("capabilities");}}/></> :
     page==="resources" ? <ResourcesPage project={project} hosted={hosted} citation={citation} sourceData={sourceData} sourcesError={sources.error} sourcesDenied={sourcesDenied} onPage={onPage}/> :
     <SettingsPage project={project} threadId={threadId} hosted={hosted} workspaceId={workspaceId} storageScope={storageScope} session={session} capturedEpoch={capturedEpoch} status={status} consent={consent} focusConsent={focusConsent} onConsentFocused={clearConsentFocus} onPage={onPage} onOpenCatalog={()=>{setCatalogNamespace("all");onPage("capabilities");}}/>}
-  </section>;
+  </WorkspaceContent>;
 }
 
 function ProjectNavItem({ project, active, removing, onOpen, onRemove }: {
@@ -265,7 +267,7 @@ export function LiveProjectWorkspace() {
   if (gate || !ready || !scopeKey) return gate;
   const executionReady = executionReadiness(ready, hosted);
   const sourceCount = project && shellSources.data ? shellSources.data.value.artifacts.length : null;
-  return <main className="workstation conversation-workstation bp6-dark">
+  return <WorkspacePageContext.Provider value={page}><main className="workstation conversation-workstation bp6-dark">
     <aside className="navigation-rail">
       <Brand hosted={hosted} />
       <Button icon="plus" intent="primary" className="new-project-button" onClick={()=>{chooseProject("");setOpenCreate(true);}}>{t("workspace.newProject")}</Button>
@@ -277,7 +279,7 @@ export function LiveProjectWorkspace() {
           item.project_id===context.projectId ? <div className="project-sessions" key={`${item.project_id}-sessions`}>
             <Button small minimal icon="plus" className="new-session-button" aria-label={t("workspace.newTask")} onClick={()=>chooseThread("")}>{t("workspace.newSession")}</Button>
             {threadsQuery.isPending&&<p className="empty-copy">{t("workspace.loadingSessions")}</p>}
-            {threadsQuery.error&&<Callout compact intent="danger">{threadsQuery.error.message}</Callout>}
+            {threadsQuery.error&&<Callout compact intent="danger" role="alert">{threadsQuery.error.message}</Callout>}
             {visibleThreads.map(thread=><Button minimal alignText="left" className={`thread-button ${thread.thread_id===context.threadId?"active":""}`} key={thread.thread_id} onClick={()=>chooseThread(thread.thread_id)}><Icon icon="chat"/><span><strong>{thread.problem||t("workspace.untitledSession")}</strong><small>{thread.execution_state==="RUNNING"?t("workspace.running"):thread.execution_state==="PAUSED"?t("workspace.paused"):t("workspace.reopen")}</small></span></Button>)}
             {!threadsQuery.isPending&&!threadsQuery.error&&threads.length===0&&<p className="empty-copy">{t("workspace.firstQuestion")}</p>}
           </div> : null,
@@ -290,7 +292,7 @@ export function LiveProjectWorkspace() {
       <div className="header-status">{project&&projectCutoffText(project.cutoff_at)&&<Tag minimal icon="time" title={t("workspace.cutoffHint")}>{message("cutoff", projectCutoffText(project.cutoff_at)!)}</Tag>}<Tag minimal intent={health.data?.status==="ok"?"success":health.error?"danger":"none"}>{health.data?.status==="ok"?t("workspace.serverConnected"):health.error?t("workspace.serverFailed"):t("workspace.checkingConnection")}</Tag>
         {!hosted&&!executionReady&&<Button small intent="warning" className="setup-needed-button" icon="warning-sign" endIcon="arrow-right" title={t("workspace.openSetup")} onClick={()=>setPage("settings")}>{t("workspace.setupNeeded")}</Button>}
         {!hosted&&contextStoreFailed&&<Tag minimal intent="warning">{t("workspace.locationUnsaved")}</Tag>}{missingSelection&&<Tag minimal intent="warning">{message("missingSelection", missingSelection)}</Tag>}<Button small minimal icon="refresh" aria-label={t("workspace.refreshContext")} onClick={()=>void client.invalidateQueries()}/></div></header>
-    <div className="workspace-navigation"><WorkspaceLocationNotice location={ready.workspace_location} /><Tabs id="workspace-tabs" selectedTabId={page} onChange={value=>setPage(value as Page)}>
+    <div className="workspace-navigation"><WorkspaceLocationNotice location={ready.workspace_location} /><Tabs id={WORKSPACE_TABS_ID} selectedTabId={page} onChange={value=>setPage(value as Page)}>
       <Tab id="research" title={t("workspace.conversation")}/><Tab id="resources" title={t("workspace.resources")} disabled={!project}/>
       <Tab id="records" title={t("workspace.history")} disabled={!project}/><Tab id="trace" title={t("workspace.trace")} disabled={!project}/><Tab id="settings" title={t("workspace.settings")}/></Tabs>
       {project&&<WorkspaceCounts sessions={threadsQuery.isPending ? null : threads.length} sources={sourceCount}/>}</div>
@@ -299,6 +301,6 @@ export function LiveProjectWorkspace() {
       onUserInput={cancelOpenLatest} onAdmitted={admit}
       rowOrigin={rowOrigin} onOriginDone={clearRowOrigin} onInvestigate={investigate} traceFocus={traceFocus} onOpenTrace={openTraceRow}/></WorkspaceErrorBoundary> :
       isTimelineExampleRequested() && page === "research" ? <TimelineExamplePane /> :
-      <section className="workspace-content">{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?t("workspace.missingProject"):t("workspace.taskSelectionNeeded")}{sentenceGap()}{t("workspace.draftNotSent")}</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">{t("workspace.locationFailure")}</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">{t("workspace.identityMissing")}</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title={t("workspace.chooseProjectNotice")}>{t("workspace.selectForInfo")}</Callout>:<section className="detail-card"><h2>{t("workspace.connectModel")}</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">{t("workspace.selectForDefaults")}</p></section>}<LanguageSettingsCard scope={storageScope}/></>:<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</section>}
-  </main>;
+      <WorkspaceContent>{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?t("workspace.missingProject"):t("workspace.taskSelectionNeeded")}{sentenceGap()}{t("workspace.draftNotSent")}</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">{t("workspace.locationFailure")}</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">{t("workspace.identityMissing")}</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title={t("workspace.chooseProjectNotice")}>{t("workspace.selectForInfo")}</Callout>:<section className="detail-card"><h2>{t("workspace.connectModel")}</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">{t("workspace.selectForDefaults")}</p></section>}<LanguageSettingsCard scope={storageScope}/></>:<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</WorkspaceContent>}
+  </main></WorkspacePageContext.Provider>;
 }

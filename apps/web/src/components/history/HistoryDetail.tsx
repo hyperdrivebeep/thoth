@@ -79,7 +79,7 @@ export function HistoryDetail({ selection, actorScope, onUseQuestion, onChooseRe
       {entry.capability.previewSupported && !entry.capability.applyReady && <p className="history-help">{t("historyDetail.notReady")}</p>}
       {entry.kind === "RESULT" && !entry.currentHead && <p className="history-help">{t("historyDetail.noHead")}</p>}
       {compare && comparison.isFetching && <p role="status">{t("historyDetail.comparing")}</p>}
-      {compare && comparison.error && <Callout compact intent="warning">{t("historyDetail.compareFailed")} <Button small onClick={() => void comparison.refetch()}>{t("delta.retry")}</Button></Callout>}
+      {compare && comparison.error && <Callout compact intent="warning" role="alert">{t("historyDetail.compareFailed")} <Button small onClick={() => void comparison.refetch()}>{t("delta.retry")}</Button></Callout>}
       {compare && comparison.data && <RevisionComparison comparison={comparison.data} />}
     </>}
     <Disclosure className="history-technical" label={t("historyDetail.technical")}><pre>{JSON.stringify(entry.technical, null, 2)}</pre></Disclosure>

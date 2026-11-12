@@ -17,7 +17,7 @@ type ReadyShell = Pick<Shell, "readyQuery" | "ready" | "hosted" | "scopeKey" | "
 /** The readiness read itself: still pending, failed, or not yet restored for this workspace scope. */
 function readyReadGate({ readyQuery, ready, scopeKey, restoredFor }: ReadyShell): ReactNode | null {
   if (readyQuery.isPending || (readyQuery.isSuccess && !ready)) return status(t("workspace.preparing"));
-  if (readyQuery.error) return card(<Callout intent="danger" title={t("workspace.readinessFailed")}>{t("workspace.readinessAdvice")}<Button small onClick={()=>void readyQuery.refetch()}>{t("workspace.checkAgain")}</Button></Callout>);
+  if (readyQuery.error) return card(<Callout intent="danger" title={t("workspace.readinessFailed")} role="alert">{t("workspace.readinessAdvice")}<Button small onClick={()=>void readyQuery.refetch()}>{t("workspace.checkAgain")}</Button></Callout>);
   if (!ready || !scopeKey || restoredFor !== scopeKey) return status(t("workspace.loadingSaved"));
   return null;
 }

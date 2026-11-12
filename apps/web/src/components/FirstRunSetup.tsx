@@ -198,8 +198,8 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
               {guideUrl && <p><a href={guideUrl} target="_blank" rel="noopener noreferrer">{t("setup.openKeySite")}</a></p>}</Callout>}
             {loadModels.data && <Callout compact role="status" data-catalog-result>{catalogResultLines((loadModels.data.value as { catalog_status?: CatalogStatusRow[] }).catalog_status, providerLabel).map(line => <p key={line}>{line}</p>)}</Callout>}
             {loadModels.error && <Callout compact intent="warning" role="alert">{connectionErrorText(loadModels.error, t("setup.catalogFailed"))}</Callout>}
-            {connect.error && <Callout compact intent="danger">{connectionErrorText(connect.error, connect.error.message)}</Callout>}
-            {listed.error && <Callout compact intent="warning">{t("setup.methodsFailed")}</Callout>}
+            {connect.error && <Callout compact intent="danger" role="alert">{connectionErrorText(connect.error, connect.error.message)}</Callout>}
+            {listed.error && <Callout compact intent="warning" role="alert">{t("setup.methodsFailed")}</Callout>}
             <Button small minimal icon="refresh" loading={ready.isFetching || listed.isFetching}
               onClick={() => { void ready.refetch(); void listed.refetch(); }}>{t("setup.refreshConnection")}</Button>
             <div className="first-run-footer">
@@ -244,7 +244,7 @@ export function FirstRunSetup({ onDone }: { onDone: () => void }) {
                 </span></span>
               </Button>
             </div>
-            {update.error && <Callout compact intent="danger">{update.error.message}</Callout>}
+            {update.error && <Callout compact intent="danger" role="alert">{update.error.message}</Callout>}
             <div className="first-run-footer">
               {hosted ? <span>{t("setup.noCredential")}</span> : <Button minimal onClick={() => setStep("model")}>{t("setup.backToModel")}</Button>}
               {setupReady ? (

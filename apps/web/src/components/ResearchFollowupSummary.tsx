@@ -146,7 +146,11 @@ export function ResearchFollowupSummary({
     {coverage && <Disclosure defaultOpen={needsCheck > 0} label={message("answerChecks", rows.length)}>
       {coverage.availability === "UNAVAILABLE" ? <p className="result-notice">{t("followup.inaccessibleChecks")}</p> : rows.length === 0 ? <p className="muted">{t("followup.noAnswerChecks")}</p>
         : <div className="coverage-table" role="table" aria-label={t("followup.checkStatus")}>
-          <div className="coverage-head" role="row"><span>{t("followup.criterion")}</span><span>{t("followup.criterionStatus")}</span><span>{t("history.assessment")}</span></div>
+          <div className="coverage-head" role="row">
+            <span role="columnheader">{t("followup.criterion")}</span>
+            <span role="columnheader">{t("followup.criterionStatus")}</span>
+            <span role="columnheader">{t("history.assessment")}</span>
+          </div>
           {rows.map(row => {
             const text = criterionText(row.target, row.question, responseLanguage);
             const term = coverageTermLabel(row.target);
@@ -157,8 +161,14 @@ export function ResearchFollowupSummary({
             <div role="cell"><Tag minimal intent={coverageIntent(row.status)}>{coverageLabel(row.status)}</Tag></div>
             <div role="cell"><small>{[row.relation, row.validation].filter(term => term && term !== "NOT_ASSESSED").map(coverageTermLabel).join(" · ")
               || (row.blocker ? coverageTermLabel(row.blocker) : t("followup.noExplanation"))}</small></div>
-            {technical.length > 0 && <details className="connection-tech coverage-tech"><summary>{t("oauth.technical")}</summary>
-              <small>{technical.join(" · ")}</small></details>}
+            {technical.length > 0 && (
+              <div role="cell" aria-colspan={3} className="coverage-tech">
+                <details className="connection-tech">
+                  <summary>{t("oauth.technical")}</summary>
+                  <small>{technical.join(" · ")}</small>
+                </details>
+              </div>
+            )}
           </article>;
           })}
         </div>}

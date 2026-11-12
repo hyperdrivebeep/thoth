@@ -89,7 +89,7 @@ export function EvidenceRail({
         </div>
       )}
       <div className="evidence-list" ref={listRef}>
-        {loading ? <p className="empty-copy">{t("evidenceRail.reading")}</p> : error ? <Callout compact intent="danger">{error}</Callout> : evidence.length === 0 ? (
+        {loading ? <p className="empty-copy">{t("evidenceRail.reading")}</p> : error ? <Callout compact intent="danger" role="alert">{error}</Callout> : evidence.length === 0 ? (
           <p className="empty-copy">{t("evidenceRail.empty")}</p>
         ) : (
           filtered.map((span) => (
