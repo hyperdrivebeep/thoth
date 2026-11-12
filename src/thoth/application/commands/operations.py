@@ -16,6 +16,7 @@ from thoth.domain.operation import OperationRecord
 from thoth.ports.event_store import EventStorePort
 from thoth.ports.ledger import LedgerPort
 from thoth.ports.operation import OperationStorePort
+from thoth.ports.operation_outcome import OperationOutcomeReasonPort
 from thoth.ports.resource_scope import ResourceAccessPort
 from thoth.ports.runtime import ClockPort
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
@@ -46,7 +47,9 @@ class OperationCommandHandlers:
         clock: ClockPort | None = None,
         resource_access: ResourceAccessPort | None = None,
         read_ledger: LedgerPort | None = None,
+        outcome_reasons: OperationOutcomeReasonPort | None = None,
     ) -> None:
+        self._outcome_reasons = outcome_reasons
         self._store = store
         self._events = events
         self._clock = clock
@@ -89,6 +92,12 @@ class OperationCommandHandlers:
             )
         return payload
 
+    def _shown_error(self, operation: OperationRecord) -> dict[str, JsonValue] | None:
+        """The stored error, or the reason an operation that knows its own gives for its ending."""
+        if operation.error is not None or self._outcome_reasons is None:
+            return operation.error
+        return self._outcome_reasons.error_for(operation)
+
     async def result(self, value: dict[str, JsonValue]) -> dict[str, JsonValue]:
         request = OperationResultReadInput.model_validate(value)
         operation = self._read_query_scoped(request)
@@ -97,7 +106,7 @@ class OperationCommandHandlers:
                 "operation_id": operation.operation_id,
                 "state": operation.state.value,
                 "result": operation.result,
-                "error": operation.error,
+                "error": self._shown_error(operation),
                 "execution_observation": "UNKNOWN",
             },
             request.expected_result_contract,

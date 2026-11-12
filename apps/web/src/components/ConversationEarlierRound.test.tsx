@@ -72,7 +72,11 @@ afterEach(async () => {
   vi.resetAllMocks();
 });
 
-async function mount(liveStatus: ResearchStatus | undefined) {
+type Stored = { state: string; result: unknown; error?: unknown };
+async function mount(
+  liveStatus: ResearchStatus | undefined,
+  stored: (epoch: number) => Stored = (epoch) => ({ state: "SUCCEEDED", result: result(epoch) }),
+) {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
   vi.mocked(rpc).mockImplementation(async (method, args) => {
     if (method === "thread/activity/list")
@@ -86,7 +90,7 @@ async function mount(liveStatus: ResearchStatus | undefined) {
       return {
         operation_id: "",
         state: "SUCCEEDED",
-        value: { operation_id: args.operation_id, state: "SUCCEEDED", result: result(epoch) },
+        value: { operation_id: args.operation_id, ...stored(epoch) },
       };
     }
     throw new Error("not served: " + method);
@@ -127,10 +131,32 @@ it("tells an earlier round that its answer checks are not shown here, and the la
   expect(first).not.toContain(NOT_YET);
   expect(latest).toContain(NOT_YET);
   expect(latest).not.toContain(EARLIER);
-  // The usage of an earlier round is not sent either. Its card does not claim that none was recorded; the latest
-  // round, whose usage would be sent if there were any, still says so.
+  // With no usage sent for either round, each card says that none was recorded.
+  expect(first).toContain(NO_USAGE);
+  expect(latest).toContain(NO_USAGE);
+});
+
+it("shows the usage the server recorded for an earlier round, and says none only for a round without any", async () => {
+  const usage = (operation: string, tokens: number) => ({
+    operation_id: operation,
+    calls: 2,
+    input_tokens: tokens - 10,
+    output_tokens: 10,
+    total_tokens: tokens,
+    cached_input_tokens: null,
+    unreported_calls: 0,
+    state: "OBSERVED",
+    wall_ms: 120_000,
+  });
+  await mount({
+    ...status,
+    result_usage: { "operation:1": usage("operation:1", 4321) },
+  } as ResearchStatus);
+  const [first, latest] = cards();
+  expect(first).toContain("4,321");
   expect(first).not.toContain(NO_USAGE);
   expect(latest).toContain(NO_USAGE);
+  expect(latest).not.toContain("4,321");
 });
 
 it("does not call a round earlier when nothing says which request is the latest", async () => {
@@ -140,4 +166,34 @@ it("does not call a round earlier when nothing says which request is the latest"
     expect(card).toContain(NO_USAGE);
     expect(card).not.toContain(EARLIER);
   }
+});
+
+const STOPPED = "직접 중지했습니다.";
+const CANCEL_UNKNOWN = "취소 사유는 현재 기록에서 확인되지 않습니다.";
+
+it("tells the turn of a round the person stopped that they stopped it, from operation/result/read alone", async () => {
+  await mount(undefined, (epoch) =>
+    epoch === 1
+      ? {
+          state: "CANCELLED",
+          result: null,
+          error: { message: "USER_STOPPED", data: { reason_code: "USER_STOPPED" } },
+        }
+      : { state: "SUCCEEDED", result: result(epoch) },
+  );
+  const [first, latest] = cards();
+  expect(first).toContain(STOPPED);
+  expect(first).not.toContain(CANCEL_UNKNOWN);
+  expect(latest).not.toContain(STOPPED);
+});
+
+it("keeps the old sentence for a cancelled turn that has no reason on record", async () => {
+  await mount(undefined, (epoch) =>
+    epoch === 1
+      ? { state: "CANCELLED", result: null, error: null }
+      : { state: "SUCCEEDED", result: result(epoch) },
+  );
+  const [first] = cards();
+  expect(first).toContain(CANCEL_UNKNOWN);
+  expect(first).not.toContain(STOPPED);
 });

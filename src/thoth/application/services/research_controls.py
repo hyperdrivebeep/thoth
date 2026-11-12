@@ -15,6 +15,7 @@ from thoth.domain.research_request import (
     ResearchAttempt,
     decode_thread_request,
 )
+from thoth.domain.research_stop import ResearchStopNote, stop_note_key
 from thoth.protocol.deferred import AcceptedRunning
 from thoth.protocol.jsonrpc import RpcApplicationError, RpcErrorCode
 
@@ -173,9 +174,19 @@ class ResearchControls:
                 # Stopped thread, request still running (a first stop was cut off before it
                 # cancelled): finish that cancel now, as a normal stop.
                 del result["unchanged"], result["unchanged_reason"]
-            self.host.operations.cancel(
-                operation.operation_id, completed_at=self.host.records.clock.now()
-            )
+            now = self.host.records.clock.now()
+            cancelled = self.host.operations.cancel(operation.operation_id, completed_at=now)
+            if cancelled.state == OperationState.CANCELLED and cancelled.completed_at == now:
+                # This stop is what ended the request (a cancel that had already happened keeps its
+                # own time): say so.
+                self.host.records.journal(
+                    operation.project_id,
+                    stop_note_key(operation.operation_id),
+                    ResearchStopNote(
+                        operation_id=operation.operation_id, requested_at=now.isoformat()
+                    ),
+                    "CANCELLED",
+                )
             self.host.records.journal(
                 operation.project_id,
                 operation.operation_id,

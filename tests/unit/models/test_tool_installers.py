@@ -54,6 +54,7 @@ def test_codex_install_uses_one_pinned_npm_command_and_then_verifies(tmp_path: P
                 str(prefix),
                 "--install-strategy=nested",
                 "--save-exact",
+                "--ignore-scripts",
                 "@openai/codex@0.157.1",
             ),
             300.0,
@@ -114,6 +115,7 @@ def test_claude_code_install_targets_its_own_folder_and_clears_the_cached_status
         env={"LOCALAPPDATA": str(local)},
         verify=lambda: {"connection_state": "LOGIN_REQUIRED"},
         invalidate=lambda workspace: cleared.append(workspace),
+        place=lambda _prefix: None,
     )
     result = installer.install()
     argv, timeout = npm.calls[0]
@@ -137,6 +139,7 @@ def test_claude_code_install_reports_an_unusable_result_instead_of_success(
             "reason_code": "CLAUDE_CODE_CAPABILITY_UNSUPPORTED",
         },
         invalidate=lambda _workspace: None,
+        place=lambda _prefix: None,
     )
     with pytest.raises(ModelToolingError, match="CLAUDE_CODE_CAPABILITY_UNSUPPORTED"):
         installer.install()

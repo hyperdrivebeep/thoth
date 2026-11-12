@@ -17,6 +17,7 @@ from thoth.application.services import FieldMeasurementService
 from thoth.application.services.connector_service import ConnectorService
 from thoth.application.services.full_project_memory import FullProjectMemoryService
 from thoth.application.services.operation_journal import OperationJournal
+from thoth.application.services.research_stop_reason import ResearchStopReasons
 from thoth.application.services.scoped_artifacts import ScopedArtifactLedger
 from thoth.apps.local_retrieval_composition import create_local_retrieval
 from thoth.apps.project_deletion_composition import register_project_deletion
@@ -130,6 +131,7 @@ def assemble_runtime_entry(
             owner=owner,
             journal_completion=journal_completion,
             journal=journal,
+            outcome_reasons=ResearchStopReasons(stores.controls),
         )
         registration.judgment_review.connect(bus, research_component.entry)
         from thoth.application.commands.research_queue_cancel import QueueAwareOperationCancel

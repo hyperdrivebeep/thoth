@@ -7,11 +7,27 @@ from typing import TYPE_CHECKING
 from pydantic import JsonValue
 
 from thoth.application.services.research_model_hold import model_call_hold_failure
+from thoth.domain.enums import OperationState
+from thoth.domain.research_stop import user_stopped_error
 
 if TYPE_CHECKING:
     from thoth.application.services.research_thread_read_snapshot import ResearchThreadReadSnapshot
     from thoth.domain.model_dispatch import ModelDispatchRecord
     from thoth.domain.research_failure import ResearchCleanupFailure, ResearchFailureRecord
+
+
+def operation_error(snapshot: ResearchThreadReadSnapshot) -> JsonValue:
+    """The operation's error; for a request the person stopped, that fact in the same shape.
+
+    A cancelled operation has no stored error. The reason is read from the stop note, and only when
+    the operation did end CANCELLED: a request that finished first keeps no reason.
+    """
+    op, note = snapshot.operation, snapshot.stop_note
+    if op is None:
+        return None
+    if op.error is None and note is not None and op.state == OperationState.CANCELLED:
+        return user_stopped_error(note)
+    return op.error
 
 
 def snapshot_fields(
@@ -35,7 +51,7 @@ def snapshot_fields(
         "request_ref": current_ref.model_dump(mode="json"),
         "request_epoch": request.request_epoch,
         "operation_state": "UNKNOWN" if op is None else op.state.value,
-        "operation_error": None if op is None else op.error,
+        "operation_error": operation_error(snapshot),
         "failure": model_call_hold_failure(manifest if fresh else None, attempt)
         if failure is None
         else failure.model_dump(mode="json"),

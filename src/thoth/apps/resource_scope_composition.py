@@ -26,6 +26,7 @@ from thoth.ports.governance import GovernanceStorePort
 from thoth.ports.journal import JournalPort
 from thoth.ports.ledger import ManagedLedgerPort
 from thoth.ports.operation import OperationStorePort
+from thoth.ports.operation_outcome import OperationOutcomeReasonPort
 from thoth.ports.project import ProjectStorePort
 from thoth.ports.runtime import ClockPort, IdGeneratorPort
 from thoth.ports.sandbox import SandboxPort
@@ -119,6 +120,7 @@ def scope_bus(
     owner: OperationOwner | None = None,
     journal: JournalPort | None = None,
     journal_completion: JournalCompletion | None = None,
+    outcome_reasons: OperationOutcomeReasonPort | None = None,
 ) -> CommandBus:
     handlers = OperationCommandHandlers(
         operations,
@@ -126,6 +128,7 @@ def scope_bus(
         clock,
         resource_access=scopes,
         read_ledger=ledger,
+        outcome_reasons=outcome_reasons,
     )
     registry.register("operation/read", handlers.read)
     registry.register("operation/checkpoint/read", handlers.checkpoint)

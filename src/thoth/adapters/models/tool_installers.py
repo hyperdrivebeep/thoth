@@ -60,7 +60,10 @@ def install_npm_package(
     npm: str | None = None,
     timeout: float = NPM_INSTALL_TIMEOUT_SECONDS,
 ) -> None:
-    """One exact-version npm install into `prefix`; outcome is a typed reason, not npm output."""
+    """One exact-version npm install into `prefix` that runs no package script.
+
+    The outcome is a typed reason, not npm output.
+    """
     executable = npm or find_npm()
     if not executable:
         raise ModelToolingError("NODE_NPM_UNAVAILABLE")
@@ -71,6 +74,8 @@ def install_npm_package(
         str(prefix),
         "--install-strategy=nested",
         "--save-exact",
+        # No install script of the package or of anything it pulls in runs on this computer.
+        "--ignore-scripts",
         package_spec,
     )
     try:

@@ -29,6 +29,7 @@ export const researchJa: ColumnOf<typeof researchMessages> = {
   "result.deadline": "呼び出しの期限に達しました",
   "result.responseTimeout": "応答がタイムアウトしました",
   "result.cancelled": "調査はキャンセルされました。自動では再開しません。",
+  "result.userStopped": "ご自身で停止しました。",
   "result.cancelUnknown": "キャンセルの理由は現在の記録にありません。",
   "result.beforeCancel": "キャンセル前に保存された調査結果",
   "result.noSavedAnswer": "このリクエストに保存された回答はありません。",

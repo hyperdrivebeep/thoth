@@ -87,6 +87,10 @@ export const researchMessages = {
     ko: "연구 실행이 취소되었습니다. 자동 재실행하지 않습니다.",
     en: "Research was cancelled. It will not restart automatically.",
   },
+  "result.userStopped": {
+    ko: "직접 중지했습니다.",
+    en: "You stopped it yourself.",
+  },
   "result.cancelUnknown": {
     ko: "취소 사유는 현재 기록에서 확인되지 않습니다.",
     en: "The cancellation reason is not available in the current record.",
