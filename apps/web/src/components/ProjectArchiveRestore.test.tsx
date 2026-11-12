@@ -78,6 +78,13 @@ afterEach(async () => {
 });
 
 const newProject = () => container.querySelector("button.new-project-button") as HTMLButtonElement;
+const openArchivedMenu = () => act(async () => { (container.querySelector(".archived-project-row button") as HTMLButtonElement).click(); });
+const archivedMenuItems = () => [...document.querySelectorAll('.archived-project-menu [role="menuitem"]')] as HTMLButtonElement[];
+/** Restore and delete are in the row's menu, which is drawn outside the list. */
+const chooseArchived = async (label: string) => {
+  await openArchivedMenu();
+  await act(async () => { archivedMenuItems().find(item => item.textContent === label)!.click(); });
+};
 const nameInput = () => [...container.querySelectorAll("label")].find(item => item.textContent?.startsWith("프로젝트 이름"));
 
 it("opens the create screen from the left button on the first screen, where it used to do nothing", async () => {
@@ -111,7 +118,7 @@ it("lists archived projects on demand and restores one, then shows it in the nor
   await settle(() => container.textContent?.includes("archived demo") === true);
   expect(fixture.calls.some(call => call.method === "project/list" && call.input.include_archived === true)).toBe(true);
   expect(container.querySelector(".archived-projects")!.textContent).not.toContain("old project");
-  await act(async () => button("되살리기")!.click());
+  await chooseArchived("되살리기");
   await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("보관한 프로젝트가 없습니다") === true);
   expect(fixture.calls.filter(call => call.method === "project/restore")).toEqual([{ method: "project/restore", input: { project_id: "q", expected_revision: 4 } }]);
   await settle(() => container.querySelector(".navigation-rail")?.textContent?.includes("archived demo") === true);
@@ -181,10 +188,10 @@ it("explains a stale revision when restoring and reads the list again", async ()
   await act(async () => button("보관한 프로젝트 보기")!.click());
   await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("archived demo") === true);
   fixture.projects[1].revision = 5;
-  await act(async () => button("되살리기")!.click());
+  await chooseArchived("되살리기");
   await settle(() => container.querySelector('.archived-projects [role="alert"]') !== null);
   expect(container.querySelector('.archived-projects [role="alert"]')!.textContent).toContain("프로젝트가 그 사이 바뀌었습니다");
-  await act(async () => button("되살리기")!.click());
+  await chooseArchived("되살리기");
   await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("보관한 프로젝트가 없습니다") === true);
   expect(fixture.calls.filter(call => call.method === "project/restore").map(call => call.input.expected_revision)).toEqual([4, 5]);
 });
@@ -196,7 +203,7 @@ const typeInto = async (input: HTMLInputElement, value: string) => act(async () 
 async function deleteFromArchive(name: string) {
   await act(async () => button("보관한 프로젝트 보기")!.click());
   await settle(() => container.querySelector(".archived-projects")?.textContent?.includes(name) === true);
-  await act(async () => ([...container.querySelectorAll(".archived-projects button")].find(item => item.textContent === "영구 삭제") as HTMLButtonElement).click());
+  await chooseArchived("영구 삭제");
   await settle(() => document.querySelector(".project-delete-dialog") !== null);
   const dialog = document.querySelector(".project-delete-dialog")!;
   await typeInto(dialog.querySelector("input")!, name);
@@ -236,6 +243,6 @@ it("offers no permanent delete in the hosted review environment", async () => {
   await mount(false);
   await act(async () => button("보관한 프로젝트 보기")!.click());
   await settle(() => container.querySelector(".archived-projects")?.textContent?.includes("archived demo") === true);
-  expect([...container.querySelectorAll(".archived-projects button")].some(item => item.textContent === "영구 삭제")).toBe(false);
-  expect(button("되살리기")).toBeDefined();
+  await openArchivedMenu();
+  expect(archivedMenuItems().map(item => item.textContent)).toEqual(["되살리기"]);
 });

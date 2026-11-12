@@ -20,7 +20,7 @@ export const advancedMessages = {
     "en": "Search scope · acquisition stage · stop reason"
   },
   "advanced.evidenceHint": {
-    "ko": "원문 위치 · 지지 · 권위 · 시점",
+    "ko": "원문 위치 · 지지 · 자료 성격 · 시점",
     "en": "Source locations · support · authority · timing"
   },
   "advanced.object": {

@@ -19,16 +19,33 @@ function selectionOf(item: ProjectReviewItem): HistorySelection {
     resultDigest: item.result_revision_digest ?? undefined, title: item.title };
 }
 
-export function ProjectReviewList({ projectId, onSelect }: { projectId: string; onSelect: (selection: HistorySelection) => void }) {
-  const query = useInfiniteQuery({ queryKey: ["project-review-list", projectId], initialPageParam: null as string | null, retry: false, gcTime: 0,
+/** The answers of a project that need review. Both pieces below read it; the request is made once. */
+function useProjectReview(projectId: string, enabled = true) {
+  const query = useInfiniteQuery({ queryKey: ["project-review-list", projectId], initialPageParam: null as string | null, retry: false, gcTime: 0, enabled,
     queryFn: ({ pageParam, signal }) => readProjectReviewList(projectId, pageParam, signal), getNextPageParam: page => page.next_cursor ?? undefined });
   const blocked = useReadAccessProtection(["project-review-list", projectId], query.error);
   const pages = blocked ? [] : query.data?.pages ?? [];
   const items = pages.flatMap(page => page.items);
+  return { query, blocked, pages, items, nothingToReview: !query.isPending && !query.error && items.length === 0 };
+}
+
+/**
+ * Nothing to review is one line next to the screen's controls, not a card above the records. Where the
+ * screen shows no review list (show is false) the place stays empty and nothing is read.
+ */
+export function ProjectReviewEmptyNote({ projectId, show }: { projectId: string; show: boolean }) {
+  const { nothingToReview } = useProjectReview(projectId, show);
+  return show && nothingToReview ? <p className="muted project-review-empty">{t("reviewList.empty")}</p> : <span />;
+}
+
+export function ProjectReviewList({ projectId, onSelect }: { projectId: string; onSelect: (selection: HistorySelection) => void }) {
+  const { query, blocked, pages, items, nothingToReview } = useProjectReview(projectId);
   if ((query.error || blocked) && pages.length === 0) return <Callout compact intent="warning" role="alert">{t("reviewList.failed")}<Button small onClick={() => void query.refetch()}>{t("workspace.reload")}</Button></Callout>;
+  // The empty state is ProjectReviewEmptyNote. The screen's own "read again" reads this list too.
+  if (nothingToReview) return null;
   return <section className="project-review-list" aria-label={t("reviewList.title")}>
-    <div className="section-title-row"><div><h2>{t("followup.reviewNeeded")}</h2><p>{t("reviewList.notice")}</p></div><Button small minimal icon="refresh" onClick={() => void query.refetch()} loading={query.isRefetching}>{t("historyWorkspace.reload")}</Button></div>
-    {query.isPending ? <p className="muted" role="status">{t("reviewList.loading")}</p> : items.length === 0 ? <p className="muted">{t("reviewList.empty")}</p>
+    <div className="section-title-row"><div><h2>{t("followup.reviewNeeded")}</h2><p>{t("reviewList.notice")}</p></div></div>
+    {query.isPending ? <p className="muted" role="status">{t("reviewList.loading")}</p>
       : <div className="review-items">{items.map(item => <article className="review-item" key={item.item_id}>
         <div><Tag minimal>{priorityLabel(item.priority)}</Tag><Tag minimal intent={currentnessTone(item.currentness)}>{currentnessLabel(item.currentness)}</Tag></div>
         <h3>{item.title}</h3>

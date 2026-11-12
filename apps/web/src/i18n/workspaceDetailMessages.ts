@@ -1,8 +1,4 @@
 export const workspaceDetailMessages = {
-  "workspace.questionEvidence": {
-    "ko": "질문에서 근거로, 근거에서 다음 행동으로.",
-    "en": "From questions to evidence, and from evidence to the next action."
-  },
   "workspace.continueHeading": {
     "ko": "연구를 이어가거나 새 문제를 시작하세요.",
     "en": "Continue your research or start a new problem."
@@ -72,8 +68,8 @@ export const workspaceDetailMessages = {
     "en": "The saved model selection is currently unavailable."
   },
   "model.inheritedUnchanged": {
-    "ko": " 이 작업은 프로젝트의 모델 설정을 그대로 씁니다.",
-    "en": " This task inherits the project model settings; no separate selection has replaced them."
+    "ko": " 이 대화는 프로젝트의 모델 설정을 그대로 씁니다.",
+    "en": " This conversation uses the project model settings as they are."
   },
   "model.keepSelection": {
     "ko": "기존 선택은 유지됩니다. 변경하려면 아래에서 모델을 직접 고르세요.",

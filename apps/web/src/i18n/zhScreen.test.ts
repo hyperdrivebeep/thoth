@@ -94,7 +94,9 @@ it("puts Chinese fonts first on the Chinese screen only, on the page and on body
   expect(faces.indexOf("PingFang SC")).toBeGreaterThan(faces.indexOf("Microsoft YaHei UI"));
   expect(faces).toContain("Noto Sans SC");
   expect(faces.some(face => /Malgun|Pretendard|Noto Sans KR|Apple SD/.test(face))).toBe(false);
-  expect(workstationCss.match(/:lang\(/g)).toHaveLength(6);
+  // No other language gets a font rule. (Korean has a line-breaking rule, which sets no font.)
+  const fontRules = [...workstationCss.matchAll(/([^{}]*:lang\([^{}]*)\{([^}]*)\}/g)].filter(found => /font/.test(found[2]));
+  expect(fontRules).toHaveLength(3);
   expect(rule![1]).not.toMatch(/code-font/);
 });
 

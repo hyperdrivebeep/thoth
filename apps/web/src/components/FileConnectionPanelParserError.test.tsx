@@ -29,8 +29,6 @@ async function connectFile() {
   const input = container.querySelector<HTMLInputElement>('input[type="file"]')!;
   Object.defineProperty(input, "files", { configurable: true, value: [new File(["x"], "report.txt")] });
   await act(async () => { input.dispatchEvent(new Event("change", { bubbles: true })); });
-  const scope = container.querySelector<HTMLSelectElement>(`[aria-label="${t("sources.scopeLabel")}"]`)!;
-  await act(async () => { scope.value = "PROJECT_SHARED"; scope.dispatchEvent(new Event("change", { bubbles: true })); });
   await act(async () => { [...container.querySelectorAll("button")].find(item => item.textContent === t("composer.attach"))!.click(); });
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
 }
@@ -45,7 +43,9 @@ it("says in words what to do when the text encoding is not confirmed, and folds 
   expect(details.querySelector("summary")!.textContent).toBe("기술 정보");
   expect(details.textContent).toContain("source parsing failed [-32030]");
   expect(details.textContent).toContain("TEXT_ENCODING_UNCONFIRMED");
-  expect(callout().textContent).toContain(t("sources.checkConnected"));
+  expect(callout().textContent).toContain("자료를 연결하지 못했습니다");
+  // One file was chosen, so there is no sentence about the rest of a selection.
+  expect(callout().textContent).not.toContain("선택한 파일");
 });
 
 it("uses the English sentence when the screen is in English", async () => {

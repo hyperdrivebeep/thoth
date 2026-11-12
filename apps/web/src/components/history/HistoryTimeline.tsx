@@ -24,7 +24,7 @@ export function HistoryTimeline({ pages, selected, loadingMore, onSelect, onMore
   const partial = pages.some(page => page.coverage.association !== "EXACT" || page.coverage.scan !== "COMPLETE_PAGE");
   return <section className="history-timeline" aria-label={t("timeline.list")}>
     <div className="history-list-heading"><h2>{t("timeline.flow")}</h2><span>{t("timeline.newest")}</span></div>
-    {partial && <p className="history-coverage" role="status">{t("timeline.coverage")}</p>}
+    {partial && <p className="history-coverage-note" role="status">{t("timeline.coverage")}</p>}
     {items.length === 0 && <div className="history-empty">
       <Icon icon="history" size={28} />
       <h3>{onlyCheckpoints ? t("timeline.hasCheckpoints") : last?.nextCursor || partial ? t("timeline.emptyPage") : t("timeline.emptyHistory")}</h3>

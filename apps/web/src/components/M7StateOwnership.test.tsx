@@ -204,10 +204,6 @@ it.each(["stage", "connect"] as const)("W2 a newer file selection survives prior
     await act(async () => { input.dispatchEvent(new Event("change", { bubbles: true })); });
   }
   await selectFile("A.md");
-  await act(async () => {
-    const visibility = container.querySelector<HTMLSelectElement>(`[aria-label="${t("sources.scopeLabel")}"]`)!;
-    visibility.value = "PROJECT_SHARED"; visibility.dispatchEvent(new Event("change", { bubbles: true }));
-  });
   const gate = deferred();
   if (phase === "stage") fixture.stageGate = gate.promise; else fixture.connectGate = gate.promise;
   const button = [...container.querySelectorAll<HTMLButtonElement>("button")].find(item => item.textContent === t("composer.attach"))!;

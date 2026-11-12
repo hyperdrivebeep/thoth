@@ -1,5 +1,6 @@
 import { message as formatMessage } from "../i18n/formatMessages";
 import { UiError } from "../i18n/UiError";
+import { isUploadRefusalCode, UPLOAD_ERROR_HEADER, UploadRefused } from "./uploadTypes";
 export type StagedFile = {
   relative_path: string;
   filename: string;
@@ -62,6 +63,12 @@ export function stageFile(file: File, projectId: string, options: StageFileOptio
     xhr.onload = () => {
       if (settled) return;
       if (xhr.status < 200 || xhr.status >= 300) {
+        // A refusal the server names by code is said in the screen language, with the file's name.
+        const code = xhr.getResponseHeader(UPLOAD_ERROR_HEADER);
+        if (isUploadRefusalCode(code)) {
+          finish(new UploadRefused(code, file.name));
+          return;
+        }
         let detail: { detail?: string } | null = null;
         try { detail = JSON.parse(xhr.responseText); } catch { /* Preserve the HTTP fallback. */ }
         finish(new Error(detail?.detail ?? formatMessage("filePrepareFailed", xhr.status)));

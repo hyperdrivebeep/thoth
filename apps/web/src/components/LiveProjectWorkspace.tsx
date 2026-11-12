@@ -1,9 +1,10 @@
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
 import { sentenceGap } from "../i18n/sentences";
-import { Button, Callout, Collapse, Icon, InputGroup, Tab, Tabs, Tag } from "@blueprintjs/core";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { Button, Callout, Icon, InputGroup, Tab, Tabs, Tag } from "@blueprintjs/core";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
+import { flushSync } from "react-dom";
 import { rpc } from "../api/rpcClient";
 import { connectedArtifacts, detachedArtifactIds } from "../api/sourceBindings";
 import { DetachedSourcesContext } from "./detachedSources";
@@ -12,7 +13,6 @@ import { threadName } from "../api/threadName";
 import { ProjectNavItem } from "./ProjectNavItem";
 import { ThreadNavItem } from "./ThreadNavItem";
 import { useProjectManagement } from "./useProjectManagement";
-import { captureProjectCreation } from "../api/projectCreation";
 import type { WorkspaceReady } from "../api/research";
 import { validWorkspaceId, type BrowserScope } from "../api/localWorkspacePersistence";
 import type { RowInvestigation } from "./traceInvestigation";
@@ -24,7 +24,6 @@ import { useCitationGate } from "./SourceCitationGate";
 import { projectCutoffText } from "../api/sourceTime";
 import { WorkspaceLocationNotice } from "./WorkspaceLocationNotice";
 import { workspaceSetupIssue, workspaceSetupIssueText, type WorkspaceSetupIssue } from "./workspaceSetupIssue";
-import { ModelCredentialPanel } from "./ModelCredentialPanel";
 import { LanguageSettingsCard } from "./LanguageSettingsCard";
 import { useResearchSession } from "./useResearchSession";
 import { useReadAccessProtection } from "./useReadAccessProtection";
@@ -35,15 +34,18 @@ import { ArchivedProjects } from "./ArchivedProjects";
 import { WorkspaceContent } from "./WorkspaceContent";
 import { WORKSPACE_TABS_ID, WorkspacePageContext } from "./workspaceTabs";
 import { Brand } from "./Brand";
+import { ProjectForm } from "./ProjectForm";
+import { useNavigationDrawer } from "./useNavigationDrawer";
+import { WorkspaceTopbar } from "./WorkspaceTopbar";
 import { ResearchComposer } from "./ResearchComposer";
 import { ResearchSidePanel, type SidePanelTab } from "./ResearchSidePanel";
 import { TracePage } from "./TracePage";
 import type { ResearchDetail } from "./ResearchResultCard";
 import { ProjectReadinessCard, type ReadinessFacts } from "./ProjectReadinessCard";
-import { ResourcesPage, SettingsPage } from "./ProjectSessionPages";
+import { ComputerSettingsPage, ResourcesPage, SettingsPages } from "./ProjectSessionPages";
 import { useProjectSources } from "./useProjectSources";
 import { executionReadiness, workspaceGate } from "./WorkspaceGate";
-import { useSelectionReconcile, useWorkspaceSelection, type Page, type RowOrigin, type TraceRowRef } from "./workspaceSelection";
+import { settingsPageFor, useSelectionReconcile, useWorkspaceSelection, type Page, type RowOrigin, type TraceRowRef } from "./workspaceSelection";
 import {
   isTimelineExampleRequested,
   TIMELINE_EXAMPLE_SOURCES,
@@ -71,37 +73,6 @@ function TimelineExamplePane() {
       </div>
     </WorkspaceContent>
   );
-}
-
-function ProjectForm({ onCreated }: { onCreated: (projectId: string) => void }) {
-  useTranslation();
-  const client = useQueryClient();
-  const [name, setName] = useState("");
-  const [overlay, setOverlay] = useState("general-rnd");
-  const [cutoff, setCutoff] = useState(() => { const date = new Date(); return new Date(date.getTime() - date.getTimezoneOffset()*60000).toISOString().slice(0,16); });
-  const [advancedOpen, setAdvancedOpen] = useState(false);
-  const pending = useRef<(ReturnType<typeof captureProjectCreation> & {signature:string;inFlight:boolean}) | null>(null);
-  const create = useMutation({ mutationFn: (captured: ReturnType<typeof captureProjectCreation> & {onCreated:typeof onCreated}) => rpc<ProjectSummary>("project/create",captured.input,captured.key),
-    onSuccess: async (response,captured) => {pending.current=null;await client.invalidateQueries({queryKey:["projects"]});captured.onCreated(response.value.project_id);},
-    onSettled:()=>{if(pending.current)pending.current.inFlight=false;},
-  });
-  const submit = () => {
-    if (!name.trim() || pending.current?.inFlight) return;
-    const signature=JSON.stringify([name,cutoff,overlay]);
-    if(pending.current?.signature!==signature)pending.current={...captureProjectCreation(name,cutoff,overlay),signature,inFlight:false};
-    pending.current.inFlight=true;
-    create.mutate({...pending.current,onCreated});
-  };
-  return <div className="start-page"><div className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel("RESEARCH WORKSPACE")}</p><h1>{t("workspace.questionEvidence")}</h1><p>{t("workspace.chooseOrCreate")}</p></div><Icon icon="projects" size={50} /></div>
-    <form className="onboarding-card" onSubmit={event=>{event.preventDefault();submit();}}><h2>{t("workspace.newProject")}</h2>
-      <label>{t("workspace.projectName")}<InputGroup required value={name} onChange={event=>setName(event.target.value)} placeholder={t("workspace.namePlaceholder")} /></label>
-      <div className="project-advanced"><Button minimal small icon={advancedOpen?"chevron-up":"chevron-down"} aria-expanded={advancedOpen} onClick={()=>setAdvancedOpen(value=>!value)}>{t("workspace.advanced")}</Button><Collapse isOpen={advancedOpen}><div className="form-row"><label>{t("workspace.cutoff")}<InputGroup required type="datetime-local" value={cutoff} onChange={event=>setCutoff(event.target.value)} /></label>
-        <label>{t("workspace.profile")}<InputGroup required value={overlay} onChange={event=>setOverlay(event.target.value)} /></label></div></Collapse></div>
-      <p className="muted">{t("workspace.createNotice")}</p>
-      <Button type="submit" icon="plus" intent="primary" disabled={!name.trim() || !cutoff || !overlay.trim()} loading={create.isPending}>{t("workspace.create")}</Button>
-      {create.error && <Callout intent="danger" role="alert">{create.error.message}</Callout>}</form>
-    <div className="start-principles"><div><Icon icon="document-open"/><h3>{t("workspace.sourcesFirst")}</h3><p>{t("workspace.sourceNotice")}</p></div><div><Icon icon="comparison"/><h3>{t("workspace.alternatives")}</h3><p>{t("workspace.alternativesNotice")}</p></div><div><Icon icon="history"/><h3>{t("workspace.historyTitle")}</h3><p>{t("workspace.historyNotice")}</p></div></div>
-  </div>;
 }
 
 function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, onUserInput, hosted = false, workspaceId = null, browserScopeId = null, executionReady = true, readSuspended = false, setupIssue = null,
@@ -132,7 +103,14 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
   const [panelOpen,setPanelOpen] = useState(false);
   const opener = useRef<HTMLElement|null>(null);
   const openDetail = (value:ResearchDetail) => {detailFromResearch.current = value.result === session.research.data?.value.current_result?.result || value.result === session.research.data?.value.previous_result?.result;opener.current=document.activeElement instanceof HTMLElement?document.activeElement:null;setDetail(value);setSideTab(value.kind==="actions"?"actions":value.kind==="hypotheses"?"hypotheses":value.kind==="history"||value.kind==="memory"?"history":value.kind==="evidence"?"evidence":sideTab);setPanelOpen(true);};
-  const closeDetail = () => {setDetail(null);setPanelOpen(false);opener.current?.focus();};
+  const closeDetail = () => {
+    // The page is drawn again first: in a narrow window the panel covers the conversation and hides what opened it.
+    flushSync(() => {
+      setDetail(null);
+      setPanelOpen(false);
+    });
+    opener.current?.focus();
+  };
   const openResourcePanel = () => {opener.current=document.activeElement instanceof HTMLElement?document.activeElement:null;setDetail(null);setSideTab("files");setPanelOpen(true);};
   const capturedEpoch = epoch.current;
   const citation=useCitationGate(project.project_id, session.isCurrentScope);
@@ -142,7 +120,7 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
   const status = session.research.data?.value;
   const detachedSources = useMemo(() => detachedArtifactIds(sourceData?.value), [sourceData]);
   const queryError = session.research.error ?? sources.error;
-  const openSettings = (target?: "consent") => { setFocusConsent(target === "consent"); onPage("settings"); };
+  const openSettings = (target?: "consent" | "project") => { setFocusConsent(target === "consent"); onPage(settingsPageFor(hosted, target)); };
   // A thread with nothing sent yet: the readiness card carries the setup notice, so the composer does not repeat it.
   const freshConversation = !threadId && !status?.request && status?.operation_state !== "RUNNING";
   const readiness: ReadinessFacts = { sourceCount: sourceData ? connectedArtifacts(sourceData.value).length : null, modelConnected, consent, cutoffAt: project.cutoff_at, executionReady, hosted };
@@ -155,7 +133,7 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
     {page==="research" ? <div className={`conversation-layout ${panelOpen?"detail-open":""}`}><div className="conversation-center">
       <header className="conversation-heading"><h1>{threadName(status)||(threadId?t("workspace.continue"):t("workspace.newQuestion"))}</h1></header>
       {import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Callout compact intent="warning" className="test-mode-banner">{t("workspace.testModeNotice")}</Callout>}
-      <div className="conversation-scroll"><ConversationTimeline projectId={project.project_id} threadId={threadId} status={status} sourceUris={(sourceData?.value.artifacts??[]).map(item=>item.source_uri)} onDetail={openDetail} queuedInstruction={session.queuedNotice} onContinue={()=>document.getElementById("live-problem")?.focus()} onRetry={question=>{session.setProblem(question);document.getElementById("live-problem")?.focus();}} onResume={operationId=>session.resume.mutate(operationId)} resuming={session.resume.isPending} onOpenHistory={()=>onPage("records")} onOpenSettings={()=>openSettings()} onOpenTrace={onOpenTrace}
+      <div className="conversation-scroll"><ConversationTimeline projectId={project.project_id} threadId={threadId} status={status} sourceUris={(sourceData?.value.artifacts??[]).map(item=>item.source_uri)} onDetail={openDetail} queuedInstruction={session.queuedNotice} onContinue={()=>document.getElementById("live-problem")?.focus()} onRetry={question=>{session.setProblem(question);document.getElementById("live-problem")?.focus();}} onResume={operationId=>session.resume.mutate(operationId)} resuming={session.resume.isPending} onOpenHistory={()=>onPage("records")} onOpenSettings={()=>openSettings("project")} onOpenTrace={onOpenTrace}
         emptyNotice={<ProjectReadinessCard facts={readiness} onOpenSettings={openSettings} onManageSources={()=>onPage("resources")}/>}/>
         {session.resume.error&&<Callout intent="danger" role="alert">{t("workspace.resumeFailed")}{sentenceGap()}{session.resume.error.message}</Callout>}
         {(queryError || sourcesDenied || session.researchReadDenied)&&<Callout intent="danger" role="alert">{queryError?.message ?? t("workspace.accessFailed")}<Button small onClick={()=>{void session.research.refetch();void sources.refetch();}}>{t("workspace.reload")}</Button></Callout>}
@@ -168,8 +146,8 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
     page==="trace" ? <TracePage projectId={project.project_id} responseLanguage={session.responseLanguage} onInvestigate={onInvestigate} focusRow={traceFocus}/> : page==="records" ? <ResearchHistoryWorkspace key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId}
       onUseQuestion={session.problem.trim() ? undefined : question=>{session.setProblem(question);onPage("research");}}/> :
     page==="raw-records" && !hosted ? <><Button minimal icon="arrow-left" onClick={()=>onPage("settings")}>{t("workspace.backSettings")}</Button><DomainRecords key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId} operationId={status?.request?.operation_id} onOpenCatalog={namespace=>{setCatalogNamespace(namespace);onPage("capabilities");}}/></> :
-    page==="resources" ? <ResourcesPage project={project} hosted={hosted} citation={citation} sourceData={sourceData} sourcesError={sources.error} sourcesDenied={sourcesDenied} onPage={onPage}/> :
-    <SettingsPage project={project} threadId={threadId} hosted={hosted} workspaceId={workspaceId} storageScope={storageScope} session={session} capturedEpoch={capturedEpoch} status={status} consent={consent} focusConsent={focusConsent} onConsentFocused={clearConsentFocus} onPage={onPage} onOpenCatalog={()=>{setCatalogNamespace("all");onPage("capabilities");}}/>}
+    page==="resources" ? <ResourcesPage project={project} hosted={hosted} citation={citation} sourceData={sourceData} sourcesError={sources.error} sourcesDenied={sourcesDenied} onPage={onPage} onOpenConsent={() => openSettings("consent")}/> :
+    <SettingsPages page={page} modelConnected={modelConnected} project={project} threadId={threadId} hosted={hosted} workspaceId={workspaceId} storageScope={storageScope} session={session} capturedEpoch={capturedEpoch} status={status} consent={consent} focusConsent={focusConsent} onConsentFocused={clearConsentFocus} onPage={onPage} onOpenCatalog={()=>{setCatalogNamespace("all");onPage("capabilities");}}/>}
   </WorkspaceContent>;
 }
 
@@ -198,6 +176,34 @@ export function ProjectLanding({ projects, loading = false, contextRestoreIssue 
     </section>
     <p className="muted">{t("workspace.noReplacement")}</p>
   </div>;
+}
+
+function currentThreadLabel(checking: boolean, threads: WorkThread[], threadId: string): string {
+  if (checking) return t("workspace.checkingTask");
+  return threadName(threads.find(item => item.thread_id === threadId)) || t("workspace.selectedTask");
+}
+
+/** The page when no project is open: the project list, or this computer's settings. */
+function NoProjectPage({ page, hosted, workspaceId, storageScope, consent, missingSelection, contextStoreFailed, landing }: {
+  page: Page; hosted: boolean; workspaceId: string | null; storageScope: BrowserScope; consent?: string;
+  missingSelection: "project" | "thread" | null; contextStoreFailed: boolean; landing: ReactNode;
+}) {
+  const body = () => {
+    if (page === "computer" && !hosted) return <ComputerSettingsPage credentialProjectId="system:workspace" workspaceId={workspaceId} storageScope={storageScope} consent={consent} />;
+    if (page === "settings" && hosted) {
+      return <>
+        <Callout icon="info-sign" title={t("workspace.chooseProjectNotice")}>{t("workspace.selectForInfo")}</Callout>
+        <LanguageSettingsCard scope={storageScope}/>
+      </>;
+    }
+    return landing;
+  };
+  return <WorkspaceContent>
+    {missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?t("workspace.missingProject"):t("workspace.taskSelectionNeeded")}{sentenceGap()}{t("workspace.draftNotSent")}</Callout>}
+    {contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">{t("workspace.locationFailure")}</Callout>}
+    {!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">{t("workspace.identityMissing")}</Callout>}
+    {body()}
+  </WorkspaceContent>;
 }
 
 /** What the project holds, from values the shell already reads: sessions from the thread list, sources from the shared sources read. */
@@ -236,6 +242,7 @@ export function LiveProjectWorkspace() {
   const visibleThreads = threadsQuery.isFetching ? [] : threads;
   const health = useQuery({queryKey:["health"],queryFn:async()=>{const response=await fetch("/healthz",{credentials:"same-origin"});if(!response.ok)throw new Error(`HTTP ${response.status}`);return await response.json() as {status:string;version:string};},retry:false,refetchInterval:30000});
   const shellSources = useProjectSources(project?.project_id ?? "", Boolean(project));
+  const drawer = useNavigationDrawer();
   const management = useProjectManagement({
     projects,
     threads,
@@ -249,15 +256,15 @@ export function LiveProjectWorkspace() {
   const executionReady = executionReadiness(ready, hosted);
   const sourceCount = project && shellSources.data ? connectedArtifacts(shellSources.data.value).length : null;
   return <WorkspacePageContext.Provider value={page}><main className="workstation conversation-workstation bp6-dark">
-    <aside className="navigation-rail">
+    <aside className="navigation-rail" {...drawer.railProps}>
       <Brand hosted={hosted} />
-      <Button icon="plus" intent="primary" className="new-project-button" onClick={()=>{chooseProject("");setOpenCreate(true);}}>{t("workspace.newProject")}</Button>
+      <Button icon="plus" intent="primary" className="new-project-button" onClick={drawer.closing(()=>{chooseProject("");setOpenCreate(true);})}>{t("workspace.newProject")}</Button>
       <InputGroup small leftIcon="search" aria-label={t("workspace.searchProjects")} placeholder={t("workspace.searchPlaceholder")} value={search} onChange={event=>setSearch(event.target.value)}/>
       <section className="nav-section"><div className="nav-section-heading"><p className="nav-label">{t("nav.projects")}</p><Button small minimal icon="refresh" aria-label={t("workspace.refreshProjects")} onClick={()=>void projectsQuery.refetch()}/></div>
         {visibleProjects.filter(item=>`${item.name} ${item.project_id}`.toLowerCase().includes(search.toLowerCase())).flatMap(item=>[
-          <ProjectNavItem project={item} active={item.project_id===context.projectId} removing={management.archiving} key={item.project_id} onOpen={()=>openProject(item.project_id)} onRename={()=>management.askRenameProject(item)} onRemove={()=>management.askArchive(item)}/>,
+          <ProjectNavItem project={item} active={item.project_id===context.projectId} removing={management.archiving} key={item.project_id} onOpen={drawer.closing(()=>openProject(item.project_id))} onRename={()=>management.askRenameProject(item)} onRemove={()=>management.askArchive(item)}/>,
           item.project_id===context.projectId ? <div className="project-sessions" key={`${item.project_id}-sessions`}>
-            <Button small minimal icon="plus" className="new-session-button" aria-label={t("workspace.newTask")} onClick={()=>chooseThread("")}>{t("workspace.newSession")}</Button>
+            <Button small minimal icon="plus" className="new-session-button" aria-label={t("workspace.newTask")} onClick={drawer.closing(()=>chooseThread(""))}>{t("workspace.newSession")}</Button>
             {threadsQuery.isPending&&<p className="empty-copy">{t("workspace.loadingSessions")}</p>}
             {threadsQuery.error&&<Callout compact intent="danger" role="alert">{threadsQuery.error.message}</Callout>}
             {visibleThreads.map(thread => (
@@ -265,7 +272,7 @@ export function LiveProjectWorkspace() {
                 thread={thread}
                 active={thread.thread_id === context.threadId}
                 key={thread.thread_id}
-                onOpen={() => chooseThread(thread.thread_id)}
+                onOpen={drawer.closing(() => chooseThread(thread.thread_id))}
                 onRename={() => management.askRenameThread(thread)}
               />
             ))}
@@ -274,22 +281,34 @@ export function LiveProjectWorkspace() {
         ])}
         {!projectsQuery.isPending&&!projectsQuery.error&&projects.length===0&&<p className="empty-copy">{t("workspace.noProjects")}</p>}<ArchivedProjects scopeKey={scopeKey} hosted={hosted} storageScope={storageScope} onDeleted={projectId=>{if(context.projectId===projectId)chooseProject("");}}/>
       </section>
-      <div className="sidebar-bottom"><Button minimal alignText="left" icon={hosted?"info-sign":"settings"} onClick={()=>setPage("settings")}>{hosted?t("workspace.operations"):t("workspace.settingsTools")}</Button></div>
+      <div className="sidebar-bottom"><Button minimal alignText="left" icon={hosted?"info-sign":"settings"} onClick={drawer.closing(()=>setPage(settingsPageFor(hosted)))}>{hosted?t("workspace.operations"):t("settings.computerTitle")}</Button></div>
     </aside>
-    <header className="workstation-topbar"><div className="context-path"><Icon icon="projects"/><span>{t("nav.workspaceRoot")}</span>{import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Tag intent="warning">{t("workspace.testMode")}</Tag>}<span>/</span><strong>{projectsQuery.isFetching?t("workspace.checkingProject"):project?.name??t("workspace.selectProject")}</strong>{context.threadId&&<><span>/</span><small>{threadsQuery.isFetching?t("workspace.checkingTask"):threadName(visibleThreads.find(item=>item.thread_id===context.threadId))||t("workspace.selectedTask")}</small></>}</div>
-      <div className="header-status">{project&&projectCutoffText(project.cutoff_at)&&<Tag minimal icon="time" title={t("workspace.cutoffHint")}>{message("cutoff", projectCutoffText(project.cutoff_at)!)}</Tag>}<Tag minimal intent={health.data?.status==="ok"?"success":health.error?"danger":"none"}>{health.data?.status==="ok"?t("workspace.serverConnected"):health.error?t("workspace.serverFailed"):t("workspace.checkingConnection")}</Tag>
-        {!hosted&&!executionReady&&<Button small intent="warning" className="setup-needed-button" icon="warning-sign" endIcon="arrow-right" title={t("workspace.openSetup")} onClick={()=>setPage("settings")}>{t("workspace.setupNeeded")}</Button>}
-        {!hosted&&contextStoreFailed&&<Tag minimal intent="warning">{t("workspace.locationUnsaved")}</Tag>}{missingSelection&&<Tag minimal intent="warning">{message("missingSelection", missingSelection)}</Tag>}<Button small minimal icon="refresh" aria-label={t("workspace.refreshContext")} onClick={()=>void client.invalidateQueries()}/></div></header>
+    {drawer.open && <div className="nav-drawer-backdrop" onClick={() => drawer.close()} />}
+    <WorkspaceTopbar
+      drawer={drawer}
+      testMode={import.meta.env.VITE_THOTH_TEST_MODE === "true"}
+      projectLabel={projectsQuery.isFetching ? t("workspace.checkingProject") : project?.name ?? t("workspace.selectProject")}
+      threadLabel={context.threadId ? currentThreadLabel(threadsQuery.isFetching, visibleThreads, context.threadId) : null}
+      cutoff={project ? projectCutoffText(project.cutoff_at) : null}
+      health={health.data?.status === "ok" ? "ok" : health.error ? "failed" : "checking"}
+      setupNeeded={!hosted && !executionReady}
+      locationUnsaved={!hosted && contextStoreFailed}
+      missingSelection={missingSelection}
+      onOpenSettings={() => setPage(settingsPageFor(hosted))}
+      onRefresh={() => void client.invalidateQueries()}
+    />
     <div className="workspace-navigation"><WorkspaceLocationNotice location={ready.workspace_location} /><Tabs id={WORKSPACE_TABS_ID} selectedTabId={page} onChange={value=>setPage(value as Page)}>
       <Tab id="research" title={t("workspace.conversation")}/><Tab id="resources" title={t("workspace.resources")} disabled={!project}/>
-      <Tab id="records" title={t("workspace.history")} disabled={!project}/><Tab id="trace" title={t("workspace.trace")} disabled={!project}/><Tab id="settings" title={t("workspace.settings")}/></Tabs>
+      <Tab id="records" title={t("workspace.history")} disabled={!project}/><Tab id="trace" title={t("workspace.trace")} disabled={!project}/><Tab id="settings" title={t("workspace.settings")} disabled={!project && !hosted}/></Tabs>
       {project&&<WorkspaceCounts sessions={threadsQuery.isPending ? null : threads.length} sources={sourceCount}/>}</div>
     {project ? <WorkspaceErrorBoundary resetKey={`${scopeKey}:${project.project_id}:${context.threadId}:${page}`} onRetry={()=>client.invalidateQueries()}><ProjectSession key={`${scopeKey}:${project.project_id}:${selectionVersion}`} project={project} threadId={context.threadId} epoch={epoch} page={page} onPage={setPage} hosted={hosted} workspaceId={workspaceId} browserScopeId={browserScopeId} executionReady={executionReady && !threadsQuery.error} consent={ready.setup?.internet_consent} modelConnected={ready.model_connected}
       readSuspended={readyQuery.isFetching || projectsQuery.isFetching || threadsQuery.isFetching} setupIssue={setupIssue}
       onUserInput={cancelOpenLatest} onAdmitted={admit}
       rowOrigin={rowOrigin} onOriginDone={clearRowOrigin} onInvestigate={investigate} traceFocus={traceFocus} onOpenTrace={openTraceRow}/></WorkspaceErrorBoundary> :
       isTimelineExampleRequested() && page === "research" ? <TimelineExamplePane /> :
-      <WorkspaceContent>{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?t("workspace.missingProject"):t("workspace.taskSelectionNeeded")}{sentenceGap()}{t("workspace.draftNotSent")}</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">{t("workspace.locationFailure")}</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">{t("workspace.identityMissing")}</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title={t("workspace.chooseProjectNotice")}>{t("workspace.selectForInfo")}</Callout>:<section className="detail-card"><h2>{t("workspace.connectModel")}</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">{t("workspace.selectForDefaults")}</p></section>}<LanguageSettingsCard scope={storageScope}/></>:<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</WorkspaceContent>}
+      <NoProjectPage page={page} hosted={hosted} workspaceId={workspaceId} storageScope={storageScope} consent={ready.setup?.internet_consent}
+        missingSelection={missingSelection} contextStoreFailed={contextStoreFailed}
+        landing={<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}/>}
     {management.dialog}
   </main></WorkspacePageContext.Provider>;
 }

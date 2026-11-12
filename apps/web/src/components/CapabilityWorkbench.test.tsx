@@ -99,8 +99,6 @@ it("successful file connect resets the native chooser and permits selecting the 
   Object.defineProperty(input,"files",{configurable:true,value:[file]});
   await act(async()=>{
     input.dispatchEvent(new Event("change",{bubbles:true}));
-    const visibility=container.querySelector<HTMLSelectElement>('[aria-label="자료 사용 범위"]')!;
-    visibility.value="PROJECT_SHARED";visibility.dispatchEvent(new Event("change",{bubbles:true}));
     const authority=container.querySelector<HTMLSelectElement>('[aria-label="자료 성격"]')!;
     authority.value="INFORMAL";authority.dispatchEvent(new Event("change",{bubbles:true}));
   });

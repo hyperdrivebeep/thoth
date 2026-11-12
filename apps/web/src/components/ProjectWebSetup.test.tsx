@@ -178,8 +178,11 @@ it("does not allow turning the web on without hosts, and still allows OFF after 
     },
   };
   await mount("p");
-  const checkbox = container.querySelector<HTMLInputElement>("input[type='checkbox']")!;
-  expect(checkbox.disabled).toBe(true);
+  // Nothing here can be used until the workspace allows the internet: the switch and the domain box are
+  // left out, and the screen says why.
+  expect(container.querySelector("input[type='checkbox']")).toBeNull();
+  expect(container.querySelector("input[type='text']")).toBeNull();
+  expect(container.textContent).toContain("이 작업 공간에서는 인터넷 사용을 허용하지 않았습니다.");
   fixture.projects = {
     p: {
       revision: 2,

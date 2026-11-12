@@ -36,7 +36,7 @@ counterReview: {
   ELIMINATED_WITHIN_SCOPE: "이 범위에서는 반박됨",
   UNRESOLVED_NO_RESULTS: "반대 근거 탐색에서 결과가 없어 미해결",
   UNRESOLVED_INDEPENDENCE: "찾은 근거가 독립적이지 않아 미해결",
-  UNRESOLVED_AUTHORITY: "찾은 근거의 권위를 확인하지 못해 미해결",
+  UNRESOLVED_AUTHORITY: "찾은 근거의 자료 성격을 확인하지 못해 미해결",
   UNRESOLVED_TEMPORAL: "찾은 근거의 시점이 맞지 않아 미해결",
   UNRESOLVED_PROHIBITED_CONTEXT: "사용이 금지된 맥락이라 미해결",
   UNRESOLVED_POLICY_BLOCKED: "정책상 탐색이 막혀 미해결",
@@ -71,7 +71,7 @@ actionFamilies: {
 },
 memoryExclusions: {
   PROJECT_MISMATCH: "다른 프로젝트의 기억", RESOURCE_ACCESS_DENIED: "접근 권한이 없음", AMBIGUOUS_OR_CONFLICTING: "근거가 모호하거나 충돌함",
-  AUTHORITY_INVALID: "출처 권위가 확인되지 않음", CUTOFF_INVALID: "기준시점이 맞지 않음", OWNER_REVISION_NOT_CURRENT: "원본이 바뀌어 다시 확인이 필요함",
+  AUTHORITY_INVALID: "자료 성격이 확인되지 않음", CUTOFF_INVALID: "기준시점이 맞지 않음", OWNER_REVISION_NOT_CURRENT: "원본이 바뀌어 다시 확인이 필요함",
   DEPENDENCY_REVIEW_REQUIRED: "근거가 바뀌어 재검토가 필요함", RECALL_INELIGIBLE: "다시 불러오지 않는 기억", ACTION_INELIGIBLE: "행동 계획에는 쓰지 않는 기억",
   SCOPE_MISMATCH: "이 작업 범위와 맞지 않음", QUERY_IRRELEVANT: "이번 질문과 관련이 낮음", NOT_CURRENT: "현재 버전이 아님",
   RECALL_CLASS_NOT_ACTIVE: "지금 쓰지 않는 종류", BUDGET: "분량 제한으로 제외",

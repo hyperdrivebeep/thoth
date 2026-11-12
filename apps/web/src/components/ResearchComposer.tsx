@@ -15,7 +15,7 @@ import type { useResearchSession } from "./useResearchSession";
 const BLOCKED_REASON_ID = "composer-blocked-reason";
 
 export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOpenSettings,hosted=false,executionReady=true,readSuspended=false,consentMissing=false,modelConnected,setupNoticeShown=false}: {
-  session:ReturnType<typeof useResearchSession>;projectId:string;threadId:string;epoch:number;onAttach:()=>void;onOpenSettings?:(target?:"consent")=>void;
+  session:ReturnType<typeof useResearchSession>;projectId:string;threadId:string;epoch:number;onAttach:()=>void;onOpenSettings?:(target?:"consent"|"project")=>void;
   hosted?:boolean;executionReady?:boolean;readSuspended?:boolean;consentMissing?:boolean;modelConnected?:boolean;
   /** The readiness card above already says what blocks a new run; do not repeat it here. */
   setupNoticeShown?:boolean;
@@ -74,7 +74,7 @@ export function ResearchComposer({session,projectId,threadId,epoch,onAttach,onOp
           threadId={threadId}
           epoch={epoch}
         />
-        {onOpenSettings && <Button minimal icon="settings" aria-label={t("workspace.settings")} title={t("workspace.settings")} onClick={()=>onOpenSettings()}/>}
+        {onOpenSettings && <Button minimal icon="settings" aria-label={t("settings.projectTitle")} title={t("settings.projectTitle")} onClick={()=>onOpenSettings("project")}/>}
         <SendButton
           followup={Boolean(threadId)}
           checkingOriginal={session.pendingRead.kind === "PENDING"}

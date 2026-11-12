@@ -372,7 +372,7 @@ export const activityMessages = {
     "en": "Citation or evidence changed"
   },
   "changeSummary.authority": {
-    "ko": "출처 권위 변경",
+    "ko": "자료 성격 변경",
     "en": "Source authority changed"
   },
   "changeSummary.time": {
@@ -384,7 +384,7 @@ export const activityMessages = {
     "en": "Changes in this version"
   },
   "changeSummary.notice": {
-    "ko": "숫자·부정·상태·인용·권위·시점이 바뀐 항목은 원문을 함께 보여 줍니다.",
+    "ko": "숫자·부정·상태·인용·자료 성격·시점이 바뀐 항목은 원문을 함께 보여 줍니다.",
     "en": "Original text is shown when numbers, negation, states, citations, authority, or timing changed."
   },
   "changeSummary.original": {
@@ -476,11 +476,11 @@ export const activityMessages = {
     "en": "Search passages"
   },
   "evidenceRail.authorityFilter": {
-    "ko": "근거 권위 필터",
+    "ko": "자료 성격으로 거르기",
     "en": "Evidence authority filter"
   },
   "evidenceRail.all": {
-    "ko": "모든 권위",
+    "ko": "모든 자료 성격",
     "en": "All authority levels"
   },
   "evidenceRail.official": {

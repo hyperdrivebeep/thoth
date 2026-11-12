@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { stageFile, type StagedFile } from "./files";
 import { setLocale } from "../i18n/locale";
+import { UploadRefused } from "./uploadTypes";
 
 type Progress = { phase: "uploading" | "processing"; loaded: number; total: number | null };
 type Options = { signal?: AbortSignal; onProgress?: (progress: Progress) => void };
@@ -18,6 +19,8 @@ class FakeXHR {
   ontimeout: null | (() => void) = null;
   status = 0;
   responseText = "";
+  responseHeaders: Record<string, string> = {};
+  getResponseHeader = (name: string) => this.responseHeaders[name.toLowerCase()] ?? null;
   timeout = 0;
   body: FormData | null = null;
   open = vi.fn();
@@ -162,6 +165,28 @@ it.each([[413, '{"detail":"server detail"}', "server detail"], [503, "not json",
     await expectNoUploadTimer();
   },
 );
+
+it("turns a refusal the server names by code into one that names the file, and keeps the old sentence otherwise", async () => {
+  const refused = start();
+  FakeXHR.instances[0].responseHeaders = { "x-thoth-upload-error": "UPLOAD_UNSUPPORTED_TYPE" };
+  FakeXHR.instances[0].complete(415, JSON.stringify({ detail: "unsupported research file type" }));
+  await refused.done;
+  expect(refused.result.error).toBeInstanceOf(UploadRefused);
+  expect(refused.result.error).toMatchObject({ code: "UPLOAD_UNSUPPORTED_TYPE", filename: "a.md" });
+  expect(refused.result.error?.message).toContain('"a.md" is not a file type that can be uploaded.');
+  setLocale("ko");
+  expect(refused.result.error?.message).toContain('"a.md" 파일은 올릴 수 없는 형식입니다.');
+  setLocale("en");
+  // A code this screen does not know, or no code: the server's own sentence, as before.
+  FakeXHR.instances = [];
+  const other = start();
+  FakeXHR.instances[0].responseHeaders = { "x-thoth-upload-error": "A_CODE_FROM_A_NEWER_SERVER" };
+  FakeXHR.instances[0].complete(409, JSON.stringify({ detail: "staged digest collision" }));
+  await other.done;
+  expect(other.result.error).not.toBeInstanceOf(UploadRefused);
+  expect(other.result.error?.message).toBe("staged digest collision");
+  await expectNoUploadTimer();
+});
 
 it("cleans up after malformed successful JSON", async () => {
   const { result, done } = start(); xhr().complete(200, "invalid json"); await done;

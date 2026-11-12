@@ -124,7 +124,7 @@ const projectEnabled = (id = "p1"): RetrievalExperimentRead => ({
 let root: Root, container: HTMLDivElement, client: QueryClient, server: FakeServer;
 const tick = (ms = 25) => new Promise(resolve => setTimeout(resolve, ms));
 const settle = async (ms?: number) => { await act(async () => { await tick(ms); }); };
-type Props = { workspaceId?: string; projectId?: string; hosted?: boolean; timeouts?: Partial<OperationTimeouts> };
+type Props = { workspaceId?: string; projectId?: string; hosted?: boolean; timeouts?: Partial<OperationTimeouts>; part?: "all" | "computer" | "project" };
 const body = () => container.textContent ?? "";
 /** Queries start in effects after the commit, so the initial reads are awaited outside the render act. */
 async function render({ workspaceId = "workspace:local", timeouts = FAST, ...rest }: Props = {}) {
@@ -723,4 +723,23 @@ describe("screen scope", () => {
     expect(operationState()).toBeNull();
     expect(isDisabled(button(ko("localRetrieval.prepareButton")))).toBe(false);
   });
+});
+
+it("shows the parts every project shares on the computer's screen and the index on the project's, with no control on both", async () => {
+  fixture.asset = assetMissing;
+  await render({ part: "computer" });
+  expect(container.querySelector("h2")!.textContent).toBe(ko("localRetrieval.title"));
+  expect(inputById("local-retrieval-source-path")).not.toBeNull();
+  expect(document.getElementById("local-retrieval-enable")).toBeNull();
+  expect(container.querySelector("h3")).toBeNull();
+  // Nothing about a project at all, not even "no project is selected".
+  expect(body()).not.toContain(ko("localRetrieval.noProject"));
+  expect(reads("project/retrieval/experiment/read")).toHaveLength(0);
+  await act(async () => root.unmount());
+  root = createRoot(container);
+  await render({ part: "project", projectId: "p1" });
+  expect(container.querySelector("h2")!.textContent).toBe(ko("localRetrieval.projectTitle"));
+  expect(document.getElementById("local-retrieval-enable")).not.toBeNull();
+  expect(inputById("local-retrieval-source-path")).toBeNull();
+  expect(body()).not.toContain(ko("localRetrieval.importTitle"));
 });

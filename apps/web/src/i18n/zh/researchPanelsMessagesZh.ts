@@ -75,7 +75,6 @@ export const researchPanelsZh: ColumnOf<typeof researchPanelsMessages> = {
   "memory.original": "原始版本",
   "memory.fingerprint": "记录指纹",
   "memory.notice": "记忆的调用取决于每个研究问题，不由此屏幕决定。更正会生成建议的新版本；原来的记忆仍保留在历史记录中。",
-  "historyWorkspace.intro": "查看问题、回答以及评估是如何变化的。",
   "historyWorkspace.checkpoints": "包含检查点",
   "historyWorkspace.reload": "重新加载",
   "historyWorkspace.cursorExpired": "无法再继续此页。请重新加载，从第一页开始。",
