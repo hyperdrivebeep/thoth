@@ -24,6 +24,7 @@ export const researchZh: ColumnOf<typeof researchMessages> = {
   "result.deadline": "已到调用期限",
   "result.responseTimeout": "响应超时",
   "result.cancelled": "研究已取消。不会自动重新开始。",
+  "result.userStopped": "你已手动停止。",
   "result.cancelUnknown": "当前记录中没有取消的原因。",
   "result.beforeCancel": "取消前已保存的发现",
   "result.noSavedAnswer": "此请求没有已保存的回答。",

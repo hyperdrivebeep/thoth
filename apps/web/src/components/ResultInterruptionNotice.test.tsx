@@ -232,3 +232,50 @@ it("has the retry-off sentence and button in every screen language", () => {
   }
   expect(seen.size).toBe(5);
 });
+
+/** A research run that ended CANCELLED, with the reason code the server recorded (none for an older record). */
+function cancelledNotice(code: string | null): string {
+  const view = interruptionView({
+    state: "CANCELLED",
+    result: null,
+    error: code === null ? null : { message: code, data: { reason_code: code } },
+  });
+  return renderToStaticMarkup(
+    <ResultInterruptionNotice
+      view={view}
+      result={null}
+      hasSavedResult={false}
+      onDetail={() => {}}
+    />,
+  );
+}
+
+it("says the person stopped it, in the five languages", () => {
+  const words = {
+    ko: "직접 중지했습니다.",
+    en: "You stopped it yourself.",
+    "zh-Hans": "你已手动停止。",
+    "zh-Hant": "你已手動停止。",
+    ja: "ご自身で停止しました。",
+  } as const;
+  for (const [locale, sentence] of Object.entries(words)) {
+    setLocale(locale as keyof typeof words);
+    const html = cancelledNotice("USER_STOPPED");
+    expect(html).toContain(sentence);
+    expect(html).not.toContain(t("result.cancelUnknown"));
+    expect(html).not.toContain("USER_STOPPED");
+  }
+});
+
+it("keeps today's sentence for a cancelled run with no reason on record", () => {
+  const html = cancelledNotice(null);
+  expect(html).toContain(t("result.cancelUnknown"));
+  expect(html).not.toContain("직접 중지했습니다.");
+});
+
+it("still shows another recorded reason as the recorded code, never as the person's stop", () => {
+  const html = cancelledNotice("RESEARCH_TIME_BUDGET_EXHAUSTED");
+  expect(html).toContain("RESEARCH_TIME_BUDGET_EXHAUSTED");
+  expect(html).not.toContain("직접 중지했습니다.");
+  expect(html).not.toContain(t("result.cancelUnknown"));
+});

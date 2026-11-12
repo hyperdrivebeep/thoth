@@ -221,13 +221,9 @@ function SavedTurnCard({
 }) {
   const requestDigest = turn.input.request_revision_digest;
   const earlier = isEarlierRound(liveStatus, requestDigest);
-  // The server sends the usage of the latest result and of the request now running only. An earlier round has
-  // none here, which is not the same as "no usage recorded": its line is left out (the conversation's total is
-  // under the question box).
-  const usageLine =
-    earlier && !liveStatus?.result_usage?.[turn.input.operation_id]
-      ? undefined
-      : resultUsageLine(liveStatus, turn.input.operation_id);
+  // The server sends the usage of every round that recorded a call, the earlier ones included. A round with none says
+  // so; it is no longer left out.
+  const usageLine = resultUsageLine(liveStatus, turn.input.operation_id);
   return (
     <ResearchResultCard
       {...retry}

@@ -164,8 +164,11 @@ are not imported. A configured connection and a successful provider response are
 
 The Codex CLI and Claude Code are helper programs. When one is missing, its card offers an automatic
 install (Node.js required) into `%LOCALAPPDATA%\THOTH\tools\codex` or `...\claude-code`. It installs one
-pinned version, checks it, and never touches a global install or another program's login. The
-manual commands below do the same thing.
+pinned version with `npm --ignore-scripts` (no install script of the package or its dependencies runs),
+checks the integrity npm recorded against the values pinned in THOTH, and never touches a global
+install or another program's login. For Claude Code, THOTH then copies the platform package's
+`claude.exe` over the `bin\claude.exe` placeholder itself, only when both integrity values match;
+otherwise the install fails and nothing is copied.
 
 For Codex, use THOTH's connection action. A started login is not a completed login; refresh the
 connection status after finishing in the browser. Missing CLI, unsupported version, missing login,
@@ -199,7 +202,7 @@ Use a separate tool directory so installing it does not replace your global CLI 
 
 ```powershell
 $thothCodexPrefix = Join-Path $env:LOCALAPPDATA 'THOTH\tools\codex'
-npm.cmd install --prefix $thothCodexPrefix --install-strategy=nested --save-exact @openai/codex@0.157.1
+npm.cmd install --prefix $thothCodexPrefix --install-strategy=nested --save-exact --ignore-scripts @openai/codex@0.157.1
 $env:THOTH_CODEX_PACKAGE_ROOT = Join-Path $thothCodexPrefix 'node_modules\@openai\codex'
 .\.venv\Scripts\python.exe -m thoth.cli serve --port 8765
 ```
@@ -224,7 +227,9 @@ native version check passed; product authentication and integrated acceptance ar
 THOTH looks for Claude Code in its own tools folder first, then `claude` on PATH (an npm shim is
 followed to its native `claude.exe`), then the official installer folder. A global Claude Code that
 other programs use therefore never overrides the copy THOTH installed. To install a THOTH-only copy
-without changing that global one:
+without changing that global one, use the install button on the Claude card. A manual install needs
+the package's own install script, because `--ignore-scripts` leaves a 500-byte placeholder in
+`bin\claude.exe`; running it trusts that script:
 
 ```powershell
 $thothClaudePrefix = Join-Path $env:LOCALAPPDATA 'THOTH\tools\claude-code'

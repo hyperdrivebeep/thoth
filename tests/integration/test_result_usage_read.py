@@ -65,9 +65,14 @@ async def test_thread_read_reports_the_current_results_own_usage(tmp_path: Path)
             )
         )
         usage = cast(dict[str, dict[str, object]], read["result_usage"])
-        assert second_op in usage and first_op not in usage
-        # the thread-wide total still covers both operations; the per-result entry only its own
+        # each round has its own entry; the thread-wide total covers both, an entry only its own
+        assert second_op in usage and first_op in usage
         thread_calls = cast(dict[str, int], read["usage"])["model_transports"]
         assert cast(int, usage[second_op]["calls"]) < thread_calls
+        assert cast(int, usage[first_op]["calls"]) < thread_calls
+        assert (
+            cast(int, usage[first_op]["calls"]) + cast(int, usage[second_op]["calls"])
+            == thread_calls
+        )
     finally:
         runtime.close()

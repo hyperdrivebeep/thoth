@@ -38,12 +38,18 @@ def read_thread_usage(
             quota if quota is not None else provider_usage.read_snapshot(project_id, thread_id)
         ).model_dump(mode="json"),
     )
-    # Per-result usage, computed from this read's dispatches: the result's own operation and the
-    # one currently requested. A result without recorded calls simply has no entry.
+    # Per-result usage, computed from this read's dispatches: the result's own operation, the one
+    # currently requested, then every earlier round that recorded a call (they are already read:
+    # the dispatches of the whole thread are loaded for the thread totals above). A round without
+    # recorded calls simply has no entry.
     result_usage: dict[str, JsonValue] = {}
     for usage_op in dict.fromkeys(
         op_id
-        for op_id in (None if manifest is None else manifest.operation_id, request.operation_id)
+        for op_id in (
+            None if manifest is None else manifest.operation_id,
+            request.operation_id,
+            *(d.operation_id for d in dispatches if d.thread_id == thread_id),
+        )
         if op_id
     ):
         usage_record = operations.read(usage_op)

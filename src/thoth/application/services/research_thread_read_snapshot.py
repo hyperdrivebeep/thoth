@@ -32,6 +32,7 @@ from thoth.domain.research_request import (
     ThreadRequestRevision,
     decode_thread_request,
 )
+from thoth.domain.research_stop import ResearchStopNote, stop_note_key
 from thoth.ports.source_version_catalog import SourceVersionCatalogPort
 
 if TYPE_CHECKING:
@@ -51,6 +52,7 @@ class ResearchThreadReadSnapshot:
     dispatches: tuple[ModelDispatchRecord, ...]
     activity_source_context: dict[str, dict[str, object]]
     operation: OperationRecord | None
+    stop_note: ResearchStopNote | None = None
 
 
 def read_research_snapshot(
@@ -143,6 +145,9 @@ def read_research_snapshot(
         currentness = boundary_currentness(currentness, fresh)
         fresh = fresh and currentness.state == "CURRENT"
         budget = host.records.journal_read(project_id, f"budget:{thread_id}", ResearchBudget)
+        stop_note = host.records.journal_read(
+            project_id, stop_note_key(request.operation_id), ResearchStopNote
+        )
         dispatches: list[ModelDispatchRecord] = []
         try:
             listed = host.records.controls.list(
@@ -187,4 +192,5 @@ def read_research_snapshot(
         dispatches=tuple(dispatches),
         activity_source_context=activity_source_context,
         operation=op,
+        stop_note=stop_note,
     )

@@ -11,6 +11,14 @@ import type { InterruptionView } from "./resultInterruption";
 const AUTH_LIKE =
   /AUTH_REQUIRED|OAUTH_REQUEST_REJECTED|MODEL_NOT_SUPPORTED|CLAUDE_CODE_LOGIN_REQUIRED/;
 const TIME_LIKE = /TIME_BUDGET|DEADLINE/;
+/** What the server records when the person pressed stop. */
+const USER_STOPPED = "USER_STOPPED";
+
+/** Why a cancelled run ended: the person's own stop, a recorded reason, or none on record. */
+function cancelReasonText(code: string): string {
+  if (code === USER_STOPPED) return t("result.userStopped");
+  return code ? message("terminationReason", code) : t("result.cancelUnknown");
+}
 
 /** The sentences that explain an interrupted run, in display order; each is shown only when its code matches. */
 function interruptionReasons({
@@ -139,7 +147,7 @@ export function ResultInterruptionNotice({
     return (
       <div className="result-notice" role="alert">
         <p>{t("result.cancelled")}</p>
-        <p>{view.code ? message("terminationReason", view.code) : t("result.cancelUnknown")}</p>
+        <p>{cancelReasonText(view.code)}</p>
         {view.content ? (
           <strong>{t("result.beforeCancel")}</strong>
         ) : (

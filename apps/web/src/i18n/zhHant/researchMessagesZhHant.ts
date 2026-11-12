@@ -24,6 +24,7 @@ export const researchZhHant: ColumnOf<typeof researchMessages> = {
   "result.deadline": "已到呼叫期限",
   "result.responseTimeout": "回應超時",
   "result.cancelled": "研究已取消。不會自動重新開始。",
+  "result.userStopped": "你已手動停止。",
   "result.cancelUnknown": "目前記錄中沒有取消的原因。",
   "result.beforeCancel": "取消前已儲存的發現",
   "result.noSavedAnswer": "此請求沒有已儲存的回答。",
