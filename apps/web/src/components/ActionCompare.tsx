@@ -50,7 +50,7 @@ export function ActionCompare({ result, projectId, links, discrimination }: {
   const evaluations = objectList(analysis.evaluations);
   const extra = [...actions.flatMap(action => stringValues(action.source_refs)), ...evaluations.flatMap(item => stringValues(item.evidence_refs))];
   const numbers = numberSources(typeof result.answer === "string" ? result.answer : "", extra);
-  const cite = (refs: string[]) => refs.map(ref => <span className="source-number" key={ref} title={ref}>[{numbers.get(ref)}]</span>);
+  const cite = (refs: string[]) => refs.map(ref => <span className="source-number" key={ref}>[{numbers.get(ref)}]</span>);
   if (actions.length === 0) return <p>{t("actions.empty")}</p>;
   const againstNote = (action: Record<string, unknown>) =>
     standingActionNote([...stringValues(action.hypothesis_ids), ...stringValues(action.hypothesis_refs)], discrimination);

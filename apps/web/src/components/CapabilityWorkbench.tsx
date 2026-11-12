@@ -1,12 +1,12 @@
 import { message as formatMessage } from "../i18n/formatMessages";
 import { t } from "../i18n/locale";
-import { Button, Callout, Checkbox, HTMLSelect, InputGroup, Tag, TextArea } from "@blueprintjs/core";
+import { Button, Callout, Checkbox, InputGroup, Tag, TextArea } from "@blueprintjs/core";
+import { Select } from "./Select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDeferredValue, useState } from "react";
 import { capabilityCatalog, filterCapabilities, namespaceLabels, namespaces, parseInvocation, transportFor, type Capability } from "../api/capabilities";
 import { rpc, RpcError } from "../api/rpcClient";
 import { RecordInspector } from "./RecordInspector";
-import { eyebrowLabel } from "./statusLabels";
 
 function MethodDetail({ method, projectId, threadId }: { method: Capability; projectId: string; threadId?: string }) {
   const client = useQueryClient();
@@ -66,11 +66,11 @@ export function CapabilityWorkbench({ projectId, threadId, initialNamespace = "a
   );
   const method = methods.find(item => item.name === selected) ?? methods[0];
   return <section className="capability-workbench">
-    <header className="workspace-heading"><div><p className="eyebrow">{eyebrowLabel("CAPABILITY WORKBENCH")}</p><h1>{t("advanced.title")}</h1><p>{t("advanced.intro")}</p></div>
+    <header className="workspace-heading"><div><h1>{t("advanced.title")}</h1><p>{t("advanced.intro")}</p></div>
       <Tag minimal>{capabilityCatalog.canonical_method_count} canonical + {capabilityCatalog.compatibility_alias_count} aliases</Tag></header>
     <div className="catalog-toolbar"><InputGroup leftIcon="search" aria-label={t("advanced.search")} placeholder={t("advanced.searchPlaceholder")} value={search} onChange={event => setSearch(event.target.value)} />
-      <HTMLSelect aria-label={t("advanced.namespace")} value={namespace} onChange={event => setNamespace(event.target.value)} options={[{value:"all", label:formatMessage("namespaceCount", visibleNamespaces.length)}, ...visibleNamespaces.map(value => ({value, label:`${value} · ${namespaceLabels[value] ?? value}`}))]} />
-      <HTMLSelect aria-label={t("advanced.kind")} value={surface} onChange={event => setSurface(event.target.value)} options={[{value:"all",get label() { return t("advanced.allKinds"); }},{value:"QUERY",get label() { return t("advanced.queryKind"); }},{value:"COMMAND",get label() { return t("advanced.commandKind"); }},{value:"QUERY_OR_CONTROL",get label() { return t("advanced.compatibility"); }}]} /></div>
+      <Select aria-label={t("advanced.namespace")} value={namespace} onChange={event => setNamespace(event.target.value)} options={[{value:"all", label:formatMessage("namespaceCount", visibleNamespaces.length)}, ...visibleNamespaces.map(value => ({value, label:`${value} · ${namespaceLabels[value] ?? value}`}))]} />
+      <Select aria-label={t("advanced.kind")} value={surface} onChange={event => setSurface(event.target.value)} options={[{value:"all",get label() { return t("advanced.allKinds"); }},{value:"QUERY",get label() { return t("advanced.queryKind"); }},{value:"COMMAND",get label() { return t("advanced.commandKind"); }},{value:"QUERY_OR_CONTROL",get label() { return t("advanced.compatibility"); }}]} /></div>
     <div className="catalog-layout"><div className="method-list" role="group" aria-label={t("advanced.list")}><div className="catalog-count">{methods.length} visible methods</div>
       {methods.length === 0 && <p className="empty-copy">{t("advanced.noMatch")}</p>}
       {methods.map(item => <Button alignText="left" minimal active={method?.name === item.name} key={item.name} onClick={() => setSelected(item.name)} className="method-item">

@@ -6,7 +6,6 @@ export const sourceJa: ColumnOf<typeof sourceMessages> = {
   "sources.fileUploadCancel": "アップロードをキャンセル",
   "sources.fileUploadCancelled": "アップロードをキャンセルしました。資料は接続されていません。",
   "sources.fileTitle": "資料ファイルを接続",
-  "sources.preserve": "元の文章、バージョン、位置を保持します",
   "sources.fileTypes": "HWPX、PDF、DOCX、XLSX、CSV、JSON、MD、TXT、YAML、HTML のファイルをアップロードし、その権威性と利用範囲を記録します。",
   "sources.hostedUpload": "アップロードしたファイルは、このレビュー用プロジェクトで使われます。",
   "sources.localUpload": "ファイルはこのコンピューターの THOTH ワークスペースに一時的に置かれます。",

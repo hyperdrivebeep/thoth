@@ -61,6 +61,10 @@ it("shows numbered citations and bold text instead of internal ids and asterisks
   expect(node.querySelector(".answer-text p:not(.answer-lead) strong")?.textContent).toContain("1세부");
   const first = cites()[0];
   expect(first.textContent).toBe("[1]");
+  // Neither the tooltip nor the name read aloud carries the range id; both say what the button does.
+  expect(first.title).toBe("근거 1 보기");
+  expect(first.getAttribute("aria-label")).toBe("근거 1 보기");
+  expect([...node.querySelectorAll("[title], [aria-label]")].filter(element => /span:/.test((element.getAttribute("title") ?? "") + (element.getAttribute("aria-label") ?? "")))).toEqual([]);
   await act(async () => first.click());
   expect(opened).toHaveLength(1);
   expect(opened[0].kind).toBe("evidence");

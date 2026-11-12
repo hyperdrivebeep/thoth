@@ -77,4 +77,3 @@ export function ProjectForm({ onCreated }: { onCreated: (projectId: string) => v
     </div>
   );
 }
-

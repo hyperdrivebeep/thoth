@@ -1,7 +1,8 @@
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
 import { joinSentences, sentenceGap } from "../i18n/sentences";
-import { Button, HTMLSelect } from "@blueprintjs/core";
+import { Button } from "@blueprintjs/core";
+import { Select } from "./Select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { rpc } from "../api/rpcClient";
@@ -135,16 +136,16 @@ export function ModelSettings({ projectId, threadId, selection, onSelect, onSave
       : inherited.error ? <small role="alert">{t("model.parentFailed")}</small>
         : <small>{message("inheritedSelection", inheritedLabel ?? t("model.noProjectModel"))}</small>)}
     {inheritsProject && data?.availability !== "UNAVAILABLE" && <small>{t("model.inheritsProject")}</small>}
-    <label><span className="model-control-label">{t("model.modelLabel")}</span> <HTMLSelect key={`${scopeIdentity}:${query.dataUpdatedAt}`} aria-label={t("model.researchModel")} title={optionTitle(option, providerLabel)} disabled={!data} value={option ? `${option.provider}/${option.model}` : ""}
+    <label><span className="model-control-label">{t("model.modelLabel")}</span> <Select key={`${scopeIdentity}:${query.dataUpdatedAt}`} aria-label={t("model.researchModel")} title={optionTitle(option, providerLabel)} disabled={!data} value={option ? `${option.provider}/${option.model}` : ""}
       onChange={event => {
         const next = data?.model_options.find(o => `${o.provider}/${o.model}` === event.target.value);
         if (next) choose({ provider: next.provider, model: next.model,
           ...(data?.availability !== "UNAVAILABLE" && next.default_effort ? { reasoning_effort: next.default_effort } : {}) });
       }}><option value="">{t("model.choose")}</option>{data?.model_options.map(o =>
-        <option key={`${o.provider}/${o.model}`} value={`${o.provider}/${o.model}`}>{optionText(o, providerLabel(o.provider))}</option>)}</HTMLSelect></label>
-    <label><span className="model-control-label">{t("model.effortLabel")}</span> <HTMLSelect aria-label={t("model.reasoningEffort")} disabled={!option} value={current?.reasoning_effort ?? ""}
+        <option key={`${o.provider}/${o.model}`} value={`${o.provider}/${o.model}`}>{optionText(o, providerLabel(o.provider))}</option>)}</Select></label>
+    <label><span className="model-control-label">{t("model.effortLabel")}</span> <Select aria-label={t("model.reasoningEffort")} disabled={!option} value={current?.reasoning_effort ?? ""}
       onChange={event => { if (current) choose({ ...current, reasoning_effort: event.target.value }); }}>
-      <option value="">{t("model.default")}</option>{option?.reasoning_efforts.map(e => <option key={e} value={e}>{e}</option>)}</HTMLSelect></label>
+      <option value="">{t("model.default")}</option>{option?.reasoning_efforts.map(e => <option key={e} value={e}>{e}</option>)}</Select></label>
     {!compact && <Button className="model-defaults" small minimal icon="floppy-disk" disabled={!current || !option || !validEffort || !explicitlyChosen || !data || save.isPending} loading={save.isPending} onClick={() => {
       if (current && option && validEffort && explicitlyChosen && data) save.mutate({scope, selection: current, digest: data.settings_digest, key, onSaved});
     }}>

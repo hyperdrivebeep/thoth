@@ -45,7 +45,7 @@ export function ConfirmedFacts({ result, onCite, heading = t("facts.title"), onl
       : findings.length === 0 ? <p className="muted">{t("facts.empty")}</p>
         : <ul>{findings.map((item, index) => <li key={index}>
           {item.negative && <Tag minimal>{t("facts.notFound")}</Tag>} {item.statement}{" "}
-          {item.refs.map(ref => <button key={ref} type="button" className="answer-citation" title={ref} aria-label={formatMessage("evidenceButton", numbers.get(ref) ?? "?")}
+          {item.refs.map(ref => <button key={ref} type="button" className="answer-citation" title={formatMessage("evidenceButton", numbers.get(ref) ?? "?")} aria-label={formatMessage("evidenceButton", numbers.get(ref) ?? "?")}
             onClick={() => onCite(ref, numberMap)}>[{numbers.get(ref)}]</button>)}
         </li>)}</ul>}
     {dropped > 0 && <small className="muted">{formatMessage("excludedFacts", dropped)}</small>}

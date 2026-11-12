@@ -72,8 +72,6 @@ export const workspaceZh: ColumnOf<typeof workspaceMessages> = {
   "workspace.contextCorrupt": "无法读取上一次的工作区位置。原始记录没有被删除。",
   "workspace.contextUnavailable": "无法在此浏览器中读取上一次的工作区位置。请检查存储访问权限和工作区标识。",
   "workspace.backProjects": "返回项目选择",
-  "workspace.openOrCreate": "打开已有的项目以继续，或创建新的研究上下文。",
-  "workspace.continueProject": "要继续的项目",
   "workspace.projects": "项目",
   "workspace.loadingProjects": "正在加载项目…",
   "workspace.openProject": "打开项目",

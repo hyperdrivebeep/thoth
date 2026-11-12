@@ -33,7 +33,7 @@ import { ResultHoldDetails } from "./ResultHoldDetails";
  * One research result, read top to bottom: state tags next to the heading, the answer, the detail buttons, then why
  * the answer is in that state (folding), the alternative explanations and the next actions.
  */
-export function ResearchResultCard({ result, state, unavailable, error, failure, terminalReason, onDetail, onRetry, onResume, resumeCompleted, resuming, historySelection, currentness, progressSummary, coverageMatrix, nextUserAction, decisionDelta, usageLine, executionHold, projectId, holdCauseRef, onOpenTrace, hypothesisLinks, linkDistribution, hasSavedResult = false, autoRetryOff, onOpenSettings }: {
+export function ResearchResultCard({ result, state, unavailable, error, failure, terminalReason, onDetail, onRetry, onResume, resumeCompleted, resuming, historySelection, currentness, progressSummary, coverageMatrix, nextUserAction, decisionDelta, usageLine, executionHold, projectId, holdCauseRef, onOpenTrace, hypothesisLinks, linkDistribution, hasSavedResult = false, autoRetryOff, onOpenSettings, earlierRound }: {
   result: Record<string, unknown> | null; state: string; unavailable?: string; error?:ExecutionError | null; failure?:ResearchFailure | null; terminalReason?:string | null; onDetail: (detail: ResearchDetail) => void; onRetry?: () => void;
   /** Continue the interrupted run from where it stopped; only offered with the number of stages it had finished. */
   onResume?: () => void; resumeCompleted?: number; resuming?: boolean; historySelection?: HistorySelection; currentness?: Currentness;
@@ -47,6 +47,8 @@ export function ResearchResultCard({ result, state, unavailable, error, failure,
   hasSavedResult?: boolean;
   /** The project's automatic retry of an interrupted model call is off (read by the timeline, which has the query client). */
   autoRetryOff?: boolean; onOpenSettings?: () => void;
+  /** A saved round before the latest one. */
+  earlierRound?: boolean;
 }) {
   useTranslation();
   const languageCheck = objectValue(result?.hypothesis_language_check);
@@ -80,7 +82,7 @@ export function ResearchResultCard({ result, state, unavailable, error, failure,
         ] as const).map(([kind,label])=><Button small minimal key={kind} onClick={()=>onDetail({kind,result,historySelection})}>{label}</Button>)}</div></Disclosure>
       </nav>
       {executionHold && projectId && <ExecutionHoldNotice hold={executionHold} projectId={projectId} causeRef={holdCauseRef ?? "hold:" + (executionHold.plan_execution_id ?? "none")} onCleared={onRetry}/>}
-      <ResultHoldDetails result={result} historySelection={historySelection} coverageMatrix={coverageMatrix} progressSummary={progressSummary} nextUserAction={nextUserAction} decisionDelta={decisionDelta} onDetail={onDetail}/>
+      <ResultHoldDetails result={result} historySelection={historySelection} coverageMatrix={coverageMatrix} progressSummary={progressSummary} nextUserAction={nextUserAction} decisionDelta={decisionDelta} earlierRound={earlierRound} onDetail={onDetail}/>
       {Object.hasOwn(objectValue(result.portfolio), "hypotheses") && <section className="conversation-findings"><h3>{t("result.alternatives")}</h3>
         {causeUnconfirmed(result) && <CauseUnconfirmed/>}
         {hypotheses.length ? hypotheses.map((h,index)=><div key={textValue(h.hypothesis_id)||index}><p>{textValue(h.statement)}</p>{textValue(h.uncertainty)&&<small>{textValue(h.uncertainty)}</small>}{projectId&&<HypothesisLinkNotice projectId={projectId} link={hypothesisLinks?.find(item=>item.hypothesis_id===textValue(h.hypothesis_id))} all={hypothesisLinks} distribution={linkDistribution}/>}</div>) : <p>{t("result.noHypotheses")}</p>}

@@ -29,7 +29,7 @@ const formats = {
   detachedSources: { ko: (count: number) => `연결을 해제한 자료 ${count}개`, en: (count: number) => `${count} disconnected ${count === 1 ? "source" : "sources"}`, "zh-Hans": (count: number) => `已断开连接的资料 ${count} 个`, "zh-Hant": (count: number) => `已中斷連線的資料 ${count} 個`, ja: (count: number) => `接続を解除した資料 ${count} 件` },
   projectMenu: { ko: (name: string) => `${name} 프로젝트 메뉴`, en: (name: string) => `Project menu for ${name}`, "zh-Hans": (name: string)=>`${name} 的项目菜单`, "zh-Hant": (name: string)=>`${name} 的專案選單`, ja: (name: string)=>`${name} のプロジェクトメニュー` },
   archiveProject: {
-    ko: (name: string) => `프로젝트 "${name}"을 보관할까요? 보관하면 읽기 전용이 되고 목록에서 숨겨집니다. 보관은 되돌릴 수 있습니다. '보관한 프로젝트 보기'에서 되살립니다.`,
+    ko: (name: string) => `"${name}" 프로젝트를 보관할까요? 보관하면 읽기 전용이 되고 목록에서 숨겨집니다. 보관은 되돌릴 수 있습니다. '보관한 프로젝트 보기'에서 되살립니다.`,
     en: (name: string) => `Archive project "${name}"? It becomes read-only and is hidden from the list. You can restore it from archived projects.`, "zh-Hans": (name: string)=>`要归档项目“${name}”吗？归档后它将变为只读，并从列表中隐藏。你可以在“已归档的项目”中将其恢复。`, "zh-Hant": (name: string)=>`要歸檔專案“${name}”嗎？歸檔後它將變為唯讀，並從列表中隱藏。你可以在“已歸檔的專案”中將其還原。`, ja: (name: string)=>`プロジェクト「${name}」をアーカイブしますか？アーカイブすると読み取り専用になり、一覧から非表示になります。「アーカイブ済みのプロジェクトを見る」から復元できます。`,
   },
   cutoff: { ko: (value: string | null) => `기준시점 ${value}`, en: (value: string | null) => `Cutoff ${value}`, "zh-Hans": (value: string | null)=>`截止时间 ${value}`, "zh-Hant": (value: string | null)=>`截止時間 ${value}`, ja: (value: string | null)=>`基準時点 ${value}` },

@@ -2,11 +2,11 @@ import { message as formatMessage } from "../i18n/formatMessages";
 import { DetachedSourcesContext } from "./detachedSources";
 import { t, localeTag } from "../i18n/locale";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Callout, HTMLSelect, InputGroup } from "@blueprintjs/core";
+import { Callout, InputGroup } from "@blueprintjs/core";
+import { Select } from "./Select";
 
 import type { EvidenceSpan } from "../types";
 import { StatusBadge } from "./StatusBadge";
-import { eyebrowLabel } from "./statusLabels";
 
 function locator(span: EvidenceSpan) {
   const values = [
@@ -64,7 +64,6 @@ export function EvidenceRail({
     <aside className="evidence-rail" aria-label={t("evidenceRail.title")}>
       <div className="panel-heading">
         <div>
-          <p className="eyebrow">{eyebrowLabel("EVIDENCE")}</p>
           <h2>{loading ? t("evidenceRail.loading") : error ? t("evidenceRail.failed") : heading ?? formatMessage("activeEvidence", evidence.length)}</h2>
           {totalCount > evidence.length && <span>{formatMessage("evidenceTotal", totalCount.toLocaleString(localeTag()))}</span>}
         </div>
@@ -78,7 +77,7 @@ export function EvidenceRail({
             placeholder={t("evidenceRail.searchText")}
             value={query}
           />
-          <HTMLSelect
+          <Select
             aria-label={t("evidenceRail.authorityFilter")}
             onChange={(event) => setAuthority(event.target.value)}
             value={authority}
@@ -88,7 +87,7 @@ export function EvidenceRail({
             <option value="OFFICIAL">{t("evidenceRail.official")}</option>
             <option value="INFORMAL">{t("evidenceRail.informal")}</option>
             <option value="UNCLASSIFIED">{t("evidenceRail.unclassified")}</option>
-          </HTMLSelect>
+          </Select>
         </div>
       )}
       <div className="evidence-list" ref={listRef}>

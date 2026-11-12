@@ -34,4 +34,3 @@ it("sets no font size in a component's own style", () => {
   const found = files(SOURCE, ".tsx").filter(path => /fontSize\s*:/.test(readFileSync(path, "utf8")));
   expect(found).toEqual([]);
 });
-

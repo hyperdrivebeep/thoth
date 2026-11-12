@@ -53,9 +53,7 @@ providers: {
   "claude-code": "Claude Code 계정", openai: "OpenAI API 키", anthropic: "Anthropic API 키", xai: "xAI API 키",
 },
 eyebrows: {
-  EVIDENCE: "근거", "AUTHORIZED SOURCES": "허용된 자료", "RESEARCH HISTORY": "연구 이력",
-  "RESEARCH WORKSPACE": "연구 작업 공간", "LOCAL WORKSPACE": "이 컴퓨터", "REVIEW WORKSPACE": "심사 작업 공간",
-  "CAPABILITY WORKBENCH": "기능 탐색", "CANONICAL RECORDS": "저장된 기록",
+  "LOCAL WORKSPACE": "이 컴퓨터", "REVIEW WORKSPACE": "심사 작업 공간",
 },
 reversibility: { FULL: "되돌릴 수 있음", PARTIAL: "일부만 되돌릴 수 있음", NONE: "되돌릴 수 없음" },
 actionState: { APPROVED: "승인됨", PARTIAL: "일부만 실행됨", SUCCEEDED: "완료", FAILED: "실패", CANCELLED: "취소됨" },

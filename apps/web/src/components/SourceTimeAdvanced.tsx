@@ -1,5 +1,6 @@
 import { t } from "../i18n/locale";
-import { Button, Callout, Collapse, HTMLSelect } from "@blueprintjs/core";
+import { Button, Callout, Collapse } from "@blueprintjs/core";
+import { Select } from "./Select";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { cutoffOptions } from "../api/sourcePolicy";
@@ -20,7 +21,7 @@ export function SourceTimeAdvanced({projectId, artifactId, assessment, cutoff}:{
     <Collapse isOpen={open}><div className="source-time-advanced-body">
       <p>{t("labels.classification")}{" "}{cutoffLabel(assessment.cutoff_state)}</p>
       <p>{t("labels.assessmentReason")}{" "}{assessment.reason_code} · {assessment.mode}</p>
-      <HTMLSelect aria-label={t("sourceTime.state")} value={assessment.cutoff_state} options={cutoffOptions} disabled />
+      <Select aria-label={t("sourceTime.state")} value={assessment.cutoff_state} options={cutoffOptions} disabled />
       <p className="muted">{t("sourceTime.notice")}</p>
       {assessment.cutoff_state !== "PROHIBITED_CONTEXT" && <>
         <Button small onClick={async ()=>{ try { await correctSourceTime({project_id:projectId, artifact_id:artifactId, source_version_id:assessment.source_version_id, byte_sha256:assessment.byte_sha256, expected_project_revision:cutoff.project_revision, expected_cutoff_at:cutoff.cutoff_at, expected_assessment_revision:assessment.revision, expected_metadata_digest:assessment.metadata_digest ?? assessment.assessment_digest, assertion:"ON_OR_BEFORE_CUTOFF", correction_reason:reason}); } catch(err){ setError(err instanceof Error?err.message:String(err)); } }}>{t("sourceTime.eligible")}</Button>

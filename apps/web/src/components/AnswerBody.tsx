@@ -15,7 +15,7 @@ export function AnswerBody({ answer, onCite, language }: {
   const render = (items: Inline[]) => items.map((item, index) => {
     const body = item.kind === "text"
       ? item.text
-      : <button type="button" className="answer-citation" title={item.spanId} aria-label={message("evidenceButton", item.n)} onClick={() => onCite(item.spanId, numbers)}>[{item.n}]</button>;
+      : <button type="button" className="answer-citation" title={message("evidenceButton", item.n)} aria-label={message("evidenceButton", item.n)} onClick={() => onCite(item.spanId, numbers)}>[{item.n}]</button>;
     return <Fragment key={index}>{item.bold ? <strong>{body}</strong> : body}</Fragment>;
   });
   return <div className="answer-text" lang={language ?? undefined}>

@@ -20,9 +20,11 @@ import type { ResearchDetail } from "./ResearchResultCard";
  * check, and one folded block of technical details for all of it. One folding block under the answer; the
  * header tags keep the status and the counts visible when it is folded, so they are not repeated inside.
  */
-export function ResultHoldDetails({ result, historySelection, coverageMatrix, progressSummary, nextUserAction, decisionDelta, onDetail }: {
+export function ResultHoldDetails({ result, historySelection, coverageMatrix, progressSummary, nextUserAction, decisionDelta, earlierRound, onDetail }: {
   result: Record<string, unknown>; historySelection?: HistorySelection; coverageMatrix?: CoverageMatrix | null;
   progressSummary?: UserProgressSummary | null; nextUserAction?: NextUserAction | null; decisionDelta?: DecisionDelta | null;
+  /** A saved round before the latest one: its answer checks are not sent, and never will be. */
+  earlierRound?: boolean;
   onDetail: (detail: ResearchDetail) => void;
 }) {
   const language = useResultLanguage();
@@ -39,7 +41,7 @@ export function ResultHoldDetails({ result, historySelection, coverageMatrix, pr
   ];
   // Open by default (the mock-up R1 shows it open); the header tags keep the counts visible once the reader folds it.
   return <Disclosure className="result-hold-details" label={label} defaultOpen>
-    {status && <AnswerHold status={status} coverage={coverageMatrix} facts={<ConfirmedFacts result={result} onCite={cite}/>}/>}
+    {status && <AnswerHold status={status} coverage={coverageMatrix} earlierRound={earlierRound} facts={<ConfirmedFacts result={result} onCite={cite}/>}/>}
     <ResearchFollowupSummary answerEvidenceCount={selectedEvidenceCount(result)} progress={progressSummary} coverage={coverageMatrix} action={nextUserAction} delta={decisionDelta}
       onOpenEvidence={historySelection ? () => onDetail({ kind: "evidence", result, historySelection }) : undefined}/>
     {gaps.length > 0 && (

@@ -2,7 +2,6 @@ import type { ColumnOf } from "../withColumns";
 import type { workspaceDetailMessages } from "../workspaceDetailMessages";
 
 export const workspaceDetailJa: ColumnOf<typeof workspaceDetailMessages> = {
-  "workspace.continueHeading": "調査を続けるか、新しい問題を始めてください。",
   "workspace.authorizedRead": "アクセス権限の範囲内で、保存済みの調査を引き続き読めます。",
   "workspace.readOnlyHold": "権限の範囲内で、保存済みの調査は引き続き利用できます。新しいモデルの実行と同意の変更は保留されています。",
   "workspace.resumeFailed": "調査を再開できませんでした。",

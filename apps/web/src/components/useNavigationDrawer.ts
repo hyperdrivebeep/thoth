@@ -60,4 +60,3 @@ export function useNavigationDrawer() {
 }
 
 export type NavigationDrawer = ReturnType<typeof useNavigationDrawer>;
-

@@ -8,7 +8,6 @@ import { selectionKey, type HistoryKind, type HistoryScope, type HistorySelectio
 import { HistoryDetail } from "./HistoryDetail";
 import { HistoryTimeline } from "./HistoryTimeline";
 import { Disclosure } from "../Disclosure";
-import { eyebrowLabel } from "../statusLabels";
 import { ProjectReviewEmptyNote, ProjectReviewList } from "./ProjectReviewList";
 import { DecisionDeltaComparison } from "./DecisionDeltaComparison";
 import { useReadAccessProtection } from "../useReadAccessProtection";
@@ -118,7 +117,7 @@ export function ResearchHistoryWorkspace({ projectId, threadId, requestDigest, i
   return <section className={`research-history ${compact ? "history-compact" : ""}`} aria-label={t("workspace.history")}>
     {import.meta.env.VITE_THOTH_TEST_MODE === "true" && <Callout compact intent="warning" className="history-test-banner">{t("historyWorkspace.testMode")}</Callout>}
     {/* The panel has its own title ("변경 이력"); a second, different one inside it read as another feature. */}
-    {!compact && <header className="workspace-heading history-heading"><div><p className="eyebrow">{eyebrowLabel("RESEARCH HISTORY")}</p><h1>{kinds?.length === 1 && kinds[0] === "MEMORY" ? t("result.memory") : t("workspace.history")}</h1><p>{t("historyWorkspace.preserve")}</p></div>
+    {!compact && <header className="workspace-heading history-heading"><div><h1>{kinds?.length === 1 && kinds[0] === "MEMORY" ? t("result.memory") : t("workspace.history")}</h1><p>{t("historyWorkspace.preserve")}</p></div>
       {!initialSelection && !requestDigest && threadId && <div className="history-scope" role="group" aria-label={t("historyWorkspace.scope")}><Button small active={!allProject} onClick={() => setAllProject(false)}>{t("historyWorkspace.session")}</Button><Button small active={allProject} onClick={() => setAllProject(true)}>{t("historyWorkspace.project")}</Button></div>}
     </header>}
     {compact && initialSelection

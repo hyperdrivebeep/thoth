@@ -2,7 +2,6 @@ import type { ColumnOf } from "../withColumns";
 import type { workspaceDetailMessages } from "../workspaceDetailMessages";
 
 export const workspaceDetailZh: ColumnOf<typeof workspaceDetailMessages> = {
-  "workspace.continueHeading": "继续你的研究，或开始一个新问题。",
   "workspace.authorizedRead": "在你的访问权限范围内，仍可阅读已保存的研究。",
   "workspace.readOnlyHold": "在你的权限范围内，已保存的研究仍可使用。新的模型运行和同意变更已暂缓。",
   "workspace.resumeFailed": "无法继续研究。",
