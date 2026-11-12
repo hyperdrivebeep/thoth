@@ -442,6 +442,44 @@ button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px soli
   color: var(--muted);
 }
 
+/* A conversation in the project list: its name and, next to it, its menu. */
+.thread-nav-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+.thread-nav-row > .thread-button {
+  flex: 1;
+  min-width: 0;
+}
+.thread-nav-row .bp6-popover-target > .bp6-button {
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* Evidence from a source that was disconnected afterwards. */
+.status-badge.detached-source {
+  color: var(--muted);
+  border: 1px dashed var(--line);
+}
+
+.detached-sources {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.confirm-dialog p,
+.rename-dialog p {
+  line-height: 1.6;
+}
+.rename-dialog label {
+  display: grid;
+  gap: 6px;
+}
+
 /* Text for a screen reader that the screen says more briefly. */
 /* The small labels of the project list keep their capital look in English; other scripts are unaffected. */
 .workstation .brand span,

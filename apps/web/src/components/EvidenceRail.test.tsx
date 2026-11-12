@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { EvidenceRail } from "./EvidenceRail";
+import { DetachedSourcesContext } from "./detachedSources";
 import type { EvidenceSpan } from "../types";
 
 const row = (locator: EvidenceSpan["locator"], text: string): EvidenceSpan => ({
@@ -18,6 +19,30 @@ describe("EvidenceRail position of a table row", () => {
     expect(html).toContain("line 4 · R4C1:R4C6");
     expect(html).toContain("R6C2");
     expect(html).not.toContain("구조 위치 없음");
+  });
+});
+
+describe("EvidenceRail and a source that was disconnected later", () => {
+  const evidence = [
+    { ...row({ line: 1 }, "from the connected source"), span_id: "span:kept", artifact_id: "artifact:kept" },
+    { ...row({ line: 2 }, "from the disconnected source"), span_id: "span:gone", artifact_id: "artifact:gone" },
+  ];
+  const marked = (html: string) => html.split("<article").filter(part => part.includes("지금은 연결 해제됨"));
+
+  it("keeps the evidence and marks only what came from the disconnected source", () => {
+    const html = renderToStaticMarkup(
+      <DetachedSourcesContext.Provider value={new Set(["artifact:gone"])}>
+        <EvidenceRail evidence={evidence} />
+      </DetachedSourcesContext.Provider>,
+    );
+    expect(html).toContain("from the connected source");
+    expect(html).toContain("from the disconnected source");
+    expect(marked(html)).toHaveLength(1);
+    expect(marked(html)[0]).toContain("from the disconnected source");
+  });
+
+  it("marks nothing where no source was disconnected", () => {
+    expect(marked(renderToStaticMarkup(<EvidenceRail evidence={evidence} />))).toHaveLength(0);
   });
 });
 

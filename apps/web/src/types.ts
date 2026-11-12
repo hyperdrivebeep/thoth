@@ -13,6 +13,10 @@ export type WorkThread = {
   project_id: string;
   cycle_id: string;
   problem: string;
+  /** The name shown in the list; the first question until a person renames the conversation. */
+  display_name?: string;
+  /** The version a rename has to name; missing only in records written before it was listed. */
+  revision?: number;
   lifecycle: string;
   execution_state: string;
   current_object_ids: string[];

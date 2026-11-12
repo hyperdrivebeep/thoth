@@ -1,4 +1,72 @@
 export const workspaceMessages = {
+  "manage.rename": {
+    "ko": "이름 바꾸기",
+    "en": "Rename"
+  },
+  "manage.renameProjectTitle": {
+    "ko": "프로젝트 이름 바꾸기",
+    "en": "Rename project"
+  },
+  "manage.renameThreadTitle": {
+    "ko": "대화 이름 바꾸기",
+    "en": "Rename conversation"
+  },
+  "manage.nameLabel": {
+    "ko": "새 이름",
+    "en": "New name"
+  },
+  "manage.threadNameNotice": {
+    "ko": "질문 원문은 바뀌지 않습니다. 목록과 제목에 보이는 이름만 바뀝니다.",
+    "en": "The original question is not changed. Only the name shown in the list and the title changes."
+  },
+  "manage.save": {
+    "ko": "저장",
+    "en": "Save"
+  },
+  "manage.cancel": {
+    "ko": "취소",
+    "en": "Cancel"
+  },
+  "manage.renameFailed": {
+    "ko": "이름을 바꾸지 못했습니다.",
+    "en": "The name could not be changed."
+  },
+  "manage.threadChanged": {
+    "ko": "그 사이에 대화가 바뀌었습니다. 목록을 다시 읽었으니 한 번 더 시도하세요.",
+    "en": "The conversation changed in the meantime. The list was read again; please try once more."
+  },
+  "manage.archiveConfirm": {
+    "ko": "보관",
+    "en": "Archive"
+  },
+  "sources.disconnect": {
+    "ko": "연결 해제",
+    "en": "Disconnect"
+  },
+  "sources.disconnectKeeps": {
+    "ko": "이 자료는 새 질문에 쓰이지 않습니다. 파일과 이미 만든 답은 지워지지 않습니다.",
+    "en": "This source will not be used for new questions. The file and the answers already made are not deleted."
+  },
+  "sources.disconnectReview": {
+    "ko": "이 프로젝트에서 이미 만든 답은 모두 \"재검토 필요\"로 표시됩니다. 다시 쓰려면 같은 파일을 다시 연결합니다.",
+    "en": "Every answer already made in this project will be marked \"Review needed\". To use the source again, connect the same file again."
+  },
+  "sources.disconnectFailed": {
+    "ko": "연결을 해제하지 못했습니다.",
+    "en": "The source could not be disconnected."
+  },
+  "sources.detachedNotice": {
+    "ko": "새 질문에는 쓰이지 않습니다. 다시 쓰려면 같은 파일을 다시 연결하세요.",
+    "en": "These are not used for new questions. To use one again, connect the same file again."
+  },
+  "evidenceRail.detached": {
+    "ko": "지금은 연결 해제됨",
+    "en": "Now disconnected"
+  },
+  "progress.stopTitle": {
+    "ko": "조사 중단",
+    "en": "Stop research"
+  },
   "workspace.newProject": {
     "ko": "새 프로젝트",
     "en": "New project"

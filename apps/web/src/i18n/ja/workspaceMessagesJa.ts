@@ -2,6 +2,23 @@ import type { ColumnOf } from "../withColumns";
 import type { workspaceMessages } from "../workspaceMessages";
 
 export const workspaceJa: ColumnOf<typeof workspaceMessages> = {
+  "manage.rename": "名前を変更",
+  "manage.renameProjectTitle": "プロジェクト名を変更",
+  "manage.renameThreadTitle": "会話の名前を変更",
+  "manage.nameLabel": "新しい名前",
+  "manage.threadNameNotice": "元の質問は変わりません。一覧とタイトルに表示される名前だけが変わります。",
+  "manage.save": "保存",
+  "manage.cancel": "キャンセル",
+  "manage.renameFailed": "名前を変更できませんでした。",
+  "manage.threadChanged": "その間に会話が変更されました。一覧を読み込み直しましたので、もう一度お試しください。",
+  "manage.archiveConfirm": "アーカイブ",
+  "sources.disconnect": "接続を解除",
+  "sources.disconnectKeeps": "この資料は新しい質問には使われません。ファイルと作成済みの回答は削除されません。",
+  "sources.disconnectReview": "このプロジェクトで作成済みの回答は、すべて「再確認が必要」と表示されます。もう一度使うには、同じファイルを再度接続します。",
+  "sources.disconnectFailed": "接続を解除できませんでした。",
+  "sources.detachedNotice": "新しい質問には使われません。もう一度使うには、同じファイルを再度接続してください。",
+  "evidenceRail.detached": "現在は接続解除済み",
+  "progress.stopTitle": "調査を停止",
   "workspace.newProject": "新しいプロジェクト",
   "workspace.projectName": "プロジェクト名",
   "workspace.namePlaceholder": "調査する問題またはプロジェクト名",

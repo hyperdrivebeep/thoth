@@ -1,12 +1,16 @@
 import { message } from "../i18n/formatMessages";
 import { t, useTranslation } from "../i18n/locale";
 import { sentenceGap } from "../i18n/sentences";
-import { Button, Callout, Collapse, Icon, InputGroup, PopoverNext, Tab, Tabs, Tag } from "@blueprintjs/core";
+import { Button, Callout, Collapse, Icon, InputGroup, Tab, Tabs, Tag } from "@blueprintjs/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { rpc } from "../api/rpcClient";
-import { rereadProjects } from "../api/projectActionFailure";
-import { ProjectActionNotice } from "./ProjectActionNotice";
+import { connectedArtifacts, detachedArtifactIds } from "../api/sourceBindings";
+import { DetachedSourcesContext } from "./detachedSources";
+import { threadName } from "../api/threadName";
+import { ProjectNavItem } from "./ProjectNavItem";
+import { ThreadNavItem } from "./ThreadNavItem";
+import { useProjectManagement } from "./useProjectManagement";
 import { captureProjectCreation } from "../api/projectCreation";
 import type { WorkspaceReady } from "../api/research";
 import { validWorkspaceId, type BrowserScope } from "../api/localWorkspacePersistence";
@@ -135,11 +139,12 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
   const sourcesDenied = useReadAccessProtection(["sources", project.project_id], sources.error);
   const sourceData = sourcesDenied ? undefined : sources.data;
   const status = session.research.data?.value;
+  const detachedSources = useMemo(() => detachedArtifactIds(sourceData?.value), [sourceData]);
   const queryError = session.research.error ?? sources.error;
   const openSettings = (target?: "consent") => { setFocusConsent(target === "consent"); onPage("settings"); };
   // A thread with nothing sent yet: the readiness card carries the setup notice, so the composer does not repeat it.
   const freshConversation = !threadId && !status?.request && status?.operation_state !== "RUNNING";
-  const readiness: ReadinessFacts = { sourceCount: sourceData ? sourceData.value.artifacts.length : null, modelConnected, consent, cutoffAt: project.cutoff_at, executionReady, hosted };
+  const readiness: ReadinessFacts = { sourceCount: sourceData ? connectedArtifacts(sourceData.value).length : null, modelConnected, consent, cutoffAt: project.cutoff_at, executionReady, hosted };
   if (readSuspended) return <WorkspaceContent className="conversation-page">
     {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)}{sentenceGap()}{t("workspace.authorizedRead")}</Callout>}
     {page==="research"&&<ResearchComposer session={session} projectId={project.project_id} threadId={threadId} epoch={capturedEpoch}
@@ -147,7 +152,7 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
   return <WorkspaceContent ref={contentRef} className={page==="research"?"conversation-page":undefined}>
     {setupIssue && <Callout compact intent="warning" role="alert">{workspaceSetupIssueText(setupIssue)}{sentenceGap()}{t("workspace.readOnlyHold")}</Callout>}
     {page==="research" ? <div className={`conversation-layout ${panelOpen?"detail-open":""}`}><div className="conversation-center">
-      <header className="conversation-heading"><h1>{status?.problem??(threadId?t("workspace.continue"):t("workspace.newQuestion"))}</h1></header>
+      <header className="conversation-heading"><h1>{threadName(status)||(threadId?t("workspace.continue"):t("workspace.newQuestion"))}</h1></header>
       {import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Callout compact intent="warning" className="test-mode-banner">{t("workspace.testModeNotice")}</Callout>}
       <div className="conversation-scroll"><ConversationTimeline projectId={project.project_id} threadId={threadId} status={status} sourceUris={(sourceData?.value.artifacts??[]).map(item=>item.source_uri)} onDetail={openDetail} queuedInstruction={session.queuedNotice} onContinue={()=>document.getElementById("live-problem")?.focus()} onRetry={question=>{session.setProblem(question);document.getElementById("live-problem")?.focus();}} onResume={operationId=>session.resume.mutate(operationId)} resuming={session.resume.isPending} onOpenHistory={()=>onPage("records")} onOpenSettings={()=>openSettings()} onOpenTrace={onOpenTrace}
         emptyNotice={<ProjectReadinessCard facts={readiness} onOpenSettings={openSettings} onManageSources={()=>onPage("resources")}/>}/>
@@ -157,7 +162,7 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
       <ResearchComposer session={session} projectId={project.project_id} threadId={threadId} epoch={capturedEpoch} onAttach={openResourcePanel}
         onOpenSettings={openSettings} hosted={hosted} executionReady={executionReady} setupNoticeShown={freshConversation}
         consentMissing={!hosted && consent==="UNDECIDED"} modelConnected={modelConnected}/>
-    </div>{panelOpen && !(session.researchReadDenied && detailFromResearch.current)&&<ResearchSidePanel tab={sideTab} onTab={setSideTab} detail={detail} onClose={closeDetail} sources={sourceData?.value.artifacts??[]} project={project} thread={{thread_id:threadId,problem:status?.problem??t("workspace.research"),current_object_ids:status?.current_object_ids??[]}} onOpenRecords={()=>onPage("records")} onManageResources={()=>{closeDetail();onPage("resources");}}/>}</div> :
+    </div>{panelOpen && !(session.researchReadDenied && detailFromResearch.current)&&<DetachedSourcesContext.Provider value={detachedSources}><ResearchSidePanel tab={sideTab} onTab={setSideTab} detail={detail} onClose={closeDetail} sources={connectedArtifacts(sourceData?.value)} project={project} thread={{thread_id:threadId,problem:status?.problem??t("workspace.research"),current_object_ids:status?.current_object_ids??[]}} onOpenRecords={()=>onPage("records")} onManageResources={()=>{closeDetail();onPage("resources");}}/></DetachedSourcesContext.Provider>}</div> :
     page==="capabilities" && !hosted ? <><Button minimal icon="arrow-left" onClick={()=>onPage("settings")}>{t("workspace.backSettings")}</Button><CapabilityWorkbench projectId={project.project_id} threadId={threadId} initialNamespace={catalogNamespace}/></> :
     page==="trace" ? <TracePage projectId={project.project_id} responseLanguage={session.responseLanguage} onInvestigate={onInvestigate} focusRow={traceFocus}/> : page==="records" ? <ResearchHistoryWorkspace key={`${project.project_id}:${threadId}`} projectId={project.project_id} threadId={threadId}
       onUseQuestion={session.problem.trim() ? undefined : question=>{session.setProblem(question);onPage("research");}}/> :
@@ -165,24 +170,6 @@ function ProjectSession({ project, threadId, epoch, page, onPage, onAdmitted, on
     page==="resources" ? <ResourcesPage project={project} hosted={hosted} citation={citation} sourceData={sourceData} sourcesError={sources.error} sourcesDenied={sourcesDenied} onPage={onPage}/> :
     <SettingsPage project={project} threadId={threadId} hosted={hosted} workspaceId={workspaceId} storageScope={storageScope} session={session} capturedEpoch={capturedEpoch} status={status} consent={consent} focusConsent={focusConsent} onConsentFocused={clearConsentFocus} onPage={onPage} onOpenCatalog={()=>{setCatalogNamespace("all");onPage("capabilities");}}/>}
   </WorkspaceContent>;
-}
-
-function ProjectNavItem({ project, active, removing, onOpen, onRemove }: {
-  project: ProjectSummary;
-  active: boolean;
-  removing: boolean;
-  onOpen: () => void;
-  onRemove: () => void;
-}) {
-  const [menuOpen,setMenuOpen] = useState(false);
-  return <div className={`project-nav-row ${active ? "active" : ""}`}>
-    <Button minimal alignText="left" className={`project-button ${active ? "active" : ""}`} onClick={onOpen}>
-      <Icon icon={active ? "folder-open" : "folder-close"}/><span><strong>{project.name}</strong></span>
-    </Button>
-    <PopoverNext isOpen={menuOpen} onInteraction={setMenuOpen} placement="right-start" arrow={false} content={<div className="project-inline-menu" role="menu"><Button fill alignText="left" minimal role="menuitem" icon="box" disabled={removing} onClick={()=>{setMenuOpen(false);onRemove();}}>{t("workspace.removeProject")}</Button></div>}>
-      <Button small minimal icon="more" aria-label={message("projectMenu", project.name)} aria-expanded={menuOpen} loading={removing}/>
-    </PopoverNext>
-  </div>;
 }
 
 export function ProjectLanding({ projects, loading = false, contextRestoreIssue = null, setupIssue = null, onOpen, onCreated, openCreate = false, onOpenCreateHandled }: {
@@ -248,39 +235,39 @@ export function LiveProjectWorkspace() {
   const visibleThreads = threadsQuery.isFetching ? [] : threads;
   const health = useQuery({queryKey:["health"],queryFn:async()=>{const response=await fetch("/healthz",{credentials:"same-origin"});if(!response.ok)throw new Error(`HTTP ${response.status}`);return await response.json() as {status:string;version:string};},retry:false,refetchInterval:30000});
   const shellSources = useProjectSources(project?.project_id ?? "", Boolean(project));
-  const archiveProject = useMutation({
-    mutationFn: (target: ProjectSummary) => rpc<ProjectSummary>("project/archive", {project_id: target.project_id, expected_revision: target.revision}, crypto.randomUUID()),
-    onSuccess: async (_response, target) => {
-      await client.invalidateQueries({queryKey:["projects"]});
-      await client.invalidateQueries({queryKey:["threads", target.project_id]});
+  const management = useProjectManagement({
+    projects,
+    threads,
+    onArchived: target => {
       if (context.projectId === target.project_id) chooseProject("");
     },
-    // A stale revision is the usual reason. Read the list again so the next try uses the current one.
-    onError: rereadProjects(client),
   });
-  const removeProject = (target: ProjectSummary) => {
-    if (!window.confirm(message("archiveProject", target.name))) return;
-    archiveProject.mutate(target);
-  };
   const gate = workspaceGate({ readyQuery, ready, hosted, scopeKey, restoredFor, projectsQuery, projectsCount: projects.length, threadsQuery, hasProject: Boolean(project),
     threadId: context.threadId, threadListed: threads.some(item=>item.thread_id===context.threadId), admissionPending: pendingAdmission.current===context.threadId });
   if (gate || !ready || !scopeKey) return gate;
   const executionReady = executionReadiness(ready, hosted);
-  const sourceCount = project && shellSources.data ? shellSources.data.value.artifacts.length : null;
+  const sourceCount = project && shellSources.data ? connectedArtifacts(shellSources.data.value).length : null;
   return <WorkspacePageContext.Provider value={page}><main className="workstation conversation-workstation bp6-dark">
     <aside className="navigation-rail">
       <Brand hosted={hosted} />
       <Button icon="plus" intent="primary" className="new-project-button" onClick={()=>{chooseProject("");setOpenCreate(true);}}>{t("workspace.newProject")}</Button>
       <InputGroup small leftIcon="search" aria-label={t("workspace.searchProjects")} placeholder={t("workspace.searchPlaceholder")} value={search} onChange={event=>setSearch(event.target.value)}/>
       <section className="nav-section"><div className="nav-section-heading"><p className="nav-label">{t("nav.projects")}</p><Button small minimal icon="refresh" aria-label={t("workspace.refreshProjects")} onClick={()=>void projectsQuery.refetch()}/></div>
-        <ProjectActionNotice error={archiveProject.error} fallbackKey="archive.archiveFailed"/>
         {visibleProjects.filter(item=>`${item.name} ${item.project_id}`.toLowerCase().includes(search.toLowerCase())).flatMap(item=>[
-          <ProjectNavItem project={item} active={item.project_id===context.projectId} removing={archiveProject.isPending} key={item.project_id} onOpen={()=>openProject(item.project_id)} onRemove={()=>removeProject(item)}/>,
+          <ProjectNavItem project={item} active={item.project_id===context.projectId} removing={management.archiving} key={item.project_id} onOpen={()=>openProject(item.project_id)} onRename={()=>management.askRenameProject(item)} onRemove={()=>management.askArchive(item)}/>,
           item.project_id===context.projectId ? <div className="project-sessions" key={`${item.project_id}-sessions`}>
             <Button small minimal icon="plus" className="new-session-button" aria-label={t("workspace.newTask")} onClick={()=>chooseThread("")}>{t("workspace.newSession")}</Button>
             {threadsQuery.isPending&&<p className="empty-copy">{t("workspace.loadingSessions")}</p>}
             {threadsQuery.error&&<Callout compact intent="danger" role="alert">{threadsQuery.error.message}</Callout>}
-            {visibleThreads.map(thread=><Button minimal alignText="left" className={`thread-button ${thread.thread_id===context.threadId?"active":""}`} key={thread.thread_id} onClick={()=>chooseThread(thread.thread_id)}><Icon icon="chat"/><span><strong>{thread.problem||t("workspace.untitledSession")}</strong><small>{thread.execution_state==="RUNNING"?t("workspace.running"):thread.execution_state==="PAUSED"?t("workspace.paused"):t("workspace.reopen")}</small></span></Button>)}
+            {visibleThreads.map(thread => (
+              <ThreadNavItem
+                thread={thread}
+                active={thread.thread_id === context.threadId}
+                key={thread.thread_id}
+                onOpen={() => chooseThread(thread.thread_id)}
+                onRename={() => management.askRenameThread(thread)}
+              />
+            ))}
             {!threadsQuery.isPending&&!threadsQuery.error&&threads.length===0&&<p className="empty-copy">{t("workspace.firstQuestion")}</p>}
           </div> : null,
         ])}
@@ -288,7 +275,7 @@ export function LiveProjectWorkspace() {
       </section>
       <div className="sidebar-bottom"><Button minimal alignText="left" icon={hosted?"info-sign":"settings"} onClick={()=>setPage("settings")}>{hosted?t("workspace.operations"):t("workspace.settingsTools")}</Button></div>
     </aside>
-    <header className="workstation-topbar"><div className="context-path"><Icon icon="projects"/><span>{t("nav.workspaceRoot")}</span>{import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Tag intent="warning">{t("workspace.testMode")}</Tag>}<span>/</span><strong>{projectsQuery.isFetching?t("workspace.checkingProject"):project?.name??t("workspace.selectProject")}</strong>{context.threadId&&<><span>/</span><small>{threadsQuery.isFetching?t("workspace.checkingTask"):visibleThreads.find(item=>item.thread_id===context.threadId)?.problem??t("workspace.selectedTask")}</small></>}</div>
+    <header className="workstation-topbar"><div className="context-path"><Icon icon="projects"/><span>{t("nav.workspaceRoot")}</span>{import.meta.env.VITE_THOTH_TEST_MODE==="true"&&<Tag intent="warning">{t("workspace.testMode")}</Tag>}<span>/</span><strong>{projectsQuery.isFetching?t("workspace.checkingProject"):project?.name??t("workspace.selectProject")}</strong>{context.threadId&&<><span>/</span><small>{threadsQuery.isFetching?t("workspace.checkingTask"):threadName(visibleThreads.find(item=>item.thread_id===context.threadId))||t("workspace.selectedTask")}</small></>}</div>
       <div className="header-status">{project&&projectCutoffText(project.cutoff_at)&&<Tag minimal icon="time" title={t("workspace.cutoffHint")}>{message("cutoff", projectCutoffText(project.cutoff_at)!)}</Tag>}<Tag minimal intent={health.data?.status==="ok"?"success":health.error?"danger":"none"}>{health.data?.status==="ok"?t("workspace.serverConnected"):health.error?t("workspace.serverFailed"):t("workspace.checkingConnection")}</Tag>
         {!hosted&&!executionReady&&<Button small intent="warning" className="setup-needed-button" icon="warning-sign" endIcon="arrow-right" title={t("workspace.openSetup")} onClick={()=>setPage("settings")}>{t("workspace.setupNeeded")}</Button>}
         {!hosted&&contextStoreFailed&&<Tag minimal intent="warning">{t("workspace.locationUnsaved")}</Tag>}{missingSelection&&<Tag minimal intent="warning">{message("missingSelection", missingSelection)}</Tag>}<Button small minimal icon="refresh" aria-label={t("workspace.refreshContext")} onClick={()=>void client.invalidateQueries()}/></div></header>
@@ -302,5 +289,6 @@ export function LiveProjectWorkspace() {
       rowOrigin={rowOrigin} onOriginDone={clearRowOrigin} onInvestigate={investigate} traceFocus={traceFocus} onOpenTrace={openTraceRow}/></WorkspaceErrorBoundary> :
       isTimelineExampleRequested() && page === "research" ? <TimelineExamplePane /> :
       <WorkspaceContent>{missingSelection&&<Callout intent="warning" role="status">{missingSelection==="project"?t("workspace.missingProject"):t("workspace.taskSelectionNeeded")}{sentenceGap()}{t("workspace.draftNotSent")}</Callout>}{contextStoreFailed&&!hosted&&<Callout intent="warning" role="status">{t("workspace.locationFailure")}</Callout>}{!hosted&&!validWorkspaceId(workspaceId)&&<Callout intent="warning" role="status">{t("workspace.identityMissing")}</Callout>}{page==="settings"?<>{hosted?<Callout icon="info-sign" title={t("workspace.chooseProjectNotice")}>{t("workspace.selectForInfo")}</Callout>:<section className="detail-card"><h2>{t("workspace.connectModel")}</h2><ModelCredentialPanel projectId="system:workspace" workspaceId={workspaceId ?? undefined}/><p className="muted">{t("workspace.selectForDefaults")}</p></section>}<LanguageSettingsCard scope={storageScope}/></>:<ProjectLanding openCreate={openCreate} onOpenCreateHandled={()=>setOpenCreate(false)} contextRestoreIssue={contextRestoreIssue} setupIssue={setupIssue} projects={visibleProjects} loading={projectsQuery.isPending||projectsQuery.isFetching} onOpen={openProject} onCreated={projectId=>{if(renderedEpoch===epoch.current)chooseProject(projectId,"resources");}}/>}</WorkspaceContent>}
+    {management.dialog}
   </main></WorkspacePageContext.Provider>;
 }
